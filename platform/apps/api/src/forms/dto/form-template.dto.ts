@@ -77,4 +77,3 @@ export class UpdateFormSubmissionDto {
   @IsObject()
   responses?: Record<string, unknown> | null;
 }
-

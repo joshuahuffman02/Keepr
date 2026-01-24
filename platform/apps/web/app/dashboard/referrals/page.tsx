@@ -21,7 +21,7 @@ import {
   Sparkles,
   TrendingUp,
   Clock,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { XLogo } from "@/components/icons/XLogo";
 
@@ -65,18 +65,23 @@ export default function ReferralsPage() {
   const [organizationId, setOrganizationId] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:organizationId") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:organizationId") : null;
     if (stored) {
       setOrganizationId(stored);
     }
   }, []);
 
   // Fetch referral data
-  const { data: referralData, isLoading, error } = useQuery<ReferralStats>({
+  const {
+    data: referralData,
+    isLoading,
+    error,
+  } = useQuery<ReferralStats>({
     queryKey: ["referral-stats", organizationId],
     queryFn: async () => {
       const res = await fetch(`${API_BASE}/organizations/${organizationId}/referrals`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
       });
       if (!res.ok) {
         // Return mock data if endpoint doesn't exist yet
@@ -89,14 +94,14 @@ export default function ReferralsPage() {
             totalSignups: 0,
             totalConversions: 0,
             pendingCredits: 0,
-            earnedCredits: 0
+            earnedCredits: 0,
           },
-          referrals: []
+          referrals: [],
         };
       }
       return res.json();
     },
-    enabled: !!organizationId
+    enabled: !!organizationId,
   });
 
   // Use stable fallback data if endpoint not ready
@@ -109,9 +114,9 @@ export default function ReferralsPage() {
       totalSignups: 0,
       totalConversions: 0,
       pendingCredits: 0,
-      earnedCredits: 0
+      earnedCredits: 0,
     },
-    referrals: []
+    referrals: [],
   };
 
   const handleCopyLink = async () => {
@@ -121,20 +126,24 @@ export default function ReferralsPage() {
       toast({ title: "Link copied!", description: "Share it with fellow campground owners." });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast({ title: "Copy failed", description: "Please copy the link manually.", variant: "destructive" });
+      toast({
+        title: "Copy failed",
+        description: "Please copy the link manually.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleShare = (platform: "email" | "x" | "facebook") => {
     const message = encodeURIComponent(
-      "I've been using Keepr to manage my campground and it's been great! Sign up with my referral link and we both get a $50 credit:"
+      "I've been using Keepr to manage my campground and it's been great! Sign up with my referral link and we both get a $50 credit:",
     );
     const link = encodeURIComponent(displayData.referralLink);
 
     const urls: Record<string, string> = {
       email: `mailto:?subject=${encodeURIComponent("Try Keepr - Campground Management Software")}&body=${message}%0A%0A${link}`,
       x: `https://x.com/intent/tweet?text=${message}&url=${link}`,
-      facebook: `https://www.facebook.com/sharer/sharer.php?u=${link}&quote=${message}`
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${link}&quote=${message}`,
     };
 
     window.open(urls[platform], platform === "email" ? "_self" : "_blank");
@@ -155,7 +164,7 @@ export default function ReferralsPage() {
     return new Date(dateStr).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
-      year: "numeric"
+      year: "numeric",
     });
   };
 
@@ -173,9 +182,11 @@ export default function ReferralsPage() {
               Earn $50 in credits for each campground you refer that gets their first booking
             </p>
           </div>
-          <Badge variant="secondary" className="flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700">
-            <Sparkles className="h-3 w-3" />
-            ${displayData.stats.earnedCredits} Earned
+          <Badge
+            variant="secondary"
+            className="flex items-center gap-1 px-3 py-1 bg-emerald-50 text-emerald-700"
+          >
+            <Sparkles className="h-3 w-3" />${displayData.stats.earnedCredits} Earned
           </Badge>
         </div>
 
@@ -183,7 +194,9 @@ export default function ReferralsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-foreground">{displayData.stats.totalClicks}</div>
+              <div className="text-2xl font-bold text-foreground">
+                {displayData.stats.totalClicks}
+              </div>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <TrendingUp className="h-3 w-3" />
                 Link Clicks
@@ -193,7 +206,9 @@ export default function ReferralsPage() {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-blue-600">{displayData.stats.totalSignups}</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {displayData.stats.totalSignups}
+              </div>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Users className="h-3 w-3" />
                 Sign Ups
@@ -203,7 +218,9 @@ export default function ReferralsPage() {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-emerald-600">{displayData.stats.totalConversions}</div>
+              <div className="text-2xl font-bold text-emerald-600">
+                {displayData.stats.totalConversions}
+              </div>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Check className="h-3 w-3" />
                 Conversions
@@ -213,7 +230,9 @@ export default function ReferralsPage() {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-amber-600">${displayData.stats.pendingCredits}</div>
+              <div className="text-2xl font-bold text-amber-600">
+                ${displayData.stats.pendingCredits}
+              </div>
               <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
                 <Clock className="h-3 w-3" />
                 Pending
@@ -230,7 +249,8 @@ export default function ReferralsPage() {
               Your Referral Link
             </CardTitle>
             <CardDescription>
-              Share this link with other campground owners. When they sign up and receive their first booking, you both get $50 in credits.
+              Share this link with other campground owners. When they sign up and receive their
+              first booking, you both get $50 in credits.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -256,15 +276,26 @@ export default function ReferralsPage() {
 
             {/* Share Buttons */}
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={() => handleShare("email")} className="flex-1 md:flex-none">
+              <Button
+                variant="outline"
+                onClick={() => handleShare("email")}
+                className="flex-1 md:flex-none"
+              >
                 <Mail className="h-4 w-4 mr-2" />
                 Email
               </Button>
-              <Button variant="outline" onClick={() => handleShare("x")} className="flex-1 md:flex-none">
-                <XLogo className="h-4 w-4 mr-2" />
-                X
+              <Button
+                variant="outline"
+                onClick={() => handleShare("x")}
+                className="flex-1 md:flex-none"
+              >
+                <XLogo className="h-4 w-4 mr-2" />X
               </Button>
-              <Button variant="outline" onClick={() => handleShare("facebook")} className="flex-1 md:flex-none">
+              <Button
+                variant="outline"
+                onClick={() => handleShare("facebook")}
+                className="flex-1 md:flex-none"
+              >
                 <Facebook className="h-4 w-4 mr-2" />
                 Facebook
               </Button>
@@ -319,9 +350,7 @@ export default function ReferralsPage() {
               <Users className="h-5 w-5" />
               Referral History
             </CardTitle>
-            <CardDescription>
-              Track your referrals and earned credits
-            </CardDescription>
+            <CardDescription>Track your referrals and earned credits</CardDescription>
           </CardHeader>
           <CardContent>
             {displayData.referrals.length === 0 ? (
@@ -360,8 +389,8 @@ export default function ReferralsPage() {
                         {referral.status === "converted"
                           ? "Converted"
                           : referral.status === "signed_up"
-                          ? "Signed Up"
-                          : "Clicked"}
+                            ? "Signed Up"
+                            : "Clicked"}
                       </Badge>
                       {referral.status === "converted" && (
                         <span className="font-semibold text-emerald-600">

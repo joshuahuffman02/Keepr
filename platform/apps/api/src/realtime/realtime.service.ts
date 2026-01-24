@@ -151,47 +151,30 @@ export class RealtimeService {
 
   emitReservationCreated(campgroundId: string, data: ReservationEventData) {
     this.logger.debug(`Emitting reservation.created for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.RESERVATION_CREATED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.RESERVATION_CREATED, data);
   }
 
   emitReservationUpdated(campgroundId: string, data: ReservationEventData) {
     this.logger.debug(`Emitting reservation.updated for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.RESERVATION_UPDATED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.RESERVATION_UPDATED, data);
   }
 
-  emitReservationCancelled(campgroundId: string, data: { reservationId: string; guestName?: string }) {
+  emitReservationCancelled(
+    campgroundId: string,
+    data: { reservationId: string; guestName?: string },
+  ) {
     this.logger.debug(`Emitting reservation.cancelled for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.RESERVATION_CANCELLED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.RESERVATION_CANCELLED, data);
   }
 
   emitReservationCheckedIn(campgroundId: string, data: ReservationEventData) {
     this.logger.debug(`Emitting reservation.checked_in for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.RESERVATION_CHECKED_IN,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.RESERVATION_CHECKED_IN, data);
   }
 
   emitReservationCheckedOut(campgroundId: string, data: ReservationEventData) {
     this.logger.debug(`Emitting reservation.checked_out for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.RESERVATION_CHECKED_OUT,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.RESERVATION_CHECKED_OUT, data);
   }
 
   // ============================================
@@ -200,11 +183,7 @@ export class RealtimeService {
 
   emitSiteAvailabilityChanged(campgroundId: string, data: SiteAvailabilityEventData) {
     this.logger.debug(`Emitting site.availability for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.SITE_AVAILABILITY_CHANGED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.SITE_AVAILABILITY_CHANGED, data);
   }
 
   // ============================================
@@ -213,20 +192,12 @@ export class RealtimeService {
 
   emitPaymentReceived(campgroundId: string, data: PaymentEventData) {
     this.logger.debug(`Emitting payment.received for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.PAYMENT_RECEIVED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.PAYMENT_RECEIVED, data);
   }
 
   emitPaymentRefunded(campgroundId: string, data: PaymentEventData) {
     this.logger.debug(`Emitting payment.refunded for ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.PAYMENT_REFUNDED,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.PAYMENT_REFUNDED, data);
   }
 
   // ============================================
@@ -235,11 +206,7 @@ export class RealtimeService {
 
   emitDashboardMetrics(campgroundId: string, data: DashboardMetricsData) {
     // Use dashboard-specific room to reduce noise
-    this.gateway.emitToDashboard(
-      campgroundId,
-      RealtimeEvent.DASHBOARD_METRICS,
-      data
-    );
+    this.gateway.emitToDashboard(campgroundId, RealtimeEvent.DASHBOARD_METRICS, data);
   }
 
   // ============================================
@@ -253,18 +220,17 @@ export class RealtimeService {
 
   emitNotificationToCampground(campgroundId: string, data: NotificationData) {
     this.logger.debug(`Emitting notification to campground ${campgroundId}`);
-    this.gateway.emitToCampground(
-      campgroundId,
-      RealtimeEvent.NOTIFICATION_NEW,
-      data
-    );
+    this.gateway.emitToCampground(campgroundId, RealtimeEvent.NOTIFICATION_NEW, data);
   }
 
   // ============================================
   // Calendar Sync
   // ============================================
 
-  emitCalendarSync(campgroundId: string, data: { siteIds?: string[]; startDate?: string; endDate?: string }) {
+  emitCalendarSync(
+    campgroundId: string,
+    data: { siteIds?: string[]; startDate?: string; endDate?: string },
+  ) {
     this.logger.debug(`Emitting calendar.sync for ${campgroundId}`);
     this.gateway.emitToCampground(campgroundId, RealtimeEvent.CALENDAR_SYNC, data);
   }
@@ -275,29 +241,17 @@ export class RealtimeService {
 
   emitYieldMetricsUpdated(campgroundId: string, data: YieldMetricsUpdatedData) {
     this.logger.debug(`Emitting yield.metrics_updated for ${campgroundId}`);
-    this.gateway.emitToDashboard(
-      campgroundId,
-      RealtimeEvent.YIELD_METRICS_UPDATED,
-      data
-    );
+    this.gateway.emitToDashboard(campgroundId, RealtimeEvent.YIELD_METRICS_UPDATED, data);
   }
 
   emitYieldRecommendationGenerated(campgroundId: string, data: YieldRecommendationData) {
     this.logger.debug(`Emitting yield.recommendation_generated for ${campgroundId}`);
-    this.gateway.emitToDashboard(
-      campgroundId,
-      RealtimeEvent.YIELD_RECOMMENDATION_GENERATED,
-      data
-    );
+    this.gateway.emitToDashboard(campgroundId, RealtimeEvent.YIELD_RECOMMENDATION_GENERATED, data);
   }
 
   emitYieldForecastUpdated(campgroundId: string, data: YieldForecastUpdatedData) {
     this.logger.debug(`Emitting yield.forecast_updated for ${campgroundId}`);
-    this.gateway.emitToDashboard(
-      campgroundId,
-      RealtimeEvent.YIELD_FORECAST_UPDATED,
-      data
-    );
+    this.gateway.emitToDashboard(campgroundId, RealtimeEvent.YIELD_FORECAST_UPDATED, data);
   }
 
   // ============================================

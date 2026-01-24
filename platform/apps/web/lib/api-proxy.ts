@@ -18,10 +18,7 @@ export { API_BASE };
  * Generic API proxy function
  * Forwards requests from Next.js to the NestJS backend
  */
-export async function proxyToBackend(
-  req: NextRequest,
-  backendPath: string
-): Promise<NextResponse> {
+export async function proxyToBackend(req: NextRequest, backendPath: string): Promise<NextResponse> {
   const { searchParams } = new URL(req.url);
   const queryString = searchParams.toString();
   const url = `${API_BASE}/${backendPath}${queryString ? `?${queryString}` : ""}`;
@@ -100,9 +97,6 @@ export async function proxyToBackend(
     }
   } catch (err) {
     console.error(`[api-proxy][${req.method}] Network error for ${backendPath}:`, err);
-    return NextResponse.json(
-      { error: "Failed to connect to backend service" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to connect to backend service" }, { status: 500 });
   }
 }

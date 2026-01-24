@@ -5,7 +5,14 @@ import { CreatePolicyTemplateDto } from "./dto/create-policy-template.dto";
 import { UpdatePolicyTemplateDto } from "./dto/update-policy-template.dto";
 import { randomBytes, randomUUID } from "crypto";
 import { Prisma, SignatureDeliveryChannel, SignatureDocumentType } from "@prisma/client";
-import type { DocumentTemplate, Guest, Reservation, SignatureRequest, Site, SiteClass } from "@prisma/client";
+import type {
+  DocumentTemplate,
+  Guest,
+  Reservation,
+  SignatureRequest,
+  Site,
+  SiteClass,
+} from "@prisma/client";
 
 type PolicyRuleOperator =
   | "eq"
@@ -113,18 +120,20 @@ export type PolicyContext = {
   };
 };
 
-const DEFAULT_POLICY_CONFIG: Required<Pick<
-  PolicyConfig,
-  | "enforcement"
-  | "showDuringBooking"
-  | "requireSignature"
-  | "autoSend"
-  | "deliveryChannel"
-  | "reminderCadenceDays"
-  | "reminderMaxCount"
-  | "expiresAfterDays"
-  | "signerRequirement"
->> = {
+const DEFAULT_POLICY_CONFIG: Required<
+  Pick<
+    PolicyConfig,
+    | "enforcement"
+    | "showDuringBooking"
+    | "requireSignature"
+    | "autoSend"
+    | "deliveryChannel"
+    | "reminderCadenceDays"
+    | "reminderMaxCount"
+    | "expiresAfterDays"
+    | "signerRequirement"
+  >
+> = {
   enforcement: "post_booking",
   showDuringBooking: true,
   requireSignature: true,
@@ -133,7 +142,7 @@ const DEFAULT_POLICY_CONFIG: Required<Pick<
   reminderCadenceDays: 7,
   reminderMaxCount: 8,
   expiresAfterDays: 30,
-  signerRequirement: "primary_guest"
+  signerRequirement: "primary_guest",
 };
 
 const ALLOWED_SIGNATURE_TYPES = new Set<SignatureDocumentType>([
@@ -142,7 +151,7 @@ const ALLOWED_SIGNATURE_TYPES = new Set<SignatureDocumentType>([
   SignatureDocumentType.deposit,
   SignatureDocumentType.waiver,
   SignatureDocumentType.coi,
-  SignatureDocumentType.other
+  SignatureDocumentType.other,
 ]);
 
 type PolicySignatureResult = SignatureRequest | { request: SignatureRequest; signingUrl: string };
@@ -157,7 +166,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -215,7 +224,7 @@ const isDeliveryChannel = (value: unknown): value is NonNullable<PolicyConfig["d
 export class PoliciesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly signatures: SignaturesService
+    private readonly signatures: SignaturesService,
   ) {}
 
   private appBaseUrl() {
@@ -236,7 +245,7 @@ export class PoliciesService {
       reminderCadenceDays: raw.reminderCadenceDays ?? DEFAULT_POLICY_CONFIG.reminderCadenceDays,
       reminderMaxCount: raw.reminderMaxCount ?? DEFAULT_POLICY_CONFIG.reminderMaxCount,
       expiresAfterDays: raw.expiresAfterDays ?? DEFAULT_POLICY_CONFIG.expiresAfterDays,
-      signerRequirement: raw.signerRequirement ?? DEFAULT_POLICY_CONFIG.signerRequirement
+      signerRequirement: raw.signerRequirement ?? DEFAULT_POLICY_CONFIG.signerRequirement,
     };
   }
 
@@ -319,7 +328,7 @@ export class PoliciesService {
     if (!normalizedMode && rules.length === 0) return undefined;
     return {
       ...(normalizedMode ? { mode: normalizedMode } : {}),
-      rules
+      rules,
     };
   }
 
@@ -367,11 +376,7 @@ export class PoliciesService {
     const actual = this.getContextValue(context, rule.field);
     const op = rule.op;
     const value = rule.value;
-    const values = Array.isArray(rule.values)
-      ? rule.values
-      : value !== undefined
-        ? [value]
-        : [];
+    const values = Array.isArray(rule.values) ? rule.values : value !== undefined ? [value] : [];
 
     if (op === "exists") {
       return actual !== undefined && actual !== null;
@@ -416,27 +421,31 @@ export class PoliciesService {
       case "neq":
         return left !== right;
       case "gt":
-        return right !== null && right !== undefined
-          && typeof left === typeof right
-          && (typeof left === "number" || typeof left === "string")
+        return right !== null &&
+          right !== undefined &&
+          typeof left === typeof right &&
+          (typeof left === "number" || typeof left === "string")
           ? left > right
           : false;
       case "gte":
-        return right !== null && right !== undefined
-          && typeof left === typeof right
-          && (typeof left === "number" || typeof left === "string")
+        return right !== null &&
+          right !== undefined &&
+          typeof left === typeof right &&
+          (typeof left === "number" || typeof left === "string")
           ? left >= right
           : false;
       case "lt":
-        return right !== null && right !== undefined
-          && typeof left === typeof right
-          && (typeof left === "number" || typeof left === "string")
+        return right !== null &&
+          right !== undefined &&
+          typeof left === typeof right &&
+          (typeof left === "number" || typeof left === "string")
           ? left < right
           : false;
       case "lte":
-        return right !== null && right !== undefined
-          && typeof left === typeof right
-          && (typeof left === "number" || typeof left === "string")
+        return right !== null &&
+          right !== undefined &&
+          typeof left === typeof right &&
+          (typeof left === "number" || typeof left === "string")
           ? left <= right
           : false;
       case "between": {
@@ -471,8 +480,10 @@ export class PoliciesService {
 
   private matchesSimpleConfig(config: PolicyConfig, context: PolicyContext) {
     const nights = context.stay?.nights ?? null;
-    if (typeof config.minNights === "number" && nights !== null && nights < config.minNights) return false;
-    if (typeof config.maxNights === "number" && nights !== null && nights > config.maxNights) return false;
+    if (typeof config.minNights === "number" && nights !== null && nights < config.minNights)
+      return false;
+    if (typeof config.maxNights === "number" && nights !== null && nights > config.maxNights)
+      return false;
 
     const siteType = context.site?.siteType ?? context.siteClass?.siteType ?? null;
     if (config.siteTypes?.length && siteType && !config.siteTypes.includes(siteType)) return false;
@@ -481,7 +492,8 @@ export class PoliciesService {
     if (config.siteIds?.length && siteId && !config.siteIds.includes(siteId)) return false;
 
     const siteClassId = context.site?.siteClassId ?? context.siteClass?.id ?? null;
-    if (config.siteClassIds?.length && siteClassId && !config.siteClassIds.includes(siteClassId)) return false;
+    if (config.siteClassIds?.length && siteClassId && !config.siteClassIds.includes(siteClassId))
+      return false;
 
     const petTypes = context.guest?.petTypes ?? [];
     if (config.petTypes?.length && !config.petTypes.some((p) => petTypes.includes(p))) return false;
@@ -491,7 +503,11 @@ export class PoliciesService {
 
   private templateApplies(template: DocumentTemplate, context: PolicyContext) {
     if (template.siteId && template.siteId !== context.site?.id) return false;
-    if (template.siteClassId && template.siteClassId !== context.site?.siteClassId && template.siteClassId !== context.siteClass?.id) {
+    if (
+      template.siteClassId &&
+      template.siteClassId !== context.site?.siteClassId &&
+      template.siteClassId !== context.siteClass?.id
+    ) {
       return false;
     }
 
@@ -510,14 +526,14 @@ export class PoliciesService {
       siteId: template.siteId ?? null,
       siteClassId: template.siteClassId ?? null,
       documentType: template.type ?? SignatureDocumentType.other,
-      config: this.normalizeConfig(template)
+      config: this.normalizeConfig(template),
     };
   }
 
   async listTemplates(campgroundId: string) {
     return this.prisma.documentTemplate.findMany({
       where: { campgroundId },
-      orderBy: { updatedAt: "desc" }
+      orderBy: { updatedAt: "desc" },
     });
   }
 
@@ -538,14 +554,14 @@ export class PoliciesService {
         siteClassId: dto.siteClassId ?? null,
         siteId: dto.siteId ?? null,
         policyConfig: toNullableJsonInput(dto.policyConfig),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
   async updateTemplate(campgroundId: string, id: string, dto: UpdatePolicyTemplateDto) {
     const existing = await this.prisma.documentTemplate.findFirst({
-      where: { id, campgroundId }
+      where: { id, campgroundId },
     });
     if (!existing) {
       throw new NotFoundException("Policy template not found");
@@ -563,15 +579,16 @@ export class PoliciesService {
         autoSend: dto.autoSend ?? undefined,
         siteClassId: dto.siteClassId ?? undefined,
         siteId: dto.siteId ?? undefined,
-        policyConfig: dto.policyConfig === undefined ? undefined : toNullableJsonInput(dto.policyConfig),
-        updatedAt: new Date()
-      }
+        policyConfig:
+          dto.policyConfig === undefined ? undefined : toNullableJsonInput(dto.policyConfig),
+        updatedAt: new Date(),
+      },
     });
   }
 
   async removeTemplate(campgroundId: string, id: string) {
     const existing = await this.prisma.documentTemplate.findFirst({
-      where: { id, campgroundId }
+      where: { id, campgroundId },
     });
     if (!existing) {
       throw new NotFoundException("Policy template not found");
@@ -582,15 +599,17 @@ export class PoliciesService {
   async evaluatePolicies(campgroundId: string, context: PolicyContext) {
     const templates = await this.prisma.documentTemplate.findMany({
       where: { campgroundId, isActive: true },
-      orderBy: { updatedAt: "desc" }
+      orderBy: { updatedAt: "desc" },
     });
-    return templates.filter((tpl) => this.templateApplies(tpl, context)).map((tpl) => this.toRequirement(tpl));
+    return templates
+      .filter((tpl) => this.templateApplies(tpl, context))
+      .map((tpl) => this.toRequirement(tpl));
   }
 
   async assertPreBookingPolicies(
     campgroundId: string,
     context: PolicyContext,
-    acceptances: PolicyAcceptance[] | undefined
+    acceptances: PolicyAcceptance[] | undefined,
   ) {
     const requirements = await this.evaluatePolicies(campgroundId, context);
     const acceptanceMap = new Map((acceptances ?? []).map((a) => [a.templateId, a]));
@@ -606,7 +625,7 @@ export class PoliciesService {
     if (missing.length) {
       throw new BadRequestException({
         reason: "policy_required",
-        policies: missing.map((req) => ({ id: req.id, name: req.name }))
+        policies: missing.map((req) => ({ id: req.id, name: req.name })),
       });
     }
 
@@ -622,7 +641,9 @@ export class PoliciesService {
     acceptances?: PolicyAcceptance[];
   }) {
     const arrival = args.reservation.arrivalDate ? new Date(args.reservation.arrivalDate) : null;
-    const departure = args.reservation.departureDate ? new Date(args.reservation.departureDate) : null;
+    const departure = args.reservation.departureDate
+      ? new Date(args.reservation.departureDate)
+      : null;
     const nights =
       arrival && departure
         ? Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)))
@@ -634,32 +655,32 @@ export class PoliciesService {
       stay: {
         nights,
         arrivalDate: arrival ?? undefined,
-        departureDate: departure ?? undefined
+        departureDate: departure ?? undefined,
       },
       site: args.site
         ? {
-          id: args.site.id,
-          siteClassId: args.site.siteClassId,
-          siteType: args.site.siteType,
-          tags: args.site.tags ?? [],
-          amenityTags: args.site.amenityTags ?? [],
-          vibeTags: args.site.vibeTags ?? [],
-          petFriendly: args.site.petFriendly,
-          accessible: args.site.accessible,
-          maxOccupancy: args.site.maxOccupancy
-        }
+            id: args.site.id,
+            siteClassId: args.site.siteClassId,
+            siteType: args.site.siteType,
+            tags: args.site.tags ?? [],
+            amenityTags: args.site.amenityTags ?? [],
+            vibeTags: args.site.vibeTags ?? [],
+            petFriendly: args.site.petFriendly,
+            accessible: args.site.accessible,
+            maxOccupancy: args.site.maxOccupancy,
+          }
         : undefined,
       siteClass: args.siteClass
         ? {
-          id: args.siteClass.id,
-          siteType: args.siteClass.siteType,
-          tags: args.siteClass.tags ?? [],
-          petFriendly: args.siteClass.petFriendly,
-          accessible: args.siteClass.accessible,
-          maxOccupancy: args.siteClass.maxOccupancy,
-          minNights: args.siteClass.minNights ?? null,
-          maxNights: args.siteClass.maxNights ?? null
-        }
+            id: args.siteClass.id,
+            siteType: args.siteClass.siteType,
+            tags: args.siteClass.tags ?? [],
+            petFriendly: args.siteClass.petFriendly,
+            accessible: args.siteClass.accessible,
+            maxOccupancy: args.siteClass.maxOccupancy,
+            minNights: args.siteClass.minNights ?? null,
+            maxNights: args.siteClass.maxNights ?? null,
+          }
         : undefined,
       guest: {
         adults: args.reservation.adults ?? undefined,
@@ -667,8 +688,8 @@ export class PoliciesService {
         partySize: (args.reservation.adults ?? 0) + (args.reservation.children ?? 0),
         petCount: args.reservation.petCount ?? undefined,
         petTypes: getStringArray(args.reservation.petTypes),
-        stayReasonPreset: args.reservation.stayReasonPreset ?? undefined
-      }
+        stayReasonPreset: args.reservation.stayReasonPreset ?? undefined,
+      },
     };
 
     const requirements = await this.evaluatePolicies(args.reservation.campgroundId, context);
@@ -680,8 +701,8 @@ export class PoliciesService {
       const existing = await this.prisma.signatureRequest.findFirst({
         where: {
           reservationId: args.reservation.id,
-          templateId: req.id
-        }
+          templateId: req.id,
+        },
       });
       if (existing) {
         results.push(existing);
@@ -697,7 +718,7 @@ export class PoliciesService {
         reminderMaxCount: req.config.reminderMaxCount,
         requireSignature: req.config.requireSignature,
         signerRequirement: req.config.signerRequirement,
-        ...(acceptance?.metadata ?? {})
+        ...(acceptance?.metadata ?? {}),
       };
 
       if (acceptance?.accepted) {
@@ -709,15 +730,19 @@ export class PoliciesService {
           documentType: req.documentType ?? SignatureDocumentType.other,
           recipientName: acceptance.signerName ?? args.guest?.primaryFirstName ?? null,
           recipientEmail: acceptance.signerEmail ?? args.guest?.email ?? null,
-          metadata
+          metadata,
         });
         results.push(signed);
         continue;
       }
 
       if (req.config.autoSend) {
-        const expiresAt = new Date(Date.now() + (req.config.expiresAfterDays ?? 30) * 24 * 60 * 60 * 1000);
-        const reminderAt = new Date(Date.now() + (req.config.reminderCadenceDays ?? 7) * 24 * 60 * 60 * 1000);
+        const expiresAt = new Date(
+          Date.now() + (req.config.expiresAfterDays ?? 30) * 24 * 60 * 60 * 1000,
+        );
+        const reminderAt = new Date(
+          Date.now() + (req.config.reminderCadenceDays ?? 7) * 24 * 60 * 60 * 1000,
+        );
         const sent = await this.signatures.createAndSend(
           {
             campgroundId: args.reservation.campgroundId,
@@ -732,9 +757,9 @@ export class PoliciesService {
             message: req.content ? req.content.slice(0, 280) : undefined,
             expiresAt: expiresAt.toISOString(),
             reminderAt: reminderAt.toISOString(),
-            metadata
+            metadata,
           },
-          null
+          null,
         );
         results.push(sent);
       } else {
@@ -754,8 +779,8 @@ export class PoliciesService {
             recipientEmail: args.guest?.email ?? null,
             recipientPhone: args.guest?.phone ?? null,
             metadata: toNullableJsonInput(metadata),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
         results.push(created);
       }
@@ -767,7 +792,7 @@ export class PoliciesService {
   async getPendingPolicyCompliance(reservationId: string) {
     const requests = await this.prisma.signatureRequest.findMany({
       where: { reservationId },
-      include: { DocumentTemplate: true }
+      include: { DocumentTemplate: true },
     });
 
     const pending = requests.filter((req) => {
@@ -781,9 +806,9 @@ export class PoliciesService {
       const metadata = isRecord(req.metadata) ? req.metadata : undefined;
       const template = req.DocumentTemplate ?? undefined;
       const enforcement =
-        getString(metadata?.enforcement)
-        ?? (template ? this.normalizeConfig(template).enforcement : undefined)
-        ?? "post_booking";
+        getString(metadata?.enforcement) ??
+        (template ? this.normalizeConfig(template).enforcement : undefined) ??
+        "post_booking";
       return enforcement === "pre_checkin";
     });
 
@@ -799,9 +824,9 @@ export class PoliciesService {
         return {
           id: req.id,
           name: req.DocumentTemplate?.name ?? getString(metadata?.policyName) ?? "Policy",
-          status: req.status
+          status: req.status,
         };
-      })
+      }),
     };
   }
 }

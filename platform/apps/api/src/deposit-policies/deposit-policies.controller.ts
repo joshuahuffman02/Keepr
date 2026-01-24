@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { DepositPoliciesService } from "./deposit-policies.service";
 import { CreateDepositPolicyDto } from "./dto/create-deposit-policy.dto";
@@ -42,8 +42,8 @@ export class DepositPoliciesController {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" || user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
@@ -66,7 +66,7 @@ export class DepositPoliciesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreateDepositPolicyDto,
-    @Req() req: DepositPoliciesRequest
+    @Req() req: DepositPoliciesRequest,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.depositPolicies.create(campgroundId, dto);
@@ -78,7 +78,7 @@ export class DepositPoliciesController {
     @Param("id") id: string,
     @Body() dto: UpdateDepositPolicyDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DepositPoliciesRequest
+    @Req() req: DepositPoliciesRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -90,7 +90,7 @@ export class DepositPoliciesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DepositPoliciesRequest
+    @Req() req: DepositPoliciesRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

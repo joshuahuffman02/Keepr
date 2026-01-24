@@ -16,9 +16,7 @@ export function generateOrganizationSchema() {
     name: SEO_CONFIG.siteName,
     url: baseUrl,
     logo: `${baseUrl}/logo.png`,
-    sameAs: [
-      `https://x.com/${SEO_CONFIG.twitterHandle.replace("@", "")}`,
-    ],
+    sameAs: [`https://x.com/${SEO_CONFIG.twitterHandle.replace("@", "")}`],
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
@@ -51,9 +49,7 @@ export function generateWebsiteSchema() {
 /**
  * Breadcrumb schema for navigation
  */
-export function generateBreadcrumbSchema(
-  items: Array<{ name: string; path: string }>
-) {
+export function generateBreadcrumbSchema(items: Array<{ name: string; path: string }>) {
   const baseUrl = getBaseUrl();
   return {
     "@context": "https://schema.org",
@@ -70,9 +66,7 @@ export function generateBreadcrumbSchema(
 /**
  * FAQ schema for FAQ pages
  */
-export function generateFAQSchema(
-  faqs: Array<{ question: string; answer: string }>
-) {
+export function generateFAQSchema(faqs: Array<{ question: string; answer: string }>) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -343,15 +337,16 @@ export function generateEventSchema(event: {
     },
     image: event.image,
     url: event.url,
-    offers: event.price !== undefined
-      ? {
-          "@type": "Offer",
-          price: event.price.toFixed(2),
-          priceCurrency: event.currency || "USD",
-          availability: "https://schema.org/InStock",
-          url: event.url,
-        }
-      : undefined,
+    offers:
+      event.price !== undefined
+        ? {
+            "@type": "Offer",
+            price: event.price.toFixed(2),
+            priceCurrency: event.currency || "USD",
+            availability: "https://schema.org/InStock",
+            url: event.url,
+          }
+        : undefined,
     organizer: event.organizer
       ? {
           "@type": "Organization",

@@ -51,7 +51,9 @@ describe("SupportAdminPage", () => {
     expect(nav).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Tasks/i })).toHaveAttribute("href", "#support-queue");
     expect(screen.getByRole("link", { name: /Messages/i })).toHaveAttribute("href", "/messages");
-    expect(screen.getByRole("link", { name: /Checklists/i })).toHaveAttribute("href", "/operations#checklists");
+    expect(screen.getByRole("link", { name: /Checklists/i })).toHaveAttribute(
+      "href",
+      "/operations#checklists",
+    );
   });
 });
-

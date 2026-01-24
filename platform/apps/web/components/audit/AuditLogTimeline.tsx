@@ -14,7 +14,7 @@ import {
   ChevronDown,
   ChevronRight,
   AlertCircle,
-  History
+  History,
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../../lib/utils";
@@ -57,8 +57,8 @@ const actionIcons: Record<string, React.ReactNode> = {
   "reservation.confirm": <CheckCircle className="h-4 w-4" />,
   "reservation.payment": <CheckCircle className="h-4 w-4" />,
   "reservation.refund": <RefreshCw className="h-4 w-4" />,
-  "reservation_override": <AlertCircle className="h-4 w-4" />,
-  "checkin.override": <AlertCircle className="h-4 w-4" />
+  reservation_override: <AlertCircle className="h-4 w-4" />,
+  "checkin.override": <AlertCircle className="h-4 w-4" />,
 };
 
 const actionLabels: Record<string, string> = {
@@ -74,25 +74,31 @@ const actionLabels: Record<string, string> = {
   "reservation.confirm": "Reservation Confirmed",
   "reservation.payment": "Payment Received",
   "reservation.refund": "Refund Issued",
-  "reservation_override": "Price Override",
-  "checkin.override": "Check-in Override"
+  reservation_override: "Price Override",
+  "checkin.override": "Check-in Override",
 };
 
 const actionColors: Record<string, string> = {
   "guest.create": "bg-status-success-bg text-status-success-text border-status-success-border",
   "guest.update": "bg-status-info-bg text-status-info-text border-status-info-border",
   "guest.delete": "bg-status-error-bg text-status-error-text border-status-error-border",
-  "reservation.create": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.create":
+    "bg-status-success-bg text-status-success-text border-status-success-border",
   "reservation.update": "bg-status-info-bg text-status-info-text border-status-info-border",
   "reservation.delete": "bg-status-error-bg text-status-error-text border-status-error-border",
   "reservation.cancel": "bg-status-error-bg text-status-error-text border-status-error-border",
-  "reservation.checkin": "bg-status-success-bg text-status-success-text border-status-success-border",
-  "reservation.checkout": "bg-status-warning-bg text-status-warning-text border-status-warning-border",
-  "reservation.confirm": "bg-status-success-bg text-status-success-text border-status-success-border",
-  "reservation.payment": "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.checkin":
+    "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.checkout":
+    "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+  "reservation.confirm":
+    "bg-status-success-bg text-status-success-text border-status-success-border",
+  "reservation.payment":
+    "bg-status-success-bg text-status-success-text border-status-success-border",
   "reservation.refund": "bg-status-error-bg text-status-error-text border-status-error-border",
-  "reservation_override": "bg-status-warning-bg text-status-warning-text border-status-warning-border",
-  "checkin.override": "bg-status-warning-bg text-status-warning-text border-status-warning-border"
+  reservation_override:
+    "bg-status-warning-bg text-status-warning-text border-status-warning-border",
+  "checkin.override": "bg-status-warning-bg text-status-warning-text border-status-warning-border",
 };
 
 function formatValue(value: unknown): string {
@@ -118,13 +124,16 @@ function formatValue(value: unknown): string {
   return String(value);
 }
 
-function DiffView({ before, after }: { before: Record<string, unknown> | null; after: Record<string, unknown> | null }) {
+function DiffView({
+  before,
+  after,
+}: {
+  before: Record<string, unknown> | null;
+  after: Record<string, unknown> | null;
+}) {
   if (!before && !after) return null;
 
-  const allKeys = new Set([
-    ...Object.keys(before || {}),
-    ...Object.keys(after || {})
-  ]);
+  const allKeys = new Set([...Object.keys(before || {}), ...Object.keys(after || {})]);
 
   // Filter to only show keys that changed
   const changedKeys = Array.from(allKeys).filter((key) => {
@@ -134,9 +143,7 @@ function DiffView({ before, after }: { before: Record<string, unknown> | null; a
   });
 
   if (changedKeys.length === 0) {
-    return (
-      <p className="text-xs text-muted-foreground italic">No field changes recorded</p>
-    );
+    return <p className="text-xs text-muted-foreground italic">No field changes recorded</p>;
   }
 
   return (
@@ -148,17 +155,13 @@ function DiffView({ before, after }: { before: Record<string, unknown> | null; a
           </span>
           <div className="flex items-center gap-2 mt-0.5">
             {before?.[key] !== undefined && (
-              <span className="text-red-600 line-through">
-                {formatValue(before[key])}
-              </span>
+              <span className="text-red-600 line-through">{formatValue(before[key])}</span>
             )}
             {before?.[key] !== undefined && after?.[key] !== undefined && (
               <span className="text-muted-foreground">→</span>
             )}
             {after?.[key] !== undefined && (
-              <span className="text-emerald-600">
-                {formatValue(after[key])}
-              </span>
+              <span className="text-emerald-600">{formatValue(after[key])}</span>
             )}
           </div>
         </div>
@@ -189,7 +192,7 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
       <div
         className={cn(
           "absolute left-0 top-0 flex items-center justify-center w-6 h-6 rounded-full border",
-          colorClass
+          colorClass,
         )}
       >
         {icon}
@@ -215,11 +218,7 @@ function AuditLogEntry({ log }: { log: AuditLog }) {
             onClick={() => setExpanded(!expanded)}
             className="flex items-center gap-1 mt-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            {expanded ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronRight className="h-3 w-3" />
-            )}
+            {expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
             {expanded ? "Hide details" : "Show details"}
           </button>
         )}
@@ -238,21 +237,25 @@ export function AuditLogTimeline({
   campgroundId,
   entityType,
   entityId,
-  limit = 50
+  limit = 50,
 }: AuditLogTimelineProps) {
-  const { data: logs, isLoading, error } = useQuery<AuditLog[]>({
+  const {
+    data: logs,
+    isLoading,
+    error,
+  } = useQuery<AuditLog[]>({
     queryKey: ["audit", campgroundId, entityType, entityId],
     queryFn: async () => {
       const res = await fetch(
         `/api/campgrounds/${campgroundId}/audit/entity/${entityType}/${entityId}?limit=${limit}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       if (!res.ok) {
         throw new Error("Failed to fetch audit logs");
       }
       return res.json();
     },
-    staleTime: 30000 // 30 seconds
+    staleTime: 30000, // 30 seconds
   });
 
   if (isLoading) {
@@ -285,9 +288,7 @@ export function AuditLogTimeline({
       <div className="text-center py-8 text-muted-foreground">
         <History className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
         <p>No activity recorded yet</p>
-        <p className="text-sm mt-1">
-          Changes will appear here as they happen
-        </p>
+        <p className="text-sm mt-1">Changes will appear here as they happen</p>
       </div>
     );
   }

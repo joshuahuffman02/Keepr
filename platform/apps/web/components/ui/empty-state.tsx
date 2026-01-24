@@ -84,13 +84,13 @@ export function EmptyState({
       className={cn(
         "flex flex-col items-center justify-center text-center",
         config.wrapper,
-        className
+        className,
       )}
     >
       <div
         className={cn(
           "flex items-center justify-center rounded-full bg-muted mb-3",
-          config.iconWrapper
+          config.iconWrapper,
         )}
       >
         <Icon className={cn("text-muted-foreground", config.icon)} />
@@ -102,22 +102,13 @@ export function EmptyState({
         </p>
       )}
       {action && (
-        <Button
-          onClick={action.onClick}
-          size={size === "sm" ? "sm" : "default"}
-          className="mt-4"
-        >
+        <Button onClick={action.onClick} size={size === "sm" ? "sm" : "default"} className="mt-4">
           {ActionIcon && <ActionIcon className="h-4 w-4 mr-2" />}
           {action.label}
         </Button>
       )}
       {href && (
-        <Button
-          asChild
-          variant="outline"
-          size={size === "sm" ? "sm" : "default"}
-          className="mt-4"
-        >
+        <Button asChild variant="outline" size={size === "sm" ? "sm" : "default"} className="mt-4">
           <a href={href.url}>
             {LinkIcon && <LinkIcon className="h-4 w-4 mr-2" />}
             {href.label}
@@ -143,12 +134,7 @@ export function InlineEmpty({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "text-center py-4 text-sm text-muted-foreground",
-        className
-      )}
-    >
+    <div className={cn("text-center py-4 text-sm text-muted-foreground", className)}>
       {children}
     </div>
   );
@@ -177,18 +163,14 @@ export function CardEmpty({
     <div
       className={cn(
         "flex flex-col items-center justify-center text-center py-8 px-4 border border-dashed border-muted-foreground/25 rounded-lg",
-        className
+        className,
       )}
     >
       <div className="flex items-center justify-center h-12 w-12 rounded-full bg-muted mb-3">
         <Icon className="h-6 w-6 text-muted-foreground" />
       </div>
       <h3 className="text-sm font-medium text-foreground">{title}</h3>
-      {description && (
-        <p className="text-sm text-muted-foreground mt-1 max-w-xs">
-          {description}
-        </p>
-      )}
+      {description && <p className="text-sm text-muted-foreground mt-1 max-w-xs">{description}</p>}
       {action && (
         <Button onClick={action.onClick} size="sm" className="mt-4">
           {ActionIcon && <ActionIcon className="h-4 w-4 mr-2" />}

@@ -4,9 +4,9 @@ packages:
   - tools/ralph
 
 ignoredBuiltDependencies:
-  - '@nestjs/core'
-  - '@prisma/client'
-  - '@prisma/engines'
+  - "@nestjs/core"
+  - "@prisma/client"
+  - "@prisma/engines"
   - esbuild
   - prisma
   - sharp

@@ -8,4 +8,3 @@ import { CurrencyTaxController } from "./currency-tax.controller";
   exports: [CurrencyTaxService],
 })
 export class CurrencyTaxModule {}
-

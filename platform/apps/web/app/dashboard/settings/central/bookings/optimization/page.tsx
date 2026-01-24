@@ -95,7 +95,9 @@ export default function OptimizationPage() {
   });
 
   const [isLogOpen, setIsLogOpen] = useState(false);
-  const [selectedLogEntry, setSelectedLogEntry] = useState<typeof optimizationLog[0] | null>(null);
+  const [selectedLogEntry, setSelectedLogEntry] = useState<(typeof optimizationLog)[0] | null>(
+    null,
+  );
   const [showCelebration, setShowCelebration] = useState(false);
 
   const handleSettingsChange = useCallback((updates: Partial<typeof settings>) => {
@@ -116,7 +118,7 @@ export default function OptimizationPage() {
     setIsLogOpen(true);
   }, []);
 
-  const viewLogDetails = (entry: typeof optimizationLog[0]) => {
+  const viewLogDetails = (entry: (typeof optimizationLog)[0]) => {
     setSelectedLogEntry(entry);
   };
 
@@ -139,9 +141,9 @@ export default function OptimizationPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Grid optimization runs nightly at 2 AM. It analyzes upcoming reservations
-          and moves them to better sites when possible, filling gaps and maximizing revenue
-          while respecting all guest preferences and requirements.
+          Grid optimization runs nightly at 2 AM. It analyzes upcoming reservations and moves them
+          to better sites when possible, filling gaps and maximizing revenue while respecting all
+          guest preferences and requirements.
         </AlertDescription>
       </Alert>
 
@@ -164,9 +166,7 @@ export default function OptimizationPage() {
                   <TrendingUp className="h-5 w-5 text-status-success" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    ${totalRevenueGain}
-                  </p>
+                  <p className="text-2xl font-bold text-foreground">${totalRevenueGain}</p>
                   <p className="text-sm text-muted-foreground">Revenue gained (30 days)</p>
                 </div>
               </div>
@@ -226,9 +226,7 @@ export default function OptimizationPage() {
               <Activity className="h-5 w-5 text-purple-600" />
               Optimization Log
             </DialogTitle>
-            <DialogDescription>
-              Recent optimization runs and their results
-            </DialogDescription>
+            <DialogDescription>Recent optimization runs and their results</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-auto py-4">
@@ -255,7 +253,9 @@ export default function OptimizationPage() {
                   <div className="h-8 w-px bg-muted" />
                   <div>
                     <p className="text-sm text-muted-foreground">Optimized</p>
-                    <p className="font-medium">{selectedLogEntry.reservationsOptimized} reservations</p>
+                    <p className="font-medium">
+                      {selectedLogEntry.reservationsOptimized} reservations
+                    </p>
                   </div>
                   <div className="h-8 w-px bg-muted" />
                   <div>
@@ -299,7 +299,9 @@ export default function OptimizationPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-muted-foreground text-sm">No detailed move data available for this run.</p>
+                  <p className="text-muted-foreground text-sm">
+                    No detailed move data available for this run.
+                  </p>
                 )}
               </div>
             ) : (

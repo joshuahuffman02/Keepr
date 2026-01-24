@@ -10,7 +10,12 @@ export class RateLimitMiddleware {
   use = (req: Request, res: Response, next: NextFunction): void => {
     const now = Date.now();
     const keyHeader = req.headers["x-api-key"];
-    const keyValue = typeof keyHeader === "string" ? keyHeader : Array.isArray(keyHeader) ? keyHeader[0] : undefined;
+    const keyValue =
+      typeof keyHeader === "string"
+        ? keyHeader
+        : Array.isArray(keyHeader)
+          ? keyHeader[0]
+          : undefined;
     const key = keyValue?.toString?.() || req.ip || "unknown";
     const existing = this.map.get(key);
     if (!existing || existing.resetAt < now) {

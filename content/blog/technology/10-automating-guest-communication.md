@@ -17,17 +17,20 @@ Every guest interaction requires communication: confirmations, reminders, thank-
 ## Messages to Automate
 
 ### Transactional (Essential)
+
 - Booking confirmation
 - Payment receipts
 - Cancellation confirmations
 - Modification confirmations
 
 ### Pre-Arrival (Recommended)
+
 - 1 week before: Trip preparation tips
 - 2-3 days before: Check-in details, directions
 - Day of: Welcome, final reminders
 
 ### Post-Stay (Recommended)
+
 - Same day: Thank you message
 - 3-5 days after: Review request
 - Seasonal: "We miss you" / rebooking prompt
@@ -46,21 +49,25 @@ Every guest interaction requires communication: confirmations, reminders, thank-
 ## Setting Up Automation
 
 ### Step 1: Map Your Timeline
+
 - When should each message send?
 - What triggers each message?
 - What information should each include?
 
 ### Step 2: Create Templates
+
 - Write base content
 - Add personalization fields (name, dates, site)
 - Review for tone and clarity
 
 ### Step 3: Configure Triggers
+
 - Booking created → confirmation
 - X days before → reminder
 - Check-out → thank you
 
 ### Step 4: Test Thoroughly
+
 - Send test messages to yourself
 - Verify all fields populate
 - Check timing accuracy
@@ -104,4 +111,4 @@ CHECK-OUT DAY → "Thanks for staying!"
 
 ---
 
-*Keepr includes built-in automation for confirmations, reminders, and follow-ups. [Automate your communication at campreserv.com](https://campreserv.com)*
+_Keepr includes built-in automation for confirmations, reminders, and follow-ups. [Automate your communication at campreserv.com](https://campreserv.com)_

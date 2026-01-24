@@ -133,9 +133,7 @@ export function useChatHistory({
         throw new Error("Invalid history response");
       }
 
-      setMessages((prev) =>
-        nextCursor ? [...data.messages, ...prev] : data.messages
-      );
+      setMessages((prev) => (nextCursor ? [...data.messages, ...prev] : data.messages));
       setHistoryConversationId(data.conversationId);
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);

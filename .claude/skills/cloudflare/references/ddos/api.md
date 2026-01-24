@@ -6,20 +6,20 @@
 
 ```typescript
 // Zone-level
-PUT /zones/{zoneId}/rulesets/phases/ddos_l7/entrypoint
-GET /zones/{zoneId}/rulesets/phases/ddos_l7/entrypoint
+PUT / zones / { zoneId } / rulesets / phases / ddos_l7 / entrypoint;
+GET / zones / { zoneId } / rulesets / phases / ddos_l7 / entrypoint;
 
 // Account-level (Enterprise Advanced)
-PUT /accounts/{accountId}/rulesets/phases/ddos_l7/entrypoint
-GET /accounts/{accountId}/rulesets/phases/ddos_l7/entrypoint
+PUT / accounts / { accountId } / rulesets / phases / ddos_l7 / entrypoint;
+GET / accounts / { accountId } / rulesets / phases / ddos_l7 / entrypoint;
 ```
 
 ### Network DDoS (L3/4)
 
 ```typescript
 // Account-level only
-PUT /accounts/{accountId}/rulesets/phases/ddos_l4/entrypoint
-GET /accounts/{accountId}/rulesets/phases/ddos_l4/entrypoint
+PUT / accounts / { accountId } / rulesets / phases / ddos_l4 / entrypoint;
+GET / accounts / { accountId } / rulesets / phases / ddos_l4 / entrypoint;
 ```
 
 ## TypeScript SDK
@@ -64,8 +64,11 @@ const l4Ruleset = await client.accounts.rulesets.phases.entrypoint.get("ddos_l4"
 interface DDoSAlertConfig {
   name: string;
   enabled: boolean;
-  alert_type: "http_ddos_attack_alert" | "layer_3_4_ddos_attack_alert" 
-    | "advanced_http_ddos_attack_alert" | "advanced_layer_3_4_ddos_attack_alert";
+  alert_type:
+    | "http_ddos_attack_alert"
+    | "layer_3_4_ddos_attack_alert"
+    | "advanced_http_ddos_attack_alert"
+    | "advanced_layer_3_4_ddos_attack_alert";
   filters?: {
     zones?: string[];
     hostnames?: string[];
@@ -84,17 +87,14 @@ interface DDoSAlertConfig {
 }
 
 // Create alert
-await fetch(
-  `https://api.cloudflare.com/client/v4/accounts/${accountId}/alerting/v3/policies`,
-  {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(alertConfig),
-  }
-);
+await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/alerting/v3/policies`, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${apiToken}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(alertConfig),
+});
 ```
 
 ## Worker Integration
@@ -121,9 +121,11 @@ export default {
           },
           body: JSON.stringify({
             description: "Dynamic DDoS config",
-            rules: [/* ... */],
+            rules: [
+              /* ... */
+            ],
           }),
-        }
+        },
       );
       return response;
     }

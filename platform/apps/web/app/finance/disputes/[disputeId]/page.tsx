@@ -18,7 +18,7 @@ const statusColors: Record<string, string> = {
   under_review: "bg-status-info/15 text-status-info",
   charge_refunded: "bg-status-error/15 text-status-error",
   won: "bg-status-success/15 text-status-success",
-  lost: "bg-status-error/15 text-status-error"
+  lost: "bg-status-error/15 text-status-error",
 };
 
 function formatMoney(cents: number | null | undefined, currency = "USD") {
@@ -41,14 +41,14 @@ export default function DisputeDetailPage() {
     queryKey: ["dispute-detail", campgroundId, disputeId],
     queryFn: () => apiClient.getDispute(campgroundId, disputeId),
     enabled: !!campgroundId && !!disputeId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   const { data: templates } = useQuery({
     queryKey: ["dispute-templates", campgroundId],
     queryFn: () => apiClient.listDisputeTemplates(campgroundId),
     enabled: !!campgroundId,
-    staleTime: 60_000
+    staleTime: 60_000,
   });
 
   const dueSoon = useMemo(() => {
@@ -63,7 +63,9 @@ export default function DisputeDetailPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Dispute Detail</h1>
-            <p className="text-sm text-muted-foreground">Evidence kit and links for dispute resolution.</p>
+            <p className="text-sm text-muted-foreground">
+              Evidence kit and links for dispute resolution.
+            </p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -95,10 +97,23 @@ export default function DisputeDetailPage() {
             <div className="flex flex-wrap gap-4">
               <div>Amount: {formatMoney(data?.amountCents, data?.currency?.toUpperCase())}</div>
               <div>Reason: {data?.reason ?? "—"}</div>
-              <div>Reservation: {data?.reservationId ? <Link className="text-indigo-600 hover:underline" href={`/campgrounds/${campgroundId}/reservations/${data.reservationId}`}>{data.reservationId}</Link> : "—"}</div>
+              <div>
+                Reservation:{" "}
+                {data?.reservationId ? (
+                  <Link
+                    className="text-indigo-600 hover:underline"
+                    href={`/campgrounds/${campgroundId}/reservations/${data.reservationId}`}
+                  >
+                    {data.reservationId}
+                  </Link>
+                ) : (
+                  "—"
+                )}
+              </div>
             </div>
             <div className="text-xs text-muted-foreground">
-              Evidence due: {data?.evidenceDueBy ? format(new Date(data.evidenceDueBy), "yyyy-MM-dd") : "—"}
+              Evidence due:{" "}
+              {data?.evidenceDueBy ? format(new Date(data.evidenceDueBy), "yyyy-MM-dd") : "—"}
             </div>
             <div className="text-xs text-muted-foreground flex gap-3">
               <span>Charge: {data?.stripeChargeId ?? "—"}</span>
@@ -114,7 +129,9 @@ export default function DisputeDetailPage() {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               {templates.map((t) => (
-                <Badge key={t.id} variant="outline">{t.label}</Badge>
+                <Badge key={t.id} variant="outline">
+                  {t.label}
+                </Badge>
               ))}
             </CardContent>
           </Card>

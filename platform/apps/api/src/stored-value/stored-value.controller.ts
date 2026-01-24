@@ -8,11 +8,15 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { Roles, RolesGuard } from "../auth/guards/roles.guard";
-import { IssueStoredValueDto, RedeemStoredValueDto, AdjustStoredValueDto } from "./stored-value.dto";
+import {
+  IssueStoredValueDto,
+  RedeemStoredValueDto,
+  AdjustStoredValueDto,
+} from "./stored-value.dto";
 import { StoredValueService } from "./stored-value.service";
 import { ScopeGuard } from "../permissions/scope.guard";
 import { UserRole } from "@prisma/client";
@@ -44,7 +48,9 @@ export class StoredValueController {
     }
 
     const platformRole = user.platformRole ?? "";
-    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(platformRole);
+    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(
+      platformRole,
+    );
     if (isPlatformStaff) {
       return;
     }
@@ -119,7 +125,7 @@ export class StoredValueController {
   balance(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -131,7 +137,7 @@ export class StoredValueController {
   balanceByCode(
     @Param("code") code: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

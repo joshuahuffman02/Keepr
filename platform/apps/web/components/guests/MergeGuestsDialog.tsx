@@ -70,7 +70,8 @@ export function MergeGuestsDialog({
       onSuccess?.();
     },
     onError: (error) => {
-      const message = error instanceof Error ? error.message : "An error occurred while merging guests";
+      const message =
+        error instanceof Error ? error.message : "An error occurred while merging guests";
       toast({
         title: "Failed to merge guests",
         description: message,
@@ -88,9 +89,7 @@ export function MergeGuestsDialog({
               <Users className="h-5 w-5" />
               Merge Guests
             </DialogTitle>
-            <DialogDescription>
-              Please select exactly 2 guests to merge.
-            </DialogDescription>
+            <DialogDescription>Please select exactly 2 guests to merge.</DialogDescription>
           </DialogHeader>
           <div className="py-6 text-center">
             <AlertTriangle className="h-12 w-12 text-status-warning mx-auto mb-3" />
@@ -122,7 +121,8 @@ export function MergeGuestsDialog({
             Merge Guest Records
           </DialogTitle>
           <DialogDescription>
-            Select which guest profile to keep as the primary. The other profile will be merged into it.
+            Select which guest profile to keep as the primary. The other profile will be merged into
+            it.
           </DialogDescription>
         </DialogHeader>
 
@@ -135,7 +135,7 @@ export function MergeGuestsDialog({
                   "flex items-center space-x-3 rounded-lg border p-4 cursor-pointer transition-all",
                   primaryId === guest.id
                     ? "border-status-success-border bg-status-success-bg ring-2 ring-status-success/20"
-                    : "border-border hover:border-border"
+                    : "border-border hover:border-border",
                 )}
                 onClick={() => setPrimaryId(guest.id)}
               >
@@ -148,7 +148,10 @@ export function MergeGuestsDialog({
                           {guest.primaryFirstName} {guest.primaryLastName}
                         </span>
                         {guest.vip && (
-                          <Badge variant="outline" className="border-status-warning-border bg-status-warning-bg text-status-warning-text">
+                          <Badge
+                            variant="outline"
+                            className="border-status-warning-border bg-status-warning-bg text-status-warning-text"
+                          >
                             <Crown className="h-3 w-3 mr-1" />
                             VIP
                           </Badge>
@@ -184,13 +187,23 @@ export function MergeGuestsDialog({
           </div>
           <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
             <li>
-              All reservations from <strong>{secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}</strong> will be transferred to <strong>{primaryGuest?.primaryFirstName} {primaryGuest?.primaryLastName}</strong>
+              All reservations from{" "}
+              <strong>
+                {secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}
+              </strong>{" "}
+              will be transferred to{" "}
+              <strong>
+                {primaryGuest?.primaryFirstName} {primaryGuest?.primaryLastName}
+              </strong>
             </li>
             <li>Messages, equipment, and loyalty points will be combined</li>
             <li>Missing contact info will be filled from the secondary profile</li>
             <li>VIP status and marketing opt-in will be preserved if either guest had them</li>
             <li className="text-status-error">
-              <strong>{secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}</strong>'s profile will be deleted
+              <strong>
+                {secondaryGuest?.primaryFirstName} {secondaryGuest?.primaryLastName}
+              </strong>
+              's profile will be deleted
             </li>
           </ul>
         </div>

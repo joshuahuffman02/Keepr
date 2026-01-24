@@ -111,9 +111,7 @@ export function ChatHistoryPanel({
               <ArrowLeft className="w-4 h-4" />
             </button>
           )}
-          <div className="text-sm font-semibold">
-            {isListView ? "History" : "Conversation"}
-          </div>
+          <div className="text-sm font-semibold">{isListView ? "History" : "Conversation"}</div>
         </div>
         <div className="flex items-center gap-1">
           {isListView && onNewConversation && (
@@ -161,7 +159,7 @@ export function ChatHistoryPanel({
                           "rounded-full border px-2 py-0.5 text-[11px] transition-colors",
                           filter.id === activeFilterId
                             ? cn("border-transparent", activeFilterClass)
-                            : "border-border text-muted-foreground hover:bg-muted"
+                            : "border-border text-muted-foreground hover:bg-muted",
                         )}
                       >
                         {filter.label}
@@ -183,7 +181,7 @@ export function ChatHistoryPanel({
                   onClick={() => onSelectConversation?.(conversation.id)}
                   className={cn(
                     "w-full rounded-lg border p-2 text-left text-xs transition-colors",
-                    isActive ? activeConversationClass : "border-border hover:bg-muted/40"
+                    isActive ? activeConversationClass : "border-border hover:bg-muted/40",
                   )}
                 >
                   <div className="flex items-center justify-between gap-2">

@@ -35,7 +35,7 @@ import {
   TrendingUp,
   Trophy,
   UserCheck,
-  Users
+  Users,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
@@ -50,7 +50,7 @@ import {
   staggerContainer,
   hoverScale,
   getStaggerDelay,
-  reducedMotion as reducedMotionVariants
+  reducedMotion as reducedMotionVariants,
 } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { CharityImpactWidget } from "@/components/charity/CharityImpactWidget";
@@ -67,10 +67,7 @@ type BreakdownItem = { label: string; value: string; tone?: "success" | "warning
 // Loading skeleton component
 function SkeletonCard() {
   return (
-    <div className={cn(
-      "rounded-xl border p-4 animate-pulse",
-      "bg-muted border-border"
-    )}>
+    <div className={cn("rounded-xl border p-4 animate-pulse", "bg-muted border-border")}>
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 rounded-lg bg-muted" />
         <div className="space-y-2 flex-1">
@@ -83,28 +80,16 @@ function SkeletonCard() {
 }
 
 // Error state component
-function ErrorState({
-  message,
-  onRetry
-}: {
-  message: string;
-  onRetry: () => void;
-}) {
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "rounded-xl p-6 space-y-4",
-        "bg-red-50 border-2 border-red-200",
-        ""
-      )}
+      className={cn("rounded-xl p-6 space-y-4", "bg-red-50 border-2 border-red-200", "")}
     >
       <div className="flex items-center gap-3">
         <AlertCircle className="h-5 w-5 text-red-600" />
-        <h3 className="font-semibold text-red-900">
-          Unable to load data
-        </h3>
+        <h3 className="font-semibold text-red-900">Unable to load data</h3>
       </div>
       <p className="text-sm text-red-700">
         {message || "Please check your connection and try again."}
@@ -114,7 +99,7 @@ function ErrorState({
         className={cn(
           "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold",
           "bg-red-600 text-white hover:bg-red-700",
-          "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+          "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2",
         )}
       >
         <RefreshCw className="h-4 w-4" />
@@ -131,7 +116,7 @@ function TodaysWins({
   outstandingBalanceCents,
   occupancyRate,
   reservationsCount,
-  prefersReducedMotion
+  prefersReducedMotion,
 }: {
   todayArrivals: Reservation[];
   todayDepartures: Reservation[];
@@ -147,7 +132,7 @@ function TodaysWins({
       list.push({
         id: "paid",
         icon: <DollarSign className="h-4 w-4 text-emerald-600" />,
-        text: "All payments collected"
+        text: "All payments collected",
       });
     }
 
@@ -155,13 +140,13 @@ function TodaysWins({
       list.push({
         id: "busy",
         icon: <Tent className="h-4 w-4 text-purple-600" />,
-        text: `${occupancyRate}% occupancy - Nearly full!`
+        text: `${occupancyRate}% occupancy - Nearly full!`,
       });
     } else if (occupancyRate >= 70) {
       list.push({
         id: "good-occ",
         icon: <TrendingUp className="h-4 w-4 text-emerald-600" />,
-        text: `${occupancyRate}% occupancy - Great day!`
+        text: `${occupancyRate}% occupancy - Great day!`,
       });
     }
 
@@ -169,7 +154,7 @@ function TodaysWins({
       list.push({
         id: "busy-arrivals",
         icon: <PartyPopper className="h-4 w-4 text-amber-600" />,
-        text: `${todayArrivals.length} arrivals today`
+        text: `${todayArrivals.length} arrivals today`,
       });
     }
 
@@ -177,7 +162,7 @@ function TodaysWins({
       list.push({
         id: "balanced",
         icon: <Scale className="h-4 w-4 text-blue-600" />,
-        text: "Balanced arrivals & departures"
+        text: "Balanced arrivals & departures",
       });
     }
 
@@ -191,19 +176,13 @@ function TodaysWins({
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ ...SPRING_CONFIG, delay: 0.15 }}
-      className={cn(
-        "rounded-xl p-4",
-        "bg-muted/30",
-        "border border-border/70"
-      )}
+      className={cn("rounded-xl p-4", "bg-muted/30", "border border-border/70")}
     >
       <div className="flex items-center gap-2 mb-3">
         <Trophy className="h-4 w-4 text-muted-foreground" />
-        <span className="text-sm font-semibold text-foreground">
-          Today's Wins
-        </span>
+        <span className="text-sm font-semibold text-foreground">Today's Wins</span>
         <span className="text-xs text-muted-foreground">
-          {achievements.length} achievement{achievements.length !== 1 ? 's' : ''}
+          {achievements.length} achievement{achievements.length !== 1 ? "s" : ""}
         </span>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -212,17 +191,15 @@ function TodaysWins({
             key={achievement.id}
             initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ ...SPRING_CONFIG, delay: 0.2 + (i * 0.1) }}
+            transition={{ ...SPRING_CONFIG, delay: 0.2 + i * 0.1 }}
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm",
               "bg-card",
-              "border border-border/70"
+              "border border-border/70",
             )}
           >
             {achievement.icon}
-            <span className="text-foreground font-medium">
-              {achievement.text}
-            </span>
+            <span className="text-foreground font-medium">{achievement.text}</span>
           </motion.div>
         ))}
       </div>
@@ -231,13 +208,7 @@ function TodaysWins({
 }
 
 // Celebration badge for high-performing metrics
-function CelebrationBadge({
-  show,
-  message
-}: {
-  show: boolean;
-  message: string;
-}) {
+function CelebrationBadge({ show, message }: { show: boolean; message: string }) {
   if (!show) return null;
 
   return (
@@ -248,13 +219,13 @@ function CelebrationBadge({
       className={cn(
         "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold",
         "bg-card text-foreground border border-border",
-        "shadow-sm"
+        "shadow-sm",
       )}
     >
       <motion.div
         animate={{
           rotate: [0, 10, -10, 10, 0],
-          scale: [1, 1.2, 1.2, 1.2, 1]
+          scale: [1, 1.2, 1.2, 1.2, 1],
         }}
         transition={{ duration: 0.6, delay: 0.5 }}
       >
@@ -316,7 +287,7 @@ export default function Dashboard() {
         greeting: "Welcome",
         icon: <Sun className="h-8 w-8 text-amber-500" />,
         message: "Here's what's happening at the park",
-        tone: "bg-card border-border"
+        tone: "bg-card border-border",
       };
     }
 
@@ -328,21 +299,21 @@ export default function Dashboard() {
         greeting: "Good morning",
         icon: <Sun className="h-8 w-8 text-amber-500" />,
         message: "Here's what's happening at the park today",
-        tone: "bg-card border-border"
+        tone: "bg-card border-border",
       };
     } else if (hour < 17) {
       return {
         greeting: "Good afternoon",
         icon: <Sunset className="h-8 w-8 text-sky-500" />,
         message: "Let's check on today's progress",
-        tone: "bg-card border-border"
+        tone: "bg-card border-border",
       };
     } else {
       return {
         greeting: "Good evening",
         icon: <Moon className="h-8 w-8 text-indigo-500" />,
         message: "Winding down the day",
-        tone: "bg-card border-border"
+        tone: "bg-card border-border",
       };
     }
   }, [hasMounted]);
@@ -465,7 +436,9 @@ export default function Dashboard() {
       d.setDate(d.getDate() + i);
       days14.push(d);
       // Also store as YYYY-MM-DD string for reliable comparison
-      days14Strings.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+      days14Strings.push(
+        `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+      );
     }
 
     // Helper to convert ISO date to local timezone and extract YYYY-MM-DD
@@ -484,7 +457,11 @@ export default function Dashboard() {
         const departureDateStr = getDatePart(r.departureDate);
 
         // Today's arrivals (exclude already checked in)
-        if (arrivalDateStr === todayString && r.status !== "checked_in" && r.status !== "checked_out") {
+        if (
+          arrivalDateStr === todayString &&
+          r.status !== "checked_in" &&
+          r.status !== "checked_out"
+        ) {
           todayArrivals.push(r);
         }
 
@@ -533,17 +510,16 @@ export default function Dashboard() {
     }
 
     // Sort and slice attention list
-    const attentionList = withBalance
-      .sort((a, b) => b.balance - a.balance)
-      .slice(0, 4);
+    const attentionList = withBalance.sort((a, b) => b.balance - a.balance).slice(0, 4);
 
     // Build occupancy chart data
-    const occupancy14 = totalSites > 0
-      ? days14.map((day, i) => ({
-          label: day.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
-          rate: Math.round((occupancy14Counts[i] / totalSites) * 100)
-        }))
-      : [];
+    const occupancy14 =
+      totalSites > 0
+        ? days14.map((day, i) => ({
+            label: day.toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+            rate: Math.round((occupancy14Counts[i] / totalSites) * 100),
+          }))
+        : [];
 
     return {
       todayArrivals,
@@ -583,7 +559,11 @@ export default function Dashboard() {
     balanceBreakdown.push({ label: "overdue", value: formatMoney(balanceOverdue), tone: "danger" });
   }
   if (balanceDueToday > 0) {
-    balanceBreakdown.push({ label: "due today", value: formatMoney(balanceDueToday), tone: "warning" });
+    balanceBreakdown.push({
+      label: "due today",
+      value: formatMoney(balanceDueToday),
+      tone: "warning",
+    });
   }
   if (balanceFuture > 0) {
     balanceBreakdown.push({ label: "future", value: formatMoney(balanceFuture), tone: "success" });
@@ -594,24 +574,40 @@ export default function Dashboard() {
         {
           label: "vs last year",
           value: `${yieldMetrics.yoyChange.revenue >= 0 ? "+" : ""}${yieldMetrics.yoyChange.revenue.toFixed(0)}%`,
-          tone: yieldMetrics.yoyChange.revenue >= 0 ? "success" : "danger"
-        }
+          tone: yieldMetrics.yoyChange.revenue >= 0 ? "success" : "danger",
+        },
       ]
     : undefined;
 
   const alerts = useMemo(() => {
     const list: { id: string; label: string; href: string }[] = [];
     if ((attentionList?.length ?? 0) > 0) {
-      list.push({ id: "balances", label: "Balances due need attention", href: "/billing/repeat-charges" });
+      list.push({
+        id: "balances",
+        label: "Balances due need attention",
+        href: "/billing/repeat-charges",
+      });
     }
     if (occupancyRate >= 90) {
-      list.push({ id: "high-occ", label: "High occupancy today — verify arrivals", href: "/check-in-out" });
+      list.push({
+        id: "high-occ",
+        label: "High occupancy today — verify arrivals",
+        href: "/check-in-out",
+      });
     }
     if ((todayArrivals?.length ?? 0) === 0 && (futureReservations ?? 0) > 0) {
-      list.push({ id: "no-arrivals", label: "No arrivals today — check calendar", href: "/calendar" });
+      list.push({
+        id: "no-arrivals",
+        label: "No arrivals today — check calendar",
+        href: "/calendar",
+      });
     }
     if (totalSites === 0) {
-      list.push({ id: "no-sites", label: "No sites configured for this park", href: "/campgrounds" });
+      list.push({
+        id: "no-sites",
+        label: "No sites configured for this park",
+        href: "/campgrounds",
+      });
     }
     return list;
   }, [attentionList, occupancyRate, todayArrivals, futureReservations, totalSites]);
@@ -621,7 +617,8 @@ export default function Dashboard() {
     if (!term || !reservations) return [];
     return reservations
       .filter((r) => {
-        const guest = `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.toLowerCase();
+        const guest =
+          `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.toLowerCase();
         const site = `${r.siteId || ""}`.toLowerCase();
         return guest.includes(term) || site.includes(term) || r.id.toLowerCase().includes(term);
       })
@@ -662,7 +659,9 @@ export default function Dashboard() {
           >
             <div className="text-center space-y-2">
               <h2 className="text-2xl font-bold text-foreground">Welcome to Keepr</h2>
-              <p className="text-muted-foreground">Select a campground from the dropdown to get started.</p>
+              <p className="text-muted-foreground">
+                Select a campground from the dropdown to get started.
+              </p>
             </div>
           </motion.div>
         ) : null}
@@ -671,7 +670,7 @@ export default function Dashboard() {
         <motion.div
           className={cn(
             "flex flex-col gap-4 rounded-2xl p-6 shadow-sm transition-colors",
-            "border border-border bg-card"
+            "border border-border bg-card",
           )}
           {...motionProps}
           transition={{ ...SPRING_CONFIG, delay: 0.05 }}
@@ -684,14 +683,10 @@ export default function Dashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ ...SPRING_CONFIG, delay: 0.1 }}
               >
-                <span className="rounded-xl bg-muted p-2">
-                  {timeOfDay.icon}
-                </span>
+                <span className="rounded-xl bg-muted p-2">{timeOfDay.icon}</span>
                 <div>
                   <div className="text-xs font-semibold text-muted-foreground">Daily briefing</div>
-                  <h1 className="text-2xl font-semibold text-foreground">
-                    {timeOfDay.greeting}
-                  </h1>
+                  <h1 className="text-2xl font-semibold text-foreground">{timeOfDay.greeting}</h1>
                 </div>
               </motion.div>
 
@@ -699,9 +694,7 @@ export default function Dashboard() {
                 {todayLabel} · {selectedCampground?.name ?? "Loading campground"}
               </div>
 
-              <p className="text-sm text-muted-foreground font-medium">
-                {timeOfDay.message}
-              </p>
+              <p className="text-sm text-muted-foreground font-medium">{timeOfDay.message}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -713,7 +706,7 @@ export default function Dashboard() {
                     "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white",
                     "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover",
                     "shadow-sm transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2",
                   )}
                 >
                   <Plus className="h-4 w-4" />
@@ -729,7 +722,7 @@ export default function Dashboard() {
                     "border border-border bg-muted/30 text-foreground",
                     "hover:border-muted-foreground/30 hover:bg-muted/60",
                     "shadow-sm transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2",
                   )}
                 >
                   <ShoppingBag className="h-4 w-4" />
@@ -745,7 +738,7 @@ export default function Dashboard() {
                     "border border-border bg-muted/30 text-foreground",
                     "hover:border-muted-foreground/30 hover:bg-muted/60",
                     "shadow-sm transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2"
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-primary focus-visible:ring-offset-2",
                   )}
                 >
                   <Calendar className="h-4 w-4" />
@@ -755,7 +748,6 @@ export default function Dashboard() {
             </div>
           </div>
         </motion.div>
-
 
         {/* Impact highlights: NPS + Charity */}
         <motion.div
@@ -816,11 +808,10 @@ export default function Dashboard() {
             {
               label: "View Calendar",
               onClick: () => (window.location.href = "/calendar"),
-              variant: "ghost"
-            }
+              variant: "ghost",
+            },
           ]}
         />
-
 
         {/* Error State */}
         {isError && (
@@ -838,7 +829,7 @@ export default function Dashboard() {
             <motion.div
               className={cn(
                 "rounded-2xl p-6 space-y-6 shadow-sm transition-colors",
-                "bg-card border border-border"
+                "bg-card border border-border",
               )}
               {...motionProps}
               transition={{ ...SPRING_CONFIG, delay: 0.1 }}
@@ -866,14 +857,17 @@ export default function Dashboard() {
                             Total number of occupied sites right now.
                           </HelpTooltipSection>
                           <HelpTooltipSection title="Occupancy">
-                            Percentage of sites currently occupied. High occupancy (90%+) means you're nearly full!
+                            Percentage of sites currently occupied. High occupancy (90%+) means
+                            you're nearly full!
                           </HelpTooltipSection>
                           <HelpTooltipSection title="Balance due">
-                            Total unpaid balances across all active reservations. The breakdown shows:
-                            Overdue (past arrival date), Due Today (arriving today), and Future (not yet due).
+                            Total unpaid balances across all active reservations. The breakdown
+                            shows: Overdue (past arrival date), Due Today (arriving today), and
+                            Future (not yet due).
                           </HelpTooltipSection>
                           <HelpTooltipSection title="Revenue">
-                            Total revenue collected today. Click to view detailed revenue analytics and trends.
+                            Total revenue collected today. Click to view detailed revenue analytics
+                            and trends.
                           </HelpTooltipSection>
                         </HelpTooltipContent>
                       }
@@ -891,7 +885,7 @@ export default function Dashboard() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors",
                       "border border-border bg-muted/30 hover:border-muted-foreground/30 hover:text-foreground",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                     )}
                   >
                     <Calendar className="h-3.5 w-3.5" /> Calendar
@@ -901,7 +895,7 @@ export default function Dashboard() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors",
                       "border border-border bg-muted/30 hover:border-muted-foreground/30 hover:text-foreground",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                     )}
                   >
                     <UserCheck className="h-3.5 w-3.5" /> Check-ins
@@ -911,7 +905,7 @@ export default function Dashboard() {
                     className={cn(
                       "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 transition-colors",
                       "border border-border bg-muted/30 hover:border-muted-foreground/30 hover:text-foreground",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                     )}
                   >
                     <ClipboardList className="h-3.5 w-3.5" /> Reservations
@@ -927,10 +921,44 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <OpsCard label="Arrivals" value={todayArrivals.length} href="/check-in-out" icon={<UserCheck className="h-4 w-4" />} tone="emerald" index={0} prefersReducedMotion={prefersReducedMotion} celebrate={todayArrivals.length >= 5} />
-                  <OpsCard label="Departures" value={todayDepartures.length} href="/check-in-out" icon={<LogOut className="h-4 w-4" />} tone="amber" index={1} prefersReducedMotion={prefersReducedMotion} />
-                  <OpsCard label="In-house" value={inHouse.length} href="/reservations" icon={<Users className="h-4 w-4" />} tone="blue" index={2} prefersReducedMotion={prefersReducedMotion} />
-                  <OpsCard label="Occupancy" value={`${occupancyRate}%`} href="/calendar" icon={<Calendar className="h-4 w-4" />} tone="purple" index={3} prefersReducedMotion={prefersReducedMotion} celebrate={occupancyRate >= 90} />
+                  <OpsCard
+                    label="Arrivals"
+                    value={todayArrivals.length}
+                    href="/check-in-out"
+                    icon={<UserCheck className="h-4 w-4" />}
+                    tone="emerald"
+                    index={0}
+                    prefersReducedMotion={prefersReducedMotion}
+                    celebrate={todayArrivals.length >= 5}
+                  />
+                  <OpsCard
+                    label="Departures"
+                    value={todayDepartures.length}
+                    href="/check-in-out"
+                    icon={<LogOut className="h-4 w-4" />}
+                    tone="amber"
+                    index={1}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                  <OpsCard
+                    label="In-house"
+                    value={inHouse.length}
+                    href="/reservations"
+                    icon={<Users className="h-4 w-4" />}
+                    tone="blue"
+                    index={2}
+                    prefersReducedMotion={prefersReducedMotion}
+                  />
+                  <OpsCard
+                    label="Occupancy"
+                    value={`${occupancyRate}%`}
+                    href="/calendar"
+                    icon={<Calendar className="h-4 w-4" />}
+                    tone="purple"
+                    index={3}
+                    prefersReducedMotion={prefersReducedMotion}
+                    celebrate={occupancyRate >= 90}
+                  />
                   <OpsCard
                     label="Balance due"
                     value={formatMoney(outstandingBalanceCents)}
@@ -982,15 +1010,19 @@ export default function Dashboard() {
                     ))}
                   </div>
                 ) : occupancy14.length === 0 ? (
-                  <div className={cn(
-                    "rounded-lg p-6 text-center space-y-3",
-                    "border border-dashed border-border bg-muted/40"
-                  )}>
+                  <div
+                    className={cn(
+                      "rounded-lg p-6 text-center space-y-3",
+                      "border border-dashed border-border bg-muted/40",
+                    )}
+                  >
                     <div className="flex justify-center mb-2">
                       <BarChart3 className="h-8 w-8 text-muted-foreground" />
                     </div>
                     <p className="text-sm font-semibold text-foreground">No occupancy data yet</p>
-                    <p className="text-xs text-muted-foreground">Add sites and create reservations to see your occupancy forecast</p>
+                    <p className="text-xs text-muted-foreground">
+                      Add sites and create reservations to see your occupancy forecast
+                    </p>
                     <div className="flex justify-center gap-2 pt-2">
                       <Link
                         href="/campgrounds"
@@ -998,7 +1030,7 @@ export default function Dashboard() {
                           "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold",
                           "bg-emerald-600 text-white hover:bg-emerald-500",
                           "shadow-sm transition-colors",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                         )}
                       >
                         <Tent className="h-3.5 w-3.5" />
@@ -1010,7 +1042,7 @@ export default function Dashboard() {
                           "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold",
                           "border border-border bg-card text-foreground hover:bg-muted",
                           "shadow-sm transition-colors",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                         )}
                       >
                         <Plus className="h-3.5 w-3.5" />
@@ -1023,7 +1055,9 @@ export default function Dashboard() {
                     {occupancy14.map((d, index) => (
                       <motion.div
                         key={d.label}
-                        initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+                        initial={
+                          prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }
+                        }
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ ...SPRING_FAST, delay: getStaggerDelay(index, 0.05) }}
                       >
@@ -1034,18 +1068,15 @@ export default function Dashboard() {
                             "flex flex-col gap-1 rounded-lg px-3 py-2 transition-all",
                             "border border-border bg-muted/30",
                             "hover:border-muted-foreground/30 hover:bg-muted/50",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                           )}
                         >
                           <span className="text-xs text-muted-foreground">{d.label}</span>
-                          <div className={cn(
-                            "h-2 w-full rounded",
-                            "bg-muted"
-                          )}>
+                          <div className={cn("h-2 w-full rounded", "bg-muted")}>
                             <div
                               className={cn(
                                 "h-2 rounded transition-all",
-                                d.rate >= 90 ? "bg-amber-500" : "bg-emerald-500"
+                                d.rate >= 90 ? "bg-amber-500" : "bg-emerald-500",
                               )}
                               style={{ width: `${Math.min(100, d.rate)}%` }}
                             />
@@ -1068,7 +1099,7 @@ export default function Dashboard() {
                     href="/check-in-out"
                     className={cn(
                       "text-xs font-semibold text-emerald-600 hover:text-emerald-500 flex items-center gap-1",
-                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded",
                     )}
                   >
                     Open check-in/out <ArrowRight className="h-4 w-4" />
@@ -1102,7 +1133,7 @@ export default function Dashboard() {
                       href="/reservations"
                       className={cn(
                         "text-xs font-semibold text-emerald-600 hover:text-emerald-500 flex items-center gap-1",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded",
                       )}
                     >
                       View reservations <ArrowRight className="h-4 w-4" />
@@ -1119,8 +1150,18 @@ export default function Dashboard() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <ActivityList title="Arrivals" tone="emerald" rows={todayArrivals.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
-                      <ActivityList title="Departures" tone="amber" rows={todayDepartures.slice(0, 6)} prefersReducedMotion={prefersReducedMotion} />
+                      <ActivityList
+                        title="Arrivals"
+                        tone="emerald"
+                        rows={todayArrivals.slice(0, 6)}
+                        prefersReducedMotion={prefersReducedMotion}
+                      />
+                      <ActivityList
+                        title="Departures"
+                        tone="amber"
+                        rows={todayDepartures.slice(0, 6)}
+                        prefersReducedMotion={prefersReducedMotion}
+                      />
                     </div>
                   )}
                 </div>
@@ -1132,7 +1173,7 @@ export default function Dashboard() {
             <motion.div
               className={cn(
                 "rounded-2xl p-6 space-y-6 shadow-sm transition-colors",
-                "bg-card border border-border"
+                "bg-card border border-border",
               )}
               {...motionProps}
               transition={{ ...SPRING_CONFIG, delay: 0.14 }}
@@ -1166,10 +1207,12 @@ export default function Dashboard() {
                   />
                 </div>
 
-                <div className={cn(
-                  "rounded-xl p-4 space-y-4 transition-colors",
-                  "border border-border/70 bg-card"
-                )}>
+                <div
+                  className={cn(
+                    "rounded-xl p-4 space-y-4 transition-colors",
+                    "border border-border/70 bg-card",
+                  )}
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-base font-semibold text-foreground">
@@ -1178,14 +1221,16 @@ export default function Dashboard() {
                       <p className="text-xs text-muted-foreground">
                         {attentionList.length === 0
                           ? "Every reservation is fully paid. Nice work!"
-                          : `${attentionList.length} reservation${attentionList.length !== 1 ? 's' : ''} to follow up on`}
+                          : `${attentionList.length} reservation${attentionList.length !== 1 ? "s" : ""} to follow up on`}
                       </p>
                     </div>
                     {attentionList.length > 0 && (
-                      <span className={cn(
-                        "rounded-full text-xs font-bold px-3 py-1",
-                        "bg-card text-foreground border border-border"
-                      )}>
+                      <span
+                        className={cn(
+                          "rounded-full text-xs font-bold px-3 py-1",
+                          "bg-card text-foreground border border-border",
+                        )}
+                      >
                         {attentionList.length}
                       </span>
                     )}
@@ -1198,14 +1243,14 @@ export default function Dashboard() {
                       transition={{ type: "spring", duration: 0.5 }}
                       className={cn(
                         "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-lg px-4 py-4",
-                        "border border-border bg-card"
+                        "border border-border bg-card",
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <motion.div
                           animate={{
                             rotate: [0, 10, -10, 10, 0],
-                            scale: [1, 1.2, 1.2, 1.2, 1]
+                            scale: [1, 1.2, 1.2, 1.2, 1],
                           }}
                           transition={{ duration: 0.6 }}
                         >
@@ -1226,7 +1271,7 @@ export default function Dashboard() {
                           "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold whitespace-nowrap",
                           "border border-border bg-card text-foreground hover:bg-muted",
                           "shadow-sm transition-colors",
-                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                         )}
                       >
                         <BarChart3 className="h-3.5 w-3.5" />
@@ -1246,39 +1291,41 @@ export default function Dashboard() {
                             "rounded-lg px-3 py-2.5 shadow-sm",
                             "border border-border bg-muted/40",
                             "hover:border-muted-foreground/30",
-                            "hover:shadow-md transition-all duration-200"
+                            "hover:shadow-md transition-all duration-200",
                           )}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={cn(
-                              "h-8 w-8 rounded-full font-semibold flex items-center justify-center text-xs",
-                              "bg-muted text-muted-foreground border border-border"
-                            )}>
+                            <div
+                              className={cn(
+                                "h-8 w-8 rounded-full font-semibold flex items-center justify-center text-xs",
+                                "bg-muted text-muted-foreground border border-border",
+                              )}
+                            >
                               {r.guest?.primaryFirstName?.[0] ?? "?"}
                             </div>
                             <div>
                               <div className="text-sm font-semibold text-foreground">
-                                {r.guest?.primaryFirstName ?? "Guest"} {r.guest?.primaryLastName ?? ""}
+                                {r.guest?.primaryFirstName ?? "Guest"}{" "}
+                                {r.guest?.primaryLastName ?? ""}
                               </div>
-                              <div className="text-xs text-muted-foreground">Site {r.siteId ?? "—"}</div>
+                              <div className="text-xs text-muted-foreground">
+                                Site {r.siteId ?? "—"}
+                              </div>
                             </div>
                           </div>
                           <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
                             <span className="text-sm font-semibold text-foreground whitespace-nowrap">
                               {formatMoney(r.balance)}
                             </span>
-                            <motion.div
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                               <Link
                                 href={`/campgrounds/${selectedId}/reservations/${r.id}`}
-                                aria-label={`Collect payment from ${r.guest?.primaryFirstName ?? 'Guest'}`}
+                                aria-label={`Collect payment from ${r.guest?.primaryFirstName ?? "Guest"}`}
                                 className={cn(
                                   "inline-flex items-center justify-center rounded-md px-3 py-1.5 text-xs font-semibold text-white",
                                   "bg-emerald-600 hover:bg-emerald-500",
                                   "shadow-sm hover:shadow-md transition-all duration-200",
-                                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                                 )}
                               >
                                 Collect
@@ -1300,8 +1347,13 @@ export default function Dashboard() {
                     title="Common Tasks"
                     content={
                       <div className="space-y-2">
-                        <p>Tap these buttons to quickly perform common front desk tasks without navigating through menus.</p>
-                        <p className="text-xs text-muted-foreground">Tip: Use keyboard shortcuts to speed up your workflow even more!</p>
+                        <p>
+                          Tap these buttons to quickly perform common front desk tasks without
+                          navigating through menus.
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Tip: Use keyboard shortcuts to speed up your workflow even more!
+                        </p>
                       </div>
                     }
                     side="right"
@@ -1363,10 +1415,12 @@ export default function Dashboard() {
                   </Badge>
                 </div>
                 {alerts.length === 0 ? (
-                  <div className={cn(
-                    "rounded-lg border border-dashed px-4 py-3 text-sm flex items-center gap-2",
-                    "border-border bg-muted/30 text-muted-foreground"
-                  )}>
+                  <div
+                    className={cn(
+                      "rounded-lg border border-dashed px-4 py-3 text-sm flex items-center gap-2",
+                      "border-border bg-muted/30 text-muted-foreground",
+                    )}
+                  >
                     <CheckCircle className="h-4 w-4 text-emerald-600" />
                     All clear - nothing needs your attention.
                   </div>
@@ -1384,7 +1438,7 @@ export default function Dashboard() {
                           className={cn(
                             "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all",
                             "border border-border bg-muted/30 text-foreground hover:border-muted-foreground/30 hover:shadow-sm",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2",
                           )}
                         >
                           <span>{a.label}</span>
@@ -1395,7 +1449,12 @@ export default function Dashboard() {
                   </div>
                 )}
                 <div className="pt-2">
-                  <StatCard label="Future bookings" value={futureReservations} hint="Upcoming arrivals" icon={<ClipboardList className="h-4 w-4" />} />
+                  <StatCard
+                    label="Future bookings"
+                    value={futureReservations}
+                    hint="Upcoming arrivals"
+                    icon={<ClipboardList className="h-4 w-4" />}
+                  />
                 </div>
               </div>
 
@@ -1405,7 +1464,9 @@ export default function Dashboard() {
                     <Search className="h-4 w-4 text-muted-foreground" />
                     Quick search
                   </div>
-                  <span className="text-xs text-muted-foreground">Guest, site, or reservation ID</span>
+                  <span className="text-xs text-muted-foreground">
+                    Guest, site, or reservation ID
+                  </span>
                 </div>
                 <Input
                   className="h-11"
@@ -1434,18 +1495,23 @@ export default function Dashboard() {
                           className={cn(
                             "flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all",
                             "border border-border bg-muted/30 hover:border-muted-foreground/30 hover:shadow-sm",
-                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
                           )}
                         >
                           <div className="flex flex-col">
                             <span className="font-semibold text-foreground">
-                              {(r.guest?.primaryFirstName || "Guest") + " " + (r.guest?.primaryLastName || "")}
+                              {(r.guest?.primaryFirstName || "Guest") +
+                                " " +
+                                (r.guest?.primaryLastName || "")}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                              {new Date(r.arrivalDate).toLocaleDateString()} → {new Date(r.departureDate).toLocaleDateString()} • Site {r.siteId}
+                              {new Date(r.arrivalDate).toLocaleDateString()} →{" "}
+                              {new Date(r.departureDate).toLocaleDateString()} • Site {r.siteId}
                             </span>
                           </div>
-                          <span className="text-xs uppercase text-muted-foreground">{r.status}</span>
+                          <span className="text-xs uppercase text-muted-foreground">
+                            {r.status}
+                          </span>
                         </Link>
                       </motion.div>
                     ))}
@@ -1455,10 +1521,7 @@ export default function Dashboard() {
             </motion.div>
 
             {hasMounted && selectedId && (
-              <motion.div
-                {...motionProps}
-                transition={{ ...SPRING_CONFIG, delay: 0.18 }}
-              >
+              <motion.div {...motionProps} transition={{ ...SPRING_CONFIG, delay: 0.18 }}>
                 <SetupQueueWidget campgroundId={selectedId} />
               </motion.div>
             )}
@@ -1478,7 +1541,7 @@ function OpsCard({
   index,
   prefersReducedMotion,
   celebrate = false,
-  breakdown
+  breakdown,
 }: {
   label: string;
   value: string | number;
@@ -1508,16 +1571,14 @@ function OpsCard({
       <Link
         href={href}
         aria-label={`${label}: ${value}`}
-          className={cn(
+        className={cn(
           "flex items-start justify-between gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 transition-colors",
           "hover:border-muted-foreground/30 hover:bg-muted/50",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
         )}
       >
         <div className="flex items-start gap-3 flex-1">
-          <span className={cn("rounded-lg p-2 bg-muted", toneStyle.icon)}>
-            {icon}
-          </span>
+          <span className={cn("rounded-lg p-2 bg-muted", toneStyle.icon)}>{icon}</span>
           <div className="flex-1">
             <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <span className={cn("h-2 w-2 rounded-full", toneStyle.dot)} />
@@ -1533,8 +1594,9 @@ function OpsCard({
                       "inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px]",
                       item.tone === "danger" && "border-red-200 text-red-700 bg-red-50",
                       item.tone === "warning" && "border-amber-200 text-amber-700 bg-amber-50",
-                      item.tone === "success" && "border-emerald-200 text-emerald-700 bg-emerald-50",
-                      !item.tone && "border-border text-muted-foreground bg-muted"
+                      item.tone === "success" &&
+                        "border-emerald-200 text-emerald-700 bg-emerald-50",
+                      !item.tone && "border-border text-muted-foreground bg-muted",
                     )}
                   >
                     <span className="font-semibold">{item.value}</span>
@@ -1570,7 +1632,7 @@ function BoardCard({
   rows,
   tone = "emerald",
   prefersReducedMotion,
-  isLoading = false
+  isLoading = false,
 }: {
   title: string;
   count: number;
@@ -1589,7 +1651,7 @@ function BoardCard({
       className={cn(
         "rounded-xl p-4 space-y-3 transition-colors",
         "bg-muted/30 border border-border/70",
-        ""
+        "",
       )}
     >
       <div className="flex items-center justify-between">
@@ -1615,7 +1677,7 @@ function BoardCard({
           transition={{ type: "spring", duration: 0.4 }}
           className={cn(
             "rounded-lg p-6 text-center space-y-3",
-            "border border-dashed border-border bg-muted/40"
+            "border border-dashed border-border bg-muted/40",
           )}
         >
           <div className="flex justify-center mb-2">
@@ -1642,7 +1704,7 @@ function BoardCard({
                 "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold",
                 "bg-emerald-600 text-white hover:bg-emerald-500",
                 "shadow-sm transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
               )}
             >
               <Plus className="h-3.5 w-3.5" />
@@ -1654,7 +1716,7 @@ function BoardCard({
                 "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold",
                 "border border-border bg-card text-foreground hover:bg-muted",
                 "shadow-sm transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
               )}
             >
               <Calendar className="h-3.5 w-3.5" />
@@ -1673,14 +1735,16 @@ function BoardCard({
               className={cn(
                 "flex items-center justify-between rounded-lg px-3 py-2.5 transition-colors",
                 "border border-border bg-card",
-                "hover:border-muted-foreground/30"
+                "hover:border-muted-foreground/30",
               )}
             >
               <div className="flex items-center gap-3">
-                <div className={cn(
-                  "h-9 w-9 rounded-full font-semibold flex items-center justify-center text-xs",
-                  "bg-muted text-muted-foreground"
-                )}>
+                <div
+                  className={cn(
+                    "h-9 w-9 rounded-full font-semibold flex items-center justify-center text-xs",
+                    "bg-muted text-muted-foreground",
+                  )}
+                >
                   {r.guest?.primaryFirstName?.[0] ?? "?"}
                 </div>
                 <div>
@@ -1694,7 +1758,10 @@ function BoardCard({
                 <div className="text-xs text-muted-foreground">{r.status ?? "Pending"}</div>
                 <div className="text-xs text-muted-foreground flex items-center justify-end gap-1">
                   <Clock className="h-3.5 w-3.5" />
-                  {new Date(r.arrivalDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                  {new Date(r.arrivalDate).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                  })}
                 </div>
               </div>
             </motion.div>
@@ -1706,7 +1773,7 @@ function BoardCard({
         href={ctaHref}
         className={cn(
           "inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-500",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded"
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 rounded",
         )}
       >
         {ctaLabel} <ArrowRight className="h-4 w-4" />
@@ -1721,7 +1788,7 @@ function QuickActionButton({
   icon,
   tone,
   index,
-  prefersReducedMotion
+  prefersReducedMotion,
 }: {
   href: string;
   label: string;
@@ -1735,7 +1802,7 @@ function QuickActionButton({
     blue: "text-blue-600",
     purple: "text-purple-600",
     amber: "text-amber-600",
-    slate: "text-muted-foreground"
+    slate: "text-muted-foreground",
   };
 
   return (
@@ -1750,12 +1817,10 @@ function QuickActionButton({
         className={cn(
           "group flex h-full min-h-[120px] flex-col items-center justify-center gap-2.5 rounded-xl border border-border/70 bg-muted/30 px-3 py-4 text-center transition-all",
           "hover:-translate-y-0.5 hover:bg-muted/50 hover:border-muted-foreground/30 hover:shadow-md",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2",
         )}
       >
-        <span className={cn("rounded-lg p-2 bg-muted", toneMap[tone])}>
-          {icon}
-        </span>
+        <span className={cn("rounded-lg p-2 bg-muted", toneMap[tone])}>{icon}</span>
         <span className="text-[13px] font-semibold text-foreground leading-snug whitespace-normal break-words text-center w-full min-h-[32px]">
           {label}
         </span>
@@ -1768,7 +1833,7 @@ function StatCard({
   label,
   value,
   hint,
-  icon
+  icon,
 }: {
   label: string;
   value: string | number;
@@ -1776,16 +1841,10 @@ function StatCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className={cn(
-      "rounded-lg p-3 transition-colors",
-      "border border-border/70 bg-muted/30"
-    )}>
+    <div className={cn("rounded-lg p-3 transition-colors", "border border-border/70 bg-muted/30")}>
       <div className="flex items-center justify-between mb-2">
         <div className="text-xs font-semibold text-muted-foreground">{label}</div>
-        <span className={cn(
-          "rounded-md p-2",
-          "bg-muted text-muted-foreground"
-        )}>{icon}</span>
+        <span className={cn("rounded-md p-2", "bg-muted text-muted-foreground")}>{icon}</span>
       </div>
       <div className="text-xl font-semibold text-foreground">{value}</div>
       <div className="text-xs text-muted-foreground mt-1">{hint}</div>
@@ -1793,11 +1852,7 @@ function StatCard({
   );
 }
 
-function NpsSummaryCard({
-  npsData
-}: {
-  npsData?: NpsMetrics;
-}) {
+function NpsSummaryCard({ npsData }: { npsData?: NpsMetrics }) {
   const totalResponses = npsData?.totalResponses ?? 0;
   const promoters = npsData?.promoters ?? 0;
   const passives = npsData?.passives ?? 0;
@@ -1808,21 +1863,13 @@ function NpsSummaryCard({
   const score = hasScore ? npsScore : 0;
   const isLoading = !npsData;
 
-  const formatPercent = (value: number) => (
-    totalResponses > 0
-      ? `${Math.round((value / totalResponses) * 100)}%`
-      : "—"
-  );
+  const formatPercent = (value: number) =>
+    totalResponses > 0 ? `${Math.round((value / totalResponses) * 100)}%` : "—";
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {hasScore || isLoading ? (
-        <NpsGauge
-          score={score}
-          loading={isLoading}
-          size="md"
-          title="Guest NPS Score"
-        />
+        <NpsGauge score={score} loading={isLoading} size="md" title="Guest NPS Score" />
       ) : (
         <Card className="border-border bg-muted/30">
           <CardContent className="p-6">
@@ -1889,22 +1936,22 @@ function ActivityList({
   title,
   rows,
   tone,
-  prefersReducedMotion
+  prefersReducedMotion,
 }: {
   title: string;
   rows: Reservation[];
   tone: "emerald" | "amber";
   prefersReducedMotion: boolean | null;
 }) {
-  const accent = tone === "emerald"
-    ? "text-emerald-600"
-    : "text-amber-600";
+  const accent = tone === "emerald" ? "text-emerald-600" : "text-amber-600";
 
   return (
-    <div className={cn(
-      "rounded-xl overflow-hidden transition-colors",
-      "border border-border/70 bg-muted/30"
-    )}>
+    <div
+      className={cn(
+        "rounded-xl overflow-hidden transition-colors",
+        "border border-border/70 bg-muted/30",
+      )}
+    >
       <div className="flex items-center justify-between border-b border-border px-3 py-2">
         <div className="text-sm font-semibold text-foreground">{title}</div>
         <div className={cn("text-xs font-semibold", accent)}>{rows.length}</div>
@@ -1926,7 +1973,7 @@ function ActivityList({
                 "inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium",
                 "bg-muted text-foreground hover:bg-accent",
                 "transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1",
               )}
             >
               <Plus className="h-3 w-3" />
@@ -1938,7 +1985,7 @@ function ActivityList({
                 "inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium",
                 "text-muted-foreground hover:text-foreground hover:bg-muted",
                 "transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1"
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1",
               )}
             >
               <Calendar className="h-3 w-3" />
@@ -1957,10 +2004,12 @@ function ActivityList({
               className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 py-2.5"
             >
               <div className="flex items-center gap-3">
-                <div className={cn(
-                  "h-8 w-8 rounded-full font-semibold flex items-center justify-center text-xs",
-                  "bg-muted text-muted-foreground"
-                )}>
+                <div
+                  className={cn(
+                    "h-8 w-8 rounded-full font-semibold flex items-center justify-center text-xs",
+                    "bg-muted text-muted-foreground",
+                  )}
+                >
                   {r.guest?.primaryFirstName?.[0] ?? "?"}
                 </div>
                 <div>
@@ -1971,7 +2020,10 @@ function ActivityList({
                 </div>
               </div>
               <div className="text-right text-xs text-muted-foreground sm:min-w-[80px]">
-                {new Date(r.arrivalDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                {new Date(r.arrivalDate).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })}
               </div>
             </motion.div>
           ))}

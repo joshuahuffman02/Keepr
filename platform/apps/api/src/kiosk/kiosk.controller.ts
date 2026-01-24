@@ -31,7 +31,7 @@ export class KioskController {
   @Post("kiosk/pair")
   async pairDevice(
     @Body() body: { code: string; deviceName?: string },
-    @Headers("user-agent") userAgent?: string
+    @Headers("user-agent") userAgent?: string,
   ) {
     return this.kioskService.pairDevice(body.code, body.deviceName, userAgent);
   }
@@ -43,7 +43,7 @@ export class KioskController {
   @Get("kiosk/me")
   async getDeviceInfo(
     @Headers("x-kiosk-token") deviceToken: string,
-    @Headers("user-agent") userAgent?: string
+    @Headers("user-agent") userAgent?: string,
   ) {
     if (!deviceToken) {
       return { valid: false, error: "No device token provided" };
@@ -83,7 +83,7 @@ export class KioskController {
         type: string;
         plateNumber?: string;
       };
-    }
+    },
   ) {
     if (!deviceToken) {
       throw new BadRequestException("No device token provided");
@@ -102,7 +102,7 @@ export class KioskController {
   @UseGuards(JwtAuthGuard)
   async generatePairingCode(
     @Param("campgroundId") campgroundId: string,
-    @Req() req: ExpressRequest
+    @Req() req: ExpressRequest,
   ) {
     const userId = req.user?.id;
     if (!userId) {
@@ -134,7 +134,7 @@ export class KioskController {
       allowWalkIns?: boolean;
       allowCheckIn?: boolean;
       allowPayments?: boolean;
-    }
+    },
   ) {
     return this.kioskService.updateDevice(campgroundId, deviceId, body);
   }
@@ -146,7 +146,7 @@ export class KioskController {
   @UseGuards(JwtAuthGuard)
   async revokeDevice(
     @Param("campgroundId") campgroundId: string,
-    @Param("deviceId") deviceId: string
+    @Param("deviceId") deviceId: string,
   ) {
     return this.kioskService.revokeDevice(campgroundId, deviceId);
   }
@@ -158,7 +158,7 @@ export class KioskController {
   @UseGuards(JwtAuthGuard)
   async enableDevice(
     @Param("campgroundId") campgroundId: string,
-    @Param("deviceId") deviceId: string
+    @Param("deviceId") deviceId: string,
   ) {
     return this.kioskService.enableDevice(campgroundId, deviceId);
   }
@@ -170,7 +170,7 @@ export class KioskController {
   @UseGuards(JwtAuthGuard)
   async deleteDevice(
     @Param("campgroundId") campgroundId: string,
-    @Param("deviceId") deviceId: string
+    @Param("deviceId") deviceId: string,
   ) {
     return this.kioskService.deleteDevice(campgroundId, deviceId);
   }

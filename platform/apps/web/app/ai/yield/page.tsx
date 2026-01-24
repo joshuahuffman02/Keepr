@@ -129,7 +129,7 @@ export default function YieldDashboardPage() {
         });
       }
     },
-    [queryClient, toast]
+    [queryClient, toast],
   );
 
   // Handle new pricing recommendations
@@ -143,7 +143,7 @@ export default function YieldDashboardPage() {
         description: `${eventData.reason} - potential +${formatCurrency(eventData.estimatedRevenueDelta)}`,
       });
     },
-    [queryClient, toast]
+    [queryClient, toast],
   );
 
   // Handle forecast updates
@@ -164,7 +164,7 @@ export default function YieldDashboardPage() {
         };
       });
     },
-    [queryClient]
+    [queryClient],
   );
 
   // Subscribe to yield real-time events
@@ -244,13 +244,13 @@ export default function YieldDashboardPage() {
             className={cn(
               isConnected
                 ? "text-emerald-600 border-emerald-200 bg-emerald-50"
-                : "text-amber-600 border-amber-200 bg-amber-50"
+                : "text-amber-600 border-amber-200 bg-amber-50",
             )}
           >
             <span
               className={cn(
                 "h-2 w-2 rounded-full mr-2",
-                isConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500"
+                isConnected ? "bg-emerald-500 animate-pulse" : "bg-amber-500",
               )}
             />
             {isConnected ? "Live" : "Polling"}
@@ -305,7 +305,12 @@ export default function YieldDashboardPage() {
                 {metrics.yoyChange && (
                   <div className="mt-4 flex items-center gap-1">
                     {getChangeIcon(metrics.yoyChange.revenue)}
-                    <span className={cn("text-sm font-medium", getChangeColor(metrics.yoyChange.revenue))}>
+                    <span
+                      className={cn(
+                        "text-sm font-medium",
+                        getChangeColor(metrics.yoyChange.revenue),
+                      )}
+                    >
                       {metrics.yoyChange.revenue > 0 ? "+" : ""}
                       {formatPercent(metrics.yoyChange.revenue)} YoY
                     </span>
@@ -336,7 +341,9 @@ export default function YieldDashboardPage() {
                 {metrics.yoyChange && (
                   <div className="mt-4 flex items-center gap-1">
                     {getChangeIcon(metrics.yoyChange.adr)}
-                    <span className={cn("text-sm font-medium", getChangeColor(metrics.yoyChange.adr))}>
+                    <span
+                      className={cn("text-sm font-medium", getChangeColor(metrics.yoyChange.adr))}
+                    >
                       {metrics.yoyChange.adr > 0 ? "+" : ""}
                       {formatPercent(metrics.yoyChange.adr)} YoY
                     </span>
@@ -457,9 +464,7 @@ export default function YieldDashboardPage() {
                     {metrics.gapNights} gap nights
                   </Badge>
                 </div>
-                <CardDescription>
-                  Revenue opportunities waiting to be captured
-                </CardDescription>
+                <CardDescription>Revenue opportunities waiting to be captured</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -547,14 +552,15 @@ export default function YieldDashboardPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <p className="font-medium text-slate-900 text-sm">
-                              {format(new Date(rec.dateStart), "MMM d")} - {format(new Date(rec.dateEnd), "MMM d")}
+                              {format(new Date(rec.dateStart), "MMM d")} -{" "}
+                              {format(new Date(rec.dateEnd), "MMM d")}
                             </p>
                             <Badge
                               variant="outline"
                               className={cn(
                                 rec.adjustmentPercent > 0
                                   ? "text-emerald-600 border-emerald-200"
-                                  : "text-red-600 border-red-200"
+                                  : "text-red-600 border-red-200",
                               )}
                             >
                               {rec.adjustmentPercent > 0 ? "+" : ""}
@@ -562,7 +568,8 @@ export default function YieldDashboardPage() {
                             </Badge>
                           </div>
                           <p className="text-xs text-slate-500 mt-1">
-                            {formatCurrency(rec.currentPrice)} &rarr; {formatCurrency(rec.suggestedPrice)}
+                            {formatCurrency(rec.currentPrice)} &rarr;{" "}
+                            {formatCurrency(rec.suggestedPrice)}
                           </p>
                         </div>
                         <div className="text-right">
@@ -631,7 +638,10 @@ export default function YieldDashboardPage() {
                     ))}
                   </div>
                   <div className="flex justify-between text-xs text-slate-500">
-                    <span>{occupancyTrend.length > 0 && format(new Date(occupancyTrend[0].date), "MMM d")}</span>
+                    <span>
+                      {occupancyTrend.length > 0 &&
+                        format(new Date(occupancyTrend[0].date), "MMM d")}
+                    </span>
                     <span>
                       {occupancyTrend.length > 0 &&
                         format(new Date(occupancyTrend[occupancyTrend.length - 1].date), "MMM d")}
@@ -653,9 +663,7 @@ export default function YieldDashboardPage() {
                       <p className="text-xs text-slate-500">Total Revenue</p>
                     </div>
                     <div className="text-center">
-                      <p className="text-2xl font-bold text-slate-900">
-                        {metrics.periodNights}
-                      </p>
+                      <p className="text-2xl font-bold text-slate-900">{metrics.periodNights}</p>
                       <p className="text-xs text-slate-500">Days Tracked</p>
                     </div>
                   </div>
@@ -694,15 +702,15 @@ export default function YieldDashboardPage() {
                       elasticityData.elasticity < -1.5
                         ? "text-red-600 border-red-200 bg-red-50"
                         : elasticityData.elasticity < -0.5
-                        ? "text-amber-600 border-amber-200 bg-amber-50"
-                        : "text-emerald-600 border-emerald-200 bg-emerald-50"
+                          ? "text-amber-600 border-amber-200 bg-amber-50"
+                          : "text-emerald-600 border-emerald-200 bg-emerald-50",
                     )}
                   >
                     {elasticityData.elasticity < -1.5
                       ? "Highly Elastic"
                       : elasticityData.elasticity < -0.5
-                      ? "Moderately Elastic"
-                      : "Inelastic"}
+                        ? "Moderately Elastic"
+                        : "Inelastic"}
                   </Badge>
                 </div>
               </CardHeader>
@@ -723,8 +731,8 @@ export default function YieldDashboardPage() {
                           elasticityData.elasticity < -1.5
                             ? "bg-red-500"
                             : elasticityData.elasticity < -0.5
-                            ? "bg-amber-500"
-                            : "bg-emerald-500"
+                              ? "bg-amber-500"
+                              : "bg-emerald-500",
                         )}
                         style={{
                           width: `${Math.min(Math.abs(elasticityData.elasticity) * 30, 100)}%`,
@@ -761,11 +769,15 @@ export default function YieldDashboardPage() {
 
                   {/* Price Points Distribution */}
                   <div className="space-y-4">
-                    <span className="text-sm font-medium text-slate-700">Booking Distribution by Price</span>
+                    <span className="text-sm font-medium text-slate-700">
+                      Booking Distribution by Price
+                    </span>
                     {elasticityData.pricePoints.length > 0 ? (
                       <div className="space-y-2">
                         {elasticityData.pricePoints.slice(0, 6).map((point, i) => {
-                          const maxBookings = Math.max(...elasticityData.pricePoints.map(p => p.bookings));
+                          const maxBookings = Math.max(
+                            ...elasticityData.pricePoints.map((p) => p.bookings),
+                          );
                           const width = (point.bookings / maxBookings) * 100;
                           return (
                             <div key={i} className="flex items-center gap-3">
@@ -773,7 +785,10 @@ export default function YieldDashboardPage() {
                                 {formatCurrency(point.price)}
                               </div>
                               <div className="flex-1 h-6 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${width}%` }} />
+                                <div
+                                  className="h-full bg-primary rounded-full transition-all"
+                                  style={{ width: `${width}%` }}
+                                />
                               </div>
                               <div className="w-16 text-right text-sm text-slate-600">
                                 {point.bookings} bookings
@@ -828,15 +843,15 @@ export default function YieldDashboardPage() {
                         day.occupancyPct >= 80
                           ? "bg-emerald-500"
                           : day.occupancyPct >= 50
-                          ? "bg-amber-500"
-                          : "bg-red-400";
+                            ? "bg-amber-500"
+                            : "bg-red-400";
 
                       return (
                         <div
                           key={day.date}
                           className={cn(
                             "p-3 rounded-lg text-center border",
-                            isWeekend ? "bg-slate-50" : "bg-white"
+                            isWeekend ? "bg-slate-50" : "bg-white",
                           )}
                         >
                           <p className="text-xs font-medium text-slate-500">
@@ -849,7 +864,7 @@ export default function YieldDashboardPage() {
                             <div
                               className={cn(
                                 "inline-block px-2 py-1 rounded text-white text-xs font-bold",
-                                occupancyLevel
+                                occupancyLevel,
                               )}
                             >
                               {formatPercent(day.occupancyPct)}

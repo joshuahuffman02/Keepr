@@ -19,321 +19,322 @@ import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
  */
 @Injectable()
 export class TotpService {
-    private readonly logger = new Logger(TotpService.name);
-    private readonly issuer = "CampReserv";
-    private readonly encryptionKey: Buffer;
-    private readonly algorithm = "aes-256-gcm";
+  private readonly logger = new Logger(TotpService.name);
+  private readonly issuer = "CampReserv";
+  private readonly encryptionKey: Buffer;
+  private readonly algorithm = "aes-256-gcm";
 
-    constructor(private readonly prisma: PrismaService) {
-        // Encryption key for storing TOTP secrets
-        // In production, this should be from a secure key management service
-        const keyString = process.env.TOTP_ENCRYPTION_KEY || process.env.JWT_SECRET || "";
+  constructor(private readonly prisma: PrismaService) {
+    // Encryption key for storing TOTP secrets
+    // In production, this should be from a secure key management service
+    const keyString = process.env.TOTP_ENCRYPTION_KEY || process.env.JWT_SECRET || "";
 
-        if (keyString.length < 32) {
-            this.logger.warn("TOTP_ENCRYPTION_KEY should be at least 32 characters");
-        }
-
-        // Derive a 32-byte key using padding/truncating
-        this.encryptionKey = Buffer.alloc(32);
-        Buffer.from(keyString).copy(this.encryptionKey);
+    if (keyString.length < 32) {
+      this.logger.warn("TOTP_ENCRYPTION_KEY should be at least 32 characters");
     }
 
-    /**
-     * Generate a new TOTP secret for a user (Step 1 of setup)
-     *
-     * @param userId The user's ID
-     * @param email The user's email (used as account name in authenticator)
-     * @returns Setup data including secret and QR code
-     */
-    async generateSetup(userId: string, email: string): Promise<{
-        secret: string;
-        qrCodeDataUrl: string;
-        manualEntryKey: string;
-        backupCodes: string[];
-    }> {
-        // Generate a random secret
-        const secret = new OTPAuth.Secret({ size: 20 });
+    // Derive a 32-byte key using padding/truncating
+    this.encryptionKey = Buffer.alloc(32);
+    Buffer.from(keyString).copy(this.encryptionKey);
+  }
 
-        // Create TOTP instance
-        const totp = new OTPAuth.TOTP({
-            issuer: this.issuer,
-            label: email,
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
-            secret: secret,
-        });
+  /**
+   * Generate a new TOTP secret for a user (Step 1 of setup)
+   *
+   * @param userId The user's ID
+   * @param email The user's email (used as account name in authenticator)
+   * @returns Setup data including secret and QR code
+   */
+  async generateSetup(
+    userId: string,
+    email: string,
+  ): Promise<{
+    secret: string;
+    qrCodeDataUrl: string;
+    manualEntryKey: string;
+    backupCodes: string[];
+  }> {
+    // Generate a random secret
+    const secret = new OTPAuth.Secret({ size: 20 });
 
-        // Generate QR code
-        const otpauthUrl = totp.toString();
-        const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl, {
-            width: 256,
-            margin: 2,
-            color: {
-                dark: "#000000",
-                light: "#ffffff",
-            },
-        });
+    // Create TOTP instance
+    const totp = new OTPAuth.TOTP({
+      issuer: this.issuer,
+      label: email,
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: secret,
+    });
 
-        // Generate backup codes
-        const backupCodes = this.generateBackupCodes(8);
+    // Generate QR code
+    const otpauthUrl = totp.toString();
+    const qrCodeDataUrl = await QRCode.toDataURL(otpauthUrl, {
+      width: 256,
+      margin: 2,
+      color: {
+        dark: "#000000",
+        light: "#ffffff",
+      },
+    });
 
-        // Store the pending setup (encrypted)
-        const encryptedSecret = this.encryptSecret(secret.base32);
-        const hashedBackupCodes = await this.hashBackupCodes(backupCodes);
+    // Generate backup codes
+    const backupCodes = this.generateBackupCodes(8);
 
-        await this.prisma.user.update({
-            where: { id: userId },
-            data: {
-                totpPendingSecret: encryptedSecret,
-                totpBackupCodes: hashedBackupCodes,
-            },
-        });
+    // Store the pending setup (encrypted)
+    const encryptedSecret = this.encryptSecret(secret.base32);
+    const hashedBackupCodes = await this.hashBackupCodes(backupCodes);
 
-        return {
-            secret: secret.base32,
-            qrCodeDataUrl,
-            manualEntryKey: secret.base32,
-            backupCodes,
-        };
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        totpPendingSecret: encryptedSecret,
+        totpBackupCodes: hashedBackupCodes,
+      },
+    });
+
+    return {
+      secret: secret.base32,
+      qrCodeDataUrl,
+      manualEntryKey: secret.base32,
+      backupCodes,
+    };
+  }
+
+  /**
+   * Confirm TOTP setup with a valid code (Step 2 of setup)
+   *
+   * @param userId The user's ID
+   * @param code The 6-digit code from authenticator app
+   * @returns Whether setup was successful
+   */
+  async confirmSetup(userId: string, code: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { totpPendingSecret: true },
+    });
+
+    if (!user?.totpPendingSecret) {
+      throw new BadRequestException("No pending 2FA setup found. Please start setup again.");
     }
 
-    /**
-     * Confirm TOTP setup with a valid code (Step 2 of setup)
-     *
-     * @param userId The user's ID
-     * @param code The 6-digit code from authenticator app
-     * @returns Whether setup was successful
-     */
-    async confirmSetup(userId: string, code: string): Promise<boolean> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: { totpPendingSecret: true },
-        });
+    // Decrypt and verify
+    const secret = this.decryptSecret(user.totpPendingSecret);
+    const isValid = this.verifyCode(secret, code);
 
-        if (!user?.totpPendingSecret) {
-            throw new BadRequestException("No pending 2FA setup found. Please start setup again.");
-        }
+    if (!isValid) {
+      throw new BadRequestException("Invalid verification code. Please try again.");
+    }
 
-        // Decrypt and verify
-        const secret = this.decryptSecret(user.totpPendingSecret);
-        const isValid = this.verifyCode(secret, code);
+    // Move pending secret to active
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        totpSecret: user.totpPendingSecret,
+        totpPendingSecret: null,
+        totpEnabled: true,
+        totpEnabledAt: new Date(),
+      },
+    });
 
-        if (!isValid) {
-            throw new BadRequestException("Invalid verification code. Please try again.");
-        }
+    return true;
+  }
 
-        // Move pending secret to active
+  /**
+   * Verify a TOTP code during login
+   *
+   * @param userId The user's ID
+   * @param code The 6-digit code from authenticator app
+   * @returns Whether the code is valid
+   */
+  async verifyLogin(userId: string, code: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        totpSecret: true,
+        totpEnabled: true,
+        totpBackupCodes: true,
+      },
+    });
+
+    if (!user?.totpEnabled || !user.totpSecret) {
+      // 2FA not enabled - allow login
+      return true;
+    }
+
+    // Try regular TOTP code first
+    const secret = this.decryptSecret(user.totpSecret);
+    if (this.verifyCode(secret, code)) {
+      return true;
+    }
+
+    // Try backup codes
+    const backupCodes = normalizeBackupCodes(user.totpBackupCodes);
+    if (backupCodes) {
+      const usedIndex = await this.checkBackupCode(code, backupCodes);
+
+      if (usedIndex >= 0) {
+        // Remove used backup code
+        backupCodes.splice(usedIndex, 1);
         await this.prisma.user.update({
-            where: { id: userId },
-            data: {
-                totpSecret: user.totpPendingSecret,
-                totpPendingSecret: null,
-                totpEnabled: true,
-                totpEnabledAt: new Date(),
-            },
+          where: { id: userId },
+          data: { totpBackupCodes: backupCodes },
         });
 
+        this.logger.log(`Backup code used for user ${userId}. ${backupCodes.length} remaining.`);
         return true;
+      }
     }
 
-    /**
-     * Verify a TOTP code during login
-     *
-     * @param userId The user's ID
-     * @param code The 6-digit code from authenticator app
-     * @returns Whether the code is valid
-     */
-    async verifyLogin(userId: string, code: string): Promise<boolean> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: {
-                totpSecret: true,
-                totpEnabled: true,
-                totpBackupCodes: true,
-            },
-        });
+    throw new UnauthorizedException("Invalid 2FA code");
+  }
 
-        if (!user?.totpEnabled || !user.totpSecret) {
-            // 2FA not enabled - allow login
-            return true;
-        }
+  /**
+   * Check if a user has 2FA enabled
+   */
+  async isEnabled(userId: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { totpEnabled: true },
+    });
 
-        // Try regular TOTP code first
-        const secret = this.decryptSecret(user.totpSecret);
-        if (this.verifyCode(secret, code)) {
-            return true;
-        }
+    return user?.totpEnabled ?? false;
+  }
 
-        // Try backup codes
-        const backupCodes = normalizeBackupCodes(user.totpBackupCodes);
-        if (backupCodes) {
-            const usedIndex = await this.checkBackupCode(code, backupCodes);
+  /**
+   * Disable 2FA for a user
+   *
+   * @param userId The user's ID
+   * @param code A valid TOTP code or backup code (for verification)
+   */
+  async disable(userId: string, code: string): Promise<boolean> {
+    // Verify the code first
+    const isValid = await this.verifyLogin(userId, code);
 
-            if (usedIndex >= 0) {
-                // Remove used backup code
-                backupCodes.splice(usedIndex, 1);
-                await this.prisma.user.update({
-                    where: { id: userId },
-                    data: { totpBackupCodes: backupCodes },
-                });
-
-                this.logger.log(`Backup code used for user ${userId}. ${backupCodes.length} remaining.`);
-                return true;
-            }
-        }
-
-        throw new UnauthorizedException("Invalid 2FA code");
+    if (!isValid) {
+      throw new BadRequestException("Invalid verification code");
     }
 
-    /**
-     * Check if a user has 2FA enabled
-     */
-    async isEnabled(userId: string): Promise<boolean> {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: { totpEnabled: true },
-        });
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        totpEnabled: false,
+        totpSecret: null,
+        totpPendingSecret: null,
+        totpBackupCodes: Prisma.DbNull,
+        totpEnabledAt: null,
+      },
+    });
 
-        return user?.totpEnabled ?? false;
+    this.logger.log(`2FA disabled for user ${userId}`);
+    return true;
+  }
+
+  /**
+   * Generate new backup codes
+   */
+  async regenerateBackupCodes(userId: string, code: string): Promise<string[]> {
+    // Verify current code
+    await this.verifyLogin(userId, code);
+
+    const backupCodes = this.generateBackupCodes(8);
+    const hashedCodes = await this.hashBackupCodes(backupCodes);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { totpBackupCodes: hashedCodes },
+    });
+
+    return backupCodes;
+  }
+
+  // --- Private Methods ---
+
+  private verifyCode(secret: string, code: string): boolean {
+    if (!code || code.length !== 6) {
+      return false;
     }
 
-    /**
-     * Disable 2FA for a user
-     *
-     * @param userId The user's ID
-     * @param code A valid TOTP code or backup code (for verification)
-     */
-    async disable(userId: string, code: string): Promise<boolean> {
-        // Verify the code first
-        const isValid = await this.verifyLogin(userId, code);
+    const totp = new OTPAuth.TOTP({
+      algorithm: "SHA1",
+      digits: 6,
+      period: 30,
+      secret: OTPAuth.Secret.fromBase32(secret),
+    });
 
-        if (!isValid) {
-            throw new BadRequestException("Invalid verification code");
-        }
+    // Allow 1 period of drift (30 seconds before/after)
+    const delta = totp.validate({ token: code, window: 1 });
+    return delta !== null;
+  }
 
-        await this.prisma.user.update({
-            where: { id: userId },
-            data: {
-                totpEnabled: false,
-                totpSecret: null,
-                totpPendingSecret: null,
-                totpBackupCodes: Prisma.DbNull,
-                totpEnabledAt: null,
-            },
-        });
+  private generateBackupCodes(count: number): string[] {
+    const codes: string[] = [];
 
-        this.logger.log(`2FA disabled for user ${userId}`);
-        return true;
+    for (let i = 0; i < count; i++) {
+      // Generate 8-character alphanumeric codes
+      const code = randomBytes(5)
+        .toString("base64")
+        .replace(/[+/=]/g, "")
+        .substring(0, 8)
+        .toUpperCase();
+      codes.push(code);
     }
 
-    /**
-     * Generate new backup codes
-     */
-    async regenerateBackupCodes(userId: string, code: string): Promise<string[]> {
-        // Verify current code
-        await this.verifyLogin(userId, code);
+    return codes;
+  }
 
-        const backupCodes = this.generateBackupCodes(8);
-        const hashedCodes = await this.hashBackupCodes(backupCodes);
+  private async hashBackupCodes(codes: string[]): Promise<string[]> {
+    const bcrypt = await import("bcryptjs");
+    const hashed: string[] = [];
 
-        await this.prisma.user.update({
-            where: { id: userId },
-            data: { totpBackupCodes: hashedCodes },
-        });
-
-        return backupCodes;
+    for (const code of codes) {
+      hashed.push(await bcrypt.hash(code.toUpperCase(), 10));
     }
 
-    // --- Private Methods ---
+    return hashed;
+  }
 
-    private verifyCode(secret: string, code: string): boolean {
-        if (!code || code.length !== 6) {
-            return false;
-        }
+  private async checkBackupCode(code: string, hashedCodes: string[]): Promise<number> {
+    const bcrypt = await import("bcryptjs");
+    const normalizedCode = code.toUpperCase().replace(/\s/g, "");
 
-        const totp = new OTPAuth.TOTP({
-            algorithm: "SHA1",
-            digits: 6,
-            period: 30,
-            secret: OTPAuth.Secret.fromBase32(secret),
-        });
-
-        // Allow 1 period of drift (30 seconds before/after)
-        const delta = totp.validate({ token: code, window: 1 });
-        return delta !== null;
+    for (let i = 0; i < hashedCodes.length; i++) {
+      if (await bcrypt.compare(normalizedCode, hashedCodes[i])) {
+        return i;
+      }
     }
 
-    private generateBackupCodes(count: number): string[] {
-        const codes: string[] = [];
+    return -1;
+  }
 
-        for (let i = 0; i < count; i++) {
-            // Generate 8-character alphanumeric codes
-            const code = randomBytes(5)
-                .toString("base64")
-                .replace(/[+/=]/g, "")
-                .substring(0, 8)
-                .toUpperCase();
-            codes.push(code);
-        }
+  private encryptSecret(secret: string): string {
+    const iv = randomBytes(16);
+    const cipher = createCipheriv(this.algorithm, this.encryptionKey, iv);
 
-        return codes;
-    }
+    let encrypted = cipher.update(secret, "utf8", "hex");
+    encrypted += cipher.final("hex");
 
-    private async hashBackupCodes(codes: string[]): Promise<string[]> {
-        const bcrypt = await import("bcryptjs");
-        const hashed: string[] = [];
+    const authTag = cipher.getAuthTag();
 
-        for (const code of codes) {
-            hashed.push(await bcrypt.hash(code.toUpperCase(), 10));
-        }
+    // Format: iv:authTag:encrypted
+    return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
+  }
 
-        return hashed;
-    }
+  private decryptSecret(encryptedSecret: string): string {
+    const [ivHex, authTagHex, encrypted] = encryptedSecret.split(":");
 
-    private async checkBackupCode(code: string, hashedCodes: string[]): Promise<number> {
-        const bcrypt = await import("bcryptjs");
-        const normalizedCode = code.toUpperCase().replace(/\s/g, "");
+    const iv = Buffer.from(ivHex, "hex");
+    const authTag = Buffer.from(authTagHex, "hex");
+    const decipher = createDecipheriv(this.algorithm, this.encryptionKey, iv);
 
-        for (let i = 0; i < hashedCodes.length; i++) {
-            if (await bcrypt.compare(normalizedCode, hashedCodes[i])) {
-                return i;
-            }
-        }
+    decipher.setAuthTag(authTag);
 
-        return -1;
-    }
+    let decrypted = decipher.update(encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
 
-    private encryptSecret(secret: string): string {
-        const iv = randomBytes(16);
-        const cipher = createCipheriv(this.algorithm, this.encryptionKey, iv);
-
-        let encrypted = cipher.update(secret, "utf8", "hex");
-        encrypted += cipher.final("hex");
-
-        const authTag = cipher.getAuthTag();
-
-        // Format: iv:authTag:encrypted
-        return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted}`;
-    }
-
-    private decryptSecret(encryptedSecret: string): string {
-        const [ivHex, authTagHex, encrypted] = encryptedSecret.split(":");
-
-        const iv = Buffer.from(ivHex, "hex");
-        const authTag = Buffer.from(authTagHex, "hex");
-        const decipher = createDecipheriv(this.algorithm, this.encryptionKey, iv);
-
-        decipher.setAuthTag(authTag);
-
-        let decrypted = decipher.update(encrypted, "hex", "utf8");
-        decrypted += decipher.final("utf8");
-
-        return decrypted;
-    }
+    return decrypted;
+  }
 }
 
 const normalizeBackupCodes = (value: unknown): string[] | null =>
-    Array.isArray(value) && value.every((entry) => typeof entry === "string")
-        ? [...value]
-        : null;
+  Array.isArray(value) && value.every((entry) => typeof entry === "string") ? [...value] : null;

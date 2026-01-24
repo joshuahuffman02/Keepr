@@ -8,13 +8,14 @@ type ApiScopeRequest = Request & { apiPrincipal?: ApiPrincipal };
 
 @Injectable()
 export class ApiScopeGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) { }
+  constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const required = this.reflector.getAllAndOverride<string[]>(API_SCOPES_KEY, [
-      context.getHandler(),
-      context.getClass()
-    ]) || [];
+    const required =
+      this.reflector.getAllAndOverride<string[]>(API_SCOPES_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]) || [];
 
     if (!required.length) return true;
 
@@ -22,7 +23,7 @@ export class ApiScopeGuard implements CanActivate {
     const principal: ApiPrincipal | undefined = request.apiPrincipal;
     if (!principal) throw new ForbiddenException("Missing token context");
 
-    const allowed = required.every(scope => principal.scopes.includes(scope));
+    const allowed = required.every((scope) => principal.scopes.includes(scope));
     if (!allowed) throw new ForbiddenException("Insufficient scope");
     return true;
   }

@@ -114,7 +114,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
       (p) =>
         p.referenceNumber.toLowerCase().includes(term) ||
         p.description.toLowerCase().includes(term) ||
-        p.provider.toLowerCase().includes(term)
+        p.provider.toLowerCase().includes(term),
     );
   }, [externalPayments, searchTerm]);
 
@@ -203,7 +203,9 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
             <DollarSign className="w-4 h-4" />
             <span className="text-xs font-medium">Total Amount</span>
           </div>
-          <p className="text-2xl font-bold text-status-success-text">{formatCurrency(stats.totalAmount)}</p>
+          <p className="text-2xl font-bold text-status-success-text">
+            {formatCurrency(stats.totalAmount)}
+          </p>
         </div>
         <div className="bg-status-info-bg rounded-xl p-4 border border-status-info-border">
           <div className="flex items-center gap-2 text-status-info mb-1">
@@ -217,7 +219,9 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
             <CreditCard className="w-4 h-4" />
             <span className="text-xs font-medium">Today&apos;s Total</span>
           </div>
-          <p className="text-2xl font-bold text-status-warning-text">{formatCurrency(stats.todayAmount)}</p>
+          <p className="text-2xl font-bold text-status-warning-text">
+            {formatCurrency(stats.todayAmount)}
+          </p>
         </div>
       </div>
 
@@ -233,7 +237,8 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
           <div>
             <p className="font-medium text-foreground">Record External Payments</p>
             <p className="text-sm text-status-warning-text mt-1">
-              Use this feature to log payments processed through external POS systems (Square, Clover, etc.) so they appear in your reports.
+              Use this feature to log payments processed through external POS systems (Square,
+              Clover, etc.) so they appear in your reports.
             </p>
           </div>
         </div>
@@ -276,7 +281,9 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   <Check className="w-8 h-8 text-status-success" />
                 </div>
                 <h3 className="font-medium text-lg text-foreground">Payment Recorded!</h3>
-                <p className="text-muted-foreground mt-1">The payment has been added to your records.</p>
+                <p className="text-muted-foreground mt-1">
+                  The payment has been added to your records.
+                </p>
               </div>
             ) : (
               <>
@@ -329,7 +336,8 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   {/* Reference Number */}
                   <div className="space-y-2">
                     <Label htmlFor="reference-number">
-                      Reference Number <span className="text-muted-foreground font-normal">(optional)</span>
+                      Reference Number{" "}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
                     <div className="relative">
                       <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -357,7 +365,8 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                   {/* Description */}
                   <div className="space-y-2">
                     <Label htmlFor="payment-description">
-                      Description <span className="text-muted-foreground font-normal">(optional)</span>
+                      Description{" "}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
                     <Textarea
                       id="payment-description"
@@ -401,9 +410,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
             <History className="w-5 h-5 text-muted-foreground" />
             Recorded Payments
           </CardTitle>
-          <CardDescription>
-            External POS payments logged in the system
-          </CardDescription>
+          <CardDescription>External POS payments logged in the system</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredPayments.length === 0 ? (
@@ -413,10 +420,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
               <p className="text-sm text-muted-foreground mb-4">
                 External POS payments will appear here once recorded.
               </p>
-              <Button
-                variant="outline"
-                onClick={() => setIsRecordDialogOpen(true)}
-              >
+              <Button variant="outline" onClick={() => setIsRecordDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Record First Payment
               </Button>
@@ -433,7 +437,7 @@ export function ExternalPOSRecording({ campgroundId }: ExternalPOSRecordingProps
                     <div
                       className={cn(
                         "w-10 h-10 rounded-lg flex items-center justify-center",
-                        providerInfo.color
+                        providerInfo.color,
                       )}
                     >
                       <Smartphone className="w-5 h-5 text-white" />

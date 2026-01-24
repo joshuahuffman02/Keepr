@@ -36,4 +36,3 @@ export class UpdateCampaignDto {
   @IsString()
   textBody?: string;
 }
-

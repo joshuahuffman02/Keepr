@@ -43,7 +43,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
 
   constructor(
     private readonly framework: IntegrationFrameworkService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   onModuleInit() {
@@ -58,7 +58,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   async initiateOAuth(
     campgroundId: string,
     redirectUri: string,
-    state?: string
+    state?: string,
   ): Promise<OAuthUrlResult> {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID || process.env.QBO_CLIENT_ID;
 
@@ -86,7 +86,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   async handleOAuthCallback(
     code: string,
     state: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<OAuthCallbackResult> {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID || process.env.QBO_CLIENT_ID;
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || process.env.QBO_CLIENT_SECRET;
@@ -126,9 +126,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
           oauth: {
             accessToken: tokens.access_token,
             refreshToken: tokens.refresh_token,
-            expiresAt: tokens.expires_in
-              ? Date.now() + tokens.expires_in * 1000
-              : undefined,
+            expiresAt: tokens.expires_in ? Date.now() + tokens.expires_in * 1000 : undefined,
             tokenType: tokens.token_type,
             realmId: tokens.realmId,
           },
@@ -207,7 +205,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
             Accept: "application/json",
             Authorization: `Bearer ${credentials.oauth.accessToken}`,
           },
-        }
+        },
       );
 
       return response.ok;
@@ -222,7 +220,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   async connect(
     campgroundId: string,
     credentials: IntegrationCredentials,
-    config?: Record<string, unknown>
+    config?: Record<string, unknown>,
   ): Promise<{ success: boolean; error?: string }> {
     // Validate the connection works
     const isValid = await this.validateCredentials(credentials);
@@ -255,7 +253,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
       direction: "inbound" | "outbound" | "bidirectional";
       entityTypes?: string[];
       since?: Date;
-    }
+    },
   ): Promise<SyncResult> {
     const realmId = credentials.oauth?.realmId;
     const accessToken = credentials.oauth?.accessToken;
@@ -283,7 +281,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
         const paymentResult = await this.syncPaymentsToQuickBooks(
           campgroundId,
           credentials,
-          options.since
+          options.since,
         );
         totalProcessed += paymentResult.processed;
         totalFailed += paymentResult.failed;
@@ -299,7 +297,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
         const reservationResult = await this.syncReservationsToQuickBooks(
           campgroundId,
           credentials,
-          options.since
+          options.since,
         );
         totalProcessed += reservationResult.processed;
         totalFailed += reservationResult.failed;
@@ -327,7 +325,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
    */
   async handleWebhook(
     payload: WebhookPayload,
-    credentials: IntegrationCredentials
+    credentials: IntegrationCredentials,
   ): Promise<WebhookResult> {
     this.logger.log(`Received QuickBooks webhook: ${payload.eventType}`);
 
@@ -413,7 +411,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
             Accept: "application/json",
             Authorization: `Bearer ${credentials.oauth.accessToken}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -448,7 +446,8 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   // ========================================
 
   private getApiBase(): string {
-    const useSandbox = process.env.QUICKBOOKS_SANDBOX === "true" ||
+    const useSandbox =
+      process.env.QUICKBOOKS_SANDBOX === "true" ||
       process.env.QBO_SANDBOX === "true" ||
       process.env.NODE_ENV !== "production";
     return useSandbox ? this.sandboxApiBase : this.apiBase;
@@ -460,7 +459,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   private async syncPaymentsToQuickBooks(
     campgroundId: string,
     credentials: IntegrationCredentials,
-    since?: Date
+    since?: Date,
   ): Promise<{
     processed: number;
     failed: number;
@@ -494,7 +493,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
   private async syncReservationsToQuickBooks(
     campgroundId: string,
     credentials: IntegrationCredentials,
-    since?: Date
+    since?: Date,
   ): Promise<{
     processed: number;
     failed: number;
@@ -531,7 +530,7 @@ export class QuickBooksMarketplaceProvider implements IntegrationProvider, OnMod
     options: {
       method?: string;
       body?: unknown;
-    } = {}
+    } = {},
   ): Promise<Response> {
     const realmId = credentials.oauth?.realmId;
     const accessToken = credentials.oauth?.accessToken;

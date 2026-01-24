@@ -56,13 +56,13 @@ Effective reminder systems use multiple touchpoints at strategic intervals:
 
 ### The Ideal Reminder Sequence
 
-| Timing | Type | Purpose |
-|--------|------|---------|
-| Immediately | Booking confirmation | Confirm details, set expectations |
-| 7 days before | Reminder email | Prompt trip planning, catch date errors |
-| 2-3 days before | SMS reminder | Last-chance confirmation |
-| Day before | Final reminder | Share check-in details, build excitement |
-| Day of | Welcome message | Arrival instructions, contact info |
+| Timing          | Type                 | Purpose                                  |
+| --------------- | -------------------- | ---------------------------------------- |
+| Immediately     | Booking confirmation | Confirm details, set expectations        |
+| 7 days before   | Reminder email       | Prompt trip planning, catch date errors  |
+| 2-3 days before | SMS reminder         | Last-chance confirmation                 |
+| Day before      | Final reminder       | Share check-in details, build excitement |
+| Day of          | Welcome message      | Arrival instructions, contact info       |
 
 ### Why Multiple Touchpoints Work
 
@@ -120,7 +120,7 @@ A FEW THINGS TO HELP YOU PREPARE:
 • [Weather typically/currently: brief note]
 
 NEED TO CANCEL OR MODIFY?
-If your plans have changed, please let us know by [Date] 
+If your plans have changed, please let us know by [Date]
 to avoid cancellation fees. [Link to modify reservation]
 
 See you soon!
@@ -191,17 +191,20 @@ Safe travels!
 ### 1. Timing Matters
 
 **Don't send reminders at:**
+
 - 3 AM (obvious, but automation requires configuration)
 - Early Monday morning (buried in work emails)
 - Friday afternoon (lost in weekend plans)
 
 **Optimal send times:**
+
 - Email: 9-11 AM or 7-8 PM local time
 - SMS: 10 AM - 8 PM only
 
 ### 2. Personalization Increases Engagement
 
 Generic messages get ignored. Include:
+
 - Guest's first name
 - Specific site number
 - Exact dates
@@ -212,6 +215,7 @@ Generic messages get ignored. Include:
 Counterintuitive but important: making it easy to cancel reduces no-shows.
 
 Why? Guests who know they can't make it will cancel instead of ignore if:
+
 - There's no shame/hassle in canceling
 - Clear instructions are provided
 - They have enough advance notice opportunity
@@ -221,6 +225,7 @@ A canceled reservation can be resold. A no-show can't.
 ### 4. Include Two-Way Communication
 
 Reminders should invite response:
+
 - "Reply to this email with questions"
 - "Text HELP for assistance"
 - "Call us at [number]"
@@ -230,6 +235,7 @@ Engaged guests show up. Silent guests disappear.
 ### 5. Monitor and Optimize
 
 Track your reminder performance:
+
 - Email open rates (aim for 50%+)
 - Click-through rates
 - Response rates
@@ -268,12 +274,14 @@ Reminders work best alongside these practices:
 ### 1. Require Deposits
 
 A financial stake dramatically reduces no-shows:
+
 - 50% at booking = serious commitment
 - First night non-refundable = skin in the game
 
 ### 2. Clear Cancellation Policies
 
 Guests should know:
+
 - Deadline for full refund
 - Deadline for partial refund
 - No-show fee
@@ -281,6 +289,7 @@ Guests should know:
 ### 3. Waitlist Management
 
 Keep a waitlist for sold-out dates:
+
 - If cancellation occurs, offer to waitlist
 - Fill vacant sites faster
 - Reduces net revenue loss from no-shows
@@ -288,6 +297,7 @@ Keep a waitlist for sold-out dates:
 ### 4. Overbooking Strategy (Advanced)
 
 Some campgrounds strategically overbook by 5-10% on peak dates, based on historical no-show rates. This requires:
+
 - Solid historical data
 - Backup plan for excess arrivals
 - Careful risk management
@@ -327,4 +337,4 @@ The best reminder systems feel helpful, not nagging. They give guests the inform
 
 ---
 
-*Keepr includes automated confirmation, reminder, and pre-arrival messages built right in—reducing no-shows while keeping guests informed throughout their journey. [Explore at campreserv.com](https://campreserv.com)*
+_Keepr includes automated confirmation, reminder, and pre-arrival messages built right in—reducing no-shows while keeping guests informed throughout their journey. [Explore at campreserv.com](https://campreserv.com)_

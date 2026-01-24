@@ -6,7 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { OfflineTelemetryPanel } from "@/components/pwa/OfflineTelemetryPanel";
 
-type QueueStat = { key: string; label: string; count: number; conflicts: number; nextRetry?: number | null; lastError?: string | null };
+type QueueStat = {
+  key: string;
+  label: string;
+  count: number;
+  conflicts: number;
+  nextRetry?: number | null;
+  lastError?: string | null;
+};
 type QueueEntry = { conflict?: boolean; nextAttemptAt?: number; lastError?: string | null };
 
 const queueSources = [
@@ -95,7 +102,15 @@ export default function SyncSummaryPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground space-y-1">
-                <div>Next retry: {q.nextRetry ? new Date(q.nextRetry).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}</div>
+                <div>
+                  Next retry:{" "}
+                  {q.nextRetry
+                    ? new Date(q.nextRetry).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "—"}
+                </div>
                 <div>Last error: {q.lastError || "—"}</div>
               </CardContent>
             </Card>

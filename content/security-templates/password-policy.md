@@ -14,6 +14,7 @@ This policy establishes requirements for creating and managing passwords to prot
 ## 2. Scope
 
 This policy applies to:
+
 - All employees, contractors, and volunteers
 - All systems requiring password authentication
 - All devices used for business purposes
@@ -26,12 +27,12 @@ This policy applies to:
 
 All passwords must meet these requirements:
 
-| Requirement | Standard |
-|-------------|----------|
-| Minimum length | 12 characters |
-| Complexity | At least 3 of 4: uppercase, lowercase, numbers, symbols |
-| Uniqueness | Cannot reuse last 10 passwords |
-| Change frequency | Every 90 days (or immediately if compromised) |
+| Requirement      | Standard                                                |
+| ---------------- | ------------------------------------------------------- |
+| Minimum length   | 12 characters                                           |
+| Complexity       | At least 3 of 4: uppercase, lowercase, numbers, symbols |
+| Uniqueness       | Cannot reuse last 10 passwords                          |
+| Change frequency | Every 90 days (or immediately if compromised)           |
 
 ### 3.2 Prohibited Passwords
 
@@ -54,9 +55,11 @@ Do NOT use passwords that include:
 **Recommended: Use a passphrase**
 
 Create a memorable sentence and use the first letter of each word:
+
 - "My dog Buster loves to swim at the lake!" = MdBl2s@tl!
 
 **Or use a password manager** (recommended):
+
 - [1Password](https://1password.com)
 - [Bitwarden](https://bitwarden.com) (free option)
 - [LastPass](https://lastpass.com)
@@ -74,12 +77,14 @@ Create a memorable sentence and use the first letter of each word:
 ## 5. Multi-Factor Authentication (MFA)
 
 MFA is **required** for:
+
 - [ ] Reservation/management system access
 - [ ] Email accounts
 - [ ] Financial/accounting systems
 - [ ] Remote access (VPN)
 
 Approved MFA methods:
+
 1. Authenticator app (Google Authenticator, Microsoft Authenticator)
 2. Hardware security key (YubiKey)
 3. SMS codes (least preferred, but acceptable)
@@ -89,16 +94,19 @@ Approved MFA methods:
 ## 6. System-Specific Requirements
 
 ### 6.1 Reservation System
+
 - Password expires every 90 days
 - Account locks after 5 failed attempts
 - Session timeout after 15 minutes of inactivity
 
 ### 6.2 Workstation Computers
+
 - Screen lock after 5 minutes of inactivity
 - Unique password required (not same as other systems)
 - Automatic updates enabled
 
 ### 6.3 Shared Devices (POS terminals, etc.)
+
 - Use unique PIN or badge for each employee
 - Log out after each session
 - Change shared passwords when any user leaves
@@ -108,13 +116,16 @@ Approved MFA methods:
 ## 7. Password Reset Procedures
 
 ### 7.1 Forgotten Password
+
 1. Use the "Forgot Password" function if available
 2. Contact [IT Admin/Manager] for manual reset
 3. Create new password meeting all requirements
 4. Do not reuse the old password
 
 ### 7.2 Suspected Compromise
+
 If you believe your password may be compromised:
+
 1. Change it immediately
 2. Report to [Manager/Security Contact]
 3. Review recent account activity for unauthorized access
@@ -124,6 +135,7 @@ If you believe your password may be compromised:
 ## 8. Enforcement
 
 Violations of this policy may result in:
+
 - First offense: Verbal warning and immediate password change
 - Second offense: Written warning
 - Third offense: Disciplinary action up to termination
@@ -136,12 +148,12 @@ Intentional sharing of passwords or security bypass attempts will result in imme
 
 I have read, understand, and agree to follow this Password Policy.
 
-**Employee Name:** ________________________
+**Employee Name:** **********\_\_\_\_**********
 
-**Signature:** ________________________
+**Signature:** **********\_\_\_\_**********
 
-**Date:** ________________________
+**Date:** **********\_\_\_\_**********
 
 ---
 
-*This template is provided for informational purposes. Customize based on your specific systems and security requirements.*
+_This template is provided for informational purposes. Customize based on your specific systems and security requirements._

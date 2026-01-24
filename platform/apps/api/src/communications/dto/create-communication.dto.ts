@@ -48,4 +48,3 @@ export class CreateCommunicationDto {
   @IsString()
   fromAddress?: string;
 }
-

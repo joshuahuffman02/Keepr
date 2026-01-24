@@ -12,14 +12,7 @@ import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { UserRole, PlatformRole, ClaimVerificationMethod } from "@prisma/client";
 import { ClaimsService, SubmitClaimDto, VerifyClaimDto } from "./claims.service";
-import {
-  IsString,
-  IsEmail,
-  IsPhoneNumber,
-  IsEnum,
-  IsOptional,
-  MinLength,
-} from "class-validator";
+import { IsString, IsEmail, IsPhoneNumber, IsEnum, IsOptional, MinLength } from "class-validator";
 
 /**
  * Claims Controller
@@ -101,10 +94,7 @@ export class ClaimsController {
    * Submit a new claim for a campground
    */
   @Post()
-  async submitClaim(
-    @CurrentUser() user: UserPayload,
-    @Body() dto: SubmitClaimRequestDto
-  ) {
+  async submitClaim(@CurrentUser() user: UserPayload, @Body() dto: SubmitClaimRequestDto) {
     return this.claimsService.submitClaim(user.sub, dto);
   }
 
@@ -112,10 +102,7 @@ export class ClaimsController {
    * Verify a claim with the verification code
    */
   @Post("verify")
-  async verifyClaim(
-    @CurrentUser() user: UserPayload,
-    @Body() dto: VerifyClaimRequestDto
-  ) {
+  async verifyClaim(@CurrentUser() user: UserPayload, @Body() dto: VerifyClaimRequestDto) {
     return this.claimsService.verifyClaim(user.sub, {
       claimId: dto.claimId,
       verificationCode: dto.verificationCode,
@@ -126,10 +113,7 @@ export class ClaimsController {
    * Resend verification code for a claim
    */
   @Post(":id/resend-code")
-  async resendCode(
-    @CurrentUser() user: UserPayload,
-    @Param("id") claimId: string
-  ) {
+  async resendCode(@CurrentUser() user: UserPayload, @Param("id") claimId: string) {
     await this.claimsService.resendVerificationCode(user.sub, claimId);
     return { success: true, message: "Verification code resent" };
   }
@@ -138,10 +122,7 @@ export class ClaimsController {
    * Get a specific claim by ID
    */
   @Get(":id")
-  async getClaim(
-    @CurrentUser() user: UserPayload,
-    @Param("id") claimId: string
-  ) {
+  async getClaim(@CurrentUser() user: UserPayload, @Param("id") claimId: string) {
     const claim = await this.claimsService.getClaimById(claimId);
     if (!claim) {
       throw new NotFoundException("Claim not found");
@@ -172,7 +153,7 @@ export class AdminClaimsController {
   async listClaims(
     @Query("status") status?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.claimsService.listPendingClaims({
       status,
@@ -196,7 +177,7 @@ export class AdminClaimsController {
   async approveClaim(
     @CurrentUser() user: { sub: string },
     @Param("id") claimId: string,
-    @Body() dto: ApproveClaimRequestDto
+    @Body() dto: ApproveClaimRequestDto,
   ) {
     return this.claimsService.approveClaim(user.sub, claimId, dto.organizationId);
   }
@@ -208,7 +189,7 @@ export class AdminClaimsController {
   async rejectClaim(
     @CurrentUser() user: { sub: string },
     @Param("id") claimId: string,
-    @Body() dto: RejectClaimRequestDto
+    @Body() dto: RejectClaimRequestDto,
   ) {
     return this.claimsService.rejectClaim(user.sub, claimId, dto.reason);
   }

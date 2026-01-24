@@ -7,11 +7,7 @@ import { AccessProviderAdapter } from "./access-provider.types";
 export class AccessProviderRegistry {
   private readonly adapters: Map<AccessProviderType, AccessProviderAdapter>;
 
-  constructor(
-    kisi: KisiAdapter,
-    brivo: BrivoAdapter,
-    cloudKey: CloudKeyAdapter
-  ) {
+  constructor(kisi: KisiAdapter, brivo: BrivoAdapter, cloudKey: CloudKeyAdapter) {
     this.adapters = new Map();
     if (kisi?.provider) this.adapters.set(kisi.provider, kisi);
     if (brivo?.provider) this.adapters.set(brivo.provider, brivo);

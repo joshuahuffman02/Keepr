@@ -2,13 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -172,7 +166,9 @@ function TrendIndicator({ current, previous }: { current: number; previous: numb
   }
 
   return (
-    <span className={`flex items-center text-xs ${isPositive ? "text-emerald-600" : "text-rose-600"}`}>
+    <span
+      className={`flex items-center text-xs ${isPositive ? "text-emerald-600" : "text-rose-600"}`}
+    >
       {isPositive ? <ArrowUp className="h-3 w-3 mr-1" /> : <ArrowDown className="h-3 w-3 mr-1" />}
       {Math.abs(change).toFixed(1)}% vs last month
     </span>
@@ -181,13 +177,18 @@ function TrendIndicator({ current, previous }: { current: number; previous: numb
 
 type BarChartDatum = { [key: string]: number | string | undefined; percentage?: number };
 
-function BarChart({ data, labelKey, valueKey, maxValue }: {
+function BarChart({
+  data,
+  labelKey,
+  valueKey,
+  maxValue,
+}: {
   data: BarChartDatum[];
   labelKey: string;
   valueKey: string;
   maxValue?: number;
 }) {
-  const max = maxValue || Math.max(...data.map(d => Number(d[valueKey]) || 0));
+  const max = maxValue || Math.max(...data.map((d) => Number(d[valueKey]) || 0));
 
   return (
     <div className="space-y-2">
@@ -201,7 +202,9 @@ function BarChart({ data, labelKey, valueKey, maxValue }: {
             />
           </div>
           <div className="w-16 text-xs text-foreground text-right">
-            {item.percentage ? `${item.percentage}%` : (Number(item[valueKey]) || 0).toLocaleString()}
+            {item.percentage
+              ? `${item.percentage}%`
+              : (Number(item[valueKey]) || 0).toLocaleString()}
           </div>
         </div>
       ))}
@@ -210,8 +213,8 @@ function BarChart({ data, labelKey, valueKey, maxValue }: {
 }
 
 function SimpleLineChart({ data }: { data: { month: string; reservations: number }[] }) {
-  const max = Math.max(...data.map(d => d.reservations));
-  const min = Math.min(...data.map(d => d.reservations));
+  const max = Math.max(...data.map((d) => d.reservations));
+  const min = Math.min(...data.map((d) => d.reservations));
   const range = max - min;
 
   return (
@@ -268,7 +271,7 @@ export default function GuestAnalyticsPage() {
 
         const res = await fetch(`${apiUrl}/admin/guest-analytics?range=${dateRange}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -306,7 +309,7 @@ export default function GuestAnalyticsPage() {
 
       const res = await fetch(`${apiUrl}/admin/guest-analytics?range=${dateRange}`, {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -339,7 +342,7 @@ export default function GuestAnalyticsPage() {
       const res = await fetch(`${apiUrl}/admin/analytics/export`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -363,7 +366,7 @@ export default function GuestAnalyticsPage() {
 
         const statusRes = await fetch(`${apiUrl}/admin/analytics/exports/${exportId}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -444,7 +447,7 @@ export default function GuestAnalyticsPage() {
       const res = await fetch(`${apiUrl}/admin/analytics/share`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -486,7 +489,7 @@ export default function GuestAnalyticsPage() {
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-muted rounded w-64" />
           <div className="grid grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map(i => (
+            {[1, 2, 3, 4].map((i) => (
               <div key={i} className="h-32 bg-muted rounded-lg" />
             ))}
           </div>
@@ -627,308 +630,313 @@ export default function GuestAnalyticsPage() {
 
       {/* KPI Cards */}
       {hasData && (
-      <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <Users className="h-8 w-8 text-emerald-500" />
-              <Badge variant="outline" className="text-emerald-600 border-emerald-400">
-                Total
-              </Badge>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl font-bold text-foreground">
-                {analytics.overview.totalGuests.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Guests</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <TrendingUp className="h-8 w-8 text-blue-500" />
-              <TrendIndicator
-                current={analytics.overview.newGuestsThisMonth}
-                previous={analytics.overview.newGuestsLastMonth}
-              />
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl font-bold text-foreground">
-                {analytics.overview.newGuestsThisMonth.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">New Guests This Month</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <RefreshCw className="h-8 w-8 text-amber-500" />
-              <Badge variant="outline" className="text-amber-600 border-amber-400">
-                {analytics.overview.repeatRate}%
-              </Badge>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl font-bold text-foreground">
-                {analytics.overview.repeatGuests.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">Repeat Guests</div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card border-border">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <Calendar className="h-8 w-8 text-violet-500" />
-              <Badge variant="outline" className="text-violet-600 border-violet-400">
-                Avg
-              </Badge>
-            </div>
-            <div className="mt-3">
-              <div className="text-2xl font-bold text-foreground">
-                {analytics.overview.avgStayLength} nights
-              </div>
-              <div className="text-sm text-muted-foreground">Avg Stay Length</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Insights Banner */}
-      {analytics.insights.length > 0 && (
-        <Card className="bg-muted border-border">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-emerald-500" />
-              Key Insights
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {analytics.insights.map((insight, i) => (
-                <div
-                  key={i}
-                  className={`p-3 rounded-lg border ${
-                    insight.type === "warning"
-                      ? "bg-amber-50 border-amber-700/50"
-                      : insight.type === "success"
-                      ? "bg-emerald-50 border-emerald-700/50"
-                      : "bg-muted border-border"
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium text-sm text-foreground">{insight.title}</span>
-                    {insight.metric && (
-                      <Badge variant="outline" className="text-xs">
-                        {insight.metric}
-                      </Badge>
-                    )}
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <Users className="h-8 w-8 text-emerald-500" />
+                  <Badge variant="outline" className="text-emerald-600 border-emerald-400">
+                    Total
+                  </Badge>
+                </div>
+                <div className="mt-3">
+                  <div className="text-2xl font-bold text-foreground">
+                    {analytics.overview.totalGuests.toLocaleString()}
                   </div>
-                  <p className="text-xs text-muted-foreground">{insight.description}</p>
+                  <div className="text-sm text-muted-foreground">Total Guests</div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Geographic Origin */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-emerald-500" />
-              Geographic Origin
-            </CardTitle>
-            <CardDescription>Where your guests are coming from</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">By Country</h4>
-              <BarChart
-                data={analytics.geographic.byCountry}
-                labelKey="country"
-                valueKey="count"
-              />
-            </div>
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Top States/Provinces</h4>
-              <BarChart
-                data={analytics.geographic.byState.slice(0, 6)}
-                labelKey="state"
-                valueKey="count"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Seasonal Trends */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-blue-500" />
-              Seasonal Trends
-            </CardTitle>
-            <CardDescription>Booking patterns throughout the year</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <SimpleLineChart data={analytics.seasonalTrends.byMonth} />
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
-              <div className="text-center">
-                <Badge className="bg-emerald-600 mb-1">Peak</Badge>
-                <div className="text-xs text-muted-foreground">{analytics.seasonalTrends.peakSeason}</div>
-              </div>
-              <div className="text-center">
-                <Badge className="bg-amber-600 mb-1">Shoulder</Badge>
-                <div className="text-xs text-muted-foreground">{analytics.seasonalTrends.shoulderSeason}</div>
-              </div>
-              <div className="text-center">
-                <Badge className="bg-muted mb-1">Off</Badge>
-                <div className="text-xs text-muted-foreground">{analytics.seasonalTrends.offSeason}</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Demographics */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-amber-500" />
-              Guest Demographics
-            </CardTitle>
-            <CardDescription>Equipment types and party composition</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">RV/Equipment Types</h4>
-              <BarChart
-                data={analytics.demographics.rigTypes}
-                labelKey="type"
-                valueKey="count"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground">{analytics.demographics.avgRigLength}ft</div>
-                <div className="text-xs text-muted-foreground">Avg RV Length</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
-                  <Baby className="h-4 w-4 text-blue-600" />
-                  {((analytics.demographics.partyComposition.withChildren / analytics.overview.totalGuests) * 100).toFixed(0)}%
+            <Card className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <TrendingUp className="h-8 w-8 text-blue-500" />
+                  <TrendIndicator
+                    current={analytics.overview.newGuestsThisMonth}
+                    previous={analytics.overview.newGuestsLastMonth}
+                  />
                 </div>
-                <div className="text-xs text-muted-foreground">With Children</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
-                  <Dog className="h-4 w-4 text-amber-600" />
-                  {analytics.demographics.petPercentage}%
+                <div className="mt-3">
+                  <div className="text-2xl font-bold text-foreground">
+                    {analytics.overview.newGuestsThisMonth.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">New Guests This Month</div>
                 </div>
-                <div className="text-xs text-muted-foreground">With Pets</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
-        {/* Travel Behavior */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-violet-500" />
-              Travel Behavior
-            </CardTitle>
-            <CardDescription>Why and how guests book</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Stay Reasons</h4>
-              <BarChart
-                data={analytics.travelBehavior.stayReasons.slice(0, 5)}
-                labelKey="reason"
-                valueKey="count"
-              />
-            </div>
-            <div>
-              <h4 className="text-sm font-medium text-foreground mb-3">Booking Sources</h4>
-              <BarChart
-                data={analytics.travelBehavior.bookingSources.slice(0, 5)}
-                labelKey="source"
-                valueKey="count"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground">{analytics.travelBehavior.avgBookingWindow} days</div>
-                <div className="text-xs text-muted-foreground">Avg Booking Window</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-foreground">
-                  {analytics.travelBehavior.weekdayVsWeekend.weekend}%
+            <Card className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <RefreshCw className="h-8 w-8 text-amber-500" />
+                  <Badge variant="outline" className="text-amber-600 border-amber-400">
+                    {analytics.overview.repeatRate}%
+                  </Badge>
                 </div>
-                <div className="text-xs text-muted-foreground">Weekend Arrivals</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+                <div className="mt-3">
+                  <div className="text-2xl font-bold text-foreground">
+                    {analytics.overview.repeatGuests.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Repeat Guests</div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Snowbird Insights */}
-      <Card className="bg-status-info/10 border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-600" />
-            Snowbird Migration Patterns
-          </CardTitle>
-          <CardDescription>
-            Northern guests traveling to southern destinations (Oct - Mar)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 bg-card rounded-lg">
-              <div className="text-3xl font-bold text-foreground">
-                {analytics.geographic.snowbirdPatterns.northernStates.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Guests from Northern States/Canada
-              </div>
-              <div className="text-xs text-blue-600 mt-2">
-                MI, OH, MN, WI, Ontario, Alberta
-              </div>
-            </div>
-            <div className="text-center p-4 bg-card rounded-lg">
-              <div className="text-3xl font-bold text-foreground">
-                {analytics.geographic.snowbirdPatterns.southernDestinations.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Booked Southern Destinations
-              </div>
-              <div className="text-xs text-emerald-600 mt-2">
-                TX, AZ, FL properties
-              </div>
-            </div>
-            <div className="text-center p-4 bg-card rounded-lg">
-              <div className="text-3xl font-bold text-foreground">
-                October
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">
-                Peak Migration Month
-              </div>
-              <div className="text-xs text-amber-600 mt-2">
-                15% earlier than last year
-              </div>
-            </div>
+            <Card className="bg-card border-border">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <Calendar className="h-8 w-8 text-violet-500" />
+                  <Badge variant="outline" className="text-violet-600 border-violet-400">
+                    Avg
+                  </Badge>
+                </div>
+                <div className="mt-3">
+                  <div className="text-2xl font-bold text-foreground">
+                    {analytics.overview.avgStayLength} nights
+                  </div>
+                  <div className="text-sm text-muted-foreground">Avg Stay Length</div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
-      </>
+
+          {/* Insights Banner */}
+          {analytics.insights.length > 0 && (
+            <Card className="bg-muted border-border">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-emerald-500" />
+                  Key Insights
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {analytics.insights.map((insight, i) => (
+                    <div
+                      key={i}
+                      className={`p-3 rounded-lg border ${
+                        insight.type === "warning"
+                          ? "bg-amber-50 border-amber-700/50"
+                          : insight.type === "success"
+                            ? "bg-emerald-50 border-emerald-700/50"
+                            : "bg-muted border-border"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium text-sm text-foreground">{insight.title}</span>
+                        {insight.metric && (
+                          <Badge variant="outline" className="text-xs">
+                            {insight.metric}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{insight.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Main Content Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Geographic Origin */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-emerald-500" />
+                  Geographic Origin
+                </CardTitle>
+                <CardDescription>Where your guests are coming from</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-3">By Country</h4>
+                  <BarChart
+                    data={analytics.geographic.byCountry}
+                    labelKey="country"
+                    valueKey="count"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-3">Top States/Provinces</h4>
+                  <BarChart
+                    data={analytics.geographic.byState.slice(0, 6)}
+                    labelKey="state"
+                    valueKey="count"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Seasonal Trends */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-blue-500" />
+                  Seasonal Trends
+                </CardTitle>
+                <CardDescription>Booking patterns throughout the year</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <SimpleLineChart data={analytics.seasonalTrends.byMonth} />
+                <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
+                  <div className="text-center">
+                    <Badge className="bg-emerald-600 mb-1">Peak</Badge>
+                    <div className="text-xs text-muted-foreground">
+                      {analytics.seasonalTrends.peakSeason}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <Badge className="bg-amber-600 mb-1">Shoulder</Badge>
+                    <div className="text-xs text-muted-foreground">
+                      {analytics.seasonalTrends.shoulderSeason}
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <Badge className="bg-muted mb-1">Off</Badge>
+                    <div className="text-xs text-muted-foreground">
+                      {analytics.seasonalTrends.offSeason}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Demographics */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-amber-500" />
+                  Guest Demographics
+                </CardTitle>
+                <CardDescription>Equipment types and party composition</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-3">RV/Equipment Types</h4>
+                  <BarChart
+                    data={analytics.demographics.rigTypes}
+                    labelKey="type"
+                    valueKey="count"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border">
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground">
+                      {analytics.demographics.avgRigLength}ft
+                    </div>
+                    <div className="text-xs text-muted-foreground">Avg RV Length</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
+                      <Baby className="h-4 w-4 text-blue-600" />
+                      {(
+                        (analytics.demographics.partyComposition.withChildren /
+                          analytics.overview.totalGuests) *
+                        100
+                      ).toFixed(0)}
+                      %
+                    </div>
+                    <div className="text-xs text-muted-foreground">With Children</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground flex items-center justify-center gap-1">
+                      <Dog className="h-4 w-4 text-amber-600" />
+                      {analytics.demographics.petPercentage}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">With Pets</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Travel Behavior */}
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5 text-violet-500" />
+                  Travel Behavior
+                </CardTitle>
+                <CardDescription>Why and how guests book</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-3">Stay Reasons</h4>
+                  <BarChart
+                    data={analytics.travelBehavior.stayReasons.slice(0, 5)}
+                    labelKey="reason"
+                    valueKey="count"
+                  />
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-foreground mb-3">Booking Sources</h4>
+                  <BarChart
+                    data={analytics.travelBehavior.bookingSources.slice(0, 5)}
+                    labelKey="source"
+                    valueKey="count"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground">
+                      {analytics.travelBehavior.avgBookingWindow} days
+                    </div>
+                    <div className="text-xs text-muted-foreground">Avg Booking Window</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-foreground">
+                      {analytics.travelBehavior.weekdayVsWeekend.weekend}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">Weekend Arrivals</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Snowbird Insights */}
+          <Card className="bg-status-info/10 border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-blue-600" />
+                Snowbird Migration Patterns
+              </CardTitle>
+              <CardDescription>
+                Northern guests traveling to southern destinations (Oct - Mar)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center p-4 bg-card rounded-lg">
+                  <div className="text-3xl font-bold text-foreground">
+                    {analytics.geographic.snowbirdPatterns.northernStates.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Guests from Northern States/Canada
+                  </div>
+                  <div className="text-xs text-blue-600 mt-2">MI, OH, MN, WI, Ontario, Alberta</div>
+                </div>
+                <div className="text-center p-4 bg-card rounded-lg">
+                  <div className="text-3xl font-bold text-foreground">
+                    {analytics.geographic.snowbirdPatterns.southernDestinations.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    Booked Southern Destinations
+                  </div>
+                  <div className="text-xs text-emerald-600 mt-2">TX, AZ, FL properties</div>
+                </div>
+                <div className="text-center p-4 bg-card rounded-lg">
+                  <div className="text-3xl font-bold text-foreground">October</div>
+                  <div className="text-sm text-muted-foreground mt-1">Peak Migration Month</div>
+                  <div className="text-xs text-amber-600 mt-2">15% earlier than last year</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {/* Export Dialog */}
@@ -971,7 +979,8 @@ export default function GuestAnalyticsPage() {
               </div>
             </div>
             <div className="text-xs text-muted-foreground">
-              The export will include overview metrics, geographic data, demographics, seasonal trends, and travel behavior.
+              The export will include overview metrics, geographic data, demographics, seasonal
+              trends, and travel behavior.
             </div>
           </div>
           <DialogFooter>
@@ -1072,7 +1081,15 @@ export default function GuestAnalyticsPage() {
                   </div>
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  This link will expire in {shareExpiry === "24" ? "24 hours" : shareExpiry === "168" ? "7 days" : shareExpiry === "720" ? "30 days" : "90 days"}.
+                  This link will expire in{" "}
+                  {shareExpiry === "24"
+                    ? "24 hours"
+                    : shareExpiry === "168"
+                      ? "7 days"
+                      : shareExpiry === "720"
+                        ? "30 days"
+                        : "90 days"}
+                  .
                 </div>
               </div>
             )}
@@ -1106,10 +1123,7 @@ export default function GuestAnalyticsPage() {
                 </Button>
               </>
             ) : (
-              <Button
-                onClick={() => setShareDialogOpen(false)}
-                className="bg-muted hover:bg-muted"
-              >
+              <Button onClick={() => setShareDialogOpen(false)} className="bg-muted hover:bg-muted">
                 Done
               </Button>
             )}

@@ -13,8 +13,9 @@ function NpsRespondContent() {
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: (payload: { token: string; score: number; comment?: string }) => apiClient.respondNps(payload),
-    onSuccess: () => setSubmitted(true)
+    mutationFn: (payload: { token: string; score: number; comment?: string }) =>
+      apiClient.respondNps(payload),
+    onSuccess: () => setSubmitted(true),
   });
 
   if (!token) {
@@ -37,7 +38,9 @@ function NpsRespondContent() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-6">
-      <h1 className="text-3xl font-bold text-slate-900 mb-6">How likely are you to recommend us?</h1>
+      <h1 className="text-3xl font-bold text-slate-900 mb-6">
+        How likely are you to recommend us?
+      </h1>
       <div className="grid grid-cols-11 gap-2 mb-4">
         {Array.from({ length: 11 }).map((_, idx) => (
           <button
@@ -51,7 +54,9 @@ function NpsRespondContent() {
       </div>
       <p className="text-sm text-slate-500 mb-6">0 = Not at all likely, 10 = Extremely likely</p>
       <div className="mb-6">
-        <label className="block text-sm font-medium text-slate-700 mb-2">Tell us more (optional)</label>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Tell us more (optional)
+        </label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -81,7 +86,9 @@ function NpsRespondContent() {
 
 export default function NpsRespondPage() {
   return (
-    <Suspense fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-slate-500">Loading…</div>}>
+    <Suspense
+      fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-slate-500">Loading…</div>}
+    >
       <NpsRespondContent />
     </Suspense>
   );

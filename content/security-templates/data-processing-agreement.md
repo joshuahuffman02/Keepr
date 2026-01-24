@@ -31,11 +31,13 @@
 ## 2. Purpose and Scope
 
 ### 2.1 Purpose
+
 This Agreement governs the Processing of Personal Data by Vendor on behalf of Company in connection with the following services:
 
 [DESCRIBE SERVICES]
 
 ### 2.2 Types of Personal Data
+
 Vendor will Process the following categories of Personal Data:
 
 - [ ] Names and contact information
@@ -43,21 +45,23 @@ Vendor will Process the following categories of Personal Data:
 - [ ] Payment card information
 - [ ] Vehicle/equipment information
 - [ ] Communication records
-- [ ] Other: _______________
+- [ ] Other: ******\_\_\_******
 
 ### 2.3 Data Subjects
+
 The Personal Data relates to the following categories of Data Subjects:
 
 - [ ] Campground guests/customers
 - [ ] Prospective customers
 - [ ] Company employees
-- [ ] Other: _______________
+- [ ] Other: ******\_\_\_******
 
 ---
 
 ## 3. Vendor Obligations
 
 ### 3.1 Processing Limitations
+
 Vendor shall:
 
 a) Process Personal Data only on documented instructions from Company, unless required by law
@@ -69,6 +73,7 @@ c) Not sell, rent, or otherwise disclose Personal Data to third parties except a
 d) Not transfer Personal Data outside the United States without prior written consent
 
 ### 3.2 Confidentiality
+
 Vendor shall:
 
 a) Ensure that personnel authorized to Process Personal Data are bound by confidentiality obligations
@@ -78,6 +83,7 @@ b) Limit access to Personal Data to personnel who require access to perform the 
 c) Maintain confidentiality of Personal Data after termination of this Agreement
 
 ### 3.3 Security Measures
+
 Vendor shall implement and maintain appropriate technical and organizational security measures, including:
 
 a) Encryption of Personal Data at rest and in transit
@@ -93,6 +99,7 @@ e) Employee security awareness training
 f) Incident response procedures
 
 ### 3.4 Subprocessors
+
 Vendor shall:
 
 a) Not engage subprocessors without prior written consent from Company
@@ -104,11 +111,12 @@ c) Remain fully liable for subprocessor compliance
 **Approved Subprocessors:**
 
 | Subprocessor | Purpose | Location |
-|--------------|---------|----------|
-| | | |
-| | | |
+| ------------ | ------- | -------- |
+|              |         |          |
+|              |         |          |
 
 ### 3.5 Data Subject Rights
+
 Vendor shall:
 
 a) Promptly notify Company of any Data Subject requests received
@@ -118,16 +126,18 @@ b) Assist Company in responding to Data Subject requests
 c) Not respond directly to Data Subject requests without Company authorization
 
 ### 3.6 Security Incidents
+
 In the event of a Security Incident, Vendor shall:
 
 a) Notify Company within 24 hours of discovery
 
 b) Provide Company with:
-   - Description of the incident
-   - Types of Personal Data affected
-   - Approximate number of Data Subjects affected
-   - Steps taken to address the incident
-   - Contact person for further information
+
+- Description of the incident
+- Types of Personal Data affected
+- Approximate number of Data Subjects affected
+- Steps taken to address the incident
+- Contact person for further information
 
 c) Cooperate with Company's investigation
 
@@ -140,6 +150,7 @@ e) Preserve evidence for investigation
 ## 4. Company Rights
 
 ### 4.1 Audit Rights
+
 Company may:
 
 a) Request completion of security questionnaires annually
@@ -149,6 +160,7 @@ b) Review Vendor's security certifications and audit reports
 c) Conduct on-site audits with reasonable notice (costs borne by Company unless audit reveals material non-compliance)
 
 ### 4.2 Instructions
+
 Company may issue written instructions regarding the Processing of Personal Data, which Vendor shall follow unless prohibited by law.
 
 ---
@@ -156,9 +168,11 @@ Company may issue written instructions regarding the Processing of Personal Data
 ## 5. Data Retention and Deletion
 
 ### 5.1 Retention Period
+
 Vendor shall retain Personal Data only for as long as necessary to provide the contracted services, unless a longer retention period is required by law.
 
 ### 5.2 Return or Deletion
+
 Upon termination of this Agreement or at Company's request, Vendor shall:
 
 a) Return all Personal Data to Company in a commonly used format, OR
@@ -174,9 +188,11 @@ d) Delete Personal Data from backup systems within 90 days
 ## 6. Liability and Indemnification
 
 ### 6.1 Vendor Liability
+
 Vendor shall be liable for damages caused by Processing that violates this Agreement or Applicable Privacy Laws.
 
 ### 6.2 Indemnification
+
 Vendor shall indemnify, defend, and hold harmless Company from any claims, damages, or expenses arising from:
 
 a) Vendor's breach of this Agreement
@@ -186,6 +202,7 @@ b) Vendor's violation of Applicable Privacy Laws
 c) Security Incidents caused by Vendor's negligence
 
 ### 6.3 Limitation
+
 Nothing in the Services Agreement shall limit Vendor's liability under this Data Processing Agreement for breaches of data protection obligations.
 
 ---
@@ -193,12 +210,15 @@ Nothing in the Services Agreement shall limit Vendor's liability under this Data
 ## 7. Term and Termination
 
 ### 7.1 Term
+
 This Agreement shall remain in effect for the duration of the Services Agreement between the parties.
 
 ### 7.2 Termination for Breach
+
 Company may terminate this Agreement immediately if Vendor materially breaches any provision and fails to cure within 30 days of notice.
 
 ### 7.3 Survival
+
 Sections 3.2 (Confidentiality), 5 (Data Retention and Deletion), and 6 (Liability and Indemnification) shall survive termination.
 
 ---
@@ -206,18 +226,23 @@ Sections 3.2 (Confidentiality), 5 (Data Retention and Deletion), and 6 (Liabilit
 ## 8. General Provisions
 
 ### 8.1 Amendments
+
 This Agreement may only be amended in writing signed by both parties.
 
 ### 8.2 Governing Law
+
 This Agreement shall be governed by the laws of [STATE].
 
 ### 8.3 Entire Agreement
+
 This Agreement, together with the Services Agreement, constitutes the entire agreement between the parties regarding the Processing of Personal Data.
 
 ### 8.4 Severability
+
 If any provision is found unenforceable, the remaining provisions shall continue in full force.
 
 ### 8.5 Notices
+
 All notices shall be in writing and sent to the addresses listed above.
 
 ---
@@ -226,25 +251,25 @@ All notices shall be in writing and sent to the addresses listed above.
 
 **[CAMPGROUND NAME]**
 
-Signature: ________________________
+Signature: **********\_\_\_\_**********
 
-Printed Name: ________________________
+Printed Name: **********\_\_\_\_**********
 
-Title: ________________________
+Title: **********\_\_\_\_**********
 
-Date: ________________________
+Date: **********\_\_\_\_**********
 
 ---
 
 **[VENDOR NAME]**
 
-Signature: ________________________
+Signature: **********\_\_\_\_**********
 
-Printed Name: ________________________
+Printed Name: **********\_\_\_\_**********
 
-Title: ________________________
+Title: **********\_\_\_\_**********
 
-Date: ________________________
+Date: **********\_\_\_\_**********
 
 ---
 
@@ -253,6 +278,7 @@ Date: ________________________
 Vendor shall implement and maintain the following minimum security controls:
 
 ### Access Controls
+
 - [ ] Unique user IDs for all personnel
 - [ ] Multi-factor authentication for system access
 - [ ] Role-based access control
@@ -260,6 +286,7 @@ Vendor shall implement and maintain the following minimum security controls:
 - [ ] Immediate access revocation for terminated employees
 
 ### Data Protection
+
 - [ ] Encryption at rest (AES-256 or equivalent)
 - [ ] Encryption in transit (TLS 1.2+)
 - [ ] Secure key management
@@ -267,6 +294,7 @@ Vendor shall implement and maintain the following minimum security controls:
 - [ ] Secure data disposal procedures
 
 ### Network Security
+
 - [ ] Firewall protection
 - [ ] Intrusion detection/prevention
 - [ ] Regular vulnerability scanning
@@ -274,12 +302,14 @@ Vendor shall implement and maintain the following minimum security controls:
 - [ ] Network segmentation for sensitive systems
 
 ### Physical Security
+
 - [ ] Controlled facility access
 - [ ] Secure data center (SOC 2 certified preferred)
 - [ ] Visitor management procedures
 - [ ] Secure disposal of physical media
 
 ### Monitoring and Response
+
 - [ ] Security event logging
 - [ ] Log retention for minimum 90 days
 - [ ] 24/7 security monitoring (for critical systems)
@@ -287,10 +317,11 @@ Vendor shall implement and maintain the following minimum security controls:
 - [ ] Annual incident response testing
 
 ### Personnel
+
 - [ ] Background checks for personnel with data access
 - [ ] Security awareness training
 - [ ] Confidentiality agreements
 
 ---
 
-*This template is provided for informational purposes only. Consult with legal counsel to ensure the agreement meets your specific needs and complies with applicable laws.*
+_This template is provided for informational purposes only. Consult with legal counsel to ensure the agreement meets your specific needs and complies with applicable laws._

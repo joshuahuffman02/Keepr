@@ -9,7 +9,7 @@ const runInBand =
   normalizedRunInBand === "" || normalizedRunInBand === "true" || normalizedRunInBand === "1";
 const maxWorkersEnv = process.env.JEST_MAX_WORKERS;
 const hasMaxWorkersArg = args.some(
-  (arg) => arg === "--maxWorkers" || arg.startsWith("--maxWorkers=")
+  (arg) => arg === "--maxWorkers" || arg.startsWith("--maxWorkers="),
 );
 
 if (runInBand) {

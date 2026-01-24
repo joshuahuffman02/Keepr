@@ -5,7 +5,7 @@
  * Example:
  *   node hmac-helper.js secret "2025-05-12T18:34:00Z" "/webhooks/channel/booking.com/availability" '{"foo":"bar"}'
  */
-import crypto from 'crypto';
+import crypto from "crypto";
 
 function main() {
   const [secret, timestamp, path, body] = process.argv.slice(2);
@@ -14,9 +14,8 @@ function main() {
     process.exit(1);
   }
   const payload = `${timestamp}\n${path}\n${body}`;
-  const sig = crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  const sig = crypto.createHmac("sha256", secret).update(payload).digest("hex");
   console.log(sig);
 }
 
 main();
-

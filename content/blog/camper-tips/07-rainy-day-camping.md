@@ -17,18 +17,21 @@ Rain happens. But a wet camping trip can still be an amazing camping trip—with
 ## Staying Dry
 
 ### Tent Setup
+
 - Choose high ground (water drains away)
 - Use ground tarp (folded under tent edges)
 - Ensure rainfly is secured and taut
 - Point door away from wind
 
 ### Gear Organization
+
 - Keep gear in waterproof bags/bins
 - Store items off the ground
 - Have a "wet zone" and "dry zone"
 - Keep spare dry clothes sealed
 
 ### Personal Gear
+
 - Quality rain jacket is essential
 - Waterproof boots or sandals
 - Quick-dry clothing layers
@@ -39,6 +42,7 @@ Rain happens. But a wet camping trip can still be an amazing camping trip—with
 ## Rainy Day Activities
 
 ### At the Campsite
+
 - Card games and board games
 - Book reading
 - Campfire cooking under shelter
@@ -46,12 +50,14 @@ Rain happens. But a wet camping trip can still be an amazing camping trip—with
 - Campfire (under tarp if needed)
 
 ### Exploring
+
 - Hiking in the rain (it's magical!)
 - Visit nearby towns
 - Museums or local attractions
 - Covered picnic areas
 
 ### Embrace It
+
 - Jump in puddles
 - Listen to rain on the tent
 - Photography (rain creates great shots)
@@ -71,12 +77,14 @@ Rain happens. But a wet camping trip can still be an amazing camping trip—with
 ## Mindset Matters
 
 **Reframe the experience:**
+
 - Rain creates atmosphere
 - Fewer crowds during rain
 - Stories to tell later
 - Teaches resilience and adaptability
 
 **What to tell yourself:**
+
 > "This is part of the adventure. We're going to have a great time anyway."
 
 ---
@@ -84,6 +92,7 @@ Rain happens. But a wet camping trip can still be an amazing camping trip—with
 ## When to Call It
 
 There's no shame in adjusting plans:
+
 - Dangerous weather (lightning, flooding)
 - Truly miserable and unsafe
 - Equipment failing
@@ -101,4 +110,4 @@ Check forecast—often rain passes and sunshine returns.
 
 ---
 
-*Book your next camping trip at [campreserv.com](https://campreserv.com)*
+_Book your next camping trip at [campreserv.com](https://campreserv.com)_

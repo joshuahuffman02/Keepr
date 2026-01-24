@@ -45,14 +45,19 @@ export function CheckMethod({ onSuccess, onError, onCancel }: CheckMethodProps) 
       const amountCents = state.remainingCents;
 
       // Get reservation ID from subject if available
-      const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
-        ? props.subject.reservationId
-        : undefined;
+      const reservationId =
+        props.subject?.type === "reservation" || props.subject?.type === "balance"
+          ? props.subject.reservationId
+          : undefined;
 
       // Record the payment in the database
       if (reservationId) {
         await apiClient.recordReservationPayment(reservationId, amountCents, [
-          { method: "check", amountCents, note: `Check #${checkNumber.trim()}${bankName ? ` - ${bankName.trim()}` : ""}` }
+          {
+            method: "check",
+            amountCents,
+            note: `Check #${checkNumber.trim()}${bankName ? ` - ${bankName.trim()}` : ""}`,
+          },
         ]);
       }
 
@@ -116,15 +121,13 @@ export function CheckMethod({ onSuccess, onError, onCancel }: CheckMethodProps) 
       {/* Info box */}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-800">
-          Ensure the check is properly endorsed and made out for the correct amount before
-          recording this payment.
+          Ensure the check is properly endorsed and made out for the correct amount before recording
+          this payment.
         </p>
       </div>
 
       {/* Error display */}
-      {error && (
-        <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
       {/* Action buttons */}
       <div className="flex justify-end gap-2 pt-2">

@@ -16,14 +16,14 @@ import { PrismaClient, SeoLocationType, AttractionType } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
 
 // US States data
 const US_STATES = [
-  { code: "AL", name: "Alabama", lat: 32.806671, lng: -86.791130 },
+  { code: "AL", name: "Alabama", lat: 32.806671, lng: -86.79113 },
   { code: "AK", name: "Alaska", lat: 61.370716, lng: -152.404419 },
   { code: "AZ", name: "Arizona", lat: 33.729759, lng: -111.431221 },
   { code: "AR", name: "Arkansas", lat: 34.969704, lng: -92.373123 },
@@ -38,8 +38,8 @@ const US_STATES = [
   { code: "IL", name: "Illinois", lat: 40.349457, lng: -88.986137 },
   { code: "IN", name: "Indiana", lat: 39.849426, lng: -86.258278 },
   { code: "IA", name: "Iowa", lat: 42.011539, lng: -93.210526 },
-  { code: "KS", name: "Kansas", lat: 38.526600, lng: -96.726486 },
-  { code: "KY", name: "Kentucky", lat: 37.668140, lng: -84.670067 },
+  { code: "KS", name: "Kansas", lat: 38.5266, lng: -96.726486 },
+  { code: "KY", name: "Kentucky", lat: 37.66814, lng: -84.670067 },
   { code: "LA", name: "Louisiana", lat: 31.169546, lng: -91.867805 },
   { code: "ME", name: "Maine", lat: 44.693947, lng: -69.381927 },
   { code: "MD", name: "Maryland", lat: 39.063946, lng: -76.802101 },
@@ -49,7 +49,7 @@ const US_STATES = [
   { code: "MS", name: "Mississippi", lat: 32.741646, lng: -89.678696 },
   { code: "MO", name: "Missouri", lat: 38.456085, lng: -92.288368 },
   { code: "MT", name: "Montana", lat: 46.921925, lng: -110.454353 },
-  { code: "NE", name: "Nebraska", lat: 41.125370, lng: -98.268082 },
+  { code: "NE", name: "Nebraska", lat: 41.12537, lng: -98.268082 },
   { code: "NV", name: "Nevada", lat: 38.313515, lng: -117.055374 },
   { code: "NH", name: "New Hampshire", lat: 43.452492, lng: -71.563896 },
   { code: "NJ", name: "New Jersey", lat: 40.298904, lng: -74.521011 },
@@ -61,7 +61,7 @@ const US_STATES = [
   { code: "OK", name: "Oklahoma", lat: 35.565342, lng: -96.928917 },
   { code: "OR", name: "Oregon", lat: 44.572021, lng: -122.070938 },
   { code: "PA", name: "Pennsylvania", lat: 40.590752, lng: -77.209755 },
-  { code: "RI", name: "Rhode Island", lat: 41.680893, lng: -71.511780 },
+  { code: "RI", name: "Rhode Island", lat: 41.680893, lng: -71.51178 },
   { code: "SC", name: "South Carolina", lat: 33.856892, lng: -80.945007 },
   { code: "SD", name: "South Dakota", lat: 44.299782, lng: -99.438828 },
   { code: "TN", name: "Tennessee", lat: 35.747845, lng: -86.692345 },
@@ -72,31 +72,191 @@ const US_STATES = [
   { code: "WA", name: "Washington", lat: 47.400902, lng: -121.490494 },
   { code: "WV", name: "West Virginia", lat: 38.491226, lng: -80.954453 },
   { code: "WI", name: "Wisconsin", lat: 44.268543, lng: -89.616508 },
-  { code: "WY", name: "Wyoming", lat: 42.755966, lng: -107.302490 },
+  { code: "WY", name: "Wyoming", lat: 42.755966, lng: -107.30249 },
 ];
 
 // Major National Parks
 const NATIONAL_PARKS = [
-  { name: "Yosemite National Park", slug: "yosemite-national-park", state: "CA", lat: 37.8651, lng: -119.5383, npsCode: "YOSE", activities: ["hiking", "rock climbing", "camping", "photography", "wildlife viewing"] },
-  { name: "Yellowstone National Park", slug: "yellowstone-national-park", state: "WY", lat: 44.4280, lng: -110.5885, npsCode: "YELL", activities: ["hiking", "wildlife viewing", "geysers", "camping", "fishing"] },
-  { name: "Grand Canyon National Park", slug: "grand-canyon-national-park", state: "AZ", lat: 36.0544, lng: -112.1401, npsCode: "GRCA", activities: ["hiking", "rafting", "camping", "photography", "mule rides"] },
-  { name: "Zion National Park", slug: "zion-national-park", state: "UT", lat: 37.2982, lng: -113.0263, npsCode: "ZION", activities: ["hiking", "canyoneering", "rock climbing", "camping", "photography"] },
-  { name: "Joshua Tree National Park", slug: "joshua-tree-national-park", state: "CA", lat: 33.8734, lng: -115.9010, npsCode: "JOTR", activities: ["rock climbing", "hiking", "stargazing", "camping", "photography"] },
-  { name: "Acadia National Park", slug: "acadia-national-park", state: "ME", lat: 44.3386, lng: -68.2733, npsCode: "ACAD", activities: ["hiking", "biking", "kayaking", "camping", "wildlife viewing"] },
-  { name: "Rocky Mountain National Park", slug: "rocky-mountain-national-park", state: "CO", lat: 40.3428, lng: -105.6836, npsCode: "ROMO", activities: ["hiking", "wildlife viewing", "camping", "fishing", "photography"] },
-  { name: "Olympic National Park", slug: "olympic-national-park", state: "WA", lat: 47.8021, lng: -123.6044, npsCode: "OLYM", activities: ["hiking", "camping", "fishing", "wildlife viewing", "beach walks"] },
-  { name: "Glacier National Park", slug: "glacier-national-park", state: "MT", lat: 48.7596, lng: -113.7870, npsCode: "GLAC", activities: ["hiking", "camping", "wildlife viewing", "photography", "boating"] },
-  { name: "Grand Teton National Park", slug: "grand-teton-national-park", state: "WY", lat: 43.7904, lng: -110.6818, npsCode: "GRTE", activities: ["hiking", "climbing", "camping", "fishing", "wildlife viewing"] },
-  { name: "Arches National Park", slug: "arches-national-park", state: "UT", lat: 38.7331, lng: -109.5925, npsCode: "ARCH", activities: ["hiking", "photography", "stargazing", "camping"] },
-  { name: "Bryce Canyon National Park", slug: "bryce-canyon-national-park", state: "UT", lat: 37.5930, lng: -112.1871, npsCode: "BRCA", activities: ["hiking", "stargazing", "photography", "horseback riding"] },
-  { name: "Death Valley National Park", slug: "death-valley-national-park", state: "CA", lat: 36.5054, lng: -117.0794, npsCode: "DEVA", activities: ["hiking", "stargazing", "photography", "camping"] },
-  { name: "Sequoia National Park", slug: "sequoia-national-park", state: "CA", lat: 36.4864, lng: -118.5658, npsCode: "SEQU", activities: ["hiking", "camping", "wildlife viewing", "photography"] },
-  { name: "Great Smoky Mountains National Park", slug: "great-smoky-mountains-national-park", state: "TN", lat: 35.6532, lng: -83.5070, npsCode: "GRSM", activities: ["hiking", "camping", "fishing", "wildlife viewing", "waterfall viewing"] },
-  { name: "Shenandoah National Park", slug: "shenandoah-national-park", state: "VA", lat: 38.2928, lng: -78.6796, npsCode: "SHEN", activities: ["hiking", "camping", "wildlife viewing", "scenic drives"] },
-  { name: "Mount Rainier National Park", slug: "mount-rainier-national-park", state: "WA", lat: 46.8800, lng: -121.7269, npsCode: "MORA", activities: ["hiking", "climbing", "camping", "wildflower viewing"] },
-  { name: "Crater Lake National Park", slug: "crater-lake-national-park", state: "OR", lat: 42.8684, lng: -122.1685, npsCode: "CRLA", activities: ["hiking", "swimming", "camping", "photography"] },
-  { name: "Big Bend National Park", slug: "big-bend-national-park", state: "TX", lat: 29.2500, lng: -103.2500, npsCode: "BIBE", activities: ["hiking", "camping", "stargazing", "hot springs", "rafting"] },
-  { name: "Everglades National Park", slug: "everglades-national-park", state: "FL", lat: 25.2866, lng: -80.8987, npsCode: "EVER", activities: ["kayaking", "wildlife viewing", "camping", "fishing", "airboat tours"] },
+  {
+    name: "Yosemite National Park",
+    slug: "yosemite-national-park",
+    state: "CA",
+    lat: 37.8651,
+    lng: -119.5383,
+    npsCode: "YOSE",
+    activities: ["hiking", "rock climbing", "camping", "photography", "wildlife viewing"],
+  },
+  {
+    name: "Yellowstone National Park",
+    slug: "yellowstone-national-park",
+    state: "WY",
+    lat: 44.428,
+    lng: -110.5885,
+    npsCode: "YELL",
+    activities: ["hiking", "wildlife viewing", "geysers", "camping", "fishing"],
+  },
+  {
+    name: "Grand Canyon National Park",
+    slug: "grand-canyon-national-park",
+    state: "AZ",
+    lat: 36.0544,
+    lng: -112.1401,
+    npsCode: "GRCA",
+    activities: ["hiking", "rafting", "camping", "photography", "mule rides"],
+  },
+  {
+    name: "Zion National Park",
+    slug: "zion-national-park",
+    state: "UT",
+    lat: 37.2982,
+    lng: -113.0263,
+    npsCode: "ZION",
+    activities: ["hiking", "canyoneering", "rock climbing", "camping", "photography"],
+  },
+  {
+    name: "Joshua Tree National Park",
+    slug: "joshua-tree-national-park",
+    state: "CA",
+    lat: 33.8734,
+    lng: -115.901,
+    npsCode: "JOTR",
+    activities: ["rock climbing", "hiking", "stargazing", "camping", "photography"],
+  },
+  {
+    name: "Acadia National Park",
+    slug: "acadia-national-park",
+    state: "ME",
+    lat: 44.3386,
+    lng: -68.2733,
+    npsCode: "ACAD",
+    activities: ["hiking", "biking", "kayaking", "camping", "wildlife viewing"],
+  },
+  {
+    name: "Rocky Mountain National Park",
+    slug: "rocky-mountain-national-park",
+    state: "CO",
+    lat: 40.3428,
+    lng: -105.6836,
+    npsCode: "ROMO",
+    activities: ["hiking", "wildlife viewing", "camping", "fishing", "photography"],
+  },
+  {
+    name: "Olympic National Park",
+    slug: "olympic-national-park",
+    state: "WA",
+    lat: 47.8021,
+    lng: -123.6044,
+    npsCode: "OLYM",
+    activities: ["hiking", "camping", "fishing", "wildlife viewing", "beach walks"],
+  },
+  {
+    name: "Glacier National Park",
+    slug: "glacier-national-park",
+    state: "MT",
+    lat: 48.7596,
+    lng: -113.787,
+    npsCode: "GLAC",
+    activities: ["hiking", "camping", "wildlife viewing", "photography", "boating"],
+  },
+  {
+    name: "Grand Teton National Park",
+    slug: "grand-teton-national-park",
+    state: "WY",
+    lat: 43.7904,
+    lng: -110.6818,
+    npsCode: "GRTE",
+    activities: ["hiking", "climbing", "camping", "fishing", "wildlife viewing"],
+  },
+  {
+    name: "Arches National Park",
+    slug: "arches-national-park",
+    state: "UT",
+    lat: 38.7331,
+    lng: -109.5925,
+    npsCode: "ARCH",
+    activities: ["hiking", "photography", "stargazing", "camping"],
+  },
+  {
+    name: "Bryce Canyon National Park",
+    slug: "bryce-canyon-national-park",
+    state: "UT",
+    lat: 37.593,
+    lng: -112.1871,
+    npsCode: "BRCA",
+    activities: ["hiking", "stargazing", "photography", "horseback riding"],
+  },
+  {
+    name: "Death Valley National Park",
+    slug: "death-valley-national-park",
+    state: "CA",
+    lat: 36.5054,
+    lng: -117.0794,
+    npsCode: "DEVA",
+    activities: ["hiking", "stargazing", "photography", "camping"],
+  },
+  {
+    name: "Sequoia National Park",
+    slug: "sequoia-national-park",
+    state: "CA",
+    lat: 36.4864,
+    lng: -118.5658,
+    npsCode: "SEQU",
+    activities: ["hiking", "camping", "wildlife viewing", "photography"],
+  },
+  {
+    name: "Great Smoky Mountains National Park",
+    slug: "great-smoky-mountains-national-park",
+    state: "TN",
+    lat: 35.6532,
+    lng: -83.507,
+    npsCode: "GRSM",
+    activities: ["hiking", "camping", "fishing", "wildlife viewing", "waterfall viewing"],
+  },
+  {
+    name: "Shenandoah National Park",
+    slug: "shenandoah-national-park",
+    state: "VA",
+    lat: 38.2928,
+    lng: -78.6796,
+    npsCode: "SHEN",
+    activities: ["hiking", "camping", "wildlife viewing", "scenic drives"],
+  },
+  {
+    name: "Mount Rainier National Park",
+    slug: "mount-rainier-national-park",
+    state: "WA",
+    lat: 46.88,
+    lng: -121.7269,
+    npsCode: "MORA",
+    activities: ["hiking", "climbing", "camping", "wildflower viewing"],
+  },
+  {
+    name: "Crater Lake National Park",
+    slug: "crater-lake-national-park",
+    state: "OR",
+    lat: 42.8684,
+    lng: -122.1685,
+    npsCode: "CRLA",
+    activities: ["hiking", "swimming", "camping", "photography"],
+  },
+  {
+    name: "Big Bend National Park",
+    slug: "big-bend-national-park",
+    state: "TX",
+    lat: 29.25,
+    lng: -103.25,
+    npsCode: "BIBE",
+    activities: ["hiking", "camping", "stargazing", "hot springs", "rafting"],
+  },
+  {
+    name: "Everglades National Park",
+    slug: "everglades-national-park",
+    state: "FL",
+    lat: 25.2866,
+    lng: -80.8987,
+    npsCode: "EVER",
+    activities: ["kayaking", "wildlife viewing", "camping", "fishing", "airboat tours"],
+  },
 ];
 
 /**
@@ -104,13 +264,15 @@ const NATIONAL_PARKS = [
  */
 function calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 3959; // Earth's radius in miles
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
   const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng/2) * Math.sin(dLng/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
 
@@ -212,7 +374,7 @@ async function associateCampgroundsWithStates() {
     select: { id: true, state: true },
   });
 
-  const stateMap = new Map(states.map(s => [s.state, s.id]));
+  const stateMap = new Map(states.map((s) => [s.state, s.id]));
 
   let associated = 0;
   for (const cg of campgrounds) {
@@ -397,7 +559,6 @@ async function main() {
     console.log("");
 
     console.log("SEO location seeding complete!");
-
   } catch (error) {
     console.error("Error during seeding:", error);
     throw error;

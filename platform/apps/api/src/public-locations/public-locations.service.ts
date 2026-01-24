@@ -139,7 +139,7 @@ export class PublicLocationsService {
    */
   async getLocationBySlug(
     slug: string,
-    options: { limit?: number; offset?: number; sortBy?: "name" | "rating" | "distance" } = {}
+    options: { limit?: number; offset?: number; sortBy?: "name" | "rating" | "distance" } = {},
   ): Promise<LocationPageData | null> {
     const { limit = 20, offset = 0, sortBy = "name" } = options;
 
@@ -273,7 +273,7 @@ export class PublicLocationsService {
    */
   async getAttractionBySlug(
     slug: string,
-    options: { limit?: number; offset?: number; maxDistance?: number } = {}
+    options: { limit?: number; offset?: number; maxDistance?: number } = {},
   ): Promise<AttractionPageData | null> {
     const { limit = 20, offset = 0, maxDistance = 50 } = options;
 
@@ -341,8 +341,7 @@ export class PublicLocationsService {
     }
 
     const metaTitle =
-      attraction.metaTitle ||
-      `Camping near ${attraction.name} - Best Campgrounds & RV Parks`;
+      attraction.metaTitle || `Camping near ${attraction.name} - Best Campgrounds & RV Parks`;
     const metaDescription =
       attraction.metaDescription ||
       `Find the best campgrounds and RV parks near ${attraction.name}. ${attraction.nearbyCampgroundCount} camping options within ${maxDistance} miles.`;
@@ -473,11 +472,13 @@ export class PublicLocationsService {
   /**
    * Get cities in a state
    */
-  async listCitiesInState(stateSlug: string): Promise<Array<{
-    name: string;
-    slug: string;
-    campgroundCount: number;
-  }>> {
+  async listCitiesInState(stateSlug: string): Promise<
+    Array<{
+      name: string;
+      slug: string;
+      campgroundCount: number;
+    }>
+  > {
     const state = await this.prisma.seoLocation.findUnique({
       where: { slug: stateSlug },
       select: { state: true },

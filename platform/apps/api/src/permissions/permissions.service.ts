@@ -16,26 +16,24 @@ type CheckAccessInput = {
 const PLATFORM_RULES: Record<PlatformRole, { resource: string; action: string }[]> = {
   support_agent: [
     { resource: "support", action: "read" },
-    { resource: "support", action: "write" }
+    { resource: "support", action: "write" },
   ],
   support_lead: [
     { resource: "support", action: "read" },
     { resource: "support", action: "write" },
     { resource: "support", action: "assign" },
-    { resource: "support", action: "analytics" }
+    { resource: "support", action: "analytics" },
   ],
   regional_support: [
     { resource: "support", action: "read" },
     { resource: "support", action: "write" },
-    { resource: "support", action: "assign" }
+    { resource: "support", action: "assign" },
   ],
   ops_engineer: [
     { resource: "operations", action: "read" },
-    { resource: "operations", action: "write" }
+    { resource: "operations", action: "write" },
   ],
-  platform_admin: [
-    { resource: "*", action: "*" }
-  ]
+  platform_admin: [{ resource: "*", action: "*" }],
 };
 
 @Injectable()
@@ -65,10 +63,14 @@ export class PermissionsService {
     return true;
   }
 
-  private getRole(user: AuthUser | null | undefined, campgroundId?: string | null): UserRole | null {
+  private getRole(
+    user: AuthUser | null | undefined,
+    campgroundId?: string | null,
+  ): UserRole | null {
     if (!user) return null;
     if (user.role) return user.role;
-    if (Array.isArray(user.ownershipRoles) && user.ownershipRoles.includes("owner")) return UserRole.owner;
+    if (Array.isArray(user.ownershipRoles) && user.ownershipRoles.includes("owner"))
+      return UserRole.owner;
 
     const membership = campgroundId
       ? user.memberships.find((membership) => membership.campgroundId === campgroundId)
@@ -92,7 +94,7 @@ export class PermissionsService {
       UserRole.front_desk,
       UserRole.maintenance,
       UserRole.marketing,
-      UserRole.readonly
+      UserRole.readonly,
     ];
     return order.find((r) => roles.includes(r)) ?? roles[0];
   }
@@ -121,12 +123,9 @@ export class PermissionsService {
   async listRules(campgroundId?: string | null, region?: string | null) {
     const rules = await this.prisma.permissionRule.findMany({
       where: {
-        AND: [
-          campgroundId ? { campgroundId } : {},
-          region ? { campgroundId: null } : {}
-        ]
+        AND: [campgroundId ? { campgroundId } : {}, region ? { campgroundId: null } : {}],
       },
-      orderBy: [{ campgroundId: "asc" }, { role: "asc" }, { resource: "asc" }, { action: "asc" }]
+      orderBy: [{ campgroundId: "asc" }, { role: "asc" }, { resource: "asc" }, { action: "asc" }],
     });
 
     return rules.map((rule) => {
@@ -152,8 +151,8 @@ export class PermissionsService {
         campgroundId,
         role: params.role,
         resource: params.resource,
-        action: params.action
-      }
+        action: params.action,
+      },
     });
 
     if (existing) {
@@ -161,8 +160,8 @@ export class PermissionsService {
         where: { id: existing.id },
         data: {
           fields,
-          effect: params.effect ?? PermissionEffect.allow
-        }
+          effect: params.effect ?? PermissionEffect.allow,
+        },
       });
     }
 
@@ -175,19 +174,24 @@ export class PermissionsService {
         action: params.action,
         fields,
         effect: params.effect ?? PermissionEffect.allow,
-        createdById: params.createdById ?? null
-      }
+        createdById: params.createdById ?? null,
+      },
     });
   }
 
-  async deleteRule(params: { campgroundId?: string | null; role: UserRole; resource: string; action: string }) {
+  async deleteRule(params: {
+    campgroundId?: string | null;
+    role: UserRole;
+    resource: string;
+    action: string;
+  }) {
     const rule = await this.prisma.permissionRule.findFirst({
       where: {
         campgroundId: params.campgroundId ?? null,
         role: params.role,
         resource: params.resource,
-        action: params.action
-      }
+        action: params.action,
+      },
     });
 
     if (!rule) {
@@ -209,7 +213,9 @@ export class PermissionsService {
     return memberships.some((membership) => membership.campgroundId === campgroundId);
   }
 
-  async checkAccess(input: CheckAccessInput): Promise<{ allowed: boolean; deniedFields?: string[] }> {
+  async checkAccess(
+    input: CheckAccessInput,
+  ): Promise<{ allowed: boolean; deniedFields?: string[] }> {
     const platformRole = this.getPlatformRole(input.user);
     if (platformRole && this.isPlatformActive(input.user)) {
       const platformResult = this.checkPlatformRules({
@@ -217,7 +223,7 @@ export class PermissionsService {
         role: platformRole,
         resource: input.resource,
         action: input.action,
-        region: input.region
+        region: input.region,
       });
       if (platformResult.allowed) {
         return platformResult;
@@ -232,7 +238,11 @@ export class PermissionsService {
     if (!role) return { allowed: false };
 
     if (!this.isRegionScoped(input.user, input.region)) return { allowed: false };
-    if (!this.isCampgroundScoped(input.user, input.campgroundId) && role !== UserRole.owner && role !== UserRole.manager) {
+    if (
+      !this.isCampgroundScoped(input.user, input.campgroundId) &&
+      role !== UserRole.owner &&
+      role !== UserRole.manager
+    ) {
       return { allowed: false };
     }
 
@@ -243,11 +253,8 @@ export class PermissionsService {
         role,
         resource: input.resource,
         action: input.action,
-        OR: [
-          { campgroundId: input.campgroundId ?? null },
-          { campgroundId: null }
-        ]
-      }
+        OR: [{ campgroundId: input.campgroundId ?? null }, { campgroundId: null }],
+      },
     });
 
     if (!rules.length) return { allowed: false };
@@ -314,8 +321,8 @@ export class PermissionsService {
         status: autoApprove,
         decidedBy: params.requestedBy,
         decidedAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -329,8 +336,8 @@ export class PermissionsService {
         status: approve ? ApprovalStatus.approved : ApprovalStatus.rejected,
         decidedBy: actorId,
         decidedAt: new Date(),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -338,7 +345,7 @@ export class PermissionsService {
     return this.prisma.approvalRequest.findMany({
       where: { campgroundId: campgroundId ?? undefined },
       orderBy: { createdAt: "desc" },
-      take: 200
+      take: 200,
     });
   }
 }

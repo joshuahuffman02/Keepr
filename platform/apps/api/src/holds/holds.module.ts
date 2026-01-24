@@ -9,7 +9,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [WaitlistModule, PermissionsModule],
   controllers: [HoldsController],
   providers: [HoldsService],
-  exports: [HoldsService]
+  exports: [HoldsService],
 })
-export class HoldsModule { }
-
+export class HoldsModule {}

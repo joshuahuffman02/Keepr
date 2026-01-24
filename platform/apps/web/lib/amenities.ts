@@ -232,8 +232,12 @@ export const BED_SIZES: BedSizeOption[] = [
 ];
 
 // Helper to get amenity by id
-export function getAmenityById(id: string, type: "park" | "site" | "cabin"): AmenityOption | undefined {
-  const list = type === "park" ? PARK_AMENITIES : type === "cabin" ? CABIN_AMENITIES : SITE_CLASS_AMENITIES;
+export function getAmenityById(
+  id: string,
+  type: "park" | "site" | "cabin",
+): AmenityOption | undefined {
+  const list =
+    type === "park" ? PARK_AMENITIES : type === "cabin" ? CABIN_AMENITIES : SITE_CLASS_AMENITIES;
   return list.find((a) => a.id === id);
 }
 

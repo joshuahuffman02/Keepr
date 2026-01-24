@@ -140,8 +140,20 @@ const initialState: StubState = {
       weeklyXp: 240,
       seasonalXp: 860,
       badges: [
-        { id: "b-1", name: "Hospitality Hero", description: "5 perfect check-ins", tier: "silver", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString() },
-        { id: "b-2", name: "Team Assist", description: "Helped teammates 3 times", tier: "bronze", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 14).toISOString() },
+        {
+          id: "b-1",
+          name: "Hospitality Hero",
+          description: "5 perfect check-ins",
+          tier: "silver",
+          earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString(),
+        },
+        {
+          id: "b-2",
+          name: "Team Assist",
+          description: "Helped teammates 3 times",
+          tier: "bronze",
+          earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 14).toISOString(),
+        },
       ],
       challenges: [
         { challengeId: "welcome-wow", currentXp: 45, status: "active" },
@@ -156,11 +168,15 @@ const initialState: StubState = {
       weeklyXp: 210,
       seasonalXp: 720,
       badges: [
-        { id: "b-3", name: "Maintenance Ace", description: "Closed 10 tickets", tier: "silver", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 9).toISOString() },
+        {
+          id: "b-3",
+          name: "Maintenance Ace",
+          description: "Closed 10 tickets",
+          tier: "silver",
+          earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 9).toISOString(),
+        },
       ],
-      challenges: [
-        { challengeId: "ops-uptime", currentXp: 55, status: "active" },
-      ],
+      challenges: [{ challengeId: "ops-uptime", currentXp: 55, status: "active" }],
     },
     {
       id: "u-3",
@@ -170,11 +186,15 @@ const initialState: StubState = {
       weeklyXp: 310,
       seasonalXp: 1120,
       badges: [
-        { id: "b-4", name: "Coaching Star", description: "Mentored staff to hit goals", tier: "gold", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString() },
+        {
+          id: "b-4",
+          name: "Coaching Star",
+          description: "Mentored staff to hit goals",
+          tier: "gold",
+          earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        },
       ],
-      challenges: [
-        { challengeId: "coaching-loop", currentXp: 70, status: "active" },
-      ],
+      challenges: [{ challengeId: "coaching-loop", currentXp: 70, status: "active" }],
     },
   ],
   challenges: [
@@ -246,9 +266,27 @@ const initialState: StubState = {
     },
   ],
   badgeLibrary: [
-    { id: "lib-hero", name: "Hospitality Hero", description: "Flawless welcomes and on-time arrivals", tier: "silver", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString() },
-    { id: "lib-assist", name: "Assist Ally", description: "Helping teammates when queues spike", tier: "bronze", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 10).toISOString() },
-    { id: "lib-ops", name: "Ops Steady", description: "Consistent checklists completed on time", tier: "gold", earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 12).toISOString() },
+    {
+      id: "lib-hero",
+      name: "Hospitality Hero",
+      description: "Flawless welcomes and on-time arrivals",
+      tier: "silver",
+      earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 6).toISOString(),
+    },
+    {
+      id: "lib-assist",
+      name: "Assist Ally",
+      description: "Helping teammates when queues spike",
+      tier: "bronze",
+      earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 10).toISOString(),
+    },
+    {
+      id: "lib-ops",
+      name: "Ops Steady",
+      description: "Consistent checklists completed on time",
+      tier: "gold",
+      earnedAt: new Date(now - 1000 * 60 * 60 * 24 * 12).toISOString(),
+    },
   ],
   notifications: [
     {
@@ -287,7 +325,7 @@ const optInByCampground: Record<string, OptInState> = campgrounds.reduce(
       enabledRoles: ["owner", "manager", "front_desk", "maintenance"],
       manualAwardsAllowed: true,
     },
-  }
+  },
 );
 
 const delay = (ms = 40) => new Promise((res) => setTimeout(res, ms));
@@ -356,7 +394,9 @@ function ensureBadgeForUser(userId: string, badgeId?: string, badgeNameHint?: st
   return true;
 }
 
-function recordNotification(payload: Omit<GamificationNotification, "id" | "createdAt"> & { createdAt?: string }) {
+function recordNotification(
+  payload: Omit<GamificationNotification, "id" | "createdAt"> & { createdAt?: string },
+) {
   const entry: GamificationNotification = {
     id: `n-${Math.random().toString(36).slice(2, 8)}`,
     createdAt: payload.createdAt || new Date().toISOString(),
@@ -373,7 +413,7 @@ export function awardManualXp(
   reason?: string,
   category: GamificationCategory = "manual",
   badgeId?: string,
-  campgroundId?: string
+  campgroundId?: string,
 ) {
   const staff = state.staff.find((s) => s.id === userId);
   if (!staff) return listStaff();
@@ -429,7 +469,12 @@ export function computeLevel(totalXp: number) {
 }
 
 function getRecentEvents(userId: string, limit = 6): GamificationEvent[] {
-  return structuredClone(state.events.filter((evt) => evt.userId === userId).sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, limit));
+  return structuredClone(
+    state.events
+      .filter((evt) => evt.userId === userId)
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      .slice(0, limit),
+  );
 }
 
 function getCategoryStats(userId: string) {
@@ -445,10 +490,14 @@ function getCategoryStats(userId: string) {
     manual: 0,
     other: 0,
   };
-  state.events.filter((e) => e.userId === userId).forEach((evt) => {
-    byCategory[evt.category] = (byCategory[evt.category] || 0) + evt.xp;
-  });
-  const categories = Object.keys(byCategory).filter((category): category is GamificationCategory => category in byCategory);
+  state.events
+    .filter((e) => e.userId === userId)
+    .forEach((evt) => {
+      byCategory[evt.category] = (byCategory[evt.category] || 0) + evt.xp;
+    });
+  const categories = Object.keys(byCategory).filter(
+    (category): category is GamificationCategory => category in byCategory,
+  );
   return categories
     .map((category) => ({ category, xp: byCategory[category] }))
     .filter(({ xp }) => xp !== 0);
@@ -486,7 +535,8 @@ export async function fetchStaffDashboard(userId: string, campgroundId?: string)
 export async function fetchLeaderboard(window: "weekly" | "seasonal" | "all", viewerId?: string) {
   await delay();
   type XpKey = "weeklyXp" | "seasonalXp" | "totalXp";
-  const key: XpKey = window === "weekly" ? "weeklyXp" : window === "seasonal" ? "seasonalXp" : "totalXp";
+  const key: XpKey =
+    window === "weekly" ? "weeklyXp" : window === "seasonal" ? "seasonalXp" : "totalXp";
   const ranked = [...state.staff]
     .sort((a, b) => b[key] - a[key])
     .map((s, idx) => ({
@@ -517,7 +567,12 @@ export function listBadgeLibrary() {
   return structuredClone(state.badgeLibrary);
 }
 
-export function upsertBadge(payload: { id?: string; name: string; description: string; tier?: GamificationBadge["tier"] }) {
+export function upsertBadge(payload: {
+  id?: string;
+  name: string;
+  description: string;
+  tier?: GamificationBadge["tier"];
+}) {
   const id = payload.id || `lib-${Math.random().toString(36).slice(2, 8)}`;
   const idx = state.badgeLibrary.findIndex((b) => b.id === id);
   const badge: GamificationBadge = {
@@ -550,24 +605,30 @@ export function listRecentAwards(limit = 8) {
         ...evt,
         userName: staffMap.get(evt.userId)?.name || "Unknown staff",
         role: staffMap.get(evt.userId)?.role || "staff",
-      }))
+      })),
   );
 }
 
 export function listRecentBadgeUnlocks(limit = 8) {
-  const flattened = state.staff.flatMap((s) => s.badges.map((badge) => ({ ...badge, userId: s.id, userName: s.name, role: s.role })));
+  const flattened = state.staff.flatMap((s) =>
+    s.badges.map((badge) => ({ ...badge, userId: s.id, userName: s.name, role: s.role })),
+  );
   return structuredClone(
-    flattened
-      .sort((a, b) => Date.parse(b.earnedAt) - Date.parse(a.earnedAt))
-      .slice(0, limit)
+    flattened.sort((a, b) => Date.parse(b.earnedAt) - Date.parse(a.earnedAt)).slice(0, limit),
   );
 }
 
 export function listNotifications(limit = 10) {
-  return structuredClone([...state.notifications].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt)).slice(0, limit));
+  return structuredClone(
+    [...state.notifications]
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      .slice(0, limit),
+  );
 }
 
-export function sendGamificationNotification(payload: Omit<GamificationNotification, "id" | "createdAt"> & { createdAt?: string }) {
+export function sendGamificationNotification(
+  payload: Omit<GamificationNotification, "id" | "createdAt"> & { createdAt?: string },
+) {
   return recordNotification(payload);
 }
 
@@ -593,7 +654,7 @@ export function listHistoryEntries(limit = 12): GamificationHistoryEntry[] {
       badgeName: badge.name,
       badgeTier: badge.tier,
       createdAt: badge.earnedAt,
-    }))
+    })),
   );
   const overrideEntries: GamificationHistoryEntry[] = state.notifications
     .filter((n) => n.type === "override")
@@ -614,6 +675,6 @@ export function listHistoryEntries(limit = 12): GamificationHistoryEntry[] {
   return structuredClone(
     [...awardEntries, ...badgeEntries, ...overrideEntries]
       .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
-      .slice(0, limit)
+      .slice(0, limit),
   );
 }

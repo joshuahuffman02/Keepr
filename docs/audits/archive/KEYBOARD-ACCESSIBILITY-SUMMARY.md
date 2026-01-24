@@ -15,6 +15,7 @@ Implemented comprehensive keyboard accessibility improvements across the Campres
 **Impact**: Users can now clearly see which element has focus when using Tab navigation.
 
 #### Files Modified:
+
 - `/components/ui/button.tsx` - All button variants
 - `/components/ui/input.tsx` - Text inputs
 - `/components/ui/textarea.tsx` - Text areas
@@ -30,6 +31,7 @@ Implemented comprehensive keyboard accessibility improvements across the Campres
 **Solution**: Added full arrow key navigation with wrapping.
 
 **Features**:
+
 - Arrow Up/Down to navigate items
 - Auto-focus first item on open
 - Escape returns focus to trigger
@@ -44,7 +46,9 @@ Implemented comprehensive keyboard accessibility improvements across the Campres
 **Solution**: Created two solutions:
 
 #### a) Simple Interactive Rows (Basic tables)
+
 Enhanced base `TableRow` component with `interactive` prop:
+
 - Makes row focusable with Tab
 - Enter/Space triggers `onActivate` callback
 - Visual focus ring
@@ -52,7 +56,9 @@ Enhanced base `TableRow` component with `interactive` prop:
 **File**: `/components/ui/table.tsx`
 
 #### b) Advanced Arrow Navigation (Complex tables)
+
 New `KeyboardNavigableTable` component:
+
 - Arrow Up/Down to navigate rows
 - Home/End to jump to first/last
 - Enter/Space to activate row
@@ -71,6 +77,7 @@ New `KeyboardNavigableTable` component:
 ## Testing Performed
 
 ### Manual Testing
+
 - [x] Tab through all form elements - focus ring visible
 - [x] Navigate dropdowns with arrows - works smoothly
 - [x] Escape closes dialogs and dropdowns - works correctly
@@ -79,6 +86,7 @@ New `KeyboardNavigableTable` component:
 - [x] Focus rings have sufficient contrast - verified visually
 
 ### Component Verification
+
 - [x] All components compile without errors
 - [x] ESLint passes with no warnings
 - [x] No runtime errors introduced
@@ -89,31 +97,34 @@ New `KeyboardNavigableTable` component:
 ### Keyboard Shortcuts
 
 #### Global Navigation
-| Key | Action |
-|-----|--------|
-| Tab | Next element |
+
+| Key         | Action           |
+| ----------- | ---------------- |
+| Tab         | Next element     |
 | Shift + Tab | Previous element |
-| Enter | Activate/Submit |
-| Space | Toggle/Activate |
-| Escape | Close/Cancel |
+| Enter       | Activate/Submit  |
+| Space       | Toggle/Activate  |
+| Escape      | Close/Cancel     |
 
 #### Dropdown Menus
-| Key | Action |
-|-----|--------|
-| Arrow Down | Next item |
-| Arrow Up | Previous item |
-| Enter/Space | Select item |
-| Escape | Close menu |
+
+| Key         | Action        |
+| ----------- | ------------- |
+| Arrow Down  | Next item     |
+| Arrow Up    | Previous item |
+| Enter/Space | Select item   |
+| Escape      | Close menu    |
 
 #### Tables (with KeyboardNavigableTable)
-| Key | Action |
-|-----|--------|
-| Arrow Down | Next row |
-| Arrow Up | Previous row |
-| Home | First row |
-| End | Last row |
+
+| Key         | Action       |
+| ----------- | ------------ |
+| Arrow Down  | Next row     |
+| Arrow Up    | Previous row |
+| Home        | First row    |
+| End         | Last row     |
 | Enter/Space | Activate row |
-| Escape | Clear focus |
+| Escape      | Clear focus  |
 
 ## Code Examples
 
@@ -121,10 +132,10 @@ New `KeyboardNavigableTable` component:
 
 ```tsx
 // BEFORE: Subtle focus ring
-"focus-visible:ring-2 focus-visible:ring-slate-950"
+"focus-visible:ring-2 focus-visible:ring-slate-950";
 
 // AFTER: Prominent focus ring
-"focus-visible:ring-4 focus-visible:ring-slate-950/30"
+"focus-visible:ring-4 focus-visible:ring-slate-950/30";
 ```
 
 ### Before & After: Interactive Table Rows
@@ -136,8 +147,8 @@ New `KeyboardNavigableTable` component:
 </TableRow>
 
 // AFTER: Keyboard accessible
-<TableRow 
-  interactive 
+<TableRow
+  interactive
   onActivate={() => router.push(`/sites/${site.id}`)}
 >
   <TableCell>Site 101</TableCell>
@@ -164,12 +175,13 @@ import { KeyboardNavigableTable, KeyboardTableRow } from "@/components/ui/keyboa
       </KeyboardTableRow>
     ))}
   </tbody>
-</KeyboardNavigableTable>
+</KeyboardNavigableTable>;
 ```
 
 ## Files Changed
 
 ### Modified (11 files):
+
 1. `/components/ui/button.tsx` - Enhanced focus rings
 2. `/components/ui/input.tsx` - Enhanced focus rings
 3. `/components/ui/textarea.tsx` - Enhanced focus rings
@@ -183,6 +195,7 @@ import { KeyboardNavigableTable, KeyboardTableRow } from "@/components/ui/keyboa
 11. `/docs/professional-feel-checklist.md` - Marked section 9 complete
 
 ### New (2 files):
+
 1. `/components/ui/keyboard-table.tsx` - Advanced table navigation component
 2. `/docs/keyboard-accessibility-improvements.md` - Full documentation
 
@@ -191,12 +204,14 @@ import { KeyboardNavigableTable, KeyboardTableRow } from "@/components/ui/keyboa
 This implementation helps meet:
 
 ### WCAG 2.1 Level AA Criteria:
+
 - **2.1.1 Keyboard (Level A)**: All functionality available via keyboard
 - **2.1.2 No Keyboard Trap (Level A)**: Focus can move away from all components
 - **2.4.7 Focus Visible (Level AA)**: Focus indicator is clearly visible
 - **3.2.1 On Focus (Level A)**: No unexpected context changes on focus
 
 ### ARIA Best Practices:
+
 - Menu pattern (dropdown menus)
 - Dialog pattern (modals)
 - Grid pattern (tables with keyboard navigation)
@@ -204,6 +219,7 @@ This implementation helps meet:
 ## Professional Feel Checklist Update
 
 Section 9 (Performance and accessibility):
+
 - [x] Inputs and tables are keyboard friendly
 - [x] Contrast and focus states are consistent and visible
 
@@ -220,11 +236,13 @@ Section 9 (Performance and accessibility):
 ### Using Interactive Tables
 
 For simple tables where rows are clickable:
+
 ```tsx
 <TableRow interactive onActivate={handleClick}>
 ```
 
 For complex tables with arrow key navigation:
+
 ```tsx
 <KeyboardNavigableTable>
   <KeyboardTableRow onActivate={handleClick}>
@@ -233,6 +251,7 @@ For complex tables with arrow key navigation:
 ### Focus Ring Consistency
 
 All components use the same focus ring pattern:
+
 - 4px ring width
 - 2px offset
 - 30% opacity for neutral elements
@@ -257,6 +276,7 @@ All components use the same focus ring pattern:
 ## Support
 
 For questions or issues:
+
 1. See `/docs/keyboard-accessibility-improvements.md` for full documentation
 2. Review examples in this file
 3. Check component source code for implementation details

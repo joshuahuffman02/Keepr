@@ -9,8 +9,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Plus, Trash2, MapPin, Wifi, WifiOff } from "lucide-react";
 
 interface TerminalManagementProps {
@@ -68,7 +80,14 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
       queryClient.invalidateQueries({ queryKey: ["terminal-locations", campgroundId] });
       toast({ title: "Location created", description: "Terminal location added successfully." });
       setShowAddLocation(false);
-      setNewLocation({ displayName: "", line1: "", line2: "", city: "", state: "", postal_code: "" });
+      setNewLocation({
+        displayName: "",
+        line1: "",
+        line2: "",
+        city: "",
+        state: "",
+        postal_code: "",
+      });
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -127,14 +146,20 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Stripe Terminal</CardTitle>
-              <CardDescription>Manage card readers for in-person payments at this campground.</CardDescription>
+              <CardDescription>
+                Manage card readers for in-person payments at this campground.
+              </CardDescription>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => setShowAddLocation(true)}>
                 <MapPin className="w-4 h-4 mr-1" />
                 Add Location
               </Button>
-              <Button size="sm" onClick={() => setShowAddReader(true)} disabled={!locations?.length}>
+              <Button
+                size="sm"
+                onClick={() => setShowAddReader(true)}
+                disabled={!locations?.length}
+              >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Reader
               </Button>
@@ -168,7 +193,8 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
                             <p className="font-medium text-sm">{location.displayName}</p>
                             {location.address && (
                               <p className="text-xs text-muted-foreground">
-                                {location.address.line1}, {location.address.city}, {location.address.state}
+                                {location.address.line1}, {location.address.city},{" "}
+                                {location.address.state}
                               </p>
                             )}
                           </div>
@@ -245,7 +271,8 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Terminal readers process card-present payments. Each campground uses its own connected Stripe account.
+                Terminal readers process card-present payments. Each campground uses its own
+                connected Stripe account.
               </p>
             </div>
           )}
@@ -383,9 +410,7 @@ export function TerminalManagement({ campgroundId }: TerminalManagementProps) {
             <Button
               onClick={() => registerReaderMutation.mutate()}
               disabled={
-                registerReaderMutation.isPending ||
-                !newReader.registrationCode ||
-                !newReader.label
+                registerReaderMutation.isPending || !newReader.registrationCode || !newReader.label
               }
             >
               {registerReaderMutation.isPending ? "Registering..." : "Register Reader"}

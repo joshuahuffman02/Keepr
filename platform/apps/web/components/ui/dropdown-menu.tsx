@@ -65,10 +65,12 @@ export function DropdownMenu({ children, className }: DropdownMenuProps) {
       // Arrow key navigation within menu
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
         event.preventDefault();
-        const items = Array.from(contentRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') || []);
+        const items = Array.from(
+          contentRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') || [],
+        );
         if (items.length === 0) return;
 
-        const currentIndex = items.findIndex(item => item === document.activeElement);
+        const currentIndex = items.findIndex((item) => item === document.activeElement);
         let nextIndex = currentIndex;
 
         if (event.key === "ArrowDown") {
@@ -148,12 +150,8 @@ export const DropdownMenuTrigger = React.forwardRef<HTMLElement, DropdownMenuTri
       ref: mergeRefs(ref, triggerRef),
     };
 
-    return (
-      <button {...buttonProps}>
-        {children}
-      </button>
-    );
-  }
+    return <button {...buttonProps}>{children}</button>;
+  },
 );
 DropdownMenuTrigger.displayName = "DropdownMenuTrigger";
 
@@ -174,11 +172,11 @@ export const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenu
         className={cn(
           "absolute z-50 mt-2 min-w-[10rem] rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-lg",
           align === "end" ? "right-0" : "left-0",
-          className
+          className,
         )}
       />
     );
-  }
+  },
 );
 DropdownMenuContent.displayName = "DropdownMenuContent";
 
@@ -202,7 +200,7 @@ export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenu
     const itemClassName = cn(
       "flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-1 transition-colors",
       disabled && "cursor-not-allowed opacity-50",
-      className
+      className,
     );
 
     if (asChild && React.isValidElement<React.HTMLAttributes<HTMLElement>>(children)) {
@@ -232,7 +230,7 @@ export const DropdownMenuItem = React.forwardRef<HTMLButtonElement, DropdownMenu
         {children}
       </button>
     );
-  }
+  },
 );
 DropdownMenuItem.displayName = "DropdownMenuItem";
 
@@ -248,6 +246,6 @@ export const DropdownMenuSeparator = React.forwardRef<HTMLDivElement, DropdownMe
         {...props}
       />
     );
-  }
+  },
 );
 DropdownMenuSeparator.displayName = "DropdownMenuSeparator";

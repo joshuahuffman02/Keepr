@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const { PrismaPg } = require('@prisma/adapter-pg');
+const { PrismaClient } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
 
 const connectionString = process.env.DATABASE_URL;
 const adapter = new PrismaPg({ connectionString });
@@ -14,19 +14,19 @@ async function checkUsers() {
         firstName: true,
         lastName: true,
       },
-      take: 10
+      take: 10,
     });
 
     console.log(`Found ${users.length} users:`);
-    users.forEach(user => {
+    users.forEach((user) => {
       console.log(`  - ${user.email} (${user.firstName} ${user.lastName})`);
     });
 
     if (users.length === 0) {
-      console.log('\nNo users found! Need to create them.');
+      console.log("\nNo users found! Need to create them.");
     }
   } catch (error) {
-    console.error('Error checking users:', error.message);
+    console.error("Error checking users:", error.message);
   } finally {
     await prisma.$disconnect();
   }

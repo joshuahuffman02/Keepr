@@ -3,6 +3,7 @@
 Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs pay-now; refunds/exchanges; offline parity), reporting/analytics (ADR/RevPAR/revenue/channel mix; saved reports/exports), waitlist with auto-offers (matching, throttles, comms, acceptance/expiry, audit).
 
 ## Data & API (tenant-scoped, idempotent, audited)
+
 - **Tables (new):**
   - `gift_card`: `id` (ULID), `tenant_id`, `code` (hashed), `status` (active/void/expired), `type` (gift_card|store_credit), `issued_value`, `balance`, `currency`, `expires_at`, `taxable_load` (bool), `issued_via` (pos|web|support|import), `recipient_contact`, `metadata`, `created_by`, timestamps, `version`.
   - `ledger_entry`: `id`, `tenant_id`, `subject_type` (gift_card|folio|pos_order), `subject_id`, `entry_type` (issue|redeem|refund|void|adjust|expire|reprice), `amount`, `currency`, `balance_after`, `tax_components`, `idempotency_key`, `created_by`, timestamps; immutable rows.
@@ -28,11 +29,13 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
   - Reporting rollups use ledger/booking sources with timezone-aware bucketing; saved definitions immutable except name/recipients/schedule.
 
 ## UX notes
+
 - Staff: POS flow for pay-now vs charge-to-site; gift card issuance/redemption with balance check; refund to original tender or store credit; audit banner for adjustments; offline mode shows sync queue and last sync.
 - Public: gift card redemption entry at checkout; balance lookup with CAPTCHA/throttle; waitlist offer email/SMS with CTA, countdown, and terms.
 - Admin: saved reports list with statuses; export history with download + delete; liability dashboard showing issued vs redeemed vs expired.
 
 ## Comms triggers
+
 - Gift/store credit: issue (receipt + terms), redeem (receipt), low-balance threshold, expiry notice, void, refund-to-credit, adjustment audit copy to staff.
 - POS: pay-now receipt (email/SMS/print), refund/exchange receipts, charge-to-site notification to guest/contact, offline replay success/failure to staff channel.
 - Waitlist: offer sent, reminder before expiry, acceptance confirmation, expiry/decline notice; bounce/complaint routed to support.
@@ -40,6 +43,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - All comms: template IDs per tenant, audit message_id, rate limits per channel, retries with DLQ, idempotent send keyed by business action.
 
 ## Risks & edge cases
+
 - Double-redeem/overspend under concurrency; need atomic decrement and idempotency on redeems/refunds.
 - Tax timing on stored value (load taxable vs redeem taxable) by region; ensure reporting separates liability vs revenue recognition.
 - Offline replay duplicates or stale pricing/tax versions; enforce `(device_id, seq)` uniqueness and price version check.
@@ -48,18 +52,21 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Reporting correctness: timezone boundaries, inclusion rules for canceled/refunded stays, liability rollup equals ledger.
 
 ## Test plan (high level)
+
 - Unit: ledger ops, idempotency keys, expiry transitions, tax calc permutations, waitlist offer lifecycle, offline dedupe helper.
 - Integration: split tender with gift card + card + site_charge; refund/exchange adjusts ledger and inventory; offline batch replay dedupe; waitlist accept/decline/expire; reporting rollup vs fixtures; comms dispatch with fallbacks.
 - E2E: issue + redeem + expiry; POS pay-now and charge-to-site with refunds; waitlist auto-offer → acceptance; export request → CSV matches UI totals.
 - Reconciliation: ledger vs liability snapshot; report totals vs raw bookings/POS; concurrency stress for double-spend and replay duplicates.
 
 ## Dependencies / asks
+
 - Tax policy per region (load taxable vs redeem taxable), expiry policy by locale, rounding rules.
 - Comms provider creds and sender domains; template approval (staff/public).
 - Pricing/tax service availability and versioning; inventory hold semantics for offers; auth/roles for staff devices.
 - POS hardware limits (reader/printer, storage) and offline storage caps.
 
 ## Execution plan & acceptance criteria
+
 - Domain schema + API contracts published; RLS + audit on all new tables; Idempotency-Key enforced.
 - Gift/store credit: issue/redeem/void/adjust/refund endpoints idempotent; expiry honored; ledger immutable; liability rollup matches ledger; split tender prevents overspend.
 - POS: pay-now and charge-to-site flows complete with taxes/discounts; refunds/exchanges adjust ledger/inventory; offline replay deduped; staff auth required.
@@ -68,7 +75,9 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Comms: triggers wired with audit and rate limits; retries with DLQ; sandbox verified.
 
 ## Sequence diagrams (text)
+
 ### Gift card issue/redeem (idempotent)
+
 - Client → API: `POST /gift-cards` with Idempotency-Key
 - API → Idempotency store: fetch/lock key
 - API → DB: insert `gift_card` + `ledger_entry(issue)`
@@ -82,6 +91,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - API → Comms: send receipt (async)
 
 ### POS pay-now + charge-to-site
+
 - Staff app → API: `POST /pos/orders` (items, tenders)
 - API: price/tax calc; validate split tender sum
 - API → DB: create `pos_order (open)`
@@ -93,6 +103,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Offline: device batches with `(device_id, seq)` → API validates seq, applies same flow, rejects duplicates/stale price version.
 
 ### Waitlist offer/accept
+
 - Matcher → API: `POST /waitlist/{id}/offers` (inventory, hold_expires_at)
 - API → DB: `waitlist_offer` pending + inventory hold
 - API → Comms: send offer template
@@ -102,6 +113,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Expiry job: marks pending → expired, releases holds, sends expiry notice.
 
 ### Reporting export
+
 - User → API: `POST /reports/definitions/{id}/run`
 - API → DB: `export_job` queued
 - Worker: fetches job, runs query/rollup, writes file, updates status/progress
@@ -109,6 +121,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Comms: send "export ready" or failure notice.
 
 ## Service-area breakdown (for grooming)
+
 - **Payments/Value (Gift & Store Credit):** Tables `gift_card`, `ledger_entry`, idempotency keys; issue/redeem/adjust/void/refund APIs; expiry job; split tender guardrails; liability rollup; comms hooks for issue/redeem/expiry/void.
 - **POS:** `pos_order`, `pos_offline_batch`; pay-now vs charge-to-site flows; refunds/exchanges; split tender validation; device/session auth; offline dedupe `(device_id, seq)`; receipts (print/email/SMS); inventory/tax service integration.
 - **Waitlist & Offers:** `waitlist_entry`, `waitlist_offer`; matcher rules and throttles; inventory holds with expiry; accept/decline/expire endpoints idempotent; audit; comms templates (offer, reminder, outcome).
@@ -116,6 +129,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - **Comms & Observability:** Template registry per tenant; message audit ids; rate limits; DLQ + retries; alerts for redeem failure spike, offline backlog, offer lag, report failures; synthetic checks for redeem/POS/offer/export.
 
 ## API payload sketches (concise)
+
 - `POST /gift-cards` issue/store credit  
   Request: `{ type, amount, currency, expires_at?, taxable_load?, recipient_contact?, issued_via, metadata?, Idempotency-Key }`  
   Response: `{ id, masked_code?, balance, currency, expires_at, status }`
@@ -151,6 +165,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
   Response: `{ export_job_id }`
 
 ## Acceptance criteria (succinct, per-surface)
+
 - Gift/store credit: atomic decrement prevents overspend; idempotent issue/redeem/refund; expiry applied; ledger immutable; liability rollup = sum(balances); logs redacted.
 - POS: split tender sums validated; charge-to-site posts folio with audit; refunds/exchanges adjust ledger and inventory; offline seq dedupe rejects duplicates; receipts delivered.
 - Waitlist: throttles enforced; holds placed/released; accept/decline/expire audited; idempotent accept; comms templated; matcher lag within SLA.
@@ -158,6 +173,7 @@ Scope: Gift cards/store credit (liability, expiry, tax), POS (charge-to-site vs 
 - Comms/obs: idempotent sends with message_id; rate limits; DLQ monitored; alerts and synthetics active for redeem/POS/offer/export; PII redaction verified.
 
 ## Mermaid sketches (read-only text)
+
 ```mermaid
 sequenceDiagram
   participant StaffApp
@@ -210,7 +226,9 @@ sequenceDiagram
 ```
 
 ## Example payloads (JSON)
+
 - Issue gift card/store credit
+
 ```json
 POST /gift-cards
 Headers: { "Idempotency-Key": "abc-123" }
@@ -228,6 +246,7 @@ Response: { "id": "gft_...", "balance": 10000, "currency": "USD", "status": "act
 ```
 
 - Redeem gift card
+
 ```json
 POST /gift-cards/gft_123/redeem
 Headers: { "Idempotency-Key": "abc-124" }
@@ -240,6 +259,7 @@ Response: { "balance_after": 5500, "ledger_entry_id": "led_..." }
 ```
 
 - POS pay-now with split tender
+
 ```json
 POST /pos/orders
 Headers: { "Idempotency-Key": "abc-200" }
@@ -260,6 +280,7 @@ Response: { "id": "pos_789", "status": "paid", "totals": { "net": 6200, "tax": 1
 ```
 
 - Waitlist offer accept
+
 ```json
 POST /waitlist/offers/wlo_456/accept
 Headers: { "Idempotency-Key": "abc-300" }
@@ -271,6 +292,7 @@ Response: { "status": "accepted", "booking_id": "bkg_555", "folio_id": "fol_777"
 ```
 
 - Run export
+
 ```json
 POST /reports/definitions/rpt_123/run
 Body: { "format": "csv", "recipients_override": ["finops@example.com"] }
@@ -278,6 +300,7 @@ Response: { "export_job_id": "exp_999" }
 ```
 
 - POS refund / exchange
+
 ```json
 POST /pos/orders/pos_789/refund
 Headers: { "Idempotency-Key": "abc-400" }
@@ -311,6 +334,7 @@ Response: { "status": "exchanged", "net_delta": 1500, "ledger_entries": ["led_..
 ```
 
 - Charge-to-site receipt/notice
+
 ```json
 POST /pos/orders/pos_900/charge-to-site
 Headers: { "Idempotency-Key": "abc-450" }
@@ -322,6 +346,7 @@ Response: { "status": "charged", "folio_id": "fol_123", "receipt_id": "rcp_900" 
 ```
 
 - Offline replay batch (dedupe)
+
 ```json
 POST /pos/offline-batch
 Headers: { "Idempotency-Key": "abc-500" }
@@ -342,6 +367,7 @@ Response: { "applied": true, "duplicate": false }
 ```
 
 ## Comms template variables (reference)
+
 - Gift/store credit: `{{guest_name}}`, `{{card_last4_or_mask}}`, `{{amount}}`, `{{balance_after}}`, `{{currency}}`, `{{expires_at}}`, `{{terms_url}}`, `{{support_contact}}`, `{{txn_id}}`.
 - POS receipts/refunds: `{{order_id}}`, `{{folio_id}}`, `{{items_table}}`, `{{net}}`, `{{tax}}`, `{{total}}`, `{{tenders_breakdown}}`, `{{refund_amount}}`, `{{device_id}}`, `{{location}}`, `{{receipt_url}}`.
 - Waitlist: `{{property_name}}`, `{{dates}}`, `{{site_type}}`, `{{price}}`, `{{hold_expires_at}}`, `{{offer_accept_url}}`, `{{terms_url}}`, `{{support_contact}}`.
@@ -349,6 +375,7 @@ Response: { "applied": true, "duplicate": false }
 - All: `{{message_id}}`, `{{tenant_name}}`, `{{unsubscribe/manage_prefs_url}}` where required.
 
 ## SLA and guardrails (targets)
+
 - Waitlist matcher lag: p95 < 30s staging; alert at >60s.
 - Offer expiry reminders: send T-15m (configurable), expiry sweep every 5m.
 - Redeem/posting latency: p95 < 400ms; alert at >700ms sustained 5m.
@@ -357,6 +384,7 @@ Response: { "applied": true, "duplicate": false }
 - Comms delivery: bounce/complaint alerts; retry with backoff; DLQ monitored; rate limits per channel (e.g., 5/s per tenant per channel).
 
 ## Error codes (concise)
+
 - 400: validation (missing fields, tender sum mismatch, invalid tax config, stale price version).
 - 401/403: unauth/forbidden (device/session not authorized, tenant mismatch).
 - 404: resource not found (gift card id/code, order, offer).
@@ -367,6 +395,7 @@ Response: { "applied": true, "duplicate": false }
 - 500/503: capacity guard (reports/export), downstream unavailability; include `retry_after` when possible.
 
 ## Alert & synthetic checklist (staging)
+
 - Redeem synthetic: create + redeem card; expect 200 then 409 on repeat; alert on failure spike.
 - POS synthetic: split tender (gift + card); ensure ledger once; alert on tender mismatch or double-debit.
 - Offer synthetic: send offer; accept once (200); second = 409; expired = 410; alert on matcher lag.
@@ -375,6 +404,7 @@ Response: { "applied": true, "duplicate": false }
 - Comms: trigger bounce/complaint; ensure alert and DLQ count increments.
 
 ## Tax edge cases (matrix)
+
 - Stored value taxation:
   - Jurisdictions where load is taxable (VAT-like): collect tax on issuance; revenue recognition deferred; liability includes tax component; refund returns tax proportionally.
   - Jurisdictions where redemption is taxable (sales-tax): no tax on load; tax calculated at redeem per item jurisdiction; ensure price versioning for offline replay.
@@ -385,6 +415,7 @@ Response: { "applied": true, "duplicate": false }
 - Refund to expired card: 410 with guidance; allow refund to new store credit if policy permits (new card issuance).
 
 ## RLS / access control notes
+
 - All new tables keyed by `tenant_id`; RLS ensures `current_tenant = tenant_id`.
 - Staff POS/device: require device token + staff role; restrict `pos_offline_batch` to registered devices.
 - Public endpoints: gift balance lookup throttled + CAPTCHA; waitlist accept scoped to offer token/id.
@@ -392,6 +423,7 @@ Response: { "applied": true, "duplicate": false }
 - Audit: write-only append logs; include actor (user/device/service), request id, message id for comms.
 
 ## Inventory hold semantics (offers/POS)
+
 - Holds carry `hold_expires_at`, `inventory_ref`, `price_version`, `tax_version`.
 - On offer send: place hold; fail if conflicting hold or inventory unavailable.
 - On accept: validate hold not expired; confirm inventory; convert hold to booking/folio; release other holds for same entry.
@@ -399,12 +431,14 @@ Response: { "applied": true, "duplicate": false }
 - POS holds (if used for charge-to-site reservations): ensure same versions as pricing/tax; reconcile on replay.
 
 ## Matcher throttles (waitlist)
+
 - Throttle buckets by segment/channel (e.g., property-date-range-site-type).
 - Limit outstanding offers per entry (e.g., 1 active at a time) and per bucket per interval (e.g., 20/min).
 - Respect do-not-disturb windows; pause offers during blackout.
 - Ensure matcher lag alerts if queue depth/latency exceeds SLA; support manual resend with idempotency key.
 
 ## DLQ / retry policy (comms + jobs)
+
 - Comms send: retry 3x with backoff (e.g., 1s, 10s, 60s); move to DLQ with reason and message_id; surface in admin; optional auto-replay with cap.
 - Export jobs: retry failed chunks up to 2x; mark job failed with error; alert on failure rate; allow user rerun.
 - Offer send: if comms fails, keep offer pending; retry per comms policy; do not auto-expire solely on comms failure; log for support.
@@ -412,6 +446,7 @@ Response: { "applied": true, "duplicate": false }
 - Idempotency store: TTL (e.g., 7d); returning stored response for completed keys; in-progress keys block concurrent work.
 
 ## Rate limits (defaults; per-tenant unless noted)
+
 - Gift card balance lookup/apply: 5 r/s, burst 10.
 - Gift card issuance/redeem/refund: 2 r/s, burst 5.
 - POS pay/charge-to-site: 5 r/s, burst 10 (per device_id may be stricter).
@@ -422,6 +457,7 @@ Response: { "applied": true, "duplicate": false }
 - Comms send: 5 r/s per channel; provider-specific limits respected; backoff on 429/5xx.
 
 ## Ops runbook snippets (succinct)
+
 - **Redeem spike/409s:** check idempotency collisions; verify ledger for double spend; raise rate limit if legit spike; inspect logs for code/PAN redaction.
 - **Offline backlog:** check pending `pos_offline_batch`; confirm device clock skew and price/tax version; reject duplicates; notify staff to resync.
 - **Matcher lag:** inspect queue depth; scale workers; pause new offer generation if >60s lag; communicate ETA.

@@ -2,14 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  MessageCircle,
-  Send,
-  X,
-  Loader2,
-  Sparkles,
-  ChevronDown,
-} from "lucide-react";
+import { MessageCircle, Send, X, Loader2, Sparkles, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -87,21 +80,18 @@ export function AiImportChat({
 
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
-      const response = await fetch(
-        `${apiBase}/onboarding/session/${sessionId}/ai-import/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({
-            token,
-            message: content,
-            documentId,
-          }),
-        }
-      );
+      const response = await fetch(`${apiBase}/onboarding/session/${sessionId}/ai-import/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({
+          token,
+          message: content,
+          documentId,
+        }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to get response");
@@ -149,11 +139,7 @@ export function AiImportChat({
             exit={{ scale: 0, opacity: 0 }}
             className="fixed bottom-6 right-6 z-50"
           >
-            <Button
-              onClick={toggleOpen}
-              size="lg"
-              className="rounded-full h-14 w-14 shadow-lg"
-            >
+            <Button onClick={toggleOpen} size="lg" className="rounded-full h-14 w-14 shadow-lg">
               <MessageCircle className="w-6 h-6" />
             </Button>
           </motion.div>
@@ -185,17 +171,14 @@ export function AiImportChat({
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={cn(
-                    "flex",
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  )}
+                  className={cn("flex", message.role === "user" ? "justify-end" : "justify-start")}
                 >
                   <div
                     className={cn(
                       "max-w-[85%] rounded-2xl px-4 py-2 text-sm",
                       message.role === "user"
                         ? "bg-primary text-primary-foreground rounded-br-sm"
-                        : "bg-muted rounded-bl-sm"
+                        : "bg-muted rounded-bl-sm",
                     )}
                   >
                     {message.content}

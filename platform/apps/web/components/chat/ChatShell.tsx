@@ -90,7 +90,7 @@ export function ChatShell({
         className={cn(
           "fixed w-14 h-14 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all flex items-center justify-center z-[9999]",
           styles.launcher,
-          positionClass
+          positionClass,
         )}
         aria-label={launcherLabel}
       >
@@ -104,7 +104,7 @@ export function ChatShell({
       <div
         className={cn(
           "fixed w-72 rounded-2xl shadow-xl overflow-hidden z-50 border border-border",
-          positionClass
+          positionClass,
         )}
       >
         <div
@@ -112,7 +112,9 @@ export function ChatShell({
           onClick={onMaximize}
         >
           <div className="flex items-center gap-2">
-            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", styles.icon)}>
+            <div
+              className={cn("w-8 h-8 rounded-full flex items-center justify-center", styles.icon)}
+            >
               {icon}
             </div>
             <span className="font-medium">{title}</span>
@@ -153,12 +155,14 @@ export function ChatShell({
         widthClassName,
         heightClassName,
         positionClass,
-        className
+        className,
       )}
     >
       <div className={cn("p-4 flex items-center justify-between", styles.header)}>
         <div className="flex items-center gap-3">
-          <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", styles.icon)}>
+          <div
+            className={cn("w-10 h-10 rounded-full flex items-center justify-center", styles.icon)}
+          >
             {icon}
           </div>
           <div>

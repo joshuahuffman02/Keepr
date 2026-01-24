@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class WaiversService {
@@ -14,18 +14,18 @@ export class WaiversService {
    */
   async generateWaiverPdf(waiverId: string) {
     const waiver = await this.prisma.digitalWaiver.findUnique({ where: { id: waiverId } });
-    if (!waiver) throw new NotFoundException('Waiver not found');
+    if (!waiver) throw new NotFoundException("Waiver not found");
 
-    const pdfEnabled = process.env.WAIVER_PDF_ENABLED === 'true';
+    const pdfEnabled = process.env.WAIVER_PDF_ENABLED === "true";
 
     if (!pdfEnabled) {
       this.logger.warn(`[WaiverPDF] Skipped generation (feature flag disabled) for ${waiverId}`);
-      return { waiverId, status: 'skipped' };
+      return { waiverId, status: "skipped" };
     }
 
     // Minimal PDF content (not a full PDF renderer)
-    const content = `Waiver for guest ${waiver.guestId || ''} at campground ${waiver.campgroundId}\nStatus: ${waiver.status}\nGenerated: ${new Date().toISOString()}`;
-    const base64 = Buffer.from(content).toString('base64');
+    const content = `Waiver for guest ${waiver.guestId || ""} at campground ${waiver.campgroundId}\nStatus: ${waiver.status}\nGenerated: ${new Date().toISOString()}`;
+    const base64 = Buffer.from(content).toString("base64");
     const dataUrl = `data:application/pdf;base64,${base64}`;
 
     await this.prisma.digitalWaiver.update({
@@ -44,11 +44,12 @@ export class WaiversService {
   async startIdVerification(guestId: string, reservationId?: string, provider?: string) {
     const stripeKey = process.env.STRIPE_IDENTITY_KEY;
     const jumioKey = process.env.JUMIO_API_KEY;
-    const chosenProvider = provider || (stripeKey ? 'stripe_identity' : jumioKey ? 'jumio' : 'noop');
+    const chosenProvider =
+      provider || (stripeKey ? "stripe_identity" : jumioKey ? "jumio" : "noop");
 
     const campgroundId = await this.resolveCampgroundId(reservationId);
     if (!campgroundId) {
-      throw new NotFoundException('Campground required for ID verification');
+      throw new NotFoundException("Campground required for ID verification");
     }
 
     const verification = await this.prisma.idVerification.create({
@@ -57,15 +58,17 @@ export class WaiversService {
         guestId,
         reservationId: reservationId ?? null,
         campgroundId,
-        status: chosenProvider === 'noop' ? 'pending' : 'pending',
+        status: chosenProvider === "noop" ? "pending" : "pending",
         provider: chosenProvider,
         metadata: { startedAt: new Date().toISOString(), provider: chosenProvider },
         updatedAt: new Date(),
       },
     });
 
-    if (chosenProvider === 'noop') {
-      this.logger.warn(`[IDV] No provider configured; recorded noop verification for guest ${guestId}`);
+    if (chosenProvider === "noop") {
+      this.logger.warn(
+        `[IDV] No provider configured; recorded noop verification for guest ${guestId}`,
+      );
     } else {
       this.logger.log(`[IDV] Started verification via ${chosenProvider} for guest ${guestId}`);
     }
@@ -77,7 +80,7 @@ export class WaiversService {
     return this.prisma.idVerification.update({
       where: { id },
       data: {
-        status: success ? 'verified' : 'failed',
+        status: success ? "verified" : "failed",
         verifiedAt: success ? new Date() : null,
         updatedAt: new Date(),
       },

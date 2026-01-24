@@ -1,15 +1,18 @@
 # Staff Dashboard Repolish Plan
 
 ## Context
+
 This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on staff-facing pages (dashboard, operations, reservations, calendar, guests, finance, and settings). The target is a professional, calm, hospitality-first UI for campground management. Constraints: light theme only, no gradients, minimal animation.
 
 ## Goals
+
 - Make staff pages feel premium, reliable, and easy to learn in days.
 - Reduce visual noise and decorative styling; emphasize clarity and actions.
 - Use a consistent layout and component system across all staff pages.
 - Adapt to campground workflows (arrivals, turnovers, site readiness, seasonal stays).
 
 ## Design Principles
+
 - Calm hierarchy: clear primary action, secondary actions grouped, tertiary actions hidden.
 - Hospitality-first language: "Turnovers", "Quiet hours", "Site readiness", "Arrival window".
 - Operational clarity: strong status system, minimal colors, consistent iconography.
@@ -17,6 +20,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 - Low-motion: subtle transitions only for state changes.
 
 ## Visual System (Light Theme Only)
+
 - Backgrounds: off-white and neutral surfaces; avoid stark white everywhere.
 - Accents: pine/sage green for success, amber for warnings, blue for info, red for errors.
 - Typography: use a clean, non-default UI font (example: "Source Sans 3") with tabular numerals for KPIs.
@@ -24,12 +28,14 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 - Badges: single-tone fills (no gradients), consistent sizing.
 
 ## Layout Templates
+
 - Overview template: header + KPIs + action queue + recent activity.
 - List template: header + filters + table + right-side detail (optional).
 - Detail template: left content + right context sidebar.
 - Settings template: left nav + section cards with clear grouping.
 
 ## Component Standards
+
 - Page header: title, short subtitle, primary CTA, secondary actions.
 - Filter bar: unified filter chips, search, date range, export.
 - Tables: fixed header, compact density, inline actions on hover.
@@ -39,6 +45,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 ## Page-by-Page Repolish Plan (Prioritized)
 
 ### Phase 1: Daily-use core
+
 - Dashboard overview `platform/apps/web/app/dashboard/v2/page.tsx`
   - Convert to "Today at a glance" blocks (Arrivals, Departures, In-house, Occupancy).
   - Add an "Action queue" (check-ins, payments, site moves).
@@ -55,6 +62,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
   - Normalize badges and notes styling.
 
 ### Phase 2: Operations + Property
+
 - Operations `platform/apps/web/app/operations/page.tsx`
   - Task lanes by priority and SLA indicator.
   - Separate staff vs guest impact tasks.
@@ -68,6 +76,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
   - Shift coverage clarity and request approvals.
 
 ### Phase 3: Finance and Reporting
+
 - Finance `platform/apps/web/app/finance/page.tsx`
   - Consolidate KPIs into a clean "Financial health" grid.
   - Replace decorative blocks with clean data cards.
@@ -79,6 +88,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
   - Clear dispute lifecycle and evidence timeline.
 
 ### Phase 4: Settings + Admin
+
 - Settings (global + campground) `platform/apps/web/app/dashboard/settings/*` and `platform/apps/web/app/campgrounds/[campgroundId]/settings/*`
   - Standardize section cards and form spacing.
   - Clearer inline help, reduce copy density.
@@ -88,6 +98,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
   - Flat cards, consistent modals, clearer creation flow.
 
 ## Campground-Specific Enhancements
+
 - Site plan as a first-class view (map + list).
 - "Site readiness" and "utility hookups" badges.
 - Weather/fire restriction status in the header.
@@ -95,6 +106,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 - Seasonal lease timeline and payment schedule visual.
 
 ## Implementation Phases (Delivery Plan)
+
 1. Foundation: tokens, typography, spacing, component cleanup.
 2. Core workflow pages (Dashboard, Calendar, Reservations, Guests).
 3. Operations and site management pages.
@@ -102,6 +114,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 5. Settings, store, and long-tail pages.
 
 ## Definition of Done
+
 - No gradients or dark-mode classes on staff pages.
 - Consistent header/filter templates across core pages.
 - Status colors and badges are uniform across the app.
@@ -109,6 +122,7 @@ This plan aligns with `docs/cloudbeds-competitive-analysis.md` and focuses on st
 - Copy and labels are hospitality-focused and consistent.
 
 ## Open Questions
+
 - Final brand palette for staff UI (sage vs pine emphasis).
 - Preferred UI font choice and licensing.
 - Priority of site plan/map work vs other backlog items.

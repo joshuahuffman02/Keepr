@@ -138,7 +138,10 @@ const toArtifacts = (messages: UnifiedChatMessage[]): ChatArtifact[] => {
           id: `${message.id}-availability-${index}`,
           type: "availability",
           title: "Availability",
-          summary: total > 0 ? `${total} sites available${nights ? ` for ${nights} nights` : ""}` : "Availability update",
+          summary:
+            total > 0
+              ? `${total} sites available${nights ? ` for ${nights} nights` : ""}`
+              : "Availability update",
           details,
           createdAt: message.createdAt,
         });
@@ -179,7 +182,9 @@ const toArtifacts = (messages: UnifiedChatMessage[]): ChatArtifact[] => {
             ? `Transactions: ${getNumber(revenue.transactionCount)}`
             : "",
           ...(methods
-            ? Object.entries(methods).slice(0, 3).map(([key, value]) => `${key}: ${getString(value)}`)
+            ? Object.entries(methods)
+                .slice(0, 3)
+                .map(([key, value]) => `${key}: ${getString(value)}`)
             : []),
         ].filter(Boolean);
 
@@ -199,9 +204,7 @@ const toArtifacts = (messages: UnifiedChatMessage[]): ChatArtifact[] => {
           occupancy.dateRange && isRecord(occupancy.dateRange)
             ? `Dates: ${getString(occupancy.dateRange.start)} - ${getString(occupancy.dateRange.end)}`
             : "",
-          occupancy.totalSites !== undefined
-            ? `Sites: ${getNumber(occupancy.totalSites)}`
-            : "",
+          occupancy.totalSites !== undefined ? `Sites: ${getNumber(occupancy.totalSites)}` : "",
         ].filter(Boolean);
 
         artifacts.push({
@@ -260,7 +263,7 @@ export function ChatArtifactPanel({
       run_report: () => undefined,
       save_report: () => undefined,
     }),
-    []
+    [],
   );
   if (!isOpen) return null;
   const accentBorder =
@@ -278,7 +281,7 @@ export function ChatArtifactPanel({
     <div
       className={cn(
         "absolute inset-0 sm:inset-y-0 sm:right-0 sm:left-auto w-full bg-card border-t border-border sm:border-t-0 sm:border-l shadow-xl z-10 flex flex-col",
-        panelWidthClassName
+        panelWidthClassName,
       )}
     >
       <div className="flex items-center justify-between px-3 py-2 border-b border-border">

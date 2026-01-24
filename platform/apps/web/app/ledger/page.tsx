@@ -54,11 +54,15 @@ type SortDir = "asc" | "desc";
 type AgingData = Awaited<ReturnType<typeof apiClient.getAging>>;
 type AgingKey = keyof AgingData;
 
-const agingBuckets: Array<{ label: string; key: AgingKey; severity: "low" | "medium" | "high" | "critical" }> = [
+const agingBuckets: Array<{
+  label: string;
+  key: AgingKey;
+  severity: "low" | "medium" | "high" | "critical";
+}> = [
   { label: "Current (0-30)", key: "current", severity: "low" },
   { label: "31-60 days", key: "31_60", severity: "medium" },
   { label: "61-90 days", key: "61_90", severity: "high" },
-  { label: "90+ days", key: "90_plus", severity: "critical" }
+  { label: "90+ days", key: "90_plus", severity: "critical" },
 ];
 
 export default function LedgerPage() {
@@ -80,17 +84,17 @@ export default function LedgerPage() {
   const ledgerQuery = useQuery({
     queryKey: ["ledger", campgroundId, start, end, glCode],
     queryFn: () => apiClient.getLedger(campgroundId, { start, end, glCode }),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const summaryQuery = useQuery({
     queryKey: ["ledger-summary", campgroundId, start, end],
     queryFn: () => apiClient.getLedgerSummary(campgroundId, { start, end }),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const agingQuery = useQuery({
     queryKey: ["aging", campgroundId],
     queryFn: () => apiClient.getAging(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const datePresets = getDatePresets();
@@ -171,7 +175,9 @@ export default function LedgerPage() {
         {!campgroundId && (
           <div className="card p-5">
             <div className="text-lg font-semibold text-foreground">Select a campground</div>
-            <p className="text-sm text-muted-foreground mt-1">Use the left sidebar switcher to choose a campground.</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Use the left sidebar switcher to choose a campground.
+            </p>
           </div>
         )}
         {campgroundId && (
@@ -199,7 +205,10 @@ export default function LedgerPage() {
               {/* Custom Date Range & Filters */}
               <div className="flex flex-wrap gap-3 items-end">
                 <div className="space-y-1">
-                  <Label htmlFor="ledger-start" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label
+                    htmlFor="ledger-start"
+                    className="text-xs font-medium text-muted-foreground flex items-center gap-1"
+                  >
                     <Calendar className="h-3 w-3" />
                     Start Date
                   </Label>
@@ -212,7 +221,10 @@ export default function LedgerPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="ledger-end" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label
+                    htmlFor="ledger-end"
+                    className="text-xs font-medium text-muted-foreground flex items-center gap-1"
+                  >
                     <Calendar className="h-3 w-3" />
                     End Date
                   </Label>
@@ -237,7 +249,10 @@ export default function LedgerPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="ledger-search" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label
+                    htmlFor="ledger-search"
+                    className="text-xs font-medium text-muted-foreground flex items-center gap-1"
+                  >
                     <Search className="h-3 w-3" />
                     Search
                   </Label>
@@ -259,7 +274,10 @@ export default function LedgerPage() {
                     if (end) qs.set("end", end);
                     if (glCode) qs.set("glCode", glCode);
                     const url = `/campgrounds/${campgroundId}/ledger/export${qs.toString() ? `?${qs.toString()}` : ""}`;
-                    window.open((process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api") + url, "_blank");
+                    window.open(
+                      (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api") + url,
+                      "_blank",
+                    );
                   }}
                 >
                   <Download className="h-4 w-4" />
@@ -294,7 +312,14 @@ export default function LedgerPage() {
                     Total Credits
                   </div>
                   <div className="text-2xl font-bold text-status-success">
-                    ${ledgerQuery.isLoading ? "—" : ((ledgerQuery.data || []).filter(e => e.direction === 'credit').reduce((sum, e) => sum + e.amountCents, 0) / 100).toFixed(2)}
+                    $
+                    {ledgerQuery.isLoading
+                      ? "—"
+                      : (
+                          (ledgerQuery.data || [])
+                            .filter((e) => e.direction === "credit")
+                            .reduce((sum, e) => sum + e.amountCents, 0) / 100
+                        ).toFixed(2)}
                   </div>
                 </div>
                 <div className="p-4 rounded-xl bg-status-error/10 border border-status-error/20">
@@ -303,16 +328,30 @@ export default function LedgerPage() {
                     Total Debits
                   </div>
                   <div className="text-2xl font-bold text-status-error">
-                    ${ledgerQuery.isLoading ? "—" : ((ledgerQuery.data || []).filter(e => e.direction === 'debit').reduce((sum, e) => sum + e.amountCents, 0) / 100).toFixed(2)}
+                    $
+                    {ledgerQuery.isLoading
+                      ? "—"
+                      : (
+                          (ledgerQuery.data || [])
+                            .filter((e) => e.direction === "debit")
+                            .reduce((sum, e) => sum + e.amountCents, 0) / 100
+                        ).toFixed(2)}
                   </div>
                 </div>
-                <div className={`p-4 rounded-xl border ${total >= 0 ? "bg-status-success/10 border-status-success/20" : "bg-status-error/10 border-status-error/20"}`}>
-                  <div className={`flex items-center gap-2 text-xs font-medium mb-1 ${total >= 0 ? "text-status-success" : "text-status-error"}`}>
+                <div
+                  className={`p-4 rounded-xl border ${total >= 0 ? "bg-status-success/10 border-status-success/20" : "bg-status-error/10 border-status-error/20"}`}
+                >
+                  <div
+                    className={`flex items-center gap-2 text-xs font-medium mb-1 ${total >= 0 ? "text-status-success" : "text-status-error"}`}
+                  >
                     <DollarSign className="h-3.5 w-3.5" />
                     Net Balance
                   </div>
-                  <div className={`text-2xl font-bold ${total >= 0 ? "text-status-success" : "text-status-error"}`}>
-                    {total >= 0 ? "+" : "-"}${ledgerQuery.isLoading ? "—" : (Math.abs(total) / 100).toFixed(2)}
+                  <div
+                    className={`text-2xl font-bold ${total >= 0 ? "text-status-success" : "text-status-error"}`}
+                  >
+                    {total >= 0 ? "+" : "-"}$
+                    {ledgerQuery.isLoading ? "—" : (Math.abs(total) / 100).toFixed(2)}
                   </div>
                 </div>
               </div>
@@ -323,10 +362,17 @@ export default function LedgerPage() {
                   <h3 className="text-sm font-medium text-foreground mb-2">By GL Code</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
                     {summaryQuery.data?.map((row) => (
-                      <div key={row.glCode} className="rounded-lg border border-border bg-muted px-3 py-2 hover:bg-muted transition-colors cursor-pointer" onClick={() => setGlCode(row.glCode)}>
+                      <div
+                        key={row.glCode}
+                        className="rounded-lg border border-border bg-muted px-3 py-2 hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => setGlCode(row.glCode)}
+                      >
                         <div className="text-xs text-muted-foreground">GL {row.glCode}</div>
-                        <div className={`text-sm font-semibold ${row.netCents >= 0 ? "text-status-success" : "text-status-error"}`}>
-                          {row.netCents >= 0 ? "+" : "-"}${(Math.abs(row.netCents) / 100).toFixed(2)}
+                        <div
+                          className={`text-sm font-semibold ${row.netCents >= 0 ? "text-status-success" : "text-status-error"}`}
+                        >
+                          {row.netCents >= 0 ? "+" : "-"}$
+                          {(Math.abs(row.netCents) / 100).toFixed(2)}
                         </div>
                       </div>
                     ))}
@@ -351,18 +397,22 @@ export default function LedgerPage() {
                             !hasBalance
                               ? "border-border bg-muted"
                               : b.severity === "critical"
-                              ? "border-status-error/20 bg-status-error/10"
-                              : b.severity === "high"
-                              ? "border-status-warning/20 bg-status-warning/10"
-                              : b.severity === "medium"
-                              ? "border-status-warning/20 bg-status-warning/10"
-                              : "border-status-success/20 bg-status-success/10"
+                                ? "border-status-error/20 bg-status-error/10"
+                                : b.severity === "high"
+                                  ? "border-status-warning/20 bg-status-warning/10"
+                                  : b.severity === "medium"
+                                    ? "border-status-warning/20 bg-status-warning/10"
+                                    : "border-status-success/20 bg-status-success/10"
                           }`}
                         >
-                          <div className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}>
+                          <div
+                            className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}
+                          >
                             {b.label}
                           </div>
-                          <div className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}>
+                          <div
+                            className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}
+                          >
                             ${(amount / 100).toFixed(2)}
                           </div>
                         </div>
@@ -375,19 +425,26 @@ export default function LedgerPage() {
               {/* Balance Verification */}
               {(() => {
                 const entries = ledgerQuery.data || [];
-                const totalCredits = entries.filter(e => e.direction === 'credit').reduce((sum, e) => sum + e.amountCents, 0);
-                const totalDebits = entries.filter(e => e.direction === 'debit').reduce((sum, e) => sum + e.amountCents, 0);
+                const totalCredits = entries
+                  .filter((e) => e.direction === "credit")
+                  .reduce((sum, e) => sum + e.amountCents, 0);
+                const totalDebits = entries
+                  .filter((e) => e.direction === "debit")
+                  .reduce((sum, e) => sum + e.amountCents, 0);
                 const netBalance = totalCredits - totalDebits;
-                const missingGlCount = entries.filter(e => !e.glCode).length;
+                const missingGlCount = entries.filter((e) => !e.glCode).length;
                 const hasUnbalanced = Math.abs(netBalance) > 0 && entries.length > 0;
                 const needsReview = missingGlCount > 0 || hasUnbalanced;
                 const isBalanced = !needsReview && entries.length > 0;
 
                 return (
-                  <div className={`rounded-xl border p-4 transition-all duration-300 ${needsReview
-                      ? 'border-status-warning/20 bg-status-warning/10'
-                      : 'border-status-success/20 bg-status-success/10'
-                    }`}>
+                  <div
+                    className={`rounded-xl border p-4 transition-all duration-300 ${
+                      needsReview
+                        ? "border-status-warning/20 bg-status-warning/10"
+                        : "border-status-success/20 bg-status-success/10"
+                    }`}
+                  >
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-foreground flex items-center gap-2">
                         {isBalanced ? (
@@ -397,12 +454,19 @@ export default function LedgerPage() {
                         ) : null}
                         Balance Verification
                       </h3>
-                      <span className={`text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 ${needsReview
-                          ? 'bg-status-warning/15 text-status-warning border border-status-warning'
-                          : 'bg-status-success/15 text-status-success border border-status-success'
-                        }`}>
+                      <span
+                        className={`text-xs px-3 py-1.5 rounded-full font-medium flex items-center gap-1.5 ${
+                          needsReview
+                            ? "bg-status-warning/15 text-status-warning border border-status-warning"
+                            : "bg-status-success/15 text-status-success border border-status-success"
+                        }`}
+                      >
                         {isBalanced && <CheckCircle className="h-3.5 w-3.5" />}
-                        {needsReview ? 'Needs Review' : entries.length > 0 ? 'Books Balanced!' : 'No Entries'}
+                        {needsReview
+                          ? "Needs Review"
+                          : entries.length > 0
+                            ? "Books Balanced!"
+                            : "No Entries"}
                       </span>
                     </div>
 
@@ -422,13 +486,19 @@ export default function LedgerPage() {
                         {hasUnbalanced && (
                           <div className="flex items-center gap-2 text-sm text-status-warning">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                            <span>Unbalanced by <strong>${(Math.abs(netBalance) / 100).toFixed(2)}</strong></span>
+                            <span>
+                              Unbalanced by{" "}
+                              <strong>${(Math.abs(netBalance) / 100).toFixed(2)}</strong>
+                            </span>
                           </div>
                         )}
                         {missingGlCount > 0 && (
                           <div className="flex items-center gap-2 text-sm text-status-warning">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
-                            <span><strong>{missingGlCount}</strong> {missingGlCount === 1 ? 'entry is' : 'entries are'} missing GL codes</span>
+                            <span>
+                              <strong>{missingGlCount}</strong>{" "}
+                              {missingGlCount === 1 ? "entry is" : "entries are"} missing GL codes
+                            </span>
                           </div>
                         )}
                       </div>
@@ -437,21 +507,29 @@ export default function LedgerPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <div className="text-muted-foreground text-xs">Total Credits</div>
-                        <div className="font-bold text-status-success text-lg">${(totalCredits / 100).toFixed(2)}</div>
+                        <div className="font-bold text-status-success text-lg">
+                          ${(totalCredits / 100).toFixed(2)}
+                        </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Total Debits</div>
-                        <div className="font-bold text-status-error text-lg">${(totalDebits / 100).toFixed(2)}</div>
+                        <div className="font-bold text-status-error text-lg">
+                          ${(totalDebits / 100).toFixed(2)}
+                        </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Net Balance</div>
-                        <div className={`font-bold text-lg ${netBalance >= 0 ? 'text-status-success' : 'text-status-error'}`}>
-                          {netBalance >= 0 ? '+' : ''}${(netBalance / 100).toFixed(2)}
+                        <div
+                          className={`font-bold text-lg ${netBalance >= 0 ? "text-status-success" : "text-status-error"}`}
+                        >
+                          {netBalance >= 0 ? "+" : ""}${(netBalance / 100).toFixed(2)}
                         </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Missing GL Codes</div>
-                        <div className={`font-bold text-lg ${missingGlCount > 0 ? 'text-status-warning' : 'text-muted-foreground'}`}>
+                        <div
+                          className={`font-bold text-lg ${missingGlCount > 0 ? "text-status-warning" : "text-muted-foreground"}`}
+                        >
                           {missingGlCount}
                         </div>
                       </div>
@@ -480,7 +558,9 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Date
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-primary" : "text-muted-foreground"}`} />
+                            <ArrowUpDown
+                              className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-primary" : "text-muted-foreground"}`}
+                            />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
@@ -489,18 +569,26 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             GL Code
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-primary" : "text-muted-foreground"}`} />
+                            <ArrowUpDown
+                              className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-primary" : "text-muted-foreground"}`}
+                            />
                           </button>
                         </th>
-                        <th scope="col" className="px-3 py-3 font-medium">Account</th>
-                        <th scope="col" className="px-3 py-3 font-medium">Reservation</th>
+                        <th scope="col" className="px-3 py-3 font-medium">
+                          Account
+                        </th>
+                        <th scope="col" className="px-3 py-3 font-medium">
+                          Reservation
+                        </th>
                         <th scope="col" className="px-3 py-3">
                           <button
                             onClick={() => handleSort("direction")}
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Type
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-primary" : "text-muted-foreground"}`} />
+                            <ArrowUpDown
+                              className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-primary" : "text-muted-foreground"}`}
+                            />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
@@ -509,10 +597,14 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Amount
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-primary" : "text-muted-foreground"}`} />
+                            <ArrowUpDown
+                              className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-primary" : "text-muted-foreground"}`}
+                            />
                           </button>
                         </th>
-                        <th scope="col" className="px-3 py-3 font-medium">Description</th>
+                        <th scope="col" className="px-3 py-3 font-medium">
+                          Description
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-card divide-y divide-border">
@@ -535,11 +627,13 @@ export default function LedgerPage() {
                             {row.reservationId ? row.reservationId.slice(0, 8) : "—"}
                           </td>
                           <td className="px-3 py-3">
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-                              row.direction === "credit"
-                                ? "bg-status-success/15 text-status-success"
-                                : "bg-status-error/15 text-status-error"
-                            }`}>
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                row.direction === "credit"
+                                  ? "bg-status-success/15 text-status-success"
+                                  : "bg-status-error/15 text-status-error"
+                              }`}
+                            >
                               {row.direction === "credit" ? (
                                 <TrendingUp className="h-3 w-3" />
                               ) : (
@@ -564,13 +658,15 @@ export default function LedgerPage() {
                                 <FileText className="h-8 w-8 text-muted-foreground" />
                               </div>
                               <div>
-                                <p className="text-muted-foreground font-medium">No ledger entries found</p>
+                                <p className="text-muted-foreground font-medium">
+                                  No ledger entries found
+                                </p>
                                 <p className="text-sm text-muted-foreground mt-1">
                                   {searchQuery
                                     ? "Try adjusting your search or filters"
                                     : start || end
-                                    ? "No entries in this date range. Try a different period."
-                                    : "Select a date range to view ledger entries."}
+                                      ? "No entries in this date range. Try a different period."
+                                      : "Select a date range to view ledger entries."}
                                 </p>
                               </div>
                               {!start && !end && (

@@ -33,7 +33,11 @@ import { SiteClassPhotoUpload } from "@/components/onboarding/SiteClassPhotoUplo
 import { EquipmentTypePicker } from "@/components/onboarding/EquipmentTypePicker";
 import { GuestPricingPanel } from "@/components/onboarding/GuestPricingPanel";
 import { RentalTypeSelector, type RentalType } from "@/components/onboarding/RentalTypeSelector";
-import { MeteredUtilitiesPanel, type MeteredType, type MeteredBillingMode } from "@/components/onboarding/MeteredUtilitiesPanel";
+import {
+  MeteredUtilitiesPanel,
+  type MeteredType,
+  type MeteredBillingMode,
+} from "@/components/onboarding/MeteredUtilitiesPanel";
 import {
   Select,
   SelectContent,
@@ -120,7 +124,12 @@ function generateClassName(data: Partial<SiteClassData>): string {
 
     if (hookups.length === 0) {
       parts.push("Dry Camping");
-    } else if (data.hookupsWater && data.hookupsSewer && data.electricAmps && data.electricAmps.length > 0) {
+    } else if (
+      data.hookupsWater &&
+      data.hookupsSewer &&
+      data.electricAmps &&
+      data.electricAmps.length > 0
+    ) {
       parts.push(`Full Hookup (${data.electricAmps.join("/")}A)`);
     } else {
       parts.push(hookups.join("/"));
@@ -353,8 +362,8 @@ function SiteClassWizard({
                   isActive
                     ? "bg-emerald-500 text-white"
                     : isPast
-                    ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-slate-700 text-slate-400"
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : "bg-slate-700 text-slate-400",
                 )}
               >
                 {isPast ? <Check className="w-4 h-4" /> : i + 1}
@@ -381,18 +390,13 @@ function SiteClassWizard({
               <h3 className="text-lg font-medium text-slate-200">Rental Type</h3>
               <RentalTypeSelector
                 value={data.rentalType || "transient"}
-                onChange={(rentalType) =>
-                  setData((prev) => ({ ...prev, rentalType }))
-                }
+                onChange={(rentalType) => setData((prev) => ({ ...prev, rentalType }))}
               />
             </div>
 
             <div className="space-y-3">
               <h3 className="text-lg font-medium text-slate-200">Site Type</h3>
-              <SiteTypeSelector
-                selected={data.siteType || null}
-                onSelect={handleTypeSelect}
-              />
+              <SiteTypeSelector selected={data.siteType || null} onSelect={handleTypeSelect} />
             </div>
           </motion.div>
         )}
@@ -408,11 +412,7 @@ function SiteClassWizard({
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-medium text-slate-200">RV Site Configuration</h3>
-              <Button
-                variant="ghost"
-                onClick={() => setStep("type")}
-                className="text-slate-400"
-              >
+              <Button variant="ghost" onClick={() => setStep("type")} className="text-slate-400">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back
               </Button>
@@ -424,17 +424,11 @@ function SiteClassWizard({
                 setData((prev) => ({ ...prev, rvOrientation: orientation }))
               }
               electricAmps={data.electricAmps || []}
-              onElectricAmpsChange={(amps) =>
-                setData((prev) => ({ ...prev, electricAmps: amps }))
-              }
+              onElectricAmpsChange={(amps) => setData((prev) => ({ ...prev, electricAmps: amps }))}
               hookupsWater={data.hookupsWater || false}
-              onWaterChange={(value) =>
-                setData((prev) => ({ ...prev, hookupsWater: value }))
-              }
+              onWaterChange={(value) => setData((prev) => ({ ...prev, hookupsWater: value }))}
               hookupsSewer={data.hookupsSewer || false}
-              onSewerChange={(value) =>
-                setData((prev) => ({ ...prev, hookupsSewer: value }))
-              }
+              onSewerChange={(value) => setData((prev) => ({ ...prev, hookupsSewer: value }))}
             />
 
             {/* Equipment Types - RV only */}
@@ -442,9 +436,7 @@ function SiteClassWizard({
               <Label className="text-sm text-slate-300">Accepted Equipment Types</Label>
               <EquipmentTypePicker
                 selected={data.equipmentTypes || []}
-                onChange={(types) =>
-                  setData((prev) => ({ ...prev, equipmentTypes: types }))
-                }
+                onChange={(types) => setData((prev) => ({ ...prev, equipmentTypes: types }))}
               />
               <p className="text-xs text-slate-500">
                 Select which types of RVs can book this site type
@@ -459,7 +451,7 @@ function SiteClassWizard({
                 onValueChange={(value) =>
                   setData((prev) => ({
                     ...prev,
-                    slideOutsAccepted: value === "any" ? null : value
+                    slideOutsAccepted: value === "any" ? null : value,
                   }))
                 }
               >
@@ -557,7 +549,9 @@ function SiteClassWizard({
               </div>
               <Switch
                 checked={data.petFriendly || false}
-                onCheckedChange={(checked) => setData((prev) => ({ ...prev, petFriendly: checked }))}
+                onCheckedChange={(checked) =>
+                  setData((prev) => ({ ...prev, petFriendly: checked }))
+                }
               />
             </div>
 
@@ -569,13 +563,16 @@ function SiteClassWizard({
                   ...prev,
                   meteredEnabled: enabled,
                   meteredType: enabled && !prev.meteredType ? "power" : prev.meteredType,
-                  meteredBillingMode: enabled && !prev.meteredBillingMode ? "per_reading" : prev.meteredBillingMode,
+                  meteredBillingMode:
+                    enabled && !prev.meteredBillingMode ? "per_reading" : prev.meteredBillingMode,
                 }));
               }}
               type={data.meteredType || null}
               onTypeChange={(type) => setData((prev) => ({ ...prev, meteredType: type }))}
               billingMode={data.meteredBillingMode || null}
-              onBillingModeChange={(mode) => setData((prev) => ({ ...prev, meteredBillingMode: mode }))}
+              onBillingModeChange={(mode) =>
+                setData((prev) => ({ ...prev, meteredBillingMode: mode }))
+              }
             />
 
             {/* Guest Pricing Panel */}
@@ -613,7 +610,8 @@ function SiteClassWizard({
                 onPhotosChange={(photos) => setData((prev) => ({ ...prev, photos }))}
               />
               <p className="text-xs text-slate-500">
-                Add photos of this site type. You can add individual site photos later in your dashboard.
+                Add photos of this site type. You can add individual site photos later in your
+                dashboard.
               </p>
             </div>
 
@@ -635,9 +633,9 @@ function SiteClassWizard({
                       <p className="font-medium text-white">{data.name || "Unnamed"}</p>
                       <p className="text-sm text-slate-500">
                         {data.maxOccupancy} guests max
-                        {data.siteType === "rv" && data.electricAmps && data.electricAmps.length > 0 && (
-                          <> • {data.electricAmps.join("/")}A</>
-                        )}
+                        {data.siteType === "rv" &&
+                          data.electricAmps &&
+                          data.electricAmps.length > 0 && <> • {data.electricAmps.join("/")}A</>}
                         {data.hookupsWater && " • Water"}
                         {data.hookupsSewer && " • Sewer"}
                       </p>
@@ -703,7 +701,8 @@ function SiteClassCard({
             {siteClass.siteType === "rv" && siteClass.electricAmps.length > 0 && (
               <>
                 {" "}
-                • <Zap className="w-3 h-3 inline text-yellow-400" /> {siteClass.electricAmps.join("/")}A
+                • <Zap className="w-3 h-3 inline text-yellow-400" />{" "}
+                {siteClass.electricAmps.join("/")}A
               </>
             )}
             {siteClass.hookupsWater && (
@@ -761,7 +760,7 @@ export function SiteClasses({
       meteredEnabled: c.meteredEnabled || false,
       meteredType: c.meteredType || null,
       meteredBillingMode: c.meteredBillingMode || null,
-    }))
+    })),
   );
   const [saving, setSaving] = useState(false);
   const [showWizard, setShowWizard] = useState(classes.length === 0);
@@ -769,9 +768,7 @@ export function SiteClasses({
 
   const handleAddClass = (data: SiteClassData) => {
     if (editingIndex !== null) {
-      setClasses((prev) =>
-        prev.map((c, i) => (i === editingIndex ? data : c))
-      );
+      setClasses((prev) => prev.map((c, i) => (i === editingIndex ? data : c)));
       setEditingIndex(null);
     } else {
       setClasses((prev) => [...prev, data]);
@@ -882,7 +879,7 @@ export function SiteClasses({
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-emerald-500 to-teal-500",
                 "hover:from-emerald-400 hover:to-teal-400",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
             >
               {saving ? "Saving..." : "Continue to Add Sites"}

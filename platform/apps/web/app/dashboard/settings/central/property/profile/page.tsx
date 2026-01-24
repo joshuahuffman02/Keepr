@@ -40,7 +40,8 @@ export default function ProfilePage() {
       return;
     }
 
-    apiClient.getCampground(id)
+    apiClient
+      .getCampground(id)
       .then((data) => {
         setProfile({
           id: data.id,
@@ -95,9 +96,7 @@ export default function ProfilePage() {
       <div className="max-w-4xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
-          <p className="text-muted-foreground mt-1">
-            Basic information about your campground
-          </p>
+          <p className="text-muted-foreground mt-1">Basic information about your campground</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -111,9 +110,7 @@ export default function ProfilePage() {
       <div className="max-w-4xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
-          <p className="text-muted-foreground mt-1">
-            Basic information about your campground
-          </p>
+          <p className="text-muted-foreground mt-1">Basic information about your campground</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -129,9 +126,7 @@ export default function ProfilePage() {
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Campground Profile</h2>
-        <p className="text-muted-foreground mt-1">
-          Basic information about your campground
-        </p>
+        <p className="text-muted-foreground mt-1">Basic information about your campground</p>
       </div>
 
       {/* Basic Info Card */}
@@ -141,9 +136,7 @@ export default function ProfilePage() {
             <Building2 className="h-5 w-5 text-muted-foreground" />
             Basic Information
           </CardTitle>
-          <CardDescription>
-            This information appears on your booking page
-          </CardDescription>
+          <CardDescription>This information appears on your booking page</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

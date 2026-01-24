@@ -5,7 +5,13 @@ import { Check, Loader2, CreditCard, Building2, Users, TestTube, Rocket } from "
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +27,7 @@ interface StripeSettingsCardProps {
     percentBasisPoints: number;
     flatFeeCents: number;
   };
-  onSave: (data: {
-    mode: GatewayMode;
-    feeMode: FeeMode;
-  }) => void;
+  onSave: (data: { mode: GatewayMode; feeMode: FeeMode }) => void;
   isSaving: boolean;
   saveSuccess: boolean;
   disabled: boolean;
@@ -89,9 +92,7 @@ export function StripeSettingsCard({
               Configure your Stripe payment processing.
             </CardDescription>
           </div>
-          <Badge className="bg-violet-100 text-violet-800 border-violet-200">
-            Stripe
-          </Badge>
+          <Badge className="bg-violet-100 text-violet-800 border-violet-200">Stripe</Badge>
         </div>
       </CardHeader>
 
@@ -107,20 +108,26 @@ export function StripeSettingsCard({
                 "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                 mode === "test"
                   ? "border-blue-500 bg-blue-50"
-                  : "border-border hover:border-border bg-card"
+                  : "border-border hover:border-border bg-card",
               )}
             >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center",
-                mode === "test" ? "bg-blue-500 text-foreground" : "bg-muted text-muted-foreground"
-              )}>
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  mode === "test"
+                    ? "bg-blue-500 text-foreground"
+                    : "bg-muted text-muted-foreground",
+                )}
+              >
                 <TestTube className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
-                <p className={cn(
-                  "font-medium",
-                  mode === "test" ? "text-blue-900" : "text-foreground"
-                )}>
+                <p
+                  className={cn(
+                    "font-medium",
+                    mode === "test" ? "text-blue-900" : "text-foreground",
+                  )}
+                >
                   Test Mode
                 </p>
                 <p className="text-xs text-muted-foreground">No real charges</p>
@@ -134,20 +141,26 @@ export function StripeSettingsCard({
                 "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                 mode === "prod"
                   ? "border-emerald-500 bg-emerald-50"
-                  : "border-border hover:border-border bg-card"
+                  : "border-border hover:border-border bg-card",
               )}
             >
-              <div className={cn(
-                "w-10 h-10 rounded-full flex items-center justify-center",
-                mode === "prod" ? "bg-emerald-500 text-foreground" : "bg-muted text-muted-foreground"
-              )}>
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-full flex items-center justify-center",
+                  mode === "prod"
+                    ? "bg-emerald-500 text-foreground"
+                    : "bg-muted text-muted-foreground",
+                )}
+              >
                 <Rocket className="w-5 h-5" aria-hidden="true" />
               </div>
               <div>
-                <p className={cn(
-                  "font-medium",
-                  mode === "prod" ? "text-emerald-900" : "text-foreground"
-                )}>
+                <p
+                  className={cn(
+                    "font-medium",
+                    mode === "prod" ? "text-emerald-900" : "text-foreground",
+                  )}
+                >
                   Live Mode
                 </p>
                 <p className="text-xs text-muted-foreground">Real transactions</p>
@@ -209,7 +222,7 @@ export function StripeSettingsCard({
           disabled={disabled || isSaving}
           className={cn(
             "w-full sm:w-auto transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none",
-            showSuccess && "bg-emerald-600 hover:bg-emerald-600"
+            showSuccess && "bg-emerald-600 hover:bg-emerald-600",
           )}
         >
           {isSaving ? (
@@ -219,7 +232,10 @@ export function StripeSettingsCard({
             </>
           ) : showSuccess ? (
             <>
-              <Check className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in" aria-hidden="true" />
+              <Check
+                className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in"
+                aria-hidden="true"
+              />
               Saved!
             </>
           ) : (

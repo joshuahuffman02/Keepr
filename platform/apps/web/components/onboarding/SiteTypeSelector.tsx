@@ -65,25 +65,27 @@ export function SiteTypeSelector({ selected, onSelect }: SiteTypeSelectorProps) 
                 "relative p-6 rounded-xl border-2 text-left transition-all duration-200",
                 "hover:border-emerald-500/50 hover:bg-muted/50",
                 "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
-                isSelected
-                  ? "border-emerald-500 bg-emerald-500/10"
-                  : "border-border bg-muted/30"
+                isSelected ? "border-emerald-500 bg-emerald-500/10" : "border-border bg-muted/30",
               )}
             >
               <div className="flex items-start gap-4">
                 <div
                   className={cn(
                     "p-3 rounded-lg",
-                    isSelected ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"
+                    isSelected
+                      ? "bg-emerald-500/20 text-emerald-400"
+                      : "bg-muted text-muted-foreground",
                   )}
                 >
                   <Icon className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <h4 className={cn(
-                    "font-medium",
-                    isSelected ? "text-emerald-400" : "text-muted-foreground"
-                  )}>
+                  <h4
+                    className={cn(
+                      "font-medium",
+                      isSelected ? "text-emerald-400" : "text-muted-foreground",
+                    )}
+                  >
                     {siteType.label}
                   </h4>
                   <p className="text-sm text-muted-foreground mt-1">{siteType.description}</p>

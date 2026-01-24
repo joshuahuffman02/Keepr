@@ -47,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         const existing = stateMap.get(cg.state);
         stateMap.set(cg.state, {
           count: (existing?.count || 0) + 1,
-          lastModified: now
+          lastModified: now,
         });
       }
     });
@@ -70,7 +70,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         cityMap.set(key, {
           state: cg.state,
           count: (existing?.count || 0) + 1,
-          lastModified: now
+          lastModified: now,
         });
       }
     });
@@ -88,13 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         };
       });
 
-    return [
-      ...staticUrls,
-      ...campgroundUrls,
-      ...bookingUrls,
-      ...stateUrls,
-      ...cityUrls,
-    ];
+    return [...staticUrls, ...campgroundUrls, ...bookingUrls, ...stateUrls, ...cityUrls];
   } catch {
     // Fallback to static pages only if API fails
     return staticUrls;

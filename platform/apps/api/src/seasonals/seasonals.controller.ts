@@ -39,7 +39,7 @@ type SeasonalsRequest = Request & { user?: AuthUser };
 export class SeasonalsController {
   constructor(
     private readonly seasonals: SeasonalsService,
-    private readonly pricing: SeasonalPricingService
+    private readonly pricing: SeasonalPricingService,
   ) {}
 
   private requireUserId(req: SeasonalsRequest): string {
@@ -67,7 +67,7 @@ export class SeasonalsController {
   @Get("campground/:campgroundId")
   async listSeasonalGuests(
     @Param("campgroundId") campgroundId: string,
-    @Query() query: SeasonalGuestQueryDto
+    @Query() query: SeasonalGuestQueryDto,
   ) {
     const filters = {
       status: parseSeasonalStatus(query.status),
@@ -105,10 +105,7 @@ export class SeasonalsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post(":id/renewal-intent")
-  async updateRenewalIntent(
-    @Param("id") id: string,
-    @Body() dto: UpdateRenewalIntentDto
-  ) {
+  async updateRenewalIntent(@Param("id") id: string, @Body() dto: UpdateRenewalIntentDto) {
     return this.seasonals.updateRenewalIntent(id, dto.intent, dto.notes);
   }
 
@@ -120,11 +117,11 @@ export class SeasonalsController {
   @Get("campground/:campgroundId/stats")
   async getDashboardStats(
     @Param("campgroundId") campgroundId: string,
-    @Query("seasonYear") seasonYear?: string
+    @Query("seasonYear") seasonYear?: string,
   ) {
     return this.seasonals.getDashboardStats(
       campgroundId,
-      seasonYear ? parseInt(seasonYear, 10) : undefined
+      seasonYear ? parseInt(seasonYear, 10) : undefined,
     );
   }
 
@@ -141,7 +138,7 @@ export class SeasonalsController {
         ...dto,
         paidAt: dto.paidAt ? new Date(dto.paidAt) : undefined,
       },
-      userId
+      userId,
     );
   }
 
@@ -149,14 +146,8 @@ export class SeasonalsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.readonly)
   @RequireScope({ resource: "reservations", action: "read" })
   @Get(":id/payments")
-  async getPaymentHistory(
-    @Param("id") id: string,
-    @Query("seasonYear") seasonYear?: string
-  ) {
-    return this.seasonals.getPaymentHistory(
-      id,
-      seasonYear ? parseInt(seasonYear, 10) : undefined
-    );
+  async getPaymentHistory(@Param("id") id: string, @Query("seasonYear") seasonYear?: string) {
+    return this.seasonals.getPaymentHistory(id, seasonYear ? parseInt(seasonYear, 10) : undefined);
   }
 
   // ==================== RATE CARDS ====================
@@ -186,11 +177,11 @@ export class SeasonalsController {
   @Get("campground/:campgroundId/rate-cards")
   async getRateCards(
     @Param("campgroundId") campgroundId: string,
-    @Query("seasonYear") seasonYear?: string
+    @Query("seasonYear") seasonYear?: string,
   ) {
     return this.seasonals.getRateCards(
       campgroundId,
-      seasonYear ? parseInt(seasonYear, 10) : undefined
+      seasonYear ? parseInt(seasonYear, 10) : undefined,
     );
   }
 
@@ -250,14 +241,19 @@ export class SeasonalsController {
   async applyPricing(
     @Req() req: SeasonalsRequest,
     @Param("id") id: string,
-    @Body() dto: { rateCardId: string; seasonYear: number; manualAdjustment?: { amount: number; reason: string } }
+    @Body()
+    dto: {
+      rateCardId: string;
+      seasonYear: number;
+      manualAdjustment?: { amount: number; reason: string };
+    },
   ) {
     const userId = this.requireUserId(req);
     await this.pricing.applyPricingToGuest(
       id,
       dto.rateCardId,
       dto.seasonYear,
-      dto.manualAdjustment ? { ...dto.manualAdjustment, userId } : undefined
+      dto.manualAdjustment ? { ...dto.manualAdjustment, userId } : undefined,
     );
     return this.seasonals.findById(id);
   }
@@ -283,14 +279,10 @@ export class SeasonalsController {
   async convertReservationToSeasonal(
     @Req() req: SeasonalsRequest,
     @Param("reservationId") reservationId: string,
-    @Body() dto: { rateCardId?: string; isMetered?: boolean; paysInFull?: boolean; notes?: string }
+    @Body() dto: { rateCardId?: string; isMetered?: boolean; paysInFull?: boolean; notes?: string },
   ) {
     const userId = this.requireUserId(req);
-    return this.seasonals.convertReservationToSeasonal(
-      reservationId,
-      dto,
-      userId
-    );
+    return this.seasonals.convertReservationToSeasonal(reservationId, dto, userId);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
@@ -299,14 +291,10 @@ export class SeasonalsController {
   @Post("link-reservation")
   async linkReservationToSeasonal(
     @Req() req: SeasonalsRequest,
-    @Body() dto: { reservationId: string; seasonalGuestId: string }
+    @Body() dto: { reservationId: string; seasonalGuestId: string },
   ) {
     const userId = this.requireUserId(req);
-    return this.seasonals.linkReservationToSeasonal(
-      dto.reservationId,
-      dto.seasonalGuestId,
-      userId
-    );
+    return this.seasonals.linkReservationToSeasonal(dto.reservationId, dto.seasonalGuestId, userId);
   }
 
   // ==================== ADMIN OPERATIONS ====================
@@ -326,7 +314,7 @@ export class SeasonalsController {
   @Post("campground/:campgroundId/rollover-season")
   async rolloverSeason(
     @Param("campgroundId") campgroundId: string,
-    @Body() dto: { fromYear: number; toYear: number }
+    @Body() dto: { fromYear: number; toYear: number },
   ) {
     return this.seasonals.rolloverSeason(campgroundId, dto.fromYear, dto.toYear);
   }
@@ -339,7 +327,7 @@ export class SeasonalsController {
   @Post("contracts/bulk")
   async sendBulkContracts(
     @Req() req: SeasonalsRequest,
-    @Body() dto: { seasonalGuestIds: string[]; templateId?: string; campgroundId: string }
+    @Body() dto: { seasonalGuestIds: string[]; templateId?: string; campgroundId: string },
   ) {
     const userId = this.requireUserId(req);
     return this.seasonals.sendBulkContracts(dto, userId);
@@ -351,7 +339,7 @@ export class SeasonalsController {
   @Post("payments/bulk")
   async recordBulkPayments(
     @Req() req: SeasonalsRequest,
-    @Body() dto: { seasonalGuestIds: string[]; amountCents: number; method: string; note?: string }
+    @Body() dto: { seasonalGuestIds: string[]; amountCents: number; method: string; note?: string },
   ) {
     const userId = this.requireUserId(req);
     return this.seasonals.recordBulkPayments(dto, userId);
@@ -363,7 +351,7 @@ export class SeasonalsController {
   @Get("campground/:campgroundId/export")
   async exportSeasonals(
     @Param("campgroundId") campgroundId: string,
-    @Query() query: { seasonYear?: string; ids?: string }
+    @Query() query: { seasonYear?: string; ids?: string },
   ) {
     const seasonYear = query.seasonYear ? parseInt(query.seasonYear, 10) : new Date().getFullYear();
     const ids = query.ids ? query.ids.split(",") : undefined;
@@ -383,9 +371,15 @@ const isPaymentStatus = (value: string): value is "current" | "past_due" | "paid
 const isContractStatus = (value: string): value is "signed" | "pending" | "not_sent" =>
   CONTRACT_STATUS_SET.has(value);
 
-const parseList = <T extends string>(value: string | undefined, guard: (entry: string) => entry is T) => {
+const parseList = <T extends string>(
+  value: string | undefined,
+  guard: (entry: string) => entry is T,
+) => {
   if (!value) return undefined;
-  const parts = value.split(",").map((entry) => entry.trim()).filter(Boolean);
+  const parts = value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
   const filtered = parts.filter(guard);
   if (!filtered.length) return undefined;
   return filtered.length === 1 ? filtered[0] : filtered;
@@ -393,5 +387,7 @@ const parseList = <T extends string>(value: string | undefined, guard: (entry: s
 
 const parseSeasonalStatus = (value?: string) => parseList(value, isSeasonalStatus);
 const parseRenewalIntent = (value?: string) => parseList(value, isRenewalIntent);
-const parsePaymentStatus = (value?: string) => (value && isPaymentStatus(value) ? value : undefined);
-const parseContractStatus = (value?: string) => (value && isContractStatus(value) ? value : undefined);
+const parsePaymentStatus = (value?: string) =>
+  value && isPaymentStatus(value) ? value : undefined;
+const parseContractStatus = (value?: string) =>
+  value && isContractStatus(value) ? value : undefined;

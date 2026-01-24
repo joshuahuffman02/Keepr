@@ -119,7 +119,7 @@ export default function CustomFieldsPage() {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const resetForm = useCallback(() => {
@@ -131,19 +131,22 @@ export default function CustomFieldsPage() {
     setEditingField(null);
   }, []);
 
-  const openEditor = useCallback((field: CustomField | null) => {
-    if (field) {
-      setEditingField(field);
-      setFormQuestion(field.question);
-      setFormFieldType(field.fieldType);
-      setFormOptions(field.options?.join("\n") || "");
-      setFormIsRequired(field.isRequired);
-      setFormDisplayAt(field.displayAt);
-    } else {
-      resetForm();
-    }
-    setIsEditorOpen(true);
-  }, [resetForm]);
+  const openEditor = useCallback(
+    (field: CustomField | null) => {
+      if (field) {
+        setEditingField(field);
+        setFormQuestion(field.question);
+        setFormFieldType(field.fieldType);
+        setFormOptions(field.options?.join("\n") || "");
+        setFormIsRequired(field.isRequired);
+        setFormDisplayAt(field.displayAt);
+      } else {
+        resetForm();
+      }
+      setIsEditorOpen(true);
+    },
+    [resetForm],
+  );
 
   const handleSave = useCallback(() => {
     if (!formQuestion.trim()) return;
@@ -160,11 +163,7 @@ export default function CustomFieldsPage() {
 
     if (editingField) {
       // Update existing
-      setFields((prev) =>
-        prev.map((f) =>
-          f.id === editingField.id ? { ...f, ...fieldData } : f
-        )
-      );
+      setFields((prev) => prev.map((f) => (f.id === editingField.id ? { ...f, ...fieldData } : f)));
     } else {
       // Add new
       const newField: CustomField = {
@@ -177,18 +176,23 @@ export default function CustomFieldsPage() {
 
     setIsEditorOpen(false);
     resetForm();
-  }, [editingField, fields.length, formQuestion, formFieldType, formOptions, formIsRequired, formDisplayAt, resetForm]);
+  }, [
+    editingField,
+    fields.length,
+    formQuestion,
+    formFieldType,
+    formOptions,
+    formIsRequired,
+    formDisplayAt,
+    resetForm,
+  ]);
 
   const handleDelete = useCallback((id: string) => {
     setFields((prev) => prev.filter((f) => f.id !== id));
   }, []);
 
   const handleToggleActive = useCallback((id: string) => {
-    setFields((prev) =>
-      prev.map((f) =>
-        f.id === id ? { ...f, isActive: !f.isActive } : f
-      )
-    );
+    setFields((prev) => prev.map((f) => (f.id === id ? { ...f, isActive: !f.isActive } : f)));
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
@@ -206,25 +210,26 @@ export default function CustomFieldsPage() {
     }
   }, []);
 
-  const handleAddSuggested = useCallback((suggestion: typeof suggestedFields[0]) => {
-    const newField: CustomField = {
-      id: Date.now().toString(),
-      question: suggestion.question,
-      fieldType: suggestion.fieldType,
-      isRequired: false,
-      displayAt: ["reservation"],
-      siteClasses: [],
-      isActive: true,
-      sortOrder: fields.length,
-    };
-    setFields((prev) => [...prev, newField]);
-  }, [fields.length]);
+  const handleAddSuggested = useCallback(
+    (suggestion: (typeof suggestedFields)[0]) => {
+      const newField: CustomField = {
+        id: Date.now().toString(),
+        question: suggestion.question,
+        fieldType: suggestion.fieldType,
+        isRequired: false,
+        displayAt: ["reservation"],
+        siteClasses: [],
+        isActive: true,
+        sortOrder: fields.length,
+      };
+      setFields((prev) => [...prev, newField]);
+    },
+    [fields.length],
+  );
 
   const toggleDisplayContext = (context: DisplayContext) => {
     setFormDisplayAt((prev) =>
-      prev.includes(context)
-        ? prev.filter((c) => c !== context)
-        : [...prev, context]
+      prev.includes(context) ? prev.filter((c) => c !== context) : [...prev, context],
     );
   };
 
@@ -251,8 +256,8 @@ export default function CustomFieldsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Custom fields appear during the booking process. Drag to reorder how they appear to guests.
-          Required fields must be answered before completing a reservation.
+          Custom fields appear during the booking process. Drag to reorder how they appear to
+          guests. Required fields must be answered before completing a reservation.
         </AlertDescription>
       </Alert>
 
@@ -264,9 +269,7 @@ export default function CustomFieldsPage() {
               <Sparkles className="h-4 w-4 text-green-600" />
               Quick Add Suggestions
             </CardTitle>
-            <CardDescription>
-              Common fields used by campgrounds
-            </CardDescription>
+            <CardDescription>Common fields used by campgrounds</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
@@ -362,9 +365,7 @@ export default function CustomFieldsPage() {
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editingField ? "Edit Custom Field" : "Add Custom Field"}
-            </DialogTitle>
+            <DialogTitle>{editingField ? "Edit Custom Field" : "Add Custom Field"}</DialogTitle>
             <DialogDescription>
               Configure the question and how it should be displayed
             </DialogDescription>
@@ -384,10 +385,7 @@ export default function CustomFieldsPage() {
             </div>
 
             {/* Field Type */}
-            <FieldTypeSelector
-              value={formFieldType}
-              onChange={setFormFieldType}
-            />
+            <FieldTypeSelector value={formFieldType} onChange={setFormFieldType} />
 
             {/* Options (for dropdown/multi-select) */}
             {(formFieldType === "dropdown" || formFieldType === "multi_select") && (
@@ -416,7 +414,7 @@ export default function CustomFieldsPage() {
                       "px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
                       formDisplayAt.includes(option.value)
                         ? "bg-status-success/15 border-status-success/30 text-status-success"
-                        : "bg-card border-border text-muted-foreground hover:border-border"
+                        : "bg-card border-border text-muted-foreground hover:border-border",
                     )}
                   >
                     {option.label}
@@ -428,16 +426,12 @@ export default function CustomFieldsPage() {
             {/* Required */}
             <div className="flex items-center justify-between p-3 rounded-lg border">
               <div>
-                <Label htmlFor="required" className="font-medium">Required</Label>
-                <p className="text-sm text-muted-foreground">
-                  Guest must answer to continue
-                </p>
+                <Label htmlFor="required" className="font-medium">
+                  Required
+                </Label>
+                <p className="text-sm text-muted-foreground">Guest must answer to continue</p>
               </div>
-              <Switch
-                id="required"
-                checked={formIsRequired}
-                onCheckedChange={setFormIsRequired}
-              />
+              <Switch id="required" checked={formIsRequired} onCheckedChange={setFormIsRequired} />
             </div>
           </div>
 

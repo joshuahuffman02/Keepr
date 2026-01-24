@@ -60,8 +60,7 @@ const withColors = (rates: ApiSeasonalRate[]): SeasonalRate[] =>
 
 const rateTypes: SeasonalRate["rateType"][] = ["nightly", "weekly", "monthly", "seasonal"];
 const rateTypeSet = new Set<string>(rateTypes);
-const isRateType = (value: string): value is SeasonalRate["rateType"] =>
-  rateTypeSet.has(value);
+const isRateType = (value: string): value is SeasonalRate["rateType"] => rateTypeSet.has(value);
 
 // Helper to calculate days between dates
 function calculateDays(startDate: string | null, endDate: string | null): number {
@@ -79,9 +78,10 @@ function seasonalRateToRateGroup(rate: SeasonalRate): RateGroup {
     id: rate.id,
     name: rate.name,
     color: rate.color || PRESET_COLORS[0],
-    dateRanges: rate.startDate && rate.endDate
-      ? [{ startDate: rate.startDate.split("T")[0], endDate: rate.endDate.split("T")[0] }]
-      : [],
+    dateRanges:
+      rate.startDate && rate.endDate
+        ? [{ startDate: rate.startDate.split("T")[0], endDate: rate.endDate.split("T")[0] }]
+        : [],
     totalDays: days,
     isActive: rate.isActive,
   };
@@ -100,7 +100,9 @@ export default function RateGroupsPage() {
   // New group form state
   const [newGroupName, setNewGroupName] = useState("");
   const [newGroupColor, setNewGroupColor] = useState(PRESET_COLORS[0]);
-  const [newGroupRateType, setNewGroupRateType] = useState<"nightly" | "weekly" | "monthly" | "seasonal">("nightly");
+  const [newGroupRateType, setNewGroupRateType] = useState<
+    "nightly" | "weekly" | "monthly" | "seasonal"
+  >("nightly");
   const [newGroupAmount, setNewGroupAmount] = useState("");
 
   // Date editing form state
@@ -116,7 +118,8 @@ export default function RateGroupsPage() {
       return;
     }
 
-    apiClient.getSeasonalRates(id)
+    apiClient
+      .getSeasonalRates(id)
       .then((rates) => {
         // Assign colors to rates (API doesn't return color, so we assign from preset)
         setSeasonalRates(withColors(rates));
@@ -156,94 +159,114 @@ export default function RateGroupsPage() {
     }
   }, [newGroupName, newGroupColor, newGroupRateType, newGroupAmount, campgroundId]);
 
-  const handleUpdateGroup = useCallback(async (id: string, updates: Partial<RateGroup>) => {
-    if (!campgroundId) return;
+  const handleUpdateGroup = useCallback(
+    async (id: string, updates: Partial<RateGroup>) => {
+      if (!campgroundId) return;
 
-    setSaving(true);
-    try {
-      await apiClient.updateSeasonalRate(id, {
-        name: updates.name,
-        isActive: updates.isActive,
-      }, campgroundId);
+      setSaving(true);
+      try {
+        await apiClient.updateSeasonalRate(
+          id,
+          {
+            name: updates.name,
+            isActive: updates.isActive,
+          },
+          campgroundId,
+        );
 
-      // Reload rates
-      const rates = await apiClient.getSeasonalRates(campgroundId);
-      setSeasonalRates(withColors(rates));
-    } catch (err) {
-      console.error("Failed to update rate group:", err);
-    } finally {
-      setSaving(false);
-    }
-  }, [campgroundId]);
+        // Reload rates
+        const rates = await apiClient.getSeasonalRates(campgroundId);
+        setSeasonalRates(withColors(rates));
+      } catch (err) {
+        console.error("Failed to update rate group:", err);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [campgroundId],
+  );
 
-  const handleDeleteGroup = useCallback(async (id: string) => {
-    if (!campgroundId) return;
+  const handleDeleteGroup = useCallback(
+    async (id: string) => {
+      if (!campgroundId) return;
 
-    setSaving(true);
-    try {
-      await apiClient.deleteSeasonalRate(id, campgroundId);
+      setSaving(true);
+      try {
+        await apiClient.deleteSeasonalRate(id, campgroundId);
 
-      // Reload rates
-      const rates = await apiClient.getSeasonalRates(campgroundId);
-      setSeasonalRates(withColors(rates));
-    } catch (err) {
-      console.error("Failed to delete rate group:", err);
-    } finally {
-      setSaving(false);
-    }
-  }, [campgroundId]);
+        // Reload rates
+        const rates = await apiClient.getSeasonalRates(campgroundId);
+        setSeasonalRates(withColors(rates));
+      } catch (err) {
+        console.error("Failed to delete rate group:", err);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [campgroundId],
+  );
 
   const confirmDeleteGroup = useCallback((id: string) => {
     setDeleteConfirmId(id);
   }, []);
 
-  const handleDuplicateGroup = useCallback(async (id: string) => {
-    if (!campgroundId) return;
+  const handleDuplicateGroup = useCallback(
+    async (id: string) => {
+      if (!campgroundId) return;
 
-    const rate = seasonalRates.find((r) => r.id === id);
-    if (!rate) return;
+      const rate = seasonalRates.find((r) => r.id === id);
+      if (!rate) return;
 
-    setSaving(true);
-    try {
-      await apiClient.createSeasonalRate({
-        campgroundId,
-        name: `${rate.name} (Copy)`,
-        rateType: rate.rateType,
-        amount: rate.amount,
-        minNights: rate.minNights ?? undefined,
-        startDate: rate.startDate ?? undefined,
-        endDate: rate.endDate ?? undefined,
-      });
+      setSaving(true);
+      try {
+        await apiClient.createSeasonalRate({
+          campgroundId,
+          name: `${rate.name} (Copy)`,
+          rateType: rate.rateType,
+          amount: rate.amount,
+          minNights: rate.minNights ?? undefined,
+          startDate: rate.startDate ?? undefined,
+          endDate: rate.endDate ?? undefined,
+        });
 
-      // Reload rates
-      const rates = await apiClient.getSeasonalRates(campgroundId);
-      setSeasonalRates(withColors(rates));
-    } catch (err) {
-      console.error("Failed to duplicate rate group:", err);
-    } finally {
-      setSaving(false);
-    }
-  }, [campgroundId, seasonalRates]);
+        // Reload rates
+        const rates = await apiClient.getSeasonalRates(campgroundId);
+        setSeasonalRates(withColors(rates));
+      } catch (err) {
+        console.error("Failed to duplicate rate group:", err);
+      } finally {
+        setSaving(false);
+      }
+    },
+    [campgroundId, seasonalRates],
+  );
 
-  const handleEditDates = useCallback((id: string) => {
-    const rate = seasonalRates.find((r) => r.id === id);
-    if (!rate) return;
+  const handleEditDates = useCallback(
+    (id: string) => {
+      const rate = seasonalRates.find((r) => r.id === id);
+      if (!rate) return;
 
-    setEditingRate(rate);
-    setEditStartDate(rate.startDate?.split("T")[0] || "");
-    setEditEndDate(rate.endDate?.split("T")[0] || "");
-    setIsDateDialogOpen(true);
-  }, [seasonalRates]);
+      setEditingRate(rate);
+      setEditStartDate(rate.startDate?.split("T")[0] || "");
+      setEditEndDate(rate.endDate?.split("T")[0] || "");
+      setIsDateDialogOpen(true);
+    },
+    [seasonalRates],
+  );
 
   const handleSaveDates = useCallback(async () => {
     if (!editingRate || !campgroundId) return;
 
     setSaving(true);
     try {
-      await apiClient.updateSeasonalRate(editingRate.id, {
-        startDate: editStartDate || undefined,
-        endDate: editEndDate || undefined,
-      }, campgroundId);
+      await apiClient.updateSeasonalRate(
+        editingRate.id,
+        {
+          startDate: editStartDate || undefined,
+          endDate: editEndDate || undefined,
+        },
+        campgroundId,
+      );
 
       // Reload rates
       const rates = await apiClient.getSeasonalRates(campgroundId);
@@ -319,9 +342,8 @@ export default function RateGroupsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Rate groups help you organize your pricing calendar. Each group gets a color
-          that appears on the reservation calendar, making it easy to see which rates
-          apply to which dates.
+          Rate groups help you organize your pricing calendar. Each group gets a color that appears
+          on the reservation calendar, making it easy to see which rates apply to which dates.
         </AlertDescription>
       </Alert>
 
@@ -332,9 +354,7 @@ export default function RateGroupsPage() {
             <Calendar className="h-5 w-5 text-muted-foreground" />
             Calendar Preview
           </CardTitle>
-          <CardDescription>
-            How your rate groups will appear on the calendar
-          </CardDescription>
+          <CardDescription>How your rate groups will appear on the calendar</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-3">
@@ -419,9 +439,7 @@ export default function RateGroupsPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Rate Group</DialogTitle>
-            <DialogDescription>
-              Create a new rate group for your pricing calendar
-            </DialogDescription>
+            <DialogDescription>Create a new rate group for your pricing calendar</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -507,9 +525,7 @@ export default function RateGroupsPage() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Edit Date Ranges</DialogTitle>
-            <DialogDescription>
-              Define when "{editingRate?.name}" applies
-            </DialogDescription>
+            <DialogDescription>Define when "{editingRate?.name}" applies</DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -544,7 +560,8 @@ export default function RateGroupsPage() {
                 <div className="flex items-center justify-between mt-1">
                   <span className="text-sm text-muted-foreground">Period:</span>
                   <span className="text-sm text-foreground">
-                    {new Date(editStartDate).toLocaleDateString()} - {new Date(editEndDate).toLocaleDateString()}
+                    {new Date(editStartDate).toLocaleDateString()} -{" "}
+                    {new Date(editEndDate).toLocaleDateString()}
                   </span>
                 </div>
               </div>
@@ -553,8 +570,8 @@ export default function RateGroupsPage() {
             <Alert className="bg-amber-50 border-amber-200">
               <Info className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800 text-sm">
-                For multiple date ranges (e.g., holiday weekends), create separate rate groups
-                or use the advanced Pricing Rules page.
+                For multiple date ranges (e.g., holiday weekends), create separate rate groups or
+                use the advanced Pricing Rules page.
               </AlertDescription>
             </Alert>
           </div>
@@ -577,7 +594,10 @@ export default function RateGroupsPage() {
       </Dialog>
 
       {/* Delete Rate Group Confirmation */}
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Rate Group</AlertDialogTitle>

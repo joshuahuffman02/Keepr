@@ -22,7 +22,12 @@ interface PricingAnalysis {
   confidence: number;
   reasoning: string;
   factors: PricingFactor[];
-  recommendationType: "underpriced" | "overpriced" | "event_opportunity" | "demand_surge" | "optimal";
+  recommendationType:
+    | "underpriced"
+    | "overpriced"
+    | "event_opportunity"
+    | "demand_surge"
+    | "optimal";
   estimatedRevenueDelta: number;
 }
 
@@ -53,7 +58,7 @@ export class AiDynamicPricingService {
     private readonly prisma: PrismaService,
     private readonly aiProvider: AiProviderService,
     private readonly configService: AiAutopilotConfigService,
-    private readonly autonomousAction: AiAutonomousActionService
+    private readonly autonomousAction: AiAutonomousActionService,
   ) {}
 
   // ==================== RECOMMENDATIONS CRUD ====================
@@ -66,7 +71,7 @@ export class AiDynamicPricingService {
       startDate?: Date;
       endDate?: Date;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const { status, siteClassId, startDate, endDate, limit = 50 } = options;
 
@@ -137,12 +142,7 @@ export class AiDynamicPricingService {
 
     for (const siteClass of siteClasses) {
       try {
-        const analysis = await this.analyzeClassPricing(
-          campgroundId,
-          siteClass,
-          today,
-          endDate
-        );
+        const analysis = await this.analyzeClassPricing(campgroundId, siteClass, today, endDate);
 
         for (const rec of analysis) {
           // Check if recommendation already exists for this date range
@@ -187,14 +187,12 @@ export class AiDynamicPricingService {
           recommendations.push(created);
         }
       } catch (error) {
-        this.logger.error(
-          `Failed to analyze pricing for class ${siteClass.id}: ${error}`
-        );
+        this.logger.error(`Failed to analyze pricing for class ${siteClass.id}: ${error}`);
       }
     }
 
     this.logger.log(
-      `Generated ${recommendations.length} pricing recommendations for campground ${campgroundId}`
+      `Generated ${recommendations.length} pricing recommendations for campground ${campgroundId}`,
     );
 
     return recommendations;
@@ -207,14 +205,14 @@ export class AiDynamicPricingService {
     campgroundId: string,
     siteClass: { id: string; name: string; defaultRate: number },
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<PricingRecommendationDraft[]> {
     // Get historical reservation data
     const historicalData = await this.getHistoricalData(
       campgroundId,
       siteClass.id,
       startDate,
-      endDate
+      endDate,
     );
 
     // Get current occupancy for upcoming dates
@@ -222,7 +220,7 @@ export class AiDynamicPricingService {
       campgroundId,
       siteClass.id,
       startDate,
-      endDate
+      endDate,
     );
 
     // Get any local events (if we have this data)
@@ -290,9 +288,8 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       });
 
       const parsed = JSON.parse(response.content);
-      const recommendations = isRecord(parsed) && Array.isArray(parsed.recommendations)
-        ? parsed.recommendations
-        : [];
+      const recommendations =
+        isRecord(parsed) && Array.isArray(parsed.recommendations) ? parsed.recommendations : [];
 
       return recommendations
         .map((rec): PricingRecommendationDraft | null => {
@@ -303,13 +300,17 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
           const dateEnd = new Date(rec.dateEnd);
           if (Number.isNaN(dateStart.getTime()) || Number.isNaN(dateEnd.getTime())) return null;
 
-          if (typeof rec.recommendationType !== "string" || !isRecommendationType(rec.recommendationType)) {
+          if (
+            typeof rec.recommendationType !== "string" ||
+            !isRecommendationType(rec.recommendationType)
+          ) {
             return null;
           }
 
           const currentPrice = typeof rec.currentPrice === "number" ? rec.currentPrice : null;
           const suggestedPrice = typeof rec.suggestedPrice === "number" ? rec.suggestedPrice : null;
-          const adjustmentPercent = typeof rec.adjustmentPercent === "number" ? rec.adjustmentPercent : null;
+          const adjustmentPercent =
+            typeof rec.adjustmentPercent === "number" ? rec.adjustmentPercent : null;
           const confidence = typeof rec.confidence === "number" ? rec.confidence : null;
           const reasoning = typeof rec.reasoning === "string" ? rec.reasoning : "";
           const estimatedRevenueDelta =
@@ -330,7 +331,8 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
                   if (!isRecord(factor)) return null;
                   const name = typeof factor.name === "string" ? factor.name : null;
                   const impact = typeof factor.impact === "number" ? factor.impact : null;
-                  const factorConfidence = typeof factor.confidence === "number" ? factor.confidence : null;
+                  const factorConfidence =
+                    typeof factor.confidence === "number" ? factor.confidence : null;
                   const details = typeof factor.details === "string" ? factor.details : "";
                   if (!name || impact === null || factorConfidence === null) return null;
                   return { name, impact, confidence: factorConfidence, details };
@@ -365,7 +367,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     campgroundId: string,
     siteClassId: string,
     _startDate: Date,
-    _endDate: Date
+    _endDate: Date,
   ) {
     // Get reservations from last year
     const lastYear = new Date();
@@ -395,7 +397,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       const dayOfWeek = res.arrivalDate.getDay();
       dayOfWeekOccupancy[dayOfWeek].bookings++;
       const nights = Math.ceil(
-        (res.departureDate.getTime() - res.arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
+        (res.departureDate.getTime() - res.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
       );
       if (nights > 0) {
         dayOfWeekOccupancy[dayOfWeek].avgPrice += (res.totalAmount || 0) / nights;
@@ -406,7 +408,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     for (const day in dayOfWeekOccupancy) {
       if (dayOfWeekOccupancy[day].bookings > 0) {
         dayOfWeekOccupancy[day].avgPrice = Math.round(
-          dayOfWeekOccupancy[day].avgPrice / dayOfWeekOccupancy[day].bookings
+          dayOfWeekOccupancy[day].avgPrice / dayOfWeekOccupancy[day].bookings,
         );
       }
     }
@@ -421,7 +423,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     campgroundId: string,
     siteClassId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ) {
     // Get total sites in this class
     const totalSites = await this.prisma.site.count({
@@ -454,12 +456,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       const totalNights = totalSites * 7;
 
       for (const res of reservations) {
-        const overlap = this.getDateOverlap(
-          res.arrivalDate,
-          res.departureDate,
-          current,
-          weekEnd
-        );
+        const overlap = this.getDateOverlap(res.arrivalDate, res.departureDate, current, weekEnd);
         occupiedNights += overlap;
       }
 
@@ -477,11 +474,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
   /**
    * Get local events (placeholder - would integrate with events API)
    */
-  private async getLocalEvents(
-    _campgroundId: string,
-    _startDate: Date,
-    _endDate: Date
-  ) {
+  private async getLocalEvents(_campgroundId: string, _startDate: Date, _endDate: Date) {
     // TODO: Integrate with local events API or calendar
     return [];
   }
@@ -489,12 +482,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
   /**
    * Calculate date overlap in days
    */
-  private getDateOverlap(
-    start1: Date,
-    end1: Date,
-    start2: Date,
-    end2: Date
-  ): number {
+  private getDateOverlap(start1: Date, end1: Date, start2: Date, end2: Date): number {
     const overlapStart = Math.max(start1.getTime(), start2.getTime());
     const overlapEnd = Math.min(end1.getTime(), end2.getTime());
 
@@ -520,7 +508,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     // Check max adjustment limit
     if (Math.abs(rec.adjustmentPercent) > config.dynamicPricingMaxAdjust) {
       throw new BadRequestException(
-        `Adjustment of ${rec.adjustmentPercent}% exceeds maximum allowed ${config.dynamicPricingMaxAdjust}%`
+        `Adjustment of ${rec.adjustmentPercent}% exceeds maximum allowed ${config.dynamicPricingMaxAdjust}%`,
       );
     }
 
@@ -606,16 +594,12 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
         await this.analyzePricing(config.campgroundId);
         analyzed++;
       } catch (error) {
-        this.logger.error(
-          `Failed to analyze pricing for ${config.campgroundId}: ${error}`
-        );
+        this.logger.error(`Failed to analyze pricing for ${config.campgroundId}: ${error}`);
         errors++;
       }
     }
 
-    this.logger.log(
-      `Daily pricing analysis complete: ${analyzed} analyzed, ${errors} errors`
-    );
+    this.logger.log(`Daily pricing analysis complete: ${analyzed} analyzed, ${errors} errors`);
   }
 
   /**
@@ -658,10 +642,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       select: { estimatedRevenueDelta: true, adjustmentPercent: true },
     });
 
-    const totalRevenueDelta = applied.reduce(
-      (sum, r) => sum + (r.estimatedRevenueDelta || 0),
-      0
-    );
+    const totalRevenueDelta = applied.reduce((sum, r) => sum + (r.estimatedRevenueDelta || 0), 0);
 
     const avgAdjustment =
       applied.length > 0
@@ -683,7 +664,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
    */
   async analyzePriceSensitivity(
     campgroundId: string,
-    siteClassId?: string
+    siteClassId?: string,
   ): Promise<{
     elasticity: number; // negative = elastic (price sensitive), positive = inelastic
     optimalPriceRange: { min: number; max: number };
@@ -717,7 +698,9 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
 
     // Filter out reservations with invalid dates
     const validReservations = reservations.filter((r) => {
-      const nights = Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = Math.ceil(
+        (r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
       return nights > 0;
     });
 
@@ -733,7 +716,9 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     // Group by price per night
     const priceGroups = new Map<number, number>();
     for (const res of validReservations) {
-      const nights = Math.ceil((res.departureDate.getTime() - res.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = Math.ceil(
+        (res.departureDate.getTime() - res.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
       const pricePerNight = Math.round(res.totalAmount / nights / 500) * 500; // Round to $5 increments
       priceGroups.set(pricePerNight, (priceGroups.get(pricePerNight) || 0) + 1);
     }
@@ -750,10 +735,13 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     // Calculate simple price elasticity
     // Using midpoint method between highest and lowest booking prices
     const totalBookings = validReservations.length;
-    const avgPrice = validReservations.reduce((sum, r) => {
-      const nights = Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
-      return sum + r.totalAmount / nights;
-    }, 0) / totalBookings;
+    const avgPrice =
+      validReservations.reduce((sum, r) => {
+        const nights = Math.ceil(
+          (r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        return sum + r.totalAmount / nights;
+      }, 0) / totalBookings;
 
     // Find price range with most bookings (optimal zone)
     let maxBookingsPrice = pricePoints[0]?.price || 0;
@@ -769,11 +757,19 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     // Negative elasticity = demand drops as price increases (normal goods)
     let elasticity = -1; // Default assumption
     if (pricePoints.length >= 3) {
-      const lowPriceBookings = pricePoints.slice(0, Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.bookings, 0);
-      const highPriceBookings = pricePoints.slice(-Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.bookings, 0);
+      const lowPriceBookings = pricePoints
+        .slice(0, Math.ceil(pricePoints.length / 3))
+        .reduce((s, p) => s + p.bookings, 0);
+      const highPriceBookings = pricePoints
+        .slice(-Math.ceil(pricePoints.length / 3))
+        .reduce((s, p) => s + p.bookings, 0);
       if (lowPriceBookings > 0 && highPriceBookings > 0) {
-        const avgLowPrice = pricePoints.slice(0, Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.price, 0) / Math.ceil(pricePoints.length / 3);
-        const avgHighPrice = pricePoints.slice(-Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.price, 0) / Math.ceil(pricePoints.length / 3);
+        const avgLowPrice =
+          pricePoints.slice(0, Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.price, 0) /
+          Math.ceil(pricePoints.length / 3);
+        const avgHighPrice =
+          pricePoints.slice(-Math.ceil(pricePoints.length / 3)).reduce((s, p) => s + p.price, 0) /
+          Math.ceil(pricePoints.length / 3);
         const pctChangeQuantity = (highPriceBookings - lowPriceBookings) / lowPriceBookings;
         const pctChangePrice = (avgHighPrice - avgLowPrice) / avgLowPrice;
         if (pctChangePrice !== 0) {
@@ -784,18 +780,25 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
 
     // Determine optimal price range
     const optimalMin = Math.max(maxBookingsPrice - 1000, pricePoints[0]?.price || 0);
-    const optimalMax = Math.min(maxBookingsPrice + 1500, pricePoints[pricePoints.length - 1]?.price || avgPrice * 1.2);
+    const optimalMax = Math.min(
+      maxBookingsPrice + 1500,
+      pricePoints[pricePoints.length - 1]?.price || avgPrice * 1.2,
+    );
 
     // Generate insight
     let insight = "";
     if (elasticity < -1.5) {
-      insight = "Demand is highly price-sensitive. Consider competitive pricing and promotions for off-peak periods.";
+      insight =
+        "Demand is highly price-sensitive. Consider competitive pricing and promotions for off-peak periods.";
     } else if (elasticity < -0.5) {
-      insight = "Demand shows moderate price sensitivity. Small price increases during peak times may be well-accepted.";
+      insight =
+        "Demand shows moderate price sensitivity. Small price increases during peak times may be well-accepted.";
     } else if (elasticity < 0) {
-      insight = "Demand is relatively price-inelastic. There's room to increase prices without significantly impacting bookings.";
+      insight =
+        "Demand is relatively price-inelastic. There's room to increase prices without significantly impacting bookings.";
     } else {
-      insight = "Unusual pricing pattern detected. Higher prices seem to correlate with more bookings (prestige effect or data anomaly).";
+      insight =
+        "Unusual pricing pattern detected. Higher prices seem to correlate with more bookings (prestige effect or data anomaly).";
     }
 
     return {
@@ -819,8 +822,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
   }> {
     const config = await this.configService.getConfig(campgroundId);
 
-    const autopilotEnabled =
-      config.dynamicPricingAiEnabled && config.dynamicPricingMode === "auto";
+    const autopilotEnabled = config.dynamicPricingAiEnabled && config.dynamicPricingMode === "auto";
     if (!autopilotEnabled) {
       return { applied: 0, skipped: 0, reasons: ["Autopilot not enabled"] };
     }
@@ -896,7 +898,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
    */
   private checkGuardrails(
     rec: { adjustmentPercent: number; confidence: number; recommendationType: string },
-    config: { dynamicPricingMaxAdjust: number }
+    config: { dynamicPricingMaxAdjust: number },
   ): { pass: boolean; reason?: string } {
     // Max adjustment limit
     if (Math.abs(rec.adjustmentPercent) > config.dynamicPricingMaxAdjust) {
@@ -938,7 +940,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       endDate: Date;
       autoApplyWinner?: boolean;
       createdById?: string;
-    }
+    },
   ) {
     // Get site class base price
     const siteClass = await this.prisma.siteClass.findUnique({
@@ -1020,11 +1022,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
   /**
    * Record a booking for an experiment
    */
-  async recordExperimentBooking(
-    experimentId: string,
-    siteId: string,
-    revenueCents: number
-  ) {
+  async recordExperimentBooking(experimentId: string, siteId: string, revenueCents: number) {
     const experiment = await this.prisma.aiPriceExperiment.findUnique({
       where: { id: experimentId },
     });
@@ -1069,19 +1067,21 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
     const testRate = exp.testBookings / exp.testSiteIds.length;
 
     // Calculate revenue per booking
-    const controlAvgRevenue = exp.controlBookings > 0 ? exp.controlRevenue / exp.controlBookings : 0;
+    const controlAvgRevenue =
+      exp.controlBookings > 0 ? exp.controlRevenue / exp.controlBookings : 0;
     const testAvgRevenue = exp.testBookings > 0 ? exp.testRevenue / exp.testBookings : 0;
 
     // Revenue lift percentage
-    const liftPercent = controlAvgRevenue > 0
-      ? ((testAvgRevenue - controlAvgRevenue) / controlAvgRevenue) * 100
-      : 0;
+    const liftPercent =
+      controlAvgRevenue > 0 ? ((testAvgRevenue - controlAvgRevenue) / controlAvgRevenue) * 100 : 0;
 
     // Simplified p-value approximation using z-test for proportions
-    const pooledRate = (exp.controlBookings + exp.testBookings) /
+    const pooledRate =
+      (exp.controlBookings + exp.testBookings) /
       (exp.controlSiteIds.length + exp.testSiteIds.length);
-    const se = Math.sqrt(pooledRate * (1 - pooledRate) *
-      (1 / exp.controlSiteIds.length + 1 / exp.testSiteIds.length));
+    const se = Math.sqrt(
+      pooledRate * (1 - pooledRate) * (1 / exp.controlSiteIds.length + 1 / exp.testSiteIds.length),
+    );
 
     let pValue = 1;
     let winner: string | null = null;
@@ -1199,7 +1199,7 @@ Current date: ${startDate.toISOString().split("T")[0]}`;
       try {
         const result = await this.runAutopilot(config.campgroundId);
         this.logger.log(
-          `Autopilot for ${config.campgroundId}: ${result.applied} applied, ${result.skipped} skipped`
+          `Autopilot for ${config.campgroundId}: ${result.applied} applied, ${result.skipped} skipped`,
         );
       } catch (error) {
         this.logger.error(`Autopilot failed for ${config.campgroundId}: ${error}`);

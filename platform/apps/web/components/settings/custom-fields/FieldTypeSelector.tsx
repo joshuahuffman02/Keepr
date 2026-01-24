@@ -80,11 +80,7 @@ interface FieldTypeSelectorProps {
   className?: string;
 }
 
-export function FieldTypeSelector({
-  value,
-  onChange,
-  className,
-}: FieldTypeSelectorProps) {
+export function FieldTypeSelector({ value, onChange, className }: FieldTypeSelectorProps) {
   return (
     <div className={className}>
       <Label className="text-sm font-medium">Answer Type</Label>
@@ -103,19 +99,14 @@ export function FieldTypeSelector({
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500",
                 isSelected
                   ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                  : "border-border hover:border-border hover:bg-muted"
+                  : "border-border hover:border-border hover:bg-muted",
               )}
             >
-              <div
-                className={cn(
-                  "p-2 rounded-lg",
-                  isSelected ? "bg-emerald-100" : "bg-muted"
-                )}
-              >
+              <div className={cn("p-2 rounded-lg", isSelected ? "bg-emerald-100" : "bg-muted")}>
                 <Icon
                   className={cn(
                     "h-4 w-4",
-                    isSelected ? "text-emerald-600" : "text-muted-foreground"
+                    isSelected ? "text-emerald-600" : "text-muted-foreground",
                   )}
                 />
               </div>
@@ -123,14 +114,12 @@ export function FieldTypeSelector({
                 <p
                   className={cn(
                     "font-medium text-sm",
-                    isSelected ? "text-emerald-900" : "text-foreground"
+                    isSelected ? "text-emerald-900" : "text-foreground",
                   )}
                 >
                   {type.label}
                 </p>
-                <p className="text-xs text-muted-foreground truncate">
-                  {type.description}
-                </p>
+                <p className="text-xs text-muted-foreground truncate">{type.description}</p>
               </div>
             </button>
           );

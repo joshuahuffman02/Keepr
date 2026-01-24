@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import Image from 'next/image';
-import { ArrowRight, Play, Sparkles, Users, Calendar, Brain } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, Play, Sparkles, Users, Calendar, Brain } from "lucide-react";
 
 export function HeroSection() {
   return (
@@ -30,7 +30,7 @@ export function HeroSection() {
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-              Run your campground{' '}
+              Run your campground{" "}
               <span className="bg-gradient-to-r from-keepr-evergreen to-keepr-clay bg-clip-text text-transparent">
                 smarter, not harder
               </span>
@@ -38,10 +38,10 @@ export function HeroSection() {
 
             {/* Subheadline - Value Proposition */}
             <p className="text-xl text-muted-foreground leading-relaxed">
-              The modern reservation system with AI-powered insights, guest loyalty programs,
-              and integrated staff scheduling.
-              <span className="font-semibold text-foreground"> $100/month flat</span> + $2.30/booking.
-              No contracts. Go live in 48 hours.
+              The modern reservation system with AI-powered insights, guest loyalty programs, and
+              integrated staff scheduling.
+              <span className="font-semibold text-foreground"> $100/month flat</span> +
+              $2.30/booking. No contracts. Go live in 48 hours.
             </p>
 
             {/* Key Features */}
@@ -72,15 +72,48 @@ export function HeroSection() {
             {/* Trust Indicators */}
             <div className="flex flex-wrap gap-3 text-sm">
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-medium">
-                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg
+                  className="mr-1.5 w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 30-day money-back guarantee
               </span>
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-medium">
-                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg
+                  className="mr-1.5 w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 No contracts, cancel anytime
               </span>
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-medium">
-                <svg className="mr-1.5 w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg
+                  className="mr-1.5 w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
                 Go live in 48 hours
               </span>
             </div>
@@ -113,7 +146,13 @@ export function HeroSection() {
             {/* Migration CTA */}
             <div className="flex items-center gap-4 pt-2">
               <div className="text-sm text-muted-foreground">
-                Switching from another system? <Link href="/pricing#add-ons" className="font-semibold text-keepr-evergreen hover:text-keepr-evergreen-light">Data import services available.</Link>
+                Switching from another system?{" "}
+                <Link
+                  href="/pricing#add-ons"
+                  className="font-semibold text-keepr-evergreen hover:text-keepr-evergreen-light"
+                >
+                  Data import services available.
+                </Link>
               </div>
             </div>
           </div>
@@ -136,8 +175,18 @@ export function HeroSection() {
             <div className="absolute -bottom-4 -left-4 bg-card rounded-xl shadow-lg p-4 border border-border">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-status-success/15 flex items-center justify-center">
-                  <svg className="h-6 w-6 text-status-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="h-6 w-6 text-status-success"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <div>
@@ -150,8 +199,18 @@ export function HeroSection() {
             <div className="absolute -top-4 -right-4 bg-card rounded-xl shadow-lg p-4 border border-border">
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-lg bg-keepr-clay/10 flex items-center justify-center">
-                  <svg className="h-6 w-6 text-keepr-clay" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg
+                    className="h-6 w-6 text-keepr-clay"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
                   </svg>
                 </div>
                 <div>

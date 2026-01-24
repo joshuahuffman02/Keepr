@@ -178,10 +178,8 @@ export default function GroupsPage() {
   const selectedGroup = selectedGroupQuery.data ?? null;
 
   const createGroupMutation = useMutation({
-    mutationFn: (payload: {
-      sharedPayment?: boolean;
-      sharedComm?: boolean;
-    }) => apiClient.createGroup(campgroundId, payload),
+    mutationFn: (payload: { sharedPayment?: boolean; sharedComm?: boolean }) =>
+      apiClient.createGroup(campgroundId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["groups", campgroundId] });
       setShowGroupModal(false);
@@ -241,23 +239,20 @@ export default function GroupsPage() {
               groups.map((group) => (
                 <Card
                   key={group.id}
-                  className={`p-3 cursor-pointer hover:shadow-md transition-shadow ${selectedGroupId === group.id ? "ring-2 ring-blue-500" : ""
-                    }`}
+                  className={`p-3 cursor-pointer hover:shadow-md transition-shadow ${
+                    selectedGroupId === group.id ? "ring-2 ring-blue-500" : ""
+                  }`}
                   onClick={() => setSelectedGroupId(group.id)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="font-medium text-sm">
-                        Group {group.id.slice(-6)}
-                      </span>
+                      <span className="font-medium text-sm">Group {group.id.slice(-6)}</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                    <Badge variant="secondary">
-                      {group.reservationCount || 0} reservations
-                    </Badge>
+                    <Badge variant="secondary">{group.reservationCount || 0} reservations</Badge>
                     {group.sharedPayment && (
                       <Badge variant="outline" className="text-emerald-700 border-emerald-200">
                         <DollarSign className="h-3 w-3 mr-1" />
@@ -338,9 +333,7 @@ export default function GroupsPage() {
                               <Badge
                                 variant="outline"
                                 className={
-                                  res.groupRole === "primary"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : ""
+                                  res.groupRole === "primary" ? "bg-blue-50 text-blue-700" : ""
                                 }
                               >
                                 {res.groupRole || "member"}
@@ -411,9 +404,7 @@ export default function GroupsPage() {
                       <Calendar className="h-3 w-3" />
                       {formatDate(block.windowStart)} → {formatDate(block.windowEnd)}
                     </div>
-                    <div>
-                      {Array.isArray(block.sites) ? block.sites.length : 0} site(s) blocked
-                    </div>
+                    <div>{Array.isArray(block.sites) ? block.sites.length : 0} site(s) blocked</div>
                   </div>
                   {block.state === "active" && (
                     <Button
@@ -488,33 +479,35 @@ export default function GroupsPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label htmlFor="block-start" className="text-sm font-medium text-foreground">Start Date</Label>
+                    <Label htmlFor="block-start" className="text-sm font-medium text-foreground">
+                      Start Date
+                    </Label>
                     <Input
                       id="block-start"
                       type="date"
                       value={newBlock.windowStart}
-                      onChange={(e) =>
-                        setNewBlock({ ...newBlock, windowStart: e.target.value })
-                      }
+                      onChange={(e) => setNewBlock({ ...newBlock, windowStart: e.target.value })}
                       className="mt-1"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="block-end" className="text-sm font-medium text-foreground">End Date</Label>
+                    <Label htmlFor="block-end" className="text-sm font-medium text-foreground">
+                      End Date
+                    </Label>
                     <Input
                       id="block-end"
                       type="date"
                       value={newBlock.windowEnd}
-                      onChange={(e) =>
-                        setNewBlock({ ...newBlock, windowEnd: e.target.value })
-                      }
+                      onChange={(e) => setNewBlock({ ...newBlock, windowEnd: e.target.value })}
                       className="mt-1"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="block-reason" className="text-sm font-medium text-foreground">Reason</Label>
+                  <Label htmlFor="block-reason" className="text-sm font-medium text-foreground">
+                    Reason
+                  </Label>
                   <Select
                     value={newBlock.reason}
                     onValueChange={(value) => setNewBlock({ ...newBlock, reason: value })}
@@ -668,7 +661,8 @@ export default function GroupsPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Group</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this group? Reservations will be unlinked from the group.
+                Are you sure you want to delete this group? Reservations will be unlinked from the
+                group.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

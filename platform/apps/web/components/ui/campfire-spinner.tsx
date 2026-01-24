@@ -51,9 +51,7 @@ export function CampfireSpinner({
       </div>
 
       {message && (
-        <p className={cn("text-muted-foreground animate-pulse", textSizes[size])}>
-          {message}
-        </p>
+        <p className={cn("text-muted-foreground animate-pulse", textSizes[size])}>{message}</p>
       )}
     </div>
   );
@@ -76,11 +74,7 @@ export function CampfireSpinnerStatic({
           sizes={size === "lg" ? "64px" : size === "md" ? "48px" : "32px"}
         />
       </div>
-      {message && (
-        <p className={cn("text-muted-foreground", textSizes[size])}>
-          {message}
-        </p>
-      )}
+      {message && <p className={cn("text-muted-foreground", textSizes[size])}>{message}</p>}
     </div>
   );
 }

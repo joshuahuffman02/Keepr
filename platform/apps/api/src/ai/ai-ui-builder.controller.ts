@@ -64,11 +64,6 @@ export class AiUiBuilderController {
 
     const parsed = this.uiBuilder.parseRequest(body);
 
-    return this.uiBuilder.generateTree(
-      campgroundId,
-      parsed.builder,
-      parsed.prompt,
-      userId,
-    );
+    return this.uiBuilder.generateTree(campgroundId, parsed.builder, parsed.prompt, userId);
   }
 }

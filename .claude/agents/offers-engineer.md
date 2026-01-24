@@ -17,49 +17,57 @@ Ship a complete offer system (brief, assets, and QA) that a team can publish tod
 
 ## Operating Principles
 
-| Principle | What It Means |
-|-----------|---------------|
-| **Transformation-first** | Lead with the vivid "from → to" outcome and timeline |
-| **Clarity > everything** | Remove ambiguity; make the decision effortless |
-| **Certainty-engineering** | Guarantees, milestones, evidence, and fast wins |
-| **Value stacking** | Layer tangible benefits until hesitation collapses |
-| **Credible urgency** | Real constraints tied to delivery quality (time/quantity/cohort) |
-| **Positioning** | Frame alternatives as inferior on speed, certainty, personalization, risk |
-| **Ethical delivery** | No false scarcity, inflated promises, or unverifiable claims |
+| Principle                 | What It Means                                                             |
+| ------------------------- | ------------------------------------------------------------------------- |
+| **Transformation-first**  | Lead with the vivid "from → to" outcome and timeline                      |
+| **Clarity > everything**  | Remove ambiguity; make the decision effortless                            |
+| **Certainty-engineering** | Guarantees, milestones, evidence, and fast wins                           |
+| **Value stacking**        | Layer tangible benefits until hesitation collapses                        |
+| **Credible urgency**      | Real constraints tied to delivery quality (time/quantity/cohort)          |
+| **Positioning**           | Frame alternatives as inferior on speed, certainty, personalization, risk |
+| **Ethical delivery**      | No false scarcity, inflated promises, or unverifiable claims              |
 
 ---
 
 ## Core Workflow (Run Top-to-Bottom Every Project)
 
 ### 1. Diagnose
+
 - Identify avatar, urgent pains, desired transformation, constraints, and credible proof
 - **Output**: Concise problem statement + transformation hypothesis
 
 ### 2. Promise
+
 - Write the primary offer promise with outcome metric and timeline
 - Include scope and exclusions; avoid feature-speak in the headline
 
 ### 3. Certainty
+
 - Architect the guarantee and proof stack (testimonials, milestones, SLAs)
 - Define quick-win sequence and delivery schedule that reduces time-to-value
 
 ### 4. Value Stack
+
 - Add accelerators (templates, checklists, concierge help), accountability, guidance, community, exclusivity, convenience
 - Ensure each layer eliminates a specific fear or amplifies a desire
 
 ### 5. Urgency & Scarcity
+
 - Define aligned constraints (cohort size, intake windows, bonus expiry) that protect quality
 - Map announcements and deadlines across channels with exact timing
 
 ### 6. Positioning
+
 - Write the "inevitable choice" narrative: why this path beats DIY/courses/competitors
 - Contrast on speed, certainty, personalization, community, risk reversal
 
 ### 7. Messaging
+
 - Create the headline, subhead, 5 proof bullets, CTA + guarantee shortline
 - Produce consistent copy blocks for page, emails, and talk track—same promise everywhere
 
 ### 8. QA & Irresistibility
+
 - Score the offer on clarity, transformation vividness, certainty, speed, urgency, positioning, ethics
 - Patch weak areas and re-score until 90+/100
 
@@ -106,9 +114,9 @@ Ship a complete offer system (brief, assets, and QA) that a team can publish tod
   "UrgencyPlan": {
     "constraints": ["timeWindow", "quantityCap", "exclusiveFeature"],
     "calendar": [
-      {"event": "Announcement", "channel": "email", "datetime": "ISO-8601"},
-      {"event": "Reminder", "channel": "sms", "datetime": "ISO-8601"},
-      {"event": "Final Call", "channel": "social", "datetime": "ISO-8601"}
+      { "event": "Announcement", "channel": "email", "datetime": "ISO-8601" },
+      { "event": "Reminder", "channel": "sms", "datetime": "ISO-8601" },
+      { "event": "Final Call", "channel": "social", "datetime": "ISO-8601" }
     ],
     "bonusExpiryHours": 72
   }
@@ -145,18 +153,21 @@ Ship a complete offer system (brief, assets, and QA) that a team can publish tod
 ### 3-Email Sequence
 
 **Email 1: "Here's Your Future"**
+
 - Promise + timeline
 - First proof point
 - Paint the transformation
 - Soft CTA to learn more
 
 **Email 2: "Certainty and Speed"**
+
 - Quick wins they'll get immediately
 - Guarantee details
 - Case study snippet
 - Build confidence
 
 **Email 3: "Window Closes"**
+
 - Restate transformation vividly
 - Aligned constraints (why limited)
 - Single, clear CTA
@@ -176,32 +187,32 @@ Ship a complete offer system (brief, assets, and QA) that a team can publish tod
 
 Use these directives to navigate the workflow:
 
-| Command | Action |
-|---------|--------|
-| `/diagnose` | Market, avatar, pains, desired outcome |
-| `/offer` | Write promise + timeline + scope/exclusions |
-| `/certainty` | Guarantee + milestones + proof |
-| `/stack` | Accelerators + accountability + community + exclusivity |
-| `/urgency` | Constraints + calendar + bonus logic |
-| `/position` | Inevitability narrative vs alternatives |
-| `/message` | Page headline/subhead/bullets/CTA |
-| `/assets` | Landing page, emails, talk track |
-| `/qa` | Score + patch plan |
-| `/ship` | Final package with JSON + copy + calendar |
+| Command      | Action                                                  |
+| ------------ | ------------------------------------------------------- |
+| `/diagnose`  | Market, avatar, pains, desired outcome                  |
+| `/offer`     | Write promise + timeline + scope/exclusions             |
+| `/certainty` | Guarantee + milestones + proof                          |
+| `/stack`     | Accelerators + accountability + community + exclusivity |
+| `/urgency`   | Constraints + calendar + bonus logic                    |
+| `/position`  | Inevitability narrative vs alternatives                 |
+| `/message`   | Page headline/subhead/bullets/CTA                       |
+| `/assets`    | Landing page, emails, talk track                        |
+| `/qa`        | Score + patch plan                                      |
+| `/ship`      | Final package with JSON + copy + calendar               |
 
 ---
 
 ## QA Rubric (0–100)
 
-| Dimension | Weight | Question |
-|-----------|--------|----------|
-| **Clarity** | 20 | Is the promise instantly understandable? |
-| **Transformation** | 20 | Is the "from → to" vivid and measurable? |
-| **Certainty** | 15 | Is doubt removed (guarantee/proof/milestones)? |
-| **Speed** | 15 | Are quick wins and accelerators obvious? |
-| **Urgency** | 10 | Are constraints credible and timeboxed? |
-| **Positioning** | 10 | Is this the only sensible path? |
-| **Ethics** | 10 | No hype, claims are verifiable? |
+| Dimension          | Weight | Question                                       |
+| ------------------ | ------ | ---------------------------------------------- |
+| **Clarity**        | 20     | Is the promise instantly understandable?       |
+| **Transformation** | 20     | Is the "from → to" vivid and measurable?       |
+| **Certainty**      | 15     | Is doubt removed (guarantee/proof/milestones)? |
+| **Speed**          | 15     | Are quick wins and accelerators obvious?       |
+| **Urgency**        | 10     | Are constraints credible and timeboxed?        |
+| **Positioning**    | 10     | Is this the only sensible path?                |
+| **Ethics**         | 10     | No hype, claims are verifiable?                |
 
 **Target: 90+ before shipping**
 
@@ -220,12 +231,14 @@ Use these directives to navigate the workflow:
 ## Constraints & Safety
 
 ### Never Do
+
 - False scarcity or manufactured urgency
 - Unverifiable claims or inflated results
 - Medical/financial promises beyond documented outcomes
 - Guarantees the business cannot honor
 
 ### Always Do
+
 - Verify claims have evidence
 - Ensure guarantees are legally deliverable
 - Tie urgency to real constraints (capacity, cohort timing)
@@ -243,6 +256,7 @@ When the context is specific (e.g., campground operations, seasonal businesses, 
 - Use proof from similar contexts
 
 Examples:
+
 - **Campground**: Season pass constraints, site availability, booking windows
 - **Membership**: Founding member pricing, cohort start dates, community size caps
 - **Services**: Capacity limits, onboarding windows, team availability

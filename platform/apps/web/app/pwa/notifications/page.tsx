@@ -21,7 +21,10 @@ export default function NotificationPrefsPage() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<string | null>(null);
   const vapidKey = useMemo(() => process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY, []);
   const subscribeUrl = useMemo(() => process.env.NEXT_PUBLIC_PUSH_SUBSCRIBE_URL, []);
-  const apiBase = useMemo(() => process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api", []);
+  const apiBase = useMemo(
+    () => process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api",
+    [],
+  );
 
   useEffect(() => {
     if (typeof window === "undefined" || !("Notification" in window)) {
@@ -82,13 +85,17 @@ export default function NotificationPrefsPage() {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: vapidKey ? toUint8Array(vapidKey) : undefined
+        applicationServerKey: vapidKey ? toUint8Array(vapidKey) : undefined,
       });
       localStorage.setItem("campreserv:pushSubscription", JSON.stringify(sub));
       const url = subscribeUrl || `${apiBase}/push/subscribe`;
       try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : null;
-        const campgroundId = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") || undefined : undefined;
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : null;
+        const campgroundId =
+          typeof window !== "undefined"
+            ? localStorage.getItem("campreserv:selectedCampground") || undefined
+            : undefined;
         await fetch(url, {
           method: "POST",
           headers: {
@@ -142,16 +149,28 @@ export default function NotificationPrefsPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant={permission === "granted" ? "secondary" : permission === "denied" ? "destructive" : "outline"}>
+            <Badge
+              variant={
+                permission === "granted"
+                  ? "secondary"
+                  : permission === "denied"
+                    ? "destructive"
+                    : "outline"
+              }
+            >
               {permission}
             </Badge>
-            {permission === "unsupported" && <span className="text-sm text-slate-300">Push is not supported in this browser.</span>}
+            {permission === "unsupported" && (
+              <span className="text-sm text-slate-300">Push is not supported in this browser.</span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button onClick={request} disabled={permission === "unsupported"}>
               {permission === "granted" ? "Re-request" : "Request permission"}
             </Button>
-            <span className="text-xs text-slate-400">Grant to receive PWA notifications (stubbed).</span>
+            <span className="text-xs text-slate-400">
+              Grant to receive PWA notifications (stubbed).
+            </span>
           </div>
 
           <div className="pt-4 space-y-2">
@@ -159,14 +178,18 @@ export default function NotificationPrefsPage() {
             <Button onClick={registerDevice} disabled={permission !== "granted"}>
               {permission === "granted" ? "Register this device" : "Grant permission first"}
             </Button>
-            {subscriptionStatus && <div className="text-xs text-slate-400">{subscriptionStatus}</div>}
+            {subscriptionStatus && (
+              <div className="text-xs text-slate-400">{subscriptionStatus}</div>
+            )}
             {!vapidKey && (
               <div className="text-xs text-amber-300">
-                VAPID key not set; subscription stored locally only. Configure NEXT_PUBLIC_VAPID_PUBLIC_KEY and NEXT_PUBLIC_PUSH_SUBSCRIBE_URL to send to server.
+                VAPID key not set; subscription stored locally only. Configure
+                NEXT_PUBLIC_VAPID_PUBLIC_KEY and NEXT_PUBLIC_PUSH_SUBSCRIBE_URL to send to server.
               </div>
             )}
             <div className="text-xs text-slate-500">
-              Server registration requires you to be signed in; we include your bearer token and campground context if available.
+              Server registration requires you to be signed in; we include your bearer token and
+              campground context if available.
             </div>
           </div>
         </CardContent>

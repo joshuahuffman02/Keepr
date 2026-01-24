@@ -21,12 +21,15 @@ const getStringValue = (value: unknown): string | null => {
 
 @Injectable()
 export class ScopeGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector, private readonly permissions: PermissionsService) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly permissions: PermissionsService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const descriptor = this.reflector.getAllAndOverride<ScopeDescriptor | undefined>(SCOPE_KEY, [
       context.getHandler(),
-      context.getClass()
+      context.getClass(),
     ]);
     if (!descriptor) return true;
 
@@ -36,9 +39,15 @@ export class ScopeGuard implements CanActivate {
     const region = this.extractRegion(request);
     const isPlatform = this.permissions.isPlatformStaff(user);
 
-    const inRegionScope = isPlatform ? true : region ? !user?.region || user.region === region : true;
+    const inRegionScope = isPlatform
+      ? true
+      : region
+        ? !user?.region || user.region === region
+        : true;
     const inCampgroundScope = campgroundId
-      ? isPlatform || (Array.isArray(user?.memberships) && user.memberships.some((membership) => membership.campgroundId === campgroundId))
+      ? isPlatform ||
+        (Array.isArray(user?.memberships) &&
+          user.memberships.some((membership) => membership.campgroundId === campgroundId))
       : true;
 
     if (!user || !inRegionScope || !inCampgroundScope) {
@@ -50,7 +59,7 @@ export class ScopeGuard implements CanActivate {
       campgroundId,
       region,
       resource: descriptor.resource,
-      action: descriptor.action
+      action: descriptor.action,
     });
 
     if (!result.allowed) {

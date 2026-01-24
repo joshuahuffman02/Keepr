@@ -15,4 +15,3 @@ export class ModerateReviewDto {
   @IsString()
   notes?: string;
 }
-

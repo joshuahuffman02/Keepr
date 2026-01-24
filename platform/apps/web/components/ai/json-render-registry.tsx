@@ -9,7 +9,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Table, TableBody, TableCell, TableEmpty, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableEmpty,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -25,12 +33,7 @@ type JsonRenderProps = ComponentRenderProps<Record<string, unknown>>;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-type JsonRenderDynamicValue =
-  | string
-  | number
-  | boolean
-  | null
-  | { path: string };
+type JsonRenderDynamicValue = string | number | boolean | null | { path: string };
 
 type ActionConfirm = {
   title: string;
@@ -40,14 +43,9 @@ type ActionConfirm = {
   variant?: "default" | "danger";
 };
 
-type ActionOnSuccess =
-  | { navigate: string }
-  | { set: Record<string, unknown> }
-  | { action: string };
+type ActionOnSuccess = { navigate: string } | { set: Record<string, unknown> } | { action: string };
 
-type ActionOnError =
-  | { set: Record<string, unknown> }
-  | { action: string };
+type ActionOnError = { set: Record<string, unknown> } | { action: string };
 
 type ActionPayload = {
   name: string;
@@ -71,7 +69,9 @@ const getStringArray = (value: unknown): string[] => {
   return value.filter((entry): entry is string => typeof entry === "string");
 };
 
-const normalizeChartRow = (row: Record<string, unknown>): Record<string, string | number | null> => {
+const normalizeChartRow = (
+  row: Record<string, unknown>,
+): Record<string, string | number | null> => {
   const normalized: Record<string, string | number | null> = {};
   for (const [key, value] of Object.entries(row)) {
     if (typeof value === "string" || typeof value === "number" || value === null) {
@@ -217,7 +217,9 @@ const Metric = ({ element }: JsonRenderProps) => {
   const value = useDataValue(valuePath);
   return (
     <div className="rounded-xl border border-border bg-card p-4">
-      {label && <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>}
+      {label && (
+        <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
+      )}
       <div className="text-2xl font-semibold text-foreground">{formatValue(value, format)}</div>
     </div>
   );
@@ -253,11 +255,13 @@ const Chart = ({ element }: JsonRenderProps) => {
 const DataTable = ({ element }: JsonRenderProps) => {
   const title = getString(element.props.title);
   const rowsPath = getString(element.props.rowsPath) ?? "/";
-  const columns = getRecordArray(element.props.columns).map((entry) => ({
-    key: getString(entry.key) ?? "",
-    label: getString(entry.label) ?? "",
-    format: getString(entry.format),
-  })).filter((entry) => entry.key && entry.label);
+  const columns = getRecordArray(element.props.columns)
+    .map((entry) => ({
+      key: getString(entry.key) ?? "",
+      label: getString(entry.label) ?? "",
+      format: getString(entry.format),
+    }))
+    .filter((entry) => entry.key && entry.label);
   const rows = getRecordArray(useDataValue(rowsPath));
   const emptyMessage = getString(element.props.emptyMessage) ?? "No rows available";
 
@@ -324,7 +328,10 @@ const List = ({ element }: JsonRenderProps) => {
             const hasSecondary =
               typeof secondaryValue === "string" || typeof secondaryValue === "number";
             return (
-              <div key={`record-${idx}`} className="rounded-lg border border-border bg-muted/40 p-3">
+              <div
+                key={`record-${idx}`}
+                className="rounded-lg border border-border bg-muted/40 p-3"
+              >
                 <div className="text-sm font-medium text-foreground">
                   {formatValue(item[primaryKey], "string")}
                 </div>
@@ -419,10 +426,12 @@ const TextArea = ({ element }: JsonRenderProps) => {
 const SelectField = ({ element }: JsonRenderProps) => {
   const label = getString(element.props.label) ?? "Select";
   const valuePath = getString(element.props.valuePath) ?? "/ui/select";
-  const options = getRecordArray(element.props.options).map((entry) => ({
-    label: getString(entry.label) ?? "",
-    value: getString(entry.value) ?? "",
-  })).filter((entry) => entry.label && entry.value);
+  const options = getRecordArray(element.props.options)
+    .map((entry) => ({
+      label: getString(entry.label) ?? "",
+      value: getString(entry.value) ?? "",
+    }))
+    .filter((entry) => entry.label && entry.value);
   const [value, setValue] = useDataBinding(valuePath);
   const valueString = typeof value === "string" ? value : "";
 
@@ -452,10 +461,7 @@ const CheckboxField = ({ element }: JsonRenderProps) => {
   const checked = getBoolean(value) ?? false;
   return (
     <label className="flex items-center gap-2 text-sm text-foreground">
-      <Checkbox
-        checked={checked}
-        onCheckedChange={(next) => setValue(next === true)}
-      />
+      <Checkbox checked={checked} onCheckedChange={(next) => setValue(next === true)} />
       {label}
     </label>
   );

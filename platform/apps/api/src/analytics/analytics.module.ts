@@ -8,21 +8,8 @@ import { AnomalyDetectionService } from "./anomaly-detection.service";
 import { AuditService } from "../audit/audit.service";
 
 @Module({
-  providers: [
-    AnalyticsService,
-    EnhancedAnalyticsService,
-    AnomalyDetectionService,
-    AuditService,
-  ],
-  controllers: [
-    AnalyticsController,
-    EnhancedAnalyticsController,
-  ],
-  exports: [
-    AnalyticsService,
-    EnhancedAnalyticsService,
-    AnomalyDetectionService,
-  ],
+  providers: [AnalyticsService, EnhancedAnalyticsService, AnomalyDetectionService, AuditService],
+  controllers: [AnalyticsController, EnhancedAnalyticsController],
+  exports: [AnalyticsService, EnhancedAnalyticsService, AnomalyDetectionService],
 })
 export class AnalyticsModule {}
-

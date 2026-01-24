@@ -34,7 +34,7 @@ export class AiCampaignService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly provider: AiProviderService,
-    private readonly gate: AiFeatureGateService
+    private readonly gate: AiFeatureGateService,
   ) {}
 
   /**
@@ -43,7 +43,7 @@ export class AiCampaignService {
   async generateSubjectLines(
     campgroundId: string,
     context: CampaignContext,
-    count: number = 5
+    count: number = 5,
   ): Promise<SubjectLineOption[]> {
     await this.gate.assertFeatureEnabled(campgroundId, AiFeatureType.analytics);
 
@@ -105,7 +105,7 @@ Return JSON array:
    */
   async generateContent(
     campgroundId: string,
-    context: CampaignContext & { subject: string }
+    context: CampaignContext & { subject: string },
   ): Promise<ContentSuggestion[]> {
     await this.gate.assertFeatureEnabled(campgroundId, AiFeatureType.analytics);
 
@@ -168,7 +168,7 @@ Return JSON array:
   async suggestSendTimes(
     campgroundId: string,
     campaignType: string,
-    targetAudience?: string
+    targetAudience?: string,
   ): Promise<{
     recommended: { day: string; time: string; reason: string };
     alternatives: { day: string; time: string; reason: string }[];
@@ -241,7 +241,7 @@ Return JSON array:
   async improveContent(
     campgroundId: string,
     currentContent: { subject?: string; body?: string },
-    goal: "clarity" | "urgency" | "warmth" | "brevity" | "persuasion"
+    goal: "clarity" | "urgency" | "warmth" | "brevity" | "persuasion",
   ): Promise<{
     improvedSubject?: string;
     improvedBody?: string;
@@ -316,7 +316,7 @@ Return JSON:
   async generateAbTest(
     campgroundId: string,
     original: { subject: string; body?: string },
-    testElement: "subject" | "cta" | "opening"
+    testElement: "subject" | "cta" | "opening",
   ): Promise<{
     variation: { subject: string; body?: string };
     hypothesis: string;
@@ -326,7 +326,8 @@ Return JSON:
     await this.gate.assertFeatureEnabled(campgroundId, AiFeatureType.analytics);
 
     const testInstructions: Record<string, string> = {
-      subject: "Create an alternative subject line that tests a different approach (e.g., question vs statement, emoji vs no emoji, personalization vs generic)",
+      subject:
+        "Create an alternative subject line that tests a different approach (e.g., question vs statement, emoji vs no emoji, personalization vs generic)",
       cta: "Create a variation with a different call to action (different wording, urgency level, or positioning)",
       opening: "Create a variation with a different opening line or hook",
     };
@@ -381,16 +382,46 @@ Return JSON:
   private fallbackSubjectLines(context: CampaignContext): SubjectLineOption[] {
     const templates: Record<string, SubjectLineOption[]> = {
       promotional: [
-        { subject: `Special Offer from ${context.campgroundName}`, tone: "promotional", reasoning: "Direct and clear value proposition", estimatedOpenRate: "baseline" },
-        { subject: `Your Exclusive Deal Awaits`, tone: "friendly", reasoning: "Creates curiosity and exclusivity", estimatedOpenRate: "+5% vs baseline" },
-        { subject: `Limited Time: Save on Your Next Stay`, tone: "urgent", reasoning: "Urgency drives action", estimatedOpenRate: "+8% vs baseline" },
+        {
+          subject: `Special Offer from ${context.campgroundName}`,
+          tone: "promotional",
+          reasoning: "Direct and clear value proposition",
+          estimatedOpenRate: "baseline",
+        },
+        {
+          subject: `Your Exclusive Deal Awaits`,
+          tone: "friendly",
+          reasoning: "Creates curiosity and exclusivity",
+          estimatedOpenRate: "+5% vs baseline",
+        },
+        {
+          subject: `Limited Time: Save on Your Next Stay`,
+          tone: "urgent",
+          reasoning: "Urgency drives action",
+          estimatedOpenRate: "+8% vs baseline",
+        },
       ],
       newsletter: [
-        { subject: `News from ${context.campgroundName}`, tone: "professional", reasoning: "Clear and expected", estimatedOpenRate: "baseline" },
-        { subject: `What's Happening This Month`, tone: "casual", reasoning: "Conversational and engaging", estimatedOpenRate: "+3% vs baseline" },
+        {
+          subject: `News from ${context.campgroundName}`,
+          tone: "professional",
+          reasoning: "Clear and expected",
+          estimatedOpenRate: "baseline",
+        },
+        {
+          subject: `What's Happening This Month`,
+          tone: "casual",
+          reasoning: "Conversational and engaging",
+          estimatedOpenRate: "+3% vs baseline",
+        },
       ],
       seasonal: [
-        { subject: `${context.seasonOrEvent || "This Season"} at ${context.campgroundName}`, tone: "friendly", reasoning: "Timely and relevant", estimatedOpenRate: "+5% vs baseline" },
+        {
+          subject: `${context.seasonOrEvent || "This Season"} at ${context.campgroundName}`,
+          tone: "friendly",
+          reasoning: "Timely and relevant",
+          estimatedOpenRate: "+5% vs baseline",
+        },
       ],
     };
 
@@ -410,7 +441,7 @@ Return JSON:
 
   private fallbackAbTest(
     original: { subject: string; body?: string },
-    testElement: string
+    testElement: string,
   ): {
     variation: { subject: string; body?: string };
     hypothesis: string;
@@ -418,7 +449,11 @@ Return JSON:
     sampleSize: string;
   } {
     const variations: Record<string, { subject: string }> = {
-      subject: { subject: original.subject.includes("?") ? original.subject.replace("?", "!") : original.subject + "?" },
+      subject: {
+        subject: original.subject.includes("?")
+          ? original.subject.replace("?", "!")
+          : original.subject + "?",
+      },
       cta: { subject: original.subject },
       opening: { subject: original.subject },
     };

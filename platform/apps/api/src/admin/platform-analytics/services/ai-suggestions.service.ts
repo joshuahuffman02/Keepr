@@ -84,7 +84,8 @@ export class AiSuggestionsService {
       // Count tags from detractor responses
       if (r.score <= 6) {
         for (const tag of r.tags) {
-          byCampground[r.campgroundId].tags[tag] = (byCampground[r.campgroundId].tags[tag] || 0) + 1;
+          byCampground[r.campgroundId].tags[tag] =
+            (byCampground[r.campgroundId].tags[tag] || 0) + 1;
         }
       }
     }
@@ -127,7 +128,7 @@ export class AiSuggestionsService {
    */
   private generateSuggestionsForIssues(
     issues: string[],
-    nps: number
+    nps: number,
   ): ImprovementSuggestion["suggestions"] {
     const suggestionMap: Record<string, ImprovementSuggestion["suggestions"][0]> = {
       cleanliness: {

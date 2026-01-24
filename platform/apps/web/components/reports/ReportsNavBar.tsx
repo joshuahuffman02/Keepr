@@ -13,7 +13,7 @@ import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
 type ReportsNavBarProps = {
@@ -41,7 +41,7 @@ export function ReportsNavBar({
   dateRange,
   filters,
   extraLinks = [],
-  showSearch = true
+  showSearch = true,
 }: ReportsNavBarProps) {
   const router = useRouter();
   const [search, setSearch] = useState("");
@@ -65,7 +65,7 @@ export function ReportsNavBar({
           subTab: null,
           label: category.label,
           category: "Overview",
-          description: category.description
+          description: category.description,
         });
         return;
       }
@@ -77,7 +77,7 @@ export function ReportsNavBar({
           subTab: sub.id,
           label: sub.label,
           category: category.label,
-          description: sub.description
+          description: sub.description,
         });
       });
     });
@@ -87,13 +87,15 @@ export function ReportsNavBar({
   const matches = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return [];
-    return searchItems.filter((item) => {
-      return (
-        item.label.toLowerCase().includes(term) ||
-        item.category.toLowerCase().includes(term) ||
-        item.description?.toLowerCase().includes(term)
-      );
-    }).slice(0, 8);
+    return searchItems
+      .filter((item) => {
+        return (
+          item.label.toLowerCase().includes(term) ||
+          item.category.toLowerCase().includes(term) ||
+          item.description?.toLowerCase().includes(term)
+        );
+      })
+      .slice(0, 8);
   }, [search, searchItems]);
 
   return (
@@ -116,7 +118,7 @@ export function ReportsNavBar({
                     tab: item.tab,
                     subTab: item.subTab,
                     dateRange,
-                    filters
+                    filters,
                   });
                   return (
                     <Link
@@ -173,15 +175,18 @@ export function ReportsNavBar({
                     return (
                       <DropdownMenuItem
                         key={sub.id}
-                        className={cn("flex flex-col items-start gap-0.5", isSubActive && "bg-muted")}
+                        className={cn(
+                          "flex flex-col items-start gap-0.5",
+                          isSubActive && "bg-muted",
+                        )}
                         onClick={() =>
                           router.push(
                             buildReportHref({
                               tab: category.id,
                               subTab: sub.id,
                               dateRange,
-                              filters
-                            })
+                              filters,
+                            }),
                           )
                         }
                       >
@@ -226,14 +231,17 @@ export function ReportsNavBar({
                   tab: activeTab,
                   subTab: sub.id,
                   dateRange,
-                  filters
+                  filters,
                 })}
                 aria-current={isActive ? "page" : undefined}
               >
                 <Button
                   size="sm"
                   variant={isActive ? "outline" : "ghost"}
-                  className={cn("shrink-0 whitespace-nowrap", isActive && "border-primary/30 text-primary")}
+                  className={cn(
+                    "shrink-0 whitespace-nowrap",
+                    isActive && "border-primary/30 text-primary",
+                  )}
                 >
                   {sub.label}
                 </Button>

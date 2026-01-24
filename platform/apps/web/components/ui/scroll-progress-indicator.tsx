@@ -22,24 +22,27 @@ export function ScrollProgressIndicator({
   const [celebratedMilestones, setCelebratedMilestones] = useState<Set<number>>(new Set());
   const prefersReducedMotion = useReducedMotion();
 
-  const checkMilestone = useCallback((progress: number) => {
-    const percentage = Math.round(progress * 100);
+  const checkMilestone = useCallback(
+    (progress: number) => {
+      const percentage = Math.round(progress * 100);
 
-    // Check milestones in order
-    if (percentage >= 100 && !celebratedMilestones.has(100)) {
-      setMilestone(100);
-      setCelebratedMilestones(prev => new Set([...prev, 100]));
-      setTimeout(() => setMilestone(null), 3000);
-    } else if (percentage >= 50 && percentage < 100 && !celebratedMilestones.has(50)) {
-      setMilestone(50);
-      setCelebratedMilestones(prev => new Set([...prev, 50]));
-      setTimeout(() => setMilestone(null), 2500);
-    } else if (percentage >= 25 && percentage < 50 && !celebratedMilestones.has(25)) {
-      setMilestone(25);
-      setCelebratedMilestones(prev => new Set([...prev, 25]));
-      setTimeout(() => setMilestone(null), 2000);
-    }
-  }, [celebratedMilestones]);
+      // Check milestones in order
+      if (percentage >= 100 && !celebratedMilestones.has(100)) {
+        setMilestone(100);
+        setCelebratedMilestones((prev) => new Set([...prev, 100]));
+        setTimeout(() => setMilestone(null), 3000);
+      } else if (percentage >= 50 && percentage < 100 && !celebratedMilestones.has(50)) {
+        setMilestone(50);
+        setCelebratedMilestones((prev) => new Set([...prev, 50]));
+        setTimeout(() => setMilestone(null), 2500);
+      } else if (percentage >= 25 && percentage < 50 && !celebratedMilestones.has(25)) {
+        setMilestone(25);
+        setCelebratedMilestones((prev) => new Set([...prev, 25]));
+        setTimeout(() => setMilestone(null), 2000);
+      }
+    },
+    [celebratedMilestones],
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -95,10 +98,7 @@ export function ScrollProgressIndicator({
 
   return (
     <motion.div
-      className={cn(
-        "fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1.5",
-        className
-      )}
+      className={cn("fixed bottom-6 right-6 z-40 flex flex-col items-center gap-1.5", className)}
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
@@ -116,7 +116,7 @@ export function ScrollProgressIndicator({
               "absolute -top-12 right-0 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap shadow-lg",
               milestone === 100
                 ? "bg-status-warning text-status-warning-foreground"
-                : "bg-action-primary text-action-primary-foreground"
+                : "bg-action-primary text-action-primary-foreground",
             )}
           >
             {getMilestoneMessage(milestone)}
@@ -167,13 +167,17 @@ export function ScrollProgressIndicator({
       {/* Mountain container - BIGGER (was 48x64, now 64x80) */}
       <motion.div
         className="relative w-16 h-20"
-        animate={isAtSummit ? {
-          filter: [
-            "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
-            "drop-shadow(0 0 12px hsl(var(--status-success) / 0.6))",
-            "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
-          ]
-        } : {}}
+        animate={
+          isAtSummit
+            ? {
+                filter: [
+                  "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
+                  "drop-shadow(0 0 12px hsl(var(--status-success) / 0.6))",
+                  "drop-shadow(0 0 0px hsl(var(--status-success) / 0))",
+                ],
+              }
+            : {}
+        }
         transition={{ duration: 2, repeat: isAtSummit ? Infinity : 0 }}
       >
         {/* Glow effect at summit */}
@@ -231,7 +235,7 @@ export function ScrollProgressIndicator({
             fill="none"
             className={cn(
               "w-full h-full drop-shadow-md",
-              isAtSummit ? "text-status-warning" : "text-status-success"
+              isAtSummit ? "text-status-warning" : "text-status-success",
             )}
           >
             {/* Tent shape with glow at milestones */}
@@ -250,7 +254,7 @@ export function ScrollProgressIndicator({
       <motion.span
         className={cn(
           "text-sm font-semibold tabular-nums transition-colors duration-300",
-          isAtSummit ? "text-status-success" : "text-muted-foreground"
+          isAtSummit ? "text-status-success" : "text-muted-foreground",
         )}
         animate={isAtSummit ? { scale: [1, 1.1, 1] } : {}}
         transition={{ duration: 0.5 }}

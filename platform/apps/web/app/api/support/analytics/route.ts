@@ -29,10 +29,38 @@ type NeedsAttentionItem = {
 };
 
 const SLA_SETS: SlaSet[] = [
-  { region: "north", campgroundId: "cg-north", campgroundName: "North Pines", onTime: 42, overdue: 3, slaTargetHours: 24 },
-  { region: "south", campgroundId: "cg-south", campgroundName: "Sunset Dunes", onTime: 35, overdue: 6, slaTargetHours: 24 },
-  { region: "east", campgroundId: "cg-east", campgroundName: "River Bend", onTime: 28, overdue: 2, slaTargetHours: 24 },
-  { region: "west", campgroundId: "cg-west", campgroundName: "Canyon Base", onTime: 22, overdue: 4, slaTargetHours: 24 },
+  {
+    region: "north",
+    campgroundId: "cg-north",
+    campgroundName: "North Pines",
+    onTime: 42,
+    overdue: 3,
+    slaTargetHours: 24,
+  },
+  {
+    region: "south",
+    campgroundId: "cg-south",
+    campgroundName: "Sunset Dunes",
+    onTime: 35,
+    overdue: 6,
+    slaTargetHours: 24,
+  },
+  {
+    region: "east",
+    campgroundId: "cg-east",
+    campgroundName: "River Bend",
+    onTime: 28,
+    overdue: 2,
+    slaTargetHours: 24,
+  },
+  {
+    region: "west",
+    campgroundId: "cg-west",
+    campgroundName: "Canyon Base",
+    onTime: 22,
+    overdue: 4,
+    slaTargetHours: 24,
+  },
 ];
 
 const CATEGORY_COUNTS: CategoryCount[] = [
@@ -114,12 +142,18 @@ export async function GET(req: Request) {
   const slaSummary = SLA_SETS.filter(matchesScope);
   const needsAttention = NEEDS_ATTENTION.filter(matchesScope);
 
-  const volumesByCategory = CATEGORY_COUNTS.filter(matchesScope).reduce<Record<string, number>>((acc, row) => {
-    acc[row.category] = (acc[row.category] ?? 0) + row.count;
-    return acc;
-  }, {});
+  const volumesByCategory = CATEGORY_COUNTS.filter(matchesScope).reduce<Record<string, number>>(
+    (acc, row) => {
+      acc[row.category] = (acc[row.category] ?? 0) + row.count;
+      return acc;
+    },
+    {},
+  );
 
-  const volumeRows = Object.entries(volumesByCategory).map(([category, count]) => ({ category, count }));
+  const volumeRows = Object.entries(volumesByCategory).map(([category, count]) => ({
+    category,
+    count,
+  }));
 
   return Response.json({
     generatedAt: new Date().toISOString(),

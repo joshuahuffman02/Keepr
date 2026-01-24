@@ -8,14 +8,24 @@ import type { Request } from "express";
  */
 export class OAuth2TokenRequestDto {
   @ApiProperty({
-    enum: [OAuth2GrantType.CLIENT_CREDENTIALS, OAuth2GrantType.AUTHORIZATION_CODE, OAuth2GrantType.REFRESH_TOKEN],
+    enum: [
+      OAuth2GrantType.CLIENT_CREDENTIALS,
+      OAuth2GrantType.AUTHORIZATION_CODE,
+      OAuth2GrantType.REFRESH_TOKEN,
+    ],
     description: "OAuth2 grant type",
   })
   @IsString()
-  @IsIn([OAuth2GrantType.CLIENT_CREDENTIALS, OAuth2GrantType.AUTHORIZATION_CODE, OAuth2GrantType.REFRESH_TOKEN])
+  @IsIn([
+    OAuth2GrantType.CLIENT_CREDENTIALS,
+    OAuth2GrantType.AUTHORIZATION_CODE,
+    OAuth2GrantType.REFRESH_TOKEN,
+  ])
   grant_type!: OAuth2GrantType;
 
-  @ApiPropertyOptional({ description: "Client ID for client_credentials or authorization_code grant" })
+  @ApiPropertyOptional({
+    description: "Client ID for client_credentials or authorization_code grant",
+  })
   @IsString()
   @IsOptional()
   client_id?: string;
@@ -40,7 +50,9 @@ export class OAuth2TokenRequestDto {
   @IsOptional()
   code?: string;
 
-  @ApiPropertyOptional({ description: "Redirect URI (must match the one used in authorization request)" })
+  @ApiPropertyOptional({
+    description: "Redirect URI (must match the one used in authorization request)",
+  })
   @IsString()
   @IsOptional()
   redirect_uri?: string;

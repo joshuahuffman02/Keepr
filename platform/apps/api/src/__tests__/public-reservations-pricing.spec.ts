@@ -15,19 +15,19 @@ import { DepositPoliciesService } from "../deposit-policies/deposit-policies.ser
 import { StripeService } from "../payments/stripe.service";
 
 jest.mock("@prisma/client", () => ({
-  PrismaClient: class { },
+  PrismaClient: class {},
   ReservationStatus: {
     pending: "pending",
     confirmed: "confirmed",
     checked_in: "checked_in",
     checked_out: "checked_out",
-    cancelled: "cancelled"
+    cancelled: "cancelled",
   },
   TaxRuleType: {
     tax: "tax",
     exemption: "exemption",
     percentage: "percentage",
-    flat: "flat"
+    flat: "flat",
   },
   SignatureRequestStatus: {
     preview: "preview",
@@ -39,7 +39,7 @@ jest.mock("@prisma/client", () => ({
     waived: "waived",
     declined: "declined",
     voided: "voided",
-    expired: "expired"
+    expired: "expired",
   },
   SignatureDocumentType: {
     long_term_stay: "long_term_stay",
@@ -49,27 +49,27 @@ jest.mock("@prisma/client", () => ({
     deposit: "deposit",
     waiver: "waiver",
     coi: "coi",
-    other: "other"
+    other: "other",
   },
   SignatureDeliveryChannel: {
     email: "email",
     sms: "sms",
-    email_and_sms: "email_and_sms"
+    email_and_sms: "email_and_sms",
   },
   SignatureMethod: {
     digital: "digital",
     paper: "paper",
-    waived: "waived"
+    waived: "waived",
   },
   CoiStatus: {
     pending: "pending",
     active: "active",
     expired: "expired",
-    rejected: "rejected"
+    rejected: "rejected",
   },
-  MembershipType: class { },
-  GuestMembership: class { },
-  Prisma: {}
+  MembershipType: class {},
+  GuestMembership: class {},
+  Prisma: {},
 }));
 
 type PrismaMock = {
@@ -83,7 +83,10 @@ type PrismaMock = {
 
 type LockMock = { withLocks: jest.Mock };
 type PromotionsMock = { validate: jest.Mock };
-type MembershipsMock = { getActiveMembershipById: jest.Mock; getActiveMembershipByGuest: jest.Mock };
+type MembershipsMock = {
+  getActiveMembershipById: jest.Mock;
+  getActiveMembershipByGuest: jest.Mock;
+};
 type PoliciesMock = { evaluatePolicies: jest.Mock };
 type PricingV2Mock = { evaluate: jest.Mock };
 type DepositPoliciesMock = { resolve: jest.Mock; calculateDeposit: jest.Mock };
@@ -142,14 +145,20 @@ describe("PublicReservationsService pricing", () => {
       taxRule: { findMany: jest.fn() },
       campground: { findUnique: jest.fn() },
       reservation: { findUnique: jest.fn() },
-      onboardingInvite: { findUnique: jest.fn() }
+      onboardingInvite: { findUnique: jest.fn() },
     };
     locks = { withLocks: jest.fn((_keys: string[], fn: () => Promise<unknown>) => fn()) };
     promotionsService = { validate: jest.fn() };
-    membershipsService = { getActiveMembershipById: jest.fn(), getActiveMembershipByGuest: jest.fn() };
+    membershipsService = {
+      getActiveMembershipById: jest.fn(),
+      getActiveMembershipByGuest: jest.fn(),
+    };
     policiesService = { evaluatePolicies: jest.fn().mockResolvedValue([]) };
     pricingV2Service = { evaluate: jest.fn() };
-    depositPoliciesService = { resolve: jest.fn().mockResolvedValue(null), calculateDeposit: jest.fn().mockResolvedValue(null) };
+    depositPoliciesService = {
+      resolve: jest.fn().mockResolvedValue(null),
+      calculateDeposit: jest.fn().mockResolvedValue(null),
+    };
     emailService = {};
     abandonedCartService = {};
     signaturesService = {};
@@ -170,8 +179,8 @@ describe("PublicReservationsService pricing", () => {
         { provide: AccessControlService, useValue: accessControlService },
         { provide: PricingV2Service, useValue: pricingV2Service },
         { provide: DepositPoliciesService, useValue: depositPoliciesService },
-        { provide: StripeService, useValue: stripeService }
-      ]
+        { provide: StripeService, useValue: stripeService },
+      ],
     }).compile();
 
     service = moduleRef.get(PublicReservationsService);
@@ -187,14 +196,14 @@ describe("PublicReservationsService pricing", () => {
       isPublished: true,
       isBookable: true,
       isExternal: false,
-      nonBookableReason: null
+      nonBookableReason: null,
     });
 
     prisma.site.findUnique = jest.fn().mockResolvedValue({
       id: "site1",
       campgroundId: "cg1",
       siteClassId: "sc1",
-      siteClass: { defaultRate: 10000 } // $100.00
+      siteClass: { defaultRate: 10000 }, // $100.00
     });
 
     pricingV2Service.evaluate.mockResolvedValue({
@@ -204,7 +213,7 @@ describe("PublicReservationsService pricing", () => {
       demandAdjustmentCents: 0,
       totalBeforeTaxCents: 20000,
       appliedRules: [],
-      pricingRuleVersion: "v2:test"
+      pricingRuleVersion: "v2:test",
     });
 
     // Tax 10%
@@ -220,14 +229,14 @@ describe("PublicReservationsService pricing", () => {
       promotionId: "promo1",
       code: "PROMO20",
       type: "percentage",
-      value: 20
+      value: 20,
     });
     promotionsService.validate = promoValidate;
 
     // Membership 10%
     membershipsService.getActiveMembershipById = jest.fn().mockResolvedValue({
       id: "mem1",
-      MembershipType: { discountPercent: 10, isActive: true }
+      MembershipType: { discountPercent: 10, isActive: true },
     });
 
     const quote = await service.getQuote("slug", {
@@ -236,7 +245,7 @@ describe("PublicReservationsService pricing", () => {
       departureDate: "2025-06-03",
       promoCode: "PROMO20",
       membershipId: "mem1",
-      taxWaiverSigned: false
+      taxWaiverSigned: false,
     });
 
     // Base: 2 nights * $100 = $20000 cents
@@ -255,14 +264,14 @@ describe("PublicReservationsService pricing", () => {
       isPublished: true,
       isBookable: true,
       isExternal: false,
-      nonBookableReason: null
+      nonBookableReason: null,
     });
 
     prisma.site.findUnique = jest.fn().mockResolvedValue({
       id: "site1",
       campgroundId: "cg1",
       siteClassId: "sc1",
-      siteClass: { defaultRate: 10000 } // $100/night
+      siteClass: { defaultRate: 10000 }, // $100/night
     });
 
     pricingV2Service.evaluate.mockResolvedValue({
@@ -272,13 +281,21 @@ describe("PublicReservationsService pricing", () => {
       demandAdjustmentCents: 0,
       totalBeforeTaxCents: 10000,
       appliedRules: [],
-      pricingRuleVersion: "v2:test"
+      pricingRuleVersion: "v2:test",
     });
 
     // Exemption requires waiver; also a tax rule exists (10%) to verify waiver needed
     prisma.taxRule.findMany = jest.fn().mockImplementation(({ where }) => {
       if (where.type === "exemption") {
-        return [{ minNights: 1, maxNights: 10, requiresWaiver: true, waiverText: "Sign to waive", isActive: true }];
+        return [
+          {
+            minNights: 1,
+            maxNights: 10,
+            requiresWaiver: true,
+            waiverText: "Sign to waive",
+            isActive: true,
+          },
+        ];
       }
       return [{ rate: 0.1, isActive: true }];
     });
@@ -292,7 +309,7 @@ describe("PublicReservationsService pricing", () => {
       siteId: "site1",
       arrivalDate: "2025-06-01",
       departureDate: "2025-06-02",
-      taxWaiverSigned: false
+      taxWaiverSigned: false,
     });
     expect(quoteNoWaiver.taxesCents).toBe(1000); // 10% of $100
     expect(quoteNoWaiver.taxWaiverRequired).toBe(true);
@@ -303,7 +320,7 @@ describe("PublicReservationsService pricing", () => {
       siteId: "site1",
       arrivalDate: "2025-06-01",
       departureDate: "2025-06-02",
-      taxWaiverSigned: true
+      taxWaiverSigned: true,
     });
     expect(quoteWithWaiver.taxesCents).toBe(0);
     expect(quoteWithWaiver.taxExemptionApplied).toBe(true);
@@ -316,14 +333,14 @@ describe("PublicReservationsService pricing", () => {
       isPublished: true,
       isBookable: true,
       isExternal: false,
-      nonBookableReason: null
+      nonBookableReason: null,
     });
 
     prisma.site.findUnique = jest.fn().mockResolvedValue({
       id: "site1",
       campgroundId: "cg1",
       siteClassId: "sc1",
-      siteClass: { defaultRate: 10000 } // $100/night
+      siteClass: { defaultRate: 10000 }, // $100/night
     });
 
     pricingV2Service.evaluate.mockResolvedValue({
@@ -333,7 +350,7 @@ describe("PublicReservationsService pricing", () => {
       demandAdjustmentCents: 0,
       totalBeforeTaxCents: 10000,
       appliedRules: [],
-      pricingRuleVersion: "v2:test"
+      pricingRuleVersion: "v2:test",
     });
     prisma.taxRule.findMany = jest.fn().mockResolvedValue([]); // ignore taxes here
 
@@ -344,13 +361,13 @@ describe("PublicReservationsService pricing", () => {
       promotionId: "promo-flat",
       code: "HALF",
       type: "flat",
-      value: 5000
+      value: 5000,
     });
 
     // Membership 30% off -> $30
     membershipsService.getActiveMembershipById = jest.fn().mockResolvedValue({
       id: "mem-big",
-      MembershipType: { discountPercent: 30, isActive: true }
+      MembershipType: { discountPercent: 30, isActive: true },
     });
 
     const quote = await service.getQuote("slug", {
@@ -359,13 +376,13 @@ describe("PublicReservationsService pricing", () => {
       departureDate: "2025-06-02",
       promoCode: "HALF",
       membershipId: "mem-big",
-      taxWaiverSigned: false
+      taxWaiverSigned: false,
     });
 
     // Base $100. Max discount at 40% cap => $40 max.
     expect(quote.discountCents).toBe(4000);
     expect(quote.discountCapped).toBe(true);
-    expect(quote.appliedDiscounts?.some(d => d.capped)).toBe(true);
+    expect(quote.appliedDiscounts?.some((d) => d.capped)).toBe(true);
     expect(quote.totalAfterDiscountCents).toBe(6000); // 10000 - 4000
     expect(quote.rejectedDiscounts?.length).toBeGreaterThan(0);
   });
@@ -376,14 +393,14 @@ describe("PublicReservationsService pricing", () => {
       isPublished: true,
       isBookable: true,
       isExternal: false,
-      nonBookableReason: null
+      nonBookableReason: null,
     });
 
     prisma.site.findUnique = jest.fn().mockResolvedValue({
       id: "site1",
       campgroundId: "cg1",
       siteClassId: "sc1",
-      siteClass: { defaultRate: 12000 } // $120/night
+      siteClass: { defaultRate: 12000 }, // $120/night
     });
 
     pricingV2Service.evaluate.mockResolvedValue({
@@ -393,7 +410,7 @@ describe("PublicReservationsService pricing", () => {
       demandAdjustmentCents: 0,
       totalBeforeTaxCents: 24000,
       appliedRules: [],
-      pricingRuleVersion: "v2:test"
+      pricingRuleVersion: "v2:test",
     });
 
     prisma.pricingRule.findMany = jest.fn().mockResolvedValue([]);
@@ -406,7 +423,7 @@ describe("PublicReservationsService pricing", () => {
     const quote = await service.getQuote("slug", {
       siteId: "site1",
       arrivalDate: "2025-07-01",
-      departureDate: "2025-07-03"
+      departureDate: "2025-07-03",
     });
 
     expect(quote.baseSubtotalCents).toBe(24000); // 2 nights * 120
@@ -420,14 +437,14 @@ describe("PublicReservationsService pricing", () => {
       isPublished: true,
       isBookable: true,
       isExternal: false,
-      nonBookableReason: null
+      nonBookableReason: null,
     });
 
     prisma.site.findUnique = jest.fn().mockResolvedValue({
       id: "site1",
       campgroundId: "cg1",
       siteClassId: "sc1",
-      siteClass: { defaultRate: 11000 } // price is tax-inclusive at 10%
+      siteClass: { defaultRate: 11000 }, // price is tax-inclusive at 10%
     });
 
     pricingV2Service.evaluate.mockResolvedValue({
@@ -437,7 +454,7 @@ describe("PublicReservationsService pricing", () => {
       demandAdjustmentCents: 0,
       totalBeforeTaxCents: 11000,
       appliedRules: [],
-      pricingRuleVersion: "v2:test"
+      pricingRuleVersion: "v2:test",
     });
 
     prisma.pricingRule.findMany = jest.fn().mockResolvedValue([]);
@@ -454,7 +471,7 @@ describe("PublicReservationsService pricing", () => {
     const quote = await service.getQuote("slug", {
       siteId: "site1",
       arrivalDate: "2025-08-01",
-      departureDate: "2025-08-02"
+      departureDate: "2025-08-02",
     });
 
     // With inclusive tax, the taxable base should be backed out: price / 1.1
@@ -478,7 +495,7 @@ describe("PublicReservationsService pricing", () => {
       taxWaiverSigned: false,
       Guest: { primaryFirstName: "Guest", primaryLastName: "One" },
       Campground: { name: "Camp One", slug: "camp-one", city: "X", state: "Y", timezone: "UTC" },
-      Site: { SiteClass: { name: "A", photos: [] } }
+      Site: { SiteClass: { name: "A", photos: [] } },
     };
 
     prisma.reservation.findUnique = jest.fn().mockResolvedValue(reservationRecord);
@@ -507,7 +524,7 @@ describe("PublicReservationsService pricing", () => {
       referralIncentiveValue: 0,
       referralSource: null,
       referralChannel: null,
-      policyRequirements: []
+      policyRequirements: [],
     };
     const quoteSpy = jest.spyOn(service, "getQuote").mockResolvedValue(mockQuote);
 

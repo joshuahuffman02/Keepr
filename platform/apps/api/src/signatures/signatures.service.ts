@@ -58,7 +58,8 @@ const toStringValue = (value: unknown): string | null => {
 };
 
 const toNumberValue = (value: unknown): number | null => {
-  const parsed = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+  const parsed =
+    typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
   if (!Number.isFinite(parsed)) return null;
   return parsed;
 };
@@ -66,7 +67,10 @@ const toNumberValue = (value: unknown): number | null => {
 const getMetadataRecord = (metadata: unknown): Record<string, unknown> =>
   isRecord(metadata) ? metadata : {};
 
-const getRecordField = (record: Record<string, unknown>, key: string): Record<string, unknown> | null => {
+const getRecordField = (
+  record: Record<string, unknown>,
+  key: string,
+): Record<string, unknown> | null => {
   const value = record[key];
   return isRecord(value) ? value : null;
 };
@@ -81,7 +85,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -94,12 +98,16 @@ const isSignatureRequestStatus = (value: string): value is SignatureRequestStatu
 const isSignatureDocumentType = (value: string): value is SignatureDocumentType =>
   SIGNATURE_DOCUMENT_TYPES.some((type) => type === value);
 
-const parseSignatureRequestStatus = (value: string | undefined): SignatureRequestStatus | undefined => {
+const parseSignatureRequestStatus = (
+  value: string | undefined,
+): SignatureRequestStatus | undefined => {
   if (!value) return undefined;
   return isSignatureRequestStatus(value) ? value : undefined;
 };
 
-const parseSignatureDocumentType = (value: string | undefined): SignatureDocumentType | undefined => {
+const parseSignatureDocumentType = (
+  value: string | undefined,
+): SignatureDocumentType | undefined => {
   if (!value) return undefined;
   return isSignatureDocumentType(value) ? value : undefined;
 };
@@ -110,20 +118,20 @@ const FINAL_SIGNATURE_STATES: SignatureRequestStatus[] = [
   SignatureRequestStatus.waived,
   SignatureRequestStatus.declined,
   SignatureRequestStatus.voided,
-  SignatureRequestStatus.expired
+  SignatureRequestStatus.expired,
 ];
 
 // Completed statuses (for calculating completion rate)
 const COMPLETED_STATUSES: SignatureRequestStatus[] = [
   SignatureRequestStatus.signed,
   SignatureRequestStatus.signed_paper,
-  SignatureRequestStatus.waived
+  SignatureRequestStatus.waived,
 ];
 
 // Pending statuses (needs guest action)
 const PENDING_STATUSES: SignatureRequestStatus[] = [
   SignatureRequestStatus.sent,
-  SignatureRequestStatus.viewed
+  SignatureRequestStatus.viewed,
 ];
 
 @Injectable()
@@ -134,8 +142,8 @@ export class SignaturesService {
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
     private readonly sms: SmsService,
-    private readonly audit: AuditService
-  ) { }
+    private readonly audit: AuditService,
+  ) {}
 
   private appBaseUrl() {
     return process.env.FRONTEND_URL || "https://app.campreserv.com";
@@ -175,7 +183,7 @@ export class SignaturesService {
       `Document: ${request.documentType}`,
       `Recipient: ${payload?.recipientEmail ?? request.recipientEmail ?? "guest"}`,
       `Status: signed`,
-      `Signed At: ${new Date().toISOString()}`
+      `Signed At: ${new Date().toISOString()}`,
     ].join("\n");
     const base64 = Buffer.from(lines).toString("base64");
     return `data:application/pdf;base64,${base64}`;
@@ -183,14 +191,17 @@ export class SignaturesService {
 
   private async deliverRequest(
     request: SignatureRequest,
-    context?: { reservation?: unknown; guest?: Guest | null; message?: string }
+    context?: { reservation?: unknown; guest?: Guest | null; message?: string },
   ) {
     const link = this.signingUrl(request.token);
     const subject = request.subject || "Signature requested";
     const recipientEmail = request.recipientEmail || context?.guest?.email;
     const recipientPhone = request.recipientPhone || context?.guest?.phone;
 
-    if (request.deliveryChannel === SignatureDeliveryChannel.email || request.deliveryChannel === SignatureDeliveryChannel.email_and_sms) {
+    if (
+      request.deliveryChannel === SignatureDeliveryChannel.email ||
+      request.deliveryChannel === SignatureDeliveryChannel.email_and_sms
+    ) {
       if (!recipientEmail) {
         throw new BadRequestException("Recipient email required for email delivery");
       }
@@ -208,18 +219,21 @@ export class SignaturesService {
         html,
         reservationId: request.reservationId ?? undefined,
         guestId: request.guestId ?? undefined,
-        campgroundId: request.campgroundId
+        campgroundId: request.campgroundId,
       });
     }
 
-    if (request.deliveryChannel === SignatureDeliveryChannel.sms || request.deliveryChannel === SignatureDeliveryChannel.email_and_sms) {
+    if (
+      request.deliveryChannel === SignatureDeliveryChannel.sms ||
+      request.deliveryChannel === SignatureDeliveryChannel.email_and_sms
+    ) {
       if (recipientPhone) {
         const body = `Keepr Host: Signature needed for your stay. ${link}`;
         await this.sms.sendSms({
           to: recipientPhone,
           body,
           reservationId: request.reservationId ?? undefined,
-          campgroundId: request.campgroundId
+          campgroundId: request.campgroundId,
         });
       } else {
         this.logger.warn(`SMS delivery requested but no phone found for request ${request.id}`);
@@ -229,18 +243,29 @@ export class SignaturesService {
 
   async createAndSend(dto: CreateSignatureRequestDto, actorId: string | null) {
     const reservation = dto.reservationId
-      ? await this.prisma.reservation.findUnique({ where: { id: dto.reservationId }, include: { Guest: true } })
+      ? await this.prisma.reservation.findUnique({
+          where: { id: dto.reservationId },
+          include: { Guest: true },
+        })
       : null;
     const campgroundId = dto.campgroundId || reservation?.campgroundId;
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
 
-    const guest = reservation?.Guest ?? (dto.guestId ? await this.prisma.guest.findUnique({ where: { id: dto.guestId } }) : null);
+    const guest =
+      reservation?.Guest ??
+      (dto.guestId ? await this.prisma.guest.findUnique({ where: { id: dto.guestId } }) : null);
     const token = randomBytes(24).toString("hex");
-    const expiresAt = dto.expiresAt ? new Date(dto.expiresAt) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
-    const cadenceDays = dto.metadata?.reminderCadenceDays ? Number(dto.metadata.reminderCadenceDays) : null;
-    const reminderAt = dto.reminderAt ? new Date(dto.reminderAt) : this.computeReminder(expiresAt, 2, cadenceDays);
+    const expiresAt = dto.expiresAt
+      ? new Date(dto.expiresAt)
+      : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+    const cadenceDays = dto.metadata?.reminderCadenceDays
+      ? Number(dto.metadata.reminderCadenceDays)
+      : null;
+    const reminderAt = dto.reminderAt
+      ? new Date(dto.reminderAt)
+      : this.computeReminder(expiresAt, 2, cadenceDays);
     const deliveryChannel = dto.deliveryChannel || SignatureDeliveryChannel.email;
     const documentType = dto.documentType || SignatureDocumentType.other;
     const signatureMethod = dto.signatureMethod || SignatureMethod.digital;
@@ -248,7 +273,9 @@ export class SignaturesService {
     // Determine initial status based on preview/signing availability
     const now = new Date();
     const previewAvailableAt = dto.previewAvailableAt ? new Date(dto.previewAvailableAt) : null;
-    const availableForSigningAt = dto.availableForSigningAt ? new Date(dto.availableForSigningAt) : null;
+    const availableForSigningAt = dto.availableForSigningAt
+      ? new Date(dto.availableForSigningAt)
+      : null;
 
     let initialStatus: SignatureRequestStatus = SignatureRequestStatus.sent;
     let shouldDeliver = true;
@@ -288,8 +315,8 @@ export class SignaturesService {
         renewsContractId: dto.renewsContractId ?? null,
         seasonYear: dto.seasonYear ?? null,
         metadata: toJsonInput(dto.metadata),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     if (shouldDeliver) {
@@ -307,8 +334,8 @@ export class SignaturesService {
         documentType,
         reservationId: created.reservationId,
         guestId: created.guestId,
-        seasonYear: created.seasonYear
-      }
+        seasonYear: created.seasonYear,
+      },
     });
 
     return { request: created, signingUrl: this.signingUrl(token) };
@@ -350,15 +377,15 @@ export class SignaturesService {
         recipientPhone: dto.recipientPhone ?? null,
         sentAt: new Date(),
         metadata: toJsonInput(dto.metadata),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     const signed = await this.handleWebhook({
       token,
       status: "signed",
       recipientEmail: dto.recipientEmail ?? undefined,
-      metadata: dto.metadata ?? undefined
+      metadata: dto.metadata ?? undefined,
     });
 
     return signed.request ?? request;
@@ -379,12 +406,15 @@ export class SignaturesService {
         status: SignatureRequestStatus.sent,
         sentAt: new Date(),
         reminderAt,
-        reminderCount: existing.reminderCount + 1
-      }
+        reminderCount: existing.reminderCount + 1,
+      },
     });
 
     const reservation = updated.reservationId
-      ? await this.prisma.reservation.findUnique({ where: { id: updated.reservationId }, include: { Guest: true } })
+      ? await this.prisma.reservation.findUnique({
+          where: { id: updated.reservationId },
+          include: { Guest: true },
+        })
       : null;
 
     await this.deliverRequest(updated, { reservation, guest: reservation?.Guest });
@@ -396,7 +426,7 @@ export class SignaturesService {
       entity: "SignatureRequest",
       entityId: updated.id,
       before: { reminderCount: existing.reminderCount },
-      after: { reminderCount: updated.reminderCount }
+      after: { reminderCount: updated.reminderCount },
     });
 
     return updated;
@@ -412,8 +442,8 @@ export class SignaturesService {
       data: {
         status: SignatureRequestStatus.voided,
         voidedAt: new Date(),
-        reminderAt: null
-      }
+        reminderAt: null,
+      },
     });
 
     await this.audit.record({
@@ -423,7 +453,7 @@ export class SignaturesService {
       entity: "SignatureRequest",
       entityId: updated.id,
       before: { status: existing.status },
-      after: { status: updated.status }
+      after: { status: updated.status },
     });
 
     return updated;
@@ -432,13 +462,18 @@ export class SignaturesService {
   async handleWebhook(dto: SignatureWebhookDto) {
     const request = await this.prisma.signatureRequest.findUnique({
       where: { token: dto.token },
-      include: { Reservation: true, Guest: true }
+      include: { Reservation: true, Guest: true },
     });
     if (!request) throw new NotFoundException("Signature request not found");
 
     const now = new Date();
     if (FINAL_SIGNATURE_STATES.includes(request.status) && dto.status !== "viewed") {
-      return { request, artifact: await this.prisma.signatureArtifact.findUnique({ where: { requestId: request.id } }) };
+      return {
+        request,
+        artifact: await this.prisma.signatureArtifact.findUnique({
+          where: { requestId: request.id },
+        }),
+      };
     }
 
     let nextStatus = request.status;
@@ -464,7 +499,10 @@ export class SignaturesService {
         nextStatus = SignatureRequestStatus.expired;
         break;
       case "viewed":
-        nextStatus = request.status === SignatureRequestStatus.sent ? SignatureRequestStatus.viewed : request.status;
+        nextStatus =
+          request.status === SignatureRequestStatus.sent
+            ? SignatureRequestStatus.viewed
+            : request.status;
         viewedAt = now;
         break;
       default:
@@ -479,11 +517,13 @@ export class SignaturesService {
         signedAt: signedAt ?? request.signedAt,
         declinedAt: declinedAt ?? request.declinedAt,
         voidedAt: voidedAt ?? request.voidedAt,
-        reminderAt: null
-      }
+        reminderAt: null,
+      },
     });
 
-    let artifact = await this.prisma.signatureArtifact.findUnique({ where: { requestId: request.id } });
+    let artifact = await this.prisma.signatureArtifact.findUnique({
+      where: { requestId: request.id },
+    });
     if (dto.status === "signed") {
       const pdfUrl = dto.pdfUrl || this.buildStubPdf(updatedRequest, dto);
       const checksum = createHash("sha256").update(pdfUrl).digest("hex");
@@ -498,7 +538,7 @@ export class SignaturesService {
           completedAt: dto.completedAt ? new Date(dto.completedAt) : now,
           reservationId: updatedRequest.reservationId,
           guestId: updatedRequest.guestId,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
         create: {
           id: randomUUID(),
@@ -511,8 +551,8 @@ export class SignaturesService {
           checksum,
           metadata: toJsonInput(dto.metadata),
           completedAt: dto.completedAt ? new Date(dto.completedAt) : now,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
     }
 
@@ -525,7 +565,7 @@ export class SignaturesService {
       before: { status: request.status },
       after: { status: updatedRequest.status },
       ip: dto.ipAddress,
-      userAgent: dto.userAgent
+      userAgent: dto.userAgent,
     });
 
     return { request: updatedRequest, artifact };
@@ -534,44 +574,48 @@ export class SignaturesService {
   async listByReservation(reservationId: string) {
     const requests = await this.prisma.signatureRequest.findMany({
       where: { reservationId },
-      include: { SignatureArtifact: true, DocumentTemplate: true }
+      include: { SignatureArtifact: true, DocumentTemplate: true },
     });
     return requests.map(({ SignatureArtifact, DocumentTemplate, ...rest }) => ({
       ...rest,
       artifact: SignatureArtifact ?? null,
-      template: DocumentTemplate ?? null
+      template: DocumentTemplate ?? null,
     }));
   }
 
   async getById(id: string) {
     const request = await this.prisma.signatureRequest.findUnique({
       where: { id },
-      include: { SignatureArtifact: true, DocumentTemplate: true }
+      include: { SignatureArtifact: true, DocumentTemplate: true },
     });
     if (!request) return null;
     const { SignatureArtifact, DocumentTemplate, ...rest } = request;
     return {
       ...rest,
       artifact: SignatureArtifact ?? null,
-      template: DocumentTemplate ?? null
+      template: DocumentTemplate ?? null,
     };
   }
 
   async getByToken(token: string) {
     const request = await this.prisma.signatureRequest.findUnique({
       where: { token },
-      include: { SignatureArtifact: true, DocumentTemplate: true }
+      include: { SignatureArtifact: true, DocumentTemplate: true },
     });
     if (!request) return null;
     const { SignatureArtifact, DocumentTemplate, ...rest } = request;
     return {
       ...rest,
       artifact: SignatureArtifact ?? null,
-      template: DocumentTemplate ?? null
+      template: DocumentTemplate ?? null,
     };
   }
 
-  private scoreTemplate(tpl: DocumentTemplate, siteId?: string | null, siteClassId?: string | null) {
+  private scoreTemplate(
+    tpl: DocumentTemplate,
+    siteId?: string | null,
+    siteClassId?: string | null,
+  ) {
     let score = 0;
     if (tpl.siteId && tpl.siteId === siteId) score += 3;
     if (tpl.siteClassId && tpl.siteClassId === siteClassId) score += 2;
@@ -588,11 +632,14 @@ export class SignaturesService {
 
     const guestRecord =
       getRecordField(reservation, "guest") ?? getRecordField(reservation, "Guest");
-    const guestId = toStringValue(reservation.guestId) ?? (guestRecord ? toStringValue(guestRecord.id) : null);
+    const guestId =
+      toStringValue(reservation.guestId) ?? (guestRecord ? toStringValue(guestRecord.id) : null);
     const guestEmail = guestRecord ? toStringValue(guestRecord.email) : null;
     const guestPhone = guestRecord ? toStringValue(guestRecord.phone) : null;
 
-    const guestFromDb = guestId ? await this.prisma.guest.findUnique({ where: { id: guestId } }) : null;
+    const guestFromDb = guestId
+      ? await this.prisma.guest.findUnique({ where: { id: guestId } })
+      : null;
     if (!guestFromDb?.email && !guestEmail) return null;
 
     const siteId = toStringValue(reservation.siteId);
@@ -610,8 +657,8 @@ export class SignaturesService {
           if (siteClassId) clauses.push({ siteClassId });
           clauses.push({ siteId: null, siteClassId: null });
           return clauses;
-        })()
-      }
+        })(),
+      },
     });
 
     if (!templates.length) return null;
@@ -619,7 +666,7 @@ export class SignaturesService {
     const ranked = templates
       .map((tpl) => ({
         tpl,
-        score: this.scoreTemplate(tpl, siteId, siteClassId ?? null)
+        score: this.scoreTemplate(tpl, siteId, siteClassId ?? null),
       }))
       .sort((a, b) => b.score - a.score);
 
@@ -630,8 +677,8 @@ export class SignaturesService {
       where: {
         reservationId,
         documentType: template.type,
-        status: { notIn: FINAL_SIGNATURE_STATES }
-      }
+        status: { notIn: FINAL_SIGNATURE_STATES },
+      },
     });
     if (existing) return existing;
 
@@ -646,9 +693,9 @@ export class SignaturesService {
           subject: template.name,
           recipientEmail: guestFromDb?.email ?? guestEmail ?? undefined,
           recipientPhone: guestFromDb?.phone ?? guestPhone ?? undefined,
-          message: template.content ? template.content.slice(0, 280) : undefined
+          message: template.content ? template.content.slice(0, 280) : undefined,
         },
-        null
+        null,
       );
     } catch (err) {
       this.logger.warn(`Auto-send signature failed for reservation ${reservationId}: ${err}`);
@@ -671,8 +718,8 @@ export class SignaturesService {
         expiresAt,
         reminderAt,
         notes: dto.notes ?? null,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     await this.audit.record({
@@ -681,7 +728,7 @@ export class SignaturesService {
       action: "coi.uploaded",
       entity: "CoiUpload",
       entityId: upload.id,
-      after: { reservationId: dto.reservationId, guestId: dto.guestId, expiresAt }
+      after: { reservationId: dto.reservationId, guestId: dto.guestId, expiresAt },
     });
 
     return upload;
@@ -694,9 +741,9 @@ export class SignaturesService {
       where: {
         status: { in: [SignatureRequestStatus.sent, SignatureRequestStatus.viewed] },
         reminderAt: { lte: now },
-        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
+        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       },
-      take: 25
+      take: 25,
     });
 
     for (const req of signatureCandidates) {
@@ -704,7 +751,7 @@ export class SignaturesService {
       if (maxCount !== null && req.reminderCount >= maxCount) {
         await this.prisma.signatureRequest.update({
           where: { id: req.id },
-          data: { reminderAt: null }
+          data: { reminderAt: null },
         });
         continue;
       }
@@ -715,8 +762,8 @@ export class SignaturesService {
           where: { id: req.id },
           data: {
             reminderCount: req.reminderCount + 1,
-            reminderAt: this.computeReminder(req.expiresAt, 2, cadenceDays)
-          }
+            reminderAt: this.computeReminder(req.expiresAt, 2, cadenceDays),
+          },
         });
       } catch (err) {
         this.logger.warn(`Failed to send reminder for ${req.id}: ${err}`);
@@ -728,27 +775,35 @@ export class SignaturesService {
       where: {
         status: { in: [CoiStatus.pending, CoiStatus.active] },
         expiresAt: { lte: expiryThreshold },
-        OR: [{ reminderAt: null }, { reminderAt: { lte: now } }]
+        OR: [{ reminderAt: null }, { reminderAt: { lte: now } }],
       },
-      take: 25
+      take: 25,
     });
 
     for (const coi of coiCandidates) {
       try {
         const subject = "Certificate of Insurance expiring soon";
         const email = coi.guestId
-          ? (await this.prisma.guest.findUnique({ where: { id: coi.guestId }, select: { email: true } }))?.email
+          ? (
+              await this.prisma.guest.findUnique({
+                where: { id: coi.guestId },
+                select: { email: true },
+              })
+            )?.email
           : null;
         if (email) {
           await this.email.sendEmail({
             to: email,
             subject,
-            html: `<p>Your certificate of insurance on file will expire on ${coi.expiresAt?.toISOString()}. Please upload a new COI.</p>`
+            html: `<p>Your certificate of insurance on file will expire on ${coi.expiresAt?.toISOString()}. Please upload a new COI.</p>`,
           });
         }
         await this.prisma.coiUpload.update({
           where: { id: coi.id },
-          data: { reminderCount: coi.reminderCount + 1, reminderAt: this.computeReminder(coi.expiresAt, 3) }
+          data: {
+            reminderCount: coi.reminderCount + 1,
+            reminderAt: this.computeReminder(coi.expiresAt, 3),
+          },
         });
       } catch (err) {
         this.logger.warn(`Failed COI reminder for ${coi.id}: ${err}`);
@@ -781,9 +836,9 @@ export class SignaturesService {
         reminderAt: null, // Stop reminders
         metadata: toJsonInput({
           ...metadataRecord,
-          paperSigningNotes: dto.notes ?? null
-        })
-      }
+          paperSigningNotes: dto.notes ?? null,
+        }),
+      },
     });
 
     // Create artifact for paper signing
@@ -793,7 +848,7 @@ export class SignaturesService {
         pdfUrl: dto.paperArtifactUrl || "paper-signed-no-scan",
         completedAt: paperSignedAt,
         metadata: toJsonInput({ paperSigned: true, receivedBy: actorId }),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       create: {
         id: randomUUID(),
@@ -804,8 +859,8 @@ export class SignaturesService {
         pdfUrl: dto.paperArtifactUrl || "paper-signed-no-scan",
         completedAt: paperSignedAt,
         metadata: toJsonInput({ paperSigned: true, receivedBy: actorId }),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     await this.audit.record({
@@ -815,7 +870,7 @@ export class SignaturesService {
       entity: "SignatureRequest",
       entityId: existing.id,
       before: { status: existing.status },
-      after: { status: updated.status, paperSignedAt, paperReceivedBy: actorId }
+      after: { status: updated.status, paperSignedAt, paperReceivedBy: actorId },
     });
 
     return updated;
@@ -847,8 +902,8 @@ export class SignaturesService {
         waiverNotes: dto.notes ?? null,
         waivedBy: actorId,
         waivedAt,
-        reminderAt: null // Stop reminders
-      }
+        reminderAt: null, // Stop reminders
+      },
     });
 
     await this.audit.record({
@@ -858,7 +913,7 @@ export class SignaturesService {
       entity: "SignatureRequest",
       entityId: existing.id,
       before: { status: existing.status },
-      after: { status: updated.status, waiverReason: dto.reason, waivedBy: actorId }
+      after: { status: updated.status, waiverReason: dto.reason, waivedBy: actorId },
     });
 
     return updated;
@@ -866,7 +921,11 @@ export class SignaturesService {
 
   // ==================== CONTRACT STATS ====================
 
-  async getContractStats(campgroundId: string, seasonYear?: number, documentType?: string): Promise<ContractStats> {
+  async getContractStats(
+    campgroundId: string,
+    seasonYear?: number,
+    documentType?: string,
+  ): Promise<ContractStats> {
     const where: Prisma.SignatureRequestWhereInput = { campgroundId };
     if (seasonYear) where.seasonYear = seasonYear;
     const parsedDocumentType = parseSignatureDocumentType(documentType);
@@ -875,7 +934,7 @@ export class SignaturesService {
     const counts = await this.prisma.signatureRequest.groupBy({
       by: ["status"],
       where,
-      _count: { status: true }
+      _count: { status: true },
     });
 
     const statusMap: Record<string, number> = {};
@@ -898,10 +957,10 @@ export class SignaturesService {
       where: {
         ...where,
         status: { in: PENDING_STATUSES },
-        expiresAt: { not: null }
+        expiresAt: { not: null },
       },
       orderBy: { expiresAt: "asc" },
-      select: { expiresAt: true }
+      select: { expiresAt: true },
     });
 
     let daysUntilDeadline: number | undefined;
@@ -924,20 +983,23 @@ export class SignaturesService {
       voided: statusMap[SignatureRequestStatus.voided] || 0,
       completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
       pendingCount,
-      daysUntilDeadline
+      daysUntilDeadline,
     };
   }
 
   // ==================== CONTRACT LISTING ====================
 
-  async listContracts(campgroundId: string, options?: {
-    seasonYear?: number;
-    documentType?: string;
-    status?: string | string[];
-    guestId?: string;
-    limit?: number;
-    offset?: number;
-  }) {
+  async listContracts(
+    campgroundId: string,
+    options?: {
+      seasonYear?: number;
+      documentType?: string;
+      status?: string | string[];
+      guestId?: string;
+      limit?: number;
+      offset?: number;
+    },
+  ) {
     const where: Prisma.SignatureRequestWhereInput = { campgroundId };
     if (options?.seasonYear) where.seasonYear = options.seasonYear;
     const parsedDocumentType = parseSignatureDocumentType(options?.documentType);
@@ -959,25 +1021,37 @@ export class SignaturesService {
       this.prisma.signatureRequest.findMany({
         where,
         include: {
-          Guest: { select: { id: true, primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
+          Guest: {
+            select: {
+              id: true,
+              primaryFirstName: true,
+              primaryLastName: true,
+              email: true,
+              phone: true,
+            },
+          },
           DocumentTemplate: { select: { id: true, name: true, type: true } },
           SignatureArtifact: { select: { id: true, pdfUrl: true, completedAt: true } },
-          Reservation: { select: { id: true, arrivalDate: true, departureDate: true, siteId: true } }
+          Reservation: {
+            select: { id: true, arrivalDate: true, departureDate: true, siteId: true },
+          },
         },
         orderBy: [{ seasonYear: "desc" }, { createdAt: "desc" }],
         take: options?.limit ?? 50,
-        skip: options?.offset ?? 0
+        skip: options?.offset ?? 0,
       }),
-      this.prisma.signatureRequest.count({ where })
+      this.prisma.signatureRequest.count({ where }),
     ]);
 
-    const contracts = contractsRaw.map(({ Guest, DocumentTemplate, SignatureArtifact, Reservation, ...rest }) => ({
-      ...rest,
-      guest: Guest ?? null,
-      template: DocumentTemplate ?? null,
-      artifact: SignatureArtifact ?? null,
-      reservation: Reservation ?? null
-    }));
+    const contracts = contractsRaw.map(
+      ({ Guest, DocumentTemplate, SignatureArtifact, Reservation, ...rest }) => ({
+        ...rest,
+        guest: Guest ?? null,
+        template: DocumentTemplate ?? null,
+        artifact: SignatureArtifact ?? null,
+        reservation: Reservation ?? null,
+      }),
+    );
 
     return { contracts, total };
   }
@@ -985,16 +1059,22 @@ export class SignaturesService {
   // ==================== RENEWAL CAMPAIGNS ====================
 
   async sendRenewalCampaign(dto: SendRenewalCampaignDto, actorId: string) {
-    const template = await this.prisma.documentTemplate.findUnique({ where: { id: dto.templateId } });
+    const template = await this.prisma.documentTemplate.findUnique({
+      where: { id: dto.templateId },
+    });
     if (!template) throw new NotFoundException("Document template not found");
     if (template.campgroundId !== dto.campgroundId) {
       throw new BadRequestException("Template does not belong to this campground");
     }
 
     const results: { guestId: string; requestId?: string; error?: string }[] = [];
-    const expiresAt = dto.expiresAt ? new Date(dto.expiresAt) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const expiresAt = dto.expiresAt
+      ? new Date(dto.expiresAt)
+      : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     const previewAvailableAt = dto.previewAvailableAt ? new Date(dto.previewAvailableAt) : null;
-    const availableForSigningAt = dto.availableForSigningAt ? new Date(dto.availableForSigningAt) : null;
+    const availableForSigningAt = dto.availableForSigningAt
+      ? new Date(dto.availableForSigningAt)
+      : null;
 
     for (const recipient of dto.recipients) {
       try {
@@ -1011,37 +1091,44 @@ export class SignaturesService {
             guestId: recipient.guestId,
             seasonYear: dto.seasonYear,
             documentType: template.type,
-            status: { notIn: [SignatureRequestStatus.voided, SignatureRequestStatus.expired] }
-          }
+            status: { notIn: [SignatureRequestStatus.voided, SignatureRequestStatus.expired] },
+          },
         });
 
         if (existingContract) {
-          results.push({ guestId: recipient.guestId, requestId: existingContract.id, error: "Contract already exists" });
+          results.push({
+            guestId: recipient.guestId,
+            requestId: existingContract.id,
+            error: "Contract already exists",
+          });
           continue;
         }
 
-        const { request } = await this.createAndSend({
-          campgroundId: dto.campgroundId,
-          guestId: recipient.guestId,
-          reservationId: recipient.reservationId,
-          templateId: dto.templateId,
-          documentType: template.type,
-          deliveryChannel: dto.deliveryChannel,
-          subject: dto.subject || `${dto.seasonYear} Seasonal Contract`,
-          message: dto.message,
-          recipientName: `${guest.primaryFirstName} ${guest.primaryLastName}`.trim(),
-          recipientEmail: guest.email ?? undefined,
-          recipientPhone: guest.phone ?? undefined,
-          expiresAt: expiresAt.toISOString(),
-          previewAvailableAt: previewAvailableAt?.toISOString(),
-          availableForSigningAt: availableForSigningAt?.toISOString(),
-          renewsContractId: recipient.previousContractId,
-          seasonYear: dto.seasonYear,
-          metadata: {
-            renewalCampaign: true,
-            previousSiteId: recipient.siteId
-          }
-        }, actorId);
+        const { request } = await this.createAndSend(
+          {
+            campgroundId: dto.campgroundId,
+            guestId: recipient.guestId,
+            reservationId: recipient.reservationId,
+            templateId: dto.templateId,
+            documentType: template.type,
+            deliveryChannel: dto.deliveryChannel,
+            subject: dto.subject || `${dto.seasonYear} Seasonal Contract`,
+            message: dto.message,
+            recipientName: `${guest.primaryFirstName} ${guest.primaryLastName}`.trim(),
+            recipientEmail: guest.email ?? undefined,
+            recipientPhone: guest.phone ?? undefined,
+            expiresAt: expiresAt.toISOString(),
+            previewAvailableAt: previewAvailableAt?.toISOString(),
+            availableForSigningAt: availableForSigningAt?.toISOString(),
+            renewsContractId: recipient.previousContractId,
+            seasonYear: dto.seasonYear,
+            metadata: {
+              renewalCampaign: true,
+              previousSiteId: recipient.siteId,
+            },
+          },
+          actorId,
+        );
 
         results.push({ guestId: recipient.guestId, requestId: request.id });
       } catch (err) {
@@ -1059,16 +1146,16 @@ export class SignaturesService {
       after: {
         seasonYear: dto.seasonYear,
         recipientCount: dto.recipients.length,
-        successCount: results.filter(r => r.requestId && !r.error).length
-      }
+        successCount: results.filter((r) => r.requestId && !r.error).length,
+      },
     });
 
     return {
       seasonYear: dto.seasonYear,
       total: dto.recipients.length,
-      success: results.filter(r => r.requestId && !r.error).length,
-      failed: results.filter(r => r.error).length,
-      results
+      success: results.filter((r) => r.requestId && !r.error).length,
+      failed: results.filter((r) => r.error).length,
+      results,
     };
   }
 
@@ -1077,7 +1164,7 @@ export class SignaturesService {
   async getContractPdfUrl(requestId: string) {
     const request = await this.prisma.signatureRequest.findUnique({
       where: { id: requestId },
-      include: { SignatureArtifact: true, DocumentTemplate: true }
+      include: { SignatureArtifact: true, DocumentTemplate: true },
     });
 
     if (!request) throw new NotFoundException("Signature request not found");
@@ -1088,7 +1175,7 @@ export class SignaturesService {
         url: request.SignatureArtifact.pdfUrl,
         status: request.status,
         signedAt: request.signedAt || request.paperSignedAt,
-        isPreview: false
+        isPreview: false,
       };
     }
 
@@ -1098,7 +1185,7 @@ export class SignaturesService {
       url: null,
       previewContent: request.DocumentTemplate?.content ?? null,
       status: request.status,
-      isPreview: true
+      isPreview: true,
     };
   }
 
@@ -1113,19 +1200,16 @@ export class SignaturesService {
       where: {
         status: SignatureRequestStatus.draft,
         previewAvailableAt: { lte: now },
-        OR: [
-          { availableForSigningAt: null },
-          { availableForSigningAt: { gt: now } }
-        ]
+        OR: [{ availableForSigningAt: null }, { availableForSigningAt: { gt: now } }],
       },
-      take: 50
+      take: 50,
     });
 
     for (const req of toPreview) {
       try {
         await this.prisma.signatureRequest.update({
           where: { id: req.id },
-          data: { status: SignatureRequestStatus.preview }
+          data: { status: SignatureRequestStatus.preview },
         });
 
         // Notify guest that preview is available
@@ -1137,7 +1221,7 @@ export class SignaturesService {
                    <p>Your ${req.seasonYear ? `${req.seasonYear} ` : ""}contract is now available for preview.</p>
                    <p>You can view it at: <a href="${this.signingUrl(req.token)}">${this.signingUrl(req.token)}</a></p>
                    <p>Signing will open soon.</p>`,
-            campgroundId: req.campgroundId
+            campgroundId: req.campgroundId,
           });
         }
 
@@ -1151,9 +1235,9 @@ export class SignaturesService {
     const toSent = await this.prisma.signatureRequest.findMany({
       where: {
         status: { in: [SignatureRequestStatus.draft, SignatureRequestStatus.preview] },
-        availableForSigningAt: { lte: now }
+        availableForSigningAt: { lte: now },
       },
-      take: 50
+      take: 50,
     });
 
     for (const req of toSent) {
@@ -1166,8 +1250,8 @@ export class SignaturesService {
           data: {
             status: SignatureRequestStatus.sent,
             sentAt: now,
-            reminderAt
-          }
+            reminderAt,
+          },
         });
 
         // Send the signing notification

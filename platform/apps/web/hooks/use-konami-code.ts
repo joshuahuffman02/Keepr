@@ -28,11 +28,7 @@ interface UseKonamiCodeOptions {
  * Hook for detecting the Konami code sequence.
  * Triggers a callback when the user enters: Up Up Down Down Left Right Left Right B A
  */
-export function useKonamiCode({
-  onSuccess,
-  timeout = 2000,
-  enabled = true,
-}: UseKonamiCodeOptions) {
+export function useKonamiCode({ onSuccess, timeout = 2000, enabled = true }: UseKonamiCodeOptions) {
   const [position, setPosition] = useState(0);
   const [lastKeyTime, setLastKeyTime] = useState(0);
 
@@ -47,11 +43,7 @@ export function useKonamiCode({
       // Don't track when typing in inputs
       const target = e.target;
       if (!(target instanceof HTMLElement)) return;
-      if (
-        target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
         return;
       }
 

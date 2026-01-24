@@ -22,43 +22,50 @@ export interface EmptyStateMessage {
 export const emptyStateMessages: Record<EmptyStateContext, EmptyStateMessage> = {
   "search-no-results": {
     title: "Even our best scouts came up empty",
-    description: "Try adjusting your search or exploring a different area. Sometimes the best campgrounds are just a filter away.",
+    description:
+      "Try adjusting your search or exploring a different area. Sometimes the best campgrounds are just a filter away.",
     icon: "/images/icons/confused-compass.png",
     actionLabel: "Clear Filters",
   },
   "reviews-none": {
     title: "Be the first to share your campfire stories",
-    description: "Your experience could help fellow campers find their perfect spot. Every adventure deserves to be told.",
+    description:
+      "Your experience could help fellow campers find their perfect spot. Every adventure deserves to be told.",
     icon: "/images/icons/campfire.png",
     actionLabel: "Write a Review",
   },
   "wishlist-empty": {
     title: "Your adventure bucket list is waiting",
-    description: "Save campgrounds you love by tapping the heart icon. Start building your dream camping itinerary.",
+    description:
+      "Save campgrounds you love by tapping the heart icon. Start building your dream camping itinerary.",
     icon: "/images/icons/lonely-tent.png",
     actionLabel: "Explore Campgrounds",
     actionHref: "/",
   },
   "reservations-none": {
     title: "Your camping calendar is wide open",
-    description: "No upcoming trips yet, but the great outdoors is calling. Ready to plan your next adventure?",
+    description:
+      "No upcoming trips yet, but the great outdoors is calling. Ready to plan your next adventure?",
     icon: "/images/icons/bouncing-tent.png",
     actionLabel: "Find a Campground",
     actionHref: "/",
   },
   "messages-none": {
     title: "Your inbox is enjoying the silence",
-    description: "Messages from campgrounds will appear here. Book a stay to start the conversation.",
+    description:
+      "Messages from campgrounds will appear here. Book a stay to start the conversation.",
     icon: "/images/icons/support.png",
   },
   "notifications-none": {
     title: "All caught up!",
-    description: "No new notifications. We'll let you know when something exciting happens with your reservations.",
+    description:
+      "No new notifications. We'll let you know when something exciting happens with your reservations.",
     icon: "/images/icons/instant-confirm.png",
   },
   "photos-none": {
     title: "No photos yet",
-    description: "Photos from your adventures will appear here. The best memories deserve to be captured.",
+    description:
+      "Photos from your adventures will appear here. The best memories deserve to be captured.",
     icon: "/images/icons/hero/sun.png",
   },
   "payments-none": {

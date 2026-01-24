@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * Types for Auth Service Rust service
@@ -81,8 +81,7 @@ export class AuthServiceClient implements OnModuleInit {
   private baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl =
-      this.configService.get('AUTH_SERVICE_URL') || 'http://localhost:8082';
+    this.baseUrl = this.configService.get("AUTH_SERVICE_URL") || "http://localhost:8082";
   }
 
   async onModuleInit() {
@@ -93,8 +92,7 @@ export class AuthServiceClient implements OnModuleInit {
       }
     } catch {
       this.logger.warn(
-        `Auth Service not available at ${this.baseUrl}. ` +
-          `Using fallback implementation.`
+        `Auth Service not available at ${this.baseUrl}. ` + `Using fallback implementation.`,
       );
     }
   }
@@ -106,7 +104,7 @@ export class AuthServiceClient implements OnModuleInit {
     try {
       const response = await fetch(`${this.baseUrl}/health`);
       const data = await response.json();
-      return data.status === 'ok';
+      return data.status === "ok";
     } catch {
       return false;
     }
@@ -121,14 +119,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async hashPassword(password: string, cost?: number): Promise<string> {
     const response = await fetch(`${this.baseUrl}/api/auth/hash-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password, cost }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to hash password');
+      throw new Error(error.message || "Failed to hash password");
     }
 
     const result: HashPasswordResponse = await response.json();
@@ -140,14 +138,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async verifyPassword(password: string, hash: string): Promise<boolean> {
     const response = await fetch(`${this.baseUrl}/api/auth/verify-password`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password, hash }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to verify password');
+      throw new Error(error.message || "Failed to verify password");
     }
 
     const result: VerifyPasswordResponse = await response.json();
@@ -165,11 +163,11 @@ export class AuthServiceClient implements OnModuleInit {
     userId: string,
     email: string,
     ttlSeconds?: number,
-    tokenType?: string
+    tokenType?: string,
   ): Promise<CreateJwtResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/create-jwt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         user_id: userId,
         email,
@@ -180,7 +178,7 @@ export class AuthServiceClient implements OnModuleInit {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to create JWT');
+      throw new Error(error.message || "Failed to create JWT");
     }
 
     return response.json();
@@ -191,14 +189,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async validateJwt(token: string): Promise<ValidateJwtResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/validate-jwt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to validate JWT');
+      throw new Error(error.message || "Failed to validate JWT");
     }
 
     return response.json();
@@ -213,14 +211,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async generateTotp(email: string): Promise<GenerateTotpResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/totp/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to generate TOTP');
+      throw new Error(error.message || "Failed to generate TOTP");
     }
 
     return response.json();
@@ -231,14 +229,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async verifyTotp(code: string, secret: string): Promise<boolean> {
     const response = await fetch(`${this.baseUrl}/api/auth/totp/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, secret }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to verify TOTP');
+      throw new Error(error.message || "Failed to verify TOTP");
     }
 
     const result: VerifyTotpResponse = await response.json();
@@ -248,19 +246,16 @@ export class AuthServiceClient implements OnModuleInit {
   /**
    * Verify a backup code.
    */
-  async verifyBackupCode(
-    code: string,
-    hashedCodes: string[]
-  ): Promise<VerifyBackupCodeResponse> {
+  async verifyBackupCode(code: string, hashedCodes: string[]): Promise<VerifyBackupCodeResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/totp/verify-backup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code, hashed_codes: hashedCodes }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to verify backup code');
+      throw new Error(error.message || "Failed to verify backup code");
     }
 
     return response.json();
@@ -275,14 +270,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async encrypt(plaintext: string, keyVersion?: string): Promise<string> {
     const response = await fetch(`${this.baseUrl}/api/auth/encrypt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ plaintext, key_version: keyVersion }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to encrypt');
+      throw new Error(error.message || "Failed to encrypt");
     }
 
     const result: EncryptResponse = await response.json();
@@ -294,14 +289,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async decrypt(ciphertext: string): Promise<DecryptResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/decrypt`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ciphertext }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to decrypt');
+      throw new Error(error.message || "Failed to decrypt");
     }
 
     return response.json();
@@ -316,14 +311,14 @@ export class AuthServiceClient implements OnModuleInit {
    */
   async checkLockout(email: string): Promise<CheckLockoutResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/lockout/check`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to check lockout');
+      throw new Error(error.message || "Failed to check lockout");
     }
 
     return response.json();
@@ -332,19 +327,16 @@ export class AuthServiceClient implements OnModuleInit {
   /**
    * Record a login attempt (success or failure).
    */
-  async recordAttempt(
-    email: string,
-    success: boolean
-  ): Promise<RecordAttemptResponse> {
+  async recordAttempt(email: string, success: boolean): Promise<RecordAttemptResponse> {
     const response = await fetch(`${this.baseUrl}/api/auth/lockout/record`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, success }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to record attempt');
+      throw new Error(error.message || "Failed to record attempt");
     }
 
     return response.json();

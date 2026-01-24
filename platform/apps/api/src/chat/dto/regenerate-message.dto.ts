@@ -1,5 +1,5 @@
-import { IsString, IsUUID, IsOptional, MaxLength } from 'class-validator';
-import { z } from 'zod';
+import { IsString, IsUUID, IsOptional, MaxLength } from "class-validator";
+import { z } from "zod";
 
 export const regenerateMessageSchema = z.object({
   messageId: z.string().uuid(),

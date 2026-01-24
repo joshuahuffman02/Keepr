@@ -137,9 +137,10 @@ export default function FeatureAdoptionDashboard() {
           : stat.avgDuration;
       }
       if (stat.successRate !== null) {
-        existing.successRate = existing.successRate !== null
-          ? (existing.successRate + stat.successRate) / 2
-          : stat.successRate;
+        existing.successRate =
+          existing.successRate !== null
+            ? (existing.successRate + stat.successRate) / 2
+            : stat.successRate;
       }
       if (stat.lastUsedAt && (!existing.lastUsedAt || stat.lastUsedAt > existing.lastUsedAt)) {
         existing.lastUsedAt = stat.lastUsedAt;
@@ -172,31 +173,39 @@ export default function FeatureAdoptionDashboard() {
   // Summary stats
   const totalUsage = aggregatedList.reduce((sum, s) => sum + s.usageCount, 0);
   const totalUniqueUsers = Math.max(...aggregatedList.map((s) => s.uniqueUsers), 0);
-  const avgSuccessRate = aggregatedList.filter((s) => s.successRate !== null).length > 0
-    ? aggregatedList.reduce((sum, s) => sum + (s.successRate || 0), 0) /
-      aggregatedList.filter((s) => s.successRate !== null).length
-    : null;
-  const topFeature = aggregatedList.length > 0
-    ? aggregatedList.reduce((top, s) => (s.usageCount > (top?.usageCount || 0) ? s : top), aggregatedList[0])
-    : null;
+  const avgSuccessRate =
+    aggregatedList.filter((s) => s.successRate !== null).length > 0
+      ? aggregatedList.reduce((sum, s) => sum + (s.successRate || 0), 0) /
+        aggregatedList.filter((s) => s.successRate !== null).length
+      : null;
+  const topFeature =
+    aggregatedList.length > 0
+      ? aggregatedList.reduce(
+          (top, s) => (s.usageCount > (top?.usageCount || 0) ? s : top),
+          aggregatedList[0],
+        )
+      : null;
 
   // Find underutilized features (less than 10% of max usage)
   const maxUsage = Math.max(...aggregatedList.map((s) => s.usageCount), 1);
   const underutilized = aggregatedList.filter((s) => s.usageCount < maxUsage * 0.1);
 
   // Calculate adoption by category
-  const categoryStats = categories.map((cat) => {
-    const catFeatures = aggregatedList.filter((s) => getFeatureCategory(s.feature) === cat);
-    return {
-      category: cat,
-      totalUsage: catFeatures.reduce((sum, s) => sum + s.usageCount, 0),
-      featureCount: catFeatures.length,
-      avgSuccessRate: catFeatures.filter((s) => s.successRate !== null).length > 0
-        ? catFeatures.reduce((sum, s) => sum + (s.successRate || 0), 0) /
-          catFeatures.filter((s) => s.successRate !== null).length
-        : null,
-    };
-  }).sort((a, b) => b.totalUsage - a.totalUsage);
+  const categoryStats = categories
+    .map((cat) => {
+      const catFeatures = aggregatedList.filter((s) => getFeatureCategory(s.feature) === cat);
+      return {
+        category: cat,
+        totalUsage: catFeatures.reduce((sum, s) => sum + s.usageCount, 0),
+        featureCount: catFeatures.length,
+        avgSuccessRate:
+          catFeatures.filter((s) => s.successRate !== null).length > 0
+            ? catFeatures.reduce((sum, s) => sum + (s.successRate || 0), 0) /
+              catFeatures.filter((s) => s.successRate !== null).length
+            : null,
+      };
+    })
+    .sort((a, b) => b.totalUsage - a.totalUsage);
 
   const toggleSort = (field: SortField) => {
     if (sortField === field) {
@@ -271,9 +280,7 @@ export default function FeatureAdoptionDashboard() {
             <Star className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold truncate">
-              {topFeature?.feature || "-"}
-            </div>
+            <div className="text-2xl font-bold truncate">{topFeature?.feature || "-"}</div>
             <p className="text-xs text-muted-foreground">
               {topFeature ? `${topFeature.usageCount.toLocaleString()} uses` : ""}
             </p>
@@ -297,7 +304,10 @@ export default function FeatureAdoptionDashboard() {
           ) : (
             <div className="space-y-4">
               {categoryStats.map((cat) => {
-                const config = FEATURE_CATEGORIES[cat.category] || { label: cat.category, color: "bg-gray-500" };
+                const config = FEATURE_CATEGORIES[cat.category] || {
+                  label: cat.category,
+                  color: "bg-gray-500",
+                };
                 const percentage = totalUsage > 0 ? (cat.totalUsage / totalUsage) * 100 : 0;
                 return (
                   <div key={cat.category} className="space-y-1">
@@ -373,37 +383,25 @@ export default function FeatureAdoptionDashboard() {
                 <TableRow>
                   <TableHead className="w-[250px]">Feature</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("usageCount")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("usageCount")}>
                     <div className="flex items-center gap-1">
                       Usage
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("uniqueUsers")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("uniqueUsers")}>
                     <div className="flex items-center gap-1">
                       Users
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("avgDuration")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("avgDuration")}>
                     <div className="flex items-center gap-1">
                       Avg Time
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("successRate")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("successRate")}>
                     <div className="flex items-center gap-1">
                       Success
                       <ArrowUpDown className="h-4 w-4" />
@@ -415,7 +413,10 @@ export default function FeatureAdoptionDashboard() {
               <TableBody>
                 {filteredStats.map((stat) => {
                   const category = getFeatureCategory(stat.feature);
-                  const config = FEATURE_CATEGORIES[category] || { label: category, color: "bg-gray-500" };
+                  const config = FEATURE_CATEGORIES[category] || {
+                    label: category,
+                    color: "bg-gray-500",
+                  };
                   const usagePercentOfMax = maxUsage > 0 ? (stat.usageCount / maxUsage) * 100 : 0;
 
                   return (
@@ -454,8 +455,8 @@ export default function FeatureAdoptionDashboard() {
                               stat.successRate >= 0.9
                                 ? "default"
                                 : stat.successRate >= 0.7
-                                ? "secondary"
-                                : "destructive"
+                                  ? "secondary"
+                                  : "destructive"
                             }
                           >
                             {formatPercent(stat.successRate)}
@@ -465,9 +466,9 @@ export default function FeatureAdoptionDashboard() {
                         )}
                       </TableCell>
                       <TableCell>
-                        {stat.usageCount > totalUsage / aggregatedList.length * 1.2 ? (
+                        {stat.usageCount > (totalUsage / aggregatedList.length) * 1.2 ? (
                           <TrendingUp className="h-4 w-4 text-green-500" />
-                        ) : stat.usageCount < totalUsage / aggregatedList.length * 0.8 ? (
+                        ) : stat.usageCount < (totalUsage / aggregatedList.length) * 0.8 ? (
                           <TrendingDown className="h-4 w-4 text-red-500" />
                         ) : (
                           <span className="text-muted-foreground">-</span>

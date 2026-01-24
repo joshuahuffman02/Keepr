@@ -22,11 +22,11 @@ This guide covers how to build a social media presence that drives bookings.
 
 **Priority platforms:**
 
-| Platform | Priority | Best For |
-|----------|----------|----------|
-| Facebook | Essential | Local reach, events, 35+ demographic |
-| Instagram | High | Visual storytelling, discovery |
-| Google Business | Essential | Search visibility, reviews |
+| Platform        | Priority  | Best For                             |
+| --------------- | --------- | ------------------------------------ |
+| Facebook        | Essential | Local reach, events, 35+ demographic |
+| Instagram       | High      | Visual storytelling, discovery       |
+| Google Business | Essential | Search visibility, reviews           |
 
 ---
 
@@ -60,6 +60,7 @@ This guide covers how to build a social media presence that drives bookings.
 ### Writing Captions
 
 **Formula:**
+
 1. Hook (grabs attention)
 2. Body (story or info)
 3. Call to action
@@ -92,4 +93,4 @@ This guide covers how to build a social media presence that drives bookings.
 
 ---
 
-*Keepr integrates with your marketing by providing booking links and guest data. [Build your presence at campreserv.com](https://campreserv.com)*
+_Keepr integrates with your marketing by providing booking links and guest data. [Build your presence at campreserv.com](https://campreserv.com)_

@@ -19,20 +19,43 @@ export class PermissionsController {
   @Get("whoami")
   async whoami(@Req() req: AuthRequest) {
     const user = req.user;
-    const memberships =
-      user.memberships.map((membership) => ({
-        campgroundId: membership.campgroundId,
-        role: membership.role,
-        campground: membership.campground
-          ? { id: membership.campground.id, name: membership.campground.name, slug: membership.campground.slug }
-          : undefined
-      }));
+    const memberships = user.memberships.map((membership) => ({
+      campgroundId: membership.campgroundId,
+      role: membership.role,
+      campground: membership.campground
+        ? {
+            id: membership.campground.id,
+            name: membership.campground.name,
+            slug: membership.campground.slug,
+          }
+        : undefined,
+    }));
 
     const [supportRead, supportAssign, supportAnalytics, operationsAccess] = await Promise.all([
-      this.permissions.checkAccess({ user, campgroundId: null, resource: "support", action: "read" }),
-      this.permissions.checkAccess({ user, campgroundId: null, resource: "support", action: "assign" }),
-      this.permissions.checkAccess({ user, campgroundId: null, resource: "support", action: "analytics" }),
-      this.permissions.checkAccess({ user, campgroundId: null, resource: "operations", action: "write" })
+      this.permissions.checkAccess({
+        user,
+        campgroundId: null,
+        resource: "support",
+        action: "read",
+      }),
+      this.permissions.checkAccess({
+        user,
+        campgroundId: null,
+        resource: "support",
+        action: "assign",
+      }),
+      this.permissions.checkAccess({
+        user,
+        campgroundId: null,
+        resource: "support",
+        action: "analytics",
+      }),
+      this.permissions.checkAccess({
+        user,
+        campgroundId: null,
+        resource: "operations",
+        action: "write",
+      }),
     ]);
 
     return {
@@ -46,21 +69,24 @@ export class PermissionsController {
         platformRegion: user.platformRegion ?? null,
         platformActive: user.platformActive ?? true,
         ownershipRoles: user.ownershipRoles ?? [],
-        memberships
+        memberships,
       },
       allowed: {
         supportRead: supportRead.allowed,
         supportAssign: supportAssign.allowed,
         supportAnalytics: supportAnalytics.allowed,
-        operationsWrite: operationsAccess.allowed
-      }
+        operationsWrite: operationsAccess.allowed,
+      },
     };
   }
 
   @Roles(UserRole.owner, UserRole.manager)
   @RequireScope({ resource: "permissions", action: "read" })
   @Get("policies")
-  async getPolicies(@Query("campgroundId") campgroundId?: string, @Query("region") region?: string) {
+  async getPolicies(
+    @Query("campgroundId") campgroundId?: string,
+    @Query("region") region?: string,
+  ) {
     const rules = await this.permissions.listRules(campgroundId, region);
     return {
       rules,
@@ -81,7 +107,7 @@ export class PermissionsController {
       regions?: string[];
       effect?: PermissionEffect;
       createdById?: string;
-    }
+    },
   ) {
     return this.permissions.upsertRule({
       campgroundId: body.campgroundId ?? null,
@@ -91,7 +117,7 @@ export class PermissionsController {
       fields: body.fields ?? [],
       regions: body.regions ?? [],
       effect: body.effect ?? "allow",
-      createdById: body.createdById ?? null
+      createdById: body.createdById ?? null,
     });
   }
 
@@ -102,13 +128,13 @@ export class PermissionsController {
     @Query("campgroundId") campgroundId: string | undefined,
     @Query("role") role: UserRole,
     @Query("resource") resource: string,
-    @Query("action") action: string
+    @Query("action") action: string,
   ) {
     return this.permissions.deleteRule({
       campgroundId: campgroundId ?? null,
       role,
       resource,
-      action
+      action,
     });
   }
 
@@ -120,21 +146,18 @@ export class PermissionsController {
       action: string;
       campgroundId?: string;
       requestedBy: string;
-    }
+    },
   ) {
     return this.permissions.requestApproval({
       action: body.action,
       campgroundId: body.campgroundId ?? null,
-      requestedBy: body.requestedBy
+      requestedBy: body.requestedBy,
     });
   }
 
   @Roles(UserRole.owner, UserRole.manager)
   @Post("approvals/:id/decision")
-  async decide(
-    @Param("id") id: string,
-    @Body() body: { approve: boolean; actorId: string }
-  ) {
+  async decide(@Param("id") id: string, @Body() body: { approve: boolean; actorId: string }) {
     return this.permissions.decideApproval(id, body.actorId, body.approve);
   }
 

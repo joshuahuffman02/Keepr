@@ -2,11 +2,15 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  ConflictException
+  ConflictException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "../email/email.service";
-import { EarlyAccessTierType, EARLY_ACCESS_TIERS, EarlyAccessSignupDto } from "./dto/enroll-early-access.dto";
+import {
+  EarlyAccessTierType,
+  EARLY_ACCESS_TIERS,
+  EarlyAccessSignupDto,
+} from "./dto/enroll-early-access.dto";
 import { randomBytes, randomUUID } from "crypto";
 
 // Local interface for EarlyAccessSpot (avoids Prisma client dependency)
@@ -42,22 +46,22 @@ const TIER_CONFIG: Record<
     bookingFeeCents: 75, // $0.75
     monthlyFeeCents: 0,
     monthlyDurationMonths: null, // Forever free
-    postPromoMonthlyFeeCents: 0
+    postPromoMonthlyFeeCents: 0,
   },
   pioneer: {
     totalSpots: 15,
     bookingFeeCents: 100, // $1.00
     monthlyFeeCents: 0,
     monthlyDurationMonths: 12, // 12 months free
-    postPromoMonthlyFeeCents: 2900 // $29 after
+    postPromoMonthlyFeeCents: 2900, // $29 after
   },
   trailblazer: {
     totalSpots: 25,
     bookingFeeCents: 125, // $1.25
     monthlyFeeCents: 1450, // $14.50 for 6 months
     monthlyDurationMonths: 6,
-    postPromoMonthlyFeeCents: 2900 // $29 after
-  }
+    postPromoMonthlyFeeCents: 2900, // $29 after
+  },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -77,12 +81,12 @@ const parseOnboardingSessionData = (value: unknown): OnboardingSessionData => {
     userId: getString(value.userId),
     tier: getString(value.tier),
     referralCode: getString(value.referralCode),
-    firstName: getString(value.firstName)
+    firstName: getString(value.firstName),
   };
 };
 
 const isEarlyAccessTier = (value: string): value is EarlyAccessTierType =>
-  EARLY_ACCESS_TIERS.some(tier => tier === value);
+  EARLY_ACCESS_TIERS.some((tier) => tier === value);
 
 const normalizeTier = (value: string | null | undefined): EarlyAccessTierType => {
   if (value && isEarlyAccessTier(value)) {
@@ -95,7 +99,7 @@ const normalizeTier = (value: string | null | undefined): EarlyAccessTierType =>
 export class EarlyAccessService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -113,9 +117,9 @@ export class EarlyAccessService {
           tier,
           totalSpots: config.totalSpots,
           remainingSpots: config.totalSpots,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
-        update: {} // Don't update if exists
+        update: {}, // Don't update if exists
       });
     }
   }
@@ -125,7 +129,7 @@ export class EarlyAccessService {
    */
   async getAvailability() {
     const spots = await this.prisma.earlyAccessSpot.findMany({
-      orderBy: { tier: "asc" }
+      orderBy: { tier: "asc" },
     });
 
     return spots.map((spot: EarlyAccessSpotRecord) => {
@@ -139,8 +143,8 @@ export class EarlyAccessService {
           bookingFeeCents: config.bookingFeeCents,
           monthlyFeeCents: config.monthlyFeeCents,
           monthlyDurationMonths: config.monthlyDurationMonths,
-          postPromoMonthlyFeeCents: config.postPromoMonthlyFeeCents
-        }
+          postPromoMonthlyFeeCents: config.postPromoMonthlyFeeCents,
+        },
       };
     });
   }
@@ -150,7 +154,7 @@ export class EarlyAccessService {
    */
   async getTierAvailability(tier: EarlyAccessTierType) {
     const spot = await this.prisma.earlyAccessSpot.findUnique({
-      where: { tier }
+      where: { tier },
     });
 
     if (!spot) {
@@ -167,8 +171,8 @@ export class EarlyAccessService {
         bookingFeeCents: config.bookingFeeCents,
         monthlyFeeCents: config.monthlyFeeCents,
         monthlyDurationMonths: config.monthlyDurationMonths,
-        postPromoMonthlyFeeCents: config.postPromoMonthlyFeeCents
-      }
+        postPromoMonthlyFeeCents: config.postPromoMonthlyFeeCents,
+      },
     };
   }
 
@@ -181,7 +185,7 @@ export class EarlyAccessService {
 
     // Check if already enrolled
     const existing = await this.prisma.earlyAccessEnrollment.findUnique({
-      where: { organizationId }
+      where: { organizationId },
     });
 
     if (existing) {
@@ -191,19 +195,21 @@ export class EarlyAccessService {
     // Atomically decrement spot and create enrollment
     const result = await this.prisma.$transaction(async (tx) => {
       // Try to decrement the spot count
-      const spot = await tx.earlyAccessSpot.update({
-        where: {
-          tier,
-          remainingSpots: { gt: 0 } // Only if spots available
-        },
-        data: {
-          remainingSpots: { decrement: 1 }
-        }
-      }).catch(() => null);
+      const spot = await tx.earlyAccessSpot
+        .update({
+          where: {
+            tier,
+            remainingSpots: { gt: 0 }, // Only if spots available
+          },
+          data: {
+            remainingSpots: { decrement: 1 },
+          },
+        })
+        .catch(() => null);
 
       if (!spot) {
         throw new BadRequestException(
-          `No spots remaining in ${tier} tier. Please select a different tier.`
+          `No spots remaining in ${tier} tier. Please select a different tier.`,
         );
       }
 
@@ -211,9 +217,7 @@ export class EarlyAccessService {
       let monthlyFeeEndsAt: Date | null = null;
       if (config.monthlyDurationMonths !== null) {
         monthlyFeeEndsAt = new Date();
-        monthlyFeeEndsAt.setMonth(
-          monthlyFeeEndsAt.getMonth() + config.monthlyDurationMonths
-        );
+        monthlyFeeEndsAt.setMonth(monthlyFeeEndsAt.getMonth() + config.monthlyDurationMonths);
       }
 
       // Create enrollment
@@ -224,8 +228,8 @@ export class EarlyAccessService {
           tier,
           lockedBookingFee: config.bookingFeeCents,
           monthlyFeeEndsAt,
-          lockedMonthlyFee: config.postPromoMonthlyFeeCents || null
-        }
+          lockedMonthlyFee: config.postPromoMonthlyFeeCents || null,
+        },
       });
 
       return enrollment;
@@ -239,7 +243,7 @@ export class EarlyAccessService {
    */
   async getEnrollment(organizationId: string) {
     const enrollment = await this.prisma.earlyAccessEnrollment.findUnique({
-      where: { organizationId }
+      where: { organizationId },
     });
 
     if (!enrollment) {
@@ -251,9 +255,7 @@ export class EarlyAccessService {
     return {
       ...enrollment,
       tierConfig: config,
-      isInPromoperiod:
-        !enrollment.monthlyFeeEndsAt ||
-        enrollment.monthlyFeeEndsAt > new Date()
+      isInPromoperiod: !enrollment.monthlyFeeEndsAt || enrollment.monthlyFeeEndsAt > new Date(),
     };
   }
 
@@ -279,8 +281,8 @@ export class EarlyAccessService {
     return this.prisma.earlyAccessSpot.update({
       where: { tier },
       data: {
-        remainingSpots: { increment: adjustment }
-      }
+        remainingSpots: { increment: adjustment },
+      },
     });
   }
 
@@ -293,7 +295,7 @@ export class EarlyAccessService {
 
     // Get user info
     const user = await this.prisma.user.findUnique({
-      where: { id: dto.userId }
+      where: { id: dto.userId },
     });
 
     if (!user) {
@@ -307,12 +309,12 @@ export class EarlyAccessService {
           Campground: {
             some: {
               CampgroundMembership: {
-                some: { userId: dto.userId }
-              }
-            }
-          }
-        }
-      }
+                some: { userId: dto.userId },
+              },
+            },
+          },
+        },
+      },
     });
 
     if (existingEnrollment) {
@@ -327,19 +329,21 @@ export class EarlyAccessService {
     // Atomically: reserve spot, create org, create enrollment, create onboarding invite
     const result = await this.prisma.$transaction(async (tx) => {
       // Try to decrement the spot count
-      const spot = await tx.earlyAccessSpot.update({
-        where: {
-          tier: dto.tier,
-          remainingSpots: { gt: 0 }
-        },
-        data: {
-          remainingSpots: { decrement: 1 }
-        }
-      }).catch(() => null);
+      const spot = await tx.earlyAccessSpot
+        .update({
+          where: {
+            tier: dto.tier,
+            remainingSpots: { gt: 0 },
+          },
+          data: {
+            remainingSpots: { decrement: 1 },
+          },
+        })
+        .catch(() => null);
 
       if (!spot) {
         throw new BadRequestException(
-          `No spots remaining in ${dto.tier} tier. Please select a different tier.`
+          `No spots remaining in ${dto.tier} tier. Please select a different tier.`,
         );
       }
 
@@ -347,17 +351,15 @@ export class EarlyAccessService {
       const organization = await tx.organization.create({
         data: {
           id: randomUUID(),
-          name: dto.campgroundName
-        }
+          name: dto.campgroundName,
+        },
       });
 
       // Calculate when monthly fee promo ends
       let monthlyFeeEndsAt: Date | null = null;
       if (config.monthlyDurationMonths !== null) {
         monthlyFeeEndsAt = new Date();
-        monthlyFeeEndsAt.setMonth(
-          monthlyFeeEndsAt.getMonth() + config.monthlyDurationMonths
-        );
+        monthlyFeeEndsAt.setMonth(monthlyFeeEndsAt.getMonth() + config.monthlyDurationMonths);
       }
 
       // Create early access enrollment
@@ -368,8 +370,8 @@ export class EarlyAccessService {
           tier: dto.tier,
           lockedBookingFee: config.bookingFeeCents,
           monthlyFeeEndsAt,
-          lockedMonthlyFee: config.postPromoMonthlyFeeCents || null
-        }
+          lockedMonthlyFee: config.postPromoMonthlyFeeCents || null,
+        },
       });
 
       // Create onboarding invite
@@ -379,8 +381,8 @@ export class EarlyAccessService {
           token: onboardingToken,
           email: user.email,
           organizationId: organization.id,
-          expiresAt
-        }
+          expiresAt,
+        },
       });
 
       // Create onboarding session
@@ -396,10 +398,10 @@ export class EarlyAccessService {
             phone: dto.phone,
             userId: dto.userId,
             tier: dto.tier,
-            referralCode: dto.referralCode
+            referralCode: dto.referralCode,
           },
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
 
       return { organization, enrollment, invite };
@@ -418,15 +420,15 @@ export class EarlyAccessService {
         tier: dto.tier,
         tierName: this.getTierDisplayName(dto.tier),
         onboardingUrl,
-        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
-      })
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`,
+      }),
     });
 
     return {
       success: true,
       organizationId: result.organization.id,
       enrollmentId: result.enrollment.id,
-      onboardingUrl
+      onboardingUrl,
     };
   }
 
@@ -434,7 +436,7 @@ export class EarlyAccessService {
     const names: Record<EarlyAccessTierType, string> = {
       founders_circle: "Founder's Circle",
       pioneer: "Pioneer",
-      trailblazer: "Trailblazer"
+      trailblazer: "Trailblazer",
     };
     return names[tier];
   }
@@ -512,30 +514,30 @@ export class EarlyAccessService {
     const invite = await this.prisma.onboardingInvite.findFirst({
       where: { email: email.toLowerCase().trim() },
       include: {
-        OnboardingSession: true
+        OnboardingSession: true,
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     if (!invite) {
       // Don't reveal if email exists or not for security
       return {
         success: true,
-        message: "If an account exists with this email, we've sent a new onboarding link."
+        message: "If an account exists with this email, we've sent a new onboarding link.",
       };
     }
 
     if (invite.OnboardingSession?.status === "completed") {
       return {
         success: false,
-        message: "Your account setup is already complete. Please sign in."
+        message: "Your account setup is already complete. Please sign in.",
       };
     }
 
     // Get enrollment info
     const enrollment = invite.organizationId
       ? await this.prisma.earlyAccessEnrollment.findFirst({
-          where: { organizationId: invite.organizationId }
+          where: { organizationId: invite.organizationId },
         })
       : null;
 
@@ -551,8 +553,8 @@ export class EarlyAccessService {
       where: { id: invite.id },
       data: {
         expiresAt: newExpiresAt,
-        lastSentAt: new Date()
-      }
+        lastSentAt: new Date(),
+      },
     });
 
     // Send the email
@@ -568,13 +570,13 @@ export class EarlyAccessService {
         tier,
         tierName: this.getTierDisplayName(tier),
         onboardingUrl,
-        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
-      })
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`,
+      }),
     });
 
     return {
       success: true,
-      message: "If an account exists with this email, we've sent a new onboarding link."
+      message: "If an account exists with this email, we've sent a new onboarding link.",
     };
   }
 
@@ -588,14 +590,14 @@ export class EarlyAccessService {
         OnboardingSession: {
           data: {
             path: ["userId"],
-            equals: userId
-          }
-        }
+            equals: userId,
+          },
+        },
       },
       include: {
-        OnboardingSession: true
+        OnboardingSession: true,
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     if (!invite) {
@@ -608,7 +610,7 @@ export class EarlyAccessService {
 
     // Get user info
     const user = await this.prisma.user.findUnique({
-      where: { id: userId }
+      where: { id: userId },
     });
 
     if (!user) {
@@ -618,7 +620,7 @@ export class EarlyAccessService {
     // Get enrollment info
     const enrollment = invite.organizationId
       ? await this.prisma.earlyAccessEnrollment.findFirst({
-          where: { organizationId: invite.organizationId }
+          where: { organizationId: invite.organizationId },
         })
       : null;
 
@@ -634,8 +636,8 @@ export class EarlyAccessService {
       where: { id: invite.id },
       data: {
         expiresAt: newExpiresAt,
-        lastSentAt: new Date()
-      }
+        lastSentAt: new Date(),
+      },
     });
 
     // Send the email
@@ -651,14 +653,14 @@ export class EarlyAccessService {
         tier,
         tierName: this.getTierDisplayName(tier),
         onboardingUrl,
-        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
-      })
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`,
+      }),
     });
 
     return {
       success: true,
       email: user.email,
-      onboardingUrl
+      onboardingUrl,
     };
   }
 
@@ -668,20 +670,20 @@ export class EarlyAccessService {
   async getPendingOnboardings() {
     const pending = await this.prisma.onboardingSession.findMany({
       where: {
-        status: { in: ["pending", "in_progress"] }
+        status: { in: ["pending", "in_progress"] },
       },
       include: {
         OnboardingInvite: true,
         Organization: {
           include: {
-            EarlyAccessEnrollment: true
-          }
-        }
+            EarlyAccessEnrollment: true,
+          },
+        },
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
-    return pending.map(session => {
+    return pending.map((session) => {
       const data = parseOnboardingSessionData(session.data);
       return {
         id: session.id,
@@ -698,7 +700,7 @@ export class EarlyAccessService {
         inviteExpiresAt: session.OnboardingInvite.expiresAt,
         inviteExpired: session.OnboardingInvite.expiresAt < new Date(),
         lastEmailSent: session.OnboardingInvite.lastSentAt,
-        organizationId: session.organizationId
+        organizationId: session.organizationId,
       };
     });
   }
@@ -711,35 +713,34 @@ export class EarlyAccessService {
       this.prisma.earlyAccessSpot.findMany(),
       this.prisma.earlyAccessEnrollment.groupBy({
         by: ["tier"],
-        _count: true
+        _count: true,
       }),
       this.prisma.onboardingSession.count({
-        where: { status: { in: ["pending", "in_progress"] } }
+        where: { status: { in: ["pending", "in_progress"] } },
       }),
       this.prisma.onboardingSession.count({
-        where: { status: "completed" }
-      })
+        where: { status: "completed" },
+      }),
     ]);
 
-    const enrollmentsByTier = Object.fromEntries(
-      enrollments.map(e => [e.tier, e._count])
-    );
+    const enrollmentsByTier = Object.fromEntries(enrollments.map((e) => [e.tier, e._count]));
 
     return {
-      tiers: spots.map(spot => ({
+      tiers: spots.map((spot) => ({
         tier: spot.tier,
         totalSpots: spot.totalSpots,
         remainingSpots: spot.remainingSpots,
         claimed: spot.totalSpots - spot.remainingSpots,
-        enrolled: enrollmentsByTier[spot.tier] || 0
+        enrolled: enrollmentsByTier[spot.tier] || 0,
       })),
       onboarding: {
         pending: pendingSessions,
         completed: completedSessions,
-        conversionRate: pendingSessions + completedSessions > 0
-          ? Math.round((completedSessions / (pendingSessions + completedSessions)) * 100)
-          : 0
-      }
+        conversionRate:
+          pendingSessions + completedSessions > 0
+            ? Math.round((completedSessions / (pendingSessions + completedSessions)) * 100)
+            : 0,
+      },
     };
   }
 
@@ -753,10 +754,10 @@ export class EarlyAccessService {
         OnboardingInvite: true,
         Organization: {
           include: {
-            EarlyAccessEnrollment: true
-          }
-        }
-      }
+            EarlyAccessEnrollment: true,
+          },
+        },
+      },
     });
 
     if (!session) {
@@ -768,9 +769,7 @@ export class EarlyAccessService {
     }
 
     const data = parseOnboardingSessionData(session.data);
-    const tier = normalizeTier(
-      session.Organization?.EarlyAccessEnrollment?.tier ?? data?.tier
-    );
+    const tier = normalizeTier(session.Organization?.EarlyAccessEnrollment?.tier ?? data?.tier);
     const config = TIER_CONFIG[tier];
 
     // Extend expiration
@@ -781,8 +780,8 @@ export class EarlyAccessService {
       where: { id: session.inviteId },
       data: {
         expiresAt: newExpiresAt,
-        lastSentAt: new Date()
-      }
+        lastSentAt: new Date(),
+      },
     });
 
     // Send the email
@@ -798,14 +797,14 @@ export class EarlyAccessService {
         tier,
         tierName: this.getTierDisplayName(tier),
         onboardingUrl,
-        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`
-      })
+        bookingFee: `$${(config.bookingFeeCents / 100).toFixed(2)}`,
+      }),
     });
 
     return {
       success: true,
       email: session.OnboardingInvite.email,
-      sessionId
+      sessionId,
     };
   }
 }

@@ -9,7 +9,7 @@ import {
   Tent,
   CheckCircle2,
   Car,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -84,9 +84,7 @@ export function EquipmentTypePicker({
         .filter((opt) => opt.id !== "any")
         .map((opt) => opt.id);
 
-      const allSelected = allTypesExceptAny.every((typeId) =>
-        newSelected.includes(typeId)
-      );
+      const allSelected = allTypesExceptAny.every((typeId) => newSelected.includes(typeId));
 
       // If all are selected, also add "any"
       if (allSelected) {
@@ -119,10 +117,8 @@ export function EquipmentTypePicker({
               "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
               !disabled && "hover:border-emerald-500/50",
               disabled && "opacity-50 cursor-not-allowed",
-              isSelected
-                ? "border-emerald-500 bg-emerald-500/10"
-                : "border-border bg-muted/50",
-              isAnyOption && "sm:col-span-3 lg:col-span-1"
+              isSelected ? "border-emerald-500 bg-emerald-500/10" : "border-border bg-muted/50",
+              isAnyOption && "sm:col-span-3 lg:col-span-1",
             )}
           >
             {/* Icon */}
@@ -131,7 +127,7 @@ export function EquipmentTypePicker({
                 "p-2 rounded-lg transition-colors",
                 isSelected
                   ? "bg-emerald-500/20 text-emerald-400"
-                  : "bg-muted text-muted-foreground"
+                  : "bg-muted text-muted-foreground",
               )}
             >
               <Icon className="w-6 h-6" />
@@ -141,7 +137,7 @@ export function EquipmentTypePicker({
             <span
               className={cn(
                 "text-sm font-medium text-center transition-colors",
-                isSelected ? "text-emerald-400" : "text-muted-foreground"
+                isSelected ? "text-emerald-400" : "text-muted-foreground",
               )}
             >
               {equipment.label}

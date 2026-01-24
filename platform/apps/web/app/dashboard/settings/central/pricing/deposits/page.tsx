@@ -24,8 +24,8 @@ export default function DepositsPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">Deposit Policies</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Set deposit amounts, due dates, and automatic payment collection rules.
-                Configure different policies for different booking types.
+                Set deposit amounts, due dates, and automatic payment collection rules. Configure
+                different policies for different booking types.
               </p>
               <div className="mt-4">
                 <Button asChild>

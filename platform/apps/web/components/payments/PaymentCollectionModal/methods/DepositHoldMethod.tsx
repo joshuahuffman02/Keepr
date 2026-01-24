@@ -15,9 +15,7 @@ interface DepositHoldMethodProps {
  * Note: Auth hold API is not yet implemented.
  * This component shows a placeholder until the API is ready.
  */
-export default function DepositHoldMethod({
-  onCancel,
-}: DepositHoldMethodProps) {
+export default function DepositHoldMethod({ onCancel }: DepositHoldMethodProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -40,9 +38,9 @@ export default function DepositHoldMethod({
           <div>
             <p className="font-medium text-amber-800">Coming Soon</p>
             <p className="text-sm text-amber-700 mt-1">
-              Authorization holds for security deposits are not yet available.
-              This feature will allow you to place a temporary hold on a guest's
-              card that can be captured or released later.
+              Authorization holds for security deposits are not yet available. This feature will
+              allow you to place a temporary hold on a guest's card that can be captured or released
+              later.
             </p>
           </div>
         </div>
@@ -57,8 +55,8 @@ export default function DepositHoldMethod({
           <li>Pet deposits or equipment rentals</li>
         </ul>
         <p className="mt-3">
-          The hold amount is reserved but not charged until you capture it.
-          Uncaptured holds automatically release after 7 days.
+          The hold amount is reserved but not charged until you capture it. Uncaptured holds
+          automatically release after 7 days.
         </p>
       </div>
 

@@ -7,9 +7,23 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiClient } from "@/lib/api-client";
-import { Smartphone, Monitor, Tablet, TrendingUp, Users, ShoppingCart, Percent } from "lucide-react";
+import {
+  Smartphone,
+  Monitor,
+  Tablet,
+  TrendingUp,
+  Users,
+  ShoppingCart,
+  Percent,
+} from "lucide-react";
 import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
 
 type DeviceData = {
@@ -64,21 +78,29 @@ export default function DeviceAnalyticsPage() {
 
   const reportNavLinks = [
     { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
-    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
-    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+    {
+      label: "Portfolio",
+      href: "/reports/portfolio",
+      active: pathname.startsWith("/reports/portfolio"),
+    },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") },
   ];
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) setCampgroundId(stored);
   }, []);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["device-analytics", campgroundId, days],
     queryFn: async () => {
-      const res = await fetch(`/api/analytics/reports/devices?campgroundId=${campgroundId}&days=${days}`, {
-        headers: { "Content-Type": "application/json" }
-      });
+      const res = await fetch(
+        `/api/analytics/reports/devices?campgroundId=${campgroundId}&days=${days}`,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
       if (!res.ok) throw new Error("Failed to fetch device analytics");
       const payload = await res.json();
       if (!isDeviceReport(payload)) {
@@ -86,7 +108,7 @@ export default function DeviceAnalyticsPage() {
       }
       return payload;
     },
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const getDeviceIcon = (type: string) => {
@@ -117,16 +139,14 @@ export default function DeviceAnalyticsPage() {
 
   const totalSessions = data?.devices?.reduce((sum, d) => sum + d.sessions, 0) || 0;
   const totalBookings = data?.devices?.reduce((sum, d) => sum + d.bookings, 0) || 0;
-  const overallConversion = totalSessions > 0 ? ((totalBookings / totalSessions) * 100).toFixed(1) : "0";
+  const overallConversion =
+    totalSessions > 0 ? ((totalBookings / totalSessions) * 100).toFixed(1) : "0";
 
   return (
     <DashboardShell>
       <div className="space-y-6">
         <Breadcrumbs
-          items={[
-            { label: "Reports", href: "/reports" },
-            { label: "Device Analytics" }
-          ]}
+          items={[{ label: "Reports", href: "/reports" }, { label: "Device Analytics" }]}
         />
 
         <div className="flex items-center justify-between">
@@ -179,7 +199,9 @@ export default function DeviceAnalyticsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Sessions</p>
-                      <p className="text-2xl font-bold text-foreground">{totalSessions.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {totalSessions.toLocaleString()}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -192,7 +214,9 @@ export default function DeviceAnalyticsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Bookings</p>
-                      <p className="text-2xl font-bold text-status-success">{totalBookings.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-status-success">
+                        {totalBookings.toLocaleString()}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -218,7 +242,9 @@ export default function DeviceAnalyticsPage() {
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Device Types</p>
-                      <p className="text-2xl font-bold text-primary">{data?.devices?.length || 0}</p>
+                      <p className="text-2xl font-bold text-primary">
+                        {data?.devices?.length || 0}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -235,7 +261,10 @@ export default function DeviceAnalyticsPage() {
                 {data?.devices && data.devices.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {data.devices.map((device) => {
-                      const percentage = totalSessions > 0 ? ((device.sessions / totalSessions) * 100).toFixed(1) : "0";
+                      const percentage =
+                        totalSessions > 0
+                          ? ((device.sessions / totalSessions) * 100).toFixed(1)
+                          : "0";
                       return (
                         <div
                           key={device.deviceType}
@@ -251,11 +280,15 @@ export default function DeviceAnalyticsPage() {
                           <div className="space-y-2 text-sm">
                             <div className="flex justify-between">
                               <span className="opacity-70">Sessions</span>
-                              <span className="font-semibold">{device.sessions.toLocaleString()}</span>
+                              <span className="font-semibold">
+                                {device.sessions.toLocaleString()}
+                              </span>
                             </div>
                             <div className="flex justify-between">
                               <span className="opacity-70">Bookings</span>
-                              <span className="font-semibold">{device.bookings.toLocaleString()}</span>
+                              <span className="font-semibold">
+                                {device.bookings.toLocaleString()}
+                              </span>
                             </div>
                             <div className="flex justify-between pt-2 border-t border-current/20">
                               <span className="opacity-70">Conversion</span>
@@ -267,7 +300,9 @@ export default function DeviceAnalyticsPage() {
                     })}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">No device data available for this period.</p>
+                  <p className="text-center text-muted-foreground py-8">
+                    No device data available for this period.
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -283,9 +318,14 @@ export default function DeviceAnalyticsPage() {
                   {data?.devices && data.devices.length > 0 && (
                     <>
                       {(() => {
-                        const mobile = data.devices.find(d => d.deviceType?.toLowerCase() === "mobile");
-                        const desktop = data.devices.find(d => d.deviceType?.toLowerCase() === "desktop");
-                        const mobileShare = mobile && totalSessions > 0 ? (mobile.sessions / totalSessions) * 100 : 0;
+                        const mobile = data.devices.find(
+                          (d) => d.deviceType?.toLowerCase() === "mobile",
+                        );
+                        const desktop = data.devices.find(
+                          (d) => d.deviceType?.toLowerCase() === "desktop",
+                        );
+                        const mobileShare =
+                          mobile && totalSessions > 0 ? (mobile.sessions / totalSessions) * 100 : 0;
 
                         const insights = [];
 
@@ -293,15 +333,19 @@ export default function DeviceAnalyticsPage() {
                           insights.push({
                             type: "info",
                             title: "Mobile-First Audience",
-                            description: `${mobileShare.toFixed(0)}% of your visitors are on mobile. Ensure your booking flow is optimized for small screens.`
+                            description: `${mobileShare.toFixed(0)}% of your visitors are on mobile. Ensure your booking flow is optimized for small screens.`,
                           });
                         }
 
-                        if (mobile && desktop && mobile.conversionRate < desktop.conversionRate * 0.7) {
+                        if (
+                          mobile &&
+                          desktop &&
+                          mobile.conversionRate < desktop.conversionRate * 0.7
+                        ) {
                           insights.push({
                             type: "warning",
                             title: "Mobile Conversion Gap",
-                            description: `Mobile converts at ${mobile.conversionRate}% vs desktop at ${desktop.conversionRate}%. Consider simplifying the mobile booking experience.`
+                            description: `Mobile converts at ${mobile.conversionRate}% vs desktop at ${desktop.conversionRate}%. Consider simplifying the mobile booking experience.`,
                           });
                         }
 
@@ -309,7 +353,7 @@ export default function DeviceAnalyticsPage() {
                           insights.push({
                             type: "success",
                             title: "Strong Desktop Performance",
-                            description: `Desktop conversion rate of ${desktop.conversionRate}% is excellent. Desktop users are highly engaged.`
+                            description: `Desktop conversion rate of ${desktop.conversionRate}% is excellent. Desktop users are highly engaged.`,
                           });
                         }
 
@@ -317,7 +361,8 @@ export default function DeviceAnalyticsPage() {
                           insights.push({
                             type: "info",
                             title: "Balanced Device Usage",
-                            description: "Your visitors are well-distributed across devices with consistent conversion rates."
+                            description:
+                              "Your visitors are well-distributed across devices with consistent conversion rates.",
                           });
                         }
 
@@ -332,22 +377,26 @@ export default function DeviceAnalyticsPage() {
                                   : "bg-primary/10 border border-primary/20"
                             }`}
                           >
-                            <h4 className={`font-semibold ${
-                              insight.type === "warning"
-                                ? "text-status-warning"
-                                : insight.type === "success"
-                                  ? "text-status-success"
-                                  : "text-primary"
-                            }`}>
+                            <h4
+                              className={`font-semibold ${
+                                insight.type === "warning"
+                                  ? "text-status-warning"
+                                  : insight.type === "success"
+                                    ? "text-status-success"
+                                    : "text-primary"
+                              }`}
+                            >
                               {insight.title}
                             </h4>
-                            <p className={`text-sm mt-1 ${
-                              insight.type === "warning"
-                                ? "text-status-warning"
-                                : insight.type === "success"
-                                  ? "text-status-success"
-                                  : "text-primary"
-                            }`}>
+                            <p
+                              className={`text-sm mt-1 ${
+                                insight.type === "warning"
+                                  ? "text-status-warning"
+                                  : insight.type === "success"
+                                    ? "text-status-success"
+                                    : "text-primary"
+                              }`}
+                            >
                               {insight.description}
                             </p>
                           </div>

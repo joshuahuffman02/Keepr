@@ -25,4 +25,3 @@ export class CreateNpsRuleDto {
   @IsBoolean()
   isActive?: boolean;
 }
-

@@ -47,13 +47,15 @@ async function assertPeriodsOpen(prisma: PrismaLedgerClient, entries: LedgerEntr
         campgroundId,
         status: { in: ["closed", "locked"] },
         startDate: { lte: range.max },
-        endDate: { gte: range.min }
+        endDate: { gte: range.min },
       },
-      select: { id: true, status: true, startDate: true, endDate: true }
+      select: { id: true, status: true, startDate: true, endDate: true },
     });
     if (blocked) {
       const rangeLabel = `${blocked.startDate?.toISOString?.() ?? "start"} → ${blocked.endDate?.toISOString?.() ?? "end"}`;
-      throw new BadRequestException(`Ledger period is ${blocked.status} for campground ${campgroundId} (${rangeLabel}); posting blocked.`);
+      throw new BadRequestException(
+        `Ledger period is ${blocked.status} for campground ${campgroundId} (${rangeLabel}); posting blocked.`,
+      );
     }
   }
 }
@@ -83,7 +85,7 @@ function normalizeEntries(entries: LedgerEntryInput[], opts?: PostLedgerOptions)
       direction: entry.direction,
       occurredAt,
       externalRef: entry.externalRef ?? null,
-      dedupeKey
+      dedupeKey,
     };
   });
 }
@@ -91,7 +93,7 @@ function normalizeEntries(entries: LedgerEntryInput[], opts?: PostLedgerOptions)
 export async function postBalancedLedgerEntries(
   prisma: PrismaLedgerClient,
   entries: LedgerEntryInput[],
-  opts?: PostLedgerOptions
+  opts?: PostLedgerOptions,
 ) {
   if (!entries.length) {
     throw new BadRequestException("No ledger entries to post");
@@ -102,7 +104,7 @@ export async function postBalancedLedgerEntries(
   if (!opts?.allowUnbalanced) {
     const net = normalized.reduce(
       (sum, e) => sum + (e.direction === "credit" ? e.amountCents : -e.amountCents),
-      0
+      0,
     );
     if (net !== 0) {
       throw new BadRequestException(`Ledger batch must balance; net=${net}¢`);
@@ -120,7 +122,7 @@ export async function postBalancedLedgerEntries(
 
   if (dedupeWhere.length) {
     const existing = await prisma.ledgerEntry.findMany({
-      where: { OR: dedupeWhere }
+      where: { OR: dedupeWhere },
     });
     if (existing.length) {
       return existing;

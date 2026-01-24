@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Query, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards";
 import { RolesGuard, Roles } from "../../auth/guards/roles.guard";
 import { UserRole } from "@prisma/client";
@@ -42,10 +33,7 @@ export class OtaSyncController {
    */
   @Post()
   @Roles(UserRole.owner, UserRole.manager)
-  async createChannel(
-    @Param("campgroundId") campgroundId: string,
-    @Body() body: CreateChannelDto
-  ) {
+  async createChannel(@Param("campgroundId") campgroundId: string, @Body() body: CreateChannelDto) {
     return this.otaSync.createChannel({
       ...body,
       campgroundId,
@@ -57,10 +45,7 @@ export class OtaSyncController {
    */
   @Patch(":channelId")
   @Roles(UserRole.owner, UserRole.manager)
-  async updateChannel(
-    @Param("channelId") channelId: string,
-    @Body() body: UpdateChannelDto
-  ) {
+  async updateChannel(@Param("channelId") channelId: string, @Body() body: UpdateChannelDto) {
     return this.otaSync.updateChannel(channelId, body);
   }
 
@@ -71,7 +56,7 @@ export class OtaSyncController {
   @Roles(UserRole.owner, UserRole.manager)
   async upsertMapping(
     @Param("channelId") channelId: string,
-    @Body() body: Omit<UpsertMappingDto, "channelId">
+    @Body() body: Omit<UpsertMappingDto, "channelId">,
   ) {
     return this.otaSync.upsertMapping({
       ...body,
@@ -93,10 +78,7 @@ export class OtaSyncController {
    */
   @Get(":channelId/logs")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  async getSyncLogs(
-    @Param("channelId") channelId: string,
-    @Query("limit") limit?: string
-  ) {
+  async getSyncLogs(@Param("channelId") channelId: string, @Query("limit") limit?: string) {
     return this.otaSync.getSyncLogs(channelId, limit ? parseInt(limit, 10) : 50);
   }
 
@@ -105,10 +87,7 @@ export class OtaSyncController {
    */
   @Get(":channelId/imports")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  async getImports(
-    @Param("channelId") channelId: string,
-    @Query("limit") limit?: string
-  ) {
+  async getImports(@Param("channelId") channelId: string, @Query("limit") limit?: string) {
     return this.otaSync.getImports(channelId, limit ? parseInt(limit, 10) : 50);
   }
 }

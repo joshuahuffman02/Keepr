@@ -14,30 +14,30 @@
  * - ARIA attributes
  */
 
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Badge, type BadgeProps } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { IconButton } from "@/components/ui/icon-button"
-import { VisuallyHidden } from "@/components/ui/visually-hidden"
-import { useAccessibility } from "@/components/accessibility/AccessibilityProvider"
-import { Calendar, MapPin, Users, Trash2, Edit } from "lucide-react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import Link from "next/link";
+import { Badge, type BadgeProps } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
+import { useAccessibility } from "@/components/accessibility/AccessibilityProvider";
+import { Calendar, MapPin, Users, Trash2, Edit } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ReservationCardProps {
-  id: string
-  guestName: string
-  siteNumber: string
-  checkIn: Date
-  checkOut: Date
-  status: "confirmed" | "pending" | "checked-in" | "cancelled"
-  adults: number
-  children: number
-  balanceDue: number
-  onEdit?: () => void
-  onDelete?: () => void
+  id: string;
+  guestName: string;
+  siteNumber: string;
+  checkIn: Date;
+  checkOut: Date;
+  status: "confirmed" | "pending" | "checked-in" | "cancelled";
+  adults: number;
+  children: number;
+  balanceDue: number;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export function AccessibleReservationCard({
@@ -53,12 +53,12 @@ export function AccessibleReservationCard({
   onEdit,
   onDelete,
 }: ReservationCardProps) {
-  const { announceMessage } = useAccessibility()
-  const [isDeleting, setIsDeleting] = React.useState(false)
+  const { announceMessage } = useAccessibility();
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   // Format dates for display
   const formatDate = (date: Date) =>
-    date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
   // Status badge configuration
   const statusConfig: Record<
@@ -85,31 +85,31 @@ export function AccessibleReservationCard({
       text: "Cancelled",
       srText: "Reservation status: cancelled",
     },
-  }
+  };
 
-  const currentStatus = statusConfig[status]
+  const currentStatus = statusConfig[status];
 
   const handleDelete = async () => {
-    if (!onDelete) return
+    if (!onDelete) return;
 
-    setIsDeleting(true)
-    announceMessage("Deleting reservation", "polite")
+    setIsDeleting(true);
+    announceMessage("Deleting reservation", "polite");
 
     try {
-      await onDelete()
-      announceMessage(`Reservation for ${guestName} deleted`, "assertive")
+      await onDelete();
+      announceMessage(`Reservation for ${guestName} deleted`, "assertive");
     } catch (error) {
-      announceMessage("Failed to delete reservation", "assertive")
+      announceMessage("Failed to delete reservation", "assertive");
     } finally {
-      setIsDeleting(false)
+      setIsDeleting(false);
     }
-  }
+  };
 
   return (
     <article
       className={cn(
         "rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow",
-        "hover:shadow-md focus-within:shadow-md"
+        "hover:shadow-md focus-within:shadow-md",
       )}
       aria-labelledby={`reservation-${id}-title`}
     >
@@ -138,11 +138,7 @@ export function AccessibleReservationCard({
         </div>
 
         {/* Status badge */}
-        <Badge
-          variant={currentStatus.variant}
-          srText={currentStatus.srText}
-          className="shrink-0"
-        >
+        <Badge variant={currentStatus.variant} srText={currentStatus.srText} className="shrink-0">
           {currentStatus.text}
         </Badge>
       </header>
@@ -154,13 +150,9 @@ export function AccessibleReservationCard({
           <dt className="sr-only">Check-in and check-out dates</dt>
           <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           <dd className="text-foreground">
-            <time dateTime={checkIn.toISOString()}>
-              {formatDate(checkIn)}
-            </time>
+            <time dateTime={checkIn.toISOString()}>{formatDate(checkIn)}</time>
             {" – "}
-            <time dateTime={checkOut.toISOString()}>
-              {formatDate(checkOut)}
-            </time>
+            <time dateTime={checkOut.toISOString()}>{formatDate(checkOut)}</time>
           </dd>
         </div>
 
@@ -197,7 +189,7 @@ export function AccessibleReservationCard({
             "border border-border bg-card text-foreground",
             "hover:bg-muted",
             "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/20 focus-visible:ring-offset-2",
-            "transition-colors"
+            "transition-colors",
           )}
         >
           View Details
@@ -228,7 +220,7 @@ export function AccessibleReservationCard({
         )}
       </footer>
     </article>
-  )
+  );
 }
 
 /**

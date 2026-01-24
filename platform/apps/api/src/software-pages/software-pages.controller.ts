@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  NotFoundException,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Param, NotFoundException, UseGuards } from "@nestjs/common";
 import { SoftwarePagesService } from "./software-pages.service";
 import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { PlatformRole } from "@prisma/client";

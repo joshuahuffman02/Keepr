@@ -18,14 +18,14 @@ export default function SocialPlannerContentBank() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
   const assetsQuery = useQuery<SocialAsset[]>({
     queryKey: ["social-assets", campgroundId],
     queryFn: () => apiClient.listSocialAssets(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const createAsset = useMutation({
@@ -37,15 +37,15 @@ export default function SocialPlannerContentBank() {
         url,
         tags: tags
           .split(",")
-          .map(t => t.trim())
-          .filter(Boolean)
+          .map((t) => t.trim())
+          .filter(Boolean),
       }),
     onSuccess: () => {
       setTitle("");
       setUrl("");
       setTags("");
       qc.invalidateQueries({ queryKey: ["social-assets", campgroundId] });
-    }
+    },
   });
 
   if (!campgroundId) {
@@ -63,13 +63,20 @@ export default function SocialPlannerContentBank() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Content bank</p>
-          <h1 className="text-2xl font-bold text-foreground">Store photos, videos, and branded captions</h1>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Content bank
+          </p>
+          <h1 className="text-2xl font-bold text-foreground">
+            Store photos, videos, and branded captions
+          </h1>
           <p className="text-muted-foreground">Suggestions will prioritize these assets first.</p>
         </div>
       </div>
@@ -77,16 +84,31 @@ export default function SocialPlannerContentBank() {
       <div className="card p-4 mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-2">Add asset</h3>
         <div className="grid md:grid-cols-4 gap-3">
-          <input className="input" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
-          <select className="input" value={type} onChange={e => setType(e.target.value)}>
+          <input
+            className="input"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <select className="input" value={type} onChange={(e) => setType(e.target.value)}>
             <option value="photo">Photo</option>
             <option value="video">Video</option>
             <option value="logo">Logo</option>
             <option value="design">Design</option>
             <option value="caption">Branded caption</option>
           </select>
-          <input className="input" placeholder="URL or path" value={url} onChange={e => setUrl(e.target.value)} />
-          <input className="input" placeholder="Tags (comma separated)" value={tags} onChange={e => setTags(e.target.value)} />
+          <input
+            className="input"
+            placeholder="URL or path"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="Tags (comma separated)"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+          />
         </div>
         <button
           className="btn-primary mt-3 flex items-center"
@@ -108,15 +130,26 @@ export default function SocialPlannerContentBank() {
                   <div className="text-xs text-muted-foreground">{asset.type}</div>
                 </div>
               </div>
-              <a className="text-xs text-emerald-700 underline" href={asset.url} target="_blank" rel="noreferrer">open</a>
+              <a
+                className="text-xs text-emerald-700 underline"
+                href={asset.url}
+                target="_blank"
+                rel="noreferrer"
+              >
+                open
+              </a>
             </div>
             {asset.tags?.length ? (
-              <div className="mt-2 text-xs text-muted-foreground">Tags: {asset.tags.join(", ")}</div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                Tags: {asset.tags.join(", ")}
+              </div>
             ) : null}
             {asset.notes && <p className="text-sm text-muted-foreground mt-1">{asset.notes}</p>}
           </div>
         ))}
-        {!assetsQuery.data?.length && <div className="text-sm text-muted-foreground">No assets yet.</div>}
+        {!assetsQuery.data?.length && (
+          <div className="text-sm text-muted-foreground">No assets yet.</div>
+        )}
       </div>
     </DashboardShell>
   );

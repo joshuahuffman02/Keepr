@@ -68,9 +68,8 @@ export class AccommodationMixService {
       occupiedNights += Math.max(0, nights);
     }
 
-    const overallOccupancy = totalAvailableNights > 0
-      ? (occupiedNights / totalAvailableNights) * 100
-      : 0;
+    const overallOccupancy =
+      totalAvailableNights > 0 ? (occupiedNights / totalAvailableNights) * 100 : 0;
 
     // Find top performing type
     const typeDistribution = await this.getTypeDistribution(dateRange);
@@ -140,7 +139,7 @@ export class AccommodationMixService {
       const type = res.Site?.siteType || "unknown";
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
 
       if (!byType[type]) {
@@ -154,20 +153,22 @@ export class AccommodationMixService {
     }
 
     // Build result
-    return siteCounts.map((sc) => {
-      const type = sc.siteType;
-      const data = byType[type] || { reservations: 0, revenue: 0, nights: 0 };
-      const availableNights = sc._count * daysInRange;
+    return siteCounts
+      .map((sc) => {
+        const type = sc.siteType;
+        const data = byType[type] || { reservations: 0, revenue: 0, nights: 0 };
+        const availableNights = sc._count * daysInRange;
 
-      return {
-        type,
-        siteCount: sc._count,
-        reservations: data.reservations,
-        revenue: data.revenue,
-        occupancyRate: availableNights > 0 ? (data.nights / availableNights) * 100 : 0,
-        revenueShare: totalRevenue > 0 ? (data.revenue / totalRevenue) * 100 : 0,
-      };
-    }).sort((a, b) => b.revenue - a.revenue);
+        return {
+          type,
+          siteCount: sc._count,
+          reservations: data.reservations,
+          revenue: data.revenue,
+          occupancyRate: availableNights > 0 ? (data.nights / availableNights) * 100 : 0,
+          revenueShare: totalRevenue > 0 ? (data.revenue / totalRevenue) * 100 : 0,
+        };
+      })
+      .sort((a, b) => b.revenue - a.revenue);
   }
 
   /**
@@ -191,7 +192,10 @@ export class AccommodationMixService {
     });
 
     // Group by rig type
-    const byRigType: Record<string, { count: number; totalLength: number; totalSpend: number; lengthCount: number }> = {};
+    const byRigType: Record<
+      string,
+      { count: number; totalLength: number; totalSpend: number; lengthCount: number }
+    > = {};
 
     for (const res of reservations) {
       const type = res.rigType || "Unknown";
@@ -211,13 +215,15 @@ export class AccommodationMixService {
 
     const totalCount = Object.values(byRigType).reduce((sum, d) => sum + d.count, 0);
 
-    return Object.entries(byRigType).map(([type, data]) => ({
-      rigType: type,
-      count: data.count,
-      percentage: totalCount > 0 ? (data.count / totalCount) * 100 : 0,
-      averageLength: data.lengthCount > 0 ? data.totalLength / data.lengthCount : 0,
-      averageSpend: data.count > 0 ? data.totalSpend / data.count : 0,
-    })).sort((a, b) => b.count - a.count);
+    return Object.entries(byRigType)
+      .map(([type, data]) => ({
+        rigType: type,
+        count: data.count,
+        percentage: totalCount > 0 ? (data.count / totalCount) * 100 : 0,
+        averageLength: data.lengthCount > 0 ? data.totalLength / data.lengthCount : 0,
+        averageSpend: data.count > 0 ? data.totalSpend / data.count : 0,
+      }))
+      .sort((a, b) => b.count - a.count);
   }
 
   /**
@@ -251,7 +257,9 @@ export class AccommodationMixService {
         const monthEnd = new Date(monthStart);
         monthEnd.setMonth(monthEnd.getMonth() + 1);
 
-        const daysInMonth = Math.ceil((monthEnd.getTime() - monthStart.getTime()) / (1000 * 60 * 60 * 24));
+        const daysInMonth = Math.ceil(
+          (monthEnd.getTime() - monthStart.getTime()) / (1000 * 60 * 60 * 24),
+        );
         const availableNights = siteCount * daysInMonth;
 
         const reservations = await this.prisma.reservation.findMany({
@@ -272,7 +280,8 @@ export class AccommodationMixService {
           occupiedNights += Math.max(0, nights);
         }
 
-        utilization[siteType][month] = availableNights > 0 ? (occupiedNights / availableNights) * 100 : 0;
+        utilization[siteType][month] =
+          availableNights > 0 ? (occupiedNights / availableNights) * 100 : 0;
       }
     }
 

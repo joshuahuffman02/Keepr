@@ -49,7 +49,7 @@ export class DataImportService {
     private readonly campspotParser: CampspotParserService,
     private readonly newbookParser: NewbookParserService,
     private readonly siteImport: SiteImportService,
-    private readonly guestImport: GuestImportService
+    private readonly guestImport: GuestImportService,
   ) {}
 
   /**
@@ -177,7 +177,7 @@ export class DataImportService {
     campgroundId: string,
     entityType: ImportEntityType,
     csvContent: string,
-    fieldMappings: FieldMapping[]
+    fieldMappings: FieldMapping[],
   ) {
     switch (entityType) {
       case "sites":
@@ -197,7 +197,7 @@ export class DataImportService {
     entityType: ImportEntityType,
     csvContent: string,
     fieldMappings: FieldMapping[],
-    options: { updateExisting?: boolean } = {}
+    options: { updateExisting?: boolean } = {},
   ) {
     // Create job record
     const jobId = this.generateJobId();
@@ -227,7 +227,7 @@ export class DataImportService {
             campgroundId,
             csvContent,
             fieldMappings,
-            options
+            options,
           );
           break;
         case "guests":
@@ -235,7 +235,7 @@ export class DataImportService {
             campgroundId,
             csvContent,
             fieldMappings,
-            options
+            options,
           );
           break;
         default:

@@ -6,7 +6,17 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as LucideIcons from "lucide-react";
-import { Sparkles, Wrench, Bug, Building2, Calendar, Users, Target, ImageIcon, Video } from "lucide-react";
+import {
+  Sparkles,
+  Wrench,
+  Bug,
+  Building2,
+  Calendar,
+  Users,
+  Target,
+  ImageIcon,
+  Video,
+} from "lucide-react";
 import {
   updates,
   getPhaseById,
@@ -47,7 +57,9 @@ function TypeBadge({ type }: { type: UpdateType }) {
   const label = typeLabels[type];
 
   return (
-    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${colors.bg} ${colors.text} ${colors.border}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold border ${colors.bg} ${colors.text} ${colors.border}`}
+    >
       {label}
     </span>
   );
@@ -70,7 +82,9 @@ function CategoryBadge({ category }: { category: UpdateCategory }) {
     enhancement: <Wrench className="h-3.5 w-3.5" />,
   };
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${colors.bg} ${colors.text} ${colors.border}`}
+    >
       {icons[category]}
       {labels[category]}
     </span>
@@ -100,14 +114,12 @@ function UpdateCard({ update, isFirst }: { update: Update; isFirst: boolean }) {
       <div className="absolute left-3 top-0 bottom-0 w-px bg-gradient-to-b from-blue-200 to-slate-200 group-last:hidden" />
 
       {/* Timeline dot */}
-      <div className={`absolute left-0 top-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-        isFirst
-          ? "bg-blue-500 border-blue-500 text-white"
-          : "bg-white border-slate-300"
-      }`}>
-        {isFirst && (
-          <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-        )}
+      <div
+        className={`absolute left-0 top-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+          isFirst ? "bg-blue-500 border-blue-500 text-white" : "bg-white border-slate-300"
+        }`}
+      >
+        {isFirst && <span className="w-2 h-2 rounded-full bg-white animate-pulse" />}
       </div>
 
       {/* Card */}
@@ -226,8 +238,18 @@ function UpdateCard({ update, isFirst }: { update: Update; isFirst: boolean }) {
             >
               <PhaseIcon name={phase.icon} className="h-5 w-5" />
               <span>Related to: {phase.name}</span>
-              <svg className="w-4 h-4 transform group-hover/link:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-4 h-4 transform group-hover/link:translate-x-0.5 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </Link>
           </div>
@@ -240,7 +262,7 @@ function UpdateCard({ update, isFirst }: { update: Update; isFirst: boolean }) {
 function FilterButton({
   active,
   onClick,
-  children
+  children,
 }: {
   active: boolean;
   onClick: () => void;
@@ -250,9 +272,7 @@ function FilterButton({
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-        active
-          ? "bg-slate-900 text-white"
-          : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+        active ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
       }`}
     >
       {children}
@@ -264,11 +284,11 @@ function FilterButton({
 function groupUpdatesByMonth(updates: Update[]): Map<string, Update[]> {
   const grouped = new Map<string, Update[]>();
 
-  updates.forEach(update => {
+  updates.forEach((update) => {
     const date = new Date(update.date);
     const monthKey = date.toLocaleDateString("en-US", {
       month: "long",
-      year: "numeric"
+      year: "numeric",
     });
 
     if (!grouped.has(monthKey)) {
@@ -283,11 +303,11 @@ function groupUpdatesByMonth(updates: Update[]): Map<string, Update[]> {
 function UpdatesPageInner() {
   const searchParams = useSearchParams();
   const phaseFilter = searchParams.get("phase");
-  const [selectedType, setSelectedType] = useState<UpdateType | 'all'>('all');
+  const [selectedType, setSelectedType] = useState<UpdateType | "all">("all");
 
   // Sort by date, newest first
   const sortedUpdates = [...updates].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
   );
 
   // Filter by phase if specified
@@ -296,7 +316,7 @@ function UpdatesPageInner() {
     : sortedUpdates;
 
   // Filter by type
-  if (selectedType !== 'all') {
+  if (selectedType !== "all") {
     filteredUpdates = filteredUpdates.filter((u) => u.type === selectedType);
   }
 
@@ -314,12 +334,7 @@ function UpdatesPageInner() {
   return (
     <DashboardShell>
       <div className="max-w-4xl mx-auto space-y-6">
-        <Breadcrumbs
-          items={[
-            { label: "Roadmap", href: "/roadmap" },
-            { label: "Updates" },
-          ]}
-        />
+        <Breadcrumbs items={[{ label: "Roadmap", href: "/roadmap" }, { label: "Updates" }]} />
 
         {/* Header */}
         <div className="space-y-3">
@@ -331,12 +346,18 @@ function UpdatesPageInner() {
             >
               View Roadmap
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </Link>
           </div>
           <p className="text-slate-600 text-lg">
-            Track what&apos;s new, improved, and fixed in Campreserv. We ship updates regularly to make campground management better.
+            Track what&apos;s new, improved, and fixed in Campreserv. We ship updates regularly to
+            make campground management better.
           </p>
         </div>
 
@@ -365,34 +386,25 @@ function UpdatesPageInner() {
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="text-sm font-medium text-slate-700">Filter by type:</div>
             <div className="flex items-center gap-2 flex-wrap">
-              <FilterButton
-                active={selectedType === 'all'}
-                onClick={() => setSelectedType('all')}
-              >
+              <FilterButton active={selectedType === "all"} onClick={() => setSelectedType("all")}>
                 All
               </FilterButton>
-              <FilterButton
-                active={selectedType === 'new'}
-                onClick={() => setSelectedType('new')}
-              >
+              <FilterButton active={selectedType === "new"} onClick={() => setSelectedType("new")}>
                 New
               </FilterButton>
               <FilterButton
-                active={selectedType === 'update'}
-                onClick={() => setSelectedType('update')}
+                active={selectedType === "update"}
+                onClick={() => setSelectedType("update")}
               >
                 Update
               </FilterButton>
               <FilterButton
-                active={selectedType === 'enhancement'}
-                onClick={() => setSelectedType('enhancement')}
+                active={selectedType === "enhancement"}
+                onClick={() => setSelectedType("enhancement")}
               >
                 Enhancement
               </FilterButton>
-              <FilterButton
-                active={selectedType === 'fix'}
-                onClick={() => setSelectedType('fix')}
-              >
+              <FilterButton active={selectedType === "fix"} onClick={() => setSelectedType("fix")}>
                 Fix
               </FilterButton>
             </div>
@@ -404,12 +416,11 @@ function UpdatesPageInner() {
           <div className="flex items-center justify-between bg-blue-50 border border-blue-100 rounded-lg p-3">
             <div className="flex items-center gap-2 text-sm text-blue-700">
               <PhaseIcon name={currentPhase.icon} className="h-5 w-5" />
-              <span>Showing updates for: <strong>{currentPhase.name}</strong></span>
+              <span>
+                Showing updates for: <strong>{currentPhase.name}</strong>
+              </span>
             </div>
-            <Link
-              href="/updates"
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
+            <Link href="/updates" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
               Clear filter
             </Link>
           </div>

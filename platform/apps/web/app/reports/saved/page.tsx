@@ -44,16 +44,24 @@ export default function SavedReportsPage() {
   const exportsQuery = useQuery({
     queryKey: ["report-exports", campgroundId],
     queryFn: () => apiClient.listReportExports(campgroundId!, 15),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const queueExport = useMutation({
-    mutationFn: () => apiClient.queueReportExport(campgroundId!, { filters: { range: "last_30_days", tab: "overview" } }),
+    mutationFn: () =>
+      apiClient.queueReportExport(campgroundId!, {
+        filters: { range: "last_30_days", tab: "overview" },
+      }),
     onSuccess: () => {
       toast({ title: "Export queued" });
       qc.invalidateQueries({ queryKey: ["report-exports", campgroundId] });
     },
-    onError: (err: unknown) => toast({ title: "Queue failed", description: getErrorMessage(err, "Unknown error"), variant: "destructive" })
+    onError: (err: unknown) =>
+      toast({
+        title: "Queue failed",
+        description: getErrorMessage(err, "Unknown error"),
+        variant: "destructive",
+      }),
   });
 
   const rerunExport = useMutation({
@@ -62,24 +70,34 @@ export default function SavedReportsPage() {
       toast({ title: "Export re-run" });
       qc.invalidateQueries({ queryKey: ["report-exports", campgroundId] });
     },
-    onError: (err: unknown) => toast({ title: "Re-run failed", description: getErrorMessage(err, "Unknown error"), variant: "destructive" })
+    onError: (err: unknown) =>
+      toast({
+        title: "Re-run failed",
+        description: getErrorMessage(err, "Unknown error"),
+        variant: "destructive",
+      }),
   });
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return reports.filter((r) =>
-      !q ||
-      r.name.toLowerCase().includes(q) ||
-      (r.description || "").toLowerCase().includes(q) ||
-      r.tab.toLowerCase().includes(q) ||
-      (r.subTab || "").toLowerCase().includes(q)
+    return reports.filter(
+      (r) =>
+        !q ||
+        r.name.toLowerCase().includes(q) ||
+        (r.description || "").toLowerCase().includes(q) ||
+        r.tab.toLowerCase().includes(q) ||
+        (r.subTab || "").toLowerCase().includes(q),
     );
   }, [reports, search]);
 
   const reportNavLinks = [
     { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
-    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
-    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+    {
+      label: "Portfolio",
+      href: "/reports/portfolio",
+      active: pathname.startsWith("/reports/portfolio"),
+    },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") },
   ];
 
   return (
@@ -91,7 +109,9 @@ export default function SavedReportsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="space-y-1">
               <h1 className="text-2xl font-semibold text-foreground">Saved reports</h1>
-              <p className="text-muted-foreground text-sm">Your favorite report views by tab/sub-report.</p>
+              <p className="text-muted-foreground text-sm">
+                Your favorite report views by tab/sub-report.
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Input
@@ -101,12 +121,16 @@ export default function SavedReportsPage() {
                 className="w-64"
                 aria-label="Search saved reports"
               />
-              <Button variant="outline" onClick={() => setReports(listSavedReports(campgroundId))}>Refresh</Button>
+              <Button variant="outline" onClick={() => setReports(listSavedReports(campgroundId))}>
+                Refresh
+              </Button>
             </div>
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-sm text-muted-foreground">No saved reports yet. Use “Save report” from the Reports page.</div>
+            <div className="text-sm text-muted-foreground">
+              No saved reports yet. Use “Save report” from the Reports page.
+            </div>
           ) : (
             <div className="grid gap-3">
               {filtered.map((r) => (
@@ -123,33 +147,38 @@ export default function SavedReportsPage() {
                         Saved {new Date(r.updatedAt).toLocaleString()}
                         {r.dateRange && ` • ${r.dateRange.start} → ${r.dateRange.end}`}
                       </div>
-                      {r.filters && (r.filters.status !== "all" || r.filters.siteType !== "all" || r.filters.groupBy !== "none") && (
-                        <div className="flex items-center gap-1 flex-wrap mt-1">
-                          {r.filters.status !== "all" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-status-info/15 text-status-info">
-                              {r.filters.status}
-                            </span>
-                          )}
-                          {r.filters.siteType !== "all" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-status-success/15 text-status-success">
-                              {r.filters.siteType}
-                            </span>
-                          )}
-                          {r.filters.groupBy !== "none" && (
-                            <span className="text-xs px-2 py-0.5 rounded bg-status-warning/15 text-status-warning">
-                              Grouped by {r.filters.groupBy}
-                            </span>
-                          )}
-                        </div>
-                      )}
+                      {r.filters &&
+                        (r.filters.status !== "all" ||
+                          r.filters.siteType !== "all" ||
+                          r.filters.groupBy !== "none") && (
+                          <div className="flex items-center gap-1 flex-wrap mt-1">
+                            {r.filters.status !== "all" && (
+                              <span className="text-xs px-2 py-0.5 rounded bg-status-info/15 text-status-info">
+                                {r.filters.status}
+                              </span>
+                            )}
+                            {r.filters.siteType !== "all" && (
+                              <span className="text-xs px-2 py-0.5 rounded bg-status-success/15 text-status-success">
+                                {r.filters.siteType}
+                              </span>
+                            )}
+                            {r.filters.groupBy !== "none" && (
+                              <span className="text-xs px-2 py-0.5 rounded bg-status-warning/15 text-status-warning">
+                                Grouped by {r.filters.groupBy}
+                              </span>
+                            )}
+                          </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Link href={buildReportHref({
-                        tab: r.tab,
-                        subTab: r.subTab ?? null,
-                        dateRange: r.dateRange,
-                        filters: r.filters
-                      })}>
+                      <Link
+                        href={buildReportHref({
+                          tab: r.tab,
+                          subTab: r.subTab ?? null,
+                          dateRange: r.dateRange,
+                          filters: r.filters,
+                        })}
+                      >
                         <Button size="sm" className="gap-1">
                           <Play className="h-4 w-4" /> Run
                         </Button>
@@ -177,7 +206,9 @@ export default function SavedReportsPage() {
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div className="space-y-1">
               <CardTitle className="text-foreground">Recent exports</CardTitle>
-              <CardDescription>Exports are scoped per campground with filters captured for auditing.</CardDescription>
+              <CardDescription>
+                Exports are scoped per campground with filters captured for auditing.
+              </CardDescription>
             </div>
             <Button
               size="sm"
@@ -189,43 +220,65 @@ export default function SavedReportsPage() {
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
-            {!campgroundId && <div className="text-sm text-muted-foreground">Select a campground to view exports.</div>}
-            {campgroundId && exportsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading exports...</div>}
-            {campgroundId && !exportsQuery.isLoading && (exportsQuery.data?.length ?? 0) === 0 && (
-              <div className="text-sm text-muted-foreground">No exports yet for this campground.</div>
-            )}
-            {campgroundId && (exportsQuery.data ?? []).map((exp) => (
-              <div key={exp.id} className="rounded-lg border border-border p-3 space-y-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">{exp.resource || "reports"}</span>
-                      <Badge variant={exp.status === "success" ? "default" : exp.status === "failed" ? "destructive" : "secondary"}>
-                        {exp.status}
-                      </Badge>
-                      {exp.location && <Badge variant="outline">{exp.location}</Badge>}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Requested {new Date(exp.createdAt || "").toLocaleString()} {exp.completedAt ? `• Completed ${new Date(exp.completedAt).toLocaleString()}` : ""}
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="gap-1"
-                    disabled={rerunExport.isPending}
-                    onClick={() => rerunExport.mutate(exp.id)}
-                  >
-                    <RotateCcw className="h-4 w-4" /> Re-run
-                  </Button>
-                </div>
-                {isRecord(exp.filters) && (
-                  <pre className="bg-muted text-xs text-foreground rounded-md p-2 overflow-x-auto">
-                    {JSON.stringify(exp.filters, null, 2)}
-                  </pre>
-                )}
+            {!campgroundId && (
+              <div className="text-sm text-muted-foreground">
+                Select a campground to view exports.
               </div>
-            ))}
+            )}
+            {campgroundId && exportsQuery.isLoading && (
+              <div className="text-sm text-muted-foreground">Loading exports...</div>
+            )}
+            {campgroundId && !exportsQuery.isLoading && (exportsQuery.data?.length ?? 0) === 0 && (
+              <div className="text-sm text-muted-foreground">
+                No exports yet for this campground.
+              </div>
+            )}
+            {campgroundId &&
+              (exportsQuery.data ?? []).map((exp) => (
+                <div key={exp.id} className="rounded-lg border border-border p-3 space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-foreground">
+                          {exp.resource || "reports"}
+                        </span>
+                        <Badge
+                          variant={
+                            exp.status === "success"
+                              ? "default"
+                              : exp.status === "failed"
+                                ? "destructive"
+                                : "secondary"
+                          }
+                        >
+                          {exp.status}
+                        </Badge>
+                        {exp.location && <Badge variant="outline">{exp.location}</Badge>}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Requested {new Date(exp.createdAt || "").toLocaleString()}{" "}
+                        {exp.completedAt
+                          ? `• Completed ${new Date(exp.completedAt).toLocaleString()}`
+                          : ""}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="gap-1"
+                      disabled={rerunExport.isPending}
+                      onClick={() => rerunExport.mutate(exp.id)}
+                    >
+                      <RotateCcw className="h-4 w-4" /> Re-run
+                    </Button>
+                  </div>
+                  {isRecord(exp.filters) && (
+                    <pre className="bg-muted text-xs text-foreground rounded-md p-2 overflow-x-auto">
+                      {JSON.stringify(exp.filters, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              ))}
           </CardContent>
         </Card>
       </div>

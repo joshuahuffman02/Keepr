@@ -9,7 +9,6 @@ import { GamificationModule } from "../gamification/gamification.module";
   imports: [EmailModule, GamificationModule],
   controllers: [ReviewsController],
   providers: [ReviewsService],
-  exports: [ReviewsService]
+  exports: [ReviewsService],
 })
-export class ReviewsModule { }
-
+export class ReviewsModule {}

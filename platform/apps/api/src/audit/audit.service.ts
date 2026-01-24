@@ -32,12 +32,19 @@ const toActorRow = (row: AuditLogWithUser): AuditLogWithActor => {
 
 @Injectable()
 export class AuditService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async list(
-    params: { campgroundId: string; action?: string; actorId?: string; start?: Date; end?: Date; limit?: number },
+    params: {
+      campgroundId: string;
+      action?: string;
+      actorId?: string;
+      start?: Date;
+      end?: Date;
+      limit?: number;
+    },
     ip?: string | null,
-    userAgent?: string | null
+    userAgent?: string | null,
   ) {
     const privacy = await this.getPrivacy(params.campgroundId);
     const rows = await this.prisma.auditLog.findMany({
@@ -45,16 +52,19 @@ export class AuditService {
         campgroundId: params.campgroundId,
         action: params.action || undefined,
         actorId: params.actorId || undefined,
-        createdAt: params.start || params.end ? {
-          ...(params.start ? { gte: params.start } : {}),
-          ...(params.end ? { lte: params.end } : {})
-        } : undefined
+        createdAt:
+          params.start || params.end
+            ? {
+                ...(params.start ? { gte: params.start } : {}),
+                ...(params.end ? { lte: params.end } : {}),
+              }
+            : undefined,
       },
       include: {
-        User: { select: { id: true, email: true, firstName: true, lastName: true } }
+        User: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: params.limit || 200
+      take: params.limit || 200,
     });
 
     const actorRows = rows.map(toActorRow);
@@ -70,16 +80,16 @@ export class AuditService {
       this.prisma.piiFieldTag.count(),
       this.prisma.piiFieldTag.findMany({
         orderBy: [{ resource: "asc" }, { field: "asc" }],
-        take: 8
+        take: 8,
       }),
       this.prisma.auditLog.findMany({
         where: { campgroundId: params.campgroundId },
         include: {
-          User: { select: { id: true, email: true, firstName: true, lastName: true } }
+          User: { select: { id: true, email: true, firstName: true, lastName: true } },
         },
         orderBy: { createdAt: "desc" },
-        take: limit
-      })
+        take: limit,
+      }),
     ]);
 
     const auditEventsMapped = auditEventsRaw.map(toActorRow);
@@ -92,20 +102,41 @@ export class AuditService {
         redactPII: privacy.redactPII,
         consentRequired: privacy.consentRequired,
         backupRetentionDays: privacy.backupRetentionDays,
-        keyRotationDays: privacy.keyRotationDays
+        keyRotationDays: privacy.keyRotationDays,
       },
       piiTagCount,
       piiTagsPreview: piiTags,
-      auditEvents
+      auditEvents,
     };
   }
 
   async exportCsv(
-    params: { campgroundId: string; action?: string; actorId?: string; start?: Date; end?: Date; limit?: number },
-    res: AuditExportResponse
+    params: {
+      campgroundId: string;
+      action?: string;
+      actorId?: string;
+      start?: Date;
+      end?: Date;
+      limit?: number;
+    },
+    res: AuditExportResponse,
   ) {
     const rows = await this.list(params);
-    const headers = ["id", "campgroundId", "actorId", "action", "entity", "entityId", "createdAt", "ip", "userAgent", "chainHash", "prevHash", "before", "after"];
+    const headers = [
+      "id",
+      "campgroundId",
+      "actorId",
+      "action",
+      "entity",
+      "entityId",
+      "createdAt",
+      "ip",
+      "userAgent",
+      "chainHash",
+      "prevHash",
+      "before",
+      "after",
+    ];
     const csv = [headers.join(",")]
       .concat(
         rows.map((r) =>
@@ -122,9 +153,9 @@ export class AuditService {
             r.chainHash,
             r.prevHash ?? "",
             r.before ? JSON.stringify(r.before).replace(/"/g, '""') : "",
-            r.after ? JSON.stringify(r.after).replace(/"/g, '""') : ""
-          ].join(",")
-        )
+            r.after ? JSON.stringify(r.after).replace(/"/g, '""') : "",
+          ].join(","),
+        ),
       )
       .join("\n");
     res.setHeader("Content-Type", "text/csv");
@@ -132,7 +163,14 @@ export class AuditService {
     return res.send(csv);
   }
 
-  async exportJson(params: { campgroundId: string; action?: string; actorId?: string; start?: Date; end?: Date; limit?: number }) {
+  async exportJson(params: {
+    campgroundId: string;
+    action?: string;
+    actorId?: string;
+    start?: Date;
+    end?: Date;
+    limit?: number;
+  }) {
     return this.list(params);
   }
 
@@ -150,13 +188,13 @@ export class AuditService {
       where: {
         campgroundId: params.campgroundId,
         entity: params.entity,
-        entityId: params.entityId
+        entityId: params.entityId,
       },
       include: {
-        User: { select: { id: true, email: true, firstName: true, lastName: true } }
+        User: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: params.limit || 100
+      take: params.limit || 100,
     });
 
     const actorRows = rows.map(toActorRow);
@@ -180,7 +218,7 @@ export class AuditService {
     const prev = await this.prisma.auditLog.findFirst({
       where: { campgroundId: event.campgroundId },
       orderBy: { createdAt: "desc" },
-      select: { chainHash: true }
+      select: { chainHash: true },
     });
     const prevHash = prev?.chainHash ?? null;
     const before = toJsonValue(event.before);
@@ -196,10 +234,12 @@ export class AuditService {
       ip: event.ip ?? null,
       userAgent: event.userAgent ?? null,
       createdAt: now.toISOString(),
-      prevHash
+      prevHash,
     };
     const chainHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
-    const retentionAt = event.retentionDays ? new Date(now.getTime() + event.retentionDays * 24 * 60 * 60 * 1000) : null;
+    const retentionAt = event.retentionDays
+      ? new Date(now.getTime() + event.retentionDays * 24 * 60 * 60 * 1000)
+      : null;
 
     return this.prisma.auditLog.create({
       data: {
@@ -210,12 +250,18 @@ export class AuditService {
         createdAt: now,
         prevHash,
         chainHash,
-        retentionAt
-      }
+        retentionAt,
+      },
     });
   }
 
-  async recordExport(params: { campgroundId: string; requestedById: string; format: "csv" | "json"; filters?: Record<string, unknown>; recordCount: number }) {
+  async recordExport(params: {
+    campgroundId: string;
+    requestedById: string;
+    format: "csv" | "json";
+    filters?: Record<string, unknown>;
+    recordCount: number;
+  }) {
     return this.prisma.auditExport.create({
       data: {
         id: randomUUID(),
@@ -223,8 +269,8 @@ export class AuditService {
         requestedById: params.requestedById,
         format: params.format,
         filters: toJsonValue(params.filters),
-        recordCount: params.recordCount
-      }
+        recordCount: params.recordCount,
+      },
     });
   }
 
@@ -232,7 +278,7 @@ export class AuditService {
     return this.prisma.auditExport.findMany({
       where: { campgroundId },
       orderBy: { createdAt: "desc" },
-      take: 50
+      take: 50,
     });
   }
 
@@ -255,7 +301,10 @@ export class AuditService {
   private redactRow(row: AuditLogWithActor) {
     const mask = (val: unknown) => {
       if (typeof val !== "string") return val;
-      const emailMasked = val.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "***@redacted");
+      const emailMasked = val.replace(
+        /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
+        "***@redacted",
+      );
       const phoneMasked = emailMasked.replace(/\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/g, "***-***-****");
       return phoneMasked;
     };

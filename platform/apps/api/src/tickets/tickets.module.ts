@@ -4,9 +4,9 @@ import { TicketsService } from "./tickets.service";
 import { EmailModule } from "../email/email.module";
 
 @Module({
-    imports: [EmailModule],
-    controllers: [TicketsController],
-    providers: [TicketsService],
-    exports: [TicketsService],
+  imports: [EmailModule],
+  controllers: [TicketsController],
+  providers: [TicketsService],
+  exports: [TicketsService],
 })
-export class TicketsModule { }
+export class TicketsModule {}

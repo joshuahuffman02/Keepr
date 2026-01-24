@@ -29,7 +29,7 @@ export class AiPredictiveMaintenanceService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly configService: AiAutopilotConfigService
+    private readonly configService: AiAutopilotConfigService,
   ) {}
 
   // ==================== ALERTS CRUD ====================
@@ -42,7 +42,7 @@ export class AiPredictiveMaintenanceService {
       category?: string;
       siteId?: string;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const { status, severity, category, siteId, limit = 50 } = options;
 
@@ -166,9 +166,7 @@ export class AiPredictiveMaintenanceService {
       }
     }
 
-    this.logger.log(
-      `Generated ${alerts.length} maintenance alerts for campground ${campgroundId}`
-    );
+    this.logger.log(`Generated ${alerts.length} maintenance alerts for campground ${campgroundId}`);
 
     return alerts;
   }
@@ -178,7 +176,7 @@ export class AiPredictiveMaintenanceService {
    */
   private groupIncidentPatterns(
     incidents: IncidentPayload[],
-    complaints: ComplaintPayload[]
+    complaints: ComplaintPayload[],
   ): Array<{
     siteId: string;
     siteName: string;
@@ -263,11 +261,7 @@ export class AiPredictiveMaintenanceService {
   private normalizeCategory(category: string): string {
     const lower = category.toLowerCase();
 
-    if (
-      lower.includes("electric") ||
-      lower.includes("power") ||
-      lower.includes("outlet")
-    ) {
+    if (lower.includes("electric") || lower.includes("power") || lower.includes("outlet")) {
       return "electrical";
     }
     if (
@@ -281,18 +275,10 @@ export class AiPredictiveMaintenanceService {
     if (lower.includes("hvac") || lower.includes("heat") || lower.includes("ac")) {
       return "hvac";
     }
-    if (
-      lower.includes("struct") ||
-      lower.includes("roof") ||
-      lower.includes("floor")
-    ) {
+    if (lower.includes("struct") || lower.includes("roof") || lower.includes("floor")) {
       return "structural";
     }
-    if (
-      lower.includes("ground") ||
-      lower.includes("lawn") ||
-      lower.includes("tree")
-    ) {
+    if (lower.includes("ground") || lower.includes("lawn") || lower.includes("tree")) {
       return "grounds";
     }
 
@@ -339,10 +325,7 @@ export class AiPredictiveMaintenanceService {
   /**
    * Calculate alert severity based on pattern
    */
-  private calculateSeverity(pattern: {
-    count: number;
-    category: string;
-  }): string {
+  private calculateSeverity(pattern: { count: number; category: string }): string {
     // Critical categories
     const critical = ["electrical", "structural"];
     const high = ["plumbing", "hvac"];
@@ -365,10 +348,7 @@ export class AiPredictiveMaintenanceService {
   /**
    * Generate suggested action text
    */
-  private generateSuggestedAction(pattern: {
-    category: string;
-    count: number;
-  }): string {
+  private generateSuggestedAction(pattern: { category: string; count: number }): string {
     const actions: Record<string, string> = {
       electrical:
         "Schedule an electrical inspection. Check wiring, outlets, and breakers. Consider upgrading electrical panel if issues persist.",
@@ -385,8 +365,7 @@ export class AiPredictiveMaintenanceService {
 
     return (
       actions[pattern.category] ||
-      actions.general +
-        ` With ${pattern.count} incidents, this site needs priority attention.`
+      actions.general + ` With ${pattern.count} incidents, this site needs priority attention.`
     );
   }
 
@@ -517,15 +496,11 @@ export class AiPredictiveMaintenanceService {
         await this.analyzePatterns(config.campgroundId);
         analyzed++;
       } catch (error) {
-        this.logger.error(
-          `Failed to analyze patterns for ${config.campgroundId}: ${error}`
-        );
+        this.logger.error(`Failed to analyze patterns for ${config.campgroundId}: ${error}`);
         errors++;
       }
     }
 
-    this.logger.log(
-      `Daily maintenance analysis complete: ${analyzed} analyzed, ${errors} errors`
-    );
+    this.logger.log(`Daily maintenance analysis complete: ${analyzed} analyzed, ${errors} errors`);
   }
 }

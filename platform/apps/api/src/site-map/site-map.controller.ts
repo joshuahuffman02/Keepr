@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  Logger,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { SiteMapService } from "./site-map.service";
 import { UpsertMapDto } from "./dto/upsert-map.dto";
@@ -22,7 +34,7 @@ const parseDataUrl = (dataUrl: string) => {
   if (!match) return null;
   return {
     contentType: match[1],
-    buffer: Buffer.from(match[2], "base64")
+    buffer: Buffer.from(match[2], "base64"),
   };
 };
 
@@ -33,14 +45,14 @@ export class SiteMapController {
 
   constructor(
     private readonly siteMap: SiteMapService,
-    private readonly uploads: UploadsService
-  ) { }
+    private readonly uploads: UploadsService,
+  ) {}
 
   @Get("campgrounds/:campgroundId/map")
   getMap(
     @Param("campgroundId") campgroundId: string,
     @Query("startDate") startDate?: string,
-    @Query("endDate") endDate?: string
+    @Query("endDate") endDate?: string,
   ) {
     return this.siteMap.getMap(campgroundId, startDate, endDate);
   }
@@ -61,7 +73,10 @@ export class SiteMapController {
   }
 
   @Put("campgrounds/:campgroundId/map/assignments")
-  upsertAssignments(@Param("campgroundId") campgroundId: string, @Body() body: UpsertMapAssignmentsDto) {
+  upsertAssignments(
+    @Param("campgroundId") campgroundId: string,
+    @Body() body: UpsertMapAssignmentsDto,
+  ) {
     return this.siteMap.upsertAssignments(campgroundId, body);
   }
 
@@ -71,10 +86,7 @@ export class SiteMapController {
   }
 
   @Post("campgrounds/:campgroundId/map")
-  async uploadMap(
-    @Param("campgroundId") campgroundId: string,
-    @Body() body: MapUploadPayload
-  ) {
+  async uploadMap(@Param("campgroundId") campgroundId: string, @Body() body: MapUploadPayload) {
     if (body?.url) {
       return this.siteMap.setBaseImage(campgroundId, body.url);
     }
@@ -104,7 +116,7 @@ export class SiteMapController {
       const uploaded = await this.uploads.uploadBuffer(buffer, {
         contentType,
         extension,
-        prefix: "campground-maps"
+        prefix: "campground-maps",
       });
 
       return this.siteMap.setBaseImage(campgroundId, uploaded.url);

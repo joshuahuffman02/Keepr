@@ -84,9 +84,10 @@ export default function WaitlistPage() {
     },
   });
 
-  const normalizeStatus = (status: WaitlistEntry["status"]) => (status === "fulfilled" ? "converted" : status);
-  const entries = (entriesQuery.data ?? []).filter((e) =>
-    statusFilter === "all" || normalizeStatus(e.status) === statusFilter
+  const normalizeStatus = (status: WaitlistEntry["status"]) =>
+    status === "fulfilled" ? "converted" : status;
+  const entries = (entriesQuery.data ?? []).filter(
+    (e) => statusFilter === "all" || normalizeStatus(e.status) === statusFilter,
   );
   const stats = statsQuery.data;
 
@@ -104,12 +105,16 @@ export default function WaitlistPage() {
 
   const formatDate = (d: string | null | undefined) => {
     if (!d) return "—";
-    return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    return new Date(d).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   const getPriorityInfo = (priority: number | null | undefined) => {
     const value = typeof priority === "number" ? priority : 0;
-    return PRIORITY_COLORS.find(p => value >= p.min && value <= p.max) ?? PRIORITY_COLORS[0];
+    return PRIORITY_COLORS.find((p) => value >= p.min && value <= p.max) ?? PRIORITY_COLORS[0];
   };
 
   if (!campgroundId) {
@@ -128,8 +133,12 @@ export default function WaitlistPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8" data-testid="waitlist-header">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900" data-testid="waitlist-title">Waitlist Management</h1>
-            <p className="text-slate-500 mt-1" data-testid="waitlist-subtitle">Manage guests waiting for availability</p>
+            <h1 className="text-2xl font-bold text-slate-900" data-testid="waitlist-title">
+              Waitlist Management
+            </h1>
+            <p className="text-slate-500 mt-1" data-testid="waitlist-subtitle">
+              Manage guests waiting for availability
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <PageSettingsLink href="/settings/seasonal-rates" label="Rate Settings" />
@@ -146,11 +155,46 @@ export default function WaitlistPage() {
         {/* Stats Cards */}
         {stats && (
           <div className="grid grid-cols-5 gap-4 mb-6" data-testid="waitlist-stats">
-            <StatCard data-testid="waitlist-active" label="Active" value={stats.active} color="emerald" onClick={() => setStatusFilter("active")} active={statusFilter === "active"} />
-            <StatCard data-testid="waitlist-offered" label="Offered" value={stats.offered} color="amber" onClick={() => setStatusFilter("offered")} active={statusFilter === "offered"} />
-            <StatCard data-testid="waitlist-converted" label="Converted" value={stats.converted} color="blue" onClick={() => setStatusFilter("converted")} active={statusFilter === "converted"} />
-            <StatCard data-testid="waitlist-expired" label="Expired" value={stats.expired} color="slate" onClick={() => setStatusFilter("expired")} active={statusFilter === "expired"} />
-            <StatCard data-testid="waitlist-total" label="Total" value={stats.total} color="violet" onClick={() => setStatusFilter("all")} active={statusFilter === "all"} />
+            <StatCard
+              data-testid="waitlist-active"
+              label="Active"
+              value={stats.active}
+              color="emerald"
+              onClick={() => setStatusFilter("active")}
+              active={statusFilter === "active"}
+            />
+            <StatCard
+              data-testid="waitlist-offered"
+              label="Offered"
+              value={stats.offered}
+              color="amber"
+              onClick={() => setStatusFilter("offered")}
+              active={statusFilter === "offered"}
+            />
+            <StatCard
+              data-testid="waitlist-converted"
+              label="Converted"
+              value={stats.converted}
+              color="blue"
+              onClick={() => setStatusFilter("converted")}
+              active={statusFilter === "converted"}
+            />
+            <StatCard
+              data-testid="waitlist-expired"
+              label="Expired"
+              value={stats.expired}
+              color="slate"
+              onClick={() => setStatusFilter("expired")}
+              active={statusFilter === "expired"}
+            />
+            <StatCard
+              data-testid="waitlist-total"
+              label="Total"
+              value={stats.total}
+              color="violet"
+              onClick={() => setStatusFilter("all")}
+              active={statusFilter === "all"}
+            />
           </div>
         )}
 
@@ -173,14 +217,19 @@ export default function WaitlistPage() {
         </div>
 
         {/* Waitlist Table */}
-        <div className="bg-white rounded-xl border border-slate-200 overflow-hidden" data-testid="waitlist-table">
+        <div
+          className="bg-white rounded-xl border border-slate-200 overflow-hidden"
+          data-testid="waitlist-table"
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
                   <th className="px-4 py-3 text-left font-medium text-slate-600">Guest</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-600">Dates</th>
-                  <th className="px-4 py-3 text-left font-medium text-slate-600">Site Preference</th>
+                  <th className="px-4 py-3 text-left font-medium text-slate-600">
+                    Site Preference
+                  </th>
                   <th className="px-4 py-3 text-left font-medium text-slate-600">Priority</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-600">Status</th>
                   <th className="px-4 py-3 text-left font-medium text-slate-600">Auto-Offer</th>
@@ -197,7 +246,11 @@ export default function WaitlistPage() {
                   </tr>
                 ) : entries.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-slate-400" data-testid="waitlist-empty">
+                    <td
+                      colSpan={8}
+                      className="px-4 py-8 text-center text-slate-400"
+                      data-testid="waitlist-empty"
+                    >
                       No waitlist entries found
                     </td>
                   </tr>
@@ -209,7 +262,8 @@ export default function WaitlistPage() {
                         <td className="px-4 py-3">
                           <div className="font-medium text-slate-900">
                             {entry.guest
-                              ? `${entry.guest.primaryFirstName || ""} ${entry.guest.primaryLastName || ""}`.trim() || "Guest"
+                              ? `${entry.guest.primaryFirstName || ""} ${entry.guest.primaryLastName || ""}`.trim() ||
+                                "Guest"
                               : entry.contactName || "Unknown"}
                           </div>
                           <div className="text-xs text-slate-500">
@@ -218,9 +272,13 @@ export default function WaitlistPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-slate-900">{formatDate(entry.arrivalDate)}</div>
-                          <div className="text-xs text-slate-500">→ {formatDate(entry.departureDate)}</div>
+                          <div className="text-xs text-slate-500">
+                            → {formatDate(entry.departureDate)}
+                          </div>
                           {entry.flexibleDates && typeof entry.flexibleDays === "number" && (
-                            <span className="text-xs text-status-warning">±{entry.flexibleDays} days</span>
+                            <span className="text-xs text-status-warning">
+                              ±{entry.flexibleDays} days
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -240,7 +298,9 @@ export default function WaitlistPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium border ${STATUS_COLORS[entry.status]}`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium border ${STATUS_COLORS[entry.status]}`}
+                          >
                             {normalizeStatus(entry.status)}
                           </span>
                         </td>
@@ -251,13 +311,17 @@ export default function WaitlistPage() {
                             <span className="text-slate-400">No</span>
                           )}
                           {entry.maxPrice && (
-                            <div className="text-xs text-slate-500">Max: ${(entry.maxPrice / 100).toFixed(0)}</div>
+                            <div className="text-xs text-slate-500">
+                              Max: ${(entry.maxPrice / 100).toFixed(0)}
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-slate-700">{entry.notifiedCount}x</div>
                           {entry.lastNotifiedAt && (
-                            <div className="text-xs text-slate-500">{formatDate(entry.lastNotifiedAt)}</div>
+                            <div className="text-xs text-slate-500">
+                              {formatDate(entry.lastNotifiedAt)}
+                            </div>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -305,7 +369,10 @@ export default function WaitlistPage() {
           />
         )}
 
-        <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialog
+          open={!!deleteConfirmId}
+          onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Remove from Waitlist</AlertDialogTitle>
@@ -358,8 +425,9 @@ function StatCard({
   return (
     <button
       onClick={onClick}
-      className={`rounded-xl border p-4 text-left transition-all ${colors[color]} ${active ? "ring-2 ring-offset-2 ring-slate-400" : "hover:shadow-sm"
-        }`}
+      className={`rounded-xl border p-4 text-left transition-all ${colors[color]} ${
+        active ? "ring-2 ring-offset-2 ring-slate-400" : "hover:shadow-sm"
+      }`}
     >
       <div className="text-2xl font-bold">{value}</div>
       <div className="text-sm opacity-80">{label}</div>
@@ -432,7 +500,20 @@ function WaitlistModal({
             {entry ? "Edit Waitlist Entry" : "Add to Waitlist"}
           </h2>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
           </button>
         </div>
 
@@ -440,11 +521,13 @@ function WaitlistModal({
           {/* Contact Info */}
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Contact Name *</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Contact Name *
+              </label>
               <input
                 type="text"
                 value={contactName}
-                onChange={e => setContactName(e.target.value)}
+                onChange={(e) => setContactName(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg"
                 required
               />
@@ -454,7 +537,7 @@ function WaitlistModal({
               <input
                 type="email"
                 value={contactEmail}
-                onChange={e => setContactEmail(e.target.value)}
+                onChange={(e) => setContactEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg"
               />
             </div>
@@ -463,7 +546,7 @@ function WaitlistModal({
               <input
                 type="tel"
                 value={contactPhone}
-                onChange={e => setContactPhone(e.target.value)}
+                onChange={(e) => setContactPhone(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg"
               />
             </div>
@@ -476,16 +559,18 @@ function WaitlistModal({
               <input
                 type="date"
                 value={arrivalDate}
-                onChange={e => setArrivalDate(e.target.value)}
+                onChange={(e) => setArrivalDate(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Departure Date</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Departure Date
+              </label>
               <input
                 type="date"
                 value={departureDate}
-                onChange={e => setDepartureDate(e.target.value)}
+                onChange={(e) => setDepartureDate(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-200 rounded-lg"
               />
             </div>
@@ -498,20 +583,22 @@ function WaitlistModal({
               <button
                 type="button"
                 onClick={() => setType("regular")}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "regular"
-                  ? "bg-status-success/15 text-status-success border-2 border-status-success/30"
-                  : "bg-slate-50 text-slate-600 border border-slate-200"
-                  }`}
+                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  type === "regular"
+                    ? "bg-status-success/15 text-status-success border-2 border-status-success/30"
+                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                }`}
               >
                 Regular
               </button>
               <button
                 type="button"
                 onClick={() => setType("seasonal")}
-                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${type === "seasonal"
-                  ? "bg-status-warning/15 text-status-warning border-2 border-status-warning/30"
-                  : "bg-slate-50 text-slate-600 border border-slate-200"
-                  }`}
+                className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  type === "seasonal"
+                    ? "bg-status-warning/15 text-status-warning border-2 border-status-warning/30"
+                    : "bg-slate-50 text-slate-600 border border-slate-200"
+                }`}
               >
                 Seasonal
               </button>
@@ -528,7 +615,7 @@ function WaitlistModal({
               min="0"
               max="100"
               value={priority}
-              onChange={e => setPriority(parseInt(e.target.value))}
+              onChange={(e) => setPriority(parseInt(e.target.value))}
               className="w-full accent-emerald-600"
             />
             <div className="flex justify-between text-xs text-slate-400 mt-1">
@@ -543,24 +630,28 @@ function WaitlistModal({
             <input
               type="checkbox"
               checked={autoOffer}
-              onChange={e => setAutoOffer(e.target.checked)}
+              onChange={(e) => setAutoOffer(e.target.checked)}
               className="rounded border-slate-300"
             />
             <div>
               <div className="font-medium text-slate-900">Auto-Offer</div>
-              <div className="text-sm text-slate-500">Automatically reserve when a match is found</div>
+              <div className="text-sm text-slate-500">
+                Automatically reserve when a match is found
+              </div>
             </div>
           </label>
 
           {/* Max Price */}
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Max Price Willing to Pay ($)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Max Price Willing to Pay ($)
+            </label>
             <input
               type="number"
               min="0"
               step="0.01"
               value={maxPrice}
-              onChange={e => setMaxPrice(e.target.value)}
+              onChange={(e) => setMaxPrice(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg"
               placeholder="Leave blank for no limit"
             />
@@ -571,7 +662,7 @@ function WaitlistModal({
             <input
               type="checkbox"
               checked={flexibleDates}
-              onChange={e => setFlexibleDates(e.target.checked)}
+              onChange={(e) => setFlexibleDates(e.target.checked)}
               className="rounded border-slate-300"
             />
             <div className="flex-1">
@@ -584,7 +675,7 @@ function WaitlistModal({
                 min="0"
                 max="14"
                 value={flexibleDays}
-                onChange={e => setFlexibleDays(parseInt(e.target.value) || 0)}
+                onChange={(e) => setFlexibleDays(parseInt(e.target.value) || 0)}
                 className="w-16 px-2 py-1 border border-slate-200 rounded text-center"
               />
             )}
@@ -595,7 +686,7 @@ function WaitlistModal({
             <label className="block text-sm font-medium text-slate-700 mb-1">Notes</label>
             <textarea
               value={notes}
-              onChange={e => setNotes(e.target.value)}
+              onChange={(e) => setNotes(e.target.value)}
               rows={3}
               className="w-full px-3 py-2 border border-slate-200 rounded-lg resize-none"
               placeholder="Special requests, preferences, etc."

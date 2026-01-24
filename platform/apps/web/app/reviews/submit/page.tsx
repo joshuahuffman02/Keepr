@@ -14,8 +14,9 @@ function ReviewSubmitContent() {
   const [submitted, setSubmitted] = useState(false);
 
   const mutation = useMutation({
-    mutationFn: (payload: { token: string; rating: number; title?: string; body?: string }) => apiClient.submitReview(payload),
-    onSuccess: () => setSubmitted(true)
+    mutationFn: (payload: { token: string; rating: number; title?: string; body?: string }) =>
+      apiClient.submitReview(payload),
+    onSuccess: () => setSubmitted(true),
   });
 
   if (!token) {
@@ -80,12 +81,12 @@ function ReviewSubmitContent() {
             token,
             rating,
             title: title.trim() || undefined,
-            body: body.trim() || undefined
+            body: body.trim() || undefined,
           });
         }}
         className="inline-flex items-center px-5 py-3 rounded-lg bg-emerald-600 text-white font-semibold disabled:opacity-50"
       >
-          {mutation.isPending ? "Submitting..." : "Submit review"}
+        {mutation.isPending ? "Submitting..." : "Submit review"}
       </button>
       {mutation.error ? (
         <p className="text-sm text-red-600 mt-3">
@@ -98,7 +99,9 @@ function ReviewSubmitContent() {
 
 export default function ReviewSubmitPage() {
   return (
-    <Suspense fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-muted-foreground">Loading…</div>}>
+    <Suspense
+      fallback={<div className="max-w-2xl mx-auto py-10 px-6 text-muted-foreground">Loading…</div>}
+    >
       <ReviewSubmitContent />
     </Suspense>
   );

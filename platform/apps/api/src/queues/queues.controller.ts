@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Body,
-  UseGuards,
-  Query,
-} from "@nestjs/common";
+import { Controller, Get, Post, Param, Body, UseGuards, Query } from "@nestjs/common";
 import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { PlatformRole } from "@prisma/client";
 import { BullQueueService, QueueStats } from "./bull-queue.service";
@@ -30,9 +22,7 @@ export class QueuesController {
    * Get statistics for a specific queue
    */
   @Get(":queueName")
-  async getQueueStats(
-    @Param("queueName") queueName: string
-  ): Promise<QueueStats> {
+  async getQueueStats(@Param("queueName") queueName: string): Promise<QueueStats> {
     return this.queueService.getStats(queueName);
   }
 
@@ -40,13 +30,10 @@ export class QueuesController {
    * Get failed jobs for a queue
    */
   @Get(":queueName/failed")
-  async getFailedJobs(
-    @Param("queueName") queueName: string,
-    @Query("limit") limit?: string
-  ) {
+  async getFailedJobs(@Param("queueName") queueName: string, @Query("limit") limit?: string) {
     const jobs = await this.queueService.getFailedJobs(
       queueName,
-      limit ? parseInt(limit, 10) : 100
+      limit ? parseInt(limit, 10) : 100,
     );
     return { jobs, count: jobs.length };
   }
@@ -55,10 +42,7 @@ export class QueuesController {
    * Retry failed jobs
    */
   @Post(":queueName/retry")
-  async retryFailed(
-    @Param("queueName") queueName: string,
-    @Body() body: { jobId?: string }
-  ) {
+  async retryFailed(@Param("queueName") queueName: string, @Body() body: { jobId?: string }) {
     const count = await this.queueService.retryFailed(queueName, body.jobId);
     return { retried: count };
   }
@@ -69,7 +53,7 @@ export class QueuesController {
   @Post(":queueName/clean")
   async cleanQueue(
     @Param("queueName") queueName: string,
-    @Body() body: { grace?: number; status?: "completed" | "failed" }
+    @Body() body: { grace?: number; status?: "completed" | "failed" },
   ) {
     const grace = body.grace ?? 86400000; // Default 24 hours
     const status = body.status ?? "completed";

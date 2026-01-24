@@ -32,6 +32,7 @@ Railway is a deployment platform designed to streamline the software development
 **Philosophy:** "Take what you need, leave what you don't" - flexibility without vendor lock-in.
 
 **Key Differentiators:**
+
 - Zero-config deployments with sane defaults
 - Automatic private networking between services
 - Built-in CI/CD from GitHub
@@ -63,11 +64,13 @@ Dashboard → Projects → Services → Deployments
 ### Services
 
 Deployment targets accepting:
+
 - **GitHub repositories** - Auto-deploy on push
 - **Docker images** - From Docker Hub, GHCR, GitLab, Quay.io
 - **Local directories** - Via CLI (`railway up`)
 
 Each service includes:
+
 - Configuration management via service variables
 - Backup capabilities for attached volumes
 - CPU/memory/network metrics
@@ -77,12 +80,14 @@ Each service includes:
 ### Deployments
 
 Lifecycle states:
+
 ```
 Initializing → Building → Deploying → Active
                                    ↘ Failed/Crashed/Completed
 ```
 
 **Key configuration variables:**
+
 - `RAILWAY_DEPLOYMENT_OVERLAP_SECONDS` - Overlap between old/new deployments
 - `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` - Graceful shutdown window (default: 3s)
 
@@ -100,6 +105,7 @@ Initializing → Building → Deploying → Active
 ### Railpack (Current Default)
 
 Zero-configuration builder that automatically:
+
 1. Analyzes source code to detect language/framework
 2. Installs appropriate runtime and dependencies
 3. Builds application using detected/configured commands
@@ -111,6 +117,7 @@ Node, Python, Go, PHP, Java, Ruby, Rust, Elixir, Deno, Shell, Staticfile
 ### Nixpacks (Deprecated)
 
 Legacy builder with 24+ language support including:
+
 - JavaScript ecosystem (Node, Bun, Deno)
 - Backend (Python, Ruby, Go, Java, PHP, Elixir)
 - Compiled (Rust, C#/.NET, Haskell, Swift, Scala)
@@ -127,11 +134,11 @@ Existing services continue working but migration to Railpack recommended.
 
 **Performance Comparison:**
 
-| Method | Build Time | Deploy Time | Total |
-|--------|-----------|-------------|-------|
-| Nixpacks/Railpack | ~55s | ~32s | ~90s |
-| Custom Dockerfile | ~11s | ~4s | ~15s |
-| Pre-built Image | 0s | ~6s | ~6s |
+| Method            | Build Time | Deploy Time | Total |
+| ----------------- | ---------- | ----------- | ----- |
+| Nixpacks/Railpack | ~55s       | ~32s        | ~90s  |
+| Custom Dockerfile | ~11s       | ~4s         | ~15s  |
+| Pre-built Image   | 0s         | ~6s         | ~6s   |
 
 ### Dockerfile Optimization
 
@@ -151,6 +158,7 @@ CMD ["node", "dist/main.js"]
 ```
 
 **Tips:**
+
 - Use Alpine/slim variants
 - Multi-stage builds to exclude dev dependencies
 - Combine RUN commands to reduce layers
@@ -167,10 +175,12 @@ WireGuard mesh isolated to project+environment.
 **DNS:** `[service-name].railway.internal`
 
 **IP Support:**
+
 - New environments (after Oct 2025): IPv4 + IPv6
 - Legacy environments: IPv6 only
 
 **Configuration:**
+
 ```javascript
 // Node/Express - bind to all interfaces
 app.listen(port, "::", () => console.log("Listening"));
@@ -180,6 +190,7 @@ app.listen(port, "0.0.0.0", () => console.log("Listening"));
 ```
 
 **Framework-specific binding:**
+
 - **Python/Gunicorn:** `--bind [::]:${PORT-3000}`
 - **Rust/Axum:** `bind("[::]:8080")`
 - **ioredis:** Add `family=0` parameter
@@ -187,12 +198,14 @@ app.listen(port, "0.0.0.0", () => console.log("Listening"));
 - **MongoDB:** `--ipv6 --bind_ip ::,0.0.0.0`
 
 **Benefits:**
+
 - Zero egress costs for service-to-service
 - Faster communication
 - Not accessible from public internet
 - Increased security
 
 **Limitations:**
+
 - Unavailable during build phase
 - Client-side browser requests cannot access
 - Cannot connect across projects/environments
@@ -200,29 +213,33 @@ app.listen(port, "0.0.0.0", () => console.log("Listening"));
 ### Public Networking
 
 **Port Configuration:**
+
 - Listen on `0.0.0.0:$PORT`
 - Railway provides PORT automatically if not set
 - Or manually set PORT variable
 
 **Domains:**
+
 - Not auto-generated; request via service panel
 - Railway domains: `*.up.railway.app`
 - Custom domains: CNAME to Railway domain
 
 **Domain Limits:**
 
-| Plan | Custom Domains |
-|------|----------------|
-| Trial | 1 |
-| Hobby | 2 |
-| Pro | 20+ (expandable) |
+| Plan  | Custom Domains   |
+| ----- | ---------------- |
+| Trial | 1                |
+| Hobby | 2                |
+| Pro   | 20+ (expandable) |
 
 **SSL/TLS:**
+
 - Let's Encrypt certificates auto-generated
 - External certificates not supported
 - For Cloudflare: Use "Full" mode, NOT "Full (Strict)"
 
 **Wildcard Domains:**
+
 - Supported for flexible subdomain management
 - CNAME for `authorize.railwaydns.net` must not be proxied
 - Nested wildcards not supported
@@ -230,6 +247,7 @@ app.listen(port, "0.0.0.0", () => console.log("Listening"));
 ### TCP Proxy
 
 For non-HTTP services (databases, custom protocols):
+
 - Generates `domain:port` combination
 - Random load balancing across replicas
 - Incurs network egress charges
@@ -265,20 +283,21 @@ FULL_URL=https://${{ RAILWAY_PUBLIC_DOMAIN }}
 
 ### Railway-Provided Variables
 
-| Variable | Description |
-|----------|-------------|
-| `PORT` | Auto-assigned port (if not manually set) |
-| `RAILWAY_PUBLIC_DOMAIN` | Public domain (if configured) |
-| `RAILWAY_PRIVATE_DOMAIN` | Private DNS name |
-| `RAILWAY_TCP_PROXY_PORT` | TCP proxy port |
-| `RAILWAY_VOLUME_NAME` | Attached volume name |
-| `RAILWAY_VOLUME_MOUNT_PATH` | Volume mount location |
-| `RAILWAY_SERVICE_NAME` | Service name |
-| `RAILWAY_ENVIRONMENT` | Current environment |
+| Variable                    | Description                              |
+| --------------------------- | ---------------------------------------- |
+| `PORT`                      | Auto-assigned port (if not manually set) |
+| `RAILWAY_PUBLIC_DOMAIN`     | Public domain (if configured)            |
+| `RAILWAY_PRIVATE_DOMAIN`    | Private DNS name                         |
+| `RAILWAY_TCP_PROXY_PORT`    | TCP proxy port                           |
+| `RAILWAY_VOLUME_NAME`       | Attached volume name                     |
+| `RAILWAY_VOLUME_MOUNT_PATH` | Volume mount location                    |
+| `RAILWAY_SERVICE_NAME`      | Service name                             |
+| `RAILWAY_ENVIRONMENT`       | Current environment                      |
 
 ### Config as Code
 
 **railway.toml:**
+
 ```toml
 [build]
 builder = "dockerfile"
@@ -295,6 +314,7 @@ restartPolicyMaxRetries = 3
 ```
 
 **railway.json:**
+
 ```json
 {
   "$schema": "https://railway.com/railway.schema.json",
@@ -322,12 +342,12 @@ restartPolicyMaxRetries = 3
 
 ### Supported Databases
 
-| Database | Template | Notes |
-|----------|----------|-------|
+| Database   | Template | Notes                           |
+| ---------- | -------- | ------------------------------- |
 | PostgreSQL | Official | Extensions available separately |
-| MySQL | Official | - |
-| MongoDB | Official | - |
-| Redis | Official | - |
+| MySQL      | Official | -                               |
+| MongoDB    | Official | -                               |
+| Redis      | Official | -                               |
 
 All databases are **unmanaged** - you control optimization and maintenance.
 
@@ -345,6 +365,7 @@ SELECT pg_reload_conf();
 **SHM Issues:** Set `RAILWAY_SHM_SIZE_BYTES=268435456` (256MB)
 
 **Extensions:** Install via separate templates:
+
 - TimescaleDB
 - PostGIS
 - pgvector
@@ -353,6 +374,7 @@ SELECT pg_reload_conf();
 ### Connection Strings
 
 **Internal (private network):**
+
 ```bash
 DATABASE_URL=postgresql://$PGUSER:$PGPASSWORD@$PGHOST:$PGPORT/$PGDATABASE
 # Or use RAILWAY_PRIVATE_DOMAIN
@@ -360,6 +382,7 @@ DATABASE_URL=postgresql://user:pass@postgres.railway.internal:5432/railway
 ```
 
 **External (TCP proxy):**
+
 ```bash
 DATABASE_PUBLIC_URL=postgresql://user:pass@containers-us-west-xxx.railway.app:7890/railway
 # Incurs egress charges!
@@ -372,17 +395,20 @@ DATABASE_PUBLIC_URL=postgresql://user:pass@containers-us-west-xxx.railway.app:78
 - Pre-deploy commands CANNOT access volumes
 
 **Configuration:**
+
 ```bash
 RAILWAY_VOLUME_MOUNT_PATH=/app/data  # Where to mount
 RAILWAY_RUN_UID=0  # For non-root container access
 ```
 
 **Limitations:**
+
 - Changes during build don't persist
 - Must use start command for persistent operations
 - Region changes require volume migration (minimal downtime)
 
 **Backups:**
+
 - Incremental, copy-on-write
 - Manual and automated options
 - Charged only for exclusive data
@@ -392,12 +418,14 @@ RAILWAY_RUN_UID=0  # For non-root container access
 S3-compatible object storage:
 
 **Pricing:**
+
 - Storage: $0.015/GB-month
 - Operations: Free
 - Bucket egress: Free
 - Service egress: Standard rates
 
 **Supported Operations:**
+
 - Put, Get, Head, Delete objects
 - List objects (v1, v2)
 - Copy objects
@@ -405,6 +433,7 @@ S3-compatible object storage:
 - Multipart uploads
 
 **Not Supported:**
+
 - Server-side encryption
 - Versioning
 - Object locks
@@ -419,15 +448,15 @@ S3-compatible object storage:
 
 Automatic scaling up to plan limits:
 
-| Plan | RAM | vCPU | Volume | Image Size |
-|------|-----|------|--------|------------|
-| Trial | 1 GB | 2 | 0.5 GB | 4 GB |
-| Free | 0.5 GB | 1 | 0.5 GB | 4 GB |
-| Hobby | 8 GB | 8 | 5 GB | 100 GB |
-| Pro | 32 GB | 32 | 50 GB* | Unlimited |
-| Enterprise | 48 GB | 64 | 2 TB* | Unlimited |
+| Plan       | RAM    | vCPU | Volume  | Image Size |
+| ---------- | ------ | ---- | ------- | ---------- |
+| Trial      | 1 GB   | 2    | 0.5 GB  | 4 GB       |
+| Free       | 0.5 GB | 1    | 0.5 GB  | 4 GB       |
+| Hobby      | 8 GB   | 8    | 5 GB    | 100 GB     |
+| Pro        | 32 GB  | 32   | 50 GB\* | Unlimited  |
+| Enterprise | 48 GB  | 64   | 2 TB\*  | Unlimited  |
 
-*Self-serve increases up to 250GB for Pro/Enterprise
+\*Self-serve increases up to 250GB for Pro/Enterprise
 
 ### Horizontal Scaling
 
@@ -436,11 +465,13 @@ Automatic scaling up to plan limits:
 - 2 replicas on Pro = potential 64 vCPU, 64 GB RAM combined
 
 **Multi-Region Replicas:**
+
 - Distribute across different regions
 - Traffic routes to nearest region first
 - Random distribution within region
 
 **Load Balancing:**
+
 - Random distribution (no sticky sessions yet)
 - Public traffic → nearest region → random replica
 
@@ -449,11 +480,13 @@ Automatic scaling up to plan limits:
 Reduces costs for inactive services:
 
 **How it works:**
+
 - Service sleeps after 10 min without OUTBOUND traffic
 - Wakes on incoming requests (cold start delay)
 - Open DB connections prevent sleep
 
 **Factors preventing sleep:**
+
 - Database connections
 - Telemetry/logging
 - Service-to-service communication
@@ -542,9 +575,9 @@ railway volume detach
 
 ### CI/CD Tokens
 
-| Token Type | Scope | Use Case |
-|------------|-------|----------|
-| `RAILWAY_TOKEN` | Single project | Deploy, logs, redeploy |
+| Token Type          | Scope          | Use Case                                 |
+| ------------------- | -------------- | ---------------------------------------- |
+| `RAILWAY_TOKEN`     | Single project | Deploy, logs, redeploy                   |
 | `RAILWAY_API_TOKEN` | All workspaces | Create projects, manage across workspace |
 
 ---
@@ -565,6 +598,7 @@ railway volume detach
 ### PR Environment Features
 
 Enable in Project Settings:
+
 - Auto-provision when PR opens
 - Auto-delete when PR merges/closes
 - Bot PR support (Dependabot, Renovate)
@@ -575,6 +609,7 @@ Enable in Project Settings:
 ### Environment Syncing
 
 Transfer services between environments:
+
 1. Select source environment
 2. Review changes (New, Edited, Removed)
 3. Deploy staged changes
@@ -591,6 +626,7 @@ Transfer services between environments:
 - Failed check = deployment marked as failed
 
 **Configuration:**
+
 ```toml
 [deploy]
 healthcheckPath = "/health"
@@ -601,11 +637,11 @@ healthcheckTimeout = 300
 
 ### Restart Policies
 
-| Policy | Behavior |
-|--------|----------|
-| `never` | No automatic restart |
+| Policy       | Behavior                       |
+| ------------ | ------------------------------ |
+| `never`      | No automatic restart           |
 | `on-failure` | Restart on crash/non-zero exit |
-| `always` | Always restart |
+| `always`     | Always restart                 |
 
 ```toml
 [deploy]
@@ -623,6 +659,7 @@ preDeployCommand = ["npm run db:migrate", "npm run db:seed"]
 ```
 
 **Characteristics:**
+
 - Have private network access
 - Have environment variables
 - Run in separate container
@@ -647,6 +684,7 @@ preDeployCommand = ["npm run db:migrate", "npm run db:seed"]
 ```
 
 **Examples:**
+
 ```bash
 0 * * * *      # Every hour
 0 0 * * *      # Daily at midnight
@@ -670,20 +708,20 @@ preDeployCommand = ["npm run db:migrate", "npm run db:seed"]
 
 ### Pricing Model
 
-| Plan | Monthly Fee | Included Usage |
-|------|-------------|----------------|
-| Free | $0 | $1 credit |
-| Hobby | $5 | $5 credit |
-| Pro | $20 | $20 credit |
-| Enterprise | Custom | Custom |
+| Plan       | Monthly Fee | Included Usage |
+| ---------- | ----------- | -------------- |
+| Free       | $0          | $1 credit      |
+| Hobby      | $5          | $5 credit      |
+| Pro        | $20         | $20 credit     |
+| Enterprise | Custom      | Custom         |
 
 ### Resource Costs (Beyond Included)
 
-| Resource | Cost |
-|----------|------|
-| RAM | $10/GB/month |
-| CPU | $20/vCPU/month |
-| Network Egress | $0.05/GB |
+| Resource       | Cost           |
+| -------------- | -------------- |
+| RAM            | $10/GB/month   |
+| CPU            | $20/vCPU/month |
+| Network Egress | $0.05/GB       |
 | Volume Storage | $0.15/GB/month |
 
 ### Cost Optimization Strategies
@@ -755,12 +793,12 @@ Recovery: Manually increase/remove limit
 
 ### Certifications
 
-| Certification | Availability |
-|---------------|--------------|
-| SOC 2 Type II | Available |
-| SOC 3 | Available |
-| HIPAA BAA | With committed spend |
-| GDPR | DPA available |
+| Certification | Availability         |
+| ------------- | -------------------- |
+| SOC 2 Type II | Available            |
+| SOC 3         | Available            |
+| HIPAA BAA     | With committed spend |
+| GDPR          | DPA available        |
 
 ### Enterprise Features
 
@@ -772,10 +810,10 @@ Recovery: Manually increase/remove limit
 ### Committed Spend Tiers
 
 | Monthly Spend | Features Unlocked |
-|---------------|-------------------|
-| $1,000 | HIPAA compliance |
-| $2,000 | SLOs |
-| $10,000 | Dedicated hosts |
+| ------------- | ----------------- |
+| $1,000        | HIPAA compliance  |
+| $2,000        | SLOs              |
+| $10,000       | Dedicated hosts   |
 
 ---
 
@@ -798,14 +836,15 @@ Project-Access-Token: <TOKEN>
 
 ### Rate Limits
 
-| Plan | Per Hour | Per Second |
-|------|----------|------------|
-| Free | 100 | — |
-| Hobby | 1,000 | 10 |
-| Pro | 10,000 | 50 |
-| Enterprise | Custom | Custom |
+| Plan       | Per Hour | Per Second |
+| ---------- | -------- | ---------- |
+| Free       | 100      | —          |
+| Hobby      | 1,000    | 10         |
+| Pro        | 10,000   | 50         |
+| Enterprise | Custom   | Custom     |
 
 **Response Headers:**
+
 - `X-RateLimit-Limit` - Max requests
 - `X-RateLimit-Remaining` - Requests left
 - `X-RateLimit-Reset` - Reset timestamp
@@ -814,6 +853,7 @@ Project-Access-Token: <TOKEN>
 ### MCP Server (AI Integration)
 
 Natural language to Railway CLI operations:
+
 - Works with Claude Desktop, Cursor, VS Code
 - Destructive actions excluded by design
 - Operations: create projects, deploy, manage vars, view logs
@@ -825,11 +865,13 @@ Natural language to Railway CLI operations:
 ### "Application Failed to Respond" (502)
 
 **Causes:**
+
 1. Not binding to `0.0.0.0:$PORT`
 2. Target port mismatch in domain settings
 3. Service overloaded
 
 **Solutions:**
+
 ```javascript
 // Correct binding
 const port = process.env.PORT || 3000;
@@ -841,6 +883,7 @@ app.listen(port, "0.0.0.0", () => {
 ### "No Start Command Could Be Found"
 
 **Solution:** Add start command in service settings or config file:
+
 ```toml
 [deploy]
 startCommand = "npm start"
@@ -851,6 +894,7 @@ startCommand = "npm start"
 **Cause:** Private networking unavailable during build phase.
 
 **Solution:** Ensure connections happen at runtime, not build:
+
 ```javascript
 // Don't connect during module initialization
 // Connect in startup function instead
@@ -859,6 +903,7 @@ startCommand = "npm start"
 ### "Nixpacks Unable to Generate Build Plan"
 
 **Solutions:**
+
 1. Verify language detection (check for package.json, requirements.txt, etc.)
 2. Use custom Dockerfile
 3. Specify builder explicitly in config
@@ -871,14 +916,15 @@ startCommand = "npm start"
 
 ## Regions
 
-| Region | Location | Identifier |
-|--------|----------|------------|
-| US West Metal | California | `us-west2` |
-| US East Metal | Virginia | `us-east4-eqdc4a` |
-| EU West Metal | Amsterdam | `europe-west4-drams3a` |
-| Southeast Asia Metal | Singapore | `asia-southeast1-eqsg3a` |
+| Region               | Location   | Identifier               |
+| -------------------- | ---------- | ------------------------ |
+| US West Metal        | California | `us-west2`               |
+| US East Metal        | Virginia   | `us-east4-eqdc4a`        |
+| EU West Metal        | Amsterdam  | `europe-west4-drams3a`   |
+| Southeast Asia Metal | Singapore  | `asia-southeast1-eqsg3a` |
 
 **Notes:**
+
 - All users have access to Metal regions
 - Pro plan required for some additional regions
 - Volume migrations require minimal downtime
@@ -906,12 +952,14 @@ startCommand = "npm start"
 For our deployment:
 
 **API Service:**
+
 - Uses `Dockerfile.api`
 - Railway injects `PORT=8080`
 - Target Port in dashboard: 8080
 - Config file: `/railway.api.toml`
 
 **Web Service:**
+
 - Uses `Dockerfile.web`
 - Exposes port 3000
 - Target Port in dashboard: 3000

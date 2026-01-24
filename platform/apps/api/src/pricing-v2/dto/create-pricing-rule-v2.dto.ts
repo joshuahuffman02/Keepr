@@ -1,4 +1,14 @@
-import { IsBoolean, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from "class-validator";
 import { AdjustmentType, PricingRuleType, PricingStackMode } from "@prisma/client";
 
 // Fallback enums in case @prisma/client enums are undefined at runtime (e.g. missing generate)
@@ -7,16 +17,16 @@ const PricingRuleTypeFallback: Record<string, string> = {
   weekend: "weekend",
   holiday: "holiday",
   event: "event",
-  demand: "demand"
+  demand: "demand",
 };
 const PricingStackModeFallback: Record<string, string> = {
   additive: "additive",
   max: "max",
-  override: "override"
+  override: "override",
 };
 const AdjustmentTypeFallback: Record<string, string> = {
   percent: "percent",
-  flat: "flat"
+  flat: "flat",
 };
 
 const PricingRuleTypeGuard = PricingRuleType ?? PricingRuleTypeFallback;

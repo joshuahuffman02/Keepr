@@ -1,11 +1,24 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException, BadRequestException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { AiProviderService } from '../ai/ai-provider.service';
-import { RedisService } from '../redis/redis.service';
-import { UploadsService } from '../uploads/uploads.service';
-import { AiFeatureType, ChatParticipantType, ChatMessageRole, AnalyticsEventName } from '@prisma/client';
-import type { ChatMessage, Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  OnModuleInit,
+  OnModuleDestroy,
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { AiProviderService } from "../ai/ai-provider.service";
+import { RedisService } from "../redis/redis.service";
+import { UploadsService } from "../uploads/uploads.service";
+import {
+  AiFeatureType,
+  ChatParticipantType,
+  ChatMessageRole,
+  AnalyticsEventName,
+} from "@prisma/client";
+import type { ChatMessage, Prisma } from "@prisma/client";
+import { randomUUID } from "crypto";
 import {
   SendMessageDto,
   ChatMessageResponse,
@@ -15,29 +28,26 @@ import {
   ChatAttachment,
   ChatMessagePart,
   ChatMessageVisibility,
-} from './dto/send-message.dto';
-import {
-  ExecuteActionDto,
-  ExecuteActionResponse,
-} from './dto/execute-action.dto';
-import { ExecuteToolDto, ExecuteToolResponse } from './dto/execute-tool.dto';
+} from "./dto/send-message.dto";
+import { ExecuteActionDto, ExecuteActionResponse } from "./dto/execute-action.dto";
+import { ExecuteToolDto, ExecuteToolResponse } from "./dto/execute-tool.dto";
 import {
   GetHistoryDto,
   ConversationHistoryResponse,
   MessageHistoryItem,
-} from './dto/get-history.dto';
+} from "./dto/get-history.dto";
 import {
   GetConversationsDto,
   ConversationListResponse,
   ConversationSummary,
-} from './dto/get-conversations.dto';
-import { GetTranscriptDto, TranscriptFormat, TranscriptResponse } from './dto/get-transcript.dto';
-import { SubmitFeedbackDto, SubmitFeedbackResponse } from './dto/submit-feedback.dto';
-import { RegenerateMessageDto } from './dto/regenerate-message.dto';
-import { ChatToolsService } from './chat-tools.service';
-import { ChatGateway } from './chat.gateway';
-import { AnalyticsService } from '../analytics/analytics.service';
-import { EnhancedAnalyticsService } from '../analytics/enhanced-analytics.service';
+} from "./dto/get-conversations.dto";
+import { GetTranscriptDto, TranscriptFormat, TranscriptResponse } from "./dto/get-transcript.dto";
+import { SubmitFeedbackDto, SubmitFeedbackResponse } from "./dto/submit-feedback.dto";
+import { RegenerateMessageDto } from "./dto/regenerate-message.dto";
+import { ChatToolsService } from "./chat-tools.service";
+import { ChatGateway } from "./chat.gateway";
+import { AnalyticsService } from "../analytics/analytics.service";
+import { EnhancedAnalyticsService } from "../analytics/enhanced-analytics.service";
 
 interface ChatContext {
   campgroundId: string;
@@ -49,7 +59,7 @@ interface ChatContext {
 
 interface PendingAction {
   id: string;
-  type: 'confirmation' | 'form' | 'selection';
+  type: "confirmation" | "form" | "selection";
   tool: string;
   args: Record<string, unknown>;
   title: string;
@@ -64,12 +74,12 @@ const PENDING_ACTION_TTL_SECONDS = 10 * 60; // For Redis TTL
 // Cleanup runs every 5 minutes (only used when Redis is unavailable)
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
 // Redis key prefix for pending actions
-const REDIS_PENDING_ACTION_PREFIX = 'chat:pending_action:';
+const REDIS_PENDING_ACTION_PREFIX = "chat:pending_action:";
 
-type PendingActionSerialized = Omit<PendingAction, 'expiresAt'> & { expiresAt: string };
+type PendingActionSerialized = Omit<PendingAction, "expiresAt"> & { expiresAt: string };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
   if (value === undefined || value === null) return undefined;
@@ -80,31 +90,29 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
   }
 };
 
-const normalizeMessageRole = (role: ChatMessageRole): MessageHistoryItem['role'] => {
+const normalizeMessageRole = (role: ChatMessageRole): MessageHistoryItem["role"] => {
   switch (role) {
     case ChatMessageRole.user:
-      return 'user';
+      return "user";
     case ChatMessageRole.assistant:
-      return 'assistant';
+      return "assistant";
     case ChatMessageRole.tool:
-      return 'tool';
+      return "tool";
     case ChatMessageRole.system:
-      return 'system';
+      return "system";
     default:
-      return 'assistant';
+      return "assistant";
   }
 };
 
 const isToolCall = (value: unknown): value is ToolCall =>
   isRecord(value) &&
-  typeof value.id === 'string' &&
-  typeof value.name === 'string' &&
+  typeof value.id === "string" &&
+  typeof value.name === "string" &&
   isRecord(value.args);
 
 const isToolResult = (value: unknown): value is ToolResult =>
-  isRecord(value) &&
-  typeof value.toolCallId === 'string' &&
-  'result' in value;
+  isRecord(value) && typeof value.toolCallId === "string" && "result" in value;
 
 const parseToolCalls = (value: unknown): ToolCall[] | undefined =>
   Array.isArray(value) ? value.filter(isToolCall) : undefined;
@@ -113,24 +121,24 @@ const parseToolResults = (value: unknown): ToolResult[] | undefined =>
   Array.isArray(value) ? value.filter(isToolResult) : undefined;
 
 const CHAT_ATTACHMENT_ALLOWED_CONTENT_TYPES = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'application/pdf',
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "application/pdf",
 ]);
 const CHAT_ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
 
 const isChatAttachment = (value: unknown): value is ChatAttachment =>
   isRecord(value) &&
-  typeof value.name === 'string' &&
-  typeof value.contentType === 'string' &&
-  typeof value.size === 'number' &&
+  typeof value.name === "string" &&
+  typeof value.contentType === "string" &&
+  typeof value.size === "number" &&
   Number.isFinite(value.size) &&
   value.size > 0 &&
   value.size <= CHAT_ATTACHMENT_MAX_BYTES &&
-  (value.storageKey === undefined || typeof value.storageKey === 'string') &&
-  (value.url === undefined || typeof value.url === 'string');
+  (value.storageKey === undefined || typeof value.storageKey === "string") &&
+  (value.url === undefined || typeof value.url === "string");
 
 const normalizeAttachments = (value: unknown): ChatAttachment[] | undefined => {
   if (!Array.isArray(value)) return undefined;
@@ -148,13 +156,13 @@ const normalizeAttachments = (value: unknown): ChatAttachment[] | undefined => {
 };
 
 const getMessageVisibility = (value: unknown): ChatMessageVisibility | undefined =>
-  value === 'internal' || value === 'public' ? value : undefined;
+  value === "internal" || value === "public" ? value : undefined;
 
 const getString = (value: unknown): string | undefined =>
-  typeof value === 'string' ? value : undefined;
+  typeof value === "string" ? value : undefined;
 
 const getNumber = (value: unknown): number | undefined =>
-  typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  typeof value === "number" && Number.isFinite(value) ? value : undefined;
 
 const buildMessageMetadata = (
   attachments?: ChatAttachment[],
@@ -164,7 +172,7 @@ const buildMessageMetadata = (
   if (attachments && attachments.length > 0) {
     metadata.attachments = attachments;
   }
-  if (visibility === 'internal') {
+  if (visibility === "internal") {
     metadata.visibility = visibility;
   }
   return Object.keys(metadata).length > 0 ? toJsonValue(metadata) : undefined;
@@ -185,7 +193,7 @@ const extractCardPart = (value: unknown): ChatMessagePart | null => {
   const title = getString(candidate.title) ?? getString(value.title);
   const summary = getString(candidate.summary) ?? getString(value.summary);
   return {
-    type: 'card',
+    type: "card",
     title: title || undefined,
     summary,
     payload: candidate,
@@ -199,13 +207,13 @@ const buildMessageParts = (params: {
   toolResults?: ToolResult[];
 }): ChatMessagePart[] | undefined => {
   const parts: ChatMessagePart[] = [];
-  const content = params.content?.trim() ?? '';
+  const content = params.content?.trim() ?? "";
   if (content) {
-    parts.push({ type: 'text', text: content });
+    parts.push({ type: "text", text: content });
   }
   if (params.attachments && params.attachments.length > 0) {
     for (const attachment of params.attachments) {
-      parts.push({ type: 'file', file: attachment });
+      parts.push({ type: "file", file: attachment });
     }
   }
 
@@ -216,7 +224,7 @@ const buildMessageParts = (params: {
     for (const call of params.toolCalls) {
       const result = resultsById.get(call.id);
       parts.push({
-        type: 'tool',
+        type: "tool",
         name: call.name,
         callId: call.id,
         args: call.args,
@@ -227,8 +235,8 @@ const buildMessageParts = (params: {
   } else if (toolResults.length > 0) {
     for (const result of toolResults) {
       parts.push({
-        type: 'tool',
-        name: 'tool',
+        type: "tool",
+        name: "tool",
         callId: result.toolCallId,
         result: result.result,
         error: result.error,
@@ -246,28 +254,25 @@ const buildMessageParts = (params: {
   return parts.length > 0 ? parts : undefined;
 };
 
-const formatTranscriptRole = (role: MessageHistoryItem['role']): string => {
+const formatTranscriptRole = (role: MessageHistoryItem["role"]): string => {
   switch (role) {
-    case 'user':
-      return 'User';
-    case 'assistant':
-      return 'Assistant';
-    case 'tool':
-      return 'Tool';
-    case 'system':
-      return 'System';
+    case "user":
+      return "User";
+    case "assistant":
+      return "Assistant";
+    case "tool":
+      return "Tool";
+    case "system":
+      return "System";
     default:
-      return 'Assistant';
+      return "Assistant";
   }
 };
 
-const formatTranscriptMessage = (
-  message: MessageHistoryItem,
-  format: TranscriptFormat,
-): string => {
+const formatTranscriptMessage = (message: MessageHistoryItem, format: TranscriptFormat): string => {
   const roleLabel = formatTranscriptRole(message.role);
   const header =
-    format === 'markdown'
+    format === "markdown"
       ? `**${roleLabel}** (${message.createdAt})`
       : `[${message.createdAt}] ${roleLabel}:`;
   const lines: string[] = [header];
@@ -278,25 +283,23 @@ const formatTranscriptMessage = (
   if (message.attachments && message.attachments.length > 0) {
     const attachmentLine = message.attachments
       .map((attachment) => `${attachment.name} (${attachment.contentType})`)
-      .join(', ');
+      .join(", ");
     lines.push(`Attachments: ${attachmentLine}`);
   }
 
   if (message.toolCalls && message.toolCalls.length > 0) {
-    lines.push(`Tool calls: ${message.toolCalls.map((call) => call.name).join(', ')}`);
+    lines.push(`Tool calls: ${message.toolCalls.map((call) => call.name).join(", ")}`);
   }
 
   if (message.toolResults && message.toolResults.length > 0) {
     lines.push(`Tool results: ${message.toolResults.length}`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 };
 
-const buildTranscriptContent = (
-  messages: MessageHistoryItem[],
-  format: TranscriptFormat,
-): string => messages.map((message) => formatTranscriptMessage(message, format)).join('\n\n');
+const buildTranscriptContent = (messages: MessageHistoryItem[], format: TranscriptFormat): string =>
+  messages.map((message) => formatTranscriptMessage(message, format)).join("\n\n");
 
 const isPendingActionType = (value: unknown): value is PendingAction["type"] =>
   value === "confirmation" || value === "form" || value === "selection";
@@ -334,11 +337,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   async assertGuestAccess(guestId: string, campgroundId: string): Promise<void> {
     const reservation = await this.prisma.reservation.findFirst({
       where: { guestId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
 
     if (!reservation) {
-      throw new ForbiddenException('You do not have access to this campground');
+      throw new ForbiddenException("You do not have access to this campground");
     }
   }
 
@@ -349,9 +352,9 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         this.cleanupExpiredActions();
       }, CLEANUP_INTERVAL_MS);
       this.cleanupInterval.unref?.();
-      this.logger.warn('Chat service using in-memory pending actions (Redis unavailable)');
+      this.logger.warn("Chat service using in-memory pending actions (Redis unavailable)");
     } else {
-      this.logger.log('Chat service initialized with Redis-backed pending actions');
+      this.logger.log("Chat service initialized with Redis-backed pending actions");
     }
   }
 
@@ -432,21 +435,18 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   /**
    * Send a message to the AI chat and get a response
    */
-  async sendMessage(
-    dto: SendMessageDto,
-    context: ChatContext,
-  ): Promise<ChatMessageResponse> {
+  async sendMessage(dto: SendMessageDto, context: ChatContext): Promise<ChatMessageResponse> {
     const startedAt = Date.now();
-    const message = dto.message?.trim() ?? '';
+    const message = dto.message?.trim() ?? "";
     const { conversationId: existingConversationId } = dto;
     const attachments = normalizeAttachments(dto.attachments);
-    const visibility = dto.visibility === 'internal' ? 'internal' : undefined;
+    const visibility = dto.visibility === "internal" ? "internal" : undefined;
     const sessionId = dto.sessionId;
     if (!message && !attachments) {
-      throw new BadRequestException('Message or attachment required');
+      throw new BadRequestException("Message or attachment required");
     }
-    if (visibility === 'internal' && context.participantType !== ChatParticipantType.staff) {
-      throw new ForbiddenException('Internal notes are staff-only');
+    if (visibility === "internal" && context.participantType !== ChatParticipantType.staff) {
+      throw new ForbiddenException("Internal notes are staff-only");
     }
 
     // Get or create conversation
@@ -469,23 +469,23 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     await this.trackChatAction({
       sessionId,
       context,
-      actionType: 'chat_message_sent',
+      actionType: "chat_message_sent",
       metadata: {
         conversationId: conversation.id,
         messageLength: message.length,
         attachmentCount: attachments?.length ?? 0,
-        visibility: visibility ?? 'public',
+        visibility: visibility ?? "public",
       },
     });
 
-    if (visibility === 'internal') {
+    if (visibility === "internal") {
       const internalReply = await this.prisma.chatMessage.create({
         data: {
           id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.assistant,
-          content: 'Internal note saved.',
-          metadata: toJsonValue({ visibility: 'internal' }),
+          content: "Internal note saved.",
+          metadata: toJsonValue({ visibility: "internal" }),
         },
       });
       const parts = buildMessageParts({ content: internalReply.content });
@@ -498,11 +498,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       return {
         conversationId: conversation.id,
         messageId: internalReply.id,
-        role: 'assistant',
+        role: "assistant",
         content: internalReply.content,
         parts,
         createdAt: internalReply.createdAt.toISOString(),
-        visibility: 'internal',
+        visibility: "internal",
       };
     }
 
@@ -526,8 +526,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         featureType: AiFeatureType.booking_assist,
         systemPrompt,
         userPrompt: this.formatHistoryForAI(history, message, attachments),
-        tools: tools.map(t => ({
-          type: 'function',
+        tools: tools.map((t) => ({
+          type: "function",
           function: {
             name: t.name,
             description: t.description,
@@ -569,7 +569,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
             campgroundId: context.campgroundId,
             featureType: AiFeatureType.booking_assist,
             systemPrompt,
-            userPrompt: this.formatHistoryWithToolResults(history, message, toolCalls, toolResults, attachments),
+            userPrompt: this.formatHistoryWithToolResults(
+              history,
+              message,
+              toolCalls,
+              toolResults,
+              attachments,
+            ),
             maxTokens: 500,
             temperature: 0.7,
           });
@@ -599,7 +605,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_response_latency',
+        actionType: "chat_response_latency",
         metadata: {
           conversationId: conversation.id,
           totalLatencyMs: Date.now() - startedAt,
@@ -613,7 +619,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       return {
         conversationId: conversation.id,
         messageId: assistantMessage.id,
-        role: 'assistant',
+        role: "assistant",
         content: finalContent,
         parts: buildMessageParts({ content: finalContent, toolCalls, toolResults }),
         toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
@@ -622,15 +628,15 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         createdAt: assistantMessage.createdAt.toISOString(),
       };
     } catch (error) {
-      this.logger.error('Chat error:', error);
+      this.logger.error("Chat error:", error);
 
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_error',
+        actionType: "chat_error",
         metadata: {
-          phase: 'send',
-          errorType: error instanceof Error ? error.name : 'UnknownError',
+          phase: "send",
+          errorType: error instanceof Error ? error.name : "UnknownError",
         },
       });
 
@@ -640,8 +646,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.system,
-          content: 'I encountered an error processing your request. Please try again.',
-          metadata: toJsonValue({ error: error instanceof Error ? error.message : 'Unknown error' }),
+          content: "I encountered an error processing your request. Please try again.",
+          metadata: toJsonValue({
+            error: error instanceof Error ? error.message : "Unknown error",
+          }),
         },
       });
 
@@ -653,21 +661,18 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
    * Send a message with streaming response via WebSocket
    * Emits tokens progressively to the conversation room
    */
-  async sendMessageStream(
-    dto: SendMessageDto,
-    context: ChatContext,
-  ): Promise<void> {
+  async sendMessageStream(dto: SendMessageDto, context: ChatContext): Promise<void> {
     const startedAt = Date.now();
-    const message = dto.message?.trim() ?? '';
+    const message = dto.message?.trim() ?? "";
     const { conversationId: existingConversationId } = dto;
     const attachments = normalizeAttachments(dto.attachments);
-    const visibility = dto.visibility === 'internal' ? 'internal' : undefined;
+    const visibility = dto.visibility === "internal" ? "internal" : undefined;
     const sessionId = dto.sessionId;
     if (!message && !attachments) {
-      throw new BadRequestException('Message or attachment required');
+      throw new BadRequestException("Message or attachment required");
     }
-    if (visibility === 'internal' && context.participantType !== ChatParticipantType.staff) {
-      throw new ForbiddenException('Internal notes are staff-only');
+    if (visibility === "internal" && context.participantType !== ChatParticipantType.staff) {
+      throw new ForbiddenException("Internal notes are staff-only");
     }
 
     // Get or create conversation
@@ -690,23 +695,23 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     await this.trackChatAction({
       sessionId,
       context,
-      actionType: 'chat_message_sent',
+      actionType: "chat_message_sent",
       metadata: {
         conversationId: conversation.id,
         messageLength: message.length,
         attachmentCount: attachments?.length ?? 0,
-        visibility: visibility ?? 'public',
+        visibility: visibility ?? "public",
       },
     });
 
-    if (visibility === 'internal') {
+    if (visibility === "internal") {
       const internalReply = await this.prisma.chatMessage.create({
         data: {
           id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.assistant,
-          content: 'Internal note saved.',
-          metadata: toJsonValue({ visibility: 'internal' }),
+          content: "Internal note saved.",
+          metadata: toJsonValue({ visibility: "internal" }),
         },
       });
 
@@ -719,7 +724,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         messageId: internalReply.id,
         content: internalReply.content,
         parts: buildMessageParts({ content: internalReply.content }),
-        visibility: 'internal',
+        visibility: "internal",
       });
       return;
     }
@@ -748,8 +753,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         featureType: AiFeatureType.booking_assist,
         systemPrompt,
         userPrompt: this.formatHistoryForAI(history, message, attachments),
-        tools: tools.map(t => ({
-          type: 'function',
+        tools: tools.map((t) => ({
+          type: "function",
           function: {
             name: t.name,
             description: t.description,
@@ -779,7 +784,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           }
 
           this.chatGateway.emitToken(conversation.id, {
-            token: '',
+            token: "",
             isComplete: false,
             toolCall: {
               id: toolCallId,
@@ -804,7 +809,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         // Emit tool results
         for (const result of toolResults) {
           this.chatGateway.emitToken(conversation.id, {
-            token: '',
+            token: "",
             isComplete: false,
             toolResult: {
               toolCallId: result.toolCallId,
@@ -816,7 +821,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         // If action is required, emit and stop
         if (actionRequired) {
           this.chatGateway.emitToken(conversation.id, {
-            token: '',
+            token: "",
             isComplete: false,
             actionRequired,
           });
@@ -827,7 +832,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
               id: randomUUID(),
               conversationId: conversation.id,
               role: ChatMessageRole.assistant,
-              content: finalContent || 'I need your confirmation to proceed.',
+              content: finalContent || "I need your confirmation to proceed.",
               toolCalls: toolCalls.length > 0 ? toJsonValue(toolCalls) : undefined,
               toolResults: toolResults.length > 0 ? toJsonValue(toolResults) : undefined,
             },
@@ -836,12 +841,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           this.chatGateway.emitTyping(conversation.id, false);
           this.chatGateway.emitComplete(conversation.id, {
             messageId: assistantMessage.id,
-            content: finalContent || 'I need your confirmation to proceed.',
+            content: finalContent || "I need your confirmation to proceed.",
             toolCalls,
             toolResults,
             actionRequired,
             parts: buildMessageParts({
-              content: finalContent || 'I need your confirmation to proceed.',
+              content: finalContent || "I need your confirmation to proceed.",
               toolCalls,
               toolResults,
             }),
@@ -849,7 +854,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           await this.trackChatAction({
             sessionId,
             context,
-            actionType: 'chat_stream_latency',
+            actionType: "chat_stream_latency",
             metadata: {
               conversationId: conversation.id,
               totalLatencyMs: Date.now() - startedAt,
@@ -858,7 +863,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
               toolLatencyMs,
               streamLatencyMs,
               toolCount: toolCalls.length,
-              status: 'action_required',
+              status: "action_required",
             },
           });
           return;
@@ -875,7 +880,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
             campgroundId: context.campgroundId,
             featureType: AiFeatureType.booking_assist,
             systemPrompt,
-            userPrompt: this.formatHistoryWithToolResults(history, message, toolCalls, toolResults, attachments),
+            userPrompt: this.formatHistoryWithToolResults(
+              history,
+              message,
+              toolCalls,
+              toolResults,
+              attachments,
+            ),
             maxTokens: 500,
             temperature: 0.7,
           });
@@ -922,7 +933,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_stream_latency',
+        actionType: "chat_stream_latency",
         metadata: {
           conversationId: conversation.id,
           totalLatencyMs: Date.now() - startedAt,
@@ -931,11 +942,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           toolLatencyMs,
           streamLatencyMs,
           toolCount: toolCalls.length,
-          status: 'complete',
+          status: "complete",
         },
       });
     } catch (error) {
-      this.logger.error('Chat stream error:', error);
+      this.logger.error("Chat stream error:", error);
 
       // Stop typing
       this.chatGateway.emitTyping(conversation.id, false);
@@ -943,7 +954,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Emit error
       this.chatGateway.emitError(
         conversation.id,
-        error instanceof Error ? error.message : 'An error occurred',
+        error instanceof Error ? error.message : "An error occurred",
       );
 
       // Save error as system message
@@ -952,18 +963,18 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.system,
-          content: 'I encountered an error processing your request. Please try again.',
-          metadata: { error: error instanceof Error ? error.message : 'Unknown error' },
+          content: "I encountered an error processing your request. Please try again.",
+          metadata: { error: error instanceof Error ? error.message : "Unknown error" },
         },
       });
 
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_stream_error',
+        actionType: "chat_stream_error",
         metadata: {
           conversationId: conversation.id,
-          errorType: error instanceof Error ? error.name : 'UnknownError',
+          errorType: error instanceof Error ? error.name : "UnknownError",
         },
       });
     }
@@ -972,13 +983,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   /**
    * Stream content as tokens with small delays for visual effect
    */
-  private async streamContentAsTokens(
-    conversationId: string,
-    content: string,
-  ): Promise<void> {
+  private async streamContentAsTokens(conversationId: string, content: string): Promise<void> {
     // Split content into words/chunks for streaming effect
     const words = content.split(/(\s+)/);
-    let accumulated = '';
+    let accumulated = "";
 
     for (let i = 0; i < words.length; i++) {
       accumulated += words[i];
@@ -986,12 +994,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Emit every few words to balance responsiveness vs overhead
       if (i % 3 === 0 || i === words.length - 1) {
         this.chatGateway.emitToken(conversationId, {
-          token: words.slice(Math.max(0, i - 2), i + 1).join(''),
+          token: words.slice(Math.max(0, i - 2), i + 1).join(""),
           isComplete: false,
         });
 
         // Small delay between chunks for visual streaming effect
-        await new Promise(resolve => setTimeout(resolve, 20));
+        await new Promise((resolve) => setTimeout(resolve, 20));
       }
     }
   }
@@ -999,10 +1007,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   /**
    * Execute a confirmed action
    */
-  async executeAction(
-    dto: ExecuteActionDto,
-    context: ChatContext,
-  ): Promise<ExecuteActionResponse> {
+  async executeAction(dto: ExecuteActionDto, context: ChatContext): Promise<ExecuteActionResponse> {
     const { conversationId, actionId, selectedOption, formData } = dto;
     const actionStart = Date.now();
     const sessionId = dto.sessionId;
@@ -1013,19 +1018,19 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     // Get pending action from Redis (or fallback to in-memory)
     const pendingAction = await this.getPendingAction(actionId);
     if (!pendingAction) {
-      throw new BadRequestException('Action not found or expired');
+      throw new BadRequestException("Action not found or expired");
     }
 
     // Check if action has expired (Redis TTL should handle this, but double-check)
     if (pendingAction.expiresAt < new Date()) {
       await this.deletePendingAction(actionId);
-      throw new BadRequestException('Action has expired. Please try again.');
+      throw new BadRequestException("Action has expired. Please try again.");
     }
 
     // Verify action belongs to this conversation (security check)
     if (pendingAction.conversationId !== conversationId) {
       this.logger.warn(`Action ${actionId} does not belong to conversation ${conversationId}`);
-      throw new ForbiddenException('Action does not belong to this conversation');
+      throw new ForbiddenException("Action does not belong to this conversation");
     }
 
     try {
@@ -1037,9 +1042,9 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       );
       const resultRecord = isRecord(result) ? result : {};
       const resultMessage =
-        typeof resultRecord.message === 'string'
+        typeof resultRecord.message === "string"
           ? resultRecord.message
-          : 'Action completed successfully';
+          : "Action completed successfully";
 
       // Clear pending action from Redis (or in-memory)
       await this.deletePendingAction(actionId);
@@ -1058,12 +1063,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_action_execute',
+        actionType: "chat_action_execute",
         metadata: {
           conversationId,
           actionId,
           toolName: pendingAction.tool,
-          status: 'success',
+          status: "success",
           durationMs: Date.now() - actionStart,
         },
       });
@@ -1074,26 +1079,26 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         result: resultRecord.data,
       };
     } catch (error) {
-      this.logger.error('Action execution error:', error);
+      this.logger.error("Action execution error:", error);
 
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_action_execute',
+        actionType: "chat_action_execute",
         metadata: {
           conversationId,
           actionId,
           toolName: pendingAction.tool,
-          status: 'error',
+          status: "error",
           durationMs: Date.now() - actionStart,
-          errorType: error instanceof Error ? error.name : 'UnknownError',
+          errorType: error instanceof Error ? error.name : "UnknownError",
         },
       });
 
       return {
         success: false,
-        message: 'Failed to execute action',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Failed to execute action",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -1101,10 +1106,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   /**
    * Execute a tool directly for staff or guest flows
    */
-  async executeTool(
-    dto: ExecuteToolDto,
-    context: ChatContext,
-  ): Promise<ExecuteToolResponse> {
+  async executeTool(dto: ExecuteToolDto, context: ChatContext): Promise<ExecuteToolResponse> {
     const { tool, args, conversationId } = dto;
     const originalArgs = args ?? {};
     const toolStart = Date.now();
@@ -1120,27 +1122,31 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         await this.trackChatAction({
           sessionId,
           context,
-          actionType: 'chat_tool_execute',
+          actionType: "chat_tool_execute",
           metadata: {
             conversationId,
             toolName: tool,
-            status: 'prevalidate_failed',
+            status: "prevalidate_failed",
             durationMs: Date.now() - toolStart,
           },
         });
         return {
           success: false,
-          message: preValidateResult.message || 'Validation failed',
-          error: preValidateResult.message || 'Validation failed',
+          message: preValidateResult.message || "Validation failed",
+          error: preValidateResult.message || "Validation failed",
           prevalidateFailed: true,
         };
       }
 
-      const mergedArgs = preValidateResult ? { ...originalArgs, ...preValidateResult } : originalArgs;
+      const mergedArgs = preValidateResult
+        ? { ...originalArgs, ...preValidateResult }
+        : originalArgs;
       const result = await this.toolsService.executeTool(tool, mergedArgs, context);
       const resultRecord = isRecord(result) ? result : {};
       const resultMessage =
-        typeof resultRecord.message === 'string' ? resultRecord.message : 'Tool executed successfully';
+        typeof resultRecord.message === "string"
+          ? resultRecord.message
+          : "Tool executed successfully";
 
       if (conversationId) {
         const toolCallId = `tool_${randomUUID()}`;
@@ -1159,11 +1165,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_tool_execute',
+        actionType: "chat_tool_execute",
         metadata: {
           conversationId,
           toolName: tool,
-          status: 'success',
+          status: "success",
           durationMs: Date.now() - toolStart,
         },
       });
@@ -1171,26 +1177,26 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       return {
         success: true,
         message: resultMessage,
-        result: 'data' in resultRecord ? resultRecord.data : resultRecord,
+        result: "data" in resultRecord ? resultRecord.data : resultRecord,
       };
     } catch (error) {
-      this.logger.error('Tool execution error:', error);
+      this.logger.error("Tool execution error:", error);
       await this.trackChatAction({
         sessionId,
         context,
-        actionType: 'chat_tool_execute',
+        actionType: "chat_tool_execute",
         metadata: {
           conversationId,
           toolName: tool,
-          status: 'error',
+          status: "error",
           durationMs: Date.now() - toolStart,
-          errorType: error instanceof Error ? error.name : 'UnknownError',
+          errorType: error instanceof Error ? error.name : "UnknownError",
         },
       });
       return {
         success: false,
-        message: 'Failed to execute tool',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Failed to execute tool",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
   }
@@ -1198,10 +1204,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   /**
    * Get conversation history
    */
-  async getHistory(
-    dto: GetHistoryDto,
-    context: ChatContext,
-  ): Promise<ConversationHistoryResponse> {
+  async getHistory(dto: GetHistoryDto, context: ChatContext): Promise<ConversationHistoryResponse> {
     const { conversationId, limit = 50, before } = dto;
 
     // If no conversation ID, get or create the most recent one
@@ -1215,7 +1218,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           participantType: context.participantType,
           participantId: context.participantId,
         },
-        orderBy: { updatedAt: 'desc' },
+        orderBy: { updatedAt: "desc" },
       });
 
       if (!existing) {
@@ -1239,7 +1242,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     const messages = await this.prisma.chatMessage.findMany({
       where: whereClause,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: limit + 1, // Get one extra to check if there's more
     });
 
@@ -1275,7 +1278,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           createdAt: m.createdAt.toISOString(),
           visibility: getMessageVisibility(metadata?.visibility),
         };
-      })
+      }),
     );
 
     return {
@@ -1300,14 +1303,14 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     if (before) {
       const parsed = new Date(before);
       if (Number.isNaN(parsed.getTime())) {
-        throw new BadRequestException('Invalid before cursor');
+        throw new BadRequestException("Invalid before cursor");
       }
       beforeDate = parsed;
     }
     if (since) {
       const parsed = new Date(since);
       if (Number.isNaN(parsed.getTime())) {
-        throw new BadRequestException('Invalid since filter');
+        throw new BadRequestException("Invalid since filter");
       }
       sinceDate = parsed;
     }
@@ -1329,10 +1332,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       whereClause.AND = [
         {
           OR: [
-            { title: { contains: trimmedQuery, mode: 'insensitive' } },
+            { title: { contains: trimmedQuery, mode: "insensitive" } },
             {
               ChatMessage: {
-                some: { content: { contains: trimmedQuery, mode: 'insensitive' } },
+                some: { content: { contains: trimmedQuery, mode: "insensitive" } },
               },
             },
           ],
@@ -1342,14 +1345,14 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     const conversations = await this.prisma.chatConversation.findMany({
       where: whereClause,
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: "desc" },
       take: limit + 1,
       select: {
         id: true,
         title: true,
         updatedAt: true,
         ChatMessage: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1,
           select: { content: true, createdAt: true, metadata: true },
         },
@@ -1363,7 +1366,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     const summaries: ConversationSummary[] = conversations.map((conversation) => {
       const lastMessage = conversation.ChatMessage[0];
-      const lastContent = lastMessage?.content?.trim() ?? '';
+      const lastContent = lastMessage?.content?.trim() ?? "";
       let lastMessagePreview = lastContent ? lastContent.slice(0, 160) : undefined;
       if (!lastMessagePreview && lastMessage) {
         const metadata = isRecord(lastMessage.metadata) ? lastMessage.metadata : undefined;
@@ -1406,11 +1409,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     context: ChatContext,
   ): Promise<TranscriptResponse> {
     const conversation = await this.getConversation(conversationId, context);
-    const format: TranscriptFormat = dto.format ?? 'markdown';
+    const format: TranscriptFormat = dto.format ?? "markdown";
 
     const messages = await this.prisma.chatMessage.findMany({
       where: { conversationId: conversation.id },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       take: 500,
     });
 
@@ -1438,10 +1441,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           createdAt: m.createdAt.toISOString(),
           visibility: getMessageVisibility(metadata?.visibility),
         };
-      })
+      }),
     );
 
-    if (format === 'json') {
+    if (format === "json") {
       return {
         conversationId: conversation.id,
         format,
@@ -1496,13 +1499,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (!message) {
-      throw new NotFoundException('Message not found');
+      throw new NotFoundException("Message not found");
     }
 
     await this.getConversation(message.conversationId, context);
 
     if (message.role !== ChatMessageRole.assistant) {
-      throw new BadRequestException('Feedback is only available for assistant messages');
+      throw new BadRequestException("Feedback is only available for assistant messages");
     }
 
     const metadata = isRecord(message.metadata) ? { ...message.metadata } : {};
@@ -1525,7 +1528,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     await this.trackChatAction({
       sessionId: dto.sessionId,
       context,
-      actionType: 'chat_feedback',
+      actionType: "chat_feedback",
       metadata: {
         messageId: message.id,
         conversationId: message.conversationId,
@@ -1533,7 +1536,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       },
     });
 
-    return { success: true, message: 'Feedback saved' };
+    return { success: true, message: "Feedback saved" };
   }
 
   /**
@@ -1548,15 +1551,15 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (!targetMessage) {
-      throw new NotFoundException('Message not found');
+      throw new NotFoundException("Message not found");
     }
 
     if (targetMessage.role !== ChatMessageRole.assistant) {
-      throw new BadRequestException('Only assistant messages can be regenerated');
+      throw new BadRequestException("Only assistant messages can be regenerated");
     }
     const targetMetadata = isRecord(targetMessage.metadata) ? targetMessage.metadata : undefined;
-    if (getMessageVisibility(targetMetadata?.visibility) === 'internal') {
-      throw new BadRequestException('Internal notes cannot be regenerated');
+    if (getMessageVisibility(targetMetadata?.visibility) === "internal") {
+      throw new BadRequestException("Internal notes cannot be regenerated");
     }
 
     const conversation = await this.getConversation(targetMessage.conversationId, context);
@@ -1567,23 +1570,26 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         role: ChatMessageRole.user,
         createdAt: { lt: targetMessage.createdAt },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     if (!userMessage) {
-      throw new BadRequestException('No user prompt found to regenerate');
+      throw new BadRequestException("No user prompt found to regenerate");
     }
 
     const userMetadata = isRecord(userMessage.metadata) ? userMessage.metadata : undefined;
     const userAttachments = normalizeAttachments(userMetadata?.attachments);
-    const history = await this.buildConversationHistoryBefore(conversation.id, targetMessage.createdAt);
+    const history = await this.buildConversationHistoryBefore(
+      conversation.id,
+      targetMessage.createdAt,
+    );
     const tools = this.toolsService.getToolsForUser(context);
     const systemPrompt = this.buildSystemPrompt(context);
 
     await this.trackChatAction({
       sessionId: dto.sessionId,
       context,
-      actionType: 'chat_regenerate',
+      actionType: "chat_regenerate",
       metadata: {
         messageId: dto.messageId,
         conversationId: conversation.id,
@@ -1596,8 +1602,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         featureType: AiFeatureType.booking_assist,
         systemPrompt,
         userPrompt: this.formatHistoryForAI(history, userMessage.content, userAttachments),
-        tools: tools.map(t => ({
-          type: 'function',
+        tools: tools.map((t) => ({
+          type: "function",
           function: {
             name: t.name,
             description: t.description,
@@ -1665,7 +1671,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       return {
         conversationId: conversation.id,
         messageId: assistantMessage.id,
-        role: 'assistant',
+        role: "assistant",
         content: finalContent,
         parts: buildMessageParts({ content: finalContent, toolCalls, toolResults }),
         toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
@@ -1674,15 +1680,17 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         createdAt: assistantMessage.createdAt.toISOString(),
       };
     } catch (error) {
-      this.logger.error('Chat regenerate error:', error);
+      this.logger.error("Chat regenerate error:", error);
 
       await this.prisma.chatMessage.create({
         data: {
           id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.system,
-          content: 'I encountered an error regenerating your request. Please try again.',
-          metadata: toJsonValue({ error: error instanceof Error ? error.message : 'Unknown error' }),
+          content: "I encountered an error regenerating your request. Please try again.",
+          metadata: toJsonValue({
+            error: error instanceof Error ? error.message : "Unknown error",
+          }),
         },
       });
 
@@ -1699,12 +1707,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     });
 
     if (!conversation) {
-      throw new NotFoundException('Conversation not found');
+      throw new NotFoundException("Conversation not found");
     }
 
     // Verify access
     if (conversation.campgroundId !== context.campgroundId) {
-      throw new ForbiddenException('Access denied to this conversation');
+      throw new ForbiddenException("Access denied to this conversation");
     }
 
     // Guests can only access their own conversations
@@ -1713,7 +1721,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       (conversation.participantType !== ChatParticipantType.guest ||
         conversation.participantId !== context.participantId)
     ) {
-      throw new ForbiddenException('Access denied to this conversation');
+      throw new ForbiddenException("Access denied to this conversation");
     }
 
     return conversation;
@@ -1744,7 +1752,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   private async buildConversationHistory(conversationId: string): Promise<ChatMessage[]> {
     const messages = await this.prisma.chatMessage.findMany({
       where: { conversationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 20, // Last 20 messages for context
     });
 
@@ -1765,7 +1773,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         } catch {
           return attachment;
         }
-      })
+      }),
     );
 
     return hydrated;
@@ -1777,7 +1785,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   ): Promise<ChatMessage[]> {
     const messages = await this.prisma.chatMessage.findMany({
       where: { conversationId, createdAt: { lt: before } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 20,
     });
 
@@ -1789,14 +1797,17 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     const names = attachments
       .map((attachment) => attachment.name.trim())
       .filter((name) => name.length > 0);
-    if (names.length === 0) return 'attachments uploaded';
+    if (names.length === 0) return "attachments uploaded";
     if (names.length === 1) return `attachment: ${names[0]}`;
-    const preview = names.slice(0, 3).join(', ');
-    const suffix = names.length > 3 ? ` and ${names.length - 3} more` : '';
+    const preview = names.slice(0, 3).join(", ");
+    const suffix = names.length > 3 ? ` and ${names.length - 3} more` : "";
     return `attachments: ${preview}${suffix}`;
   }
 
-  private buildConversationTitle(message: string, attachments?: ChatAttachment[]): string | undefined {
+  private buildConversationTitle(
+    message: string,
+    attachments?: ChatAttachment[],
+  ): string | undefined {
     const trimmed = message.trim();
     if (trimmed) return trimmed.slice(0, 60);
     const summary = this.formatAttachmentSummary(attachments);
@@ -1841,16 +1852,16 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
             eventName: AnalyticsEventName.admin_action,
             campgroundId: context.campgroundId,
             userId: context.participantId,
-            featureArea: 'chat',
+            featureArea: "chat",
             actionType,
-            actionTarget: 'message',
+            actionTarget: "message",
             metadata,
           },
           {
             campgroundId: context.campgroundId,
             organizationId: null,
             userId: context.participantId,
-          }
+          },
         );
       } else if (context.participantType === ChatParticipantType.guest) {
         await this.analytics.ingest(
@@ -1867,11 +1878,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
             campgroundId: context.campgroundId,
             organizationId: null,
             userId: null,
-          }
+          },
         );
       }
     } catch (error) {
-      this.logger.warn('Failed to track chat analytics', error);
+      this.logger.warn("Failed to track chat analytics", error);
     }
   }
 
@@ -1899,24 +1910,24 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     const formattedHistory = history
       .filter((message) => {
         const metadata = isRecord(message.metadata) ? message.metadata : undefined;
-        return getMessageVisibility(metadata?.visibility) !== 'internal';
+        return getMessageVisibility(metadata?.visibility) !== "internal";
       })
       .slice(-10) // Last 10 messages
-      .map(m => {
+      .map((m) => {
         const role =
           m.role === ChatMessageRole.user
-            ? 'User'
+            ? "User"
             : m.role === ChatMessageRole.assistant
-              ? 'Assistant'
+              ? "Assistant"
               : m.role === ChatMessageRole.system
-                ? 'System'
-                : 'Tool';
+                ? "System"
+                : "Tool";
         const metadata = isRecord(m.metadata) ? m.metadata : undefined;
         const attachments = normalizeAttachments(metadata?.attachments);
         const message = this.formatMessageForAI(m.content, attachments);
         return `${role}: ${message}`;
       })
-      .join('\n\n');
+      .join("\n\n");
 
     return `Previous conversation:\n${formattedHistory}\n\nUser: ${formattedCurrent}`;
   }
@@ -1976,19 +1987,17 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     if (totalSites !== undefined) {
       facts.push(
-        totalSites === 0
-          ? 'Active sites reported: 0.'
-          : `Active sites reported: ${totalSites}.`
+        totalSites === 0 ? "Active sites reported: 0." : `Active sites reported: ${totalSites}.`,
       );
     }
 
     if (totalAvailable !== undefined) {
       const availabilityLabel =
         totalAvailable === 0
-          ? 'Availability: 0 sites available for the requested dates.'
+          ? "Availability: 0 sites available for the requested dates."
           : `Availability: ${totalAvailable} sites available for the requested dates.`;
       const clarifiedAvailability = availabilityLabel;
-      const nightsSuffix = nights ? ` (${nights} night${nights !== 1 ? 's' : ''})` : '';
+      const nightsSuffix = nights ? ` (${nights} night${nights !== 1 ? "s" : ""})` : "";
       facts.push(`${clarifiedAvailability}${nightsSuffix}`);
     }
 
@@ -1996,7 +2005,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       const rangeLabel =
         occupancyRange.start && occupancyRange.end
           ? ` (${occupancyRange.start} to ${occupancyRange.end})`
-          : '';
+          : "";
       facts.push(`Average occupancy${rangeLabel}: ${avgOccupancy}.`);
     }
 
@@ -2004,7 +2013,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       const rangeLabel =
         revenueRange.start && revenueRange.end
           ? ` (${revenueRange.start} to ${revenueRange.end})`
-          : '';
+          : "";
       facts.push(`Total revenue${rangeLabel}: ${revenueTotal}.`);
     }
 
@@ -2015,7 +2024,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     for (const result of toolResults) {
       const payload = isRecord(result.result) ? result.result : null;
       if (!payload || payload.prevalidateFailed !== true) continue;
-      if (typeof payload.message === 'string' && payload.message.trim().length > 0) {
+      if (typeof payload.message === "string" && payload.message.trim().length > 0) {
         return payload.message.trim();
       }
     }
@@ -2031,14 +2040,16 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   ): string {
     const base = this.formatHistoryForAI(history, message, attachments);
 
-    const toolInfo = toolCalls.map((tc, i) => {
-      const result = toolResults[i];
-      return `Tool "${tc.name}" was called with args ${JSON.stringify(tc.args)} and returned: ${JSON.stringify(result?.result || 'error')}`;
-    }).join('\n');
+    const toolInfo = toolCalls
+      .map((tc, i) => {
+        const result = toolResults[i];
+        return `Tool "${tc.name}" was called with args ${JSON.stringify(tc.args)} and returned: ${JSON.stringify(result?.result || "error")}`;
+      })
+      .join("\n");
 
     const facts = this.buildToolFacts(toolResults);
     const factBlock =
-      facts.length > 0 ? `\n\nFACTS (do not contradict):\n- ${facts.join('\n- ')}` : '';
+      facts.length > 0 ? `\n\nFACTS (do not contradict):\n- ${facts.join("\n- ")}` : "";
 
     return `${base}\n\nTool Results:\n${toolInfo}${factBlock}\n\nProvide a natural response based on these results.`;
   }
@@ -2048,11 +2059,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
    */
   private buildSystemPrompt(context: ChatContext): string {
     const isGuest = context.participantType === ChatParticipantType.guest;
-    const today = new Date().toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    const today = new Date().toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
 
     const basePrompt = `You are Keepr AI, a helpful assistant for campground operations and guest support.
@@ -2099,7 +2110,7 @@ If asked to do something outside your capabilities, politely explain what you ca
 
     return `${basePrompt}
 
-Mode: Staff operations (${context.role || 'staff'}).
+Mode: Staff operations (${context.role || "staff"}).
 
 You are helping campground staff manage operations. You can help with:
 - Search and manage reservations
@@ -2162,11 +2173,11 @@ Staff guardrails:
         await this.trackChatAction({
           sessionId,
           context,
-          actionType: 'chat_tool_execute',
+          actionType: "chat_tool_execute",
           metadata: {
             conversationId,
             toolName: rawCall.name,
-            status: 'prevalidate_failed',
+            status: "prevalidate_failed",
             durationMs: Date.now() - toolStart,
           },
         });
@@ -2175,7 +2186,7 @@ Staff guardrails:
           toolCallId,
           result: {
             success: false,
-            message: preValidateResult.message || 'Validation failed',
+            message: preValidateResult.message || "Validation failed",
             prevalidateFailed: true,
           },
         });
@@ -2191,11 +2202,11 @@ Staff guardrails:
         const actionId = randomUUID();
         const pendingAction: PendingAction = {
           id: actionId,
-          type: 'confirmation',
+          type: "confirmation",
           tool: rawCall.name,
           args: mergedArgs,
           title: tool.confirmationTitle || `Confirm ${rawCall.name}`,
-          description: tool.confirmationDescription || 'Please confirm this action',
+          description: tool.confirmationDescription || "Please confirm this action",
           expiresAt: new Date(Date.now() + PENDING_ACTION_TTL_MS),
           conversationId,
         };
@@ -2204,31 +2215,31 @@ Staff guardrails:
         await this.storePendingAction(pendingAction);
 
         actionRequired = {
-          type: 'confirmation',
+          type: "confirmation",
           actionId,
           title: pendingAction.title,
           description: this.toolsService.formatConfirmationDescription(rawCall.name, mergedArgs),
           summary: this.toolsService.formatConfirmationSummary(rawCall.name, mergedArgs),
           data: mergedArgs,
           options: [
-            { id: 'confirm', label: 'Confirm', variant: 'default' },
-            { id: 'cancel', label: 'Cancel', variant: 'outline' },
+            { id: "confirm", label: "Confirm", variant: "default" },
+            { id: "cancel", label: "Cancel", variant: "outline" },
           ],
         };
 
         toolResults.push({
           toolCallId,
-          result: { pending: true, message: 'Awaiting user confirmation' },
+          result: { pending: true, message: "Awaiting user confirmation" },
         });
 
         await this.trackChatAction({
           sessionId,
           context,
-          actionType: 'chat_tool_execute',
+          actionType: "chat_tool_execute",
           metadata: {
             conversationId,
             toolName: rawCall.name,
-            status: 'requires_confirmation',
+            status: "requires_confirmation",
             durationMs: Date.now() - toolStart,
           },
         });
@@ -2240,11 +2251,11 @@ Staff guardrails:
           await this.trackChatAction({
             sessionId,
             context,
-            actionType: 'chat_tool_execute',
+            actionType: "chat_tool_execute",
             metadata: {
               conversationId,
               toolName: rawCall.name,
-              status: 'success',
+              status: "success",
               durationMs: Date.now() - toolStart,
             },
           });
@@ -2252,18 +2263,18 @@ Staff guardrails:
           toolResults.push({
             toolCallId,
             result: null,
-            error: error instanceof Error ? error.message : 'Tool execution failed',
+            error: error instanceof Error ? error.message : "Tool execution failed",
           });
           await this.trackChatAction({
             sessionId,
             context,
-            actionType: 'chat_tool_execute',
+            actionType: "chat_tool_execute",
             metadata: {
               conversationId,
               toolName: rawCall.name,
-              status: 'error',
+              status: "error",
               durationMs: Date.now() - toolStart,
-              errorType: error instanceof Error ? error.name : 'UnknownError',
+              errorType: error instanceof Error ? error.name : "UnknownError",
             },
           });
         }

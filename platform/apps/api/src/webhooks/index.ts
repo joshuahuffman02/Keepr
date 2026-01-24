@@ -6,7 +6,12 @@ export { WebhooksController } from "./webhooks.controller";
 
 // Services
 export { WebhookDeliveryService, DeliveryStatus, DeliveryResult } from "./webhook-delivery.service";
-export { WebhookLogsService, WebhookLogEntry, WebhookLogFilter, WebhookStats } from "./webhook-logs.service";
+export {
+  WebhookLogsService,
+  WebhookLogEntry,
+  WebhookLogFilter,
+  WebhookStats,
+} from "./webhook-logs.service";
 export { WebhookSecurityService } from "./webhook-security.service";
 
 // Event Catalog

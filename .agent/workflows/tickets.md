@@ -11,11 +11,13 @@ curl -s https://camp-everydayapi-production.up.railway.app/api/tickets | jq '.ti
 ```
 
 To filter by status (open tickets only):
+
 ```bash
 curl -s https://camp-everydayapi-production.up.railway.app/api/tickets | jq '.tickets | map(select(.status == "open"))'
 ```
 
 To update a ticket after completing work:
+
 ```bash
 curl -X PATCH https://camp-everydayapi-production.up.railway.app/api/tickets/{TICKET_ID} \
   -H "Content-Type: application/json" \
@@ -23,9 +25,10 @@ curl -X PATCH https://camp-everydayapi-production.up.railway.app/api/tickets/{TI
 ```
 
 ## Ticket Fields
+
 - `id` - Unique ticket ID
 - `title` - Short description of issue
-- `notes` - Detailed description from submitter  
+- `notes` - Detailed description from submitter
 - `category` - issue | question | feature | other
 - `status` - open | in_progress | blocked | resolved | closed
 - `url` / `path` - Where the issue was reported from

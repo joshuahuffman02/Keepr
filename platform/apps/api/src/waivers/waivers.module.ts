@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { PrismaModule } from '../prisma/prisma.module';
-import { WaiversService } from './waivers.service';
+import { Module } from "@nestjs/common";
+import { PrismaModule } from "../prisma/prisma.module";
+import { WaiversService } from "./waivers.service";
 
 @Module({
   imports: [PrismaModule],
@@ -8,4 +8,3 @@ import { WaiversService } from './waivers.service';
   exports: [WaiversService],
 })
 export class WaiversModule {}
-

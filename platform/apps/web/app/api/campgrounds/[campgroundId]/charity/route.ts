@@ -2,15 +2,13 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ||
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
   (process.env.NODE_ENV === "production"
     ? "https://api.keeprstay.com/api"
     : "http://localhost:4000/api");
 
-export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ campgroundId: string }> }
-) {
+export async function GET(req: Request, { params }: { params: Promise<{ campgroundId: string }> }) {
   try {
     const { campgroundId } = await params;
 
@@ -36,10 +34,7 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ campgroundId: string }> }
-) {
+export async function PUT(req: Request, { params }: { params: Promise<{ campgroundId: string }> }) {
   try {
     const { campgroundId } = await params;
     const body = await req.json();
@@ -64,7 +59,7 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: Promise<{ campgroundId: string }> }
+  { params }: { params: Promise<{ campgroundId: string }> },
 ) {
   try {
     const { campgroundId } = await params;

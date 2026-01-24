@@ -266,7 +266,7 @@ export class AiDemandForecastService {
    */
   async generateForecast(
     campgroundId: string,
-    days: number = 90
+    days: number = 90,
   ): Promise<{
     forecasts: DemandForecast[];
     summary: {
@@ -301,7 +301,9 @@ export class AiDemandForecastService {
 
     // Filter reservations with valid dates and calculate average nightly rate
     const validRes = recentRes.filter((r) => {
-      const nights = Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = Math.ceil(
+        (r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
       return nights > 0;
     });
 
@@ -309,9 +311,11 @@ export class AiDemandForecastService {
       validRes.length > 0
         ? Math.round(
             validRes.reduce((sum, r) => {
-              const nights = Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
+              const nights = Math.ceil(
+                (r.departureDate.getTime() - r.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+              );
               return sum + r.totalAmount / nights;
-            }, 0) / validRes.length
+            }, 0) / validRes.length,
           )
         : 5000; // Default $50/night
 
@@ -374,7 +378,7 @@ export class AiDemandForecastService {
         existingOccupancy,
         avgNightlyRate,
         sites,
-        i // days from now
+        i, // days from now
       );
 
       forecasts.push(forecast);
@@ -421,7 +425,7 @@ export class AiDemandForecastService {
     existingOccupancy: number,
     avgNightlyRate: number,
     totalSites: number,
-    daysFromNow: number
+    daysFromNow: number,
   ): DemandForecast {
     const factors: DemandFactor[] = [];
 
@@ -488,7 +492,8 @@ export class AiDemandForecastService {
 
     // Blend with existing bookings (more weight as we get closer)
     const bookingWeight = Math.max(0, 1 - daysFromNow / 30);
-    predictedOccupancy = predictedOccupancy * (1 - bookingWeight) + existingOccupancy * bookingWeight;
+    predictedOccupancy =
+      predictedOccupancy * (1 - bookingWeight) + existingOccupancy * bookingWeight;
 
     // Ensure existing bookings are the floor
     predictedOccupancy = Math.max(predictedOccupancy, existingOccupancy);
@@ -536,7 +541,7 @@ export class AiDemandForecastService {
   async getDemandHeatmap(
     campgroundId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<DemandHeatmapDay[]> {
     const analysis = await this.analyzeHistoricalPatterns(campgroundId);
 
@@ -662,28 +667,43 @@ export class AiDemandForecastService {
   /**
    * Get demand insights for upcoming period
    */
-  async getDemandInsights(
-    campgroundId: string
-  ): Promise<{
-    peakDemandPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; reason: string }>;
-    lowDemandPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; suggestion: string }>;
+  async getDemandInsights(campgroundId: string): Promise<{
+    peakDemandPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      reason: string;
+    }>;
+    lowDemandPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      suggestion: string;
+    }>;
     upcomingOpportunities: Array<{ date: string; type: string; description: string }>;
   }> {
     const { forecasts } = await this.generateForecast(campgroundId, 90);
 
     // Find peak periods (3+ consecutive high demand days)
-    const peakPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; reason: string }> = [];
+    const peakPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      reason: string;
+    }> = [];
     let peakStart: number | null = null;
 
     for (let i = 0; i < forecasts.length; i++) {
-      const isHigh = forecasts[i].demandLevel === "high" || forecasts[i].demandLevel === "very_high";
+      const isHigh =
+        forecasts[i].demandLevel === "high" || forecasts[i].demandLevel === "very_high";
 
       if (isHigh && peakStart === null) {
         peakStart = i;
       } else if (!isHigh && peakStart !== null) {
         if (i - peakStart >= 3) {
           const periodForecasts = forecasts.slice(peakStart, i);
-          const avgDemand = periodForecasts.reduce((s, f) => s + f.predictedOccupancy, 0) / periodForecasts.length;
+          const avgDemand =
+            periodForecasts.reduce((s, f) => s + f.predictedOccupancy, 0) / periodForecasts.length;
           const mainFactor = this.getMainFactor(periodForecasts);
 
           peakPeriods.push({
@@ -698,7 +718,12 @@ export class AiDemandForecastService {
     }
 
     // Find low periods (3+ consecutive low demand days)
-    const lowPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; suggestion: string }> = [];
+    const lowPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      suggestion: string;
+    }> = [];
     let lowStart: number | null = null;
 
     for (let i = 0; i < forecasts.length; i++) {
@@ -709,7 +734,8 @@ export class AiDemandForecastService {
       } else if (!isLow && lowStart !== null) {
         if (i - lowStart >= 3) {
           const periodForecasts = forecasts.slice(lowStart, i);
-          const avgDemand = periodForecasts.reduce((s, f) => s + f.predictedOccupancy, 0) / periodForecasts.length;
+          const avgDemand =
+            periodForecasts.reduce((s, f) => s + f.predictedOccupancy, 0) / periodForecasts.length;
 
           lowPeriods.push({
             startDate: forecasts[lowStart].date,

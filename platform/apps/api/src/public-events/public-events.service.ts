@@ -48,21 +48,12 @@ export class PublicEventsService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  async searchPublicEvents(
-    options: SearchEventsOptions
-  ): Promise<PublicEventSearchResult> {
-    const {
-      state,
-      eventType,
-      startDate,
-      endDate,
-      limit = 24,
-      offset = 0
-    } = options;
+  async searchPublicEvents(options: SearchEventsOptions): Promise<PublicEventSearchResult> {
+    const { state, eventType, startDate, endDate, limit = 24, offset = 0 } = options;
 
     // Build where clause dynamically
     const startDateFilter: Prisma.DateTimeFilter = {
-      gte: startDate ?? new Date()
+      gte: startDate ?? new Date(),
     };
 
     const where: Prisma.EventWhereInput = {
@@ -70,7 +61,7 @@ export class PublicEventsService {
       isCancelled: false,
       isGuestOnly: false, // Only show public events
       // Only upcoming events by default
-      startDate: startDateFilter
+      startDate: startDateFilter,
     };
 
     // Filter by event type
@@ -86,7 +77,7 @@ export class PublicEventsService {
     // Filter by campground state
     if (state) {
       where.Campground = {
-        state: state.toUpperCase()
+        state: state.toUpperCase(),
       };
     }
 
@@ -104,17 +95,17 @@ export class PublicEventsService {
             name: true,
             city: true,
             state: true,
-            heroImageUrl: true
-          }
-        }
+            heroImageUrl: true,
+          },
+        },
       },
       orderBy: { startDate: "asc" },
       take: limit,
-      skip: offset
+      skip: offset,
     });
 
     // Transform to response format
-    const results: PublicEventResult[] = events.map((event: typeof events[number]) => ({
+    const results: PublicEventResult[] = events.map((event: (typeof events)[number]) => ({
       id: event.id,
       title: event.title,
       description: event.description,
@@ -135,8 +126,8 @@ export class PublicEventsService {
         name: event.Campground.name,
         city: event.Campground.city,
         state: event.Campground.state,
-        heroImageUrl: event.Campground.heroImageUrl
-      }
+        heroImageUrl: event.Campground.heroImageUrl,
+      },
     }));
 
     return { results, total };
@@ -146,13 +137,10 @@ export class PublicEventsService {
     return Object.values(EventType);
   }
 
-  async getUpcomingByState(
-    state: string,
-    limit: number = 6
-  ): Promise<PublicEventResult[]> {
+  async getUpcomingByState(state: string, limit: number = 6): Promise<PublicEventResult[]> {
     const { results } = await this.searchPublicEvents({
       state,
-      limit
+      limit,
     });
     return results;
   }

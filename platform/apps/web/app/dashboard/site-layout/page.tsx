@@ -6,14 +6,7 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Map,
-  Save,
-  Upload,
-  HelpCircle,
-  Keyboard,
-  Layers,
-} from "lucide-react";
+import { Map, Save, Upload, HelpCircle, Keyboard, Layers } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -37,14 +30,94 @@ const isLayoutData = (value: unknown): value is LayoutData =>
 // Demo initial layout
 const DEMO_LAYOUT: Partial<LayoutData> = {
   sites: [
-    { id: "site-1", x: 100, y: 100, width: 60, height: 40, rotation: 0, siteNumber: "A1", siteType: "rv", color: "#3b82f6" },
-    { id: "site-2", x: 180, y: 100, width: 60, height: 40, rotation: 0, siteNumber: "A2", siteType: "rv", color: "#3b82f6" },
-    { id: "site-3", x: 260, y: 100, width: 60, height: 40, rotation: 0, siteNumber: "A3", siteType: "rv", color: "#3b82f6" },
-    { id: "site-4", x: 100, y: 200, width: 50, height: 50, rotation: 0, siteNumber: "T1", siteType: "tent", color: "#22c55e" },
-    { id: "site-5", x: 170, y: 200, width: 50, height: 50, rotation: 0, siteNumber: "T2", siteType: "tent", color: "#22c55e" },
-    { id: "site-6", x: 240, y: 200, width: 50, height: 50, rotation: 0, siteNumber: "T3", siteType: "tent", color: "#22c55e" },
-    { id: "site-7", x: 400, y: 150, width: 80, height: 60, rotation: 0, siteNumber: "C1", siteType: "cabin", color: "#f59e0b" },
-    { id: "site-8", x: 500, y: 150, width: 80, height: 60, rotation: 0, siteNumber: "C2", siteType: "cabin", color: "#f59e0b" },
+    {
+      id: "site-1",
+      x: 100,
+      y: 100,
+      width: 60,
+      height: 40,
+      rotation: 0,
+      siteNumber: "A1",
+      siteType: "rv",
+      color: "#3b82f6",
+    },
+    {
+      id: "site-2",
+      x: 180,
+      y: 100,
+      width: 60,
+      height: 40,
+      rotation: 0,
+      siteNumber: "A2",
+      siteType: "rv",
+      color: "#3b82f6",
+    },
+    {
+      id: "site-3",
+      x: 260,
+      y: 100,
+      width: 60,
+      height: 40,
+      rotation: 0,
+      siteNumber: "A3",
+      siteType: "rv",
+      color: "#3b82f6",
+    },
+    {
+      id: "site-4",
+      x: 100,
+      y: 200,
+      width: 50,
+      height: 50,
+      rotation: 0,
+      siteNumber: "T1",
+      siteType: "tent",
+      color: "#22c55e",
+    },
+    {
+      id: "site-5",
+      x: 170,
+      y: 200,
+      width: 50,
+      height: 50,
+      rotation: 0,
+      siteNumber: "T2",
+      siteType: "tent",
+      color: "#22c55e",
+    },
+    {
+      id: "site-6",
+      x: 240,
+      y: 200,
+      width: 50,
+      height: 50,
+      rotation: 0,
+      siteNumber: "T3",
+      siteType: "tent",
+      color: "#22c55e",
+    },
+    {
+      id: "site-7",
+      x: 400,
+      y: 150,
+      width: 80,
+      height: 60,
+      rotation: 0,
+      siteNumber: "C1",
+      siteType: "cabin",
+      color: "#f59e0b",
+    },
+    {
+      id: "site-8",
+      x: 500,
+      y: 150,
+      width: 80,
+      height: 60,
+      rotation: 0,
+      siteNumber: "C2",
+      siteType: "cabin",
+      color: "#f59e0b",
+    },
   ],
   elements: [],
   gridSize: 20,
@@ -201,23 +274,37 @@ export default function SiteLayoutPage() {
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <div>
                     <h4 className="font-medium text-foreground">Adding Sites</h4>
-                    <p>Select the site tool (tent icon) from the toolbar, choose a site type, then click on the canvas to place sites.</p>
+                    <p>
+                      Select the site tool (tent icon) from the toolbar, choose a site type, then
+                      click on the canvas to place sites.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Moving Sites</h4>
-                    <p>Use the select tool (arrow icon), click on a site, and drag it to move. Sites snap to the grid for easy alignment.</p>
+                    <p>
+                      Use the select tool (arrow icon), click on a site, and drag it to move. Sites
+                      snap to the grid for easy alignment.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Editing Properties</h4>
-                    <p>Select a site to see its properties panel on the right. Change site number, type, size, and rotation.</p>
+                    <p>
+                      Select a site to see its properties panel on the right. Change site number,
+                      type, size, and rotation.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Navigation</h4>
-                    <p>Use the pan tool (hand icon) or scroll wheel to zoom. Click the grid icon to toggle grid visibility.</p>
+                    <p>
+                      Use the pan tool (hand icon) or scroll wheel to zoom. Click the grid icon to
+                      toggle grid visibility.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Saving</h4>
-                    <p>Click Save to store your layout. Use Export to download as JSON for backup.</p>
+                    <p>
+                      Click Save to store your layout. Use Export to download as JSON for backup.
+                    </p>
                   </div>
                 </div>
               </DialogContent>
@@ -232,10 +319,7 @@ export default function SiteLayoutPage() {
           <div className="flex items-center gap-3">
             {SITE_CLASSES.map((sc) => (
               <div key={sc.id} className="flex items-center gap-1.5">
-                <span
-                  className="w-3 h-3 rounded"
-                  style={{ backgroundColor: sc.color }}
-                />
+                <span className="w-3 h-3 rounded" style={{ backgroundColor: sc.color }} />
                 <span className="text-sm text-muted-foreground">{sc.name}</span>
               </div>
             ))}

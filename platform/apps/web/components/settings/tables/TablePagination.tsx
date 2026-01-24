@@ -28,12 +28,7 @@ export function TablePagination({
   const canGoNext = currentPage < totalPages;
 
   return (
-    <div
-      className={cn(
-        "flex items-center justify-between px-2 py-3",
-        className
-      )}
-    >
+    <div className={cn("flex items-center justify-between px-2 py-3", className)}>
       <p className="text-sm text-muted-foreground">
         Showing <span className="font-medium text-foreground">{startItem}</span> to{" "}
         <span className="font-medium text-foreground">{endItem}</span> of{" "}

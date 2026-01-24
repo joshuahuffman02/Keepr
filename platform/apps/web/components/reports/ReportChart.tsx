@@ -64,7 +64,20 @@ const loadRecharts = async (): Promise<LoadedRecharts> => {
   ) {
     throw new Error("Failed to load Recharts modules");
   }
-  return { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, PieChart, Pie, Cell };
+  return {
+    ResponsiveContainer,
+    LineChart,
+    Line,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    Tooltip,
+    Legend,
+    PieChart,
+    Pie,
+    Cell,
+  };
 };
 
 type Point = { x: string; y: number };
@@ -72,7 +85,13 @@ type Series = { label: string; chart: string; points: Point[] };
 
 const palette = ["#2563eb", "#16a34a", "#f59e0b", "#ec4899", "#0ea5e9", "#8b5cf6"];
 
-export function ReportChart({ series, chart }: { series: Series[]; chart: "line" | "bar" | "pie" }) {
+export function ReportChart({
+  series,
+  chart,
+}: {
+  series: Series[];
+  chart: "line" | "bar" | "pie";
+}) {
   const [recharts, setRecharts] = useState<LoadedRecharts | null>(null);
 
   useEffect(() => {
@@ -111,7 +130,14 @@ export function ReportChart({ series, chart }: { series: Series[]; chart: "line"
     return (
       <RechartsContainer width="100%" height={320}>
         <RechartsPieChart>
-          <RechartsPie data={sharedData} dataKey="y" nameKey="x" innerRadius={60} outerRadius={100} paddingAngle={2}>
+          <RechartsPie
+            data={sharedData}
+            dataKey="y"
+            nameKey="x"
+            innerRadius={60}
+            outerRadius={100}
+            paddingAngle={2}
+          >
             {sharedData.map((_entry, idx) => (
               <RechartsCell key={idx} fill={palette[idx % palette.length]} />
             ))}

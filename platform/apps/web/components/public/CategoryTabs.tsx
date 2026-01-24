@@ -4,12 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
-import {
-  ChevronLeft,
-  ChevronRight,
-  TreePine,
-  Calendar
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, TreePine, Calendar } from "lucide-react";
 
 export type CategoryType =
   | "all"
@@ -37,7 +32,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-muted-foreground",
     activeBg: "bg-muted",
     activeText: "text-white",
-    ring: "ring-keepr-charcoal/20"
+    ring: "ring-keepr-charcoal/20",
   },
   rv: {
     bg: "bg-keepr-evergreen/10",
@@ -45,7 +40,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-evergreen",
     activeBg: "bg-keepr-evergreen",
     activeText: "text-white",
-    ring: "ring-keepr-evergreen/30"
+    ring: "ring-keepr-evergreen/30",
   },
   cabins: {
     bg: "bg-keepr-clay/10",
@@ -53,7 +48,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-clay",
     activeBg: "bg-keepr-clay",
     activeText: "text-white",
-    ring: "ring-keepr-clay/30"
+    ring: "ring-keepr-clay/30",
   },
   tents: {
     bg: "bg-keepr-evergreen/10",
@@ -61,7 +56,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-evergreen",
     activeBg: "bg-keepr-evergreen",
     activeText: "text-white",
-    ring: "ring-keepr-evergreen/30"
+    ring: "ring-keepr-evergreen/30",
   },
   glamping: {
     bg: "bg-keepr-clay/10",
@@ -69,7 +64,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-clay",
     activeBg: "bg-keepr-clay",
     activeText: "text-white",
-    ring: "ring-keepr-clay/30"
+    ring: "ring-keepr-clay/30",
   },
   lodges: {
     bg: "bg-keepr-charcoal/5",
@@ -77,7 +72,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-charcoal",
     activeBg: "bg-keepr-charcoal",
     activeText: "text-white",
-    ring: "ring-keepr-charcoal/30"
+    ring: "ring-keepr-charcoal/30",
   },
   unique: {
     bg: "bg-keepr-evergreen/10",
@@ -85,7 +80,7 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-evergreen",
     activeBg: "bg-keepr-evergreen",
     activeText: "text-white",
-    ring: "ring-keepr-evergreen/30"
+    ring: "ring-keepr-evergreen/30",
   },
   events: {
     bg: "bg-keepr-clay/10",
@@ -93,8 +88,8 @@ const categoryThemes: Record<CategoryType, CategoryTheme> = {
     accent: "text-keepr-clay",
     activeBg: "bg-keepr-clay",
     activeText: "text-white",
-    ring: "ring-keepr-clay/30"
-  }
+    ring: "ring-keepr-clay/30",
+  },
 };
 
 interface Category {
@@ -110,52 +105,52 @@ const categories: Category[] = [
     id: "all",
     label: "All",
     image: "/images/categories/all.png",
-    siteTypes: []
+    siteTypes: [],
   },
   {
     id: "rv",
     label: "RV Sites",
     image: "/images/categories/rv.png",
-    siteTypes: ["rv"]
+    siteTypes: ["rv"],
   },
   {
     id: "cabins",
     label: "Cabins",
     image: "/images/categories/cabins.png",
-    siteTypes: ["cabin"]
+    siteTypes: ["cabin"],
   },
   {
     id: "tents",
     label: "Tent Sites",
     image: "/images/categories/tents.png",
-    siteTypes: ["tent", "group"]
+    siteTypes: ["tent", "group"],
   },
   {
     id: "glamping",
     label: "Glamping",
     image: "/images/categories/glamping.png",
-    siteTypes: ["glamping", "safari_tent", "dome"]
+    siteTypes: ["glamping", "safari_tent", "dome"],
   },
   {
     id: "lodges",
     label: "Lodges",
     image: "/images/categories/lodges.png",
-    siteTypes: ["hotel_room", "suite", "lodge_room"]
+    siteTypes: ["hotel_room", "suite", "lodge_room"],
   },
   {
     id: "unique",
     label: "Unique Stays",
     image: "/images/categories/unique.png",
     fallbackIcon: TreePine,
-    siteTypes: ["yurt", "treehouse", "tiny_house", "airstream"]
+    siteTypes: ["yurt", "treehouse", "tiny_house", "airstream"],
   },
   {
     id: "events",
     label: "Events",
     image: "/images/categories/events.png",
     fallbackIcon: Calendar,
-    siteTypes: [] // Events are handled separately, not by site type
-  }
+    siteTypes: [], // Events are handled separately, not by site type
+  },
 ];
 
 interface CategoryTabsProps {
@@ -167,7 +162,7 @@ interface CategoryTabsProps {
 export function CategoryTabs({
   activeCategory,
   onCategoryChange,
-  className = ""
+  className = "",
 }: CategoryTabsProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -211,7 +206,7 @@ export function CategoryTabs({
     const scrollAmount = 200;
     container.scrollBy({
       left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth"
+      behavior: "smooth",
     });
   };
 
@@ -222,16 +217,16 @@ export function CategoryTabs({
       ? {}
       : {
           scale: 1.15,
-          transition: springTransition
+          transition: springTransition,
         },
     tap: prefersReducedMotion ? {} : { scale: 0.9 },
-    active: { scale: 1.05 }
+    active: { scale: 1.05 },
   };
 
   const buttonVariants = {
     initial: { scale: 1 },
     hover: prefersReducedMotion ? {} : { scale: 1.02 },
-    tap: prefersReducedMotion ? {} : { scale: 0.98 }
+    tap: prefersReducedMotion ? {} : { scale: 0.98 },
   };
 
   return (
@@ -284,9 +279,10 @@ export function CategoryTabs({
               className={`
                 relative flex-shrink-0 flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl
                 transition-all duration-200 border
-                ${isActive
-                  ? `bg-card border-border shadow-md`
-                  : `bg-transparent border-transparent hover:bg-muted`
+                ${
+                  isActive
+                    ? `bg-card border-border shadow-md`
+                    : `bg-transparent border-transparent hover:bg-muted`
                 }
               `}
             >
@@ -305,7 +301,7 @@ export function CategoryTabs({
                     sizes="56px"
                     onError={(e) => {
                       // Hide broken image, fallback icon will show
-                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.style.display = "none";
                     }}
                   />
                 ) : FallbackIcon ? (
@@ -316,9 +312,11 @@ export function CategoryTabs({
               </motion.div>
 
               {/* Label */}
-              <span className={`text-xs font-medium whitespace-nowrap transition-colors ${
-                isActive ? "text-foreground" : "text-muted-foreground"
-              }`}>
+              <span
+                className={`text-xs font-medium whitespace-nowrap transition-colors ${
+                  isActive ? "text-foreground" : "text-muted-foreground"
+                }`}
+              >
                 {category.label}
               </span>
 

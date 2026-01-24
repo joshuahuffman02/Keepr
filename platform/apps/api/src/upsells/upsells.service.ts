@@ -9,13 +9,13 @@ import { AuditService } from "../audit/audit.service";
 export class UpsellsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
   ) {}
 
   list(campgroundId: string) {
     return this.prisma.upsellItem.findMany({
       where: { campgroundId },
-      orderBy: [{ active: "desc" }, { createdAt: "desc" }]
+      orderBy: [{ active: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -29,8 +29,8 @@ export class UpsellsService {
         description: dto.description ?? null,
         taxCode: dto.taxCode ?? null,
         inventoryTracking: dto.inventoryTracking ?? false,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     await this.audit.record({
@@ -40,7 +40,7 @@ export class UpsellsService {
       entity: "UpsellItem",
       entityId: item.id,
       before: null,
-      after: item
+      after: item,
     });
 
     return item;
@@ -54,11 +54,11 @@ export class UpsellsService {
       where: { id },
       data: {
         ...rest,
-        siteClassId: siteClassId === undefined ? undefined : siteClassId ?? null,
-        description: description === undefined ? undefined : description ?? null,
-        taxCode: taxCode === undefined ? undefined : taxCode ?? null,
-        inventoryTracking: inventoryTracking === undefined ? undefined : inventoryTracking
-      }
+        siteClassId: siteClassId === undefined ? undefined : (siteClassId ?? null),
+        description: description === undefined ? undefined : (description ?? null),
+        taxCode: taxCode === undefined ? undefined : (taxCode ?? null),
+        inventoryTracking: inventoryTracking === undefined ? undefined : inventoryTracking,
+      },
     });
 
     await this.audit.record({
@@ -68,7 +68,7 @@ export class UpsellsService {
       entity: "UpsellItem",
       entityId: id,
       before: existing,
-      after: updated
+      after: updated,
     });
 
     return updated;
@@ -86,7 +86,7 @@ export class UpsellsService {
       entity: "UpsellItem",
       entityId: id,
       before: existing,
-      after: null
+      after: null,
     });
 
     return existing;

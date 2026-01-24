@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Query, Param, Body, Res, UseGuards } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Query,
+  Param,
+  Body,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { Response } from "express";
 import { PlatformAnalyticsService, AnalyticsQueryParams } from "./platform-analytics.service";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
@@ -36,7 +47,7 @@ export class PlatformAnalyticsController {
     private exportService: AnalyticsExportService,
     private executiveService: ExecutiveDashboardService,
     private aiSuggestionsService: AiSuggestionsService,
-    private goalsService: GoalsService
+    private goalsService: GoalsService,
   ) {}
 
   /**
@@ -254,7 +265,7 @@ export class PlatformAnalyticsController {
   @Get("benchmarks/:campgroundId")
   async getCampgroundBenchmarks(
     @Param("campgroundId") campgroundId: string,
-    @Query() params: AnalyticsQueryParams
+    @Query() params: AnalyticsQueryParams,
   ) {
     const dateRange = this.analyticsService.parseDateRange(params);
     return this.benchmarkService.getCampgroundVsPlatform(campgroundId, dateRange);
@@ -337,7 +348,7 @@ export class PlatformAnalyticsController {
   async getGoals(
     @Query("category") category?: string,
     @Query("status") status?: string,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     return this.goalsService.getGoals({ category, status, campgroundId });
   }

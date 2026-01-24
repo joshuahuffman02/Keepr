@@ -6,10 +6,14 @@
 // Smart Placement runs close to database - multiple round trips benefit
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const user = await env.DATABASE.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
-    const orders = await env.DATABASE.prepare('SELECT * FROM orders WHERE user_id = ?').bind(userId).all();
+    const user = await env.DATABASE.prepare("SELECT * FROM users WHERE id = ?")
+      .bind(userId)
+      .first();
+    const orders = await env.DATABASE.prepare("SELECT * FROM orders WHERE user_id = ?")
+      .bind(userId)
+      .all();
     return Response.json({ user, orders });
-  }
+  },
 };
 ```
 
@@ -26,16 +30,16 @@ name = "backend-api"; [placement]; mode = "smart"; [[d1_databases]]; binding = "
 // Frontend - forwards API requests to backend
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    if (new URL(request.url).pathname.startsWith('/api/')) return env.BACKEND.fetch(request);
+    if (new URL(request.url).pathname.startsWith("/api/")) return env.BACKEND.fetch(request);
     return env.ASSETS.fetch(request);
-  }
+  },
 };
 
 // Backend - database operations
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    return Response.json(await env.DATABASE.prepare('SELECT * FROM table').all());
-  }
+    return Response.json(await env.DATABASE.prepare("SELECT * FROM table").all());
+  },
 };
 ```
 
@@ -45,14 +49,17 @@ export default {
 // Smart Placement runs closer to external API - multiple calls benefit
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const apiUrl = 'https://api.partner.com';
-    const headers = { 'Authorization': `Bearer ${env.API_KEY}` };
+    const apiUrl = "https://api.partner.com";
+    const headers = { Authorization: `Bearer ${env.API_KEY}` };
     const [profile, transactions] = await Promise.all([
       fetch(`${apiUrl}/profile`, { headers }),
-      fetch(`${apiUrl}/transactions`, { headers })
+      fetch(`${apiUrl}/transactions`, { headers }),
     ]);
-    return Response.json({ profile: await profile.json(), transactions: await transactions.json() });
-  }
+    return Response.json({
+      profile: await profile.json(),
+      transactions: await transactions.json(),
+    });
+  },
 };
 ```
 
@@ -67,10 +74,16 @@ export default {
 export default {
   async fetch(request: Request, env: Env) {
     const [orders, inventory, shipping] = await Promise.all([
-      fetch('https://orders.internal.api'), fetch('https://inventory.internal.api'), fetch('https://shipping.internal.api')
+      fetch("https://orders.internal.api"),
+      fetch("https://inventory.internal.api"),
+      fetch("https://shipping.internal.api"),
     ]);
-    return Response.json({ orders: await orders.json(), inventory: await inventory.json(), shipping: await shipping.json() });
-  }
+    return Response.json({
+      orders: await orders.json(),
+      inventory: await inventory.json(),
+      shipping: await shipping.json(),
+    });
+  },
 };
 ```
 
@@ -80,16 +93,20 @@ export default {
 // Frontend SSR (edge) - render close to user
 export default {
   async fetch(request: Request, env: Env) {
-    const data = await env.BACKEND.fetch('/api/page-data');
-    return new Response(renderPage(await data.json()), { headers: { 'Content-Type': 'text/html' } });
-  }
+    const data = await env.BACKEND.fetch("/api/page-data");
+    return new Response(renderPage(await data.json()), {
+      headers: { "Content-Type": "text/html" },
+    });
+  },
 };
 
 // Backend (Smart Placement) - fetch data close to database
 export default {
   async fetch(request: Request, env: Env) {
-    return Response.json(await env.DATABASE.prepare('SELECT * FROM pages WHERE id = ?').bind(pageId).first());
-  }
+    return Response.json(
+      await env.DATABASE.prepare("SELECT * FROM pages WHERE id = ?").bind(pageId).first(),
+    );
+  },
 };
 ```
 
@@ -99,16 +116,16 @@ export default {
 // Gateway at edge - quick auth, forward to backend
 export default {
   async fetch(request: Request, env: Env) {
-    if (!request.headers.get('Authorization')) return new Response('Unauthorized', { status: 401 });
+    if (!request.headers.get("Authorization")) return new Response("Unauthorized", { status: 401 });
     return env.BACKEND_API.fetch(request);
-  }
+  },
 };
 
 // Backend with Smart Placement - heavy DB operations
 export default {
   async fetch(request: Request, env: Env) {
     return Response.json(await performDatabaseOperations(env.DATABASE));
-  }
+  },
 };
 ```
 

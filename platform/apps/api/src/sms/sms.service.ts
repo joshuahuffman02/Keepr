@@ -49,13 +49,19 @@ export class SmsService {
   constructor(
     private readonly alerting: AlertingService,
     private readonly usageTracker: UsageTrackerService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {
-    this.globalIsConfigured = !!(this.globalTwilioSid && this.globalTwilioToken && this.globalFromNumber);
+    this.globalIsConfigured = !!(
+      this.globalTwilioSid &&
+      this.globalTwilioToken &&
+      this.globalFromNumber
+    );
     if (this.globalIsConfigured) {
       this.logger.log("SMS service initialized with global Twilio credentials");
     } else {
-      this.logger.warn("SMS service: no global Twilio credentials (per-campground config may still work)");
+      this.logger.warn(
+        "SMS service: no global Twilio credentials (per-campground config may still work)",
+      );
     }
   }
 
@@ -82,7 +88,9 @@ export class SmsService {
    * 2. Campground assigned number + global credentials (platform assigns a dedicated number)
    * 3. Global credentials with global number (shared platform number)
    */
-  private async getCredentialsForCampground(campgroundId?: string): Promise<TwilioCredentials | null> {
+  private async getCredentialsForCampground(
+    campgroundId?: string,
+  ): Promise<TwilioCredentials | null> {
     if (campgroundId) {
       const campground = await this.prisma.campground.findUnique({
         where: { id: campgroundId },
@@ -95,7 +103,12 @@ export class SmsService {
       });
 
       // Option 1: Campground has their own full Twilio credentials
-      if (campground?.smsEnabled && campground.twilioAccountSid && campground.twilioAuthToken && campground.twilioFromNumber) {
+      if (
+        campground?.smsEnabled &&
+        campground.twilioAccountSid &&
+        campground.twilioAuthToken &&
+        campground.twilioFromNumber
+      ) {
         return {
           accountSid: campground.twilioAccountSid,
           authToken: campground.twilioAuthToken,
@@ -135,7 +148,12 @@ export class SmsService {
     return { ...this.telemetry, configured: this.globalIsConfigured, enabled: this.smsEnabled };
   }
 
-  async sendSms(opts: { to: string; body: string; campgroundId?: string; reservationId?: string }): Promise<SmsSendResult> {
+  async sendSms(opts: {
+    to: string;
+    body: string;
+    campgroundId?: string;
+    reservationId?: string;
+  }): Promise<SmsSendResult> {
     this.telemetry.attempted++;
 
     // Feature flag check
@@ -149,7 +167,9 @@ export class SmsService {
     const credentials = await this.getCredentialsForCampground(opts.campgroundId);
 
     if (!credentials) {
-      this.logger.warn(`SMS no-op: No Twilio credentials available. Would send to ${opts.to}: "${opts.body.substring(0, 50)}..."`);
+      this.logger.warn(
+        `SMS no-op: No Twilio credentials available. Would send to ${opts.to}: "${opts.body.substring(0, 50)}..."`,
+      );
       this.telemetry.skipped++;
       this.dispatchAlert(
         "SMS not configured",
@@ -161,7 +181,7 @@ export class SmsService {
           campgroundId: opts.campgroundId,
           reservationId: opts.reservationId,
           reason: "not_configured",
-        }
+        },
       );
       return { provider: "noop", fallback: "not_configured", success: false };
     }
@@ -176,10 +196,12 @@ export class SmsService {
       const res = await fetch(url, {
         method: "POST",
         headers: {
-          Authorization: "Basic " + Buffer.from(`${credentials.accountSid}:${credentials.authToken}`).toString("base64"),
-          "Content-Type": "application/x-www-form-urlencoded"
+          Authorization:
+            "Basic " +
+            Buffer.from(`${credentials.accountSid}:${credentials.authToken}`).toString("base64"),
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: params.toString()
+        body: params.toString(),
       });
       const data: unknown = await res.json();
       if (!res.ok) {
@@ -187,7 +209,9 @@ export class SmsService {
       }
       const sid = isRecord(data) && typeof data.sid === "string" ? data.sid : undefined;
       this.telemetry.sent++;
-      this.logger.log(`SMS sent to ${opts.to} via Twilio (${credentials.source}, sid: ${sid ?? "unknown"})`);
+      this.logger.log(
+        `SMS sent to ${opts.to} via Twilio (${credentials.source}, sid: ${sid ?? "unknown"})`,
+      );
 
       // Track SMS usage for billing (non-blocking)
       this.trackSmsUsageForBilling(opts.campgroundId, sid);
@@ -209,13 +233,20 @@ export class SmsService {
     }
 
     this.telemetry.failed++;
-    this.logger.error(`Twilio failed for ${opts.to} after ${this.backoffScheduleMs.length} attempts: ${lastError}`);
+    this.logger.error(
+      `Twilio failed for ${opts.to} after ${this.backoffScheduleMs.length} attempts: ${lastError}`,
+    );
     await this.dispatchAlert(
       "SMS send failure",
       `Twilio failed for ${opts.to} after retries`,
       "error",
       `sms-send-failure-${opts.campgroundId ?? "global"}`,
-      { to: opts.to, campgroundId: opts.campgroundId, reservationId: opts.reservationId, error: getErrorMessage(lastError) }
+      {
+        to: opts.to,
+        campgroundId: opts.campgroundId,
+        reservationId: opts.reservationId,
+        error: getErrorMessage(lastError),
+      },
     );
 
     // Final fallback: report failure and let caller decide on follow-up/failover.
@@ -227,7 +258,7 @@ export class SmsService {
     body: string,
     severity: "info" | "warning" | "error" | "critical",
     dedupKey?: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ) {
     try {
       await this.alerting.dispatch(title, body, severity, dedupKey, details);
@@ -262,7 +293,7 @@ export class SmsService {
         campgroundId,
         "outbound",
         messageId,
-        1 // segment count - Twilio charges per segment
+        1, // segment count - Twilio charges per segment
       );
     } catch (err) {
       // Don't fail SMS send if usage tracking fails

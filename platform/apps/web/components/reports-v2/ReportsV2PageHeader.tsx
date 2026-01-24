@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 export function ReportsV2PageHeader({
   title,
   description,
-  actions
+  actions,
 }: {
   title: string;
   description?: string;

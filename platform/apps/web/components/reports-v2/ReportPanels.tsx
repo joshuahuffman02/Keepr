@@ -7,7 +7,7 @@ export function ReportSection({
   description,
   actions,
   children,
-  className
+  className,
 }: {
   title: string;
   description?: string;
@@ -31,7 +31,7 @@ export function ReportSection({
 
 export function ReportStatGrid({
   stats,
-  className
+  className,
 }: {
   stats: { label: string; value: ReactNode; helper?: string }[];
   className?: string;
@@ -39,7 +39,10 @@ export function ReportStatGrid({
   return (
     <div className={cn("grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4", className)}>
       {stats.map((stat) => (
-        <div key={stat.label} className="rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
+        <div
+          key={stat.label}
+          className="rounded-2xl border border-border bg-card px-4 py-3 shadow-sm"
+        >
           <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
           <div className="mt-1 text-xl font-semibold text-foreground">{stat.value}</div>
           {stat.helper && <div className="text-xs text-muted-foreground">{stat.helper}</div>}
@@ -52,7 +55,7 @@ export function ReportStatGrid({
 export function ReportEmptyState({
   title,
   description,
-  helper
+  helper,
 }: {
   title: string;
   description: string;

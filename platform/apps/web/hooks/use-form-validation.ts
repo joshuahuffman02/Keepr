@@ -20,8 +20,7 @@ export const validators = {
   }),
 
   email: (message = "Please enter a valid email address"): ValidationRule => ({
-    validate: (value) =>
-      !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
+    validate: (value) => !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value)),
     message,
   }),
 
@@ -125,7 +124,7 @@ type FormState<T extends Record<string, unknown>> = {
  */
 export function useFormValidation(
   fieldConfigs: Record<string, FieldConfig>,
-  initialValues: Record<string, string>
+  initialValues: Record<string, string>,
 ) {
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [errors, setErrors] = useState<Record<string, string | null>>({});
@@ -146,7 +145,7 @@ export function useFormValidation(
       }
       return null;
     },
-    [fieldConfigs, values]
+    [fieldConfigs, values],
   );
 
   const handleChange = useCallback(
@@ -160,7 +159,7 @@ export function useFormValidation(
         setErrors((prev) => ({ ...prev, [field]: error }));
       }
     },
-    [fieldConfigs, validateField]
+    [fieldConfigs, validateField],
   );
 
   const handleBlur = useCallback(
@@ -173,7 +172,7 @@ export function useFormValidation(
         setErrors((prev) => ({ ...prev, [field]: error }));
       }
     },
-    [fieldConfigs, validateField]
+    [fieldConfigs, validateField],
   );
 
   const validateAll = useCallback((): boolean => {
@@ -196,16 +195,22 @@ export function useFormValidation(
     return isValid;
   }, [fieldConfigs, validateField]);
 
-  const resetForm = useCallback((newValues?: Record<string, string>) => {
-    setValues(newValues || initialValues);
-    setErrors({});
-    setTouched({});
-    setDirty({});
-  }, [initialValues]);
+  const resetForm = useCallback(
+    (newValues?: Record<string, string>) => {
+      setValues(newValues || initialValues);
+      setErrors({});
+      setTouched({});
+      setDirty({});
+    },
+    [initialValues],
+  );
 
-  const setFieldValue = useCallback((field: string, value: string) => {
-    handleChange(field, value);
-  }, [handleChange]);
+  const setFieldValue = useCallback(
+    (field: string, value: string) => {
+      handleChange(field, value);
+    },
+    [handleChange],
+  );
 
   const setFieldError = useCallback((field: string, error: string | null) => {
     setErrors((prev) => ({ ...prev, [field]: error }));
@@ -231,7 +236,7 @@ export function useFormValidation(
       error: touched[field] ? errors[field] || undefined : undefined,
       showSuccess: touched[field] && !errors[field] && !!values[field],
     }),
-    [values, errors, touched, handleChange, handleBlur]
+    [values, errors, touched, handleChange, handleBlur],
   );
 
   return {

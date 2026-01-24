@@ -121,7 +121,9 @@ export default function StaffPwaPage() {
           .slice(0, 8);
 
         const arrivalList = (reservations ?? [])
-          .filter((reservation) => reservation.status === "confirmed" || reservation.status === "pending")
+          .filter(
+            (reservation) => reservation.status === "confirmed" || reservation.status === "pending",
+          )
           .slice(0, 8)
           .map(toArrival);
 
@@ -201,7 +203,13 @@ export default function StaffPwaPage() {
           <Button asChild size="sm" variant="outline">
             <Link href="/pwa/sync-log">Sync log</Link>
           </Button>
-          <Button size="sm" variant="outline" onClick={() => navigator.serviceWorker?.controller?.postMessage({ type: "TRIGGER_SYNC" })}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() =>
+              navigator.serviceWorker?.controller?.postMessage({ type: "TRIGGER_SYNC" })
+            }
+          >
             Sync now
           </Button>
           <Button asChild variant="outline" size="sm">
@@ -210,11 +218,7 @@ export default function StaffPwaPage() {
         </div>
       </header>
 
-      {error && (
-        <div className="pwa-card p-3 text-sm text-red-100 border-red-500">
-          {error}
-        </div>
-      )}
+      {error && <div className="pwa-card p-3 text-sm text-red-100 border-red-500">{error}</div>}
 
       <div className="grid md:grid-cols-2 gap-3">
         <div className="pwa-card p-4 space-y-3">
@@ -232,7 +236,10 @@ export default function StaffPwaPage() {
           ) : (
             <div className="space-y-2">
               {arrivals.map((a) => (
-                <div key={a.id} className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 flex items-center justify-between">
+                <div
+                  key={a.id}
+                  className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 flex items-center justify-between"
+                >
                   <div className="space-y-1">
                     <div className="text-sm font-medium">{a.guest}</div>
                     <div className="text-xs text-slate-400">
@@ -267,7 +274,8 @@ export default function StaffPwaPage() {
                     {statusBadge(t.status)}
                   </div>
                   <div className="text-xs text-slate-400">
-                    {t.siteName || "No site"} {t.dueAt ? `• Due ${new Date(t.dueAt).toLocaleDateString()}` : ""}
+                    {t.siteName || "No site"}{" "}
+                    {t.dueAt ? `• Due ${new Date(t.dueAt).toLocaleDateString()}` : ""}
                   </div>
                 </div>
               ))}

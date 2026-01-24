@@ -12,13 +12,17 @@ interface PageHeaderProps {
 export function PageHeader({ title, subtitle, eyebrow, actions, className }: PageHeaderProps) {
   const eyebrowContent =
     typeof eyebrow === "string" ? (
-      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{eyebrow}</div>
+      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        {eyebrow}
+      </div>
     ) : (
       eyebrow
     );
 
   return (
-    <div className={cn("flex flex-col gap-4 md:flex-row md:items-end md:justify-between", className)}>
+    <div
+      className={cn("flex flex-col gap-4 md:flex-row md:items-end md:justify-between", className)}
+    >
       <div className="space-y-1">
         {eyebrowContent}
         <h1 className="text-2xl font-semibold text-foreground">{title}</h1>

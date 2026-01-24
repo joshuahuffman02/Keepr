@@ -9,7 +9,7 @@ import { AttractionType, PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -73,8 +73,7 @@ const ATTRACTIONS: AttractionSeed[] = [
     state: "Arizona",
     latitude: 36.0544,
     longitude: -112.1401,
-    description:
-      "One of the most spectacular examples of erosion in the world.",
+    description: "One of the most spectacular examples of erosion in the world.",
     activities: ["Hiking", "Rafting", "Camping", "Mule Rides", "Photography"],
     bestSeason: "March through May, September through November",
   },
@@ -85,8 +84,7 @@ const ATTRACTIONS: AttractionSeed[] = [
     state: "Utah",
     latitude: 37.2982,
     longitude: -113.0263,
-    description:
-      "Known for its stunning red cliffs, canyons, and emerald pools.",
+    description: "Known for its stunning red cliffs, canyons, and emerald pools.",
     activities: ["Hiking", "Canyoneering", "Camping", "Rock Climbing", "Photography"],
     bestSeason: "April through October",
   },
@@ -97,8 +95,7 @@ const ATTRACTIONS: AttractionSeed[] = [
     state: "Colorado",
     latitude: 40.3428,
     longitude: -105.6836,
-    description:
-      "Features majestic mountain views, alpine lakes, and diverse wildlife.",
+    description: "Features majestic mountain views, alpine lakes, and diverse wildlife.",
     activities: ["Hiking", "Wildlife Viewing", "Camping", "Fishing", "Scenic Drives"],
     bestSeason: "June through September",
   },
@@ -130,7 +127,7 @@ const CAMPGROUNDS = [
     state: "California",
     address: "9035 Village Drive",
     zipCode: "95389",
-    latitude: 37.7460,
+    latitude: 37.746,
     longitude: -119.5945,
     phone: "(209) 555-0202",
     website: "https://example.com/yosemite-valley",
@@ -232,7 +229,7 @@ const CAMPGROUNDS = [
     state: "California",
     address: "47231 Highway 1",
     zipCode: "93920",
-    latitude: 36.2440,
+    latitude: 36.244,
     longitude: -121.8077,
     phone: "(831) 555-0808",
     website: "https://example.com/big-sur-coast",
@@ -378,7 +375,7 @@ async function main() {
         Number(cg.latitude),
         Number(cg.longitude),
         Number(attr.latitude),
-        Number(attr.longitude)
+        Number(attr.longitude),
       );
 
       // Only associate if within 100 miles
@@ -424,21 +421,13 @@ async function main() {
 }
 
 // Haversine formula for calculating distance between two points
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 3959; // Earth's radius in miles
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }

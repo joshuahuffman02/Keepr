@@ -16,6 +16,7 @@ Campreserv (Keepr): Multi-tenant SaaS for campground, RV park, and lodging reser
 6. **No cron jobs**: Ask before adding `@Cron`/`@Interval` (Railway connection limits)
 
 **Area-specific rules** auto-load from `.claude/rules/`:
+
 - `api.md` - NestJS patterns, guards, DTOs, scheduled jobs
 - `web.md` - React components, TanStack Query, hydration
 - `prisma.md` - Schema, migrations, query patterns
@@ -76,18 +77,19 @@ platform/
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Backend | NestJS 10, Prisma 7, PostgreSQL |
+| Layer         | Technology                                       |
+| ------------- | ------------------------------------------------ |
+| Backend       | NestJS 10, Prisma 7, PostgreSQL                  |
 | Rust Services | actix-web, sqlx, tokio (security-critical paths) |
-| Frontend | Next.js 14 (App Router), React 18, TailwindCSS |
-| Auth | NextAuth 5 (beta), JWT (7-day expiry) |
-| Payments | Stripe (connected accounts per campground) |
-| State | TanStack Query (primary), SWR |
-| UI | Radix UI, shadcn/ui components |
-| Monorepo | pnpm workspaces |
+| Frontend      | Next.js 14 (App Router), React 18, TailwindCSS   |
+| Auth          | NextAuth 5 (beta), JWT (7-day expiry)            |
+| Payments      | Stripe (connected accounts per campground)       |
+| State         | TanStack Query (primary), SWR                    |
+| UI            | Radix UI, shadcn/ui components                   |
+| Monorepo      | pnpm workspaces                                  |
 
 **When to use Rust vs TypeScript:**
+
 - Rust: Payment processing, auth, availability, money calculations (if it compiles, it's correct)
 - TypeScript: CRUD, admin dashboards, business logic, integrations
 
@@ -99,10 +101,10 @@ platform/
 
 ## Deployment
 
-| Environment | Frontend | API | Rust Services | Database |
-|-------------|----------|-----|---------------|----------|
-| Production | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Railway | Supabase |
-| Staging | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Railway | Supabase (staging) |
+| Environment | Frontend                         | API                                   | Rust Services | Database           |
+| ----------- | -------------------------------- | ------------------------------------- | ------------- | ------------------ |
+| Production  | Vercel (`keeprstay.com`)         | Railway (`api.keeprstay.com`)         | Railway       | Supabase           |
+| Staging     | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Railway       | Supabase (staging) |
 
 **Branch strategy:** `feature/*` → PR to `staging` → merge → test → PR to `main` → production
 
@@ -110,16 +112,16 @@ platform/
 
 ## Key File Locations
 
-| Purpose | Path |
-|---------|------|
-| Prisma Schema | `platform/apps/api/prisma/schema.prisma` |
-| API Modules | `platform/apps/api/src/[feature]/` |
-| API Entry | `platform/apps/api/src/main.ts` |
-| Web API Client | `platform/apps/web/lib/api-client.ts` |
-| Web App Routes | `platform/apps/web/app/` |
-| UI Components | `platform/apps/web/components/ui/` |
-| Shared Schemas | `platform/packages/shared/src/index.ts` |
-| Auth Config | `platform/apps/web/auth.ts` |
+| Purpose        | Path                                     |
+| -------------- | ---------------------------------------- |
+| Prisma Schema  | `platform/apps/api/prisma/schema.prisma` |
+| API Modules    | `platform/apps/api/src/[feature]/`       |
+| API Entry      | `platform/apps/api/src/main.ts`          |
+| Web API Client | `platform/apps/web/lib/api-client.ts`    |
+| Web App Routes | `platform/apps/web/app/`                 |
+| UI Components  | `platform/apps/web/components/ui/`       |
+| Shared Schemas | `platform/packages/shared/src/index.ts`  |
+| Auth Config    | `platform/apps/web/auth.ts`              |
 
 ---
 
@@ -137,6 +139,7 @@ Organization (multi-tenant root)
 ```
 
 ### Reservation Status Flow
+
 ```
 pending → confirmed → checked_in → checked_out
     ↓
@@ -144,26 +147,27 @@ cancelled
 ```
 
 ### User Roles
-| Role | Scope | Access |
-|------|-------|--------|
-| `platform_admin` | Platform | All campgrounds |
-| `owner` | Campground | Full access |
-| `manager` | Campground | Operations |
-| `front_desk` | Campground | Reservations, guests |
-| `maintenance` | Campground | Tickets only |
-| `finance` | Campground | Reports, payments |
-| `readonly` | Campground | View only |
+
+| Role             | Scope      | Access               |
+| ---------------- | ---------- | -------------------- |
+| `platform_admin` | Platform   | All campgrounds      |
+| `owner`          | Campground | Full access          |
+| `manager`        | Campground | Operations           |
+| `front_desk`     | Campground | Reservations, guests |
+| `maintenance`    | Campground | Tickets only         |
+| `finance`        | Campground | Reports, payments    |
+| `readonly`       | Campground | View only            |
 
 ---
 
 ## Documentation
 
-| When doing... | Read... |
-|--------------|---------|
+| When doing...         | Read...                        |
+| --------------------- | ------------------------------ |
 | Building new features | `docs/AI_FIRST_DEVELOPMENT.md` |
-| Deploying / CI/CD | `docs/DEVELOPER_WORKFLOW.md` |
-| Adding AI features | `docs/OPENAI_INTEGRATION.md` |
-| Rust migration | `docs/RUST_MIGRATION_PLAN.md` |
+| Deploying / CI/CD     | `docs/DEVELOPER_WORKFLOW.md`   |
+| Adding AI features    | `docs/OPENAI_INTEGRATION.md`   |
+| Rust migration        | `docs/RUST_MIGRATION_PLAN.md`  |
 
 ## Known Issues
 
@@ -174,21 +178,25 @@ cancelled
 ## Common Issues & Fixes
 
 ### "Cannot find module '@prisma/client'"
+
 ```bash
 pnpm --dir platform/apps/api prisma:generate
 ```
 
 ### Type errors after schema change
+
 ```bash
 pnpm build:shared && pnpm --dir platform/apps/api prisma:generate
 ```
 
 ### Port already in use
+
 ```bash
 lsof -i :4000 && kill -9 <PID>
 ```
 
 ### Migration drift
+
 ```bash
 DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 ```
@@ -197,18 +205,19 @@ DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 
 ## Verification by Feature Area
 
-| Change Type | Verification Command |
-|-------------|---------------------|
-| API changes | `pnpm build:api` |
-| Frontend changes | `pnpm build:web` |
-| Schema changes | `pnpm --dir platform/apps/api prisma:generate` |
-| Shared types | `pnpm build:shared` |
-| Rust services | `cargo check && cargo clippy && cargo test` |
-| Everything | `pnpm build` |
+| Change Type      | Verification Command                           |
+| ---------------- | ---------------------------------------------- |
+| API changes      | `pnpm build:api`                               |
+| Frontend changes | `pnpm build:web`                               |
+| Schema changes   | `pnpm --dir platform/apps/api prisma:generate` |
+| Shared types     | `pnpm build:shared`                            |
+| Rust services    | `cargo check && cargo clippy && cargo test`    |
+| Everything       | `pnpm build`                                   |
 
 ## Code Patterns
 
 **Always do:**
+
 - Null-check after `findUnique`/`findFirst`
 - Normalize emails: `.trim().toLowerCase()`
 - Include `campgroundId` in tenant-scoped queries
@@ -220,12 +229,14 @@ DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 - Wrap risky ops in try/catch + `Sentry.captureException()`
 
 **Ask before:**
+
 - Adding new npm packages
 - Adding `@Cron` or `@Interval` decorators
 
 ## Environment Variables
 
 **API** (`platform/apps/api/.env`):
+
 ```
 DATABASE_URL=postgresql://...
 JWT_SECRET=...
@@ -234,6 +245,7 @@ REDIS_URL=redis://... (optional)
 ```
 
 **Web** (`platform/apps/web/.env`):
+
 ```
 NEXT_PUBLIC_API_BASE=http://localhost:4000/api
 NEXTAUTH_URL=http://localhost:3000

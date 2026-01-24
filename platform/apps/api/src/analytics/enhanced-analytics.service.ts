@@ -129,7 +129,7 @@ export class EnhancedAnalyticsService {
     if (dto.endedAt) {
       data.endedAt = new Date(dto.endedAt);
       data.durationSecs = Math.floor(
-        (new Date(dto.endedAt).getTime() - session.startedAt.getTime()) / 1000
+        (new Date(dto.endedAt).getTime() - session.startedAt.getTime()) / 1000,
       );
     }
 
@@ -153,9 +153,7 @@ export class EnhancedAnalyticsService {
     }
 
     const now = new Date();
-    const durationSecs = Math.floor(
-      (now.getTime() - session.startedAt.getTime()) / 1000
-    );
+    const durationSecs = Math.floor((now.getTime() - session.startedAt.getTime()) / 1000);
 
     return this.prisma.analyticsSession.update({
       where: { sessionId },
@@ -422,9 +420,10 @@ export class EnhancedAnalyticsService {
       data: {
         id: randomUUID(),
         sessionId: dto.sessionId,
-        eventName: dto.outcome === "completed"
-          ? AnalyticsEventName.funnel_complete
-          : AnalyticsEventName.funnel_abandon,
+        eventName:
+          dto.outcome === "completed"
+            ? AnalyticsEventName.funnel_complete
+            : AnalyticsEventName.funnel_abandon,
         occurredAt: now,
         metadata: toJsonValue({
           funnelName: dto.funnelName,
@@ -472,20 +471,27 @@ export class EnhancedAnalyticsService {
       const errorCount = dto.outcome === "failure" ? 1 : 0;
       const successCount = dto.outcome === "success" ? 1 : 0;
       const newUsageCount = existing.usageCount + 1;
-      const newSuccessRate = existing.successRate !== null
-        ? ((existing.successRate * existing.usageCount) + (successCount ? 1 : 0)) / newUsageCount
-        : (successCount ? 1 : 0);
+      const newSuccessRate =
+        existing.successRate !== null
+          ? (existing.successRate * existing.usageCount + (successCount ? 1 : 0)) / newUsageCount
+          : successCount
+            ? 1
+            : 0;
 
       await this.prisma.analyticsFeatureUsage.update({
         where: { id: existing.id },
         data: {
           usageCount: { increment: 1 },
-          uniqueUsers: dto.userId && !await this.hasUserUsedFeatureToday(campgroundId, dto.feature, dto.userId, today)
-            ? { increment: 1 }
-            : undefined,
-          avgDurationSecs: dto.durationSecs !== undefined
-            ? (((existing.avgDurationSecs || 0) * existing.usageCount) + dto.durationSecs) / newUsageCount
-            : undefined,
+          uniqueUsers:
+            dto.userId &&
+            !(await this.hasUserUsedFeatureToday(campgroundId, dto.feature, dto.userId, today))
+              ? { increment: 1 }
+              : undefined,
+          avgDurationSecs:
+            dto.durationSecs !== undefined
+              ? ((existing.avgDurationSecs || 0) * existing.usageCount + dto.durationSecs) /
+                newUsageCount
+              : undefined,
           successRate: newSuccessRate,
           errorCount: { increment: errorCount },
         },
@@ -536,7 +542,7 @@ export class EnhancedAnalyticsService {
     campgroundId: string,
     feature: string,
     userId: string,
-    date: Date
+    date: Date,
   ): Promise<boolean> {
     const count = await this.prisma.analyticsEvent.count({
       where: {
@@ -633,15 +639,18 @@ export class EnhancedAnalyticsService {
     });
 
     // Aggregate by feature
-    const byFeature = new Map<string, {
-      feature: string;
-      totalUsage: number;
-      uniqueUsers: number;
-      avgDuration: number;
-      successRate: number;
-      errorCount: number;
-      dates: Date[];
-    }>();
+    const byFeature = new Map<
+      string,
+      {
+        feature: string;
+        totalUsage: number;
+        uniqueUsers: number;
+        avgDuration: number;
+        successRate: number;
+        errorCount: number;
+        dates: Date[];
+      }
+    >();
 
     for (const record of usage) {
       const existing = byFeature.get(record.feature);
@@ -713,9 +722,11 @@ export class EnhancedAnalyticsService {
 
     // Average duration for completed funnels
     const completedFunnels = funnels.filter((f) => f.completedAt && f.totalDurationSecs);
-    const avgDuration = completedFunnels.length > 0
-      ? completedFunnels.reduce((sum, f) => sum + (f.totalDurationSecs || 0), 0) / completedFunnels.length
-      : 0;
+    const avgDuration =
+      completedFunnels.length > 0
+        ? completedFunnels.reduce((sum, f) => sum + (f.totalDurationSecs || 0), 0) /
+          completedFunnels.length
+        : 0;
 
     return {
       funnelName,
@@ -727,9 +738,7 @@ export class EnhancedAnalyticsService {
       completionRate: total > 0 ? completed / total : 0,
       abandonmentRate: total > 0 ? abandoned / total : 0,
       avgDurationSecs: avgDuration,
-      stepCompletionRates: stepCounts.map((count, i) =>
-        total > 0 ? count / total : 0
-      ),
+      stepCompletionRates: stepCounts.map((count, i) => (total > 0 ? count / total : 0)),
       abandonByStep: Object.fromEntries(abandonByStep),
     };
   }
@@ -902,15 +911,18 @@ export class EnhancedAnalyticsService {
     });
 
     // Aggregate by user and campground
-    const metrics = new Map<string, {
-      campgroundId: string;
-      userId: string;
-      sessions: number;
-      totalDuration: number;
-      pageViews: number;
-      actions: number;
-      errors: number;
-    }>();
+    const metrics = new Map<
+      string,
+      {
+        campgroundId: string;
+        userId: string;
+        sessions: number;
+        totalDuration: number;
+        pageViews: number;
+        actions: number;
+        errors: number;
+      }
+    >();
 
     for (const session of sessions) {
       if (!session.userId || !session.campgroundId) continue;
@@ -1002,7 +1014,7 @@ export class EnhancedAnalyticsService {
 
     for (const session of staleSessions) {
       const durationSecs = Math.floor(
-        (session.updatedAt.getTime() - session.startedAt.getTime()) / 1000
+        (session.updatedAt.getTime() - session.startedAt.getTime()) / 1000,
       );
 
       await this.prisma.analyticsSession.update({

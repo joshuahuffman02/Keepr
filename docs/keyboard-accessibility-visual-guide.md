@@ -6,36 +6,44 @@
 
 #### Input Fields
 
-**Before**: 
+**Before**:
+
 ```
 Ring: 2px solid
 Opacity: 100%
 Color: slate-950
 ```
+
 Visual: Thin, harsh line that could be jarring
 
 **After**:
+
 ```
 Ring: 4px solid
 Opacity: 30%
 Color: slate-950
 Transition: smooth shadow
 ```
+
 Visual: Soft, glowing halo that's prominent but not jarring
 
 #### Buttons
 
 **Before**:
+
 ```
 Primary: ring-action-primary/50 (2px)
 ```
+
 Visual: Barely visible on colored backgrounds
 
 **After**:
+
 ```
 Primary: ring-action-primary/60 (4px)
 Ghost/Outline: ring-slate-950/30 (4px)
 ```
+
 Visual: Clear indication on all backgrounds
 
 ## Component-by-Component Guide
@@ -47,12 +55,14 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus input (4px blue-ish ring appears)
 - Type: Enter text
 - Enter: Submit form (if in form)
 - Tab: Move to next field
 
 **Visual Feedback**:
+
 - Unfocused: 1px gray border
 - Focused: 4px ring + 2px offset, smooth transition
 - Error: Red ring instead of blue
@@ -64,11 +74,13 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus button (4px ring appears)
 - Enter/Space: Click button
 - Tab: Move to next element
 
 **Visual Feedback**:
+
 - Primary: Emerald ring
 - Ghost: Gray ring
 - Destructive: Red ring
@@ -80,11 +92,13 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus checkbox (4px ring appears)
 - Space: Toggle checked state
 - Tab: Move to next element
 
 **Visual Feedback**:
+
 - Ring appears around checkbox
 - Checkmark animates in/out
 
@@ -102,6 +116,7 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus trigger
 - Enter/Space: Open dropdown
 - Arrow Down/Up: Navigate options
@@ -109,6 +124,7 @@ Visual: Clear indication on all backgrounds
 - Escape: Close without selecting
 
 **Visual Feedback**:
+
 - Trigger: 4px ring when focused
 - Items: Background highlight on keyboard navigation
 
@@ -125,6 +141,7 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus trigger
 - Enter/Space: Open menu, first item auto-focused
 - Arrow Down: Next item (wraps to top)
@@ -133,6 +150,7 @@ Visual: Clear indication on all backgrounds
 - Escape: Close menu, return focus to trigger
 
 **Visual Feedback**:
+
 - Menu items: 2px ring on keyboard focus
 - Background highlight on hover/focus
 
@@ -141,7 +159,7 @@ Visual: Clear indication on all backgrounds
 ```tsx
 <Table>
   <TableBody>
-    <TableRow interactive onActivate={() => alert('clicked')}>
+    <TableRow interactive onActivate={() => alert("clicked")}>
       <TableCell>Content</TableCell>
     </TableRow>
   </TableBody>
@@ -149,11 +167,13 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus row (2px ring appears)
 - Enter/Space: Activate row
 - Tab: Next row or next element
 
 **Visual Feedback**:
+
 - Focused row: 2px ring + background highlight
 - Cursor: pointer on hover
 
@@ -170,6 +190,7 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus table
 - Arrow Down: Next row
 - Arrow Up: Previous row
@@ -180,6 +201,7 @@ Visual: Clear indication on all backgrounds
 - Tab: Exit table
 
 **Visual Feedback**:
+
 - Current row: 2px ring + background highlight
 - Smooth transitions between rows
 
@@ -197,6 +219,7 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Auto-focus first element (usually close button)
 - Tab: Next focusable element
 - Shift+Tab: Previous element (wraps within dialog)
@@ -204,6 +227,7 @@ Visual: Clear indication on all backgrounds
 - Enter: Submit if in form
 
 **Visual Feedback**:
+
 - Focus trapped within dialog
 - Elements show 4px rings as usual
 - Background dimmed
@@ -215,11 +239,13 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus switch (4px ring appears)
 - Space: Toggle on/off
 - Tab: Move to next element
 
 **Visual Feedback**:
+
 - Ring around entire switch track
 - Smooth thumb animation
 
@@ -233,12 +259,14 @@ Visual: Clear indication on all backgrounds
 ```
 
 **Keyboard Behavior**:
+
 - Tab: Focus first/checked item
 - Arrow Down/Right: Next item
 - Arrow Up/Left: Previous item
 - Tab: Exit group
 
 **Visual Feedback**:
+
 - 4px ring around focused radio
 - Center dot fills on selection
 
@@ -247,6 +275,7 @@ Visual: Clear indication on all backgrounds
 ### Focus Order
 
 Logical tab order:
+
 1. Skip links (if present)
 2. Main navigation
 3. Page header
@@ -257,6 +286,7 @@ Logical tab order:
 ### Focus Trap (Modals)
 
 When modal opens:
+
 1. Background becomes inert
 2. Focus moves to first element in modal
 3. Tab cycles only within modal
@@ -266,6 +296,7 @@ When modal opens:
 ### Focus Visibility
 
 All interactive elements have:
+
 - Minimum 3:1 contrast ratio for focus indicator
 - 2px offset to separate from element border
 - Smooth transitions to avoid jarring changes
@@ -276,6 +307,7 @@ All interactive elements have:
 Use this checklist when testing keyboard accessibility:
 
 ### Basic Navigation
+
 - [ ] Tab reaches all interactive elements
 - [ ] Tab order is logical (top to bottom, left to right)
 - [ ] Shift+Tab moves backwards correctly
@@ -283,6 +315,7 @@ Use this checklist when testing keyboard accessibility:
 - [ ] Skip links work (if implemented)
 
 ### Visual Indicators
+
 - [ ] Focus rings visible on all elements
 - [ ] Focus rings have sufficient contrast
 - [ ] Focus state different from hover state
@@ -290,6 +323,7 @@ Use this checklist when testing keyboard accessibility:
 - [ ] Consistent appearance across components
 
 ### Forms
+
 - [ ] Tab moves through fields in order
 - [ ] Enter submits form
 - [ ] Space toggles checkboxes/radios
@@ -297,6 +331,7 @@ Use this checklist when testing keyboard accessibility:
 - [ ] Error messages announced and visible
 
 ### Menus & Dropdowns
+
 - [ ] Arrow keys navigate items
 - [ ] Enter/Space selects item
 - [ ] Escape closes menu
@@ -304,6 +339,7 @@ Use this checklist when testing keyboard accessibility:
 - [ ] First item auto-focused on open
 
 ### Tables
+
 - [ ] Rows focusable (if interactive)
 - [ ] Arrow keys navigate rows (if enabled)
 - [ ] Enter/Space activates row
@@ -311,6 +347,7 @@ Use this checklist when testing keyboard accessibility:
 - [ ] Column headers properly marked
 
 ### Dialogs
+
 - [ ] Auto-focus first element
 - [ ] Tab cycles only within dialog
 - [ ] Escape closes dialog
@@ -322,23 +359,27 @@ Use this checklist when testing keyboard accessibility:
 ### Issue: Focus ring not visible
 
 **Problem**: Custom styling removes outline
+
 ```tsx
-className="outline-none"
+className = "outline-none";
 ```
 
 **Fix**: Use focus-visible instead
+
 ```tsx
-className="focus-visible:outline-none focus-visible:ring-4"
+className = "focus-visible:outline-none focus-visible:ring-4";
 ```
 
 ### Issue: Can't tab to element
 
 **Problem**: Not keyboard accessible
+
 ```tsx
 <div onClick={handleClick}>Click me</div>
 ```
 
 **Fix**: Use button or add tabIndex
+
 ```tsx
 <button onClick={handleClick}>Click me</button>
 // OR
@@ -348,11 +389,13 @@ className="focus-visible:outline-none focus-visible:ring-4"
 ### Issue: Custom component not accessible
 
 **Problem**: Missing ARIA attributes
+
 ```tsx
 <CustomDropdown>...</CustomDropdown>
 ```
 
 **Fix**: Add proper ARIA
+
 ```tsx
 <button aria-haspopup="menu" aria-expanded={open}>
   Toggle

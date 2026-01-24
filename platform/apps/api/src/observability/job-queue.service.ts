@@ -21,12 +21,12 @@ export class JobQueueService {
   private readonly defaultMaxQueue = Number(process.env.JOB_QUEUE_MAX ?? 200);
   private readonly defaultTimeoutMs = Number(process.env.JOB_QUEUE_TIMEOUT_MS ?? 45000);
 
-  constructor(private readonly observability: ObservabilityService) { }
+  constructor(private readonly observability: ObservabilityService) {}
 
   async enqueue<T>(
     queueName: string,
     fn: () => Promise<T>,
-    opts?: { jobName?: string; timeoutMs?: number; concurrency?: number; maxQueue?: number }
+    opts?: { jobName?: string; timeoutMs?: number; concurrency?: number; maxQueue?: number },
   ): Promise<T> {
     const normalizedName = queueName.toLowerCase();
     const state = this.ensureQueue(normalizedName, opts);
@@ -105,11 +105,19 @@ export class JobQueueService {
           queueDepth: state.pending.length,
         });
         state.running = Math.max(0, state.running - 1);
-        const oldestRemaining = state.pending[0]?.enqueuedAt ? Date.now() - state.pending[0].enqueuedAt : 0;
-        this.observability.setQueueState(state.name, state.running, state.pending.length, oldestRemaining, {
-          maxQueue: state.maxQueue,
-          concurrency: state.concurrency,
-        });
+        const oldestRemaining = state.pending[0]?.enqueuedAt
+          ? Date.now() - state.pending[0].enqueuedAt
+          : 0;
+        this.observability.setQueueState(
+          state.name,
+          state.running,
+          state.pending.length,
+          oldestRemaining,
+          {
+            maxQueue: state.maxQueue,
+            concurrency: state.concurrency,
+          },
+        );
         // Continue draining if more work remains
         setImmediate(() => this.drain(state));
       };
@@ -128,7 +136,7 @@ export class JobQueueService {
     const timeoutPromise = new Promise<never>((_, reject) => {
       timeoutHandle = setTimeout(
         () => reject(new Error(`Job exceeded timeout ${timeoutMs}ms`)),
-        timeoutMs
+        timeoutMs,
       );
       timeoutHandle.unref();
     });

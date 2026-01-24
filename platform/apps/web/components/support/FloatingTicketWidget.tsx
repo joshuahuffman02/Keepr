@@ -1,14 +1,27 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { useWhoami } from "@/hooks/use-whoami";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -125,7 +138,10 @@ export function FloatingTicketWidget() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isDirty) {
-      localStorage.setItem(LS_TICKET_DRAFT, JSON.stringify({ title: form.title, notes: form.notes, category: form.category }));
+      localStorage.setItem(
+        LS_TICKET_DRAFT,
+        JSON.stringify({ title: form.title, notes: form.notes, category: form.category }),
+      );
     } else {
       localStorage.removeItem(LS_TICKET_DRAFT);
     }
@@ -190,7 +206,10 @@ export function FloatingTicketWidget() {
       const payload = {
         ...form,
         extra: {
-          viewport: typeof window !== "undefined" ? { width: window.innerWidth, height: window.innerHeight } : undefined,
+          viewport:
+            typeof window !== "undefined"
+              ? { width: window.innerWidth, height: window.innerHeight }
+              : undefined,
           referrer: typeof document !== "undefined" ? document.referrer : undefined,
         },
         submitter,
@@ -256,12 +275,22 @@ export function FloatingTicketWidget() {
           <DialogHeader>
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Fast lane</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
+                  Fast lane
+                </p>
                 <DialogTitle className="text-xl">Report, ask, or request</DialogTitle>
-                <p className="text-sm text-muted-foreground">We auto-capture URL, device, and page context for you.</p>
+                <p className="text-sm text-muted-foreground">
+                  We auto-capture URL, device, and page context for you.
+                </p>
               </div>
               <div className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100">
-                {form.category === "issue" ? "Bug" : form.category === "feature" ? "Feature" : form.category === "question" ? "Question" : "Other"}
+                {form.category === "issue"
+                  ? "Bug"
+                  : form.category === "feature"
+                    ? "Feature"
+                    : form.category === "question"
+                      ? "Question"
+                      : "Other"}
               </div>
             </div>
           </DialogHeader>
@@ -270,7 +299,9 @@ export function FloatingTicketWidget() {
               <label className="text-sm font-medium text-foreground">Type</label>
               <Select
                 value={form.category}
-                onValueChange={(val: TicketForm["category"]) => setForm((prev) => ({ ...prev, category: val }))}
+                onValueChange={(val: TicketForm["category"]) =>
+                  setForm((prev) => ({ ...prev, category: val }))
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Choose type" />
@@ -289,7 +320,9 @@ export function FloatingTicketWidget() {
                     type="button"
                     onClick={() => setForm((prev) => ({ ...prev, category: opt.id }))}
                     className={`rounded-full border px-2 py-1 ${
-                      form.category === opt.id ? "border-emerald-500 bg-emerald-50 text-emerald-700" : "border-border text-foreground hover:bg-muted"
+                      form.category === opt.id
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                        : "border-border text-foreground hover:bg-muted"
                     }`}
                   >
                     {opt.label}
@@ -316,7 +349,8 @@ export function FloatingTicketWidget() {
                 onChange={(e) => setForm((prev) => ({ ...prev, notes: e.target.value }))}
               />
               <div className="text-[11px] text-muted-foreground">
-                We’ll auto-attach: URL, page title, device, selection, viewport. Paste links or repro GIFs if helpful.
+                We’ll auto-attach: URL, page title, device, selection, viewport. Paste links or
+                repro GIFs if helpful.
               </div>
             </div>
             <div className="grid grid-cols-1 gap-2 text-xs text-muted-foreground">
@@ -344,7 +378,9 @@ export function FloatingTicketWidget() {
           </div>
           <DialogFooter>
             <div className="flex w-full justify-between items-center gap-3">
-              <div className="text-xs text-muted-foreground">Your report keeps working—even if you close this page.</div>
+              <div className="text-xs text-muted-foreground">
+                Your report keeps working—even if you close this page.
+              </div>
               <div className="flex gap-2">
                 <Button variant="ghost" onClick={() => setOpen(false)} disabled={isSubmitting}>
                   Cancel
@@ -371,15 +407,13 @@ export function FloatingTicketWidget() {
           <AlertDialogHeader>
             <AlertDialogTitle>Discard Draft</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to close and discard this ticket draft? Your changes will be lost.
+              Are you sure you want to close and discard this ticket draft? Your changes will be
+              lost.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Keep Editing</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDiscard}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={confirmDiscard} className="bg-red-600 hover:bg-red-700">
               Discard
             </AlertDialogAction>
           </AlertDialogFooter>

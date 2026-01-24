@@ -28,32 +28,32 @@ Zaraz provides `zaraz` object in browser:
 
 ```javascript
 // Basic event
-zaraz.track('button_click');
+zaraz.track("button_click");
 
 // Event with properties
-zaraz.track('purchase', {
+zaraz.track("purchase", {
   value: 99.99,
-  currency: 'USD',
-  item_id: '12345'
+  currency: "USD",
+  item_id: "12345",
 });
 
 // E-commerce events
-zaraz.track('add_to_cart', {
-  product_name: 'Widget',
+zaraz.track("add_to_cart", {
+  product_name: "Widget",
   price: 29.99,
-  quantity: 1
+  quantity: 1,
 });
 ```
 
 ### Set User Properties
 
 ```javascript
-zaraz.set('userId', 'user_12345');
-zaraz.set('plan', 'premium');
+zaraz.set("userId", "user_12345");
+zaraz.set("plan", "premium");
 zaraz.set({
-  email: '[email protected]',
-  country: 'US',
-  age: 30
+  email: "[email protected]",
+  country: "US",
+  age: 30,
 });
 ```
 
@@ -61,31 +61,29 @@ zaraz.set({
 
 ```javascript
 // Product view
-zaraz.ecommerce('Product Viewed', {
-  product_id: 'SKU123',
-  name: 'Blue Widget',
+zaraz.ecommerce("Product Viewed", {
+  product_id: "SKU123",
+  name: "Blue Widget",
   price: 49.99,
-  currency: 'USD'
+  currency: "USD",
 });
 
 // Add to cart
-zaraz.ecommerce('Product Added', {
-  product_id: 'SKU123',
+zaraz.ecommerce("Product Added", {
+  product_id: "SKU123",
   quantity: 2,
-  price: 49.99
+  price: 49.99,
 });
 
 // Purchase
-zaraz.ecommerce('Order Completed', {
-  order_id: 'ORD-789',
+zaraz.ecommerce("Order Completed", {
+  order_id: "ORD-789",
   total: 149.98,
   revenue: 149.98,
-  shipping: 10.00,
-  tax: 12.50,
-  currency: 'USD',
-  products: [
-    { product_id: 'SKU123', quantity: 2, price: 49.99 }
-  ]
+  shipping: 10.0,
+  tax: 12.5,
+  currency: "USD",
+  products: [{ product_id: "SKU123", quantity: 2, price: 49.99 }],
 });
 ```
 
@@ -94,7 +92,7 @@ zaraz.ecommerce('Order Completed', {
 ```javascript
 // Check consent status
 if (zaraz.consent.getAll().analytics) {
-  zaraz.track('page_view');
+  zaraz.track("page_view");
 }
 
 // Request consent
@@ -104,12 +102,12 @@ zaraz.consent.modal = true; // Show consent modal
 zaraz.consent.setAll({
   analytics: true,
   marketing: false,
-  preferences: true
+  preferences: true,
 });
 
 // Listen for consent changes
-zaraz.consent.addEventListener('consentChanged', () => {
-  console.log('Consent updated:', zaraz.consent.getAll());
+zaraz.consent.addEventListener("consentChanged", () => {
+  console.log("Consent updated:", zaraz.consent.getAll());
 });
 ```
 
@@ -121,12 +119,12 @@ Access Zaraz data in Workers:
 export default {
   async fetch(req: Request): Promise<Response> {
     const url = new URL(req.url);
-    
+
     // Inject Zaraz tracking
-    if (url.pathname === '/checkout') {
+    if (url.pathname === "/checkout") {
       const response = await fetch(req);
       const html = await response.text();
-      
+
       const tracking = `
         <script>
           zaraz.track('checkout_started', {
@@ -134,13 +132,13 @@ export default {
           });
         </script>
       `;
-      
-      const modified = html.replace('</body>', tracking + '</body>');
+
+      const modified = html.replace("</body>", tracking + "</body>");
       return new Response(modified, response);
     }
-    
+
     return fetch(req);
-  }
+  },
 };
 ```
 
@@ -172,31 +170,31 @@ Action: Track event "purchase_intent"
 
 ```javascript
 // Track page view (automatic)
-zaraz.track('pageview');
+zaraz.track("pageview");
 
 // Custom event
-zaraz.track('sign_up', {
-  method: 'email'
+zaraz.track("sign_up", {
+  method: "email",
 });
 ```
 
 ### Facebook Pixel
 
 ```javascript
-zaraz.track('PageView');
-zaraz.track('Purchase', {
+zaraz.track("PageView");
+zaraz.track("Purchase", {
   value: 99.99,
-  currency: 'USD'
+  currency: "USD",
 });
 ```
 
 ### Google Ads Conversion
 
 ```javascript
-zaraz.track('conversion', {
-  send_to: 'AW-XXXXXXXXX/YYYYYY',
-  value: 1.00,
-  currency: 'USD'
+zaraz.track("conversion", {
+  send_to: "AW-XXXXXXXXX/YYYYYY",
+  value: 1.0,
+  currency: "USD",
 });
 ```
 
@@ -209,14 +207,14 @@ Build custom tools:
 export default class CustomAnalytics {
   async handleEvent(event) {
     const { type, payload } = event;
-    
-    await fetch('https://analytics.example.com/track', {
-      method: 'POST',
+
+    await fetch("https://analytics.example.com/track", {
+      method: "POST",
       body: JSON.stringify({
         event: type,
         properties: payload,
-        timestamp: Date.now()
-      })
+        timestamp: Date.now(),
+      }),
     });
   }
 }
@@ -229,9 +227,9 @@ Use `zaraz.dataLayer` for structured data:
 ```javascript
 // Set data layer
 window.zaraz.dataLayer = {
-  user_id: '12345',
-  page_type: 'product',
-  category: 'electronics'
+  user_id: "12345",
+  page_type: "product",
+  category: "electronics",
 };
 
 // Access in triggers
@@ -281,7 +279,7 @@ match_rule = "Pageview"
 zaraz.debug = true;
 
 // View events in console
-zaraz.track('test_event', { debug: true });
+zaraz.track("test_event", { debug: true });
 
 // Check loaded tools
 console.log(zaraz.tools);
@@ -303,9 +301,9 @@ console.log(zaraz.tools);
 ```javascript
 // On route change
 router.afterEach((to, from) => {
-  zaraz.track('pageview', {
+  zaraz.track("pageview", {
     page_path: to.path,
-    page_title: to.meta.title
+    page_title: to.meta.title,
   });
 });
 ```
@@ -314,17 +312,17 @@ router.afterEach((to, from) => {
 
 ```javascript
 // On login
-zaraz.set('user_id', user.id);
-zaraz.set('user_email', user.email);
-zaraz.track('login', { method: 'password' });
+zaraz.set("user_id", user.id);
+zaraz.set("user_email", user.email);
+zaraz.track("login", { method: "password" });
 ```
 
 ### A/B Testing
 
 ```javascript
-const variant = Math.random() < 0.5 ? 'A' : 'B';
-zaraz.set('ab_test_variant', variant);
-zaraz.track('ab_test_view', { variant });
+const variant = Math.random() < 0.5 ? "A" : "B";
+zaraz.set("ab_test_variant", variant);
+zaraz.track("ab_test_view", { variant });
 ```
 
 ## Limits

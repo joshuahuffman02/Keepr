@@ -55,11 +55,13 @@ const PricingEvaluationResponseSchema = z.object({
   base_subtotal_cents: z.number(),
   adjustments_cents: z.number(),
   total_before_tax_cents: z.number(),
-  applied_rules: z.array(z.object({
-    rule_id: z.string(),
-    name: z.string(),
-    adjustment_cents: z.number(),
-  })),
+  applied_rules: z.array(
+    z.object({
+      rule_id: z.string(),
+      name: z.string(),
+      adjustment_cents: z.number(),
+    }),
+  ),
 });
 
 type PricingEvaluationResponse = z.infer<typeof PricingEvaluationResponseSchema>;
@@ -95,12 +97,14 @@ interface MaintenanceData {
 }
 
 const AvailabilityCheckResponseSchema = z.object({
-  available_sites: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    site_class_id: z.string(),
-    base_rate_cents: z.number().optional(),
-  })),
+  available_sites: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      site_class_id: z.string(),
+      base_rate_cents: z.number().optional(),
+    }),
+  ),
   total_available: z.number(),
 });
 
@@ -138,12 +142,14 @@ interface ForecastRequest {
 }
 
 const ForecastResponseSchema = z.object({
-  forecasts: z.array(z.object({
-    date: z.string(),
-    predicted_occupancy: z.number(),
-    predicted_revenue_cents: z.number(),
-    confidence: z.number(),
-  })),
+  forecasts: z.array(
+    z.object({
+      date: z.string(),
+      predicted_occupancy: z.number(),
+      predicted_revenue_cents: z.number(),
+      confidence: z.number(),
+    }),
+  ),
 });
 
 type ForecastResponse = z.infer<typeof ForecastResponseSchema>;
@@ -158,7 +164,10 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
   private healthCheckTimeout: NodeJS.Timeout | null = null;
 
   constructor(private readonly config: ConfigService) {
-    this.baseUrl = this.config.get<string>("RUST_AVAILABILITY_SERVICE_URL", "http://localhost:8081");
+    this.baseUrl = this.config.get<string>(
+      "RUST_AVAILABILITY_SERVICE_URL",
+      "http://localhost:8081",
+    );
     this.timeout = this.config.get<number>("RUST_AVAILABILITY_TIMEOUT_MS", 5000);
   }
 
@@ -199,7 +208,9 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
     } catch {
       this.isHealthy = false;
       this.fallbackToLocal = true;
-      this.logger.warn(`Rust availability service unavailable at ${this.baseUrl}, using local fallback`);
+      this.logger.warn(
+        `Rust availability service unavailable at ${this.baseUrl}, using local fallback`,
+      );
     }
     return false;
   }
@@ -207,7 +218,9 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
   /**
    * Evaluate pricing via Rust service
    */
-  async evaluatePricing(request: PricingEvaluationRequest): Promise<PricingEvaluationResponse | null> {
+  async evaluatePricing(
+    request: PricingEvaluationRequest,
+  ): Promise<PricingEvaluationResponse | null> {
     if (this.fallbackToLocal) {
       return null;
     }
@@ -231,7 +244,10 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
       const json: unknown = await response.json();
       return PricingEvaluationResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust pricing evaluation failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust pricing evaluation failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -240,7 +256,9 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
   /**
    * Check availability via Rust service
    */
-  async checkAvailability(request: AvailabilityCheckRequest): Promise<AvailabilityCheckResponse | null> {
+  async checkAvailability(
+    request: AvailabilityCheckRequest,
+  ): Promise<AvailabilityCheckResponse | null> {
     if (this.fallbackToLocal) {
       return null;
     }
@@ -264,7 +282,10 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
       const json: unknown = await response.json();
       return AvailabilityCheckResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust availability check failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust availability check failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -273,7 +294,9 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
   /**
    * Calculate deposit via Rust service
    */
-  async calculateDeposit(request: DepositCalculationRequest): Promise<DepositCalculationResponse | null> {
+  async calculateDeposit(
+    request: DepositCalculationRequest,
+  ): Promise<DepositCalculationResponse | null> {
     if (this.fallbackToLocal) {
       return null;
     }
@@ -297,7 +320,10 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
       const json: unknown = await response.json();
       return DepositCalculationResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust deposit calculation failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust deposit calculation failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -330,7 +356,10 @@ export class RustAvailabilityClientService implements OnModuleInit, OnModuleDest
       const json: unknown = await response.json();
       return ForecastResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust forecasting failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust forecasting failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }

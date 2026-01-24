@@ -6,4 +6,3 @@ export class SaveOtaConfigDto {
   channelId?: string;
   notes?: string;
 }
-

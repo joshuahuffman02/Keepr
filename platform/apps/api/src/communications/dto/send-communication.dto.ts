@@ -68,4 +68,3 @@ export class SendCommunicationDto {
   @IsString()
   toPhone?: string;
 }
-

@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  Req,
-} from "@nestjs/common";
+import { Controller, Post, Get, Param, Body, Query, UseGuards, Req } from "@nestjs/common";
 import type { Request } from "express";
 import { AnalyticsExportService } from "./analytics-export.service";
 import { AnalyticsShareService } from "./analytics-share.service";
@@ -54,7 +45,7 @@ type AuthRequest = Request & { user: { id: string; email: string } };
 export class AnalyticsExportController {
   constructor(
     private readonly exportService: AnalyticsExportService,
-    private readonly shareService: AnalyticsShareService
+    private readonly shareService: AnalyticsShareService,
   ) {}
 
   // ==================== EXPORTS ====================
@@ -105,7 +96,7 @@ export class AnalyticsExportController {
   async updateShareLink(
     @Param("id") id: string,
     @Body() dto: UpdateShareDto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.shareService.updateShareLink(id, req.user.id, dto);
   }
@@ -117,10 +108,7 @@ export class SharedAnalyticsController {
   constructor(private readonly shareService: AnalyticsShareService) {}
 
   @Get(":token")
-  async accessSharedAnalytics(
-    @Param("token") token: string,
-    @Query("password") password?: string
-  ) {
+  async accessSharedAnalytics(@Param("token") token: string, @Query("password") password?: string) {
     return this.shareService.accessSharedAnalytics(token, password);
   }
 }

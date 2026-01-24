@@ -24,10 +24,7 @@ import { UserRole } from "@prisma/client";
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const getRequestString = (
-  req: Request,
-  key: "campgroundId" | "organizationId"
-): string | null => {
+const getRequestString = (req: Request, key: "campgroundId" | "organizationId"): string | null => {
   if (!isRecord(req)) return null;
   const raw = req[key];
   return typeof raw === "string" ? raw : null;
@@ -77,9 +74,7 @@ export class EnhancedAnalyticsController {
    * Public endpoint
    */
   @Post("session/end")
-  async endSession(
-    @Body() body: { sessionId: string; exitPage?: string }
-  ) {
+  async endSession(@Body() body: { sessionId: string; exitPage?: string }) {
     return this.service.endSession(body.sessionId, body.exitPage);
   }
 
@@ -153,8 +148,7 @@ export class EnhancedAnalyticsController {
     const headerOrganizationId = this.getHeader(req, "x-organization-id");
     const scope = {
       campgroundId: getRequestString(req, "campgroundId") || headerCampgroundId || null,
-      organizationId:
-        getRequestString(req, "organizationId") || headerOrganizationId || null,
+      organizationId: getRequestString(req, "organizationId") || headerOrganizationId || null,
       userId: getRequestUserId(req),
     };
     return this.service.trackFeatureUsage(dto, scope);
@@ -172,7 +166,7 @@ export class EnhancedAnalyticsController {
   async getPageStats(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||
@@ -190,7 +184,7 @@ export class EnhancedAnalyticsController {
   async getFeatureUsage(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||
@@ -209,7 +203,7 @@ export class EnhancedAnalyticsController {
     @Query("campgroundId") campgroundId: string,
     @Query("funnelName") funnelName: string,
     @Query("days") days: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||
@@ -228,7 +222,7 @@ export class EnhancedAnalyticsController {
   async getSessionStats(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||
@@ -247,7 +241,7 @@ export class EnhancedAnalyticsController {
   async getStaffMetrics(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||
@@ -265,7 +259,7 @@ export class EnhancedAnalyticsController {
   async getLiveEvents(
     @Query("campgroundId") campgroundId: string,
     @Query("limit") limit: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const cgId =
       campgroundId ||

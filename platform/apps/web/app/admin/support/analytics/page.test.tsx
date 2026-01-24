@@ -28,7 +28,14 @@ describe("SupportAnalyticsPage", () => {
         generatedAt: "2025-12-08T00:00:00Z",
         source: "stub",
         slaSummary: [
-          { region: "north", campgroundId: "cg1", campgroundName: "North Pines", onTime: 10, overdue: 2, slaTargetHours: 24 },
+          {
+            region: "north",
+            campgroundId: "cg1",
+            campgroundName: "North Pines",
+            onTime: 10,
+            overdue: 2,
+            slaTargetHours: 24,
+          },
         ],
         volumesByCategory: [{ category: "Bugs / Errors", count: 5 }],
         needsAttention: [

@@ -25,6 +25,7 @@ Here's why it's time to upgrade.
 **1. Real-time availability tracking**
 
 Your staff's availability changes constantly:
+
 - Vacation requests
 - Family obligations
 - Second jobs
@@ -36,6 +37,7 @@ A spreadsheet is a snapshot in time. The moment it's created, it starts becoming
 **2. Conflict detection**
 
 Spreadsheets don't warn you when you:
+
 - Schedule someone during their time off
 - Create shifts that overlap
 - Assign someone to two places simultaneously
@@ -53,6 +55,7 @@ Staff need to see their schedules easily. Spreadsheets buried in email chains or
 **4. Shift trading and coverage**
 
 Someone needs to swap shifts. Currently, this means:
+
 - Employee A texts you
 - You check if Employee B is available
 - You update the spreadsheet
@@ -79,15 +82,16 @@ Owners report spending 3-5 hours weekly on scheduling with spreadsheets. That's 
 
 Common spreadsheet scheduling errors:
 
-| Error | Consequence |
-|-------|-------------|
-| Wrong person scheduled | Shift goes uncovered |
-| Overtime not tracked | Unexpected labor costs |
-| Availability ignored | Employee frustration/no-show |
-| Coverage gaps | Poor guest experience |
-| Duplicate assignments | Wasted labor |
+| Error                  | Consequence                  |
+| ---------------------- | ---------------------------- |
+| Wrong person scheduled | Shift goes uncovered         |
+| Overtime not tracked   | Unexpected labor costs       |
+| Availability ignored   | Employee frustration/no-show |
+| Coverage gaps          | Poor guest experience        |
+| Duplicate assignments  | Wasted labor                 |
 
 **Each error costs:**
+
 - Time to fix (1-2 hours)
 - Potential overtime to cover
 - Staff frustration
@@ -98,6 +102,7 @@ Just two errors per week costs more than most scheduling software.
 ### Staff Frustration
 
 Your team members experience:
+
 - Schedules released late (waiting on your spreadsheet)
 - Changes communicated inconsistently
 - Difficulty trading shifts
@@ -105,6 +110,7 @@ Your team members experience:
 - Feeling like availability requests disappear
 
 This leads to:
+
 - Higher turnover (expensive: $3,000-5,000 per seasonal employee to replace)
 - Lower morale
 - More call-outs
@@ -117,6 +123,7 @@ This leads to:
 ### Automated Conflict Detection
 
 The system prevents you from:
+
 - Scheduling someone during approved time off
 - Exceeding hours limits
 - Creating impossible overlapping shifts
@@ -127,6 +134,7 @@ Errors are caught before the schedule is published.
 ### Staff Self-Service
 
 Employees can:
+
 - View schedules on their phones
 - Request time off
 - Set recurring availability
@@ -149,6 +157,7 @@ Your scheduling decisions are data-informed, not gut-based.
 ### Payroll Integration
 
 Hours worked sync directly to payroll:
+
 - No manual counting
 - No transcription errors
 - Time savings every pay period
@@ -157,6 +166,7 @@ Hours worked sync directly to payroll:
 ### Communication Built In
 
 Schedule changes notify affected employees automatically:
+
 - Push notifications
 - Text messages
 - Email
@@ -173,12 +183,14 @@ The "we're too small for software" objection is understandable but usually wrong
 ### The Math for a 5-Person Team
 
 **Current state (spreadsheet):**
+
 - 3 hours/week owner scheduling time
 - 1 error/week average (1 hour to fix)
 - 156 hours/year + 52 hours fixing = 208 hours
 - At $40/hour = **$8,320/year**
 
 **With scheduling software:**
+
 - 1 hour/week scheduling time
 - Errors nearly eliminated
 - 52 hours/year
@@ -200,17 +212,18 @@ The best campground scheduling goes beyond basic staff schedules:
 
 ### Occupancy-Based Staffing
 
-| Occupancy | Front Desk | Housekeeping | Maintenance |
-|-----------|------------|--------------|-------------|
-| Under 50% | 1 per shift | 1 | On-call |
-| 50-80% | 2 per shift | 2 | 1 |
-| Over 80% | 2-3 per shift | 3 | 1-2 |
+| Occupancy | Front Desk    | Housekeeping | Maintenance |
+| --------- | ------------- | ------------ | ----------- |
+| Under 50% | 1 per shift   | 1            | On-call     |
+| 50-80%    | 2 per shift   | 2            | 1           |
+| Over 80%  | 2-3 per shift | 3            | 1-2         |
 
 When your scheduling system knows your occupancy, it can recommend staffing levels automatically.
 
 ### Task Assignment
 
 Beyond "who's working when":
+
 - Which sites need cleaning after checkout
 - Maintenance tasks assigned to specific employees
 - Grounds work scheduled during low-traffic times
@@ -219,6 +232,7 @@ Beyond "who's working when":
 ### Labor Cost Tracking
 
 Real-time visibility into:
+
 - Labor cost as percentage of revenue
 - Cost per occupied site
 - Department-level labor spend
@@ -231,6 +245,7 @@ Real-time visibility into:
 ### Step 1: Audit Current Process
 
 Document your current approach:
+
 - How many hours weekly on scheduling?
 - What tools are you using?
 - How do staff see schedules?
@@ -240,6 +255,7 @@ Document your current approach:
 ### Step 2: Identify Must-Have Features
 
 For most campgrounds:
+
 - Mobile schedule access for staff
 - Availability and time-off management
 - Shift trading capability
@@ -249,12 +265,14 @@ For most campgrounds:
 ### Step 3: Evaluate Options
 
 **Standalone scheduling tools:**
+
 - When I Work
 - Homebase
 - Deputy
 - 7shifts
 
 **Integrated campground software:**
+
 - Scheduling built into your reservation system
 - Automatic occupancy integration
 - Single system for staff to use
@@ -274,6 +292,7 @@ For most campgrounds:
 ### "My staff won't use an app"
 
 Most staff prefer apps because:
+
 - They can see their schedule anywhere
 - Shift trades are easier
 - Time-off requests are simpler
@@ -284,6 +303,7 @@ The "won't use technology" concern is usually unfounded for basic scheduling too
 ### "I like seeing everything in a spreadsheet"
 
 Scheduling software provides the same visibility, with:
+
 - Filters to see what matters
 - Calendar views like your spreadsheet
 - Export capability if you need a printout
@@ -315,4 +335,4 @@ Stop scheduling like it's 2005. Your campground runs on modern systems for reser
 
 ---
 
-*Keepr includes built-in staff scheduling that syncs with your occupancy and reservation data. One system for reservations, guests, and staff. [See how it works at campeveryday.com](https://campeveryday.com)*
+_Keepr includes built-in staff scheduling that syncs with your occupancy and reservation data. One system for reservations, guests, and staff. [See how it works at campeveryday.com](https://campeveryday.com)_

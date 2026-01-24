@@ -15,7 +15,7 @@ export class LocalizationController {
   @Get("settings")
   settings(
     @Headers("x-user-id") userHeader?: string,
-    @Headers("x-organization-id") orgHeader?: string
+    @Headers("x-organization-id") orgHeader?: string,
   ) {
     const userKey = userHeader || "demo-user";
     return this.localization.getSettings(userKey, orgHeader);
@@ -23,9 +23,16 @@ export class LocalizationController {
 
   @Post("settings")
   update(
-    @Body() body: { locale?: string; currency?: string; timezone?: string; orgLocale?: string; orgCurrency?: string },
+    @Body()
+    body: {
+      locale?: string;
+      currency?: string;
+      timezone?: string;
+      orgLocale?: string;
+      orgCurrency?: string;
+    },
     @Headers("x-user-id") userHeader?: string,
-    @Headers("x-organization-id") orgHeader?: string
+    @Headers("x-organization-id") orgHeader?: string,
   ) {
     const userKey = userHeader || "demo-user";
     return this.localization.updateSettings(userKey, orgHeader, body);
@@ -35,9 +42,8 @@ export class LocalizationController {
   preview(
     @Query("locale") locale = "en-US",
     @Query("currency") currency = "USD",
-    @Query("timezone") timezone = "America/Denver"
+    @Query("timezone") timezone = "America/Denver",
   ) {
     return this.localization.preview(locale, currency, timezone);
   }
 }
-

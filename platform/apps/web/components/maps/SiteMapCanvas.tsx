@@ -49,7 +49,7 @@ const STATUS_THEME: Record<string, { fill: string; stroke: string; text: string 
   available: { fill: "#ecfdf5", stroke: "#10b981", text: "#047857" },
   occupied: { fill: "#fffbeb", stroke: "#f59e0b", text: "#b45309" },
   maintenance: { fill: "#fee2e2", stroke: "#ef4444", text: "#b91c1c" },
-  default: { fill: "#f1f5f9", stroke: "#94a3b8", text: "#475569" }
+  default: { fill: "#f1f5f9", stroke: "#94a3b8", text: "#475569" },
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -91,7 +91,12 @@ const extractPoints = (geometry: unknown): Point[] => {
     if (type === "Polygon" && Array.isArray(coords) && Array.isArray(coords[0])) {
       return coords[0].map(normalizePoint).filter(isPoint);
     }
-    if (type === "MultiPolygon" && Array.isArray(coords) && Array.isArray(coords[0]) && Array.isArray(coords[0][0])) {
+    if (
+      type === "MultiPolygon" &&
+      Array.isArray(coords) &&
+      Array.isArray(coords[0]) &&
+      Array.isArray(coords[0][0])
+    ) {
       return coords[0][0].map(normalizePoint).filter(isPoint);
     }
     if (type === "LineString" && Array.isArray(coords)) {
@@ -111,8 +116,12 @@ const extractRect = (geometry: unknown): Rect | null => {
   if (!isRecord(geometry)) return null;
   const x = geometry.x ?? geometry.left ?? geometry.minX;
   const y = geometry.y ?? geometry.top ?? geometry.minY;
-  const width = geometry.width ?? (isNumber(geometry.right) && isNumber(x) ? Number(geometry.right) - Number(x) : null);
-  const height = geometry.height ?? (isNumber(geometry.bottom) && isNumber(y) ? Number(geometry.bottom) - Number(y) : null);
+  const width =
+    geometry.width ??
+    (isNumber(geometry.right) && isNumber(x) ? Number(geometry.right) - Number(x) : null);
+  const height =
+    geometry.height ??
+    (isNumber(geometry.bottom) && isNumber(y) ? Number(geometry.bottom) - Number(y) : null);
   if (isNumber(x) && isNumber(y) && isNumber(width) && isNumber(height)) {
     return { x: Number(x), y: Number(y), width: Number(width), height: Number(height) };
   }
@@ -125,10 +134,16 @@ const extractCentroid = (centroid: unknown, fallback?: Shape): Point | null => {
   if (!fallback) return null;
   if (fallback.kind === "point") return fallback.point;
   if (fallback.kind === "rect") {
-    return { x: fallback.rect.x + fallback.rect.width / 2, y: fallback.rect.y + fallback.rect.height / 2 };
+    return {
+      x: fallback.rect.x + fallback.rect.width / 2,
+      y: fallback.rect.y + fallback.rect.height / 2,
+    };
   }
   if (fallback.kind === "polygon" && fallback.points.length) {
-    const sum = fallback.points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+    const sum = fallback.points.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), {
+      x: 0,
+      y: 0,
+    });
     return { x: sum.x / fallback.points.length, y: sum.y / fallback.points.length };
   }
   return null;
@@ -137,16 +152,31 @@ const extractCentroid = (centroid: unknown, fallback?: Shape): Point | null => {
 const shapeToPath = (points: Point[]) =>
   points.map((p, idx) => `${idx === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ") + " Z";
 
-const getBoundsFromConfig = (bounds: unknown): { minX: number; minY: number; maxX: number; maxY: number } | null => {
+const getBoundsFromConfig = (
+  bounds: unknown,
+): { minX: number; minY: number; maxX: number; maxY: number } | null => {
   if (!bounds) return null;
   if (Array.isArray(bounds) && bounds.length >= 4 && bounds.every(isNumber)) {
-    return { minX: Number(bounds[0]), minY: Number(bounds[1]), maxX: Number(bounds[2]), maxY: Number(bounds[3]) };
+    return {
+      minX: Number(bounds[0]),
+      minY: Number(bounds[1]),
+      maxX: Number(bounds[2]),
+      maxY: Number(bounds[3]),
+    };
   }
   if (!isRecord(bounds)) return null;
   const minX = bounds.minX ?? bounds.left ?? bounds.x;
   const minY = bounds.minY ?? bounds.top ?? bounds.y;
-  const maxX = bounds.maxX ?? bounds.right ?? (isNumber(bounds.width) && isNumber(bounds.x) ? Number(bounds.x) + Number(bounds.width) : null);
-  const maxY = bounds.maxY ?? bounds.bottom ?? (isNumber(bounds.height) && isNumber(bounds.y) ? Number(bounds.y) + Number(bounds.height) : null);
+  const maxX =
+    bounds.maxX ??
+    bounds.right ??
+    (isNumber(bounds.width) && isNumber(bounds.x) ? Number(bounds.x) + Number(bounds.width) : null);
+  const maxY =
+    bounds.maxY ??
+    bounds.bottom ??
+    (isNumber(bounds.height) && isNumber(bounds.y)
+      ? Number(bounds.y) + Number(bounds.height)
+      : null);
   if (isNumber(minX) && isNumber(minY) && isNumber(maxX) && isNumber(maxY)) {
     return { minX: Number(minX), minY: Number(minY), maxX: Number(maxX), maxY: Number(maxY) };
   }
@@ -156,8 +186,10 @@ const getBoundsFromConfig = (bounds: unknown): { minX: number; minY: number; max
 const getBaseImageUrl = (layers: unknown) => {
   if (!isRecord(layers)) return null;
   if (typeof layers.baseImageUrl === "string") return layers.baseImageUrl;
-  if (isRecord(layers.baseImage) && typeof layers.baseImage.url === "string") return layers.baseImage.url;
-  if (isRecord(layers.background) && typeof layers.background.url === "string") return layers.background.url;
+  if (isRecord(layers.baseImage) && typeof layers.baseImage.url === "string")
+    return layers.baseImage.url;
+  if (isRecord(layers.background) && typeof layers.background.url === "string")
+    return layers.background.url;
   if (typeof layers.image === "string") return layers.image;
   return null;
 };
@@ -169,7 +201,7 @@ export function SiteMapCanvas({
   showLabels = true,
   isLoading,
   height,
-  className
+  className,
 }: SiteMapCanvasProps) {
   const heightStyle = height
     ? { height: typeof height === "number" ? `${height}px` : height }
@@ -214,7 +246,12 @@ export function SiteMapCanvas({
         }
         return acc;
       },
-      { minX: Number.POSITIVE_INFINITY, minY: Number.POSITIVE_INFINITY, maxX: Number.NEGATIVE_INFINITY, maxY: Number.NEGATIVE_INFINITY }
+      {
+        minX: Number.POSITIVE_INFINITY,
+        minY: Number.POSITIVE_INFINITY,
+        maxX: Number.NEGATIVE_INFINITY,
+        maxY: Number.NEGATIVE_INFINITY,
+      },
     );
 
     const resolvedBounds = rawBounds ?? (Number.isFinite(computed.minX) ? computed : null);
@@ -225,7 +262,11 @@ export function SiteMapCanvas({
   if (isLoading) {
     return (
       <div
-        className={cn("w-full animate-pulse rounded-xl border border-border bg-muted", height ? "h-full" : "h-[420px]", className)}
+        className={cn(
+          "w-full animate-pulse rounded-xl border border-border bg-muted",
+          height ? "h-full" : "h-[420px]",
+          className,
+        )}
         style={heightStyle}
       />
     );
@@ -233,7 +274,12 @@ export function SiteMapCanvas({
 
   if (!map) {
     return (
-      <div className={cn("rounded-xl border border-border bg-muted p-4 text-sm text-muted-foreground", className)}>
+      <div
+        className={cn(
+          "rounded-xl border border-border bg-muted p-4 text-sm text-muted-foreground",
+          className,
+        )}
+      >
         Map data unavailable.
       </div>
     );
@@ -242,7 +288,12 @@ export function SiteMapCanvas({
   const hasShapes = shapes.some((entry) => entry.shape);
   if (!hasShapes && !baseImageUrl) {
     return (
-      <div className={cn("rounded-xl border border-dashed border-border bg-muted p-6 text-center text-sm text-muted-foreground", className)}>
+      <div
+        className={cn(
+          "rounded-xl border border-dashed border-border bg-muted p-6 text-center text-sm text-muted-foreground",
+          className,
+        )}
+      >
         Upload a map or add site layout geometry to preview the park map.
       </div>
     );
@@ -258,7 +309,7 @@ export function SiteMapCanvas({
       minX: resolved.minX - pad,
       minY: resolved.minY - pad,
       width: width + pad * 2,
-      height: height + pad * 2
+      height: height + pad * 2,
     };
   })();
 
@@ -301,7 +352,7 @@ export function SiteMapCanvas({
             strokeWidth: isSelected ? 2.4 : 1.4,
             strokeDasharray: hasConflicts ? "4 2" : undefined,
             onClick: onSelectSite ? () => onSelectSite(site.siteId) : undefined,
-            style: onSelectSite ? { cursor: "pointer" } : undefined
+            style: onSelectSite ? { cursor: "pointer" } : undefined,
           };
 
           return (
@@ -350,7 +401,10 @@ export function SiteMapCanvas({
           .filter(([key]) => key !== "default")
           .map(([key, theme]) => (
             <span key={key} className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: theme.stroke }} />
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: theme.stroke }}
+              />
               {key}
             </span>
           ))}

@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  Res,
-} from "@nestjs/common";
+import { Controller, Get, Post, Delete, Param, Query, Body, UseGuards, Res } from "@nestjs/common";
 import { Response } from "express";
 import { QuickBooksService } from "./quickbooks.service";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard";
@@ -39,7 +29,7 @@ export class QuickBooksController {
   @Get("authorize")
   async getAuthorizeUrl(
     @Param("campgroundId") campgroundId: string,
-    @Query("redirect_uri") redirectUri: string
+    @Query("redirect_uri") redirectUri: string,
   ) {
     const url = await this.qbService.getAuthorizationUrl(campgroundId, redirectUri);
     return { url };
@@ -51,7 +41,7 @@ export class QuickBooksController {
   @Post("callback")
   async handleCallback(
     @Param("campgroundId") campgroundId: string,
-    @Body() body: { code: string; realmId: string }
+    @Body() body: { code: string; realmId: string },
   ) {
     return this.qbService.handleOAuthCallback(body.code, body.realmId, campgroundId);
   }
@@ -70,7 +60,7 @@ export class QuickBooksController {
   @Post("sync/reservation/:reservationId")
   async syncReservation(
     @Param("campgroundId") campgroundId: string,
-    @Param("reservationId") reservationId: string
+    @Param("reservationId") reservationId: string,
   ) {
     return this.qbService.syncReservationToInvoice(campgroundId, reservationId);
   }
@@ -81,7 +71,7 @@ export class QuickBooksController {
   @Post("sync/payment/:paymentId")
   async syncPayment(
     @Param("campgroundId") campgroundId: string,
-    @Param("paymentId") paymentId: string
+    @Param("paymentId") paymentId: string,
   ) {
     return this.qbService.syncPayment(campgroundId, paymentId);
   }
@@ -93,7 +83,7 @@ export class QuickBooksController {
   async getSyncHistory(
     @Param("campgroundId") campgroundId: string,
     @Query("startDate") startDateStr?: string,
-    @Query("endDate") endDateStr?: string
+    @Query("endDate") endDateStr?: string,
   ) {
     const startDate = startDateStr ? new Date(startDateStr) : undefined;
     const endDate = endDateStr ? new Date(endDateStr) : undefined;

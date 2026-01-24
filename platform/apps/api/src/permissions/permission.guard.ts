@@ -5,18 +5,22 @@ import { PERMISSION_KEY, PermissionDescriptor } from "./permission.decorator";
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector, private readonly permissions: PermissionsService) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly permissions: PermissionsService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const descriptor = this.reflector.getAllAndOverride<PermissionDescriptor | undefined>(PERMISSION_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+    const descriptor = this.reflector.getAllAndOverride<PermissionDescriptor | undefined>(
+      PERMISSION_KEY,
+      [context.getHandler(), context.getClass()],
+    );
     if (!descriptor) return true;
 
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    const campgroundId = request.params?.campgroundId || request.headers?.["x-campground-id"] || null;
+    const campgroundId =
+      request.params?.campgroundId || request.headers?.["x-campground-id"] || null;
 
     const result = await this.permissions.checkAccess({
       user,
@@ -32,5 +36,3 @@ export class PermissionGuard implements CanActivate {
     return result.allowed;
   }
 }
-
-

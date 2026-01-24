@@ -1,7 +1,11 @@
 import { Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { randomUUID } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
-import { CreateContextItemDto, UpdateContextItemDto, UpdateAutopilotConfigDto } from "./dto/autopilot.dto";
+import {
+  CreateContextItemDto,
+  UpdateContextItemDto,
+  UpdateAutopilotConfigDto,
+} from "./dto/autopilot.dto";
 import type { Prisma } from "@prisma/client";
 
 @Injectable()
@@ -154,7 +158,10 @@ export class AiAutopilotConfigService {
       }
       if (campground.cancellationFeeType === "flat" && campground.cancellationFeeFlatCents) {
         policyText += ` A cancellation fee of $${(campground.cancellationFeeFlatCents / 100).toFixed(2)} applies.`;
-      } else if (campground.cancellationFeeType === "percent" && campground.cancellationFeePercent) {
+      } else if (
+        campground.cancellationFeeType === "percent" &&
+        campground.cancellationFeePercent
+      ) {
         policyText += ` A cancellation fee of ${campground.cancellationFeePercent}% of the booking total applies.`;
       } else if (campground.cancellationFeeType === "first_night") {
         policyText += ` The first night's rate is non-refundable.`;
@@ -269,11 +276,13 @@ export class AiAutopilotConfigService {
             source: "auto_import",
             updatedAt: new Date(),
           },
-        })
-      )
+        }),
+      ),
     );
 
-    this.logger.log(`Auto-populated ${created.length} context items for campground ${campgroundId}`);
+    this.logger.log(
+      `Auto-populated ${created.length} context items for campground ${campgroundId}`,
+    );
 
     return {
       success: true,
@@ -306,18 +315,14 @@ export class AiAutopilotConfigService {
     if (faqs.length > 0) {
       sections.push(
         "## Frequently Asked Questions\n" +
-          faqs
-            .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
-            .join("\n\n")
+          faqs.map((f) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n"),
       );
     }
 
     if (trainingExamples.length > 0) {
       sections.push(
         "## Example Responses\n" +
-          trainingExamples
-            .map((t) => `Guest: ${t.question}\nResponse: ${t.answer}`)
-            .join("\n\n")
+          trainingExamples.map((t) => `Guest: ${t.question}\nResponse: ${t.answer}`).join("\n\n"),
       );
     }
 

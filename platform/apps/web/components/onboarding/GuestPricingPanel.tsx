@@ -11,7 +11,11 @@ interface GuestPricingPanelProps {
   occupantsIncluded: number;
   extraAdultFee: number | null; // in dollars
   extraChildFee: number | null; // in dollars
-  onChange: (data: { occupantsIncluded: number; extraAdultFee: number | null; extraChildFee: number | null }) => void;
+  onChange: (data: {
+    occupantsIncluded: number;
+    extraAdultFee: number | null;
+    extraChildFee: number | null;
+  }) => void;
   disabled?: boolean;
 }
 
@@ -79,7 +83,7 @@ export function GuestPricingPanel({
         disabled={disabled}
         className={cn(
           "w-full flex items-center justify-between text-left",
-          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer"
+          disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer",
         )}
       >
         <div className="flex items-center gap-3">
@@ -88,9 +92,7 @@ export function GuestPricingPanel({
           </div>
           <div>
             <h3 className="text-sm font-medium text-white">Guest Pricing</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {getSummaryText()}
-            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">{getSummaryText()}</p>
           </div>
         </div>
         {isExpanded ? (
@@ -128,7 +130,7 @@ export function GuestPricingPanel({
                     "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground",
                     "transition-all duration-200",
                     "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
-                    disabled && "cursor-not-allowed opacity-50"
+                    disabled && "cursor-not-allowed opacity-50",
                   )}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -158,7 +160,7 @@ export function GuestPricingPanel({
                       "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground pl-7",
                       "transition-all duration-200",
                       "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
-                      disabled && "cursor-not-allowed opacity-50"
+                      disabled && "cursor-not-allowed opacity-50",
                     )}
                   />
                 </div>
@@ -189,7 +191,7 @@ export function GuestPricingPanel({
                       "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground pl-7",
                       "transition-all duration-200",
                       "focus:bg-muted focus:border-emerald-500/50 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
-                      disabled && "cursor-not-allowed opacity-50"
+                      disabled && "cursor-not-allowed opacity-50",
                     )}
                   />
                 </div>
@@ -201,8 +203,9 @@ export function GuestPricingPanel({
               {/* Info box */}
               <div className="p-3 rounded-lg bg-muted/30 border border-border">
                 <p className="text-xs text-muted-foreground">
-                  <strong className="text-muted-foreground">Example:</strong> If you set 2 occupants included
-                  with a $10 extra adult fee, a reservation for 4 adults would add $20 to the base rate.
+                  <strong className="text-muted-foreground">Example:</strong> If you set 2 occupants
+                  included with a $10 extra adult fee, a reservation for 4 adults would add $20 to
+                  the base rate.
                 </p>
               </div>
             </div>

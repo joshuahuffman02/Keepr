@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { DynamicPricingTrigger, Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { DynamicPricingTrigger, Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
 interface CreateDynamicRuleDto {
@@ -8,7 +8,7 @@ interface CreateDynamicRuleDto {
   name: string;
   trigger: DynamicPricingTrigger;
   conditions: Record<string, unknown>;
-  adjustmentType: 'percent' | 'flat';
+  adjustmentType: "percent" | "flat";
   adjustmentValue: number;
   priority?: number;
   siteClassIds?: string[];
@@ -87,15 +87,15 @@ export class DynamicPricingService {
         campgroundId,
         ...(includeInactive ? {} : { isActive: true }),
       },
-      orderBy: { priority: 'asc' },
+      orderBy: { priority: "asc" },
     });
   }
 
   async getRule(campgroundId: string, id: string) {
     const rule = await this.prisma.dynamicPricingRule.findFirst({
-      where: { id, campgroundId }
+      where: { id, campgroundId },
     });
-    if (!rule) throw new NotFoundException('Rule not found');
+    if (!rule) throw new NotFoundException("Rule not found");
     return rule;
   }
 
@@ -107,9 +107,7 @@ export class DynamicPricingService {
       data: {
         name: rest.name,
         trigger: rest.trigger,
-        conditions: rest.conditions
-          ? toJsonValue(rest.conditions) ?? Prisma.JsonNull
-          : undefined,
+        conditions: rest.conditions ? (toJsonValue(rest.conditions) ?? Prisma.JsonNull) : undefined,
         adjustmentType: rest.adjustmentType,
         adjustmentValue: rest.adjustmentValue,
         priority: rest.priority,
@@ -133,7 +131,7 @@ export class DynamicPricingService {
     campgroundId: string,
     siteClassId: string | null,
     targetDate: Date,
-    basePrice: number
+    basePrice: number,
   ): Promise<{ adjustedPrice: number; appliedRules: string[] }> {
     const now = new Date();
     const daysOut = Math.ceil((targetDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
@@ -151,7 +149,7 @@ export class DynamicPricingService {
           { validFrom: { lte: now }, validTo: { gte: now } },
         ],
       },
-      orderBy: { priority: 'asc' },
+      orderBy: { priority: "asc" },
     });
 
     let adjustedPrice = basePrice;
@@ -170,7 +168,7 @@ export class DynamicPricingService {
       }
 
       // Apply adjustment
-      if (rule.adjustmentType === 'percent') {
+      if (rule.adjustmentType === "percent") {
         adjustedPrice = adjustedPrice * (1 + rule.adjustmentValue / 100);
       } else {
         adjustedPrice = adjustedPrice + rule.adjustmentValue;
@@ -188,7 +186,7 @@ export class DynamicPricingService {
   private matchesConditions(
     conditions: OccupancyConditions,
     occupancy: number,
-    daysOut: number
+    daysOut: number,
   ): boolean {
     if (conditions.occupancyMin !== undefined && occupancy < conditions.occupancyMin) return false;
     if (conditions.occupancyMax !== undefined && occupancy > conditions.occupancyMax) return false;
@@ -223,7 +221,7 @@ export class DynamicPricingService {
         campgroundId,
         arrivalDate: { lte: date },
         departureDate: { gt: date },
-        status: { in: ['confirmed', 'checked_in'] },
+        status: { in: ["confirmed", "checked_in"] },
       },
     });
 
@@ -243,7 +241,7 @@ export class DynamicPricingService {
         campgroundId,
         arrivalDate: { lte: date },
         departureDate: { gt: date },
-        status: { in: ['confirmed', 'checked_in'] },
+        status: { in: ["confirmed", "checked_in"] },
       },
     });
 
@@ -251,10 +249,7 @@ export class DynamicPricingService {
       where: {
         campgroundId,
         outOfOrder: true,
-        OR: [
-          { outOfOrderUntil: null },
-          { outOfOrderUntil: { gte: date } },
-        ],
+        OR: [{ outOfOrderUntil: null }, { outOfOrderUntil: { gte: date } }],
       },
     });
 
@@ -267,7 +262,7 @@ export class DynamicPricingService {
         campgroundId,
         arrivalDate: { lte: date },
         departureDate: { gt: date },
-        status: { in: ['confirmed', 'checked_in', 'checked_out'] },
+        status: { in: ["confirmed", "checked_in", "checked_out"] },
       },
       _sum: { totalAmount: true },
     });
@@ -311,12 +306,14 @@ export class DynamicPricingService {
     });
 
     // Single query: generate date series and compute stats for all days at once
-    const dailyStats = await this.prisma.$queryRaw<{
-      forecast_date: Date;
-      reservation_count: bigint;
-      projected_rev: bigint;
-      day_offset: number;
-    }[]>`
+    const dailyStats = await this.prisma.$queryRaw<
+      {
+        forecast_date: Date;
+        reservation_count: bigint;
+        projected_rev: bigint;
+        day_offset: number;
+      }[]
+    >`
       WITH date_series AS (
         SELECT generate_series(
           ${now}::date,
@@ -347,11 +344,9 @@ export class DynamicPricingService {
     `;
 
     // Build forecast records
-    const forecastData = dailyStats.map(day => {
+    const forecastData = dailyStats.map((day) => {
       const dayOffset = Number(day.day_offset);
-      const occupancyPct = totalSites > 0
-        ? (Number(day.reservation_count) / totalSites) * 100
-        : 0;
+      const occupancyPct = totalSites > 0 ? (Number(day.reservation_count) / totalSites) * 100 : 0;
       const confidence = dayOffset < 7 ? 0.9 : dayOffset < 14 ? 0.7 : 0.5;
 
       return {
@@ -366,7 +361,7 @@ export class DynamicPricingService {
 
     // Batch upsert using a transaction
     const forecasts = await this.prisma.$transaction(
-      forecastData.map(data =>
+      forecastData.map((data) =>
         this.prisma.revenueForecast.upsert({
           where: { campgroundId_forecastDate: { campgroundId, forecastDate: data.forecastDate } },
           update: {
@@ -375,8 +370,8 @@ export class DynamicPricingService {
             confidence: data.confidence,
           },
           create: data,
-        })
-      )
+        }),
+      ),
     );
 
     return forecasts;
@@ -388,7 +383,7 @@ export class DynamicPricingService {
         campgroundId,
         forecastDate: { gte: startDate, lte: endDate },
       },
-      orderBy: { forecastDate: 'asc' },
+      orderBy: { forecastDate: "asc" },
     });
   }
 }

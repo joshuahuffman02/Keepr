@@ -20,16 +20,12 @@ binding = "AI"
 ```jsonc
 {
   "durable_objects": {
-    "bindings": [
-      {"name": "MyAgent", "class_name": "MyAgent"}
-    ]
+    "bindings": [{ "name": "MyAgent", "class_name": "MyAgent" }],
   },
-  "migrations": [
-    {"tag": "v1", "new_sqlite_classes": ["MyAgent"]}
-  ],
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["MyAgent"] }],
   "ai": {
-    "binding": "AI"
-  }
+    "binding": "AI",
+  },
 }
 ```
 
@@ -37,13 +33,13 @@ binding = "AI"
 
 ```typescript
 interface Env {
-  AI?: Ai;                              // Workers AI
+  AI?: Ai; // Workers AI
   MyAgent?: DurableObjectNamespace<MyAgent>;
-  DB?: D1Database;                      // D1 database
-  KV?: KVNamespace;                     // KV storage
-  R2?: R2Bucket;                        // R2 bucket
-  OPENAI_API_KEY?: string;              // Secrets
-  QUEUE?: Queue;                        // Queues
+  DB?: D1Database; // D1 database
+  KV?: KVNamespace; // KV storage
+  R2?: R2Bucket; // R2 bucket
+  OPENAI_API_KEY?: string; // Secrets
+  QUEUE?: Queue; // Queues
 }
 ```
 
@@ -68,8 +64,8 @@ export default {
     const id = env.MyAgent.idFromName("user-123");
     const stub = env.MyAgent.get(id);
     return stub.fetch(request);
-  }
-}
+  },
+};
 ```
 
 ## Email Routing
@@ -92,8 +88,8 @@ const response = await this.env.AI.run(
     gateway: {
       id: "my-gateway-id",
       skipCache: false,
-      cacheTtl: 3600
-    }
-  }
+      cacheTtl: 3600,
+    },
+  },
 );
 ```

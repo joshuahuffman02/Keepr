@@ -50,9 +50,8 @@ export class BookingBehaviorService {
       .filter((r) => r.leadTimeDays !== null)
       .map((r) => r.leadTimeDays!);
 
-    const avgLeadTime = leadTimes.length > 0
-      ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length
-      : 0;
+    const avgLeadTime =
+      leadTimes.length > 0 ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length : 0;
 
     // Last minute = less than 3 days lead time
     const lastMinute = leadTimes.filter((lt) => lt < 3).length;
@@ -214,9 +213,10 @@ export class BookingBehaviorService {
         bookings: data.count,
         revenue: data.revenue,
         percentage: totalBookings > 0 ? (data.count / totalBookings) * 100 : 0,
-        averageLeadTime: data.leadTimes.length > 0
-          ? data.leadTimes.reduce((a, b) => a + b, 0) / data.leadTimes.length
-          : 0,
+        averageLeadTime:
+          data.leadTimes.length > 0
+            ? data.leadTimes.reduce((a, b) => a + b, 0) / data.leadTimes.length
+            : 0,
       }))
       .sort((a, b) => b.bookings - a.bookings);
   }

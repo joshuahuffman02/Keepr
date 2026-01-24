@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * KeyboardNavigableTable - Adds arrow key navigation to tables
- * 
+ *
  * Features:
  * - Arrow Up/Down: Navigate between rows
  * - Enter/Space: Activate current row
@@ -40,8 +40,7 @@ export function KeyboardNavigableTable({
       if (rows.length === 0) return;
 
       const activeElement = document.activeElement;
-      const closestRow =
-        activeElement instanceof HTMLElement ? activeElement.closest("tr") : null;
+      const closestRow = activeElement instanceof HTMLElement ? activeElement.closest("tr") : null;
       const currentRow = closestRow instanceof HTMLTableRowElement ? closestRow : null;
       const currentIndex = currentRow ? rows.indexOf(currentRow) : -1;
 
@@ -136,7 +135,7 @@ export const KeyboardTableRow = React.forwardRef<HTMLTableRowElement, KeyboardTa
           "border-b transition-colors hover:bg-muted/50",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:bg-muted/50",
           onActivate && "cursor-pointer",
-          className
+          className,
         )}
         onClick={onActivate}
         {...props}
@@ -144,6 +143,6 @@ export const KeyboardTableRow = React.forwardRef<HTMLTableRowElement, KeyboardTa
         {children}
       </tr>
     );
-  }
+  },
 );
 KeyboardTableRow.displayName = "KeyboardTableRow";

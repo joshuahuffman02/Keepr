@@ -25,6 +25,8 @@ describe("GamificationService helpers", () => {
   it("honors role allow lists", () => {
     expect(roleAllowed({ enabledRoles: [] }, UserRole.front_desk)).toBe(true);
     expect(roleAllowed({ enabledRoles: [UserRole.manager] }, UserRole.front_desk)).toBe(false);
-    expect(roleAllowed({ enabledRoles: [UserRole.manager, UserRole.maintenance] }, UserRole.maintenance)).toBe(true);
+    expect(
+      roleAllowed({ enabledRoles: [UserRole.manager, UserRole.maintenance] }, UserRole.maintenance),
+    ).toBe(true);
   });
 });

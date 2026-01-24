@@ -103,17 +103,20 @@ export function SyncStatusProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const computeState = useCallback((queues: QueueInfo[], isOnline: boolean, isSyncing: boolean): SyncState => {
-    const totalPending = queues.reduce((sum, q) => sum + q.count, 0);
-    const totalConflicts = queues.reduce((sum, q) => sum + q.conflicts, 0);
-    const hasErrors = queues.some(q => q.lastError);
+  const computeState = useCallback(
+    (queues: QueueInfo[], isOnline: boolean, isSyncing: boolean): SyncState => {
+      const totalPending = queues.reduce((sum, q) => sum + q.count, 0);
+      const totalConflicts = queues.reduce((sum, q) => sum + q.conflicts, 0);
+      const hasErrors = queues.some((q) => q.lastError);
 
-    if (!isOnline) return "offline";
-    if (isSyncing) return "syncing";
-    if (totalConflicts > 0) return "error";
-    if (totalPending > 0) return "pending";
-    return "synced";
-  }, []);
+      if (!isOnline) return "offline";
+      if (isSyncing) return "syncing";
+      if (totalConflicts > 0) return "error";
+      if (totalPending > 0) return "pending";
+      return "synced";
+    },
+    [],
+  );
 
   const refresh = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -128,12 +131,8 @@ export function SyncStatusProvider({ children }: { children: ReactNode }) {
 
     // Get last sync time from telemetry
     const telemetry = getTelemetry();
-    const lastSuccessfulSync = telemetry.find(
-      (e) => e.type === "sync" && e.status === "success"
-    );
-    const lastSyncTime = lastSuccessfulSync
-      ? new Date(lastSuccessfulSync.createdAt)
-      : null;
+    const lastSuccessfulSync = telemetry.find((e) => e.type === "sync" && e.status === "success");
+    const lastSyncTime = lastSuccessfulSync ? new Date(lastSuccessfulSync.createdAt) : null;
 
     setStatus((prev) => ({
       ...prev,
@@ -178,19 +177,19 @@ export function SyncStatusProvider({ children }: { children: ReactNode }) {
       saveQueue(queueKey, []);
       refresh();
     },
-    [refresh]
+    [refresh],
   );
 
   const retryConflict = useCallback(
     (queueKey: string, itemId: string) => {
       const items = loadQueue<QueueItem>(queueKey);
       const updated = items.map((i) =>
-        i.id === itemId ? { ...i, conflict: false, nextAttemptAt: Date.now() } : i
+        i.id === itemId ? { ...i, conflict: false, nextAttemptAt: Date.now() } : i,
       );
       saveQueue(queueKey, updated);
       refresh();
     },
-    [refresh]
+    [refresh],
   );
 
   const discardConflict = useCallback(
@@ -200,7 +199,7 @@ export function SyncStatusProvider({ children }: { children: ReactNode }) {
       saveQueue(queueKey, updated);
       refresh();
     },
-    [refresh]
+    [refresh],
   );
 
   // Initial load and periodic refresh

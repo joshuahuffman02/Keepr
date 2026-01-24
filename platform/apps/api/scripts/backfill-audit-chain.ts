@@ -7,7 +7,7 @@ import { createHash } from "crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -36,7 +36,7 @@ async function main() {
   for (const camp of camps) {
     const rows = await prisma.auditLog.findMany({
       where: { campgroundId: camp.id },
-      orderBy: { createdAt: "asc" }
+      orderBy: { createdAt: "asc" },
     });
 
     let prevHash: string | null = null;
@@ -50,14 +50,16 @@ async function main() {
       const retentionAt = row.retentionAt ?? null;
       await prisma.auditLog.update({
         where: { id: row.id },
-        data: { prevHash, chainHash, retentionAt }
+        data: { prevHash, chainHash, retentionAt },
       });
       prevHash = chainHash;
       updated += 1;
     }
   }
 
-  console.log(`Backfill complete. Updated ${updated} audit rows across ${camps.length} campgrounds.`);
+  console.log(
+    `Backfill complete. Updated ${updated} audit rows across ${camps.length} campgrounds.`,
+  );
 }
 
 main()

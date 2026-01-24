@@ -18,10 +18,26 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DateRangePicker } from "@/components/analytics";
 
 const exportModules = [
-  { id: "revenue", name: "Revenue Intelligence", description: "Total revenue, ADR, RevPAN, trends" },
-  { id: "guestJourney", name: "Guest Journey", description: "Retention, progression, LTV analysis" },
-  { id: "accommodations", name: "Accommodation Mix", description: "Site types, RV breakdown, utilization" },
-  { id: "geographic", name: "Geographic Intelligence", description: "Origin states, travel distance" },
+  {
+    id: "revenue",
+    name: "Revenue Intelligence",
+    description: "Total revenue, ADR, RevPAN, trends",
+  },
+  {
+    id: "guestJourney",
+    name: "Guest Journey",
+    description: "Retention, progression, LTV analysis",
+  },
+  {
+    id: "accommodations",
+    name: "Accommodation Mix",
+    description: "Site types, RV breakdown, utilization",
+  },
+  {
+    id: "geographic",
+    name: "Geographic Intelligence",
+    description: "Origin states, travel distance",
+  },
   { id: "booking", name: "Booking Behavior", description: "Lead time, channels, cancellations" },
   { id: "los", name: "Length of Stay", description: "Stay distribution, seasonality" },
   { id: "amenities", name: "Amenity Analytics", description: "Site and campground amenities" },
@@ -40,9 +56,7 @@ export default function ExportPage() {
 
   const toggleModule = (moduleId: string) => {
     setSelectedModules((prev) =>
-      prev.includes(moduleId)
-        ? prev.filter((m) => m !== moduleId)
-        : [...prev, moduleId]
+      prev.includes(moduleId) ? prev.filter((m) => m !== moduleId) : [...prev, moduleId],
     );
   };
 
@@ -78,7 +92,9 @@ export default function ExportPage() {
 
           if (status.status === "completed") {
             // Download the data
-            const downloadRes = await fetch(`/api/admin/platform-analytics/export/${result.id}/download`);
+            const downloadRes = await fetch(
+              `/api/admin/platform-analytics/export/${result.id}/download`,
+            );
             const data = await downloadRes.text();
             setExportData(data);
             setExportComplete(true);
@@ -204,7 +220,12 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   <Button variant="ghost" size="sm" onClick={selectAll} className="text-blue-400">
                     Select All
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={selectNone} className="text-muted-foreground">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={selectNone}
+                    className="text-muted-foreground"
+                  >
                     Clear
                   </Button>
                 </div>
@@ -288,7 +309,10 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                 onClick={() => setIncludeAiSummary(!includeAiSummary)}
               >
                 <div className="flex items-center gap-3">
-                  <Checkbox checked={includeAiSummary} onCheckedChange={() => setIncludeAiSummary(!includeAiSummary)} />
+                  <Checkbox
+                    checked={includeAiSummary}
+                    onCheckedChange={() => setIncludeAiSummary(!includeAiSummary)}
+                  />
                   <Sparkles className="h-5 w-5 text-purple-400" />
                   <div>
                     <span className="text-foreground font-medium">Generate AI Summary</span>
@@ -350,7 +374,7 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                       downloadFile(
                         exportData,
                         `campreserv-analytics-${new Date().toISOString().split("T")[0]}.${exportFormat === "json" ? "json" : "md"}`,
-                        exportFormat === "json" ? "application/json" : "text/markdown"
+                        exportFormat === "json" ? "application/json" : "text/markdown",
                       )
                     }
                   >
@@ -429,7 +453,9 @@ The platform demonstrates healthy fundamentals with opportunities for optimizati
                   variant="outline"
                   size="sm"
                   className="border-border"
-                  onClick={() => downloadFile(aiSummary, "ai-analytics-summary.md", "text/markdown")}
+                  onClick={() =>
+                    downloadFile(aiSummary, "ai-analytics-summary.md", "text/markdown")
+                  }
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download

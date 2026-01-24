@@ -17,6 +17,7 @@ If you're not accepting online payments, you're creating friction for guests and
 ## Payment Processing Basics
 
 ### How It Works
+
 1. Guest enters payment information
 2. Payment processor verifies card
 3. Funds are authorized (held)
@@ -24,6 +25,7 @@ If you're not accepting online payments, you're creating friction for guests and
 5. Funds deposit to your account (1-3 days)
 
 ### Key Terms
+
 - **Payment gateway:** The technology processing payments
 - **Merchant account:** Where funds are deposited
 - **Processing fee:** Cost per transaction (typically 2.5-3%)
@@ -34,16 +36,19 @@ If you're not accepting online payments, you're creating friction for guests and
 ## What to Accept
 
 ### Credit/Debit Cards
+
 - Visa, Mastercard (essential)
 - American Express, Discover (recommended)
 - Debit cards (usually same processing)
 
 ### Digital Wallets
+
 - Apple Pay
 - Google Pay
 - Increasingly expected by guests
 
 ### Optional
+
 - ACH/bank transfer (for extended stays)
 - Cash (in-person only)
 - Checks (higher risk)
@@ -53,6 +58,7 @@ If you're not accepting online payments, you're creating friction for guests and
 ## Choosing a Processor
 
 ### Key Factors
+
 - Processing fee percentage
 - Per-transaction fee
 - Monthly fees
@@ -61,12 +67,15 @@ If you're not accepting online payments, you're creating friction for guests and
 - Customer support
 
 ### Integrated vs. Standalone
+
 **Integrated (recommended):**
+
 - Works within your reservation software
 - Automatic payment tracking
 - Single system to manage
 
 **Standalone:**
+
 - Separate terminal or account
 - Manual reconciliation needed
 - More work, more errors
@@ -76,12 +85,14 @@ If you're not accepting online payments, you're creating friction for guests and
 ## Security Requirements
 
 ### PCI Compliance
+
 - Required for credit card processing
 - Your software should handle most requirements
 - Never store full card numbers
 - Use secure, encrypted connections
 
 ### Best Practices
+
 - Use trusted payment processors
 - Keep software updated
 - Train staff on security
@@ -107,4 +118,4 @@ If you're not accepting online payments, you're creating friction for guests and
 
 ---
 
-*Keepr includes integrated payment processing with competitive rates and automatic reconciliation. [Accept payments easily at campreserv.com](https://campreserv.com)*
+_Keepr includes integrated payment processing with competitive rates and automatic reconciliation. [Accept payments easily at campreserv.com](https://campreserv.com)_

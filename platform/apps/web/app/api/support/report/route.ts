@@ -10,4 +10,3 @@ export async function POST(req: Request) {
     return new Response("Failed to record issue", { status: 500 });
   }
 }
-

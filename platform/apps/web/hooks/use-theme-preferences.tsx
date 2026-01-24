@@ -37,48 +37,51 @@ const DEFAULT_PREFERENCES: ThemePreferences = {
 };
 
 // Accent color CSS variable mappings
-export const ACCENT_COLORS: Record<AccentColor, { primary: string; hover: string; light: string; ring: string }> = {
+export const ACCENT_COLORS: Record<
+  AccentColor,
+  { primary: string; hover: string; light: string; ring: string }
+> = {
   emerald: {
-    primary: "16 185 129",   // emerald-500
-    hover: "5 150 105",      // emerald-600
-    light: "209 250 229",    // emerald-100
-    ring: "52 211 153",      // emerald-400
+    primary: "16 185 129", // emerald-500
+    hover: "5 150 105", // emerald-600
+    light: "209 250 229", // emerald-100
+    ring: "52 211 153", // emerald-400
   },
   blue: {
-    primary: "59 130 246",   // blue-500
-    hover: "37 99 235",      // blue-600
-    light: "219 234 254",    // blue-100
-    ring: "96 165 250",      // blue-400
+    primary: "59 130 246", // blue-500
+    hover: "37 99 235", // blue-600
+    light: "219 234 254", // blue-100
+    ring: "96 165 250", // blue-400
   },
   violet: {
-    primary: "139 92 246",   // violet-500
-    hover: "124 58 237",     // violet-600
-    light: "237 233 254",    // violet-100
-    ring: "167 139 250",     // violet-400
+    primary: "139 92 246", // violet-500
+    hover: "124 58 237", // violet-600
+    light: "237 233 254", // violet-100
+    ring: "167 139 250", // violet-400
   },
   rose: {
-    primary: "244 63 94",    // rose-500
-    hover: "225 29 72",      // rose-600
-    light: "255 228 230",    // rose-100
-    ring: "251 113 133",     // rose-400
+    primary: "244 63 94", // rose-500
+    hover: "225 29 72", // rose-600
+    light: "255 228 230", // rose-100
+    ring: "251 113 133", // rose-400
   },
   amber: {
-    primary: "245 158 11",   // amber-500
-    hover: "217 119 6",      // amber-600
-    light: "254 243 199",    // amber-100
-    ring: "251 191 36",      // amber-400
+    primary: "245 158 11", // amber-500
+    hover: "217 119 6", // amber-600
+    light: "254 243 199", // amber-100
+    ring: "251 191 36", // amber-400
   },
   cyan: {
-    primary: "6 182 212",    // cyan-500
-    hover: "8 145 178",      // cyan-600
-    light: "207 250 254",    // cyan-100
-    ring: "34 211 238",      // cyan-400
+    primary: "6 182 212", // cyan-500
+    hover: "8 145 178", // cyan-600
+    light: "207 250 254", // cyan-100
+    ring: "34 211 238", // cyan-400
   },
   indigo: {
-    primary: "99 102 241",   // indigo-500
-    hover: "79 70 229",      // indigo-600
-    light: "224 231 255",    // indigo-100
-    ring: "129 140 248",     // indigo-400
+    primary: "99 102 241", // indigo-500
+    hover: "79 70 229", // indigo-600
+    light: "224 231 255", // indigo-100
+    ring: "129 140 248", // indigo-400
   },
 };
 
@@ -146,7 +149,13 @@ export function useThemePreferences(): UseThemePreferencesReturn {
     } else {
       root.classList.remove("high-contrast");
     }
-  }, [resolvedColorMode, preferences.accentColor, preferences.reducedMotion, preferences.highContrast, mounted]);
+  }, [
+    resolvedColorMode,
+    preferences.accentColor,
+    preferences.reducedMotion,
+    preferences.highContrast,
+    mounted,
+  ]);
 
   // Save preferences
   const savePreferences = useCallback((newPrefs: ThemePreferences) => {
@@ -165,14 +174,14 @@ export function useThemePreferences(): UseThemePreferencesReturn {
     (_mode: ColorMode) => {
       savePreferences({ ...preferences, colorMode: "light" });
     },
-    [preferences, savePreferences]
+    [preferences, savePreferences],
   );
 
   const setAccentColor = useCallback(
     (color: AccentColor) => {
       savePreferences({ ...preferences, accentColor: color });
     },
-    [preferences, savePreferences]
+    [preferences, savePreferences],
   );
 
   const toggleReducedMotion = useCallback(() => {

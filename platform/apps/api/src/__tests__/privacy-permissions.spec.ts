@@ -1,16 +1,26 @@
-import { Test, type TestingModule } from '@nestjs/testing';
-import { PrivacyService } from '../privacy/privacy.service';
-import { PermissionsService } from '../permissions/permissions.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { Test, type TestingModule } from "@nestjs/testing";
+import { PrivacyService } from "../privacy/privacy.service";
+import { PermissionsService } from "../permissions/permissions.service";
+import { PrismaService } from "../prisma/prisma.service";
 
 // Note: uses in-memory Nest app; DB must be available.
-describe('Privacy & Permissions APIs (e2e-ish)', () => {
+describe("Privacy & Permissions APIs (e2e-ish)", () => {
   let moduleRef: TestingModule;
   let privacyService: PrivacyService;
   let permissionsService: PermissionsService;
-  const campgroundId = 'camp-pp-test';
-  const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
-  const privacySettings = new Map<string, { campgroundId: string; redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number }>();
+  const campgroundId = "camp-pp-test";
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
+  const privacySettings = new Map<
+    string,
+    {
+      campgroundId: string;
+      redactPII: boolean;
+      consentRequired: boolean;
+      backupRetentionDays: number;
+      keyRotationDays: number;
+    }
+  >();
   const consentLogs: Array<{
     id: string;
     campgroundId: string;
@@ -19,33 +29,86 @@ describe('Privacy & Permissions APIs (e2e-ish)', () => {
     grantedBy: string;
     grantedAt: Date;
   }> = [];
-  const approvalRequests: Array<{ id: string; campgroundId: string | null; action: string; status: string; requestedBy: string }> = [];
+  const approvalRequests: Array<{
+    id: string;
+    campgroundId: string | null;
+    action: string;
+    status: string;
+    requestedBy: string;
+  }> = [];
   const prismaStub = {
     privacySetting: {
       findUnique: jest.fn(async ({ where }: { where: { campgroundId: string } }) => {
         return privacySettings.get(where.campgroundId) ?? null;
       }),
-      create: jest.fn(async ({ data }: { data: { campgroundId: string; redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number } }) => {
-        privacySettings.set(data.campgroundId, data);
-        return data;
-      }),
-      update: jest.fn(async ({ where, data }: { where: { campgroundId: string }; data: Partial<{ redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number }> }) => {
-        const existing = privacySettings.get(where.campgroundId);
-        const updated = { ...(existing ?? { campgroundId: where.campgroundId, redactPII: true, consentRequired: true, backupRetentionDays: 30, keyRotationDays: 90 }), ...data };
-        privacySettings.set(where.campgroundId, updated);
-        return updated;
-      }),
+      create: jest.fn(
+        async ({
+          data,
+        }: {
+          data: {
+            campgroundId: string;
+            redactPII: boolean;
+            consentRequired: boolean;
+            backupRetentionDays: number;
+            keyRotationDays: number;
+          };
+        }) => {
+          privacySettings.set(data.campgroundId, data);
+          return data;
+        },
+      ),
+      update: jest.fn(
+        async ({
+          where,
+          data,
+        }: {
+          where: { campgroundId: string };
+          data: Partial<{
+            redactPII: boolean;
+            consentRequired: boolean;
+            backupRetentionDays: number;
+            keyRotationDays: number;
+          }>;
+        }) => {
+          const existing = privacySettings.get(where.campgroundId);
+          const updated = {
+            ...(existing ?? {
+              campgroundId: where.campgroundId,
+              redactPII: true,
+              consentRequired: true,
+              backupRetentionDays: 30,
+              keyRotationDays: 90,
+            }),
+            ...data,
+          };
+          privacySettings.set(where.campgroundId, updated);
+          return updated;
+        },
+      ),
       deleteMany: jest.fn(async ({ where }: { where: { campgroundId: string } }) => {
         privacySettings.delete(where.campgroundId);
         return { count: 1 };
       }),
     },
     consentLog: {
-      create: jest.fn(async ({ data }: { data: { id: string; campgroundId: string; subject: string; consentType: string; grantedBy: string; grantedAt?: Date } }) => {
-        const entry = { ...data, grantedAt: data.grantedAt ?? new Date() };
-        consentLogs.push(entry);
-        return entry;
-      }),
+      create: jest.fn(
+        async ({
+          data,
+        }: {
+          data: {
+            id: string;
+            campgroundId: string;
+            subject: string;
+            consentType: string;
+            grantedBy: string;
+            grantedAt?: Date;
+          };
+        }) => {
+          const entry = { ...data, grantedAt: data.grantedAt ?? new Date() };
+          consentLogs.push(entry);
+          return entry;
+        },
+      ),
       findMany: jest.fn(async ({ where }: { where: { campgroundId: string } }) => {
         return consentLogs.filter((row) => row.campgroundId === where.campgroundId);
       }),
@@ -61,12 +124,26 @@ describe('Privacy & Permissions APIs (e2e-ish)', () => {
       }),
     },
     approvalRequest: {
-      create: jest.fn(async ({ data }: { data: { id: string; campgroundId: string | null; action: string; status: string; requestedBy: string } }) => {
-        approvalRequests.push(data);
-        return data;
-      }),
+      create: jest.fn(
+        async ({
+          data,
+        }: {
+          data: {
+            id: string;
+            campgroundId: string | null;
+            action: string;
+            status: string;
+            requestedBy: string;
+          };
+        }) => {
+          approvalRequests.push(data);
+          return data;
+        },
+      ),
       findMany: jest.fn(async ({ where }: { where: { campgroundId?: string } }) => {
-        return approvalRequests.filter((row) => !where.campgroundId || row.campgroundId === where.campgroundId);
+        return approvalRequests.filter(
+          (row) => !where.campgroundId || row.campgroundId === where.campgroundId,
+        );
       }),
       deleteMany: jest.fn(async ({ where }: { where: { campgroundId: string } }) => {
         let removed = 0;
@@ -103,7 +180,7 @@ describe('Privacy & Permissions APIs (e2e-ish)', () => {
     await moduleRef.close();
   });
 
-  it('updates privacy settings and logs consent', async () => {
+  it("updates privacy settings and logs consent", async () => {
     const settingsRes = await privacyService.updateSettings(campgroundId, {
       redactPII: true,
       consentRequired: true,
@@ -115,25 +192,25 @@ describe('Privacy & Permissions APIs (e2e-ish)', () => {
 
     const consentRes = await privacyService.recordConsent({
       campgroundId,
-      subject: 'guest@example.com',
-      consentType: 'marketing',
-      grantedBy: 'tester',
+      subject: "guest@example.com",
+      consentType: "marketing",
+      grantedBy: "tester",
     });
 
-    expect(consentRes.consentType).toBe('marketing');
+    expect(consentRes.consentType).toBe("marketing");
 
     const listRes = await privacyService.listConsents(campgroundId);
     expect(listRes.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('creates and lists approval requests (auto-approved stub)', async () => {
+  it("creates and lists approval requests (auto-approved stub)", async () => {
     const createRes = await permissionsService.requestApproval({
-      action: 'export_pii',
-      requestedBy: 'tester',
+      action: "export_pii",
+      requestedBy: "tester",
       campgroundId,
     });
 
-    expect(createRes.status).toBe('approved');
+    expect(createRes.status).toBe("approved");
 
     const approvals = await permissionsService.listApprovals();
     expect(approvals.some((row) => isRecord(row) && row.id === createRes.id)).toBe(true);

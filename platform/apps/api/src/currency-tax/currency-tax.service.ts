@@ -61,8 +61,23 @@ export class CurrencyTaxService implements OnModuleInit {
       { base: "CAD", quote: "EUR", rate: 0.69, asOf: new Date().toISOString() },
     ],
     taxProfiles: [
-      { id: "us-default", name: "US sales/lodging", region: "US", type: "sales", rate: 0.085, inclusive: false },
-      { id: "ca-gst-pst", name: "GST/PST (BC)", region: "CA-BC", type: "gst", rate: 0.12, inclusive: false, notes: "GST 5% + PST 7%" },
+      {
+        id: "us-default",
+        name: "US sales/lodging",
+        region: "US",
+        type: "sales",
+        rate: 0.085,
+        inclusive: false,
+      },
+      {
+        id: "ca-gst-pst",
+        name: "GST/PST (BC)",
+        region: "CA-BC",
+        type: "gst",
+        rate: 0.12,
+        inclusive: false,
+        notes: "GST 5% + PST 7%",
+      },
       { id: "eu-vat", name: "EU VAT (DE)", region: "DE", type: "vat", rate: 0.19, inclusive: true },
     ],
     parkCurrencies: [
@@ -98,7 +113,9 @@ export class CurrencyTaxService implements OnModuleInit {
       this.logger.log("OpenExchangeRates API key found, fetching initial rates...");
       await this.refreshRates();
     } else {
-      this.logger.warn("No OPEN_EXCHANGE_RATES_API_KEY set - using manual FX rates. Set this env var for live rates.");
+      this.logger.warn(
+        "No OPEN_EXCHANGE_RATES_API_KEY set - using manual FX rates. Set this env var for live rates.",
+      );
     }
   }
 
@@ -128,7 +145,9 @@ export class CurrencyTaxService implements OnModuleInit {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new BadGatewayException(`OpenExchangeRates API error: ${response.status} ${errorText}`);
+        throw new BadGatewayException(
+          `OpenExchangeRates API error: ${response.status} ${errorText}`,
+        );
       }
 
       const data = await response.json();
@@ -137,9 +156,10 @@ export class CurrencyTaxService implements OnModuleInit {
       }
 
       // Convert API response to our FxRate format
-      const asOf = typeof data.timestamp === "number"
-        ? new Date(data.timestamp * 1000).toISOString()
-        : new Date().toISOString();
+      const asOf =
+        typeof data.timestamp === "number"
+          ? new Date(data.timestamp * 1000).toISOString()
+          : new Date().toISOString();
 
       const newRates: FxRate[] = [];
 
@@ -173,7 +193,9 @@ export class CurrencyTaxService implements OnModuleInit {
       this.config.updatedAt = new Date().toISOString();
       this.lastRefreshError = null;
 
-      this.logger.log(`FX rates refreshed: ${newRates.length} rates updated from OpenExchangeRates`);
+      this.logger.log(
+        `FX rates refreshed: ${newRates.length} rates updated from OpenExchangeRates`,
+      );
     } catch (error) {
       this.lastRefreshError = getErrorMessage(error) || "Unknown error";
       this.logger.error(`Failed to refresh FX rates: ${this.lastRefreshError}`);
@@ -184,7 +206,12 @@ export class CurrencyTaxService implements OnModuleInit {
   /**
    * Get FX refresh status for health checks
    */
-  getRefreshStatus(): { lastUpdated: string; error: string | null; provider: string; rateCount: number } {
+  getRefreshStatus(): {
+    lastUpdated: string;
+    error: string | null;
+    provider: string;
+    rateCount: number;
+  } {
     return {
       lastUpdated: this.config.updatedAt,
       error: this.lastRefreshError,
@@ -240,10 +267,13 @@ export class CurrencyTaxService implements OnModuleInit {
     reportingCurrency: string;
     updatedAt: string;
   } {
-    const exposureByCurrency = this.config.parkCurrencies.reduce<Record<string, number>>((acc, row) => {
-      acc[row.currency] = (acc[row.currency] ?? 0) + 1;
-      return acc;
-    }, {});
+    const exposureByCurrency = this.config.parkCurrencies.reduce<Record<string, number>>(
+      (acc, row) => {
+        acc[row.currency] = (acc[row.currency] ?? 0) + 1;
+        return acc;
+      },
+      {},
+    );
     return {
       exposureByCurrency,
       fxRates: this.config.fxRates,

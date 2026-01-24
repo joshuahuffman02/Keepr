@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 /**
  * Types for Payment Processor Rust service
@@ -11,7 +11,7 @@ export interface CreatePaymentIntentRequest {
   description?: string;
   metadata?: Record<string, string>;
   campground_stripe_account_id: string;
-  fee_mode?: 'absorb' | 'pass_through';
+  fee_mode?: "absorb" | "pass_through";
 }
 
 export interface CreatePaymentIntentResponse {
@@ -48,7 +48,7 @@ export interface FeeCalculation {
   gateway_fee_cents: number;
   total_fees_cents: number;
   net_amount_cents: number;
-  fee_mode: 'absorb' | 'pass_through';
+  fee_mode: "absorb" | "pass_through";
 }
 
 /**
@@ -62,8 +62,7 @@ export class PaymentProcessorClient implements OnModuleInit {
   private baseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    this.baseUrl =
-      this.configService.get('PAYMENT_SERVICE_URL') || 'http://localhost:8080';
+    this.baseUrl = this.configService.get("PAYMENT_SERVICE_URL") || "http://localhost:8080";
   }
 
   async onModuleInit() {
@@ -76,7 +75,7 @@ export class PaymentProcessorClient implements OnModuleInit {
     } catch {
       this.logger.warn(
         `Payment Processor service not available at ${this.baseUrl}. ` +
-          `Some payment features will use fallback implementation.`
+          `Some payment features will use fallback implementation.`,
       );
     }
   }
@@ -88,7 +87,7 @@ export class PaymentProcessorClient implements OnModuleInit {
     try {
       const response = await fetch(`${this.baseUrl}/health`);
       const data = await response.json();
-      return data.status === 'ok';
+      return data.status === "ok";
     } catch {
       return false;
     }
@@ -98,17 +97,17 @@ export class PaymentProcessorClient implements OnModuleInit {
    * Create a payment intent via Stripe.
    */
   async createPaymentIntent(
-    request: CreatePaymentIntentRequest
+    request: CreatePaymentIntentRequest,
   ): Promise<CreatePaymentIntentResponse> {
     const response = await fetch(`${this.baseUrl}/api/payments/create-intent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to create payment intent');
+      throw new Error(error.message || "Failed to create payment intent");
     }
 
     return response.json();
@@ -119,14 +118,14 @@ export class PaymentProcessorClient implements OnModuleInit {
    */
   async capturePayment(request: CapturePaymentRequest): Promise<void> {
     const response = await fetch(`${this.baseUrl}/api/payments/capture`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to capture payment');
+      throw new Error(error.message || "Failed to capture payment");
     }
   }
 
@@ -135,14 +134,14 @@ export class PaymentProcessorClient implements OnModuleInit {
    */
   async createRefund(request: RefundRequest): Promise<RefundResponse> {
     const response = await fetch(`${this.baseUrl}/api/payments/refund`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to create refund');
+      throw new Error(error.message || "Failed to create refund");
     }
 
     return response.json();
@@ -153,11 +152,11 @@ export class PaymentProcessorClient implements OnModuleInit {
    */
   async calculateFees(
     amountCents: number,
-    feeMode: 'absorb' | 'pass_through' = 'absorb'
+    feeMode: "absorb" | "pass_through" = "absorb",
   ): Promise<FeeCalculation> {
     const response = await fetch(`${this.baseUrl}/api/payments/calculate-fees`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         amount_cents: amountCents,
         fee_mode: feeMode,
@@ -166,7 +165,7 @@ export class PaymentProcessorClient implements OnModuleInit {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Failed to calculate fees');
+      throw new Error(error.message || "Failed to calculate fees");
     }
 
     return response.json();
@@ -175,14 +174,10 @@ export class PaymentProcessorClient implements OnModuleInit {
   /**
    * Validate a Stripe webhook signature.
    */
-  async validateWebhook(
-    payload: string,
-    signature: string,
-    secret: string
-  ): Promise<boolean> {
+  async validateWebhook(payload: string, signature: string, secret: string): Promise<boolean> {
     const response = await fetch(`${this.baseUrl}/api/payments/webhook/validate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ payload, signature, secret }),
     });
 

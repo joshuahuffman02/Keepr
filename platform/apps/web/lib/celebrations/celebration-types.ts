@@ -1,15 +1,15 @@
 "use client";
 
 export type CelebrationType =
-  | "confetti"       // Booking confirmed
-  | "stars"          // First review
-  | "fireworks"      // Loyalty milestone
-  | "hearts"         // Charity donation
-  | "sparkles";      // General success
+  | "confetti" // Booking confirmed
+  | "stars" // First review
+  | "fireworks" // Loyalty milestone
+  | "hearts" // Charity donation
+  | "sparkles"; // General success
 
 export interface CelebrationConfig {
   type: CelebrationType;
-  duration: number;  // ms
+  duration: number; // ms
   particles: number;
   colors: string[];
 }
@@ -322,7 +322,7 @@ function animateParticles<T>(
   ctx: CanvasRenderingContext2D,
   particles: T[],
   duration: number,
-  updateAndDraw: (particle: T, elapsed: number) => void
+  updateAndDraw: (particle: T, elapsed: number) => void,
 ) {
   const start = performance.now();
 
@@ -348,7 +348,7 @@ function drawStar(
   cy: number,
   spikes: number,
   outerRadius: number,
-  innerRadius: number
+  innerRadius: number,
 ) {
   let rot = (Math.PI / 2) * 3;
   const step = Math.PI / spikes;
@@ -357,15 +357,9 @@ function drawStar(
   ctx.moveTo(cx, cy - outerRadius);
 
   for (let i = 0; i < spikes; i++) {
-    ctx.lineTo(
-      cx + Math.cos(rot) * outerRadius,
-      cy + Math.sin(rot) * outerRadius
-    );
+    ctx.lineTo(cx + Math.cos(rot) * outerRadius, cy + Math.sin(rot) * outerRadius);
     rot += step;
-    ctx.lineTo(
-      cx + Math.cos(rot) * innerRadius,
-      cy + Math.sin(rot) * innerRadius
-    );
+    ctx.lineTo(cx + Math.cos(rot) * innerRadius, cy + Math.sin(rot) * innerRadius);
     rot += step;
   }
 
@@ -374,12 +368,7 @@ function drawStar(
   ctx.fill();
 }
 
-function drawHeart(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  size: number
-) {
+function drawHeart(ctx: CanvasRenderingContext2D, x: number, y: number, size: number) {
   const width = size;
   const height = size;
 
@@ -387,32 +376,23 @@ function drawHeart(
   ctx.moveTo(x, y + height / 4);
 
   // Left curve
-  ctx.bezierCurveTo(
-    x, y,
-    x - width / 2, y,
-    x - width / 2, y + height / 4
-  );
+  ctx.bezierCurveTo(x, y, x - width / 2, y, x - width / 2, y + height / 4);
 
   // Left bottom
-  ctx.bezierCurveTo(
-    x - width / 2, y + height / 2,
-    x, y + height * 0.75,
-    x, y + height
-  );
+  ctx.bezierCurveTo(x - width / 2, y + height / 2, x, y + height * 0.75, x, y + height);
 
   // Right bottom
   ctx.bezierCurveTo(
-    x, y + height * 0.75,
-    x + width / 2, y + height / 2,
-    x + width / 2, y + height / 4
+    x,
+    y + height * 0.75,
+    x + width / 2,
+    y + height / 2,
+    x + width / 2,
+    y + height / 4,
   );
 
   // Right curve
-  ctx.bezierCurveTo(
-    x + width / 2, y,
-    x, y,
-    x, y + height / 4
-  );
+  ctx.bezierCurveTo(x + width / 2, y, x, y, x, y + height / 4);
 
   ctx.fill();
 }

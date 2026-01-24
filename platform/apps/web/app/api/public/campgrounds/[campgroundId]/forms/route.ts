@@ -10,7 +10,7 @@ const API_BASE =
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ campgroundId: string }> }
+  { params }: { params: Promise<{ campgroundId: string }> },
 ) {
   const { campgroundId } = await params;
   const { searchParams } = new URL(req.url);
@@ -31,9 +31,6 @@ export async function GET(
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
     console.error("[public-forms] Error:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch forms" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch forms" }, { status: 500 });
   }
 }

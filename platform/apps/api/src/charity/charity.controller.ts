@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from "@nestjs/common";
 import {
   CharityService,
   CreateCharityDto,
@@ -41,7 +31,7 @@ export class CharityController {
   @Get()
   async listCharities(
     @Query("category") category?: string,
-    @Query("activeOnly") activeOnly?: string
+    @Query("activeOnly") activeOnly?: string,
   ) {
     // All authenticated users can list available charities
     return this.charityService.listCharities({
@@ -94,11 +84,11 @@ export class CharityController {
   @Roles(PlatformRole.platform_admin)
   async getPlatformStats(
     @Query("startDate") startDate?: string,
-    @Query("endDate") endDate?: string
+    @Query("endDate") endDate?: string,
   ) {
     return this.charityService.getPlatformDonationStats(
       startDate ? new Date(startDate) : undefined,
-      endDate ? new Date(endDate) : undefined
+      endDate ? new Date(endDate) : undefined,
     );
   }
 
@@ -113,7 +103,7 @@ export class CharityController {
     @Query("charityId") charityId?: string,
     @Query("status") status?: CharityPayoutStatus,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.charityService.listPayouts({
       charityId,
@@ -126,9 +116,7 @@ export class CharityController {
   @Post("payouts")
   @UseGuards(RolesGuard)
   @Roles(PlatformRole.platform_admin)
-  async createPayout(
-    @Body() data: { charityId: string; createdBy?: string }
-  ) {
+  async createPayout(@Body() data: { charityId: string; createdBy?: string }) {
     return this.charityService.createPayout(data.charityId, data.createdBy);
   }
 
@@ -137,7 +125,7 @@ export class CharityController {
   @Roles(PlatformRole.platform_admin)
   async completePayout(
     @Param("id") id: string,
-    @Body() data: { reference?: string; notes?: string }
+    @Body() data: { reference?: string; notes?: string },
   ) {
     return this.charityService.completePayout(id, data.reference, data.notes);
   }
@@ -158,7 +146,7 @@ export class AdminCharityController {
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.charityService.listDonations({
       charityId,
@@ -176,7 +164,7 @@ export class AdminCharityController {
     @Query("charityId") charityId?: string,
     @Query("status") status?: CharityPayoutStatus,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.charityService.listPayouts({
       charityId,
@@ -187,16 +175,14 @@ export class AdminCharityController {
   }
 
   @Post("payouts")
-  async createPayout(
-    @Body() data: { charityId: string; createdBy?: string }
-  ) {
+  async createPayout(@Body() data: { charityId: string; createdBy?: string }) {
     return this.charityService.createPayout(data.charityId, data.createdBy);
   }
 
   @Put("payouts/:id/complete")
   async completePayout(
     @Param("id") id: string,
-    @Body() data: { reference?: string; notes?: string }
+    @Body() data: { reference?: string; notes?: string },
   ) {
     return this.charityService.completePayout(id, data.reference, data.notes);
   }
@@ -216,7 +202,7 @@ export class CampgroundCharityController {
   @Put()
   async setCampgroundCharity(
     @Param("campgroundId") campgroundId: string,
-    @Body() data: SetCampgroundCharityDto
+    @Body() data: SetCampgroundCharityDto,
   ) {
     return this.charityService.setCampgroundCharity(campgroundId, data);
   }
@@ -230,12 +216,12 @@ export class CampgroundCharityController {
   async getCampgroundStats(
     @Param("campgroundId") campgroundId: string,
     @Query("startDate") startDate?: string,
-    @Query("endDate") endDate?: string
+    @Query("endDate") endDate?: string,
   ) {
     return this.charityService.getCampgroundDonationStats(
       campgroundId,
       startDate ? new Date(startDate) : undefined,
-      endDate ? new Date(endDate) : undefined
+      endDate ? new Date(endDate) : undefined,
     );
   }
 
@@ -246,7 +232,7 @@ export class CampgroundCharityController {
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.charityService.listDonations({
       campgroundId,
@@ -261,7 +247,7 @@ export class CampgroundCharityController {
   @Get("calculate-roundup")
   async calculateRoundUp(
     @Param("campgroundId") campgroundId: string,
-    @Query("amountCents") amountCents: string
+    @Query("amountCents") amountCents: string,
   ) {
     const settings = await this.charityService.getCampgroundCharity(campgroundId);
 
@@ -274,7 +260,7 @@ export class CampgroundCharityController {
     const roundUp = this.charityService.calculateRoundUp(
       amount,
       settings.roundUpType,
-      roundUpOptions
+      roundUpOptions,
     );
 
     return {
@@ -289,7 +275,8 @@ export class CampgroundCharityController {
   @Post("donations")
   async createDonation(
     @Param("campgroundId") campgroundId: string,
-    @Body() data: { reservationId: string; charityId: string; amountCents: number; guestId?: string }
+    @Body()
+    data: { reservationId: string; charityId: string; amountCents: number; guestId?: string },
   ) {
     return this.charityService.createDonation({
       ...data,

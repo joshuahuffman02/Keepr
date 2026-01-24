@@ -14,40 +14,35 @@ import { RefundService } from "./refund.service";
 
 // Controllers
 import {
-    PaymentMethodController,
-    TerminalController,
-    SavedCardController,
-    RefundController,
+  PaymentMethodController,
+  TerminalController,
+  SavedCardController,
+  RefundController,
 } from "./stripe-payments.controller";
 
 @Module({
-    imports: [
-        PrismaModule,
-        forwardRef(() => PaymentsModule),
-        forwardRef(() => AuthModule),
-        forwardRef(() => PermissionsModule),
-    ],
-    controllers: [
-        PaymentMethodController,
-        TerminalController,
-        SavedCardController,
-        RefundController,
-    ],
-    providers: [
-        CustomerService,
-        PaymentMethodService,
-        TerminalService,
-        TerminalPaymentService,
-        SavedCardService,
-        RefundService,
-    ],
-    exports: [
-        CustomerService,
-        PaymentMethodService,
-        TerminalService,
-        TerminalPaymentService,
-        SavedCardService,
-        RefundService,
-    ],
+  imports: [
+    PrismaModule,
+    forwardRef(() => PaymentsModule),
+    forwardRef(() => AuthModule),
+    forwardRef(() => PermissionsModule),
+  ],
+  controllers: [PaymentMethodController, TerminalController, SavedCardController, RefundController],
+  providers: [
+    CustomerService,
+    PaymentMethodService,
+    TerminalService,
+    TerminalPaymentService,
+    SavedCardService,
+    RefundService,
+  ],
+  exports: [
+    CustomerService,
+    PaymentMethodService,
+    TerminalService,
+    TerminalPaymentService,
+    SavedCardService,
+    RefundService,
+  ],
 })
 export class StripePaymentsModule {}

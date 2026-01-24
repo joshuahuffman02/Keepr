@@ -6,10 +6,10 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 @Controller("anomalies")
 @UseGuards(JwtAuthGuard)
 export class AnomaliesController {
-    constructor(private readonly service: AnomaliesService) { }
+  constructor(private readonly service: AnomaliesService) {}
 
-    @Get("check")
-    async check(@Query() query: AnomalyCheckDto) {
-        return this.service.check(query);
-    }
+  @Get("check")
+  async check(@Query() query: AnomalyCheckDto) {
+    return this.service.check(query);
+  }
 }

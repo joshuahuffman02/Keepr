@@ -63,23 +63,28 @@ We use the information we collect to:
 We may share your information with:
 
 ### Service Providers
+
 - Payment processors (to process your payment)
 - Reservation management systems (Campreserv)
 - Email service providers (to send confirmations)
 - IT and security providers
 
 ### Legal Requirements
+
 - Law enforcement when required by law
 - Government agencies for legal compliance
 - Courts in response to subpoenas or legal process
 
 ### Business Transfers
+
 - In connection with a merger, acquisition, or sale of assets
 
 ### With Your Consent
+
 - When you have given us explicit permission
 
 **We do NOT:**
+
 - Sell your personal information to third parties
 - Share your information for third-party marketing without consent
 - Disclose your presence to callers without your permission
@@ -90,14 +95,14 @@ We may share your information with:
 
 We retain your information for the following periods:
 
-| Data Type | Retention Period | Reason |
-|-----------|------------------|--------|
-| Reservation records | 7 years | Tax/legal requirements |
-| Contact information | 3 years after last stay | Customer service |
-| Payment transaction logs | 7 years | Financial records |
-| ID copies | 30 days | Verification only |
-| Security footage | 30 days | Security purposes |
-| Marketing preferences | Until you unsubscribe | Your choice |
+| Data Type                | Retention Period        | Reason                 |
+| ------------------------ | ----------------------- | ---------------------- |
+| Reservation records      | 7 years                 | Tax/legal requirements |
+| Contact information      | 3 years after last stay | Customer service       |
+| Payment transaction logs | 7 years                 | Financial records      |
+| ID copies                | 30 days                 | Verification only      |
+| Security footage         | 30 days                 | Security purposes      |
+| Marketing preferences    | Until you unsubscribe   | Your choice            |
 
 ---
 
@@ -106,21 +111,27 @@ We retain your information for the following periods:
 Depending on your location, you may have the following rights:
 
 ### Access
+
 You can request a copy of the personal information we hold about you.
 
 ### Correction
+
 You can request that we correct inaccurate information.
 
 ### Deletion
+
 You can request that we delete your personal information (subject to legal retention requirements).
 
 ### Opt-Out of Marketing
+
 You can unsubscribe from marketing emails at any time by clicking the unsubscribe link or contacting us.
 
 ### Do Not Sell
+
 We do not sell personal information. If this changes, you will have the right to opt out.
 
 ### Data Portability
+
 You can request your data in a portable format.
 
 To exercise any of these rights, contact us at [Email/Phone].
@@ -144,17 +155,19 @@ While we strive to protect your information, no method of transmission over the 
 ## Cookie Policy
 
 ### What Are Cookies?
+
 Cookies are small files stored on your device when you visit our website.
 
 ### How We Use Cookies
 
-| Cookie Type | Purpose | Duration |
-|-------------|---------|----------|
-| Essential | Site functionality, security | Session |
-| Analytics | Understand how visitors use our site | 2 years |
-| Preferences | Remember your settings | 1 year |
+| Cookie Type | Purpose                              | Duration |
+| ----------- | ------------------------------------ | -------- |
+| Essential   | Site functionality, security         | Session  |
+| Analytics   | Understand how visitors use our site | 2 years  |
+| Preferences | Remember your settings               | 1 year   |
 
 ### Managing Cookies
+
 You can control cookies through your browser settings. Disabling certain cookies may affect website functionality.
 
 ---
@@ -211,11 +224,11 @@ For data privacy requests, please email: [Privacy Email]
 
 ## Document Control
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | [Date] | Initial version |
-| | | |
+| Version | Date   | Changes         |
+| ------- | ------ | --------------- |
+| 1.0     | [Date] | Initial version |
+|         |        |                 |
 
 ---
 
-*This template is provided by Campreserv for guidance purposes. Consult with legal counsel to ensure compliance with applicable privacy laws in your jurisdiction.*
+_This template is provided by Campreserv for guidance purposes. Consult with legal counsel to ensure compliance with applicable privacy laws in your jurisdiction._

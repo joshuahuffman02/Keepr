@@ -8,7 +8,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PermissionsModule],
   controllers: [SupportController],
   providers: [SupportService],
-  exports: [SupportService]
+  exports: [SupportService],
 })
 export class SupportModule {}
-

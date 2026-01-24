@@ -5,9 +5,22 @@ import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Button } from "../../components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiClient, type LeadRecord } from "@/lib/api-client";
 import { useWhoami } from "@/hooks/use-whoami";
 
@@ -18,7 +31,9 @@ export default function MarketingPage() {
   const [selectedCampground, setSelectedCampground] = useState<string>("");
 
   const campgroundOptions = useMemo(() => {
-    const options: { id: string; name: string }[] = [{ id: "public-site", name: "Public site (demo)" }];
+    const options: { id: string; name: string }[] = [
+      { id: "public-site", name: "Public site (demo)" },
+    ];
     const memberships = whoami?.user?.memberships || [];
     memberships.forEach((membership) => {
       if (!options.some((opt) => opt.id === membership.campgroundId)) {
@@ -33,7 +48,8 @@ export default function MarketingPage() {
 
   useEffect(() => {
     if (selectedCampground) return;
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) {
       setSelectedCampground(stored);
       return;
@@ -56,7 +72,8 @@ export default function MarketingPage() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: LeadRecord["status"] }) => apiClient.updateLeadStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: LeadRecord["status"] }) =>
+      apiClient.updateLeadStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["leads", selectedCampground] });
       toast({ title: "Status updated", description: "Lead status updated internally." });
@@ -81,7 +98,8 @@ export default function MarketingPage() {
 
   const leads: LeadRecord[] = leadsQuery.data || [];
 
-  const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleString() : "Not yet");
+  const formatDate = (value?: string | null) =>
+    value ? new Date(value).toLocaleString() : "Not yet";
 
   const statusOptions: { value: LeadRecord["status"]; label: string }[] = [
     { value: "new", label: "New" },
@@ -98,25 +116,30 @@ export default function MarketingPage() {
         <div className="card p-6 space-y-3">
           <h1 className="text-xl font-semibold text-foreground">Marketing & web</h1>
           <p className="text-muted-foreground text-sm">
-            Public campground pages are live with SEO/meta, sitemap, and lead capture hooks. Keep promos and campaigns aligned.
+            Public campground pages are live with SEO/meta, sitemap, and lead capture hooks. Keep
+            promos and campaigns aligned.
           </p>
           <div className="grid md:grid-cols-2 gap-3">
             <div className="rounded-lg border border-border bg-muted p-3">
               <div className="text-sm font-semibold text-foreground">Public site</div>
               <div className="text-xs text-muted-foreground mt-1">
-                Campground detail pages include photos, amenities, events, SEO/meta tags, sitemap, and robots coverage.
+                Campground detail pages include photos, amenities, events, SEO/meta tags, sitemap,
+                and robots coverage.
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                Configure analytics (GA4, Meta Pixel) in Settings → Analytics & Tracking; pages honor canonical base URL.
+                Configure analytics (GA4, Meta Pixel) in Settings → Analytics & Tracking; pages
+                honor canonical base URL.
               </div>
             </div>
             <div className="rounded-lg border border-border bg-muted p-3">
               <div className="text-sm font-semibold text-foreground">Promotions & campaigns</div>
               <div className="text-xs text-muted-foreground mt-1">
-                Create promo codes, set usage windows/limits, and keep them in sync with booking flows.
+                Create promo codes, set usage windows/limits, and keep them in sync with booking
+                flows.
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                Email campaigns live in Settings → Campaigns; promos integrate with admin/public booking and OTA-safe pricing.
+                Email campaigns live in Settings → Campaigns; promos integrate with admin/public
+                booking and OTA-safe pricing.
               </div>
             </div>
           </div>
@@ -125,7 +148,9 @@ export default function MarketingPage() {
               <Button size="sm">Manage promotions</Button>
             </Link>
             <Link href="/settings/campaigns">
-              <Button size="sm" variant="secondary">Open campaigns</Button>
+              <Button size="sm" variant="secondary">
+                Open campaigns
+              </Button>
             </Link>
           </div>
         </div>
@@ -135,7 +160,8 @@ export default function MarketingPage() {
             <div className="space-y-1">
               <h2 className="text-lg font-semibold text-foreground">Leads (internal only)</h2>
               <p className="text-sm text-muted-foreground">
-                Captured from landing pages and admin forms. Stored per campground with a stubbed “sync to CRM” path.
+                Captured from landing pages and admin forms. Stored per campground with a stubbed
+                “sync to CRM” path.
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -153,7 +179,9 @@ export default function MarketingPage() {
               <Button
                 size="sm"
                 variant="secondary"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ["leads", selectedCampground] })}
+                onClick={() =>
+                  queryClient.invalidateQueries({ queryKey: ["leads", selectedCampground] })
+                }
               >
                 Refresh
               </Button>
@@ -207,8 +235,12 @@ export default function MarketingPage() {
                       </Select>
                     </TableCell>
                     <TableCell className="text-muted-foreground">{lead.source || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatDate(lead.createdAt)}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatDate(lead.lastSyncedAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(lead.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(lead.lastSyncedAt)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="sm"
@@ -216,7 +248,11 @@ export default function MarketingPage() {
                         disabled={syncLead.isPending}
                         onClick={() => syncLead.mutate(lead.id)}
                       >
-                        {lead.lastSyncedAt ? (syncLead.isPending ? "Syncing..." : "Resync") : "Sync now"}
+                        {lead.lastSyncedAt
+                          ? syncLead.isPending
+                            ? "Syncing..."
+                            : "Resync"
+                          : "Sync now"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -227,7 +263,9 @@ export default function MarketingPage() {
               <div className="text-center text-sm text-muted-foreground py-8">Loading leads…</div>
             )}
             {!leadsQuery.isLoading && leads.length === 0 && (
-              <div className="text-center text-sm text-muted-foreground py-8">No leads yet for this campground.</div>
+              <div className="text-center text-sm text-muted-foreground py-8">
+                No leads yet for this campground.
+              </div>
             )}
           </div>
         </div>

@@ -49,11 +49,29 @@ const mockBookingData = {
     ],
   },
   channelBreakdown: [
-    { channel: "Direct Website", bookings: 6850, revenue: 1712500, percentage: 55.0, averageLeadTime: 24 },
-    { channel: "Mobile App", bookings: 2490, revenue: 622500, percentage: 20.0, averageLeadTime: 18 },
+    {
+      channel: "Direct Website",
+      bookings: 6850,
+      revenue: 1712500,
+      percentage: 55.0,
+      averageLeadTime: 24,
+    },
+    {
+      channel: "Mobile App",
+      bookings: 2490,
+      revenue: 622500,
+      percentage: 20.0,
+      averageLeadTime: 18,
+    },
     { channel: "Phone", bookings: 1494, revenue: 373500, percentage: 12.0, averageLeadTime: 32 },
     { channel: "Walk-in", bookings: 996, revenue: 249000, percentage: 8.0, averageLeadTime: 0 },
-    { channel: "Third Party", bookings: 620, revenue: 155000, percentage: 5.0, averageLeadTime: 15 },
+    {
+      channel: "Third Party",
+      bookings: 620,
+      revenue: 155000,
+      percentage: 5.0,
+      averageLeadTime: 15,
+    },
   ],
   cancellationAnalysis: {
     overallRate: 8.2,
@@ -178,9 +196,7 @@ export default function BookingBehaviorPage() {
           title="Lead Time Distribution"
           description="How far in advance guests book"
           data={data.leadTimeAnalysis.buckets}
-          dataKeys={[
-            { key: "count", color: "#3b82f6", name: "Bookings" },
-          ]}
+          dataKeys={[{ key: "count", color: "#3b82f6", name: "Bookings" }]}
           xAxisKey="range"
           type="bar"
           height={300}
@@ -192,9 +208,7 @@ export default function BookingBehaviorPage() {
           title="Lead Time Seasonality"
           description="Average booking window by month"
           data={data.leadTimeAnalysis.trends}
-          dataKeys={[
-            { key: "averageLeadTime", color: "#10b981", name: "Lead Time (days)" },
-          ]}
+          dataKeys={[{ key: "averageLeadTime", color: "#10b981", name: "Lead Time (days)" }]}
           xAxisKey="month"
           type="line"
           height={300}
@@ -271,15 +285,21 @@ export default function BookingBehaviorPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
-              <p className="text-3xl font-bold text-foreground">{data.cancellationAnalysis.overallRate}%</p>
+              <p className="text-3xl font-bold text-foreground">
+                {data.cancellationAnalysis.overallRate}%
+              </p>
               <p className="text-sm text-muted-foreground">Overall Rate</p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg text-center">
-              <p className="text-3xl font-bold text-foreground">{data.cancellationAnalysis.totalCancelled.toLocaleString()}</p>
+              <p className="text-3xl font-bold text-foreground">
+                {data.cancellationAnalysis.totalCancelled.toLocaleString()}
+              </p>
               <p className="text-sm text-muted-foreground">Total Cancelled</p>
             </div>
             <div className="p-4 bg-muted/50 rounded-lg text-center">
-              <p className="text-3xl font-bold text-foreground">{formatCurrency(data.cancellationAnalysis.lostRevenue)}</p>
+              <p className="text-3xl font-bold text-foreground">
+                {formatCurrency(data.cancellationAnalysis.lostRevenue)}
+              </p>
               <p className="text-sm text-muted-foreground">Lost Revenue</p>
             </div>
           </div>
@@ -345,9 +365,7 @@ export default function BookingBehaviorPage() {
         title="Bookings by Day of Week"
         description="When guests are making reservations"
         data={data.bookingTrends.byDayOfWeek}
-        dataKeys={[
-          { key: "bookings", color: "#8b5cf6", name: "Bookings" },
-        ]}
+        dataKeys={[{ key: "bookings", color: "#8b5cf6", name: "Bookings" }]}
         xAxisKey="day"
         type="bar"
         height={250}

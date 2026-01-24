@@ -290,21 +290,24 @@ export default function SiteClosuresPage() {
     setEditingClosure(null);
   }, []);
 
-  const openEditor = useCallback((closure: SiteClosure | null) => {
-    if (closure) {
-      setEditingClosure(closure);
-      setFormName(closure.name);
-      setFormReason(closure.reason);
-      setFormSites(closure.sites);
-      setFormSiteClasses(closure.siteClasses);
-      setFormStartDate(closure.startDate);
-      setFormEndDate(closure.endDate);
-      setFormNotes(closure.notes);
-    } else {
-      resetForm();
-    }
-    setIsEditorOpen(true);
-  }, [resetForm]);
+  const openEditor = useCallback(
+    (closure: SiteClosure | null) => {
+      if (closure) {
+        setEditingClosure(closure);
+        setFormName(closure.name);
+        setFormReason(closure.reason);
+        setFormSites(closure.sites);
+        setFormSiteClasses(closure.siteClasses);
+        setFormStartDate(closure.startDate);
+        setFormEndDate(closure.endDate);
+        setFormNotes(closure.notes);
+      } else {
+        resetForm();
+      }
+      setIsEditorOpen(true);
+    },
+    [resetForm],
+  );
 
   const handleSave = useCallback(() => {
     if (!formName.trim() || !formStartDate || !formEndDate || !selectedCampground) return;
@@ -327,20 +330,38 @@ export default function SiteClosuresPage() {
           setIsEditorOpen(false);
           resetForm();
         },
-      }
+      },
     );
-  }, [formName, formStartDate, formEndDate, formReason, formNotes, formSites, formSiteClasses, selectedCampground, editingClosure, saveMutation, resetForm]);
+  }, [
+    formName,
+    formStartDate,
+    formEndDate,
+    formReason,
+    formNotes,
+    formSites,
+    formSiteClasses,
+    selectedCampground,
+    editingClosure,
+    saveMutation,
+    resetForm,
+  ]);
 
-  const handleDelete = useCallback((id: string) => {
-    deleteMutation.mutate(id);
-  }, [deleteMutation]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      deleteMutation.mutate(id);
+    },
+    [deleteMutation],
+  );
 
-  const handleToggleActive = useCallback((id: string) => {
-    const closure = closures.find((c) => c.id === id);
-    if (closure) {
-      toggleMutation.mutate({ id, isActive: !closure.isActive });
-    }
-  }, [closures, toggleMutation]);
+  const handleToggleActive = useCallback(
+    (id: string) => {
+      const closure = closures.find((c) => c.id === id);
+      if (closure) {
+        toggleMutation.mutate({ id, isActive: !closure.isActive });
+      }
+    },
+    [closures, toggleMutation],
+  );
 
   if (!isHydrated || !selectedCampground) {
     return (
@@ -360,9 +381,7 @@ export default function SiteClosuresPage() {
 
   const toggleSiteClass = (siteClass: string) => {
     setFormSiteClasses((prev) =>
-      prev.includes(siteClass)
-        ? prev.filter((s) => s !== siteClass)
-        : [...prev, siteClass]
+      prev.includes(siteClass) ? prev.filter((s) => s !== siteClass) : [...prev, siteClass],
     );
   };
 
@@ -449,17 +468,9 @@ export default function SiteClosuresPage() {
           );
         }
         if (isCurrent) {
-          return (
-            <Badge className="bg-status-error/15 text-status-error">
-              Active Now
-            </Badge>
-          );
+          return <Badge className="bg-status-error/15 text-status-error">Active Now</Badge>;
         }
-        return (
-          <Badge className="bg-status-warning/15 text-status-warning">
-            Scheduled
-          </Badge>
-        );
+        return <Badge className="bg-status-warning/15 text-status-warning">Scheduled</Badge>;
       },
     },
   ];
@@ -484,8 +495,8 @@ export default function SiteClosuresPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Site closures block availability for the specified dates. Guests cannot book
-          closed sites, and existing reservations will be flagged for review.
+          Site closures block availability for the specified dates. Guests cannot book closed sites,
+          and existing reservations will be flagged for review.
         </AlertDescription>
       </Alert>
 
@@ -514,10 +525,7 @@ export default function SiteClosuresPage() {
                 {item.isActive ? "Cancel Closure" : "Reactivate"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleDelete(item.id)}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={() => handleDelete(item.id)} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -535,9 +543,7 @@ export default function SiteClosuresPage() {
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editingClosure ? "Edit Closure" : "Add Site Closure"}
-            </DialogTitle>
+            <DialogTitle>{editingClosure ? "Edit Closure" : "Add Site Closure"}</DialogTitle>
             <DialogDescription>
               Block sites from being booked during a specific period
             </DialogDescription>
@@ -614,7 +620,7 @@ export default function SiteClosuresPage() {
                     onClick={() => toggleSiteClass(siteClass)}
                     className={cn(
                       formSiteClasses.includes(siteClass) &&
-                        "bg-status-success/15 border-status-success/30 text-status-success"
+                        "bg-status-success/15 border-status-success/30 text-status-success",
                     )}
                   >
                     {siteClass}

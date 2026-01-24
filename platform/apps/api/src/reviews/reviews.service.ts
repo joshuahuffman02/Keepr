@@ -8,10 +8,16 @@ import { ModerateReviewDto } from "./dto/moderate-review.dto";
 import { VoteReviewDto } from "./dto/vote-review.dto";
 import { ReplyReviewDto } from "./dto/reply-review.dto";
 import { GamificationService } from "../gamification/gamification.service";
-import { GamificationEventCategory, ReviewModerationStatus, ReviewStatus, ReviewVoteValue } from "@prisma/client";
+import {
+  GamificationEventCategory,
+  ReviewModerationStatus,
+  ReviewStatus,
+  ReviewVoteValue,
+} from "@prisma/client";
 
 function baseAppUrl() {
-  const url = process.env.PUBLIC_WEB_URL || process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
+  const url =
+    process.env.PUBLIC_WEB_URL || process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
@@ -50,8 +56,8 @@ export class ReviewsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
-    private readonly gamification: GamificationService
-  ) { }
+    private readonly gamification: GamificationService,
+  ) {}
 
   private generateToken() {
     return randomBytes(24).toString("hex");
@@ -62,17 +68,22 @@ export class ReviewsService {
     return createHash("sha256").update(ip).digest("hex");
   }
 
-  private async resolveGuestContact(guestId?: string, reservationId?: string, email?: string, phone?: string): Promise<GuestContact> {
+  private async resolveGuestContact(
+    guestId?: string,
+    reservationId?: string,
+    email?: string,
+    phone?: string,
+  ): Promise<GuestContact> {
     if (guestId) {
       const guest = await this.prisma.guest.findUnique({
         where: { id: guestId },
-        select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true }
+        select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true },
       });
       if (guest) {
         return {
           email: email ?? guest.email,
           phone: phone ?? guest.phone,
-          name: `${guest.primaryFirstName} ${guest.primaryLastName}`
+          name: `${guest.primaryFirstName} ${guest.primaryLastName}`,
         };
       }
     }
@@ -80,15 +91,17 @@ export class ReviewsService {
       const reservation = await this.prisma.reservation.findUnique({
         where: { id: reservationId },
         select: {
-          Guest: { select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true } }
-        }
+          Guest: {
+            select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true },
+          },
+        },
       });
       if (reservation?.Guest) {
         const g = reservation.Guest;
         return {
           email: email ?? g.email,
           phone: phone ?? g.phone,
-          name: `${g.primaryFirstName} ${g.primaryLastName}`
+          name: `${g.primaryFirstName} ${g.primaryLastName}`,
         };
       }
     }
@@ -96,9 +109,16 @@ export class ReviewsService {
   }
 
   async createRequest(dto: CreateReviewRequestDto) {
-    const contact = await this.resolveGuestContact(dto.guestId, dto.reservationId, dto.email, dto.phone);
+    const contact = await this.resolveGuestContact(
+      dto.guestId,
+      dto.reservationId,
+      dto.email,
+      dto.phone,
+    );
     const token = this.generateToken();
-    const expiresAt = dto.expireDays ? new Date(Date.now() + dto.expireDays * 24 * 60 * 60 * 1000) : null;
+    const expiresAt = dto.expireDays
+      ? new Date(Date.now() + dto.expireDays * 24 * 60 * 60 * 1000)
+      : null;
     const link = `${baseAppUrl()}/reviews/submit?token=${token}`;
 
     const request = await this.prisma.reviewRequest.create({
@@ -113,8 +133,8 @@ export class ReviewsService {
         token,
         expiresAt,
         sentAt: dto.channel === "email" ? new Date() : null,
-        metadata: { link }
-      }
+        metadata: { link },
+      },
     });
 
     if (dto.channel === "email") {
@@ -137,7 +157,7 @@ export class ReviewsService {
         html,
         guestId: dto.guestId,
         reservationId: dto.reservationId,
-        campgroundId: dto.campgroundId
+        campgroundId: dto.campgroundId,
       });
     }
 
@@ -147,11 +167,14 @@ export class ReviewsService {
   async submitReview(dto: SubmitReviewDto, ip?: string) {
     const request = await this.prisma.reviewRequest.findUnique({
       where: { token: dto.token },
-      include: { Review: true }
+      include: { Review: true },
     });
     if (!request) throw new NotFoundException("Review request not found");
     if (request.expiresAt && request.expiresAt < new Date()) {
-      await this.prisma.reviewRequest.update({ where: { id: request.id }, data: { status: "expired" } });
+      await this.prisma.reviewRequest.update({
+        where: { id: request.id },
+        data: { status: "expired" },
+      });
       throw new BadRequestException("Review link expired");
     }
     if (request.Review) throw new BadRequestException("Review already submitted");
@@ -171,13 +194,13 @@ export class ReviewsService {
         tags: dto.tags ?? [],
         source: request.channel === "kiosk" ? "kiosk" : request.channel === "sms" ? "sms" : "email",
         status: "approved",
-        exposure: "public"
-      }
+        exposure: "public",
+      },
     });
 
     await this.prisma.reviewRequest.update({
       where: { id: request.id },
-      data: { status: "responded", respondedAt: new Date() }
+      data: { status: "responded", respondedAt: new Date() },
     });
 
     await this.prisma.reviewModeration.create({
@@ -185,29 +208,31 @@ export class ReviewsService {
         id: randomUUID(),
         reviewId: review.id,
         status: "pending",
-        reasons: []
-      }
+        reasons: [],
+      },
     });
 
-    await this.prisma.reviewVote.create({
-      data: {
-        id: randomUUID(),
-        reviewId: review.id,
-        campgroundId: review.campgroundId,
-        ipHash: this.hashIp(ip),
-        value: ReviewVoteValue.helpful
-      }
-    }).catch(() => undefined);
+    await this.prisma.reviewVote
+      .create({
+        data: {
+          id: randomUUID(),
+          reviewId: review.id,
+          campgroundId: review.campgroundId,
+          ipHash: this.hashIp(ip),
+          value: ReviewVoteValue.helpful,
+        },
+      })
+      .catch(() => undefined);
 
     // Gamification: positive review mention → award creator
     if (review.reservationId && review.rating >= 4) {
       const reservation = await this.prisma.reservation.findUnique({
         where: { id: review.reservationId },
-        select: { id: true, campgroundId: true, createdBy: true }
+        select: { id: true, campgroundId: true, createdBy: true },
       });
       if (reservation?.createdBy) {
         const membership = await this.prisma.campgroundMembership.findFirst({
-          where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+          where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId },
         });
         await this.gamification.recordEvent({
           campgroundId: reservation.campgroundId,
@@ -217,7 +242,7 @@ export class ReviewsService {
           reason: "Positive guest review",
           sourceType: "review",
           sourceId: review.id,
-          eventKey: `review:${review.id}:positive`
+          eventKey: `review:${review.id}:positive`,
         });
       }
     }
@@ -226,53 +251,57 @@ export class ReviewsService {
   }
 
   async listPublic(campgroundId: string) {
-    return this.prisma.review.findMany({
-      where: { campgroundId, status: { not: "removed" } },
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        rating: true,
-        title: true,
-        body: true,
-        photos: true,
-        tags: true,
-        createdAt: true,
-        ReviewReply: true
-      }
-    }).then((reviews) =>
-      reviews.map(({ ReviewReply, ...rest }) => ({ ...rest, replies: ReviewReply }))
-    );
+    return this.prisma.review
+      .findMany({
+        where: { campgroundId, status: { not: "removed" } },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          rating: true,
+          title: true,
+          body: true,
+          photos: true,
+          tags: true,
+          createdAt: true,
+          ReviewReply: true,
+        },
+      })
+      .then((reviews) =>
+        reviews.map(({ ReviewReply, ...rest }) => ({ ...rest, replies: ReviewReply })),
+      );
   }
 
   async listAdmin(campgroundId: string, status?: string) {
     const statusFilter = getReviewStatus(status);
-    return this.prisma.review.findMany({
-      where: { campgroundId, ...(statusFilter ? { status: statusFilter } : {}) },
-      orderBy: { createdAt: "desc" },
-      include: {
-        ReviewModeration: true,
-        Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true } },
-        Reservation: { select: { id: true } },
-        ReviewReply: {
-          orderBy: { createdAt: "asc" },
-          select: {
-            id: true,
-            authorType: true,
-            authorId: true,
-            body: true,
-            createdAt: true
-          }
-        }
-      }
-    }).then((reviews) =>
-      reviews.map(({ ReviewModeration, ReviewReply, Guest, Reservation, ...rest }) => ({
-        ...rest,
-        moderation: ReviewModeration,
-        replies: ReviewReply,
-        guest: Guest,
-        reservation: Reservation,
-      }))
-    );
+    return this.prisma.review
+      .findMany({
+        where: { campgroundId, ...(statusFilter ? { status: statusFilter } : {}) },
+        orderBy: { createdAt: "desc" },
+        include: {
+          ReviewModeration: true,
+          Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true } },
+          Reservation: { select: { id: true } },
+          ReviewReply: {
+            orderBy: { createdAt: "asc" },
+            select: {
+              id: true,
+              authorType: true,
+              authorId: true,
+              body: true,
+              createdAt: true,
+            },
+          },
+        },
+      })
+      .then((reviews) =>
+        reviews.map(({ ReviewModeration, ReviewReply, Guest, Reservation, ...rest }) => ({
+          ...rest,
+          moderation: ReviewModeration,
+          replies: ReviewReply,
+          guest: Guest,
+          reservation: Reservation,
+        })),
+      );
   }
 
   async moderate(dto: ModerateReviewDto, actorId?: string) {
@@ -283,7 +312,7 @@ export class ReviewsService {
     const moderationStatus = REVIEW_MODERATION_STATUS_MAP[status];
     await prisma.review.update({
       where: { id: dto.reviewId },
-      data: { status, exposure: dto.status === "approved" ? "public" : review.exposure }
+      data: { status, exposure: dto.status === "approved" ? "public" : review.exposure },
     });
     await prisma.reviewModeration.upsert({
       where: { reviewId: dto.reviewId },
@@ -294,15 +323,15 @@ export class ReviewsService {
         reasons: dto.reasons ?? [],
         decidedBy: actorId ?? null,
         decidedAt: new Date(),
-        notes: dto.notes ?? null
+        notes: dto.notes ?? null,
       },
       update: {
         status: moderationStatus,
         reasons: dto.reasons ?? [],
         decidedBy: actorId ?? null,
         decidedAt: new Date(),
-        notes: dto.notes ?? null
-      }
+        notes: dto.notes ?? null,
+      },
     });
     return { ok: true };
   }
@@ -322,8 +351,8 @@ export class ReviewsService {
           guestId,
           ipHash,
           campgroundId: review.campgroundId,
-          value
-        }
+          value,
+        },
       });
       return vote;
     }
@@ -333,7 +362,7 @@ export class ReviewsService {
     if (existing) {
       return this.prisma.reviewVote.update({
         where: { id: existing.id },
-        data: { value, ipHash }
+        data: { value, ipHash },
       });
     }
     return this.prisma.reviewVote.create({
@@ -343,8 +372,8 @@ export class ReviewsService {
         guestId: null,
         ipHash,
         campgroundId: review.campgroundId,
-        value
-      }
+        value,
+      },
     });
   }
 
@@ -357,8 +386,8 @@ export class ReviewsService {
         reviewId: dto.reviewId,
         authorType: dto.authorType,
         authorId: dto.authorId ?? null,
-        body: dto.body
-      }
+        body: dto.body,
+      },
     });
   }
 }

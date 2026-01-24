@@ -60,24 +60,27 @@ const parseLoginResponse = (value: unknown): LoginResponse | null => {
 const isExtendedUser = (value: User): value is ExtendedUser =>
   isRecord(value) && typeof value.apiToken === "string";
 
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "user@example.com" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials): Promise<User | null> {
-        console.log("[auth] authorize called with credentials keys:", Object.keys(credentials || {}));
-        const email = typeof credentials?.email === "string" ? credentials.email.trim().toLowerCase() : "";
+        console.log(
+          "[auth] authorize called with credentials keys:",
+          Object.keys(credentials || {}),
+        );
+        const email =
+          typeof credentials?.email === "string" ? credentials.email.trim().toLowerCase() : "";
         const password = typeof credentials?.password === "string" ? credentials.password : "";
         if (!email || !password) {
           console.warn("[auth] missing credentials", {
             hasEmail: Boolean(email),
             hasPassword: Boolean(password),
-            apiBase: API_BASE
+            apiBase: API_BASE,
           });
           return null;
         }
@@ -87,10 +90,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             method: "POST",
             body: JSON.stringify({
               email,
-              password
+              password,
             }),
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            cache: "no-store"
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            cache: "no-store",
           });
 
           if (!res.ok) {
@@ -103,7 +106,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             console.warn("[auth] login failed", {
               status: res.status,
               apiBase: API_BASE,
-              body: bodyText?.slice(0, 500)
+              body: bodyText?.slice(0, 500),
             });
             return null;
           }
@@ -127,23 +130,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             name: `${data.firstName} ${data.lastName}`,
             apiToken: data.token,
             platformRole: data.platformRole,
-            campgrounds: data.campgrounds || []
+            campgrounds: data.campgrounds || [],
           };
           return user;
         } catch (error) {
           console.error("Auth error:", error, { apiBase: API_BASE });
           return null;
         }
-      }
-    })
+      },
+    }),
   ],
   pages: {
     signIn: "/auth/signin",
-    error: "/auth/error"
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
-    maxAge: 7 * 24 * 60 * 60 // 7 days
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -165,16 +168,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (typeof token.apiToken === "string") {
           Object.assign(session, {
             apiToken: token.apiToken,
-            campgrounds: token.campgrounds
+            campgrounds: token.campgrounds,
           });
         }
         if (typeof token.platformRole === "string") {
           Object.assign(session.user, {
-            platformRole: token.platformRole
+            platformRole: token.platformRole,
           });
         }
       }
       return session;
-    }
-  }
+    },
+  },
 });

@@ -29,7 +29,7 @@ export function useOnboardingHints() {
     (hintId: string): boolean => {
       return dismissedHints[hintId] === true;
     },
-    [dismissedHints]
+    [dismissedHints],
   );
 
   const dismissHint = useCallback(
@@ -38,7 +38,7 @@ export function useOnboardingHints() {
       setDismissedHints(updated);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     },
-    [dismissedHints]
+    [dismissedHints],
   );
 
   const resetHint = useCallback(
@@ -48,7 +48,7 @@ export function useOnboardingHints() {
       setDismissedHints(updated);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     },
-    [dismissedHints]
+    [dismissedHints],
   );
 
   const resetAllHints = useCallback(() => {
@@ -61,7 +61,7 @@ export function useOnboardingHints() {
     dismissHint,
     resetHint,
     resetAllHints,
-    isLoaded
+    isLoaded,
   };
 }
 
@@ -97,6 +97,6 @@ export function useOnboardingHint(hintId: string) {
     isVisible,
     isDismissed,
     dismiss,
-    reset
+    reset,
   };
 }

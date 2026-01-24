@@ -93,14 +93,12 @@ export default function PaymentsSettingsPage() {
 
   // Update Stripe settings mutation
   const updateStripeMutation = useMutation({
-    mutationFn: (payload: {
-      mode: "test" | "prod";
-      feeMode: "absorb" | "pass_through";
-    }) => apiClient.upsertPaymentGatewayConfig(campgroundId, {
-      gateway: "stripe",
-      mode: payload.mode,
-      feeMode: payload.feeMode,
-    }),
+    mutationFn: (payload: { mode: "test" | "prod"; feeMode: "absorb" | "pass_through" }) =>
+      apiClient.upsertPaymentGatewayConfig(campgroundId, {
+        gateway: "stripe",
+        mode: payload.mode,
+        feeMode: payload.feeMode,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["payment-gateway", campgroundId] });
       setStripeSaveSuccess(true);
@@ -118,9 +116,16 @@ export default function PaymentsSettingsPage() {
     try {
       await apiClient.refreshPaymentCapabilities(campgroundId);
       queryClient.invalidateQueries({ queryKey: ["payment-settings", campgroundId] });
-      toast({ title: "Capabilities refreshed", description: "Payment method status updated from Stripe." });
+      toast({
+        title: "Capabilities refreshed",
+        description: "Payment method status updated from Stripe.",
+      });
     } catch (err: unknown) {
-      toast({ title: "Refresh failed", description: getErrorMessage(err, "Refresh failed"), variant: "destructive" });
+      toast({
+        title: "Refresh failed",
+        description: getErrorMessage(err, "Refresh failed"),
+        variant: "destructive",
+      });
     } finally {
       setRefreshingCapabilities(false);
     }

@@ -14,12 +14,12 @@ Keepr is calm, trustworthy, human, and premium. We build software that feels lik
 
 ### Primary Colors
 
-| Name | Hex | HSL | Usage |
-|------|-----|-----|-------|
-| **Evergreen** | `#1F3D34` | `160 33% 18%` | Primary actions, brand emphasis, buttons |
-| **Warm Charcoal** | `#2F2F2C` | `60 3% 18%` | Body text, UI elements |
-| **Soft Clay** | `#C47A63` | `14 46% 58%` | Focus rings, accents (~5% of UI) |
-| **Off-White** | `#FAF7F2` | `38 50% 96%` | Background |
+| Name              | Hex       | HSL           | Usage                                    |
+| ----------------- | --------- | ------------- | ---------------------------------------- |
+| **Evergreen**     | `#1F3D34` | `160 33% 18%` | Primary actions, brand emphasis, buttons |
+| **Warm Charcoal** | `#2F2F2C` | `60 3% 18%`   | Body text, UI elements                   |
+| **Soft Clay**     | `#C47A63` | `14 46% 58%`  | Focus rings, accents (~5% of UI)         |
+| **Off-White**     | `#FAF7F2` | `38 50% 96%`  | Background                               |
 
 ### Color Ratios
 
@@ -44,12 +44,12 @@ Keepr is calm, trustworthy, human, and premium. We build software that feels lik
 
 ### Contrast Ratios (WCAG AA)
 
-| Combination | Ratio | Status |
-|-------------|-------|--------|
-| Evergreen on Off-White | ~8.5:1 | ✅ Pass |
-| Charcoal on Off-White | ~10:1 | ✅ Pass |
-| White on Evergreen | ~8.5:1 | ✅ Pass |
-| Clay on Off-White | ~3.2:1 | ⚠️ Large text/graphics only |
+| Combination            | Ratio  | Status                      |
+| ---------------------- | ------ | --------------------------- |
+| Evergreen on Off-White | ~8.5:1 | ✅ Pass                     |
+| Charcoal on Off-White  | ~10:1  | ✅ Pass                     |
+| White on Evergreen     | ~8.5:1 | ✅ Pass                     |
+| Clay on Off-White      | ~3.2:1 | ⚠️ Large text/graphics only |
 
 **Important**: Soft Clay should only be used for focus rings, decorative elements, and large text (18px+ or 14px+ bold). Never use it for body text.
 
@@ -59,21 +59,21 @@ Keepr is calm, trustworthy, human, and premium. We build software that feels lik
 
 ### Fonts
 
-| Purpose | Font | Weights | CSS Variable |
-|---------|------|---------|--------------|
+| Purpose   | Font    | Weights  | CSS Variable     |
+| --------- | ------- | -------- | ---------------- |
 | Headlines | DM Sans | 500, 700 | `--font-display` |
-| Body/UI | Inter | 400, 500 | `--font-body` |
+| Body/UI   | Inter   | 400, 500 | `--font-body`    |
 
 ### Type Scale
 
-| Element | Size | Font | Weight | Letter-spacing |
-|---------|------|------|--------|----------------|
-| H1 | 48-56px | DM Sans | 700 | -2.5% |
-| H2 | 32-40px | DM Sans | 500 | -2.5% |
-| H3 | 24-28px | DM Sans | 500 | -2.5% |
-| Body | 16-18px | Inter | 400 | normal |
-| UI Label | 14-15px | Inter | 500 | normal |
-| Button | 14-16px | Inter | 500 | normal |
+| Element  | Size    | Font    | Weight | Letter-spacing |
+| -------- | ------- | ------- | ------ | -------------- |
+| H1       | 48-56px | DM Sans | 700    | -2.5%          |
+| H2       | 32-40px | DM Sans | 500    | -2.5%          |
+| H3       | 24-28px | DM Sans | 500    | -2.5%          |
+| Body     | 16-18px | Inter   | 400    | normal         |
+| UI Label | 14-15px | Inter   | 500    | normal         |
+| Button   | 14-16px | Inter   | 500    | normal         |
 
 ### Typography Rules
 
@@ -134,10 +134,10 @@ All interactive elements use **Soft Clay** for focus rings:
 
 ### Border Radius
 
-| Element | Radius |
-|---------|--------|
-| Controls (buttons, inputs) | 8px (`rounded-md`) |
-| Cards | 12px (`rounded-xl`) |
+| Element                    | Radius              |
+| -------------------------- | ------------------- |
+| Controls (buttons, inputs) | 8px (`rounded-md`)  |
+| Cards                      | 12px (`rounded-xl`) |
 
 ---
 
@@ -178,16 +178,16 @@ All interactive elements use **Soft Clay** for focus rings:
 --keepr-off-white: 38 50% 96%;
 
 /* Semantic Tokens (mapped to Keepr palette) */
---background: 38 50% 96%;         /* Off-White */
---foreground: 60 3% 18%;          /* Charcoal */
---primary: 160 33% 18%;           /* Evergreen */
---accent: 14 46% 58%;             /* Clay */
---ring: 14 46% 58%;               /* Clay (focus) */
+--background: 38 50% 96%; /* Off-White */
+--foreground: 60 3% 18%; /* Charcoal */
+--primary: 160 33% 18%; /* Evergreen */
+--accent: 14 46% 58%; /* Clay */
+--ring: 14 46% 58%; /* Clay (focus) */
 
 /* Action Tokens */
---action-primary: 160 33% 18%;    /* Evergreen */
+--action-primary: 160 33% 18%; /* Evergreen */
 --action-primary-hover: 160 33% 25%;
---action-secondary: 38 30% 92%;   /* Warm light */
+--action-secondary: 38 30% 92%; /* Warm light */
 
 /* Typography */
 --font-display: "DM Sans", system-ui, sans-serif;
@@ -212,9 +212,7 @@ All interactive elements use **Soft Clay** for focus rings:
 
 ```tsx
 // Evergreen gradient for hero sections
-<div className="gradient-evergreen text-white">
-  Hero Content
-</div>
+<div className="gradient-evergreen text-white">Hero Content</div>
 ```
 
 ---
@@ -225,19 +223,20 @@ All interactive elements use **Soft Clay** for focus rings:
 
 If you see old emerald-based classes, update them:
 
-| Old | New |
-|-----|-----|
-| `bg-emerald-600` | `bg-action-primary` or `bg-keepr-evergreen` |
-| `text-emerald-600` | `text-primary` |
-| `ring-emerald-500` | `ring-ring` |
-| `.glow-emerald` | `.glow-clay` |
-| `.gradient-emerald` | `.gradient-evergreen` |
+| Old                 | New                                         |
+| ------------------- | ------------------------------------------- |
+| `bg-emerald-600`    | `bg-action-primary` or `bg-keepr-evergreen` |
+| `text-emerald-600`  | `text-primary`                              |
+| `ring-emerald-500`  | `ring-ring`                                 |
+| `.glow-emerald`     | `.glow-clay`                                |
+| `.gradient-emerald` | `.gradient-evergreen`                       |
 
 ---
 
 ## Questions?
 
 The brand system is defined in:
+
 - `/app/globals.css` - CSS variables and utilities
 - `/tailwind.config.ts` - Tailwind extensions
 - `/lib/fonts.ts` - Font configuration

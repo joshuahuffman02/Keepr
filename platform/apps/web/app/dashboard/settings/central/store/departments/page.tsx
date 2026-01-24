@@ -4,15 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Plus,
-  Folder,
-  Info,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Loader2,
-} from "lucide-react";
+import { Plus, Folder, Info, MoreHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,12 +42,13 @@ export default function DepartmentsPage() {
 
     const emptyCategories: ProductCategory[] = [];
     const emptyProducts: Product[] = [];
-    const categoriesPromise: Promise<ProductCategory[]> =
-      apiClient.getProductCategories(campgroundId).catch(() => emptyCategories);
-    const productsPromise: Promise<Product[]> =
-      apiClient.getProducts(campgroundId).catch(() => emptyProducts);
+    const categoriesPromise: Promise<ProductCategory[]> = apiClient
+      .getProductCategories(campgroundId)
+      .catch(() => emptyCategories);
+    const productsPromise: Promise<Product[]> = apiClient
+      .getProducts(campgroundId)
+      .catch(() => emptyProducts);
     Promise.all([categoriesPromise, productsPromise]).then(([categoryList, productList]) => {
-
       // Count products per category
       const productCounts: Record<string, number> = {};
       productList.forEach((product) => {
@@ -84,10 +77,7 @@ export default function DepartmentsPage() {
       label: "Department",
       render: (item: Department) => (
         <div className="flex items-center gap-3">
-          <div
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: item.color }}
-          />
+          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
           <span className="font-medium text-foreground">{item.name}</span>
         </div>
       ),
@@ -110,7 +100,7 @@ export default function DepartmentsPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted text-muted-foreground",
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -142,9 +132,7 @@ export default function DepartmentsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Departments</h2>
-          <p className="text-muted-foreground mt-1">
-            Organize your store products into categories
-          </p>
+          <p className="text-muted-foreground mt-1">Organize your store products into categories</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -155,8 +143,8 @@ export default function DepartmentsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Departments help organize products in your POS system and provide
-          better reporting by category.
+          Departments help organize products in your POS system and provide better reporting by
+          category.
         </AlertDescription>
       </Alert>
 
@@ -180,9 +168,7 @@ export default function DepartmentsPage() {
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                {item.isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
+              <DropdownMenuItem>{item.isActive ? "Deactivate" : "Activate"}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />

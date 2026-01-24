@@ -9,47 +9,40 @@
 
 export type PaymentMethodType =
   // Card payments
-  | "card"           // New card via Stripe Elements
-  | "saved_card"     // Charge card on file
-  | "terminal"       // Stripe Terminal (card present)
+  | "card" // New card via Stripe Elements
+  | "saved_card" // Charge card on file
+  | "terminal" // Stripe Terminal (card present)
   // Digital wallets
-  | "apple_pay"      // Apple Pay via PaymentRequest API
-  | "google_pay"     // Google Pay via PaymentRequest API
-  | "link"           // Stripe Link 1-click
+  | "apple_pay" // Apple Pay via PaymentRequest API
+  | "google_pay" // Google Pay via PaymentRequest API
+  | "link" // Stripe Link 1-click
   // Bank
-  | "ach"            // US bank transfer
+  | "ach" // US bank transfer
   // Manual
-  | "cash"           // Cash payment
-  | "check"          // Check payment
+  | "cash" // Cash payment
+  | "check" // Check payment
   // Account-based
-  | "guest_wallet"   // Guest stored credit
-  | "folio"          // Charge to site/room
-  | "gift_card"      // Campground-issued gift card
+  | "guest_wallet" // Guest stored credit
+  | "folio" // Charge to site/room
+  | "gift_card" // Campground-issued gift card
   // Special
-  | "deposit_hold"   // Auth hold without capture
-  | "external_pos";  // Square, Clover, etc.
+  | "deposit_hold" // Auth hold without capture
+  | "external_pos"; // Square, Clover, etc.
 
-export type CardBrand =
-  | "visa"
-  | "mastercard"
-  | "amex"
-  | "discover"
-  | "diners"
-  | "jcb"
-  | "unionpay";
+export type CardBrand = "visa" | "mastercard" | "amex" | "discover" | "diners" | "jcb" | "unionpay";
 
 // ============================================================================
 // PAYMENT CONTEXTS
 // ============================================================================
 
 export type PaymentContext =
-  | "public_booking"  // Guest booking online (web/mobile)
-  | "portal"          // Guest portal purchases
-  | "kiosk"           // Self-service kiosk
-  | "staff_checkin"   // Staff check-in desk
-  | "staff_booking"   // Staff creating booking for guest
-  | "pos"             // Point of sale / store
-  | "seasonal";       // Seasonal contract payments
+  | "public_booking" // Guest booking online (web/mobile)
+  | "portal" // Guest portal purchases
+  | "kiosk" // Self-service kiosk
+  | "staff_checkin" // Staff check-in desk
+  | "staff_booking" // Staff creating booking for guest
+  | "pos" // Point of sale / store
+  | "seasonal"; // Seasonal contract payments
 
 // ============================================================================
 // PAYMENT SUBJECT - What we're paying for
@@ -101,12 +94,12 @@ export interface PaymentConfig {
   // Fee handling (CC processing fees)
   feeMode: "absorb" | "pass_through";
   feePercentBasisPoints: number; // e.g., 290 = 2.9%
-  feeFlatCents: number;          // e.g., 30 = $0.30
+  feeFlatCents: number; // e.g., 30 = $0.30
   showFeeBreakdown: boolean;
 
   // Platform fee (Campreserv's per-booking fee based on billing plan)
   billingPlan: "ota_only" | "standard" | "enterprise";
-  perBookingFeeCents: number;    // Platform fee per reservation (e.g., 300 = $3.00)
+  perBookingFeeCents: number; // Platform fee per reservation (e.g., 300 = $3.00)
   platformFeeMode: "absorb" | "pass_through"; // Who pays the platform fee
 }
 
@@ -255,12 +248,12 @@ export interface PaymentCollectionModalProps {
   guestName?: string;
 
   // Features
-  enableSplitTender?: boolean;      // Default: true for staff contexts
-  enablePromoCode?: boolean;        // Default: true
-  enableCharityRoundUp?: boolean;   // Default: true
-  enablePartialPayment?: boolean;   // Default: false
-  enableSaveCard?: boolean;         // Default: true
-  enableDepositHold?: boolean;      // Default: false
+  enableSplitTender?: boolean; // Default: true for staff contexts
+  enablePromoCode?: boolean; // Default: true
+  enableCharityRoundUp?: boolean; // Default: true
+  enablePartialPayment?: boolean; // Default: false
+  enableSaveCard?: boolean; // Default: true
+  enableDepositHold?: boolean; // Default: false
 
   // Terminal
   terminalLocationId?: string;
@@ -275,7 +268,7 @@ export interface PaymentCollectionModalProps {
   onPartialPayment?: (paidCents: number, remainingCents: number) => void;
 
   // Check-in/out integration (optional)
-  onCheckInOut?: () => void;           // Called when user clicks check-in/out button
+  onCheckInOut?: () => void; // Called when user clicks check-in/out button
   checkInOutLabel?: "Check In" | "Check Out"; // Label for the button
 }
 
@@ -328,7 +321,9 @@ export interface PaymentContextActions {
   selectMethod: (method: PaymentMethodType | null) => void;
 
   // Split tender (status defaults to "completed" if not provided)
-  addTenderEntry: (entry: Omit<TenderEntry, "id" | "status"> & { status?: TenderEntry["status"] }) => void;
+  addTenderEntry: (
+    entry: Omit<TenderEntry, "id" | "status"> & { status?: TenderEntry["status"] },
+  ) => void;
   removeTenderEntry: (id: string) => void;
   clearTenderEntries: () => void;
 
@@ -380,7 +375,15 @@ export const PAYMENT_METHOD_INFO: Record<PaymentMethodType, PaymentMethodInfo> =
     requiresOnline: true,
     supportsPartial: true,
     supportsSplitTender: true,
-    contexts: ["public_booking", "portal", "kiosk", "staff_checkin", "staff_booking", "pos", "seasonal"],
+    contexts: [
+      "public_booking",
+      "portal",
+      "kiosk",
+      "staff_checkin",
+      "staff_booking",
+      "pos",
+      "seasonal",
+    ],
   },
   saved_card: {
     type: "saved_card",
@@ -548,7 +551,7 @@ export function getAvailablePaymentMethods(
     hasWalletBalance: boolean;
     hasTerminalReaders: boolean;
     isReservationPayment?: boolean; // Disable folio when paying reservation balance
-  }
+  },
 ): PaymentMethodType[] {
   const available: PaymentMethodType[] = [];
 
@@ -566,9 +569,21 @@ export function getAvailablePaymentMethods(
 
     // Check config toggles
     if (method === "card" && !config.enableCardPayments) continue;
-    if (method === "apple_pay" && (!config.enableApplePay || config.stripeCapabilities.apple_pay !== "active")) continue;
-    if (method === "google_pay" && (!config.enableGooglePay || config.stripeCapabilities.google_pay !== "active")) continue;
-    if (method === "ach" && (!config.enableACH || config.stripeCapabilities.us_bank_account_ach_payments !== "active")) continue;
+    if (
+      method === "apple_pay" &&
+      (!config.enableApplePay || config.stripeCapabilities.apple_pay !== "active")
+    )
+      continue;
+    if (
+      method === "google_pay" &&
+      (!config.enableGooglePay || config.stripeCapabilities.google_pay !== "active")
+    )
+      continue;
+    if (
+      method === "ach" &&
+      (!config.enableACH || config.stripeCapabilities.us_bank_account_ach_payments !== "active")
+    )
+      continue;
     if (method === "cash" && !config.enableCash) continue;
     if (method === "check" && !config.enableCheck) continue;
     if (method === "folio" && !config.enableFolio) continue;
@@ -597,7 +612,7 @@ export function getAvailablePaymentMethods(
 export function calculateProcessingFee(
   config: PaymentConfig,
   method: PaymentMethodType,
-  amountCents: number
+  amountCents: number,
 ): number {
   if (config.feeMode === "absorb") return 0;
 

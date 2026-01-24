@@ -31,6 +31,7 @@ wrangler secret delete SECRET_KEY
 ```
 
 `.dev.vars` (gitignored):
+
 ```
 SECRET_KEY=local-dev-key
 ```
@@ -110,7 +111,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const value = await env.MY_KV.get("key");
     return Response.json({ value });
-  }
+  },
 } satisfies ExportedHandler<Env>;
 ```
 
@@ -131,14 +132,11 @@ export default {
 const cached = await env.CACHE.get("key", { cacheTtl: 3600 });
 
 // Batch DB
-await env.DB.batch([
-  env.DB.prepare("SELECT * FROM users"),
-  env.DB.prepare("SELECT * FROM posts")
-]);
+await env.DB.batch([env.DB.prepare("SELECT * FROM users"), env.DB.prepare("SELECT * FROM posts")]);
 
 // Edge caching
 return new Response(data, {
-  headers: { "Cache-Control": "public, max-age=3600" }
+  headers: { "Cache-Control": "public, max-age=3600" },
 });
 ```
 

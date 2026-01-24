@@ -45,6 +45,7 @@ Focus on:
 ## What to NEVER Do
 
 NEVER use generic AI-generated aesthetics like:
+
 - Overused font families (Inter, Roboto, Arial, system fonts)
 - Cliched color schemes (particularly purple gradients on white backgrounds)
 - Predictable layouts and component patterns
@@ -55,6 +56,7 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 ## Implementation Complexity
 
 **IMPORTANT**: Match implementation complexity to the aesthetic vision:
+
 - Maximalist designs need elaborate code with extensive animations and effects
 - Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details
 - Elegance comes from executing the vision well

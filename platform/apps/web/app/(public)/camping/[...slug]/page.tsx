@@ -1,14 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import {
-  MapPin,
-  Star,
-  Tent,
-  Mountain,
-  Filter,
-  ChevronRight,
-} from "lucide-react";
+import { MapPin, Star, Tent, Mountain, Filter, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getServerApiUrl } from "@/lib/api-base";
 
@@ -104,11 +97,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LocationPage({
-  params,
-}: {
-  params: Promise<{ slug: string[] }>;
-}) {
+export default async function LocationPage({ params }: { params: Promise<{ slug: string[] }> }) {
   const { slug } = await params;
   const location = await getLocation(slug);
 
@@ -241,9 +230,7 @@ export default async function LocationPage({
                         className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                       >
                         <span className="text-slate-700">{child.name}</span>
-                        <span className="text-sm text-slate-500">
-                          {child.campgroundCount}
-                        </span>
+                        <span className="text-sm text-slate-500">{child.campgroundCount}</span>
                       </Link>
                     ))}
                   </div>
@@ -258,9 +245,7 @@ export default async function LocationPage({
               {/* Nearby Attractions */}
               {(location.nearbyAttractions || []).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">
-                    Nearby Attractions
-                  </h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Nearby Attractions</h3>
                   <div className="space-y-2">
                     {(location.nearbyAttractions || []).slice(0, 5).map((attraction) => (
                       <Link
@@ -270,9 +255,7 @@ export default async function LocationPage({
                       >
                         <Mountain className="h-5 w-5 text-emerald-600" />
                         <div className="flex-1 min-w-0">
-                          <div className="text-slate-700 truncate">
-                            {attraction.name}
-                          </div>
+                          <div className="text-slate-700 truncate">{attraction.name}</div>
                           <div className="text-xs text-slate-500">
                             {attraction.nearbyCampgroundCount} campgrounds nearby
                           </div>
@@ -286,9 +269,7 @@ export default async function LocationPage({
               {/* Popular Amenities */}
               {(location.popularAmenities || []).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">
-                    Popular Amenities
-                  </h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Popular Amenities</h3>
                   <div className="flex flex-wrap gap-2">
                     {(location.popularAmenities || []).map((amenity) => (
                       <span
@@ -356,9 +337,7 @@ export default async function LocationPage({
                       {(campground.city || campground.state) && (
                         <p className="flex items-center gap-1 text-sm text-slate-500 mb-3">
                           <MapPin className="h-4 w-4" />
-                          {[campground.city, campground.state]
-                            .filter(Boolean)
-                            .join(", ")}
+                          {[campground.city, campground.state].filter(Boolean).join(", ")}
                         </p>
                       )}
 
@@ -437,15 +416,10 @@ export default async function LocationPage({
       {(location.highlights || []).length > 0 && (
         <section className="py-16 bg-slate-50">
           <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">
-              Why Camp in {location.name}?
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Why Camp in {location.name}?</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(location.highlights || []).map((highlight, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl p-6 border border-slate-200"
-                >
+                <div key={index} className="bg-white rounded-xl p-6 border border-slate-200">
                   <p className="text-slate-700">{highlight}</p>
                 </div>
               ))}
@@ -457,16 +431,13 @@ export default async function LocationPage({
       {/* SEO Content */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">
-            Camping Guide: {location.name}
-          </h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Camping Guide: {location.name}</h2>
           <div className="prose prose-slate max-w-none">
             <p>
-              {location.name} offers {location.campgroundCount} campgrounds and RV
-              parks for outdoor enthusiasts. Whether you're looking for a rustic tent
-              camping experience or a full-service RV resort,{" "}
-              {location.type === "state" ? "the state" : "the area"} has options for
-              every camping style.
+              {location.name} offers {location.campgroundCount} campgrounds and RV parks for outdoor
+              enthusiasts. Whether you're looking for a rustic tent camping experience or a
+              full-service RV resort, {location.type === "state" ? "the state" : "the area"} has
+              options for every camping style.
             </p>
 
             {(location.popularAmenities || []).length > 0 && (
@@ -474,9 +445,8 @@ export default async function LocationPage({
                 <h3>Popular Amenities</h3>
                 <p>
                   Campgrounds in {location.name} commonly offer{" "}
-                  {(location.popularAmenities || []).slice(0, 5).join(", ")}. Many facilities
-                  cater to both tent campers and RV travelers with various hookup
-                  options.
+                  {(location.popularAmenities || []).slice(0, 5).join(", ")}. Many facilities cater
+                  to both tent campers and RV travelers with various hookup options.
                 </p>
               </>
             )}
@@ -490,8 +460,8 @@ export default async function LocationPage({
                     .slice(0, 3)
                     .map((a) => a.name)
                     .join(", ")}
-                  . The region offers excellent opportunities for hiking, fishing, and
-                  wildlife viewing.
+                  . The region offers excellent opportunities for hiking, fishing, and wildlife
+                  viewing.
                 </p>
               </>
             )}

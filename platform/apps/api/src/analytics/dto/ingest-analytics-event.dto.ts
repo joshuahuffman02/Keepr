@@ -82,4 +82,3 @@ export class IngestAnalyticsEventDto {
   @IsObject()
   metadata?: Record<string, unknown>;
 }
-

@@ -26,10 +26,16 @@ const targetFiles = walk(root);
 for (const filePath of targetFiles) {
   const content = fs.readFileSync(filePath, "utf8");
   if (!/\bRequest\b/.test(content)) continue;
-  if (/from ["']express["']/.test(content) && /Request\b/.test(content.match(/from ["']express["'][^\n]*\n?/g)?.join("") || "")) {
+  if (
+    /from ["']express["']/.test(content) &&
+    /Request\b/.test(content.match(/from ["']express["'][^\n]*\n?/g)?.join("") || "")
+  ) {
     continue;
   }
-  if (content.includes('import type { Request } from "express";') || content.includes("import type { Request } from 'express';")) {
+  if (
+    content.includes('import type { Request } from "express";') ||
+    content.includes("import type { Request } from 'express';")
+  ) {
     continue;
   }
 

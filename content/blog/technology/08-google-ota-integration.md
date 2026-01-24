@@ -17,18 +17,21 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 ## Key Channels
 
 ### Google
+
 - Google Business Profile
 - Google Hotels/Vacation Rentals
 - Google Maps visibility
 - Free to list, highest visibility
 
 ### Outdoor-Focused OTAs
+
 - Hipcamp
 - Recreation.gov
 - The Dyrt
 - Campendium
 
 ### General Travel OTAs
+
 - Booking.com
 - Airbnb (for cabins/glamping)
 
@@ -37,11 +40,13 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 ## Integration Benefits
 
 ### Expanded Reach
+
 - Access new audiences
 - Appear in more searches
 - Reach travelers you wouldn't otherwise
 
 ### Synchronized Availability
+
 - Real-time calendar sync
 - No double-booking risk
 - One source of truth
@@ -51,18 +56,22 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 ## Integration Challenges
 
 ### Commission Costs
+
 - OTAs typically take 10-20%
 - Factor into pricing strategy
 
 ### Calendar Sync
+
 - Must update in real-time
 - Delays cause double-bookings
 
 ### Rate Parity
+
 - Some OTAs require matching rates
 - Limits pricing flexibility
 
 ### Guest Communication
+
 - Different systems, different processes
 - May lose direct contact
 
@@ -71,16 +80,19 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 ## Integration Approaches
 
 ### Direct Integration
+
 - Your software connects to OTA
 - Automatic availability sync
 - Best option when available
 
 ### iCal Sync
+
 - Calendar feed between systems
 - Simple but may have delays
 - Better than manual
 
 ### Manual Management
+
 - Update each channel separately
 - Error-prone and time-consuming
 - Avoid if possible
@@ -106,4 +118,4 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 
 ---
 
-*Keepr integrates with major booking channels to keep availability synchronized. [Expand your reach at campreserv.com](https://campreserv.com)*
+_Keepr integrates with major booking channels to keep availability synchronized. [Expand your reach at campreserv.com](https://campreserv.com)_

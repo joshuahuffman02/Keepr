@@ -60,7 +60,7 @@ abstract class BasePosProviderAdapter implements PosProviderAdapter {
     const hasCredentials = Boolean(config.credentials && Object.keys(config.credentials).length);
     return {
       ok: hasCredentials,
-      message: hasCredentials ? "Credentials present (stubbed validation)" : "Missing credentials"
+      message: hasCredentials ? "Credentials present (stubbed validation)" : "Missing credentials",
     };
   }
 
@@ -74,7 +74,10 @@ abstract class BasePosProviderAdapter implements PosProviderAdapter {
     return { started: true, target: PosSyncTarget.tenders, status: PosSyncStatus.running };
   }
 
-  async processPayment(config: IntegrationRecord, request: ProviderPaymentRequest): Promise<ProviderPaymentResult | null> {
+  async processPayment(
+    config: IntegrationRecord,
+    request: ProviderPaymentRequest,
+  ): Promise<ProviderPaymentResult | null> {
     // This base implementation is a stub. Each POS provider adapter (Clover, Square, Toast, etc.)
     // should override this method to implement actual payment processing through their API.
     //
@@ -87,19 +90,19 @@ abstract class BasePosProviderAdapter implements PosProviderAdapter {
 
     this.logger.warn(
       `Payment processing not implemented for ${config.provider}. ` +
-      `Provider adapters must override processPayment() to handle real payments.`
+        `Provider adapters must override processPayment() to handle real payments.`,
     );
 
     return {
       status: "failed",
       processorIds: {
         provider: config.provider,
-        idempotencyKey: request.idempotencyKey
+        idempotencyKey: request.idempotencyKey,
       },
       raw: {
         error: "Payment processing not implemented for this provider",
-        note: "This is a stub implementation. Provider-specific adapters must override processPayment()."
-      }
+        note: "This is a stub implementation. Provider-specific adapters must override processPayment().",
+      },
     };
   }
 
@@ -109,7 +112,11 @@ abstract class BasePosProviderAdapter implements PosProviderAdapter {
     return digest === input.signature;
   }
 
-  async handlePaymentWebhook(input: { integration: IntegrationRecord; body: unknown; headers?: Record<string, unknown> }): Promise<ProviderWebhookResult> {
+  async handlePaymentWebhook(input: {
+    integration: IntegrationRecord;
+    body: unknown;
+    headers?: Record<string, unknown>;
+  }): Promise<ProviderWebhookResult> {
     this.logger.debug(`Webhook received for ${input.integration.provider}`);
     return { acknowledged: true, message: "stubbed_webhook_handler" };
   }
@@ -162,7 +169,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
             Authorization: `Bearer ${accessToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -195,7 +202,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
             Authorization: `Bearer ${accessToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -252,7 +259,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
             Authorization: `Bearer ${accessToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -273,7 +280,8 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
         const lines = toRecordArray(saleLinesRecord.SaleLine);
         const paymentRecord = isRecord(sale.SalePayments) ? sale.SalePayments : {};
         const payment = toRecordArray(paymentRecord.SalePayment)[0];
-        const paymentTypeRecord = payment && isRecord(payment.PaymentType) ? payment.PaymentType : {};
+        const paymentTypeRecord =
+          payment && isRecord(payment.PaymentType) ? payment.PaymentType : {};
         const saleTypeRecord = isRecord(sale.SaleType) ? sale.SaleType : {};
         const totalCents = Math.round((toNumberValue(sale.calcTotal) ?? 0) * 100);
 
@@ -309,7 +317,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
 
   async pushInventoryUpdate(
     config: IntegrationRecord,
-    update: ExternalInventoryUpdate
+    update: ExternalInventoryUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const accountId = toStringValue(config.credentials.accountId);
@@ -326,7 +334,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
             Authorization: `Bearer ${accessToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!itemResponse.ok) {
@@ -338,7 +346,8 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
       const itemInfo = isRecord(itemRecord.Item) ? itemRecord.Item : {};
       const itemShops = isRecord(itemInfo.ItemShops) ? itemInfo.ItemShops : {};
       const shopEntry = toRecordArray(itemShops.ItemShop)[0];
-      const shopId = update.externalLocationId || (shopEntry ? toStringValue(shopEntry.shopID) : undefined);
+      const shopId =
+        update.externalLocationId || (shopEntry ? toStringValue(shopEntry.shopID) : undefined);
 
       if (!shopId) {
         return { success: false, error: "Could not determine shop location" };
@@ -356,13 +365,15 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
           },
           body: JSON.stringify({
             ItemShops: {
-              ItemShop: [{
-                shopID: shopId,
-                qoh: update.qtyOnHand,
-              }],
+              ItemShop: [
+                {
+                  shopID: shopId,
+                  qoh: update.qtyOnHand,
+                },
+              ],
             },
           }),
-        }
+        },
       );
 
       if (updateResponse.ok) {
@@ -378,7 +389,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
 
   async pushPriceUpdate(
     config: IntegrationRecord,
-    update: ExternalPriceUpdate
+    update: ExternalPriceUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const accountId = toStringValue(config.credentials.accountId);
@@ -398,13 +409,15 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
           },
           body: JSON.stringify({
             Prices: {
-              ItemPrice: [{
-                amount: (update.priceCents / 100).toFixed(2),
-                useType: "Default",
-              }],
+              ItemPrice: [
+                {
+                  amount: (update.priceCents / 100).toFixed(2),
+                  useType: "Default",
+                },
+              ],
             },
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -420,7 +433,7 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
 
   async pushProduct(
     config: IntegrationRecord,
-    product: ExternalProductPush
+    product: ExternalProductPush,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const accountId = toStringValue(config.credentials.accountId);
@@ -446,10 +459,12 @@ export class LightspeedAdapter extends BasePosProviderAdapter {
           customSku: product.sku,
           upc: product.barcode,
           Prices: {
-            ItemPrice: [{
-              amount: (product.priceCents / 100).toFixed(2),
-              useType: "Default",
-            }],
+            ItemPrice: [
+              {
+                amount: (product.priceCents / 100).toFixed(2),
+                useType: "Default",
+              },
+            ],
           },
         }),
       });
@@ -530,7 +545,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
             "X-Shopify-Access-Token": accessToken,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -545,16 +560,18 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
 
       for (const product of productRecords) {
         const variants = toRecordArray(product.variants);
-        const productTitle = toStringValue(product.title) ?? toStringValue(product.id) ?? "Untitled product";
+        const productTitle =
+          toStringValue(product.title) ?? toStringValue(product.id) ?? "Untitled product";
         const productType = toStringValue(product.product_type) ?? null;
 
         for (const variant of variants) {
           const variantId = toStringValue(variant.id);
           if (!variantId) continue;
           const variantTitle = toStringValue(variant.title);
-          const name = variants.length > 1 && variantTitle
-            ? `${productTitle} - ${variantTitle}`
-            : productTitle;
+          const name =
+            variants.length > 1 && variantTitle
+              ? `${productTitle} - ${variantTitle}`
+              : productTitle;
           const priceCents = Math.round((toNumberValue(variant.price) ?? 0) * 100);
 
           products.push({
@@ -593,7 +610,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
             "X-Shopify-Access-Token": accessToken,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -613,7 +630,9 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
           if (!orderId || !createdAt) return [];
 
           const lineItems = toRecordArray(order.line_items);
-          const paymentGateways = Array.isArray(order.payment_gateway_names) ? order.payment_gateway_names : [];
+          const paymentGateways = Array.isArray(order.payment_gateway_names)
+            ? order.payment_gateway_names
+            : [];
           const paymentMethod = toStringValue(paymentGateways[0]) ?? null;
 
           return [
@@ -628,7 +647,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
                 const discountAllocations = toRecordArray(item.discount_allocations);
                 const discountTotal = discountAllocations.reduce(
                   (sum, allocation) => sum + (toNumberValue(allocation.amount) ?? 0),
-                  0
+                  0,
                 );
                 return [
                   {
@@ -654,7 +673,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
 
   async pushInventoryUpdate(
     config: IntegrationRecord,
-    update: ExternalInventoryUpdate
+    update: ExternalInventoryUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const shopDomain = toStringValue(config.credentials.shopDomain);
@@ -672,7 +691,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
             "X-Shopify-Access-Token": accessToken,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!variantResponse.ok) {
@@ -708,7 +727,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
             inventory_item_id: inventoryItemId,
             available: update.qtyOnHand,
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -724,7 +743,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
 
   async pushPriceUpdate(
     config: IntegrationRecord,
-    update: ExternalPriceUpdate
+    update: ExternalPriceUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const shopDomain = toStringValue(config.credentials.shopDomain);
@@ -755,7 +774,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
             Accept: "application/json",
           },
           body: JSON.stringify(body),
-        }
+        },
       );
 
       if (response.ok) {
@@ -771,7 +790,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
 
   async pushProduct(
     config: IntegrationRecord,
-    product: ExternalProductPush
+    product: ExternalProductPush,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const shopDomain = toStringValue(config.credentials.shopDomain);
@@ -799,7 +818,7 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
                 price: (product.priceCents / 100).toFixed(2),
               },
             }),
-          }
+          },
         );
 
         if (response.ok) {
@@ -810,42 +829,41 @@ export class ShopifyPosAdapter extends BasePosProviderAdapter {
       }
 
       // Create new product
-      const response = await fetch(
-        `https://${shopDomain}/admin/api/2024-01/products.json`,
-        {
-          method: "POST",
-          headers: {
-            "X-Shopify-Access-Token": accessToken,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            product: {
-              title: product.name,
-              product_type: product.category,
-              variants: [{
+      const response = await fetch(`https://${shopDomain}/admin/api/2024-01/products.json`, {
+        method: "POST",
+        headers: {
+          "X-Shopify-Access-Token": accessToken,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          product: {
+            title: product.name,
+            product_type: product.category,
+            variants: [
+              {
                 sku: product.sku,
                 barcode: product.barcode,
                 price: (product.priceCents / 100).toFixed(2),
                 inventory_management: "shopify",
-              }],
-            },
-          }),
-        }
-      );
+              },
+            ],
+          },
+        }),
+      });
 
-        if (response.ok) {
-          const data: unknown = await response.json();
-          const dataRecord = isRecord(data) ? data : {};
-          const productRecord = isRecord(dataRecord.product) ? dataRecord.product : {};
-          const variants = toRecordArray(productRecord.variants);
-          const variantId = variants[0] ? toStringValue(variants[0].id) : undefined;
-          return {
-            success: true,
-            externalId: variantId?.toString() || null,
-            message: "Product created",
-          };
-        }
+      if (response.ok) {
+        const data: unknown = await response.json();
+        const dataRecord = isRecord(data) ? data : {};
+        const productRecord = isRecord(dataRecord.product) ? dataRecord.product : {};
+        const variants = toRecordArray(productRecord.variants);
+        const variantId = variants[0] ? toStringValue(variants[0].id) : undefined;
+        return {
+          success: true,
+          externalId: variantId?.toString() || null,
+          message: "Product created",
+        };
+      }
 
       const errorText = await response.text();
       return { success: false, error: errorText };
@@ -918,7 +936,7 @@ export class VendAdapter extends BasePosProviderAdapter {
               Authorization: `Bearer ${accessToken}`,
               Accept: "application/json",
             },
-          }
+          },
         );
 
         if (!response.ok) break;
@@ -977,7 +995,7 @@ export class VendAdapter extends BasePosProviderAdapter {
             Authorization: `Bearer ${accessToken}`,
             Accept: "application/json",
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -1028,7 +1046,7 @@ export class VendAdapter extends BasePosProviderAdapter {
 
   async pushInventoryUpdate(
     config: IntegrationRecord,
-    update: ExternalInventoryUpdate
+    update: ExternalInventoryUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const domainPrefix = toStringValue(config.credentials.domainPrefix);
@@ -1038,36 +1056,40 @@ export class VendAdapter extends BasePosProviderAdapter {
 
     try {
       // Vend requires knowing the outlet_id
-      const outletId = update.externalLocationId || toStringValue(config.credentials.defaultOutletId);
+      const outletId =
+        update.externalLocationId || toStringValue(config.credentials.defaultOutletId);
       if (!outletId) {
         return { success: false, error: "No outlet ID specified" };
       }
 
-      const response = await fetch(
-        `https://${domainPrefix}.vendhq.com/api/2.0/consignments`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            outlet_id: outletId,
-            type: "STOCKTAKE",
-            status: "STOCKTAKE_COMPLETE",
-            consignment_date: new Date().toISOString(),
-            name: `Inventory Update - ${new Date().toISOString()}`,
-            products: [{
+      const response = await fetch(`https://${domainPrefix}.vendhq.com/api/2.0/consignments`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          outlet_id: outletId,
+          type: "STOCKTAKE",
+          status: "STOCKTAKE_COMPLETE",
+          consignment_date: new Date().toISOString(),
+          name: `Inventory Update - ${new Date().toISOString()}`,
+          products: [
+            {
               product_id: update.externalId,
               count: update.qtyOnHand,
-            }],
-          }),
-        }
-      );
+            },
+          ],
+        }),
+      });
 
       if (response.ok) {
-        return { success: true, externalId: update.externalId, message: "Inventory updated via stocktake" };
+        return {
+          success: true,
+          externalId: update.externalId,
+          message: "Inventory updated via stocktake",
+        };
       }
 
       const errorText = await response.text();
@@ -1079,7 +1101,7 @@ export class VendAdapter extends BasePosProviderAdapter {
 
   async pushPriceUpdate(
     config: IntegrationRecord,
-    update: ExternalPriceUpdate
+    update: ExternalPriceUpdate,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const domainPrefix = toStringValue(config.credentials.domainPrefix);
@@ -1100,7 +1122,7 @@ export class VendAdapter extends BasePosProviderAdapter {
           body: JSON.stringify({
             price_including_tax: update.priceCents / 100,
           }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -1116,7 +1138,7 @@ export class VendAdapter extends BasePosProviderAdapter {
 
   async pushProduct(
     config: IntegrationRecord,
-    product: ExternalProductPush
+    product: ExternalProductPush,
   ): Promise<ExternalSyncResult> {
     const accessToken = toStringValue(config.credentials.accessToken);
     const domainPrefix = toStringValue(config.credentials.domainPrefix);

@@ -1,8 +1,8 @@
-import { Module, Global } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { PaymentProcessorClient } from './payment-processor.client';
-import { AvailabilityClient } from './availability.client';
-import { AuthServiceClient } from './auth-service.client';
+import { Module, Global } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
+import { PaymentProcessorClient } from "./payment-processor.client";
+import { AvailabilityClient } from "./availability.client";
+import { AuthServiceClient } from "./auth-service.client";
 
 /**
  * Module providing clients to Rust microservices.

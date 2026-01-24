@@ -13,17 +13,57 @@ import type { AdaCertificationLevel } from "../../lib/ada-accessibility";
 // Region-based icons for state detection
 // Map state abbreviations to URL slugs
 const stateToSlug: Record<string, string> = {
-  AL: "alabama", AK: "alaska", AZ: "arizona", AR: "arkansas", CA: "california",
-  CO: "colorado", CT: "connecticut", DE: "delaware", FL: "florida", GA: "georgia",
-  HI: "hawaii", ID: "idaho", IL: "illinois", IN: "indiana", IA: "iowa",
-  KS: "kansas", KY: "kentucky", LA: "louisiana", ME: "maine", MD: "maryland",
-  MA: "massachusetts", MI: "michigan", MN: "minnesota", MS: "mississippi", MO: "missouri",
-  MT: "montana", NE: "nebraska", NV: "nevada", NH: "new-hampshire", NJ: "new-jersey",
-  NM: "new-mexico", NY: "new-york", NC: "north-carolina", ND: "north-dakota", OH: "ohio",
-  OK: "oklahoma", OR: "oregon", PA: "pennsylvania", RI: "rhode-island", SC: "south-carolina",
-  SD: "south-dakota", TN: "tennessee", TX: "texas", UT: "utah", VT: "vermont",
-  VA: "virginia", WA: "washington", WV: "west-virginia", WI: "wisconsin", WY: "wyoming",
-  DC: "washington-dc"
+  AL: "alabama",
+  AK: "alaska",
+  AZ: "arizona",
+  AR: "arkansas",
+  CA: "california",
+  CO: "colorado",
+  CT: "connecticut",
+  DE: "delaware",
+  FL: "florida",
+  GA: "georgia",
+  HI: "hawaii",
+  ID: "idaho",
+  IL: "illinois",
+  IN: "indiana",
+  IA: "iowa",
+  KS: "kansas",
+  KY: "kentucky",
+  LA: "louisiana",
+  ME: "maine",
+  MD: "maryland",
+  MA: "massachusetts",
+  MI: "michigan",
+  MN: "minnesota",
+  MS: "mississippi",
+  MO: "missouri",
+  MT: "montana",
+  NE: "nebraska",
+  NV: "nevada",
+  NH: "new-hampshire",
+  NJ: "new-jersey",
+  NM: "new-mexico",
+  NY: "new-york",
+  NC: "north-carolina",
+  ND: "north-dakota",
+  OH: "ohio",
+  OK: "oklahoma",
+  OR: "oregon",
+  PA: "pennsylvania",
+  RI: "rhode-island",
+  SC: "south-carolina",
+  SD: "south-dakota",
+  TN: "tennessee",
+  TX: "texas",
+  UT: "utah",
+  VT: "vermont",
+  VA: "virginia",
+  WA: "washington",
+  WV: "west-virginia",
+  WI: "wisconsin",
+  WY: "wyoming",
+  DC: "washington-dc",
 };
 
 // Region-based icons for state detection
@@ -69,20 +109,20 @@ const regionIcons: Record<string, string> = {
 const easeOut: "easeOut" = "easeOut";
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
 };
 
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.08, delayChildren: 0.1 }
-  }
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
 };
 
 const cardVariant = {
   hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } }
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
 };
 
 type NpsBadgeType = "world-class" | "top-campground" | "top-1" | "top-5" | "top-10" | "rising-star";
@@ -131,7 +171,7 @@ function HorizontalScrollSection({
   campgrounds,
   viewAllHref,
   viewAllLabel = "See all",
-  prefersReducedMotion
+  prefersReducedMotion,
 }: SectionProps) {
   const sectionRef = useRef(null);
   const inView = useInView(sectionRef, { once: true, margin: "-50px" });
@@ -152,9 +192,7 @@ function HorizontalScrollSection({
               <Image src={iconImage} alt="" fill className="object-contain" sizes="48px" />
             </div>
           ) : (
-            <div className="p-2 bg-keepr-evergreen/10 rounded-lg text-keepr-evergreen">
-              {icon}
-            </div>
+            <div className="p-2 bg-keepr-evergreen/10 rounded-lg text-keepr-evergreen">{icon}</div>
           )}
           <div>
             <h3 className="text-xl font-bold text-foreground">{title}</h3>
@@ -218,12 +256,21 @@ function HorizontalScrollSection({
 }
 
 export function LocationSections({ campgrounds, className = "" }: LocationSectionsProps) {
-  const { state: userState, stateName, isLoading: geoLoading } = useGeolocation({ autoDetect: true });
+  const {
+    state: userState,
+    stateName,
+    isLoading: geoLoading,
+  } = useGeolocation({ autoDetect: true });
   const prefersReducedMotion = useReducedMotionSafe();
 
   // Filter campgrounds by user's state
   const nearbySection = useMemo(() => {
-    if (!userState) return { title: "Popular Nearby", subtitle: "Enable location for personalized results", campgrounds: [] };
+    if (!userState)
+      return {
+        title: "Popular Nearby",
+        subtitle: "Enable location for personalized results",
+        campgrounds: [],
+      };
 
     const nearby = campgrounds
       .filter((cg) => cg.state === userState)
@@ -238,7 +285,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
     return {
       title: `Popular in ${displayState}`,
       subtitle: `${nearby.length} campgrounds near you`,
-      campgrounds: nearby
+      campgrounds: nearby,
     };
   }, [campgrounds, userState, stateName]);
 
@@ -274,7 +321,7 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
           "top-5": 4,
           "top-10": 3,
           "world-class": 2,
-          "rising-star": 1
+          "rising-star": 1,
         };
         return (priority[b.npsBadge?.type ?? ""] ?? 0) - (priority[a.npsBadge?.type ?? ""] ?? 0);
       })
@@ -285,7 +332,8 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
   if (campgrounds.length === 0) return null;
 
   // Show fewer sections on mobile for performance
-  const hasSections = nearbySection.campgrounds.length > 0 || highlyRated.length > 0 || newListings.length > 0;
+  const hasSections =
+    nearbySection.campgrounds.length > 0 || highlyRated.length > 0 || newListings.length > 0;
   if (!hasSections) return null;
 
   return (
@@ -295,10 +343,18 @@ export function LocationSections({ campgrounds, className = "" }: LocationSectio
         <HorizontalScrollSection
           title={nearbySection.title}
           subtitle={nearbySection.subtitle}
-          iconImage={userState ? (regionIcons[userState] || "/images/icons/regions/forest.png") : "/images/icons/regions/forest.png"}
+          iconImage={
+            userState
+              ? regionIcons[userState] || "/images/icons/regions/forest.png"
+              : "/images/icons/regions/forest.png"
+          }
           campgrounds={nearbySection.campgrounds}
-          viewAllHref={userState && stateToSlug[userState] ? `/camping/${stateToSlug[userState]}` : "/camping"}
-          viewAllLabel={userState ? `See all in ${stateName || getStateName(userState)}` : "Browse all"}
+          viewAllHref={
+            userState && stateToSlug[userState] ? `/camping/${stateToSlug[userState]}` : "/camping"
+          }
+          viewAllLabel={
+            userState ? `See all in ${stateName || getStateName(userState)}` : "Browse all"
+          }
           prefersReducedMotion={prefersReducedMotion}
         />
       )}

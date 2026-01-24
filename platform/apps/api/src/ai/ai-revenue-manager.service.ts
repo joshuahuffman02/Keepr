@@ -30,7 +30,7 @@ export class AiRevenueManagerService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly aiProvider: AiProviderService,
-    private readonly configService: AiAutopilotConfigService
+    private readonly configService: AiAutopilotConfigService,
   ) {}
 
   // ==================== INSIGHTS CRUD ====================
@@ -41,7 +41,7 @@ export class AiRevenueManagerService {
       status?: string;
       insightType?: string;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const { status, insightType, limit = 50 } = options;
 
@@ -80,17 +80,13 @@ export class AiRevenueManagerService {
     const insights: RevenueInsightDraft[] = [];
 
     // Run all analyses in parallel
-    const [
-      occupancyGaps,
-      underutilizedSites,
-      pricingOpportunities,
-      upsellOpportunities,
-    ] = await Promise.all([
-      this.analyzeOccupancyGaps(campgroundId),
-      this.analyzeUnderutilizedSites(campgroundId),
-      this.analyzePricingOpportunities(campgroundId),
-      this.analyzeUpsellOpportunities(campgroundId),
-    ]);
+    const [occupancyGaps, underutilizedSites, pricingOpportunities, upsellOpportunities] =
+      await Promise.all([
+        this.analyzeOccupancyGaps(campgroundId),
+        this.analyzeUnderutilizedSites(campgroundId),
+        this.analyzePricingOpportunities(campgroundId),
+        this.analyzeUpsellOpportunities(campgroundId),
+      ]);
 
     insights.push(...occupancyGaps);
     insights.push(...underutilizedSites);
@@ -124,9 +120,7 @@ export class AiRevenueManagerService {
       created.push(saved);
     }
 
-    this.logger.log(
-      `Generated ${created.length} revenue insights for campground ${campgroundId}`
-    );
+    this.logger.log(`Generated ${created.length} revenue insights for campground ${campgroundId}`);
 
     return created;
   }
@@ -166,8 +160,7 @@ export class AiRevenueManagerService {
         const next = siteRes[i + 1];
 
         const gap = Math.ceil(
-          (next.arrivalDate.getTime() - current.departureDate.getTime()) /
-            (1000 * 60 * 60 * 24)
+          (next.arrivalDate.getTime() - current.departureDate.getTime()) / (1000 * 60 * 60 * 24),
         );
 
         // 1-2 night gaps are opportunities
@@ -246,8 +239,7 @@ export class AiRevenueManagerService {
       let occupiedNights = 0;
       for (const res of site.Reservation) {
         const nights = Math.ceil(
-          (res.departureDate.getTime() - res.arrivalDate.getTime()) /
-            (1000 * 60 * 60 * 24)
+          (res.departureDate.getTime() - res.arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
         );
         occupiedNights += nights;
       }
@@ -334,10 +326,7 @@ export class AiRevenueManagerService {
       if (totalSites === 0) continue;
 
       // Calculate booking velocity
-      const totalBookings = siteClass.Site.reduce(
-        (sum, s) => sum + s.Reservation.length,
-        0
-      );
+      const totalBookings = siteClass.Site.reduce((sum, s) => sum + s.Reservation.length, 0);
 
       const bookingsPerSitePerMonth = totalBookings / totalSites / 3; // 3 months
 
@@ -403,9 +392,7 @@ export class AiRevenueManagerService {
     });
 
     const totalRes = reservations.length;
-    const withAddOns = reservations.filter(
-      (r) => r.ReservationUpsell.length > 0
-    ).length;
+    const withAddOns = reservations.filter((r) => r.ReservationUpsell.length > 0).length;
     const addOnRate = totalRes > 0 ? (withAddOns / totalRes) * 100 : 0;
 
     // Low add-on rate is an opportunity
@@ -503,10 +490,7 @@ export class AiRevenueManagerService {
       select: { insightType: true, impactCents: true, status: true },
     });
 
-    const totalOpportunity = insights.reduce(
-      (sum, i) => sum + (i.impactCents || 0),
-      0
-    );
+    const totalOpportunity = insights.reduce((sum, i) => sum + (i.impactCents || 0), 0);
 
     const byType: Record<string, { count: number; impact: number }> = {};
     for (const insight of insights) {
@@ -549,16 +533,12 @@ export class AiRevenueManagerService {
         await this.analyzeRevenue(config.campgroundId);
         analyzed++;
       } catch (error) {
-        this.logger.error(
-          `Failed to analyze revenue for ${config.campgroundId}: ${error}`
-        );
+        this.logger.error(`Failed to analyze revenue for ${config.campgroundId}: ${error}`);
         errors++;
       }
     }
 
-    this.logger.log(
-      `Weekly revenue analysis complete: ${analyzed} analyzed, ${errors} errors`
-    );
+    this.logger.log(`Weekly revenue analysis complete: ${analyzed} analyzed, ${errors} errors`);
   }
 }
 

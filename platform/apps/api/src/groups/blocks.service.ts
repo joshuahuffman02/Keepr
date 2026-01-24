@@ -1,5 +1,5 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, ConflictException, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 import { randomUUID } from "crypto";
 
 const isStringArray = (value: unknown): value is string[] =>
@@ -25,7 +25,7 @@ export class BlocksService {
     const conflictingReservations = await this.prisma.reservation.findMany({
       where: {
         siteId: { in: siteIds },
-        status: { in: ['confirmed', 'checked_in'] },
+        status: { in: ["confirmed", "checked_in"] },
         arrivalDate: { lt: windowEnd },
         departureDate: { gt: windowStart },
       },
@@ -36,7 +36,7 @@ export class BlocksService {
     const conflictingBlocks = await this.prisma.inventoryBlock.findMany({
       where: {
         tenantId,
-        state: 'active',
+        state: "active",
         windowStart: { lt: windowEnd },
         windowEnd: { gt: windowStart },
         blockId: excludeBlockId ? { not: excludeBlockId } : undefined,
@@ -48,10 +48,7 @@ export class BlocksService {
       .filter((s) => siteIds.includes(s));
 
     const allConflicts = [
-      ...new Set([
-        ...conflictingReservations.map((r) => r.siteId),
-        ...conflictingSitesFromBlocks,
-      ]),
+      ...new Set([...conflictingReservations.map((r) => r.siteId), ...conflictingSitesFromBlocks]),
     ];
 
     return {
@@ -73,16 +70,11 @@ export class BlocksService {
     const windowEnd = new Date(data.windowEnd);
 
     // Check for conflicts
-    const conflicts = await this.checkConflicts(
-      data.tenantId,
-      data.sites,
-      windowStart,
-      windowEnd,
-    );
+    const conflicts = await this.checkConflicts(data.tenantId, data.sites, windowStart, windowEnd);
 
     if (conflicts.hasConflict) {
       throw new ConflictException({
-        error: 'conflict',
+        error: "conflict",
         sites: conflicts.conflictingSites,
         window: { start: windowStart, end: windowEnd },
       });
@@ -105,7 +97,7 @@ export class BlocksService {
         windowStart,
         windowEnd,
         reason: data.reason,
-        state: 'active',
+        state: "active",
         lockId: data.lockId,
         createdBy: data.createdBy,
         updatedAt: new Date(),
@@ -119,7 +111,7 @@ export class BlocksService {
         tenantId,
         state: state ?? undefined,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -130,7 +122,7 @@ export class BlocksService {
   async update(
     blockId: string,
     data: {
-      state?: 'active' | 'released';
+      state?: "active" | "released";
       windowStart?: string;
       windowEnd?: string;
       reason?: string;
@@ -141,17 +133,13 @@ export class BlocksService {
     });
 
     if (!existing) {
-      throw new NotFoundException('Block not found');
+      throw new NotFoundException("Block not found");
     }
 
     // If extending window, check for new conflicts
     if (data.windowStart || data.windowEnd) {
-      const newStart = data.windowStart
-        ? new Date(data.windowStart)
-        : existing.windowStart;
-      const newEnd = data.windowEnd
-        ? new Date(data.windowEnd)
-        : existing.windowEnd;
+      const newStart = data.windowStart ? new Date(data.windowStart) : existing.windowStart;
+      const newEnd = data.windowEnd ? new Date(data.windowEnd) : existing.windowEnd;
 
       const conflicts = await this.checkConflicts(
         existing.tenantId,
@@ -163,7 +151,7 @@ export class BlocksService {
 
       if (conflicts.hasConflict) {
         throw new ConflictException({
-          error: 'conflict',
+          error: "conflict",
           sites: conflicts.conflictingSites,
           window: { start: newStart, end: newEnd },
         });
@@ -184,7 +172,7 @@ export class BlocksService {
   async release(blockId: string) {
     return this.prisma.inventoryBlock.update({
       where: { blockId },
-      data: { state: 'released' },
+      data: { state: "released" },
     });
   }
 

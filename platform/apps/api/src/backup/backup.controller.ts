@@ -25,4 +25,3 @@ export class BackupController {
     return this.backup.simulateRestore(campgroundId);
   }
 }
-

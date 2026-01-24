@@ -11,4 +11,3 @@ export class ListLogsDto {
   @Max(200)
   limit?: number;
 }
-

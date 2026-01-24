@@ -42,10 +42,10 @@ paths:
     post:
       summary: Channel availability webhook
       parameters:
-        - $ref: '#/components/parameters/Idem'
-        - $ref: '#/components/parameters/Channel'
-        - $ref: '#/components/parameters/Version'
-        - $ref: '#/components/parameters/Timestamp'
+        - $ref: "#/components/parameters/Idem"
+        - $ref: "#/components/parameters/Channel"
+        - $ref: "#/components/parameters/Version"
+        - $ref: "#/components/parameters/Timestamp"
       security:
         - HmacSig: []
       requestBody:
@@ -80,10 +80,10 @@ paths:
     post:
       summary: Channel rate webhook
       parameters:
-        - $ref: '#/components/parameters/Idem'
-        - $ref: '#/components/parameters/Channel'
-        - $ref: '#/components/parameters/Version'
-        - $ref: '#/components/parameters/Timestamp'
+        - $ref: "#/components/parameters/Idem"
+        - $ref: "#/components/parameters/Channel"
+        - $ref: "#/components/parameters/Version"
+        - $ref: "#/components/parameters/Timestamp"
       security:
         - HmacSig: []
       requestBody:
@@ -117,10 +117,10 @@ paths:
     post:
       summary: Channel reservation webhook
       parameters:
-        - $ref: '#/components/parameters/Idem'
-        - $ref: '#/components/parameters/Channel'
-        - $ref: '#/components/parameters/Version'
-        - $ref: '#/components/parameters/Timestamp'
+        - $ref: "#/components/parameters/Idem"
+        - $ref: "#/components/parameters/Channel"
+        - $ref: "#/components/parameters/Version"
+        - $ref: "#/components/parameters/Timestamp"
       security:
         - HmacSig: []
       requestBody:
@@ -129,7 +129,18 @@ paths:
           application/json:
             schema:
               type: object
-              required: [otaReservationId, channel, parkId, unitTypeId, status, otaUpdatedAt, version, stay, price]
+              required:
+                [
+                  otaReservationId,
+                  channel,
+                  parkId,
+                  unitTypeId,
+                  status,
+                  otaUpdatedAt,
+                  version,
+                  stay,
+                  price,
+                ]
               properties:
                 otaReservationId: { type: string }
                 channel: { type: string }
@@ -166,7 +177,7 @@ paths:
     get:
       summary: Pull availability (reconcile)
       parameters:
-        - $ref: '#/components/parameters/Channel'
+        - $ref: "#/components/parameters/Channel"
         - { in: query, name: parkId, required: true, schema: { type: string } }
         - { in: query, name: from, required: true, schema: { type: string, format: date } }
         - { in: query, name: to, required: true, schema: { type: string, format: date } }
@@ -176,7 +187,7 @@ paths:
     get:
       summary: Pull rates (reconcile)
       parameters:
-        - $ref: '#/components/parameters/Channel'
+        - $ref: "#/components/parameters/Channel"
         - { in: query, name: parkId, required: true, schema: { type: string } }
         - { in: query, name: from, required: true, schema: { type: string, format: date } }
         - { in: query, name: to, required: true, schema: { type: string, format: date } }
@@ -186,7 +197,7 @@ paths:
     get:
       summary: Pull reservations since cursor
       parameters:
-        - $ref: '#/components/parameters/Channel'
+        - $ref: "#/components/parameters/Channel"
         - { in: query, name: sinceCursor, schema: { type: string } }
       responses:
         "200": { description: ok }
@@ -194,7 +205,7 @@ paths:
     get:
       summary: Sync logs
       parameters:
-        - $ref: '#/components/parameters/Channel'
+        - $ref: "#/components/parameters/Channel"
         - { in: query, name: parkId, schema: { type: string } }
         - { in: query, name: from, schema: { type: string, format: date-time } }
         - { in: query, name: to, schema: { type: string, format: date-time } }
@@ -311,4 +322,3 @@ paths:
         - { in: path, name: parkId, required: true, schema: { type: string } }
       responses:
         "200": { description: xml sitemap }
-

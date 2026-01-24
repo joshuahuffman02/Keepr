@@ -4,7 +4,23 @@ import { useState, useRef, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import { Search, Sparkles, Calendar, MapPin, Loader2, X, Check, ChevronDown, ChevronUp, Zap, DollarSign, Users, PawPrint, Accessibility, Wifi } from "lucide-react";
+import {
+  Search,
+  Sparkles,
+  Calendar,
+  MapPin,
+  Loader2,
+  X,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Zap,
+  DollarSign,
+  Users,
+  PawPrint,
+  Accessibility,
+  Wifi,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type NLSearchResponse = Awaited<ReturnType<typeof apiClient.naturalLanguageSearch>>;
@@ -23,14 +39,14 @@ const EXAMPLE_QUERIES = [
   "Waterfront cabin for 4 this Friday",
   "Tent site with hookups under $40/night",
   "Quiet spot away from the road",
-  "ADA accessible site near bathhouse"
+  "ADA accessible site near bathhouse",
 ];
 
 export function NaturalLanguageSearch({
   slug,
   onApplyIntent,
   onSelectSite,
-  className
+  className,
 }: NaturalLanguageSearchProps) {
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -42,7 +58,7 @@ export function NaturalLanguageSearch({
     mutationFn: (q: string) => apiClient.naturalLanguageSearch(slug, q, sessionId),
     onSuccess: () => {
       setShowResults(true);
-    }
+    },
   });
 
   const handleSearch = () => {
@@ -85,8 +101,14 @@ export function NaturalLanguageSearch({
     const parts: string[] = [];
 
     if (intent.arrivalDate && intent.departureDate) {
-      const arr = new Date(intent.arrivalDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-      const dep = new Date(intent.departureDate).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      const arr = new Date(intent.arrivalDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      const dep = new Date(intent.departureDate).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
       parts.push(`${arr} - ${dep}`);
     } else if (intent.nights) {
       parts.push(`${intent.nights} night${intent.nights > 1 ? "s" : ""}`);
@@ -99,7 +121,8 @@ export function NaturalLanguageSearch({
     if (intent.adults || intent.children) {
       const guests = [];
       if (intent.adults) guests.push(`${intent.adults} adult${intent.adults > 1 ? "s" : ""}`);
-      if (intent.children) guests.push(`${intent.children} child${intent.children > 1 ? "ren" : ""}`);
+      if (intent.children)
+        guests.push(`${intent.children} child${intent.children > 1 ? "ren" : ""}`);
       parts.push(guests.join(", "));
     }
 
@@ -110,14 +133,20 @@ export function NaturalLanguageSearch({
   const getAmenityBadges = (intent: SearchIntent) => {
     const badges: { icon: React.ReactNode; label: string }[] = [];
 
-    if (intent.petFriendly) badges.push({ icon: <PawPrint className="h-3 w-3" />, label: "Pet-friendly" });
-    if (intent.accessible) badges.push({ icon: <Accessibility className="h-3 w-3" />, label: "Accessible" });
-    if (intent.waterfront) badges.push({ icon: <MapPin className="h-3 w-3" />, label: "Waterfront" });
+    if (intent.petFriendly)
+      badges.push({ icon: <PawPrint className="h-3 w-3" />, label: "Pet-friendly" });
+    if (intent.accessible)
+      badges.push({ icon: <Accessibility className="h-3 w-3" />, label: "Accessible" });
+    if (intent.waterfront)
+      badges.push({ icon: <MapPin className="h-3 w-3" />, label: "Waterfront" });
     if (intent.hookups?.power || intent.hookups?.water || intent.hookups?.sewer) {
       badges.push({ icon: <Wifi className="h-3 w-3" />, label: "Hookups" });
     }
     if (intent.maxPricePerNight) {
-      badges.push({ icon: <DollarSign className="h-3 w-3" />, label: `Under $${intent.maxPricePerNight}/night` });
+      badges.push({
+        icon: <DollarSign className="h-3 w-3" />,
+        label: `Under $${intent.maxPricePerNight}/night`,
+      });
     }
 
     return badges;
@@ -127,10 +156,14 @@ export function NaturalLanguageSearch({
     <div className={cn("relative", className)}>
       {/* Search Input */}
       <div className="relative">
-        <div className={cn(
-          "flex items-center gap-2 px-4 py-3 bg-card border-2 rounded-xl transition-all duration-200",
-          searchMutation.isPending ? "border-emerald-300 shadow-lg shadow-emerald-100" : "border-border hover:border-border focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-100"
-        )}>
+        <div
+          className={cn(
+            "flex items-center gap-2 px-4 py-3 bg-card border-2 rounded-xl transition-all duration-200",
+            searchMutation.isPending
+              ? "border-emerald-300 shadow-lg shadow-emerald-100"
+              : "border-border hover:border-border focus-within:border-emerald-500 focus-within:shadow-lg focus-within:shadow-emerald-100",
+          )}
+        >
           {searchMutation.isPending ? (
             <Loader2 className="h-5 w-5 text-emerald-500 animate-spin flex-shrink-0" />
           ) : (
@@ -166,7 +199,7 @@ export function NaturalLanguageSearch({
               "px-4 py-1.5 rounded-lg font-medium text-sm transition-all duration-200 flex items-center gap-2",
               query.length >= 3
                 ? "bg-emerald-600 text-white hover:bg-emerald-700 active:scale-95"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
+                : "bg-muted text-muted-foreground cursor-not-allowed",
             )}
           >
             <Search className="h-4 w-4" />
@@ -242,7 +275,10 @@ export function NaturalLanguageSearch({
                   {/* Intent details */}
                   <div className="flex flex-wrap items-center gap-2 mt-2">
                     {formatIntent(searchMutation.data.intent).map((part, i) => (
-                      <span key={i} className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-card rounded-full text-sm text-foreground border border-border">
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-card rounded-full text-sm text-foreground border border-border"
+                      >
                         {i === 0 && <Calendar className="h-3.5 w-3.5 text-muted-foreground" />}
                         {part}
                       </span>
@@ -253,7 +289,10 @@ export function NaturalLanguageSearch({
                   {getAmenityBadges(searchMutation.data.intent).length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       {getAmenityBadges(searchMutation.data.intent).map((badge, i) => (
-                        <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 bg-status-success-bg text-status-success-text text-xs rounded-full">
+                        <span
+                          key={i}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-status-success-bg text-status-success-text text-xs rounded-full"
+                        >
                           {badge.icon}
                           {badge.label}
                         </span>
@@ -285,7 +324,8 @@ export function NaturalLanguageSearch({
               {searchMutation.data.results.length > 0 ? (
                 <div className="p-2">
                   <p className="px-2 py-1 text-xs font-medium text-muted-foreground">
-                    {searchMutation.data.results.length} matching site{searchMutation.data.results.length !== 1 ? "s" : ""}
+                    {searchMutation.data.results.length} matching site
+                    {searchMutation.data.results.length !== 1 ? "s" : ""}
                   </p>
 
                   {searchMutation.data.results.slice(0, 5).map((result, index) => (
@@ -296,10 +336,14 @@ export function NaturalLanguageSearch({
                       transition={{ delay: index * 0.05 }}
                       className="p-3 rounded-lg hover:bg-muted cursor-pointer transition-colors group"
                       onClick={() => {
-                        if (onSelectSite && searchMutation.data.intent.arrivalDate && searchMutation.data.intent.departureDate) {
+                        if (
+                          onSelectSite &&
+                          searchMutation.data.intent.arrivalDate &&
+                          searchMutation.data.intent.departureDate
+                        ) {
                           onSelectSite(result.site.id, {
                             arrivalDate: searchMutation.data.intent.arrivalDate,
-                            departureDate: searchMutation.data.intent.departureDate
+                            departureDate: searchMutation.data.intent.departureDate,
                           });
                         }
                       }}
@@ -329,7 +373,9 @@ export function NaturalLanguageSearch({
                           {result.pricePerNight && (
                             <span className="font-semibold text-foreground">
                               ${(result.pricePerNight / 100).toFixed(0)}
-                              <span className="text-xs text-muted-foreground font-normal">/night</span>
+                              <span className="text-xs text-muted-foreground font-normal">
+                                /night
+                              </span>
                             </span>
                           )}
                           <div className="flex items-center gap-1 mt-1">

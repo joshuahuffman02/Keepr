@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/api-client";
 import { recordTelemetry } from "@/lib/sync-telemetry";
 import { BookingMap, MapSite } from "@/components/maps/BookingMap";
-import { loadQueue as loadQueueGeneric, saveQueue as saveQueueGeneric, registerBackgroundSync } from "@/lib/offline-queue";
+import {
+  loadQueue as loadQueueGeneric,
+  saveQueue as saveQueueGeneric,
+  registerBackgroundSync,
+} from "@/lib/offline-queue";
 import { randomId } from "@/lib/random-id";
 import { TableEmpty } from "@/components/ui/table";
 
@@ -98,9 +102,12 @@ export default function GuestPwaPage() {
   const [conflicts, setConflicts] = useState<QueuedMessage[]>([]);
   const [siteStatus, setSiteStatus] = useState<SiteStatusData[]>([]);
   const [mapLoading, setMapLoading] = useState(false);
-  const [campgroundCenter, setCampgroundCenter] = useState<{ latitude: number | null; longitude: number | null }>({
+  const [campgroundCenter, setCampgroundCenter] = useState<{
+    latitude: number | null;
+    longitude: number | null;
+  }>({
     latitude: null,
-    longitude: null
+    longitude: null,
   });
 
   useEffect(() => {
@@ -121,7 +128,7 @@ export default function GuestPwaPage() {
           const campgroundName =
             isRecord(campgroundValue) && typeof campgroundValue.name === "string"
               ? campgroundValue.name
-              : candidate.campgroundId ?? "Your campground";
+              : (candidate.campgroundId ?? "Your campground");
           setStay({
             id: candidate.id,
             campground: campgroundName,
@@ -165,16 +172,21 @@ export default function GuestPwaPage() {
         setEvents(
           data.map((event) => {
             const name = getOptionalString(event, "name") ?? event.title ?? "Event";
-            const startAt = getOptionalString(event, "startAt") ?? event.startDate ?? getOptionalString(event, "start") ?? "";
-            const endAt = getOptionalString(event, "endAt") ?? event.endDate ?? getOptionalString(event, "end");
+            const startAt =
+              getOptionalString(event, "startAt") ??
+              event.startDate ??
+              getOptionalString(event, "start") ??
+              "";
+            const endAt =
+              getOptionalString(event, "endAt") ?? event.endDate ?? getOptionalString(event, "end");
             return {
               id: event.id,
               name,
               startAt,
               endAt,
-              location: event.location ?? null
+              location: event.location ?? null,
             };
-          })
+          }),
         );
       } catch {
         if (!isMounted) return;
@@ -205,9 +217,9 @@ export default function GuestPwaPage() {
               id: message.id,
               content: message.content,
               senderType: message.senderType,
-              createdAt: message.createdAt
+              createdAt: message.createdAt,
             }))
-            .reverse()
+            .reverse(),
         );
       } catch {
         if (!isMounted) return;
@@ -249,21 +261,18 @@ export default function GuestPwaPage() {
         const statusPromise = apiClient
           .getSitesWithStatus(stay.campgroundId, {
             arrivalDate: stay.arrivalDate,
-            departureDate: stay.departureDate
+            departureDate: stay.departureDate,
           })
           .catch(() => emptySiteStatus);
         const campgroundPromise = apiClient.getCampground
           ? apiClient.getCampground(stay.campgroundId).catch(() => null)
           : Promise.resolve<Campground | null>(null);
-        const [statusData, campground] = await Promise.all([
-          statusPromise,
-          campgroundPromise
-        ]);
+        const [statusData, campground] = await Promise.all([statusPromise, campgroundPromise]);
         setSiteStatus(statusData);
         if (campground) {
           setCampgroundCenter({
             latitude: typeof campground.latitude === "number" ? campground.latitude : null,
-            longitude: typeof campground.longitude === "number" ? campground.longitude : null
+            longitude: typeof campground.longitude === "number" ? campground.longitude : null,
           });
         }
       } finally {
@@ -284,14 +293,25 @@ export default function GuestPwaPage() {
         continue;
       }
       try {
-        await apiClient.sendReservationMessage(item.reservationId, item.content, "guest", item.guestId);
+        await apiClient.sendReservationMessage(
+          item.reservationId,
+          item.content,
+          "guest",
+          item.guestId,
+        );
       } catch (error) {
         const attempt = (item.attempt ?? 0) + 1;
         const delay = Math.min(300000, 1000 * 2 ** attempt) + Math.floor(Math.random() * 500);
         const message = getErrorMessage(error);
         const status = getErrorStatus(error);
         const isConflict = status === 409 || status === 412 || /conflict/i.test(message);
-        remaining.push({ ...item, attempt, nextAttemptAt: Date.now() + delay, lastError: message, conflict: isConflict });
+        remaining.push({
+          ...item,
+          attempt,
+          nextAttemptAt: Date.now() + delay,
+          lastError: message,
+          conflict: isConflict,
+        });
         recordTelemetry({
           source: "guest-pwa",
           type: isConflict ? "conflict" : "error",
@@ -367,7 +387,7 @@ export default function GuestPwaPage() {
           id: randomId(),
           content: trimmed,
           senderType: "guest",
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         };
         setMessages((prev) => [newMessage, ...prev].slice(0, 12));
         recordTelemetry({
@@ -411,7 +431,9 @@ export default function GuestPwaPage() {
   };
 
   const retryConflict = (id: string) => {
-    const items = loadQueue().map((i) => (i.id === id ? { ...i, conflict: false, nextAttemptAt: Date.now() } : i));
+    const items = loadQueue().map((i) =>
+      i.id === id ? { ...i, conflict: false, nextAttemptAt: Date.now() } : i,
+    );
     saveQueue(items);
     void flushQueue();
   };
@@ -424,15 +446,19 @@ export default function GuestPwaPage() {
   const offline = typeof navigator !== "undefined" && !navigator.onLine;
 
   const mapSites: MapSite[] = useMemo(() => {
-    const baseLatitude = typeof campgroundCenter.latitude === "number" ? campgroundCenter.latitude : null;
-    const baseLongitude = typeof campgroundCenter.longitude === "number" ? campgroundCenter.longitude : null;
+    const baseLatitude =
+      typeof campgroundCenter.latitude === "number" ? campgroundCenter.latitude : null;
+    const baseLongitude =
+      typeof campgroundCenter.longitude === "number" ? campgroundCenter.longitude : null;
     return (siteStatus || []).map((site, idx) => ({
       id: site.id,
       name: site.name,
       siteNumber: site.siteNumber || "",
       status: site.status,
-      latitude: site.latitude ?? (baseLatitude !== null ? baseLatitude + 0.0004 * Math.sin(idx) : null),
-      longitude: site.longitude ?? (baseLongitude !== null ? baseLongitude + 0.0004 * Math.cos(idx) : null)
+      latitude:
+        site.latitude ?? (baseLatitude !== null ? baseLatitude + 0.0004 * Math.sin(idx) : null),
+      longitude:
+        site.longitude ?? (baseLongitude !== null ? baseLongitude + 0.0004 * Math.cos(idx) : null),
     }));
   }, [siteStatus, campgroundCenter]);
 
@@ -442,7 +468,9 @@ export default function GuestPwaPage() {
         <div>
           <div className="text-xs uppercase tracking-wide text-slate-400">Guest PWA</div>
           <h1 className="text-xl font-semibold text-slate-50">My Stay</h1>
-          <p className="text-slate-400 text-sm">Quick access to your reservation, site, and balance.</p>
+          <p className="text-slate-400 text-sm">
+            Quick access to your reservation, site, and balance.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {offline && <Badge variant="outline">Offline</Badge>}
@@ -457,8 +485,8 @@ export default function GuestPwaPage() {
                             Math.min(
                               ...loadQueue()
                                 .map((i) => i.nextAttemptAt)
-                                .filter((n) => typeof n === "number")
-                            )
+                                .filter((n) => typeof n === "number"),
+                            ),
                           ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
                         : ""
                     }`
@@ -468,8 +496,15 @@ export default function GuestPwaPage() {
               {queued} queued
             </Badge>
           )}
-          {conflicts.length > 0 && <Badge variant="destructive">{conflicts.length} conflicts</Badge>}
-          {lastSync && <Badge variant="outline">Last sync {new Date(lastSync).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Badge>}
+          {conflicts.length > 0 && (
+            <Badge variant="destructive">{conflicts.length} conflicts</Badge>
+          )}
+          {lastSync && (
+            <Badge variant="outline">
+              Last sync{" "}
+              {new Date(lastSync).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </Badge>
+          )}
           <Button asChild variant="outline" size="sm">
             <Link href="/pwa/sync-log">Sync log</Link>
           </Button>
@@ -479,11 +514,7 @@ export default function GuestPwaPage() {
         </div>
       </header>
 
-      {error && (
-        <div className="pwa-card p-3 text-sm text-red-100 border-red-500">
-          {error}
-        </div>
-      )}
+      {error && <div className="pwa-card p-3 text-sm text-red-100 border-red-500">{error}</div>}
 
       {loading ? (
         <div className="pwa-card p-4 text-sm text-slate-300">Loading…</div>
@@ -494,7 +525,9 @@ export default function GuestPwaPage() {
           <div className="pwa-card p-4 space-y-2">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs uppercase tracking-wide text-slate-400">{stay.campground}</div>
+                <div className="text-xs uppercase tracking-wide text-slate-400">
+                  {stay.campground}
+                </div>
                 <h2 className="text-lg font-semibold">{stay.site}</h2>
               </div>
               <Badge variant="outline" className="capitalize">
@@ -505,7 +538,9 @@ export default function GuestPwaPage() {
               {stay.arrivalDate ? new Date(stay.arrivalDate).toLocaleDateString() : ""} →{" "}
               {stay.departureDate ? new Date(stay.departureDate).toLocaleDateString() : ""}
             </div>
-            <div className="text-sm text-emerald-200">Balance: ${(stay.balance / 100).toFixed(2)}</div>
+            <div className="text-sm text-emerald-200">
+              Balance: ${(stay.balance / 100).toFixed(2)}
+            </div>
           </div>
 
           <div className="pwa-card p-4 space-y-2">
@@ -514,10 +549,26 @@ export default function GuestPwaPage() {
               <Button variant="secondary" className="w-full" asChild>
                 <Link href="/park/map">View map</Link>
               </Button>
-              <Button variant="secondary" className="w-full" onClick={() => sendMessage(messageInput || "Hi, I need help with my stay.")} disabled={sending || !stay?.guestId}>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => sendMessage(messageInput || "Hi, I need help with my stay.")}
+                disabled={sending || !stay?.guestId}
+              >
                 Message office
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => sendMessage(orderNote ? `ORDER REQUEST: ${orderNote}` : "ORDER REQUEST: Please contact me for an order.")} disabled={sending || !stay?.guestId}>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() =>
+                  sendMessage(
+                    orderNote
+                      ? `ORDER REQUEST: ${orderNote}`
+                      : "ORDER REQUEST: Please contact me for an order.",
+                  )
+                }
+                disabled={sending || !stay?.guestId}
+              >
                 Order to site
               </Button>
               <Button
@@ -544,7 +595,11 @@ export default function GuestPwaPage() {
                 className="bg-slate-950/40 border-slate-800"
               />
               <div className="flex items-center gap-2">
-                <Button size="sm" onClick={() => sendMessage(messageInput)} disabled={sending || !stay?.guestId}>
+                <Button
+                  size="sm"
+                  onClick={() => sendMessage(messageInput)}
+                  disabled={sending || !stay?.guestId}
+                >
                   Send
                 </Button>
                 <span className="text-xs text-slate-400">
@@ -561,7 +616,18 @@ export default function GuestPwaPage() {
                 onChange={(e) => setOrderNote(e.target.value)}
                 className="bg-slate-950/40 border-slate-800"
               />
-              <Button size="sm" variant="secondary" onClick={() => sendMessage(orderNote ? `ORDER REQUEST: ${orderNote}` : "ORDER REQUEST: Please contact me for an order.")} disabled={sending || !stay?.guestId}>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() =>
+                  sendMessage(
+                    orderNote
+                      ? `ORDER REQUEST: ${orderNote}`
+                      : "ORDER REQUEST: Please contact me for an order.",
+                  )
+                }
+                disabled={sending || !stay?.guestId}
+              >
                 Send order request
               </Button>
             </div>
@@ -573,7 +639,12 @@ export default function GuestPwaPage() {
             )}
             {lastPayRequest && (
               <div className="text-xs text-emerald-200">
-                Payment request sent {new Date(lastPayRequest).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}. We’ll text/email you a link.
+                Payment request sent{" "}
+                {new Date(lastPayRequest).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+                . We’ll text/email you a link.
               </div>
             )}
           </div>
@@ -594,7 +665,8 @@ export default function GuestPwaPage() {
                 isLoading={mapLoading}
               />
               <div className="text-xs text-slate-400">
-                Pins show availability for your dates. Colors: green = available, amber = occupied, red = maintenance/blackout.
+                Pins show availability for your dates. Colors: green = available, amber = occupied,
+                red = maintenance/blackout.
               </div>
             </div>
           )}
@@ -610,7 +682,10 @@ export default function GuestPwaPage() {
               </div>
               <div className="space-y-2">
                 {conflicts.map((c) => (
-                  <div key={c.id} className="rounded border border-amber-300 bg-amber-50/10 p-2 flex items-center justify-between gap-2">
+                  <div
+                    key={c.id}
+                    className="rounded border border-amber-300 bg-amber-50/10 p-2 flex items-center justify-between gap-2"
+                  >
                     <div className="text-xs text-amber-100 truncate">
                       {c.content.slice(0, 60)}
                       {c.content.length > 60 ? "…" : ""}
@@ -642,10 +717,18 @@ export default function GuestPwaPage() {
             ) : (
               <div className="space-y-2">
                 {messages.map((m) => (
-                  <div key={m.id} className="rounded-lg border border-slate-800 bg-slate-900/70 p-2">
+                  <div
+                    key={m.id}
+                    className="rounded-lg border border-slate-800 bg-slate-900/70 p-2"
+                  >
                     <div className="flex items-center justify-between text-xs text-slate-400">
                       <span className="capitalize">{m.senderType}</span>
-                      <span>{new Date(m.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                      <span>
+                        {new Date(m.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </div>
                     <div className="text-sm text-slate-100 whitespace-pre-wrap">{m.content}</div>
                   </div>
@@ -672,11 +755,16 @@ export default function GuestPwaPage() {
             ) : (
               <div className="space-y-2">
                 {events.map((ev) => (
-                  <div key={ev.id} className="rounded-lg border border-slate-800 bg-slate-900/70 p-2">
+                  <div
+                    key={ev.id}
+                    className="rounded-lg border border-slate-800 bg-slate-900/70 p-2"
+                  >
                     <div className="text-sm font-semibold text-slate-100">{ev.name}</div>
                     <div className="text-xs text-slate-400">
                       {ev.startAt ? new Date(ev.startAt).toLocaleString() : ""}
-                      {ev.endAt ? ` – ${new Date(ev.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}
+                      {ev.endAt
+                        ? ` – ${new Date(ev.endAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                        : ""}
                     </div>
                     {ev.location && <div className="text-xs text-slate-300">{ev.location}</div>}
                   </div>

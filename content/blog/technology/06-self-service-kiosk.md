@@ -17,12 +17,14 @@ Self-service kiosks solve common campground challenges: after-hours arrivals, sh
 ## Kiosk Benefits
 
 ### For Operations
+
 - 24/7 check-in capability
 - Reduce front desk workload
 - Handle peak arrival volume
 - Consistent process every time
 
 ### For Guests
+
 - Skip the line
 - Check in on their schedule
 - Self-service convenience
@@ -33,18 +35,21 @@ Self-service kiosks solve common campground challenges: after-hours arrivals, sh
 ## Kiosk Types
 
 ### Basic: Tablet-Based
+
 - iPad or Android tablet
 - Wall-mounted or stand-mounted
 - Lower cost ($300-800)
 - Simpler capabilities
 
 ### Advanced: Dedicated Kiosk
+
 - Purpose-built hardware
 - Often includes printer
 - Weather-resistant options
 - Higher cost ($2,000-5,000)
 
 ### Software-Only
+
 - Guest uses their own phone
 - QR code scans for check-in
 - Lowest hardware cost
@@ -86,6 +91,7 @@ Self-service kiosks solve common campground challenges: after-hours arrivals, sh
 ## Handling Exceptions
 
 Not everyone should use the kiosk:
+
 - First-time visitors (may need orientation)
 - Groups with complex needs
 - Guests with balances to discuss
@@ -104,4 +110,4 @@ Provide clear "For assistance, call..." signage.
 
 ---
 
-*Keepr includes kiosk-ready check-in interfaces that work on any tablet. [Enable self-service at campreserv.com](https://campreserv.com)*
+_Keepr includes kiosk-ready check-in interfaces that work on any tablet. [Enable self-service at campreserv.com](https://campreserv.com)_

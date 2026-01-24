@@ -11,45 +11,40 @@
  * the types because .prisma/client doesn't exist at the expected location.
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const ROOT_DIR = path.resolve(__dirname, '..');
-const NODE_MODULES = path.join(ROOT_DIR, 'node_modules');
-const PNPM_STORE = path.join(NODE_MODULES, '.pnpm');
+const ROOT_DIR = path.resolve(__dirname, "..");
+const NODE_MODULES = path.join(ROOT_DIR, "node_modules");
+const PNPM_STORE = path.join(NODE_MODULES, ".pnpm");
 
 // Locations where we need .prisma symlinks
 const SYMLINK_TARGETS = [
-  path.join(NODE_MODULES, '.prisma'),
-  path.join(ROOT_DIR, 'platform', 'apps', 'api', 'node_modules', '.prisma'),
+  path.join(NODE_MODULES, ".prisma"),
+  path.join(ROOT_DIR, "platform", "apps", "api", "node_modules", ".prisma"),
 ];
 
 function findPrismaClientFolder() {
   // Look for @prisma+client@* folders in .pnpm
   if (!fs.existsSync(PNPM_STORE)) {
-    console.log('No .pnpm folder found, skipping Prisma client linking');
+    console.log("No .pnpm folder found, skipping Prisma client linking");
     return null;
   }
 
   const entries = fs.readdirSync(PNPM_STORE);
-  const prismaClientFolder = entries.find(entry =>
-    entry.startsWith('@prisma+client@') && !entry.includes('runtime')
+  const prismaClientFolder = entries.find(
+    (entry) => entry.startsWith("@prisma+client@") && !entry.includes("runtime"),
   );
 
   if (!prismaClientFolder) {
-    console.log('No @prisma/client package found in .pnpm, skipping');
+    console.log("No @prisma/client package found in .pnpm, skipping");
     return null;
   }
 
-  const prismaPath = path.join(
-    PNPM_STORE,
-    prismaClientFolder,
-    'node_modules',
-    '.prisma'
-  );
+  const prismaPath = path.join(PNPM_STORE, prismaClientFolder, "node_modules", ".prisma");
 
   if (!fs.existsSync(prismaPath)) {
-    console.log('Prisma client not yet generated, run prisma generate first');
+    console.log("Prisma client not yet generated, run prisma generate first");
     return null;
   }
 
@@ -85,7 +80,7 @@ function createSymlink(source, target) {
   }
 
   try {
-    fs.symlinkSync(source, target, 'dir');
+    fs.symlinkSync(source, target, "dir");
     console.log(`  Created: ${target}`);
     return true;
   } catch (err) {
@@ -95,7 +90,7 @@ function createSymlink(source, target) {
 }
 
 function main() {
-  console.log('Linking Prisma client for TypeScript...');
+  console.log("Linking Prisma client for TypeScript...");
 
   const prismaSource = findPrismaClientFolder();
   if (!prismaSource) {

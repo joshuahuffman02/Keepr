@@ -1,5 +1,13 @@
 import { Type } from "class-transformer";
-import { IsBoolean, IsDateString, IsInt, IsOptional, IsPositive, IsString, IsIn } from "class-validator";
+import {
+  IsBoolean,
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  IsIn,
+} from "class-validator";
 
 export class IssueStoredValueDto {
   @IsString()

@@ -1,4 +1,9 @@
-import { PosProviderCapability, PosProviderType, PosSyncStatus, PosSyncTarget } from "@prisma/client";
+import {
+  PosProviderCapability,
+  PosProviderType,
+  PosSyncStatus,
+  PosSyncTarget,
+} from "@prisma/client";
 
 export type ProviderCapabilities = PosProviderCapability[];
 
@@ -65,7 +70,7 @@ export interface PosProviderAdapter {
   syncTenders(config: IntegrationRecord): Promise<ProviderSyncResult>;
   processPayment(
     config: IntegrationRecord,
-    request: ProviderPaymentRequest
+    request: ProviderPaymentRequest,
   ): Promise<ProviderPaymentResult | null>;
   verifyWebhookSignature(input: ProviderWebhookVerification): Promise<boolean> | boolean;
   handlePaymentWebhook?(input: {
@@ -76,9 +81,18 @@ export interface PosProviderAdapter {
 
   // Outbound inventory sync methods (optional - for 3rd party POS integration)
   supportsInventorySync?(): boolean;
-  pushProduct?(config: IntegrationRecord, product: ExternalProductPush): Promise<ExternalSyncResult>;
-  pushInventoryUpdate?(config: IntegrationRecord, update: ExternalInventoryUpdate): Promise<ExternalSyncResult>;
-  pushPriceUpdate?(config: IntegrationRecord, update: ExternalPriceUpdate): Promise<ExternalSyncResult>;
+  pushProduct?(
+    config: IntegrationRecord,
+    product: ExternalProductPush,
+  ): Promise<ExternalSyncResult>;
+  pushInventoryUpdate?(
+    config: IntegrationRecord,
+    update: ExternalInventoryUpdate,
+  ): Promise<ExternalSyncResult>;
+  pushPriceUpdate?(
+    config: IntegrationRecord,
+    update: ExternalPriceUpdate,
+  ): Promise<ExternalSyncResult>;
   fetchProducts?(config: IntegrationRecord): Promise<ExternalProduct[]>;
   fetchSales?(config: IntegrationRecord, since: Date): Promise<ExternalSale[]>;
 }

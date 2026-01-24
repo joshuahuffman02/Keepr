@@ -6,7 +6,14 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { apiClient } from "@/lib/api-client";
@@ -22,7 +29,11 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
 function formatCurrency(value: number, currency: string, locale: string) {
-  return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 function formatPercent(value: number) {
@@ -72,7 +83,8 @@ export default function PortfolioPage() {
         const record = isRecord(data) ? data : null;
         const activePortfolioId = getString(record ? record["activePortfolioId"] : undefined);
         const activeParkId = getString(record ? record["activeParkId"] : undefined);
-        if (activePortfolioId) localStorage.setItem("campreserv:selectedPortfolio", activePortfolioId);
+        if (activePortfolioId)
+          localStorage.setItem("campreserv:selectedPortfolio", activePortfolioId);
         if (activeParkId) {
           localStorage.setItem("campreserv:selectedPark", activeParkId);
           localStorage.setItem("campreserv:selectedCampground", activeParkId);
@@ -80,12 +92,20 @@ export default function PortfolioPage() {
       }
       toast({ title: "Portfolio context updated" });
     },
-    onError: (err: unknown) => toast({ title: "Unable to select portfolio", description: getErrorMessage(err, "Try again"), variant: "destructive" }),
+    onError: (err: unknown) =>
+      toast({
+        title: "Unable to select portfolio",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      }),
   });
 
   const activePortfolio = useMemo(() => {
     if (!portfoliosQuery.data || !portfolioId) return null;
-    return portfoliosQuery.data.portfolios.find((p) => p.id === portfolioId) ?? portfoliosQuery.data.portfolios[0];
+    return (
+      portfoliosQuery.data.portfolios.find((p) => p.id === portfolioId) ??
+      portfoliosQuery.data.portfolios[0]
+    );
   }, [portfolioId, portfoliosQuery.data]);
 
   const routing = useMemo(() => reportQuery.data?.routing ?? [], [reportQuery.data]);
@@ -120,7 +140,11 @@ export default function PortfolioPage() {
   if (portfoliosQuery.isError) {
     return (
       <DashboardShell>
-        <div className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700" role="alert" aria-live="assertive">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+          role="alert"
+          aria-live="assertive"
+        >
           Unable to load portfolios. Please retry.
         </div>
         <div className="mt-3">
@@ -143,7 +167,9 @@ export default function PortfolioPage() {
 
       <div className="mb-2" data-testid="portfolio-header">
         <h1 className="text-2xl font-semibold text-foreground">Portfolio</h1>
-        <p className="text-sm text-muted-foreground">Multi-property view, routing, and cross-park reporting.</p>
+        <p className="text-sm text-muted-foreground">
+          Multi-property view, routing, and cross-park reporting.
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -190,11 +216,17 @@ export default function PortfolioPage() {
         <Card data-testid="portfolio-rollup-card">
           <CardHeader>
             <CardTitle>Rollup</CardTitle>
-            <CardDescription>Home currency: {reportQuery.data?.homeCurrency ?? activePortfolio?.homeCurrency ?? "USD"}</CardDescription>
+            <CardDescription>
+              Home currency:{" "}
+              {reportQuery.data?.homeCurrency ?? activePortfolio?.homeCurrency ?? "USD"}
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             {reportQuery.isLoading && (
-              <div className="col-span-2 space-y-2 rounded border border-border bg-muted p-3 text-sm text-muted-foreground" role="status">
+              <div
+                className="col-span-2 space-y-2 rounded border border-border bg-muted p-3 text-sm text-muted-foreground"
+                role="status"
+              >
                 Loading portfolio report…
               </div>
             )}
@@ -206,15 +238,21 @@ export default function PortfolioPage() {
             </div>
             <div>
               <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
-              <div className="text-xl font-semibold">{rollup ? formatPercent(rollup.occupancy) : "—"}</div>
+              <div className="text-xl font-semibold">
+                {rollup ? formatPercent(rollup.occupancy) : "—"}
+              </div>
             </div>
             <div>
               <div className="text-xs uppercase text-muted-foreground">ADR</div>
-              <div className="text-lg font-semibold">{rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—"}</div>
+              <div className="text-lg font-semibold">
+                {rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—"}
+              </div>
             </div>
             <div>
               <div className="text-xs uppercase text-muted-foreground">RevPAR</div>
-              <div className="text-lg font-semibold">{rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—"}</div>
+              <div className="text-lg font-semibold">
+                {rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—"}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -229,20 +267,32 @@ export default function PortfolioPage() {
               routing.map((r) => (
                 <div key={r.parkId} className="rounded-lg border border-border px-3 py-2">
                   <div className="text-sm font-semibold">{r.parkId}</div>
-                  <div className="text-xs text-muted-foreground">Admin: {r.adminHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Guest: {r.guestHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Path: {r.path || "/campgrounds/:id"}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Admin: {r.adminHost || "Not configured"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Guest: {r.guestHost || "Not configured"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Path: {r.path || "/campgrounds/:id"}
+                  </div>
                 </div>
               ))
             ) : (
-              <div className="text-sm text-muted-foreground">No routing configured for this portfolio.</div>
+              <div className="text-sm text-muted-foreground">
+                No routing configured for this portfolio.
+              </div>
             )}
           </CardContent>
         </Card>
       </div>
 
       {reportQuery.isError && (
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert" aria-live="assertive">
+        <div
+          className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+          role="alert"
+          aria-live="assertive"
+        >
           Unable to load portfolio report. Please retry.
           <div className="mt-2">
             <Button size="sm" variant="outline" onClick={() => reportQuery.refetch()}>
@@ -279,7 +329,13 @@ export default function PortfolioPage() {
                     <TableCell>{formatPercent(m.occupancy)}</TableCell>
                     <TableCell>{formatCurrency(m.adr, m.currency, locale)}</TableCell>
                     <TableCell>{formatCurrency(m.revpar, m.currency, locale)}</TableCell>
-                    <TableCell>{formatCurrency(m.revenueHome, reportQuery.data?.homeCurrency ?? "USD", locale)}</TableCell>
+                    <TableCell>
+                      {formatCurrency(
+                        m.revenueHome,
+                        reportQuery.data?.homeCurrency ?? "USD",
+                        locale,
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline">{m.taxSummary ?? "N/A"}</Badge>
                     </TableCell>
@@ -307,7 +363,9 @@ export default function PortfolioPage() {
             </div>
           ))}
           {!reportQuery.data?.recommendations?.length && (
-            <div className="text-sm text-muted-foreground">No recommendations yet — data stubs are live.</div>
+            <div className="text-sm text-muted-foreground">
+              No recommendations yet — data stubs are live.
+            </div>
           )}
         </CardContent>
       </Card>
@@ -315,11 +373,16 @@ export default function PortfolioPage() {
       <Separator />
 
       <div className="flex items-center gap-3">
-        <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })}
+        >
           Refresh report
         </Button>
         <div className="text-xs text-muted-foreground">
-          Minimal functional slice: portfolio listing, selection, routing headers, and cross-park reporting stubs.
+          Minimal functional slice: portfolio listing, selection, routing headers, and cross-park
+          reporting stubs.
         </div>
       </div>
     </DashboardShell>

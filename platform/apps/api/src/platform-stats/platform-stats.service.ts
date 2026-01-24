@@ -164,19 +164,19 @@ export class PlatformStatsService {
         searchesThisWeek,
         uniqueVisitorsToday,
       },
-      recentActivity: recentPageViews.map((event: {
-        eventName: string;
-        occurredAt: Date;
-        Campground: { name: string; slug: string; state: string | null } | null;
-      }) => ({
-        type: event.eventName === "availability_check" ? "search" : "page_view",
-        campgroundName: event.Campground?.name || null,
-        campgroundSlug: event.Campground?.slug || null,
-        state: event.Campground?.state || null,
-        minutesAgo: Math.round(
-          (now.getTime() - event.occurredAt.getTime()) / 60000
-        ),
-      })),
+      recentActivity: recentPageViews.map(
+        (event: {
+          eventName: string;
+          occurredAt: Date;
+          Campground: { name: string; slug: string; state: string | null } | null;
+        }) => ({
+          type: event.eventName === "availability_check" ? "search" : "page_view",
+          campgroundName: event.Campground?.name || null,
+          campgroundSlug: event.Campground?.slug || null,
+          state: event.Campground?.state || null,
+          minutesAgo: Math.round((now.getTime() - event.occurredAt.getTime()) / 60000),
+        }),
+      ),
       topRegions: topRegions.map((r: { region: string | null; _count: { id: number } }) => ({
         state: r.region || "Unknown",
         activityCount: r._count.id,

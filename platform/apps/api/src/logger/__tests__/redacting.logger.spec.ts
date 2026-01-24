@@ -22,7 +22,7 @@ describe("RedactingLogger", () => {
   it("redacts email, phone, and card last4 in message strings", () => {
     logger.log('Contact john.doe@example.com at +1 (555) 123-4567, last4:"4242"');
     expect(console.log).toHaveBeenCalledWith(
-      "Contact [redacted_email] at [redacted_phone], last4:\"[redacted_last4]\""
+      'Contact [redacted_email] at [redacted_phone], last4:"[redacted_last4]"',
     );
   });
 

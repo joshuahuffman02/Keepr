@@ -132,19 +132,10 @@ function ACHPaymentForm({
 
       {/* Action buttons */}
       <div className="flex justify-end gap-2 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={processing}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={processing}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          disabled={!stripe || processing}
-          className="min-w-[140px]"
-        >
+        <Button type="submit" disabled={!stripe || processing} className="min-w-[140px]">
           {processing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

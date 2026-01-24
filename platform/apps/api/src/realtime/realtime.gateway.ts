@@ -52,9 +52,7 @@ const buildPayload = (data: unknown) => ({
   },
   namespace: "/realtime",
 })
-export class RealtimeGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class RealtimeGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
@@ -63,7 +61,7 @@ export class RealtimeGateway
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   afterInit() {
@@ -133,7 +131,7 @@ export class RealtimeGateway
       this.connectedClients.set(client.id, client);
 
       this.logger.log(
-        `Client connected: ${client.id} (user: ${user.email}, campgrounds: ${campgroundIds.length})`
+        `Client connected: ${client.id} (user: ${user.email}, campgrounds: ${campgroundIds.length})`,
       );
 
       // Send connection confirmation
@@ -161,7 +159,7 @@ export class RealtimeGateway
   @SubscribeMessage("subscribe:campground")
   async handleSubscribeCampground(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { campgroundId: string }
+    @MessageBody() data: { campgroundId: string },
   ) {
     // Verify user has access to this campground
     if (!client.data.campgroundIds.includes(data.campgroundId)) {
@@ -178,7 +176,7 @@ export class RealtimeGateway
   @SubscribeMessage("unsubscribe:campground")
   async handleUnsubscribeCampground(
     @ConnectedSocket() client: AuthenticatedSocket,
-    @MessageBody() data: { campgroundId: string }
+    @MessageBody() data: { campgroundId: string },
   ) {
     await client.leave(`campground:${data.campgroundId}`);
     return { success: true };

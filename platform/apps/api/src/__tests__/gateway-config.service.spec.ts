@@ -37,21 +37,48 @@ type GatewayConfigUpsertArgs = {
 const buildPrisma = () => {
   const configs: ConfigRecord[] = [];
   const presets: FeePreset[] = [
-    { id: "preset_stripe_test", gateway: "stripe", mode: "test", percentBasisPoints: 0, flatFeeCents: 0, label: "Stripe test" },
-    { id: "preset_stripe_prod", gateway: "stripe", mode: "prod", percentBasisPoints: 290, flatFeeCents: 30, label: "Stripe prod" },
+    {
+      id: "preset_stripe_test",
+      gateway: "stripe",
+      mode: "test",
+      percentBasisPoints: 0,
+      flatFeeCents: 0,
+      label: "Stripe test",
+    },
+    {
+      id: "preset_stripe_prod",
+      gateway: "stripe",
+      mode: "prod",
+      percentBasisPoints: 290,
+      flatFeeCents: 30,
+      label: "Stripe prod",
+    },
   ];
 
   return {
     gatewayFeePreset: {
-      findUnique: jest.fn(async ({ where }: GatewayFeePresetFindUniqueArgs) => presets.find((p) => p.id === where.id) ?? null),
-      findFirst: jest.fn(async ({ where }: GatewayFeePresetFindFirstArgs) => presets.find((p) => p.gateway === where.gateway && p.mode === where.mode) ?? null),
+      findUnique: jest.fn(
+        async ({ where }: GatewayFeePresetFindUniqueArgs) =>
+          presets.find((p) => p.id === where.id) ?? null,
+      ),
+      findFirst: jest.fn(
+        async ({ where }: GatewayFeePresetFindFirstArgs) =>
+          presets.find((p) => p.gateway === where.gateway && p.mode === where.mode) ?? null,
+      ),
     },
     campgroundPaymentGatewayConfig: {
-      findUnique: jest.fn(async ({ where }: { where: { campgroundId: string } }) => configs.find((c) => c.campgroundId === where.campgroundId) ?? null),
+      findUnique: jest.fn(
+        async ({ where }: { where: { campgroundId: string } }) =>
+          configs.find((c) => c.campgroundId === where.campgroundId) ?? null,
+      ),
       create: jest.fn(async ({ data, include }: GatewayConfigCreateArgs) => {
         const preset = presets.find((p) => p.id === data.feePresetId) ?? null;
         const { id: _ignored, ...rest } = data;
-        const rec: ConfigRecord = { id: `cfg_${configs.length}`, ...rest, GatewayFeePreset: preset };
+        const rec: ConfigRecord = {
+          id: `cfg_${configs.length}`,
+          ...rest,
+          GatewayFeePreset: preset,
+        };
         configs.push(rec);
         return include?.GatewayFeePreset ? rec : { ...rec, GatewayFeePreset: undefined };
       }),
@@ -64,7 +91,8 @@ const buildPrisma = () => {
           configs.push(rec);
         } else {
           Object.assign(rec, update);
-          rec.GatewayFeePreset = presets.find((p) => p.id === rec?.feePresetId) ?? rec.GatewayFeePreset;
+          rec.GatewayFeePreset =
+            presets.find((p) => p.id === rec?.feePresetId) ?? rec.GatewayFeePreset;
         }
         return include?.GatewayFeePreset ? rec : { ...rec, GatewayFeePreset: undefined };
       }),
@@ -108,7 +136,7 @@ describe("GatewayConfigService", () => {
           gateway: "stripe",
           mode: "prod",
           feeMode: "absorb",
-        })
+        }),
       ).rejects.toBeInstanceOf(BadRequestException);
     } finally {
       await close();

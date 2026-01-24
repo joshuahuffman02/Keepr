@@ -1,4 +1,5 @@
 # Acquisition Exit Strategy
+
 ## Keepr - Path to $1M+ Exit
 
 **Goal**: Be acquired by a larger campground management system company for enough to net **$1,000,000+ after taxes**.
@@ -8,7 +9,9 @@
 ## The Math
 
 ### Tax Considerations
+
 Assuming sale structured as asset sale or stock sale with long-term capital gains:
+
 - Federal capital gains: 15-20%
 - State taxes (varies): 0-13%
 - Net Investment Income Tax: 3.8% if income > $250K
@@ -16,7 +19,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 **Conservative estimate**: ~30% total tax burden
 
 | Net After Tax | Pre-Tax Needed | At 3x Revenue | At 5x Revenue |
-|---------------|----------------|---------------|---------------|
+| ------------- | -------------- | ------------- | ------------- |
 | $1,000,000    | $1,430,000     | $477K ARR     | $286K ARR     |
 | $1,500,000    | $2,140,000     | $713K ARR     | $428K ARR     |
 | $2,000,000    | $2,860,000     | $953K ARR     | $572K ARR     |
@@ -29,28 +32,28 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 
 ### Tier 1: Strategic Buyers (Highest Multiples)
 
-| Company | Why They'd Buy | Strategic Value |
-|---------|----------------|-----------------|
-| **Campspot** | Eliminate competitor, acquire modern tech stack | They're VC-backed, growing aggressively |
-| **Newbook** | US market expansion, modern booking engine | Australian company pushing into North America |
-| **RMS Cloud** | Technology acquisition, customer base | Dated tech, need modernization |
-| **Staylist** | Similar positioning, consolidation play | Could merge customer bases |
+| Company       | Why They'd Buy                                  | Strategic Value                               |
+| ------------- | ----------------------------------------------- | --------------------------------------------- |
+| **Campspot**  | Eliminate competitor, acquire modern tech stack | They're VC-backed, growing aggressively       |
+| **Newbook**   | US market expansion, modern booking engine      | Australian company pushing into North America |
+| **RMS Cloud** | Technology acquisition, customer base           | Dated tech, need modernization                |
+| **Staylist**  | Similar positioning, consolidation play         | Could merge customer bases                    |
 
 ### Tier 2: Financial Buyers
 
-| Company | Why They'd Buy | Notes |
-|---------|----------------|-------|
-| **Private Equity Roll-ups** | Consolidating fragmented market | Lower multiples but faster close |
-| **Outdoor Hospitality Groups** | Vertical integration | Own parks wanting their own software |
+| Company                        | Why They'd Buy                  | Notes                                |
+| ------------------------------ | ------------------------------- | ------------------------------------ |
+| **Private Equity Roll-ups**    | Consolidating fragmented market | Lower multiples but faster close     |
+| **Outdoor Hospitality Groups** | Vertical integration            | Own parks wanting their own software |
 
 ### Tier 3: Adjacent Players
 
-| Company | Why They'd Buy | Strategic Value |
-|---------|----------------|-----------------|
-| **Airbnb** | Outdoor/glamping expansion | Long shot but possible |
-| **Hipcamp** | Technology upgrade | Currently manual-heavy |
-| **Outdoorsy/RVShare** | Expand into park management | Adjacent market entry |
-| **Toast/Square** | Hospitality POS expansion | Outdoor vertical |
+| Company               | Why They'd Buy              | Strategic Value        |
+| --------------------- | --------------------------- | ---------------------- |
+| **Airbnb**            | Outdoor/glamping expansion  | Long shot but possible |
+| **Hipcamp**           | Technology upgrade          | Currently manual-heavy |
+| **Outdoorsy/RVShare** | Expand into park management | Adjacent market entry  |
+| **Toast/Square**      | Hospitality POS expansion   | Outdoor vertical       |
 
 ---
 
@@ -86,6 +89,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ### Phase 1: Build Acquisition Attractiveness (Months 1-12)
 
 **Revenue Targets:**
+
 - Month 6: $5K MRR (60 customers at ~$83/mo effective rate)
 - Month 12: $15K MRR (150 customers)
 
@@ -99,6 +103,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 | NPS | >50 | Customer love |
 
 **Actions:**
+
 - [ ] Implement proper analytics (Mixpanel, Amplitude)
 - [ ] Track cohort retention religiously
 - [ ] Document all processes (increases value)
@@ -132,6 +137,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ### Phase 3: Acquisition Preparation (Months 18-24)
 
 **Due Diligence Readiness:**
+
 - [ ] Financial audit (even informal)
 - [ ] Customer contract review
 - [ ] IP documentation (trademarks, code ownership)
@@ -139,6 +145,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 - [ ] Data room prepared (Dropbox/Notion)
 
 **Valuation Documentation:**
+
 - ARR/MRR trends
 - Customer acquisition metrics
 - Retention/churn data
@@ -150,18 +157,21 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ## Acquisition Scenarios
 
 ### Scenario A: Acqui-hire ($500K-$1M)
+
 **What it is**: They buy you primarily for talent + technology
 **Timeline**: Can happen at any revenue level
 **Likely buyers**: Well-funded competitors needing engineering talent
 **Your role post-acquisition**: Usually 2-4 year employment commitment
 
 ### Scenario B: Strategic Acquisition ($1.5M-$3M)
+
 **What it is**: They want your customers, technology, and market position
 **Requirements**: $200K+ ARR, proven retention, clean operations
 **Timeline**: 18-24 months of operation
 **Your role**: 6-12 month transition, possible ongoing consulting
 
 ### Scenario C: Premium Acquisition ($3M-$5M+)
+
 **What it is**: Competitive bid situation, multiple interested buyers
 **Requirements**: $500K+ ARR, strong brand, strategic importance
 **Timeline**: 24-36 months of operation
@@ -174,24 +184,28 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ### The "CAMP" Framework for Acquisition
 
 **C - Customers That Matter**
+
 - Focus on customers acquirers want
 - Mid-size parks (50-200 sites) = sweet spot
 - Document customer success stories
 - High NPS scores
 
 **A - Assets That Transfer**
+
 - Clean codebase with documentation
 - Proper legal structure (ideally Delaware C-Corp)
 - Trademarks registered
 - No legal liabilities
 
 **M - Metrics That Impress**
+
 - Revenue growing MoM
 - Churn below industry average
 - Positive unit economics
 - Clear CAC/LTV
 
 **P - Position That Threatens**
+
 - Be seen as the "next generation" option
 - Win head-to-head deals against them
 - Own a niche they can't reach
@@ -203,42 +217,45 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 
 ### What Increases Multiple
 
-| Factor | Impact | How to Achieve |
-|--------|--------|----------------|
-| Revenue Growth Rate | +1-2x multiple | Aggressive customer acquisition |
-| Net Revenue Retention | +1x multiple | Expansion revenue, low churn |
-| Modern Tech Stack | +0.5-1x | Already have this |
-| AI/ML Capabilities | +0.5-1x | Already building this |
-| Team Quality | +0.5x | Document team strengths |
-| Strategic Value | +2-3x | Be in their must-acquire list |
+| Factor                | Impact         | How to Achieve                  |
+| --------------------- | -------------- | ------------------------------- |
+| Revenue Growth Rate   | +1-2x multiple | Aggressive customer acquisition |
+| Net Revenue Retention | +1x multiple   | Expansion revenue, low churn    |
+| Modern Tech Stack     | +0.5-1x        | Already have this               |
+| AI/ML Capabilities    | +0.5-1x        | Already building this           |
+| Team Quality          | +0.5x          | Document team strengths         |
+| Strategic Value       | +2-3x          | Be in their must-acquire list   |
 
 ### What Decreases Multiple
 
-| Factor | Impact | How to Avoid |
-|--------|--------|--------------|
-| Customer Concentration | -1x | No customer >10% of revenue |
-| Technical Debt | -0.5x | Keep code clean |
-| Founder Dependence | -1x | Document everything |
-| Legal Issues | Deal killer | Stay compliant |
-| Messy Cap Table | -0.5x | Keep equity simple |
+| Factor                 | Impact      | How to Avoid                |
+| ---------------------- | ----------- | --------------------------- |
+| Customer Concentration | -1x         | No customer >10% of revenue |
+| Technical Debt         | -0.5x       | Keep code clean             |
+| Founder Dependence     | -1x         | Document everything         |
+| Legal Issues           | Deal killer | Stay compliant              |
+| Messy Cap Table        | -0.5x       | Keep equity simple          |
 
 ---
 
 ## Exit Timeline Options
 
 ### Fast Exit (12-18 months)
+
 - Focus on acqui-hire or strategic technology sale
 - Target: Campspot, Newbook
 - Requires: Strong tech, AI differentiation, some traction
 - Expected value: $500K-$1.5M
 
 ### Medium Exit (24-36 months)
+
 - Build real revenue and customer base
 - Target: Strategic acquisition
 - Requires: $200-400K ARR, strong metrics
 - Expected value: $1.5M-$4M
 
 ### Optimized Exit (36-48 months)
+
 - Build to competitive auction scenario
 - Target: Multiple bidders
 - Requires: $500K+ ARR, market leadership in niche
@@ -249,6 +266,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ## Tactical Actions to Start Now
 
 ### Immediate (This Month)
+
 1. [ ] Set up proper analytics tracking
 2. [ ] Register trademark for "Keepr"
 3. [ ] Ensure Delaware C-Corp structure (or convert)
@@ -256,6 +274,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 5. [ ] Create SEO content targeting "[competitor] alternative"
 
 ### Near-Term (Next 90 Days)
+
 1. [ ] Implement customer health scoring
 2. [ ] Build case study from first 5 early access customers
 3. [ ] Apply to speak at ARVC 2025
@@ -263,6 +282,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 5. [ ] Set up data room template
 
 ### Medium-Term (Next 6 Months)
+
 1. [ ] Achieve $10K MRR milestone
 2. [ ] Document all processes and runbooks
 3. [ ] Build advisory board with industry connections
@@ -295,6 +315,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 ### The "Anti-Sell" Positioning
 
 Paradoxically, the best way to get acquired is to act like you never want to be:
+
 - "We're building for the long term"
 - "Not interested in selling" (makes them want you more)
 - "We're having too much fun disrupting the market"
@@ -306,17 +327,20 @@ This creates scarcity and increases perceived value.
 ## Key Contacts to Build
 
 ### Investment Bankers (SaaS Focus)
+
 - Vista Point Advisors
 - Corum Group
 - Software Equity Group
 - FE International (smaller deals)
 
 ### Industry Connections
+
 - ARVC (American RV Park & Campground Association)
 - OHI (Outdoor Hospitality Industry) consultants
 - State campground associations
 
 ### Potential Advisor Targets
+
 - Former executives at Campspot, Newbook, RMS
 - Successful campground owners with tech backgrounds
 - SaaS founders who've exited
@@ -327,15 +351,16 @@ This creates scarcity and increases perceived value.
 
 **To net $1M+ after taxes:**
 
-| Path | Revenue Needed | Timeline | Probability |
-|------|----------------|----------|-------------|
-| Acqui-hire | Any + strong tech | 12-18 mo | Medium |
-| Strategic Sale | ~$300K ARR | 24-30 mo | High if metrics good |
-| Competitive Auction | ~$500K ARR | 36+ mo | Highest value |
+| Path                | Revenue Needed    | Timeline | Probability          |
+| ------------------- | ----------------- | -------- | -------------------- |
+| Acqui-hire          | Any + strong tech | 12-18 mo | Medium               |
+| Strategic Sale      | ~$300K ARR        | 24-30 mo | High if metrics good |
+| Competitive Auction | ~$500K ARR        | 36+ mo   | Highest value        |
 
 **Most realistic path**: Build to $25-35K MRR ($300-420K ARR) over 24 months, position as strategic threat to Campspot or acquisition target for Newbook's US expansion.
 
 **The formula**:
+
 ```
 $1M Net = $1.43M Pre-tax = 4-5x on $300K ARR = ~250 customers at $100/mo
 ```
@@ -344,4 +369,4 @@ This is achievable with the early access program filling all 45 spots and growin
 
 ---
 
-*"You don't get acquired because you want to be. You get acquired because you've built something they need to own."*
+_"You don't get acquired because you want to be. You get acquired because you've built something they need to own."_

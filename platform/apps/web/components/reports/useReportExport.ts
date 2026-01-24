@@ -21,7 +21,7 @@ type Site = Awaited<ReturnType<typeof apiClient.getSites>>[number];
 
 export function useReportExport(
   campgroundId: string | null,
-  dateRange: { start: string; end: string }
+  dateRange: { start: string; end: string },
 ) {
   const { toast } = useToast();
 
@@ -47,11 +47,7 @@ export function useReportExport(
   /**
    * Export a report based on tab and subtab
    */
-  const exportReport = (
-    tab: string,
-    subTab: string | null,
-    format: ExportFormat = 'csv'
-  ) => {
+  const exportReport = (tab: string, subTab: string | null, format: ExportFormat = "csv") => {
     if (!reservations || !sites) {
       toast({
         title: "Export failed",
@@ -63,113 +59,114 @@ export function useReportExport(
 
     try {
       // Daily reports
-      if (tab === 'daily') {
+      if (tab === "daily") {
         switch (subTab) {
-          case 'arrivals-list':
+          case "arrivals-list":
             exportArrivalsReport(reservations, sites, dateRange, format);
             break;
-          case 'departures-list':
+          case "departures-list":
             exportDeparturesReport(reservations, sites, dateRange, format);
             break;
-          case 'in-house-guests':
+          case "in-house-guests":
             exportInHouseGuestsReport(reservations, sites, dateRange, format);
             break;
-          case 'transaction-log':
+          case "transaction-log":
             if (ledgerEntries) {
-              exportLedgerReport(ledgerEntries, 'transaction-log', format);
+              exportLedgerReport(ledgerEntries, "transaction-log", format);
             }
             break;
-          case 'daily-summary':
+          case "daily-summary":
             // Export summary data
             const dailyData = prepareDailySummaryData(reservations, sites, dateRange);
-            exportGenericReport(dailyData, 'daily-summary', format);
+            exportGenericReport(dailyData, "daily-summary", format);
             break;
           default:
             // Generic reservation export
-            exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+            exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
         }
       }
       // Revenue reports
-      else if (tab === 'revenue') {
+      else if (tab === "revenue") {
         switch (subTab) {
-          case 'revenue-by-source':
-          case 'revenue-by-site-type':
-          case 'payment-methods':
+          case "revenue-by-source":
+          case "revenue-by-site-type":
+          case "payment-methods":
             exportReservationList(
-              reservations.filter(r => r.status !== 'cancelled'),
+              reservations.filter((r) => r.status !== "cancelled"),
               sites,
               `${subTab}`,
-              format
+              format,
             );
             break;
           default:
-            exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+            exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
         }
       }
       // Performance reports
-      else if (tab === 'performance') {
+      else if (tab === "performance") {
         switch (subTab) {
-          case 'cancellations':
+          case "cancellations":
             exportCancellationsReport(reservations, sites, dateRange, format);
             break;
-          case 'occupancy':
-          case 'los-analysis':
+          case "occupancy":
+          case "los-analysis":
             exportReservationList(
-              reservations.filter(r => r.status !== 'cancelled'),
+              reservations.filter((r) => r.status !== "cancelled"),
               sites,
               `${subTab}`,
-              format
+              format,
             );
             break;
           default:
-            exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+            exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
         }
       }
       // Guest reports
-      else if (tab === 'guests') {
+      else if (tab === "guests") {
         switch (subTab) {
-          case 'guest-origins':
-          case 'repeat-guests':
-          case 'new-vs-returning':
-          case 'top-spenders':
+          case "guest-origins":
+          case "repeat-guests":
+          case "new-vs-returning":
+          case "top-spenders":
             exportReservationList(
-              reservations.filter(r => r.status !== 'cancelled'),
+              reservations.filter((r) => r.status !== "cancelled"),
               sites,
               `${subTab}`,
-              format
+              format,
             );
             break;
           default:
-            exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+            exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
         }
       }
       // Accounting reports
-      else if (tab === 'accounting') {
+      else if (tab === "accounting") {
         switch (subTab) {
-          case 'ledger':
+          case "ledger":
             if (ledgerEntries) {
-              exportLedgerReport(ledgerEntries, 'ledger-summary', format);
+              exportLedgerReport(ledgerEntries, "ledger-summary", format);
             }
             break;
           default:
-            exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+            exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
         }
       }
       // Default export
       else {
-        exportReservationList(reservations, sites, `${tab}-${subTab || 'report'}`, format);
+        exportReservationList(reservations, sites, `${tab}-${subTab || "report"}`, format);
       }
 
       // Show success toast
       toast({
         title: "Export successful",
-        description: `Your ${format === 'xlsx' ? 'Excel CSV' : 'CSV'} file has been downloaded.`,
+        description: `Your ${format === "xlsx" ? "Excel CSV" : "CSV"} file has been downloaded.`,
       });
     } catch (error) {
-      console.error('Export error:', error);
+      console.error("Export error:", error);
       toast({
         title: "Export failed",
-        description: error instanceof Error ? error.message : "An error occurred while exporting the report.",
+        description:
+          error instanceof Error ? error.message : "An error occurred while exporting the report.",
         variant: "destructive",
       });
     }
@@ -184,23 +181,23 @@ export function useReportExport(
 function prepareDailySummaryData(
   reservations: Reservation[],
   sites: Site[],
-  dateRange: { start: string; end: string }
+  dateRange: { start: string; end: string },
 ) {
   const start = new Date(dateRange.start);
   const end = new Date(dateRange.end);
 
   const arrivals = reservations.filter((r) => {
     const arrivalDate = new Date(r.arrivalDate);
-    return arrivalDate >= start && arrivalDate <= end && r.status !== 'cancelled';
+    return arrivalDate >= start && arrivalDate <= end && r.status !== "cancelled";
   }).length;
 
   const departures = reservations.filter((r) => {
     const departureDate = new Date(r.departureDate);
-    return departureDate >= start && departureDate <= end && r.status !== 'cancelled';
+    return departureDate >= start && departureDate <= end && r.status !== "cancelled";
   }).length;
 
   const inHouse = reservations.filter((r) => {
-    if (r.status === 'cancelled') return false;
+    if (r.status === "cancelled") return false;
     const arrivalDate = new Date(r.arrivalDate);
     const departureDate = new Date(r.departureDate);
     return arrivalDate <= end && departureDate > start;
@@ -208,17 +205,22 @@ function prepareDailySummaryData(
 
   const occupancy = sites.length > 0 ? Math.round((inHouse / sites.length) * 100) : 0;
 
-  return [{
-    'Metric': 'Arrivals',
-    'Value': arrivals,
-  }, {
-    'Metric': 'Departures',
-    'Value': departures,
-  }, {
-    'Metric': 'In House',
-    'Value': inHouse,
-  }, {
-    'Metric': 'Occupancy',
-    'Value': `${occupancy}%`,
-  }];
+  return [
+    {
+      Metric: "Arrivals",
+      Value: arrivals,
+    },
+    {
+      Metric: "Departures",
+      Value: departures,
+    },
+    {
+      Metric: "In House",
+      Value: inHouse,
+    },
+    {
+      Metric: "Occupancy",
+      Value: `${occupancy}%`,
+    },
+  ];
 }

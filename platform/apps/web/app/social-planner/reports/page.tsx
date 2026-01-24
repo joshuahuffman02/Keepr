@@ -14,7 +14,7 @@ import { Button } from "../../../components/ui/button";
 export default function SocialPlannerReports() {
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
@@ -29,7 +29,7 @@ export default function SocialPlannerReports() {
   const reportQuery = useQuery({
     queryKey: ["social-report", campgroundId],
     queryFn: () => apiClient.getSocialReport(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const record = useMutation({
@@ -41,7 +41,7 @@ export default function SocialPlannerReports() {
         likes: Number(likes) || 0,
         comments: Number(comments) || 0,
         shares: Number(shares) || 0,
-        saves: Number(saves) || 0
+        saves: Number(saves) || 0,
       }),
     onSuccess: () => {
       setPostId("");
@@ -51,10 +51,15 @@ export default function SocialPlannerReports() {
       setShares("");
       setSaves("");
       qc.invalidateQueries({ queryKey: ["social-report", campgroundId] });
-    }
+    },
   });
 
-  const report = reportQuery.data || { posts: 0, templates: 0, openSuggestions: 0, performance: { likes: 0, reach: 0, comments: 0, shares: 0, saves: 0 } };
+  const report = reportQuery.data || {
+    posts: 0,
+    templates: 0,
+    openSuggestions: 0,
+    performance: { likes: 0, reach: 0, comments: 0, shares: 0, saves: 0 },
+  };
 
   if (!campgroundId) {
     return (
@@ -71,14 +76,19 @@ export default function SocialPlannerReports() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Reports</p>
           <h1 className="text-2xl font-bold text-foreground">Planner reporting & learning</h1>
-          <p className="text-muted-foreground">Suggested vs completed, template usage, categories, and performance inputs.</p>
+          <p className="text-muted-foreground">
+            Suggested vs completed, template usage, categories, and performance inputs.
+          </p>
         </div>
       </div>
 
@@ -109,8 +119,12 @@ export default function SocialPlannerReports() {
             <Lightbulb className="h-4 w-4 text-amber-600" />
             Consistency score (stub)
           </div>
-          <div className="text-3xl font-bold text-foreground mt-2">{Math.min(report.posts * 5, 100)}%</div>
-          <div className="text-xs text-muted-foreground mt-1">Improves as you add drafts and record performance.</div>
+          <div className="text-3xl font-bold text-foreground mt-2">
+            {Math.min(report.posts * 5, 100)}%
+          </div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Improves as you add drafts and record performance.
+          </div>
         </Card>
       </div>
 
@@ -119,34 +133,55 @@ export default function SocialPlannerReports() {
         <div className="grid md:grid-cols-5 gap-3 text-sm text-foreground">
           <div className="p-3 rounded border border-border bg-muted">
             <div className="text-xs text-muted-foreground uppercase">Reach</div>
-            <div className="text-lg font-semibold text-foreground">{report.performance?.reach ?? 0}</div>
+            <div className="text-lg font-semibold text-foreground">
+              {report.performance?.reach ?? 0}
+            </div>
           </div>
           <div className="p-3 rounded border border-border bg-muted">
             <div className="text-xs text-muted-foreground uppercase">Likes</div>
-            <div className="text-lg font-semibold text-foreground">{report.performance?.likes ?? 0}</div>
+            <div className="text-lg font-semibold text-foreground">
+              {report.performance?.likes ?? 0}
+            </div>
           </div>
           <div className="p-3 rounded border border-border bg-muted">
             <div className="text-xs text-muted-foreground uppercase">Comments</div>
-            <div className="text-lg font-semibold text-foreground">{report.performance?.comments ?? 0}</div>
+            <div className="text-lg font-semibold text-foreground">
+              {report.performance?.comments ?? 0}
+            </div>
           </div>
           <div className="p-3 rounded border border-border bg-muted">
             <div className="text-xs text-muted-foreground uppercase">Shares</div>
-            <div className="text-lg font-semibold text-foreground">{report.performance?.shares ?? 0}</div>
+            <div className="text-lg font-semibold text-foreground">
+              {report.performance?.shares ?? 0}
+            </div>
           </div>
           <div className="p-3 rounded border border-border bg-muted">
             <div className="text-xs text-muted-foreground uppercase">Saves</div>
-            <div className="text-lg font-semibold text-foreground">{report.performance?.saves ?? 0}</div>
+            <div className="text-lg font-semibold text-foreground">
+              {report.performance?.saves ?? 0}
+            </div>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">Because there is no auto-posting, enter reach/likes/comments manually to help the rule-based engine learn.</p>
+        <p className="text-xs text-muted-foreground mt-2">
+          Because there is no auto-posting, enter reach/likes/comments manually to help the
+          rule-based engine learn.
+        </p>
 
         <div className="grid md:grid-cols-6 gap-2 mt-3">
-          <Input placeholder="Post ID (optional)" value={postId} onChange={e => setPostId(e.target.value)} />
-          <Input placeholder="Reach" value={reach} onChange={e => setReach(e.target.value)} />
-          <Input placeholder="Likes" value={likes} onChange={e => setLikes(e.target.value)} />
-          <Input placeholder="Comments" value={comments} onChange={e => setComments(e.target.value)} />
-          <Input placeholder="Shares" value={shares} onChange={e => setShares(e.target.value)} />
-          <Input placeholder="Saves" value={saves} onChange={e => setSaves(e.target.value)} />
+          <Input
+            placeholder="Post ID (optional)"
+            value={postId}
+            onChange={(e) => setPostId(e.target.value)}
+          />
+          <Input placeholder="Reach" value={reach} onChange={(e) => setReach(e.target.value)} />
+          <Input placeholder="Likes" value={likes} onChange={(e) => setLikes(e.target.value)} />
+          <Input
+            placeholder="Comments"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+          />
+          <Input placeholder="Shares" value={shares} onChange={(e) => setShares(e.target.value)} />
+          <Input placeholder="Saves" value={saves} onChange={(e) => setSaves(e.target.value)} />
         </div>
         <Button
           className="mt-3"
@@ -159,4 +194,3 @@ export default function SocialPlannerReports() {
     </DashboardShell>
   );
 }
-

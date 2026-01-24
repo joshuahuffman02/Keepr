@@ -25,7 +25,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
 const EMPTY_SELECT_VALUE = "__empty";
@@ -51,7 +57,7 @@ const initialFilters = {
   vip: false,
   loyaltyTier: "",
   stayFrom: "",
-  stayTo: ""
+  stayTo: "",
 };
 
 type AudienceFilters = typeof initialFilters;
@@ -68,14 +74,15 @@ const toFilterPatch = (value: unknown): Partial<AudienceFilters> => {
   if (!isRecord(value)) return {};
   return {
     siteType: typeof value.siteType === "string" ? value.siteType : undefined,
-    notStayedThisYear: typeof value.notStayedThisYear === "boolean" ? value.notStayedThisYear : undefined,
+    notStayedThisYear:
+      typeof value.notStayedThisYear === "boolean" ? value.notStayedThisYear : undefined,
     lastStayBefore: typeof value.lastStayBefore === "string" ? value.lastStayBefore : undefined,
     state: typeof value.state === "string" ? value.state : undefined,
     promoUsed: typeof value.promoUsed === "boolean" ? value.promoUsed : undefined,
     vip: typeof value.vip === "boolean" ? value.vip : undefined,
     loyaltyTier: typeof value.loyaltyTier === "string" ? value.loyaltyTier : undefined,
     stayFrom: typeof value.stayFrom === "string" ? value.stayFrom : undefined,
-    stayTo: typeof value.stayTo === "string" ? value.stayTo : undefined
+    stayTo: typeof value.stayTo === "string" ? value.stayTo : undefined,
   };
 };
 
@@ -98,7 +105,11 @@ export default function CampaignsPage() {
   const [suggestions, setSuggestions] = useState<CampaignSuggestion[]>([]);
   const [sendAt, setSendAt] = useState("");
   const [batchPerMinute, setBatchPerMinute] = useState("");
-  const [confirmSend, setConfirmSend] = useState<null | { id: string; name: string; status: string }>(null);
+  const [confirmSend, setConfirmSend] = useState<null | {
+    id: string;
+    name: string;
+    status: string;
+  }>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -109,13 +120,13 @@ export default function CampaignsPage() {
   const campaignsQuery = useQuery({
     queryKey: ["campaigns", campgroundId],
     queryFn: () => apiClient.listCampaigns(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const templatesQuery = useQuery({
     queryKey: ["campaign-templates", campgroundId],
     queryFn: () => apiClient.listCampaignTemplates(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const createMutation = useMutation({
@@ -133,10 +144,10 @@ export default function CampaignsPage() {
         audienceJson: filters,
         variables: {
           promoCode: "{{promoCode}}",
-          unsubscribeLink: "{{unsubscribeLink}}"
+          unsubscribeLink: "{{unsubscribeLink}}",
         },
         scheduledAt: sendAt || null,
-        batchPerMinute: batchPerMinute ? Number(batchPerMinute) : null
+        batchPerMinute: batchPerMinute ? Number(batchPerMinute) : null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaigns", campgroundId] });
@@ -148,7 +159,8 @@ export default function CampaignsPage() {
       setTextBody("Hello from the campground!");
       toast({ title: "Saved", description: "Campaign created." });
     },
-    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const sendMutation = useMutation({
@@ -157,17 +169,30 @@ export default function CampaignsPage() {
       queryClient.invalidateQueries({ queryKey: ["campaigns", campgroundId] });
       toast({ title: "Sent", description: "Campaign send started." });
     },
-    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const statusBadge = (status: string) => {
     switch (status) {
       case "sent":
-        return <Badge className="bg-status-success/15 text-status-success border border-status-success/30">Sent</Badge>;
+        return (
+          <Badge className="bg-status-success/15 text-status-success border border-status-success/30">
+            Sent
+          </Badge>
+        );
       case "sending":
-        return <Badge className="bg-status-info/15 text-status-info border border-status-info/30">Sending</Badge>;
+        return (
+          <Badge className="bg-status-info/15 text-status-info border border-status-info/30">
+            Sending
+          </Badge>
+        );
       case "scheduled":
-        return <Badge className="bg-status-warning/15 text-status-warning border border-status-warning/30">Scheduled</Badge>;
+        return (
+          <Badge className="bg-status-warning/15 text-status-warning border border-status-warning/30">
+            Scheduled
+          </Badge>
+        );
       case "cancelled":
         return <Badge className="bg-muted text-foreground border border-border">Cancelled</Badge>;
       default:
@@ -199,7 +224,12 @@ export default function CampaignsPage() {
     if (!campgroundId) return;
     try {
       const data = await apiClient.getCampaignSuggestions(campgroundId);
-      setSuggestions((data || []).map((suggestion) => ({ reason: suggestion.reason, filters: toFilterPatch(suggestion.filters) })));
+      setSuggestions(
+        (data || []).map((suggestion) => ({
+          reason: suggestion.reason,
+          filters: toFilterPatch(suggestion.filters),
+        })),
+      );
     } catch {
       setSuggestions([]);
     }
@@ -232,11 +262,7 @@ export default function CampaignsPage() {
       );
     }
     return (
-      <Textarea
-        className="min-h-[200px]"
-        value={html}
-        onChange={(e) => setHtml(e.target.value)}
-      />
+      <Textarea className="min-h-[200px]" value={html} onChange={(e) => setHtml(e.target.value)} />
     );
   }, [html, htmlMode]);
 
@@ -246,7 +272,8 @@ export default function CampaignsPage() {
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Email Campaigns</h1>
           <p className="text-muted-foreground text-sm">
-            Draft and send marketing campaigns (email and SMS) to guests who opted in for the selected campground.
+            Draft and send marketing campaigns (email and SMS) to guests who opted in for the
+            selected campground.
           </p>
         </div>
 
@@ -255,252 +282,331 @@ export default function CampaignsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Create campaign</CardTitle>
-                <CardDescription>Subject, from info, body, channel, and audience filters.</CardDescription>
+                <CardDescription>
+                  Subject, from info, body, channel, and audience filters.
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-3">
-              <div className="space-y-1">
-                <Label>Campaign name</Label>
-                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Fall Specials" />
-              </div>
-              <div className="space-y-1">
-                <Label>Subject</Label>
-                <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Welcome to Keepr" />
-              </div>
-              <div className="space-y-1">
-                <Label>Channel</Label>
-                <div className="flex gap-3">
-                  {CHANNELS.map((ch) => (
-                    <Button
-                      key={ch}
-                      type="button"
-                      variant={channel === ch ? "default" : "outline"}
-                      onClick={() => setChannel(ch)}
-                    >
-                      {ch === "both" ? "Email + SMS" : ch.toUpperCase()}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label>From email</Label>
-                  <Input value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} placeholder="hello@keeprstay.com" />
-                </div>
-                <div className="space-y-1">
-                  <Label>From name (optional)</Label>
-                  <Input value={fromName} onChange={(e) => setFromName(e.target.value)} placeholder="Keepr Team" />
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Label>HTML body</Label>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
-                    <Tabs
-                      value={htmlMode}
-                      onValueChange={(value) => {
-                        if (isHtmlMode(value)) setHtmlMode(value);
-                      }}
-                    >
-                      <TabsList className="h-7">
-                        <TabsTrigger value="visual" className="text-xs h-7 px-2">Visual</TabsTrigger>
-                        <TabsTrigger value="html" className="text-xs h-7 px-2">HTML</TabsTrigger>
-                      </TabsList>
-                    </Tabs>
-                    <div className="hidden md:flex items-center gap-1">
-                      {["{{firstName}}", "{{lastName}}", "{{campgroundName}}", "{{siteType}}", "{{lastStayDate}}", "{{promoCode}}", "{{unsubscribeLink}}"].map((t) => (
-                        <Button key={t} variant="outline" size="sm" className="h-7 text-xs" onClick={() => insertToken(t)}>
+                  <div className="space-y-1">
+                    <Label>Campaign name</Label>
+                    <Input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Fall Specials"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Subject</Label>
+                    <Input
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      placeholder="Welcome to Keepr"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Channel</Label>
+                    <div className="flex gap-3">
+                      {CHANNELS.map((ch) => (
+                        <Button
+                          key={ch}
+                          type="button"
+                          variant={channel === ch ? "default" : "outline"}
+                          onClick={() => setChannel(ch)}
+                        >
+                          {ch === "both" ? "Email + SMS" : ch.toUpperCase()}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label>From email</Label>
+                      <Input
+                        value={fromEmail}
+                        onChange={(e) => setFromEmail(e.target.value)}
+                        placeholder="hello@keeprstay.com"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label>From name (optional)</Label>
+                      <Input
+                        value={fromName}
+                        onChange={(e) => setFromName(e.target.value)}
+                        placeholder="Keepr Team"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <Label>HTML body</Label>
+                      <div className="text-xs text-muted-foreground flex items-center gap-2">
+                        <Tabs
+                          value={htmlMode}
+                          onValueChange={(value) => {
+                            if (isHtmlMode(value)) setHtmlMode(value);
+                          }}
+                        >
+                          <TabsList className="h-7">
+                            <TabsTrigger value="visual" className="text-xs h-7 px-2">
+                              Visual
+                            </TabsTrigger>
+                            <TabsTrigger value="html" className="text-xs h-7 px-2">
+                              HTML
+                            </TabsTrigger>
+                          </TabsList>
+                        </Tabs>
+                        <div className="hidden md:flex items-center gap-1">
+                          {[
+                            "{{firstName}}",
+                            "{{lastName}}",
+                            "{{campgroundName}}",
+                            "{{siteType}}",
+                            "{{lastStayDate}}",
+                            "{{promoCode}}",
+                            "{{unsubscribeLink}}",
+                          ].map((t) => (
+                            <Button
+                              key={t}
+                              variant="outline"
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => insertToken(t)}
+                            >
+                              {t}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    {htmlPreview}
+                    <div className="flex md:hidden flex-wrap gap-2">
+                      {[
+                        "{{firstName}}",
+                        "{{lastName}}",
+                        "{{campgroundName}}",
+                        "{{siteType}}",
+                        "{{lastStayDate}}",
+                        "{{promoCode}}",
+                        "{{unsubscribeLink}}",
+                      ].map((t) => (
+                        <Button
+                          key={t}
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => insertToken(t)}
+                        >
                           {t}
                         </Button>
                       ))}
                     </div>
                   </div>
-                </div>
-                {htmlPreview}
-                <div className="flex md:hidden flex-wrap gap-2">
-                  {["{{firstName}}", "{{lastName}}", "{{campgroundName}}", "{{siteType}}", "{{lastStayDate}}", "{{promoCode}}", "{{unsubscribeLink}}"].map((t) => (
-                    <Button key={t} variant="outline" size="sm" className="h-7 text-xs" onClick={() => insertToken(t)}>
-                      {t}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <Label>SMS body</Label>
-                <Textarea
-                  className="min-h-[120px]"
-                  value={textBody}
-                  onChange={(e) => setTextBody(e.target.value)}
-                  placeholder="Short text for SMS (will include STOP to opt-out)."
-                />
-                <div className="text-xs text-muted-foreground">{textBody.length} chars</div>
-              </div>
-              <div className="space-y-1">
-                <Label>Template</Label>
-                <div className="flex gap-2">
-                  <Select
-                    value={templateId || EMPTY_SELECT_VALUE}
-                    onValueChange={(value) => applyTemplate(value === EMPTY_SELECT_VALUE ? "" : value)}
-                  >
-                    <SelectTrigger className="w-full text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={EMPTY_SELECT_VALUE}>Select a template</SelectItem>
-                      {templatesQuery.data
-                        ?.sort((a, b) => (a.category || "").localeCompare(b.category || ""))
-                        .map((t) => (
-                          <SelectItem key={t.id} value={t.id}>
-                            {t.name} ({t.channel}) [{t.category || "general"}]
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={async () => {
-                      try {
-                        await apiClient.createCampaignTemplate({
-                          campgroundId,
-                          name: name || "Untitled",
-                          channel,
-                          category: templateCategory || "general",
-                          subject,
-                          html,
-                          textBody
-                        });
-                        queryClient.invalidateQueries({ queryKey: ["campaign-templates", campgroundId] });
-                        toast({ title: "Template saved" });
-                      } catch (err) {
-                        toast({ title: "Error", description: getErrorMessage(err), variant: "destructive" });
-                      }
-                    }}
-                  >
-                    Save as template
-                  </Button>
-                </div>
-                <div className="space-y-1">
-                  <Label>Template category</Label>
-                  <Input
-                    value={templateCategory}
-                    onChange={(e) => setTemplateCategory(e.target.value)}
-                    placeholder="e.g., promos, lapsed, vip"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Audience filters</Label>
-                <div className="grid gap-3 md:grid-cols-2">
                   <div className="space-y-1">
-                    <Label>Site type</Label>
-                    <Select
-                      value={filters.siteType || EMPTY_SELECT_VALUE}
-                      onValueChange={(value) => setFilters((f) => ({ ...f, siteType: value === EMPTY_SELECT_VALUE ? "" : value }))}
+                    <Label>SMS body</Label>
+                    <Textarea
+                      className="min-h-[120px]"
+                      value={textBody}
+                      onChange={(e) => setTextBody(e.target.value)}
+                      placeholder="Short text for SMS (will include STOP to opt-out)."
+                    />
+                    <div className="text-xs text-muted-foreground">{textBody.length} chars</div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label>Template</Label>
+                    <div className="flex gap-2">
+                      <Select
+                        value={templateId || EMPTY_SELECT_VALUE}
+                        onValueChange={(value) =>
+                          applyTemplate(value === EMPTY_SELECT_VALUE ? "" : value)
+                        }
+                      >
+                        <SelectTrigger className="w-full text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={EMPTY_SELECT_VALUE}>Select a template</SelectItem>
+                          {templatesQuery.data
+                            ?.sort((a, b) => (a.category || "").localeCompare(b.category || ""))
+                            .map((t) => (
+                              <SelectItem key={t.id} value={t.id}>
+                                {t.name} ({t.channel}) [{t.category || "general"}]
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={async () => {
+                          try {
+                            await apiClient.createCampaignTemplate({
+                              campgroundId,
+                              name: name || "Untitled",
+                              channel,
+                              category: templateCategory || "general",
+                              subject,
+                              html,
+                              textBody,
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: ["campaign-templates", campgroundId],
+                            });
+                            toast({ title: "Template saved" });
+                          } catch (err) {
+                            toast({
+                              title: "Error",
+                              description: getErrorMessage(err),
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        Save as template
+                      </Button>
+                    </div>
+                    <div className="space-y-1">
+                      <Label>Template category</Label>
+                      <Input
+                        value={templateCategory}
+                        onChange={(e) => setTemplateCategory(e.target.value)}
+                        placeholder="e.g., promos, lapsed, vip"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Audience filters</Label>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      <div className="space-y-1">
+                        <Label>Site type</Label>
+                        <Select
+                          value={filters.siteType || EMPTY_SELECT_VALUE}
+                          onValueChange={(value) =>
+                            setFilters((f) => ({
+                              ...f,
+                              siteType: value === EMPTY_SELECT_VALUE ? "" : value,
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="w-full text-sm">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                            <SelectItem value="rv">RV</SelectItem>
+                            <SelectItem value="tent">Tent</SelectItem>
+                            <SelectItem value="cabin">Cabin</SelectItem>
+                            <SelectItem value="group">Group</SelectItem>
+                            <SelectItem value="glamping">Glamping</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label>State/Province</Label>
+                        <Input
+                          value={filters.state}
+                          onChange={(e) => setFilters((f) => ({ ...f, state: e.target.value }))}
+                          placeholder="e.g., CO"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Last stay before</Label>
+                        <Input
+                          type="date"
+                          value={filters.lastStayBefore}
+                          onChange={(e) =>
+                            setFilters((f) => ({ ...f, lastStayBefore: e.target.value }))
+                          }
+                        />
+                      </div>
+                      <div className="flex items-center gap-2 mt-6">
+                        <Checkbox
+                          id="notStayed"
+                          checked={filters.notStayedThisYear}
+                          onCheckedChange={(checked) =>
+                            setFilters((f) => ({ ...f, notStayedThisYear: Boolean(checked) }))
+                          }
+                        />
+                        <Label htmlFor="notStayed">
+                          Exclude guests who already stayed this year
+                        </Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="promoUsed"
+                          checked={filters.promoUsed}
+                          onCheckedChange={(checked) =>
+                            setFilters((f) => ({ ...f, promoUsed: Boolean(checked) }))
+                          }
+                        />
+                        <Label htmlFor="promoUsed">Used a promo</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          id="vip"
+                          checked={filters.vip}
+                          onCheckedChange={(checked) =>
+                            setFilters((f) => ({ ...f, vip: Boolean(checked) }))
+                          }
+                        />
+                        <Label htmlFor="vip">VIP / loyalty</Label>
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Loyalty tier</Label>
+                        <Input
+                          value={filters.loyaltyTier}
+                          onChange={(e) =>
+                            setFilters((f) => ({ ...f, loyaltyTier: e.target.value }))
+                          }
+                          placeholder="Bronze/Silver/Gold/Platinum"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Future stays from</Label>
+                        <Input
+                          type="date"
+                          value={filters.stayFrom}
+                          onChange={(e) => setFilters((f) => ({ ...f, stayFrom: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label>Future stays to</Label>
+                        <Input
+                          type="date"
+                          value={filters.stayTo}
+                          onChange={(e) => setFilters((f) => ({ ...f, stayTo: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button type="button" variant="outline" onClick={previewAudience}>
+                        Preview audience
+                      </Button>
+                      <Button type="button" variant="secondary" onClick={loadSuggestions}>
+                        Refresh suggestions
+                      </Button>
+                      <div className="text-xs text-muted-foreground self-center">
+                        Audience always honors marketing opt-in.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => createMutation.mutate()}
+                      disabled={!campgroundId || createMutation.isPending}
                     >
-                      <SelectTrigger className="w-full text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
-                        <SelectItem value="rv">RV</SelectItem>
-                        <SelectItem value="tent">Tent</SelectItem>
-                        <SelectItem value="cabin">Cabin</SelectItem>
-                        <SelectItem value="group">Group</SelectItem>
-                        <SelectItem value="glamping">Glamping</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>State/Province</Label>
-                    <Input
-                      value={filters.state}
-                      onChange={(e) => setFilters((f) => ({ ...f, state: e.target.value }))}
-                      placeholder="e.g., CO"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Last stay before</Label>
-                    <Input
-                      type="date"
-                      value={filters.lastStayBefore}
-                      onChange={(e) => setFilters((f) => ({ ...f, lastStayBefore: e.target.value }))}
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 mt-6">
-                    <Checkbox
-                      id="notStayed"
-                      checked={filters.notStayedThisYear}
-                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, notStayedThisYear: Boolean(checked) }))}
-                    />
-                    <Label htmlFor="notStayed">Exclude guests who already stayed this year</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="promoUsed"
-                      checked={filters.promoUsed}
-                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, promoUsed: Boolean(checked) }))}
-                    />
-                    <Label htmlFor="promoUsed">Used a promo</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Checkbox
-                      id="vip"
-                      checked={filters.vip}
-                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, vip: Boolean(checked) }))}
-                    />
-                    <Label htmlFor="vip">VIP / loyalty</Label>
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Loyalty tier</Label>
-                    <Input
-                      value={filters.loyaltyTier}
-                      onChange={(e) => setFilters((f) => ({ ...f, loyaltyTier: e.target.value }))}
-                      placeholder="Bronze/Silver/Gold/Platinum"
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Future stays from</Label>
-                    <Input
-                      type="date"
-                      value={filters.stayFrom}
-                      onChange={(e) => setFilters((f) => ({ ...f, stayFrom: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label>Future stays to</Label>
-                    <Input
-                      type="date"
-                      value={filters.stayTo}
-                      onChange={(e) => setFilters((f) => ({ ...f, stayTo: e.target.value }))}
-                    />
+                      Save draft
+                    </Button>
+                    <div className="text-xs text-muted-foreground self-center">
+                      Sends honor marketing opt-in and log via Postmark (email) / Twilio (SMS).
+                      Channel: {channelLabel}.
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <Button type="button" variant="outline" onClick={previewAudience}>
-                    Preview audience
-                  </Button>
-                  <Button type="button" variant="secondary" onClick={loadSuggestions}>
-                    Refresh suggestions
-                  </Button>
-                  <div className="text-xs text-muted-foreground self-center">
-                    Audience always honors marketing opt-in.
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <Button onClick={() => createMutation.mutate()} disabled={!campgroundId || createMutation.isPending}>
-                  Save draft
-                </Button>
-                <div className="text-xs text-muted-foreground self-center">
-                  Sends honor marketing opt-in and log via Postmark (email) / Twilio (SMS). Channel: {channelLabel}.
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
 
             <Card>
               <CardHeader>
@@ -508,7 +614,9 @@ export default function CampaignsPage() {
                 <CardDescription>Drafts and sends for this campground.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {campaignsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading campaigns…</div>}
+                {campaignsQuery.isLoading && (
+                  <div className="text-sm text-muted-foreground">Loading campaigns…</div>
+                )}
                 {!campaignsQuery.isLoading && (campaignsQuery.data?.length ?? 0) === 0 && (
                   <div className="text-sm text-muted-foreground">No campaigns yet.</div>
                 )}
@@ -522,12 +630,18 @@ export default function CampaignsPage() {
                         </div>
                         {statusBadge(c.status)}
                       </div>
-                      <div className="text-xs text-muted-foreground mt-1">From: {c.fromName ? `${c.fromName} ` : ""}&lt;{c.fromEmail}&gt;</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        From: {c.fromName ? `${c.fromName} ` : ""}&lt;{c.fromEmail}&gt;
+                      </div>
                       <div className="flex gap-3 mt-3">
                         <Button
                           variant="secondary"
-                          onClick={() => setConfirmSend({ id: c.id, name: c.name, status: c.status })}
-                          disabled={sendMutation.isPending || c.status === "sent" || c.status === "sending"}
+                          onClick={() =>
+                            setConfirmSend({ id: c.id, name: c.name, status: c.status })
+                          }
+                          disabled={
+                            sendMutation.isPending || c.status === "sent" || c.status === "sending"
+                          }
                         >
                           Send now
                         </Button>
@@ -541,7 +655,11 @@ export default function CampaignsPage() {
                               await apiClient.testCampaign(c.id, { email, phone });
                               toast({ title: "Test sent" });
                             } catch (err) {
-                              toast({ title: "Error", description: getErrorMessage(err), variant: "destructive" });
+                              toast({
+                                title: "Error",
+                                description: getErrorMessage(err),
+                                variant: "destructive",
+                              });
                             }
                           }}
                         >
@@ -568,7 +686,9 @@ export default function CampaignsPage() {
                     <div className="font-semibold text-foreground text-xs">Sample</div>
                     <ul className="text-xs text-muted-foreground list-disc pl-4">
                       {audiencePreview.sample.map((s) => (
-                        <li key={s.id}>{s.name || s.email || s.phone} ({s.email || "no email"})</li>
+                        <li key={s.id}>
+                          {s.name || s.email || s.phone} ({s.email || "no email"})
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -582,12 +702,19 @@ export default function CampaignsPage() {
                 <CardDescription>Auto-detected gaps based on upcoming occupancy.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {suggestions.length === 0 && <div className="text-sm text-muted-foreground">No suggestions right now.</div>}
+                {suggestions.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No suggestions right now.</div>
+                )}
                 {suggestions.map((s, idx) => (
-                  <div key={idx} className="rounded-lg border border-border p-4 flex items-center justify-between">
+                  <div
+                    key={idx}
+                    className="rounded-lg border border-border p-4 flex items-center justify-between"
+                  >
                     <div>
                       <div className="font-semibold text-foreground">{s.reason}</div>
-                      <div className="text-xs text-muted-foreground">Click apply to load filters.</div>
+                      <div className="text-xs text-muted-foreground">
+                        Click apply to load filters.
+                      </div>
                     </div>
                     <Button
                       variant="outline"
@@ -611,15 +738,25 @@ export default function CampaignsPage() {
                 <CardDescription>Saved email/SMS templates for quick reuse.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {templatesQuery.isLoading && <div className="text-sm text-muted-foreground">Loading templates…</div>}
+                {templatesQuery.isLoading && (
+                  <div className="text-sm text-muted-foreground">Loading templates…</div>
+                )}
                 {!templatesQuery.isLoading && (templatesQuery.data?.length ?? 0) === 0 && (
-                  <div className="text-sm text-muted-foreground">No templates yet. Save one from the create form.</div>
+                  <div className="text-sm text-muted-foreground">
+                    No templates yet. Save one from the create form.
+                  </div>
                 )}
                 {templatesQuery.data?.map((t) => (
-                  <div key={t.id} className="rounded-lg border border-border p-4 flex items-center justify-between">
+                  <div
+                    key={t.id}
+                    className="rounded-lg border border-border p-4 flex items-center justify-between"
+                  >
                     <div>
                       <div className="font-semibold text-foreground">{t.name}</div>
-                      <div className="text-xs text-muted-foreground">{t.channel.toUpperCase()} • {t.subject || "No subject"} • {t.category || "general"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {t.channel.toUpperCase()} • {t.subject || "No subject"} •{" "}
+                        {t.category || "general"}
+                      </div>
                     </div>
                     <Button variant="secondary" onClick={() => applyTemplate(t.id)}>
                       Use
@@ -646,7 +783,9 @@ export default function CampaignsPage() {
                     value={sendAt}
                     onChange={(e) => setSendAt(e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">Uses campground timezone if set; otherwise browser local.</p>
+                  <p className="text-xs text-muted-foreground">
+                    Uses campground timezone if set; otherwise browser local.
+                  </p>
                 </div>
                 <div>
                   <Label>Throttle (optional)</Label>
@@ -657,15 +796,20 @@ export default function CampaignsPage() {
                     value={batchPerMinute}
                     onChange={(e) => setBatchPerMinute(e.target.value)}
                   />
-                  <p className="text-xs text-muted-foreground">Leave blank to send as fast as provider allows.</p>
+                  <p className="text-xs text-muted-foreground">
+                    Leave blank to send as fast as provider allows.
+                  </p>
                 </div>
               </div>
               <div className="text-xs text-muted-foreground">
-                Audience uses saved filters for this campaign and honors marketing opt-in. Email adds unsubscribe footer; SMS adds STOP instructions.
+                Audience uses saved filters for this campaign and honors marketing opt-in. Email
+                adds unsubscribe footer; SMS adds STOP instructions.
               </div>
             </div>
             <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setConfirmSend(null)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setConfirmSend(null)}>
+                Cancel
+              </Button>
               <Button
                 onClick={() => {
                   if (!confirmSend) return;
@@ -674,7 +818,7 @@ export default function CampaignsPage() {
                       setConfirmSend(null);
                       setSendAt("");
                       setBatchPerMinute("");
-                    }
+                    },
                   });
                 }}
                 disabled={sendMutation.isPending}

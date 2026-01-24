@@ -49,7 +49,7 @@ const BILLING_MODES = [
   { value: "cycle", label: "Billing cycles" },
   { value: "per_reading", label: "Bill on each reading" },
   { value: "annual", label: "Annual true-up" },
-  { value: "manual", label: "Manual" }
+  { value: "manual", label: "Manual" },
 ];
 const EMPTY_SELECT_VALUE = "__empty";
 
@@ -77,23 +77,27 @@ export default function UtilitiesBillingPage() {
   const metersQuery = useQuery<UtilityMeter[]>({
     queryKey: ["utility-meters", campgroundId],
     queryFn: () => apiClient.listUtilityMeters(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const siteClassesQuery = useQuery<SiteClass[]>({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const ratePlansQuery = useQuery<UtilityRatePlan[]>({
     queryKey: ["utility-rate-plans", campgroundId],
     queryFn: () => apiClient.listUtilityRatePlans(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const lastReadsQuery = useQuery<Map<string, UtilityMeterRead | undefined>>({
-    queryKey: ["utility-meter-reads-latest", campgroundId, metersQuery.data?.map((m) => m.id).join(",")],
+    queryKey: [
+      "utility-meter-reads-latest",
+      campgroundId,
+      metersQuery.data?.map((m) => m.id).join(","),
+    ],
     queryFn: async () => {
       const meters = metersQuery.data ?? [];
       const pairs = await Promise.all(
@@ -101,13 +105,13 @@ export default function UtilitiesBillingPage() {
           const reads = await apiClient.listUtilityMeterReads(m.id, undefined, campgroundId);
           const last = reads[reads.length - 1];
           return { meterId: m.id, last };
-        })
+        }),
       );
       const map = new Map<string, UtilityMeterRead | undefined>();
       pairs.forEach((p) => map.set(p.meterId, p.last));
       return map;
     },
-    enabled: !!campgroundId && (metersQuery.data?.length ?? 0) > 0
+    enabled: !!campgroundId && (metersQuery.data?.length ?? 0) > 0,
   });
 
   const updateMeterMutation = useMutation({
@@ -117,43 +121,48 @@ export default function UtilitiesBillingPage() {
       qc.invalidateQueries({ queryKey: ["utility-meters", campgroundId] });
       setMessage("Meter updated.");
     },
-    onError: (error) => setMessage(getErrorMessage(error) || "Failed to update meter")
+    onError: (error) => setMessage(getErrorMessage(error) || "Failed to update meter"),
   });
 
   const billMeterMutation = useMutation({
     mutationFn: (meterId: string) => apiClient.billUtilityMeter(meterId, requireCampgroundId()),
     onSuccess: () => setMessage("Invoice created from latest reading."),
-    onError: (error) => setMessage(getErrorMessage(error) || "Failed to bill meter")
+    onError: (error) => setMessage(getErrorMessage(error) || "Failed to bill meter"),
   });
 
   const addReadMutation = useMutation({
     mutationFn: ({ meterId, draft }: { meterId: string; draft: ReadDraft }) =>
-      apiClient.addUtilityMeterRead(meterId, {
-        readingValue: Number(draft.readingValue),
-        readAt: draft.readAt || new Date().toISOString(),
-        note: draft.note || undefined
-      }, requireCampgroundId()),
+      apiClient.addUtilityMeterRead(
+        meterId,
+        {
+          readingValue: Number(draft.readingValue),
+          readAt: draft.readAt || new Date().toISOString(),
+          note: draft.note || undefined,
+        },
+        requireCampgroundId(),
+      ),
     onSuccess: () => {
       setMessage("Reading saved.");
       qc.invalidateQueries({ queryKey: ["utility-meter-reads-latest", campgroundId] });
     },
-    onError: (error) => setMessage(getErrorMessage(error) || "Failed to save reading")
+    onError: (error) => setMessage(getErrorMessage(error) || "Failed to save reading"),
   });
 
   const saveSiteClassMutation = useMutation({
     mutationFn: ({ id, draft }: { id: string; draft: SiteClassDraft }) =>
       apiClient.updateSiteClass(id, draft, requireCampgroundId()),
     onSuccess: () => setMessage("Site class metering defaults saved."),
-    onError: (error) => setMessage(getErrorMessage(error) || "Failed to save site class")
+    onError: (error) => setMessage(getErrorMessage(error) || "Failed to save site class"),
   });
 
   const seedMetersMutation = useMutation({
-    mutationFn: (siteClassId: string) => apiClient.seedMetersForSiteClass(siteClassId, requireCampgroundId()),
+    mutationFn: (siteClassId: string) =>
+      apiClient.seedMetersForSiteClass(siteClassId, requireCampgroundId()),
     onSuccess: (res) => {
       setMessage(`Created ${res.created} meters (of ${res.totalSites} sites).`);
       qc.invalidateQueries({ queryKey: ["utility-meters", campgroundId] });
     },
-    onError: (error) => setMessage(getErrorMessage(error) || "Failed to seed meters")
+    onError: (error) => setMessage(getErrorMessage(error) || "Failed to seed meters"),
   });
 
   const meters = metersQuery.data ?? [];
@@ -192,10 +201,10 @@ export default function UtilitiesBillingPage() {
         ...(prev[meterId] || {
           readingValue: "",
           readAt: new Date().toISOString().slice(0, 16),
-          billNow: undefined
+          billNow: undefined,
         }),
-        ...draft
-      }
+        ...draft,
+      },
     }));
   };
 
@@ -213,7 +222,12 @@ export default function UtilitiesBillingPage() {
     try {
       await addReadMutation.mutateAsync({ meterId, draft });
       const meter = meters.find((m) => m.id === meterId);
-      const billingMode = draft.billNow !== undefined ? (draft.billNow ? "per_reading" : meter?.billingMode) : meter?.billingMode;
+      const billingMode =
+        draft.billNow !== undefined
+          ? draft.billNow
+            ? "per_reading"
+            : meter?.billingMode
+          : meter?.billingMode;
       if (billingMode === "per_reading" || draft.billNow) {
         billMeterMutation.mutate(meterId);
       }
@@ -231,8 +245,16 @@ export default function UtilitiesBillingPage() {
     newValue?: number;
     multiplier?: number;
   }) => {
-    const plan = ratePlans.find((p) => p.id === opts.planId) || ratePlans.find((p) => p.type === opts.meterType);
-    if (!plan || opts.lastValue === undefined || opts.newValue === undefined || isNaN(opts.newValue)) return null;
+    const plan =
+      ratePlans.find((p) => p.id === opts.planId) ||
+      ratePlans.find((p) => p.type === opts.meterType);
+    if (
+      !plan ||
+      opts.lastValue === undefined ||
+      opts.newValue === undefined ||
+      isNaN(opts.newValue)
+    )
+      return null;
     const usage = Math.max(0, opts.newValue - opts.lastValue);
     const billedUsage = usage * (Number(opts.multiplier ?? 1) || 1);
     const amount = (billedUsage * plan.baseRateCents) / 100;
@@ -253,12 +275,13 @@ export default function UtilitiesBillingPage() {
     if (sc) {
       setClassDraft({
         meteredEnabled: sc.meteredEnabled ?? false,
-        meteredType: sc.meteredType ?? (sc.hookupsPower ? "power" : sc.hookupsWater ? "water" : undefined),
+        meteredType:
+          sc.meteredType ?? (sc.hookupsPower ? "power" : sc.hookupsWater ? "water" : undefined),
         meteredBillingMode: sc.meteredBillingMode ?? "cycle",
         meteredBillTo: sc.meteredBillTo ?? "reservation",
         meteredMultiplier: sc.meteredMultiplier ?? 1,
         meteredRatePlanId: sc.meteredRatePlanId ?? undefined,
-        meteredAutoEmail: sc.meteredAutoEmail ?? false
+        meteredAutoEmail: sc.meteredAutoEmail ?? false,
       });
     } else {
       setClassDraft({});
@@ -290,10 +313,12 @@ export default function UtilitiesBillingPage() {
               Total meters: <strong>{meters.length}</strong>
             </span>
             <span className="rounded border border-border px-2 py-1 bg-card">
-              With recent reads: <strong>{lastReadsQuery.data ? lastReadsQuery.data.size : 0}</strong>
+              With recent reads:{" "}
+              <strong>{lastReadsQuery.data ? lastReadsQuery.data.size : 0}</strong>
             </span>
             <span className="rounded border border-border px-2 py-1 bg-card">
-              Power: <strong>{totalByType.power ?? 0}</strong> · Water: <strong>{totalByType.water ?? 0}</strong> · Sewer:{" "}
+              Power: <strong>{totalByType.power ?? 0}</strong> · Water:{" "}
+              <strong>{totalByType.water ?? 0}</strong> · Sewer:{" "}
               <strong>{totalByType.sewer ?? 0}</strong>
             </span>
             <Button
@@ -313,12 +338,16 @@ export default function UtilitiesBillingPage() {
         <Card className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Site class defaults & auto meters</h2>
+              <h2 className="text-lg font-semibold text-foreground">
+                Site class defaults & auto meters
+              </h2>
               <p className="text-sm text-muted-foreground">
                 Mark a site class as metered, set defaults, and auto-create meters for its sites.
               </p>
             </div>
-            {siteClassesQuery.isFetching && <span className="text-xs text-muted-foreground">Refreshing…</span>}
+            {siteClassesQuery.isFetching && (
+              <span className="text-xs text-muted-foreground">Refreshing…</span>
+            )}
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
@@ -345,7 +374,10 @@ export default function UtilitiesBillingPage() {
               <Select
                 value={classDraft.meteredType || EMPTY_SELECT_VALUE}
                 onValueChange={(value) =>
-                  setClassDraft((d) => ({ ...d, meteredType: value === EMPTY_SELECT_VALUE ? "" : value }))
+                  setClassDraft((d) => ({
+                    ...d,
+                    meteredType: value === EMPTY_SELECT_VALUE ? "" : value,
+                  }))
                 }
                 disabled={!selectedClassId}
               >
@@ -375,7 +407,9 @@ export default function UtilitiesBillingPage() {
               <Label className="text-xs text-muted-foreground">Billing mode</Label>
               <Select
                 value={classDraft.meteredBillingMode ?? "cycle"}
-                onValueChange={(value) => setClassDraft((d) => ({ ...d, meteredBillingMode: value }))}
+                onValueChange={(value) =>
+                  setClassDraft((d) => ({ ...d, meteredBillingMode: value }))
+                }
                 disabled={!selectedClassId}
               >
                 <SelectTrigger className="w-full text-sm">
@@ -413,7 +447,9 @@ export default function UtilitiesBillingPage() {
                 step="0.01"
                 className="w-full text-sm"
                 value={classDraft.meteredMultiplier ?? 1}
-                onChange={(e) => setClassDraft((d) => ({ ...d, meteredMultiplier: Number(e.target.value) }))}
+                onChange={(e) =>
+                  setClassDraft((d) => ({ ...d, meteredMultiplier: Number(e.target.value) }))
+                }
                 disabled={!selectedClassId}
               />
             </div>
@@ -434,13 +470,13 @@ export default function UtilitiesBillingPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={EMPTY_SELECT_VALUE}>No plan</SelectItem>
-                  {(
-                    classDraft.meteredType
-                      ? ratePlansByType.get(classDraft.meteredType) ?? []
-                      : ratePlans ?? []
+                  {(classDraft.meteredType
+                    ? (ratePlansByType.get(classDraft.meteredType) ?? [])
+                    : (ratePlans ?? [])
                   ).map((rp) => (
                     <SelectItem key={rp.id} value={rp.id}>
-                      {rp.type} @ {(rp.baseRateCents / 100).toFixed(2)} (from {new Date(rp.effectiveFrom).toLocaleDateString()})
+                      {rp.type} @ {(rp.baseRateCents / 100).toFixed(2)} (from{" "}
+                      {new Date(rp.effectiveFrom).toLocaleDateString()})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -458,7 +494,11 @@ export default function UtilitiesBillingPage() {
               <Label className="text-sm">Auto-email invoices</Label>
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSaveClass} disabled={!selectedClassId || saveSiteClassMutation.isPending}>
+              <Button
+                size="sm"
+                onClick={handleSaveClass}
+                disabled={!selectedClassId || saveSiteClassMutation.isPending}
+              >
                 {saveSiteClassMutation.isPending ? "Saving..." : "Save defaults"}
               </Button>
               <Button
@@ -499,11 +539,17 @@ export default function UtilitiesBillingPage() {
                 aria-label="Search site or meter"
               />
             </div>
-            {metersQuery.isFetching && <span className="text-xs text-muted-foreground">Refreshing…</span>}
+            {metersQuery.isFetching && (
+              <span className="text-xs text-muted-foreground">Refreshing…</span>
+            )}
           </div>
         </Card>
 
-        {message && <div className="rounded border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm text-emerald-900">{message}</div>}
+        {message && (
+          <div className="rounded border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm text-emerald-900">
+            {message}
+          </div>
+        )}
 
         <Card className="p-0 overflow-hidden">
           <div className="grid grid-cols-13 bg-muted px-4 py-3 text-xs font-semibold uppercase text-muted-foreground">
@@ -522,12 +568,11 @@ export default function UtilitiesBillingPage() {
           <div className="divide-y">
             {filteredMeters.map((m) => {
               const draft = configDrafts[m.id] || {};
-              const readDraft =
-                readDrafts[m.id] || {
-                  readingValue: "",
-                  readAt: new Date().toISOString().slice(0, 16),
-                  billNow: m.billingMode === "per_reading"
-                };
+              const readDraft = readDrafts[m.id] || {
+                readingValue: "",
+                readAt: new Date().toISOString().slice(0, 16),
+                billNow: m.billingMode === "per_reading",
+              };
               const billingMode = draft.billingMode ?? m.billingMode ?? "cycle";
               const billTo = draft.billTo ?? m.billTo ?? "reservation";
               const meterMultiplier = typeof m.multiplier === "number" ? m.multiplier : undefined;
@@ -611,7 +656,9 @@ export default function UtilitiesBillingPage() {
                     <Select
                       value={draft.ratePlanId ?? m.ratePlanId ?? EMPTY_SELECT_VALUE}
                       onValueChange={(value) =>
-                        applyDraft(m.id, { ratePlanId: value === EMPTY_SELECT_VALUE ? null : value })
+                        applyDraft(m.id, {
+                          ratePlanId: value === EMPTY_SELECT_VALUE ? null : value,
+                        })
                       }
                     >
                       <SelectTrigger className="w-full h-8 text-sm">
@@ -642,7 +689,7 @@ export default function UtilitiesBillingPage() {
                         planId: draft.ratePlanId ?? m.ratePlanId,
                         lastValue: lastVal,
                         newValue: newVal,
-                        multiplier
+                        multiplier,
                       });
                       if (!preview) return "Preview: —";
                       return (
@@ -703,7 +750,12 @@ export default function UtilitiesBillingPage() {
                         <span>Bill immediately after saving</span>
                       </div>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => handleAddRead(m.id)} disabled={addReadMutation.isPending}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAddRead(m.id)}
+                          disabled={addReadMutation.isPending}
+                        >
                           Save read
                         </Button>
                         <Button
@@ -720,7 +772,11 @@ export default function UtilitiesBillingPage() {
                   </div>
 
                   <div className="col-span-1 flex flex-col gap-2 items-end">
-                    <Button size="sm" onClick={() => handleUpdate(m.id)} disabled={updateMeterMutation.isPending}>
+                    <Button
+                      size="sm"
+                      onClick={() => handleUpdate(m.id)}
+                      disabled={updateMeterMutation.isPending}
+                    >
                       Save config
                     </Button>
                     <Button
@@ -737,9 +793,13 @@ export default function UtilitiesBillingPage() {
             })}
 
             {filteredMeters.length === 0 && !metersQuery.isLoading && (
-              <div className="px-4 py-6 text-sm text-muted-foreground">No meters match your filters.</div>
+              <div className="px-4 py-6 text-sm text-muted-foreground">
+                No meters match your filters.
+              </div>
             )}
-            {metersQuery.isLoading && <div className="px-4 py-6 text-sm text-muted-foreground">Loading meters...</div>}
+            {metersQuery.isLoading && (
+              <div className="px-4 py-6 text-sm text-muted-foreground">Loading meters...</div>
+            )}
           </div>
         </Card>
       </div>

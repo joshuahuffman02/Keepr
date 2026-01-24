@@ -9,6 +9,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [AuditModule, PermissionsModule],
   controllers: [DepositPoliciesController],
   providers: [DepositPoliciesService],
-  exports: [DepositPoliciesService]
+  exports: [DepositPoliciesService],
 })
 export class DepositPoliciesModule {}

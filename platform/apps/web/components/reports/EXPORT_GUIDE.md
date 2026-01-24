@@ -9,6 +9,7 @@ If you create a new report component and want to add export functionality, follo
 The easiest way is to add your report to the `useReportExport` hook.
 
 ### Step 1: Identify your report's tab and subtab
+
 From the registry, find your report's `tab` and `subTab` values.
 
 Example: `tab: 'performance'`, `subTab: 'site-utilization'`
@@ -41,26 +42,26 @@ export function exportSiteUtilizationReport(
   reservations: ReservationData[],
   sites: SiteData[],
   dateRange: { start: string; end: string },
-  format: ExportFormat = 'csv'
+  format: ExportFormat = "csv",
 ) {
   // 1. Filter/transform your data
   const utilizationData = calculateSiteUtilization(reservations, sites, dateRange);
 
   // 2. Map to export format
   const exportData = utilizationData.map((item) => ({
-    'Site': item.siteName,
-    'Total Nights Available': item.totalNights,
-    'Nights Booked': item.bookedNights,
-    'Utilization %': (item.bookedNights / item.totalNights * 100).toFixed(1),
-    'Revenue': formatCurrencyForExport(item.revenue),
-    'RevPAN': formatCurrencyForExport(item.revPAN),
+    Site: item.siteName,
+    "Total Nights Available": item.totalNights,
+    "Nights Booked": item.bookedNights,
+    "Utilization %": ((item.bookedNights / item.totalNights) * 100).toFixed(1),
+    Revenue: formatCurrencyForExport(item.revenue),
+    RevPAN: formatCurrencyForExport(item.revPAN),
   }));
 
   // 3. Generate CSV and download
   const csv = convertToCSV(exportData);
-  const filename = generateExportFilename('site-utilization-report', format);
+  const filename = generateExportFilename("site-utilization-report", format);
 
-  if (format === 'xlsx') {
+  if (format === "xlsx") {
     downloadExcelCSV(csv, filename);
   } else {
     downloadCSV(csv, filename);
@@ -69,6 +70,7 @@ export function exportSiteUtilizationReport(
 ```
 
 ### Step 4: Test
+
 Navigate to your report and click Export. Your report should now download!
 
 ## Option 2: Use Generic Export
@@ -122,34 +124,43 @@ export function CustomReport() {
 ## Common Patterns
 
 ### Currency Values
+
 Always use `formatCurrencyForExport()` for monetary values:
+
 ```typescript
 'Revenue': formatCurrencyForExport(amountInCents)
 ```
 
 ### Dates
+
 Use `formatDateForExport()` for consistent date formatting:
+
 ```typescript
 'Date': formatDateForExport(dateString)
 ```
 
 ### Percentages
+
 Format as string with % symbol:
+
 ```typescript
 'Occupancy': `${occupancyRate.toFixed(1)}%`
 ```
 
 ### Guest Names
+
 Handle missing data gracefully:
+
 ```typescript
 'Guest': `${guest?.firstName || ''} ${guest?.lastName || ''}`.trim()
 ```
 
 ### Site Names
+
 Use a lookup helper:
+
 ```typescript
-const getSiteName = (siteId: string) =>
-  sites.find(s => s.id === siteId)?.name ?? 'Unknown';
+const getSiteName = (siteId: string) => sites.find((s) => s.id === siteId)?.name ?? "Unknown";
 ```
 
 ## Multi-Section Exports
@@ -157,25 +168,25 @@ const getSiteName = (siteId: string) =>
 For reports with multiple data sections:
 
 ```typescript
-import { convertToCSVWithSections } from '@/lib/export-utils';
+import { convertToCSVWithSections } from "@/lib/export-utils";
 
 const sections = [
   {
-    title: 'Summary Statistics',
+    title: "Summary Statistics",
     data: summaryData,
   },
   {
-    title: 'Detailed Breakdown',
+    title: "Detailed Breakdown",
     data: detailData,
   },
   {
-    title: 'Top Performers',
+    title: "Top Performers",
     data: topPerformers,
-  }
+  },
 ];
 
 const csv = convertToCSVWithSections(sections);
-downloadCSV(csv, 'multi-section-report.csv');
+downloadCSV(csv, "multi-section-report.csv");
 ```
 
 ## Custom Headers
@@ -183,12 +194,12 @@ downloadCSV(csv, 'multi-section-report.csv');
 Specify custom column headers:
 
 ```typescript
-const headers = ['Site ID', 'Site Name', 'Revenue', 'Occupancy %'];
-const data = sites.map(s => ({
-  'Site ID': s.id,
-  'Site Name': s.name,
-  'Revenue': formatCurrencyForExport(s.revenue),
-  'Occupancy %': s.occupancy,
+const headers = ["Site ID", "Site Name", "Revenue", "Occupancy %"];
+const data = sites.map((s) => ({
+  "Site ID": s.id,
+  "Site Name": s.name,
+  Revenue: formatCurrencyForExport(s.revenue),
+  "Occupancy %": s.occupancy,
 }));
 
 const csv = convertToCSV(data, headers);
@@ -197,6 +208,7 @@ const csv = convertToCSV(data, headers);
 ## Handling Special Characters
 
 The export utilities automatically handle:
+
 - Commas in text fields
 - Quotes in text fields
 - Newlines in text fields
@@ -222,7 +234,7 @@ try {
     description: "Your report has been downloaded.",
   });
 } catch (error) {
-  console.error('Export error:', error);
+  console.error("Export error:", error);
   toast({
     title: "Export failed",
     description: error.message,
@@ -261,23 +273,28 @@ try {
 ## Troubleshooting
 
 ### File doesn't download
+
 - Check browser console for errors
 - Verify data is not empty
 - Check that `Blob` API is supported
 
 ### Special characters broken in Excel
+
 - Use Excel CSV format instead of standard CSV
 - Ensure UTF-8 BOM is included (use `downloadExcelCSV()`)
 
 ### Column headers missing
+
 - Make sure you're using `convertToCSV()` correctly
 - Headers are auto-generated from object keys
 
 ### Numbers formatted as text in Excel
+
 - This is normal for CSV - Excel treats everything as text
 - For true numeric columns, would need XLSX format
 
 ### Export very slow
+
 - Consider limiting rows (first 10,000)
 - Add loading indicator
 - Process data in chunks for very large datasets

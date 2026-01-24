@@ -9,15 +9,18 @@ allowed-tools: Read, Glob, Grep
 ## Core Concepts
 
 ### Sites
+
 A camping **Site** is a rentable location where guests stay. Sites belong to a **Site Class** (category).
 
 **Site Types**:
+
 - **RV Sites**: Full hookup, partial hookup, dry camping
 - **Tent Sites**: Primitive, platform, glamping
 - **Cabins**: Rustic, modern, luxury
 - **Unique**: Yurts, treehouses, airstreams
 
 **Site Attributes**:
+
 - Max RV length
 - Hookups (water, electric, sewer)
 - Amp service (30/50)
@@ -27,6 +30,7 @@ A camping **Site** is a rentable location where guests stay. Sites belong to a *
 ### Reservations
 
 **Reservation Lifecycle**:
+
 ```
 Quote → Pending → Confirmed → Checked-In → Checked-Out
                     ↓
@@ -34,6 +38,7 @@ Quote → Pending → Confirmed → Checked-In → Checked-Out
 ```
 
 **Key Fields**:
+
 - `arrivalDate` / `departureDate`
 - `site` or `siteClass` (specific vs floating)
 - `guest` - Primary contact
@@ -42,9 +47,11 @@ Quote → Pending → Confirmed → Checked-In → Checked-Out
 - `totalAmount` / `paidAmount` / `balance`
 
 ### Guests
+
 Guests are customers who make reservations.
 
 **Guest Record**:
+
 - Contact info (name, email, phone)
 - Address
 - Rig information (saved for RV parks)
@@ -55,6 +62,7 @@ Guests are customers who make reservations.
 ## Pricing Model
 
 ### Base Rate Structure
+
 ```
 Daily Rate × Nights = Subtotal
 + Extra Person Fees
@@ -67,6 +75,7 @@ Daily Rate × Nights = Subtotal
 ```
 
 ### Dynamic Pricing Factors
+
 - **Seasonality**: Peak, shoulder, off-peak
 - **Day of week**: Weekend premiums
 - **Length of stay**: Weekly/monthly discounts
@@ -75,6 +84,7 @@ Daily Rate × Nights = Subtotal
 - **Site premium**: Waterfront, pull-through
 
 ### Deposit Policies
+
 - Percentage at booking (25-100%)
 - Balance due at check-in
 - Cancellation refund rules (based on days before arrival)
@@ -82,6 +92,7 @@ Daily Rate × Nights = Subtotal
 ## Operations
 
 ### Check-In Process
+
 1. Verify reservation
 2. Confirm site assignment
 3. Collect balance due
@@ -90,6 +101,7 @@ Daily Rate × Nights = Subtotal
 6. Hand off welcome packet
 
 ### Check-Out Process
+
 1. Inspect site
 2. Process final charges (late fees, damages)
 3. Collect keys/equipment
@@ -97,6 +109,7 @@ Daily Rate × Nights = Subtotal
 5. Request review
 
 ### Housekeeping/Turnover
+
 - Site inspection checklist
 - Cleaning requirements by site type
 - Maintenance issue reporting
@@ -105,6 +118,7 @@ Daily Rate × Nights = Subtotal
 ## Inventory Management
 
 ### Availability
+
 ```
 Site is available if:
 - Not already reserved for those dates
@@ -114,16 +128,19 @@ Site is available if:
 ```
 
 ### Overbooking
+
 Some parks oversell by percentage, similar to hotels.
 Requires waitlist management and upgrade/downgrade policies.
 
 ### Site Locking
+
 - **Floating**: Guest assigned to site class, specific site at check-in
 - **Locked**: Guest assigned specific site at booking
 
 ## Channel Management
 
 ### OTA Integrations
+
 - Campspot
 - Hipcamp
 - RoverPass
@@ -135,15 +152,18 @@ Requires inventory sync, rate parity, and booking notifications.
 ## Compliance
 
 ### PCI DSS
+
 - Never store card numbers
 - Use tokenization (Stripe)
 - Secure transmission
 
 ### ADA
+
 - Accessible site inventory
 - Reasonable accommodation requests
 
 ### Local Regulations
+
 - Occupancy limits
 - Quiet hours
 - Fire regulations
@@ -152,20 +172,24 @@ Requires inventory sync, rate parity, and booking notifications.
 ## Common Business Rules
 
 ### Minimum Stay
+
 - Peak season: 2-3 night minimum
 - Holidays: 3-4 night minimum
 - Monthly: 28-30 nights
 
 ### Gap Management
+
 - Prevent 1-night gaps between reservations
 - Auto-extend pricing for gap filling
 
 ### Early Check-in / Late Check-out
+
 - Subject to availability
 - May incur fees
 - Automatic or request-based
 
 ### Group Bookings
+
 - Multiple sites, single invoice
 - Deposit/payment schedules
 - Shared amenities
@@ -173,17 +197,20 @@ Requires inventory sync, rate parity, and booking notifications.
 ## Key Metrics
 
 ### Revenue
+
 - **ADR**: Average Daily Rate
 - **RevPAR**: Revenue Per Available Site
 - **Occupancy Rate**: % of sites occupied
 
 ### Operations
+
 - Average length of stay
 - Cancellation rate
 - No-show rate
 - Check-in time
 
 ### Guest
+
 - Repeat guest rate
 - NPS score
 - Review ratings

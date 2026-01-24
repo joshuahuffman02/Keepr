@@ -190,22 +190,30 @@ export function OfflineTelemetryPanel({
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className={tone.name}>{row.name}</span>
-                    <Badge variant={row.queued > 0 ? "secondary" : "outline"}>{row.queued} queued</Badge>
+                    <Badge variant={row.queued > 0 ? "secondary" : "outline"}>
+                      {row.queued} queued
+                    </Badge>
                     <Badge
                       variant={row.paused ? "outline" : "secondary"}
-                      className={row.paused ? "border-status-warning text-status-warning" : undefined}
+                      className={
+                        row.paused ? "border-status-warning text-status-warning" : undefined
+                      }
                     >
                       {row.paused ? "Paused" : "Draining"}
                     </Badge>
                   </div>
                   <div className={tone.meta}>
-                    Last sync {formatAgo(row.lastSync)} • Backoff {row.backoff} (next {formatTime(row.nextRetryAt)})
+                    Last sync {formatAgo(row.lastSync)} • Backoff {row.backoff} (next{" "}
+                    {formatTime(row.nextRetryAt)})
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
                     <span className={tone.metaLabel}>Drain</span>
-                    <Switch checked={!row.paused} onCheckedChange={(checked) => toggleDrain(row.id, !checked)} />
+                    <Switch
+                      checked={!row.paused}
+                      onCheckedChange={(checked) => toggleDrain(row.id, !checked)}
+                    />
                   </div>
                   <Button
                     size="sm"
@@ -225,10 +233,21 @@ export function OfflineTelemetryPanel({
                   return (
                     <div key={bucket.label} className="flex items-center gap-3">
                       <span className={tone.bucketLabel}>{bucket.label}</span>
-                      <div className={cn("flex flex-1 h-2 overflow-hidden rounded-full", tone.meterBg)}>
-                        <div className="h-full bg-emerald-500" style={{ width: `${(bucket.success / total) * 100}%` }} />
-                        <div className="h-full bg-amber-400" style={{ width: `${(bucket.failed / total) * 100}%` }} />
-                        <div className="h-full bg-orange-500" style={{ width: `${(bucket.conflicts / total) * 100}%` }} />
+                      <div
+                        className={cn("flex flex-1 h-2 overflow-hidden rounded-full", tone.meterBg)}
+                      >
+                        <div
+                          className="h-full bg-emerald-500"
+                          style={{ width: `${(bucket.success / total) * 100}%` }}
+                        />
+                        <div
+                          className="h-full bg-amber-400"
+                          style={{ width: `${(bucket.failed / total) * 100}%` }}
+                        />
+                        <div
+                          className="h-full bg-orange-500"
+                          style={{ width: `${(bucket.conflicts / total) * 100}%` }}
+                        />
                       </div>
                       <div className={tone.bucketStats}>
                         {bucket.success} ok · {bucket.failed} fail · {bucket.conflicts} conflict
@@ -244,4 +263,3 @@ export function OfflineTelemetryPanel({
     </Card>
   );
 }
-

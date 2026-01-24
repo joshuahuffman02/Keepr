@@ -1,31 +1,31 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../prisma/prisma.service';
-import { RegisterDeviceDto } from './dto/register-device.dto';
+import { ConfigService } from "@nestjs/config";
+import { PrismaService } from "../prisma/prisma.service";
+import { RegisterDeviceDto } from "./dto/register-device.dto";
 
 export enum MobilePushNotificationType {
   // Reservation notifications
-  RESERVATION_CONFIRMED = 'reservation_confirmed',
-  RESERVATION_CANCELLED = 'reservation_cancelled',
-  RESERVATION_MODIFIED = 'reservation_modified',
-  CHECK_IN_READY = 'check_in_ready',
-  CHECK_IN_REMINDER = 'check_in_reminder',
-  CHECK_OUT_REMINDER = 'check_out_reminder',
-  PAYMENT_RECEIVED = 'payment_received',
-  PAYMENT_DUE = 'payment_due',
+  RESERVATION_CONFIRMED = "reservation_confirmed",
+  RESERVATION_CANCELLED = "reservation_cancelled",
+  RESERVATION_MODIFIED = "reservation_modified",
+  CHECK_IN_READY = "check_in_ready",
+  CHECK_IN_REMINDER = "check_in_reminder",
+  CHECK_OUT_REMINDER = "check_out_reminder",
+  PAYMENT_RECEIVED = "payment_received",
+  PAYMENT_DUE = "payment_due",
 
   // Messaging
-  NEW_MESSAGE = 'new_message',
+  NEW_MESSAGE = "new_message",
 
   // Staff notifications
-  NEW_BOOKING = 'new_booking',
-  GUEST_CHECKED_IN = 'guest_checked_in',
-  TASK_ASSIGNED = 'task_assigned',
-  SHIFT_REMINDER = 'shift_reminder',
+  NEW_BOOKING = "new_booking",
+  GUEST_CHECKED_IN = "guest_checked_in",
+  TASK_ASSIGNED = "task_assigned",
+  SHIFT_REMINDER = "shift_reminder",
 
   // General
-  ANNOUNCEMENT = 'announcement',
+  ANNOUNCEMENT = "announcement",
 }
 
 export interface MobilePushPayload {
@@ -45,17 +45,17 @@ export class MobilePushService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {
     // Check if APNs is configured
-    this.apnsEnabled = !!this.config.get<string>('APNS_KEY_ID');
-    this.fcmEnabled = !!this.config.get<string>('FCM_SERVER_KEY');
+    this.apnsEnabled = !!this.config.get<string>("APNS_KEY_ID");
+    this.fcmEnabled = !!this.config.get<string>("FCM_SERVER_KEY");
 
     if (!this.apnsEnabled) {
-      this.logger.warn('APNs not configured - iOS push notifications disabled');
+      this.logger.warn("APNs not configured - iOS push notifications disabled");
     }
     if (!this.fcmEnabled) {
-      this.logger.warn('FCM not configured - Android push notifications disabled');
+      this.logger.warn("FCM not configured - Android push notifications disabled");
     }
   }
 
@@ -73,9 +73,9 @@ export class MobilePushService {
         deviceId: dto.deviceId || null,
         appBundle: dto.appBundle || null,
         appVersion: dto.appVersion || null,
-        environment: dto.environment || 'production',
+        environment: dto.environment || "production",
         isActive: true,
-        lastUsedAt: new Date()
+        lastUsedAt: new Date(),
       },
       create: {
         id: randomUUID(),
@@ -86,10 +86,10 @@ export class MobilePushService {
         deviceId: dto.deviceId || null,
         appBundle: dto.appBundle || null,
         appVersion: dto.appVersion || null,
-        environment: dto.environment || 'production',
+        environment: dto.environment || "production",
         isActive: true,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     this.logger.log(`Registered ${dto.platform} device for user ${userId}`);
@@ -102,7 +102,7 @@ export class MobilePushService {
   async unregisterDevice(deviceToken: string) {
     await this.prisma.mobileDeviceToken.updateMany({
       where: { deviceToken },
-      data: { isActive: false }
+      data: { isActive: false },
     });
 
     this.logger.log(`Unregistered device token`);
@@ -115,7 +115,7 @@ export class MobilePushService {
   async unregisterAllDevices(userId: string) {
     const result = await this.prisma.mobileDeviceToken.updateMany({
       where: { userId },
-      data: { isActive: false }
+      data: { isActive: false },
     });
 
     this.logger.log(`Unregistered ${result.count} devices for user ${userId}`);
@@ -129,7 +129,7 @@ export class MobilePushService {
     return this.prisma.mobileDeviceToken.findMany({
       where: {
         userId,
-        isActive: true
+        isActive: true,
       },
       select: {
         id: true,
@@ -138,9 +138,9 @@ export class MobilePushService {
         appBundle: true,
         appVersion: true,
         lastUsedAt: true,
-        createdAt: true
+        createdAt: true,
       },
-      orderBy: { lastUsedAt: 'desc' }
+      orderBy: { lastUsedAt: "desc" },
     });
   }
 
@@ -151,8 +151,8 @@ export class MobilePushService {
     const devices = await this.prisma.mobileDeviceToken.findMany({
       where: {
         userId,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     if (devices.length === 0) {
@@ -175,7 +175,7 @@ export class MobilePushService {
         if (this.isInvalidTokenError(error)) {
           await this.prisma.mobileDeviceToken.update({
             where: { id: device.id },
-            data: { isActive: false }
+            data: { isActive: false },
           });
         }
       }
@@ -191,8 +191,8 @@ export class MobilePushService {
     const devices = await this.prisma.mobileDeviceToken.findMany({
       where: {
         campgroundId,
-        isActive: true
-      }
+        isActive: true,
+      },
     });
 
     let sent = 0;
@@ -218,11 +218,11 @@ export class MobilePushService {
     deviceToken: string,
     platform: string,
     payload: MobilePushPayload,
-    environment: string
+    environment: string,
   ) {
-    if (platform === 'ios') {
-      return this.sendApns(deviceToken, payload, environment === 'sandbox');
-    } else if (platform === 'android') {
+    if (platform === "ios") {
+      return this.sendApns(deviceToken, payload, environment === "sandbox");
+    } else if (platform === "android") {
       return this.sendFcm(deviceToken, payload);
     }
     throw new BadRequestException(`Unknown platform: ${platform}`);
@@ -234,7 +234,7 @@ export class MobilePushService {
    */
   private async sendApns(deviceToken: string, payload: MobilePushPayload, sandbox: boolean) {
     if (!this.apnsEnabled) {
-      this.logger.debug('APNs not configured, skipping iOS push');
+      this.logger.debug("APNs not configured, skipping iOS push");
       return;
     }
 
@@ -274,7 +274,7 @@ export class MobilePushService {
    */
   private async sendFcm(deviceToken: string, payload: MobilePushPayload) {
     if (!this.fcmEnabled) {
-      this.logger.debug('FCM not configured, skipping Android push');
+      this.logger.debug("FCM not configured, skipping Android push");
       return;
     }
 
@@ -308,9 +308,11 @@ export class MobilePushService {
    */
   private isInvalidTokenError(error: unknown): boolean {
     const message = error instanceof Error ? error.message : String(error);
-    return message.includes('InvalidToken') ||
-           message.includes('Unregistered') ||
-           message.includes('NotRegistered') ||
-           message.includes('BadDeviceToken');
+    return (
+      message.includes("InvalidToken") ||
+      message.includes("Unregistered") ||
+      message.includes("NotRegistered") ||
+      message.includes("BadDeviceToken")
+    );
   }
 }

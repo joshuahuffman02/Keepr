@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  CreditCard,
-  Shield,
-  CheckCircle2,
-  ExternalLink,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { CreditCard, Shield, CheckCircle2, ExternalLink, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -99,12 +92,10 @@ export function StripeConnect({
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500/20 to-indigo-500/20 mb-6">
             <CreditCard className="w-10 h-10 text-violet-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Accept Payments with Stripe
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Accept Payments with Stripe</h2>
           <p className="text-slate-400 max-w-md mx-auto">
-            Connect your Stripe account to accept credit cards, debit cards, and
-            ACH bank transfers from your guests.
+            Connect your Stripe account to accept credit cards, debit cards, and ACH bank transfers
+            from your guests.
           </p>
         </motion.div>
 
@@ -150,12 +141,8 @@ export function StripeConnect({
             >
               <CheckCircle2 className="w-8 h-8 text-emerald-400" />
             </motion.div>
-            <h3 className="text-lg font-semibold text-emerald-400 mb-1">
-              Stripe Connected!
-            </h3>
-            <p className="text-sm text-slate-400 mb-4">
-              Your account is ready to accept payments
-            </p>
+            <h3 className="text-lg font-semibold text-emerald-400 mb-1">Stripe Connected!</h3>
+            <p className="text-sm text-slate-400 mb-4">Your account is ready to accept payments</p>
             {stripeAccountId && (
               <p className="text-xs text-slate-500 font-mono">
                 Account: {stripeAccountId.slice(0, 12)}...
@@ -177,7 +164,7 @@ export function StripeConnect({
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-violet-500 to-indigo-500",
                 "hover:from-violet-400 hover:to-indigo-400",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
             >
               {connecting ? (
@@ -214,9 +201,9 @@ export function StripeConnect({
             {/* Info */}
             <div className="bg-slate-800/30 rounded-lg p-4 border border-slate-700">
               <p className="text-xs text-slate-400">
-                <span className="text-slate-300 font-medium">What happens next:</span>{" "}
-                You'll be redirected to Stripe to enter your bank details and
-                verify your identity. This usually takes about 5 minutes.
+                <span className="text-slate-300 font-medium">What happens next:</span> You'll be
+                redirected to Stripe to enter your bank details and verify your identity. This
+                usually takes about 5 minutes.
               </p>
             </div>
           </motion.div>
@@ -249,7 +236,7 @@ export function StripeConnect({
               className={cn(
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-emerald-500 to-teal-500",
-                "hover:from-emerald-400 hover:to-teal-400"
+                "hover:from-emerald-400 hover:to-teal-400",
               )}
             >
               Continue to Sites Setup

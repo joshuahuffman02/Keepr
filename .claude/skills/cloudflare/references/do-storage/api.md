@@ -3,15 +3,19 @@
 ## SQL API
 
 ```typescript
-const cursor = this.sql.exec('SELECT * FROM users WHERE email = ?', email);
-for (let row of cursor) {} // Objects: { id, name, email }
-cursor.toArray(); cursor.one(); // Single row (throws if != 1)
-for (let row of cursor.raw()) {} // Arrays: [1, "Alice", "..."]
+const cursor = this.sql.exec("SELECT * FROM users WHERE email = ?", email);
+for (let row of cursor) {
+} // Objects: { id, name, email }
+cursor.toArray();
+cursor.one(); // Single row (throws if != 1)
+for (let row of cursor.raw()) {
+} // Arrays: [1, "Alice", "..."]
 cursor.columnNames; // ["id", "name", "email"]
-cursor.rowsRead; cursor.rowsWritten; // Billing
+cursor.rowsRead;
+cursor.rowsWritten; // Billing
 
 type User = { id: number; name: string; email: string };
-const user = this.sql.exec<User>('...', userId).one();
+const user = this.sql.exec<User>("...", userId).one();
 ```
 
 ## Sync KV API (SQLite only)
@@ -22,7 +26,8 @@ this.ctx.storage.kv.put("counter", 42);
 this.ctx.storage.kv.put("user", { name: "Alice", age: 30 });
 this.ctx.storage.kv.delete("counter"); // true if existed
 
-for (let [key, value] of this.ctx.storage.kv.list()) {}
+for (let [key, value] of this.ctx.storage.kv.list()) {
+}
 
 // List options: start, prefix, reverse, limit
 this.ctx.storage.kv.list({ start: "user:", prefix: "user:", reverse: true, limit: 100 });
@@ -34,7 +39,7 @@ this.ctx.storage.kv.list({ start: "user:", prefix: "user:", reverse: true, limit
 await this.ctx.storage.get("key"); // Single
 await this.ctx.storage.get(["key1", "key2"]); // Multiple (max 128)
 await this.ctx.storage.put("key", value); // Single
-await this.ctx.storage.put({ "key1": "v1", "key2": { nested: true } }); // Multiple (max 128)
+await this.ctx.storage.put({ key1: "v1", key2: { nested: true } }); // Multiple (max 128)
 await this.ctx.storage.delete("key");
 await this.ctx.storage.delete(["key1", "key2"]);
 await this.ctx.storage.list({ prefix: "user:", limit: 100 });
@@ -49,8 +54,8 @@ await this.ctx.storage.put("key", value, { allowUnconfirmed: true, noCache: true
 ```typescript
 // Sync (SQL/sync KV only)
 this.ctx.storage.transactionSync(() => {
-  this.sql.exec('UPDATE accounts SET balance = balance - ? WHERE id = ?', 100, 1);
-  this.sql.exec('UPDATE accounts SET balance = balance + ? WHERE id = ?', 100, 2);
+  this.sql.exec("UPDATE accounts SET balance = balance - ? WHERE id = ?", 100, 1);
+  this.sql.exec("UPDATE accounts SET balance = balance + ? WHERE id = ?", 100, 2);
   return "result";
 });
 

@@ -65,11 +65,15 @@ describe("PublicReservationsService rig validation", () => {
 
   it("rejects rigs that exceed maximum length", () => {
     const isRigCompatible = getPrivateMethod(service, "isRigCompatible");
-    expect(isRigCompatible.call(service, { siteType: "rv", rigMaxLength: 30 }, "rv", 35)).toBe(false);
+    expect(isRigCompatible.call(service, { siteType: "rv", rigMaxLength: 30 }, "rv", 35)).toBe(
+      false,
+    );
   });
 
   it("allows rigs within maximum length", () => {
     const isRigCompatible = getPrivateMethod(service, "isRigCompatible");
-    expect(isRigCompatible.call(service, { siteType: "rv", rigMaxLength: 35 }, "rv", 32)).toBe(true);
+    expect(isRigCompatible.call(service, { siteType: "rv", rigMaxLength: 35 }, "rv", 32)).toBe(
+      true,
+    );
   });
 });

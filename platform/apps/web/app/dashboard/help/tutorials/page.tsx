@@ -27,7 +27,7 @@ const tutorials: VideoTutorial[] = [
     category: "Getting Started",
     difficulty: "Beginner",
     roles: ["owner", "manager", "frontdesk"],
-    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U"
+    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U",
   },
   {
     id: "checkin-process",
@@ -37,7 +37,7 @@ const tutorials: VideoTutorial[] = [
     category: "Front Desk",
     difficulty: "Beginner",
     roles: ["frontdesk", "manager"],
-    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ"
+    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ",
   },
   {
     id: "new-reservation",
@@ -46,7 +46,7 @@ const tutorials: VideoTutorial[] = [
     duration: "4:45",
     category: "Front Desk",
     difficulty: "Beginner",
-    roles: ["frontdesk"]
+    roles: ["frontdesk"],
   },
   {
     id: "payment-processing",
@@ -55,7 +55,7 @@ const tutorials: VideoTutorial[] = [
     duration: "6:20",
     category: "Front Desk",
     difficulty: "Intermediate",
-    roles: ["frontdesk", "finance"]
+    roles: ["frontdesk", "finance"],
   },
   {
     id: "reports-overview",
@@ -65,7 +65,7 @@ const tutorials: VideoTutorial[] = [
     category: "Reports & Analytics",
     difficulty: "Intermediate",
     roles: ["owner", "manager"],
-    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ"
+    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ",
   },
   {
     id: "revenue-reports",
@@ -75,7 +75,7 @@ const tutorials: VideoTutorial[] = [
     category: "Reports & Analytics",
     difficulty: "Advanced",
     roles: ["owner", "finance"],
-    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U"
+    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U",
   },
   {
     id: "site-management",
@@ -84,7 +84,7 @@ const tutorials: VideoTutorial[] = [
     duration: "7:45",
     category: "Setup & Configuration",
     difficulty: "Intermediate",
-    roles: ["owner", "manager"]
+    roles: ["owner", "manager"],
   },
   {
     id: "group-bookings",
@@ -93,7 +93,7 @@ const tutorials: VideoTutorial[] = [
     duration: "9:15",
     category: "Advanced Features",
     difficulty: "Advanced",
-    roles: ["frontdesk", "manager"]
+    roles: ["frontdesk", "manager"],
   },
   {
     id: "seasonal-opening",
@@ -103,7 +103,7 @@ const tutorials: VideoTutorial[] = [
     category: "Seasonal Operations",
     difficulty: "Intermediate",
     roles: ["owner", "manager", "maintenance"],
-    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U"
+    videoUrl: "https://www.youtube.com/embed/ysz5S6PUM-U",
   },
   {
     id: "troubleshooting-payments",
@@ -113,7 +113,7 @@ const tutorials: VideoTutorial[] = [
     category: "Troubleshooting",
     difficulty: "Intermediate",
     roles: ["frontdesk", "finance", "manager"],
-    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ"
+    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ",
   },
   {
     id: "inventory-retail",
@@ -122,7 +122,7 @@ const tutorials: VideoTutorial[] = [
     duration: "5:50",
     category: "Operations",
     difficulty: "Beginner",
-    roles: ["manager", "maintenance"]
+    roles: ["manager", "maintenance"],
   },
   {
     id: "wifi-support",
@@ -132,7 +132,7 @@ const tutorials: VideoTutorial[] = [
     category: "Technology",
     difficulty: "Beginner",
     roles: ["frontdesk", "maintenance"],
-    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ"
+    videoUrl: "https://www.youtube.com/embed/aqz-KE-bpKQ",
   },
   {
     id: "integrations-setup",
@@ -141,19 +141,19 @@ const tutorials: VideoTutorial[] = [
     duration: "8:05",
     category: "Integrations",
     difficulty: "Intermediate",
-    roles: ["owner", "manager", "admin"]
-  }
+    roles: ["owner", "manager", "admin"],
+  },
 ];
 
 export default function TutorialsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
 
-  const categories = Array.from(new Set(tutorials.map(t => t.category)));
-  const difficulties = Array.from(new Set(tutorials.map(t => t.difficulty)));
-  const featuredTutorial = tutorials.find(t => t.videoUrl) ?? tutorials[0];
+  const categories = Array.from(new Set(tutorials.map((t) => t.category)));
+  const difficulties = Array.from(new Set(tutorials.map((t) => t.difficulty)));
+  const featuredTutorial = tutorials.find((t) => t.videoUrl) ?? tutorials[0];
 
-  const filteredTutorials = tutorials.filter(t => {
+  const filteredTutorials = tutorials.filter((t) => {
     const matchesCategory = selectedCategory === "all" || t.category === selectedCategory;
     const matchesDifficulty = selectedDifficulty === "all" || t.difficulty === selectedDifficulty;
     return matchesCategory && matchesDifficulty;
@@ -163,10 +163,7 @@ export default function TutorialsPage() {
     <DashboardShell>
       <div className="space-y-6">
         <Breadcrumbs
-          items={[
-            { label: "Help", href: "/dashboard/help" },
-            { label: "Video Tutorials" }
-          ]}
+          items={[{ label: "Help", href: "/dashboard/help" }, { label: "Video Tutorials" }]}
         />
 
         {/* Header */}
@@ -174,9 +171,7 @@ export default function TutorialsPage() {
           <div className="flex items-start justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 mb-2">Video Tutorials</h1>
-              <p className="text-slate-600">
-                Step-by-step video guides to master Keepr features
-              </p>
+              <p className="text-slate-600">Step-by-step video guides to master Keepr features</p>
             </div>
             <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm font-medium text-emerald-700">
               {filteredTutorials.length} video{filteredTutorials.length === 1 ? "" : "s"}
@@ -187,23 +182,25 @@ export default function TutorialsPage() {
           <div className="flex items-center gap-2 flex-wrap mt-4">
             <button
               onClick={() => setSelectedCategory("all")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === "all"
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                selectedCategory === "all"
                   ? "bg-status-success/15 text-status-success"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+              }`}
             >
               All Videos ({tutorials.length})
             </button>
-            {categories.map(cat => {
-              const count = tutorials.filter(t => t.category === cat).length;
+            {categories.map((cat) => {
+              const count = tutorials.filter((t) => t.category === cat).length;
               return (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${selectedCategory === cat
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCategory === cat
                       ? "bg-status-success/15 text-status-success"
                       : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                    }`}
+                  }`}
                 >
                   {cat} ({count})
                 </button>
@@ -215,21 +212,23 @@ export default function TutorialsPage() {
             <span className="text-xs font-semibold text-slate-700 uppercase">Difficulty</span>
             <button
               onClick={() => setSelectedDifficulty("all")}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === "all"
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                selectedDifficulty === "all"
                   ? "bg-status-info/15 text-status-info"
                   : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+              }`}
             >
               All
             </button>
-            {difficulties.map(level => (
+            {difficulties.map((level) => (
               <button
                 key={level}
                 onClick={() => setSelectedDifficulty(level)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${selectedDifficulty === level
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  selectedDifficulty === level
                     ? "bg-status-info/15 text-status-info"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                  }`}
+                }`}
               >
                 {level}
               </button>
@@ -254,11 +253,18 @@ export default function TutorialsPage() {
               </div>
               <div className="p-5 space-y-3">
                 <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">{featuredTutorial.category}</span>
-                  <span className={`px-2 py-0.5 rounded ${featuredTutorial.difficulty === "Beginner" ? "bg-status-info/15 text-status-info" :
-                      featuredTutorial.difficulty === "Intermediate" ? "bg-status-warning/15 text-status-warning" :
-                        "bg-status-error/15 text-status-error"
-                    }`}>
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-semibold">
+                    {featuredTutorial.category}
+                  </span>
+                  <span
+                    className={`px-2 py-0.5 rounded ${
+                      featuredTutorial.difficulty === "Beginner"
+                        ? "bg-status-info/15 text-status-info"
+                        : featuredTutorial.difficulty === "Intermediate"
+                          ? "bg-status-warning/15 text-status-warning"
+                          : "bg-status-error/15 text-status-error"
+                    }`}
+                  >
                     {featuredTutorial.difficulty}
                   </span>
                 </div>
@@ -320,10 +326,15 @@ export default function TutorialsPage() {
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs font-medium text-emerald-600">{video.category}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded ${video.difficulty === "Beginner" ? "bg-status-info/15 text-status-info" :
-                      video.difficulty === "Intermediate" ? "bg-status-warning/15 text-status-warning" :
-                        "bg-status-error/15 text-status-error"
-                    }`}>
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded ${
+                      video.difficulty === "Beginner"
+                        ? "bg-status-info/15 text-status-info"
+                        : video.difficulty === "Intermediate"
+                          ? "bg-status-warning/15 text-status-warning"
+                          : "bg-status-error/15 text-status-error"
+                    }`}
+                  >
                     {video.difficulty}
                   </span>
                 </div>
@@ -338,7 +349,7 @@ export default function TutorialsPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
-                    {video.roles.length} role{video.roles.length > 1 ? 's' : ''}
+                    {video.roles.length} role{video.roles.length > 1 ? "s" : ""}
                   </div>
                 </div>
 

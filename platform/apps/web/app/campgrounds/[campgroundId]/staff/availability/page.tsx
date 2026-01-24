@@ -112,7 +112,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
       const [availRes, overrideRes] = await Promise.all([
         fetch(`/api/staff/availability?campgroundId=${params.campgroundId}`),
         fetch(
-          `/api/staff/availability/overrides?campgroundId=${params.campgroundId}&startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`
+          `/api/staff/availability/overrides?campgroundId=${params.campgroundId}&startDate=${weekStart.toISOString()}&endDate=${weekEnd.toISOString()}`,
         ),
       ]);
 
@@ -168,9 +168,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
     const dateStr = date.toISOString().split("T")[0];
 
     // Check for override first
-    const override = overrides.find(
-      (o) => o.userId === userId && o.date.split("T")[0] === dateStr
-    );
+    const override = overrides.find((o) => o.userId === userId && o.date.split("T")[0] === dateStr);
     if (override) {
       return {
         available: override.isAvailable,
@@ -182,9 +180,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
     }
 
     // Fall back to regular availability
-    const regular = availability.find(
-      (a) => a.userId === userId && a.dayOfWeek === dayOfWeek
-    );
+    const regular = availability.find((a) => a.userId === userId && a.dayOfWeek === dayOfWeek);
     if (regular) {
       return {
         available: regular.isAvailable,
@@ -245,7 +241,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
     try {
       const res = await fetch(
         `/api/staff/availability/override?campgroundId=${params.campgroundId}&userId=${selectedCell.userId}&date=${selectedCell.date.toISOString().split("T")[0]}`,
-        { method: "DELETE" }
+        { method: "DELETE" },
       );
 
       if (!res.ok) throw new Error("Failed to delete");
@@ -349,7 +345,10 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
-            <button onClick={() => setError(null)} className="ml-auto text-red-800 underline text-xs font-medium">
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-800 underline text-xs font-medium"
+            >
               Dismiss
             </button>
           </motion.div>
@@ -392,7 +391,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                           key={i}
                           className={cn(
                             "text-center px-2 py-3 text-xs font-semibold uppercase tracking-wider min-w-[80px]",
-                            isToday ? "text-blue-600 bg-blue-50" : "text-muted-foreground"
+                            isToday ? "text-blue-600 bg-blue-50" : "text-muted-foreground",
                           )}
                         >
                           <div>{DAYS[date.getDay()]}</div>
@@ -439,8 +438,8 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                                     ? "bg-status-success/15 text-status-success ring-2 ring-status-success/30"
                                     : "bg-status-success/10 text-status-success"
                                   : status.isOverride
-                                  ? "bg-status-error/15 text-status-error ring-2 ring-status-error/30"
-                                  : "bg-muted text-muted-foreground"
+                                    ? "bg-status-error/15 text-status-error ring-2 ring-status-error/30"
+                                    : "bg-muted text-muted-foreground",
                               )}
                             >
                               {status.available ? (
@@ -486,7 +485,9 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
               >
                 <div className="bg-status-info/10 border-b border-status-info/20 px-6 py-4 flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-foreground">Set Availability Override</h2>
+                    <h2 className="text-lg font-semibold text-foreground">
+                      Set Availability Override
+                    </h2>
                     <p className="text-sm text-muted-foreground">
                       {selectedCell.date.toLocaleDateString(undefined, {
                         weekday: "long",
@@ -513,7 +514,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                         "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-all",
                         overrideAvailable
                           ? "border-status-success bg-status-success/15 text-status-success"
-                          : "border-border text-muted-foreground hover:border-border"
+                          : "border-border text-muted-foreground hover:border-border",
                       )}
                       aria-pressed={overrideAvailable}
                     >
@@ -526,7 +527,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                         "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 font-medium transition-all",
                         !overrideAvailable
                           ? "border-status-error bg-status-error/15 text-status-error"
-                          : "border-border text-muted-foreground hover:border-border"
+                          : "border-border text-muted-foreground hover:border-border",
                       )}
                       aria-pressed={!overrideAvailable}
                     >
@@ -539,7 +540,12 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                   {overrideAvailable && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="override-start" className="block text-sm font-medium text-foreground mb-2">Start Time</Label>
+                        <Label
+                          htmlFor="override-start"
+                          className="block text-sm font-medium text-foreground mb-2"
+                        >
+                          Start Time
+                        </Label>
                         <Input
                           id="override-start"
                           type="time"
@@ -549,7 +555,12 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                         />
                       </div>
                       <div>
-                        <Label htmlFor="override-end" className="block text-sm font-medium text-foreground mb-2">End Time</Label>
+                        <Label
+                          htmlFor="override-end"
+                          className="block text-sm font-medium text-foreground mb-2"
+                        >
+                          End Time
+                        </Label>
                         <Input
                           id="override-end"
                           type="time"
@@ -563,7 +574,10 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
 
                   {/* Reason */}
                   <div>
-                    <Label htmlFor="override-reason" className="block text-sm font-medium text-foreground mb-2">
+                    <Label
+                      htmlFor="override-reason"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       Reason <span className="text-muted-foreground">(optional)</span>
                     </Label>
                     <Input
@@ -585,7 +599,11 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                       disabled={saving}
                       className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 text-white font-medium disabled:opacity-50 hover:bg-blue-700 transition-colors"
                     >
-                      {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                      {saving ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <CheckCircle2 className="w-4 h-4" />
+                      )}
                       Save Override
                     </motion.button>
                     {getCellStatus(selectedCell.userId, selectedCell.date).isOverride && (

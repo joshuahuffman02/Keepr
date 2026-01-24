@@ -13,7 +13,11 @@ import {
   reservationImportRecordSchema,
   reservationImportSchemaSummary,
 } from "./dto/reservation-import.dto";
-import { parseNewbookCsv, mapNewbookToInternal, NewbookImportResult } from "./integrations/newbook.adapter";
+import {
+  parseNewbookCsv,
+  mapNewbookToInternal,
+  NewbookImportResult,
+} from "./integrations/newbook.adapter";
 import { randomUUID } from "crypto";
 
 type ImportFormat = "csv" | "json" | "newbook";
@@ -45,7 +49,7 @@ const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error && error.message ? error.message : fallback;
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -68,8 +72,8 @@ export class ReservationImportExportService {
     private readonly idempotency: IdempotencyService,
     private readonly jobQueue: JobQueueService,
     private readonly audit: AuditService,
-    private readonly observability: ObservabilityService
-  ) { }
+    private readonly observability: ObservabilityService,
+  ) {}
 
   // ---------------------------------------------------------------------------
   // Schema helpers
@@ -128,13 +132,15 @@ export class ReservationImportExportService {
       headers.forEach((h, idx) => {
         row[h] = cells[idx] ?? "";
       });
-      if (Object.values(row).every((v) => (v === undefined || String(v).trim() === ""))) {
+      if (Object.values(row).every((v) => v === undefined || String(v).trim() === "")) {
         continue;
       }
       records.push(row);
     }
 
-    const missing = reservationImportSchemaSummary.requiredFields.filter((req) => !headers.includes(req));
+    const missing = reservationImportSchemaSummary.requiredFields.filter(
+      (req) => !headers.includes(req),
+    );
     if (missing.length) {
       errors.push(`Missing required columns: ${missing.join(", ")}`);
     }
@@ -144,7 +150,7 @@ export class ReservationImportExportService {
 
   private validateRecords(
     campgroundId: string,
-    records: Record<string, unknown>[]
+    records: Record<string, unknown>[],
   ): { valid: ReservationImportRecord[]; errors: ReservationImportValidationError[] } {
     const valid: ReservationImportRecord[] = [];
     const errors: ReservationImportValidationError[] = [];
@@ -213,7 +219,10 @@ export class ReservationImportExportService {
       key,
       { format: request.format, dryRun: request.dryRun, filename: request.filename },
       request.campgroundId,
-      { endpoint: "reservations.import", requestBody: { format: request.format, dryRun: request.dryRun, filename: request.filename } }
+      {
+        endpoint: "reservations.import",
+        requestBody: { format: request.format, dryRun: request.dryRun, filename: request.filename },
+      },
     );
 
     if (isRecord(idemp)) {
@@ -238,14 +247,14 @@ export class ReservationImportExportService {
       if (!newbookRows.length) {
         parseErrors.push("No valid NewBook rows found in CSV");
       } else {
-        newbookResults = newbookRows.map(row => mapNewbookToInternal(row));
+        newbookResults = newbookRows.map((row) => mapNewbookToInternal(row));
         // For now, collect warnings as parse errors and extract records
         newbookResults.forEach((r, idx) => {
-          r.warnings.forEach(w => parseErrors.push(`Row ${idx + 2}: ${w}`));
+          r.warnings.forEach((w) => parseErrors.push(`Row ${idx + 2}: ${w}`));
         });
         // Note: NewBook records are partial - they need site/guest resolution
         // For full import, we'd need to resolve these first
-        records = newbookResults.map(r => r.record);
+        records = newbookResults.map((r) => r.record);
       }
     } else if (request.format === "csv") {
       const parsed = this.parseCsv(typeof request.payload === "string" ? request.payload : "");
@@ -265,7 +274,9 @@ export class ReservationImportExportService {
     const responseBase = {
       dryRun: Boolean(request.dryRun),
       parseErrors: parseErrors.map((e) => this.mask(e)),
-      validationErrors: validation.errors.slice(0, 25).map((e) => ({ ...e, value: this.mask(e.value) })),
+      validationErrors: validation.errors
+        .slice(0, 25)
+        .map((e) => ({ ...e, value: this.mask(e.value) })),
       validCount: validation.valid.length,
       errorCount: validation.errors.length + parseErrors.length,
     };
@@ -301,8 +312,9 @@ export class ReservationImportExportService {
 
     void this.jobQueue.enqueue(
       this.importQueueName,
-      () => this.processImportJob(job.id, request.campgroundId, validation.valid, validation.errors),
-      { jobName: `${this.importQueueName}:${request.campgroundId}` }
+      () =>
+        this.processImportJob(job.id, request.campgroundId, validation.valid, validation.errors),
+      { jobName: `${this.importQueueName}:${request.campgroundId}` },
     );
 
     const response = { jobId: job.id, status: "queued", ...responseBase };
@@ -314,7 +326,7 @@ export class ReservationImportExportService {
     jobId: string,
     campgroundId: string,
     records: ReservationImportRecord[],
-    validationErrors: ReservationImportValidationError[]
+    validationErrors: ReservationImportValidationError[],
   ) {
     await this.prisma.integrationExportJob.update({
       where: { id: jobId },
@@ -384,7 +396,7 @@ export class ReservationImportExportService {
       name: this.importQueueName,
       durationMs: 0,
       success: status === "success",
-      queueDepth: (this.jobQueue.getQueueState(this.importQueueName)?.pending ?? 0),
+      queueDepth: this.jobQueue.getQueueState(this.importQueueName)?.pending ?? 0,
     });
 
     return { created: created.length, failed: failed.length };
@@ -463,7 +475,8 @@ export class ReservationImportExportService {
   async exportReservations(params: ExportParams) {
     await this.idempotency.throttleScope(params.campgroundId, null, "report");
     const decoded = this.decodeToken(params.paginationToken);
-    const decodedLastId = decoded && typeof decoded.lastId === "string" ? decoded.lastId : undefined;
+    const decodedLastId =
+      decoded && typeof decoded.lastId === "string" ? decoded.lastId : undefined;
     const emitted = decoded && typeof decoded.emitted === "number" ? decoded.emitted : 0;
     const maxRows = this.exportMaxRows();
     if (emitted >= maxRows) {
@@ -511,8 +524,8 @@ export class ReservationImportExportService {
           notes: r.notes,
           createdAt: r.createdAt,
         },
-        params.includePII ?? false
-      )
+        params.includePII ?? false,
+      ),
     );
 
     const newEmitted = emitted + shaped.length;
@@ -523,8 +536,18 @@ export class ReservationImportExportService {
 
     const payload =
       (params.format ?? "json") === "csv"
-        ? { csv: this.toCsv(shaped), nextToken, emitted: newEmitted, remaining: Math.max(0, maxRows - newEmitted) }
-        : { rows: shaped, nextToken, emitted: newEmitted, remaining: Math.max(0, maxRows - newEmitted) };
+        ? {
+            csv: this.toCsv(shaped),
+            nextToken,
+            emitted: newEmitted,
+            remaining: Math.max(0, maxRows - newEmitted),
+          }
+        : {
+            rows: shaped,
+            nextToken,
+            emitted: newEmitted,
+            remaining: Math.max(0, maxRows - newEmitted),
+          };
 
     if (!params.paginationToken) {
       await this.audit.recordExport({
@@ -548,7 +571,12 @@ export class ReservationImportExportService {
     });
   }
 
-  async queueExport(campgroundId: string, filters?: Record<string, unknown>, format: "json" | "csv" = "json", requestedById?: string | null) {
+  async queueExport(
+    campgroundId: string,
+    filters?: Record<string, unknown>,
+    format: "json" | "csv" = "json",
+    requestedById?: string | null,
+  ) {
     await this.idempotency.throttleScope(campgroundId, null, "apply");
     const job = await this.prisma.integrationExportJob.create({
       data: {

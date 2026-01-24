@@ -204,17 +204,20 @@ export function useAnalytics() {
   }, [user, campgroundId, organizationId]);
 
   // Update session data
-  const updateSession = useCallback((updates: Partial<SessionData>) => {
-    if (typeof window === "undefined") return;
+  const updateSession = useCallback(
+    (updates: Partial<SessionData>) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    const updated = {
-      ...session,
-      ...updates,
-      lastActivityAt: new Date().toISOString(),
-    };
-    localStorage.setItem(SESSION_DATA_KEY, JSON.stringify(updated));
-  }, [getSession]);
+      const session = getSession();
+      const updated = {
+        ...session,
+        ...updates,
+        lastActivityAt: new Date().toISOString(),
+      };
+      localStorage.setItem(SESSION_DATA_KEY, JSON.stringify(updated));
+    },
+    [getSession],
+  );
 
   // Get event queue
   const getEventQueue = useCallback((): TrackingEvent[] => {
@@ -249,8 +252,8 @@ export function useAnalytics() {
               ...(organizationId ? { "x-organization-id": organizationId } : {}),
             },
             body: JSON.stringify(event),
-          }).catch((err) => console.warn("Failed to send event", err))
-        )
+          }).catch((err) => console.warn("Failed to send event", err)),
+        ),
       );
     } catch (err) {
       // Re-queue failed events
@@ -260,287 +263,316 @@ export function useAnalytics() {
   }, [getEventQueue, saveEventQueue, campgroundId, organizationId]);
 
   // Queue an event
-  const queueEvent = useCallback((event: TrackingEvent) => {
-    const events = getEventQueue();
-    events.push(event);
-    saveEventQueue(events);
+  const queueEvent = useCallback(
+    (event: TrackingEvent) => {
+      const events = getEventQueue();
+      events.push(event);
+      saveEventQueue(events);
 
-    // Flush if batch size reached
-    if (events.length >= BATCH_SIZE) {
-      flushEvents();
-    } else {
-      // Schedule flush after interval
-      if (batchTimeoutRef.current) {
-        clearTimeout(batchTimeoutRef.current);
+      // Flush if batch size reached
+      if (events.length >= BATCH_SIZE) {
+        flushEvents();
+      } else {
+        // Schedule flush after interval
+        if (batchTimeoutRef.current) {
+          clearTimeout(batchTimeoutRef.current);
+        }
+        batchTimeoutRef.current = setTimeout(flushEvents, BATCH_INTERVAL_MS);
       }
-      batchTimeoutRef.current = setTimeout(flushEvents, BATCH_INTERVAL_MS);
-    }
-  }, [getEventQueue, saveEventQueue, flushEvents]);
+    },
+    [getEventQueue, saveEventQueue, flushEvents],
+  );
 
   // Track page view
-  const trackPageView = useCallback((options?: {
-    page?: string;
-    pageTitle?: string;
-    featureArea?: string;
-  }) => {
-    if (typeof window === "undefined") return;
+  const trackPageView = useCallback(
+    (options?: { page?: string; pageTitle?: string; featureArea?: string }) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    const page = options?.page || window.location.pathname;
-    const featureArea = options?.featureArea || getFeatureAreaFromPath(page);
+      const session = getSession();
+      const page = options?.page || window.location.pathname;
+      const featureArea = options?.featureArea || getFeatureAreaFromPath(page);
 
-    // Update session
-    updateSession({
-      pageViews: session.pageViews + 1,
-      pages: [...session.pages.filter((p) => p !== page), page],
-    });
+      // Update session
+      updateSession({
+        pageViews: session.pageViews + 1,
+        pages: [...session.pages.filter((p) => p !== page), page],
+      });
 
-    // Reset page tracking
-    pageStartTimeRef.current = Date.now();
-    scrollDepthRef.current = 0;
+      // Reset page tracking
+      pageStartTimeRef.current = Date.now();
+      scrollDepthRef.current = 0;
 
-    // Queue event
-    queueEvent({
-      eventName: "admin_page_view",
-      sessionId: session.sessionId,
-      page,
-      pageTitle: options?.pageTitle || document.title,
-      featureArea,
-      occurredAt: new Date().toISOString(),
-      campgroundId: campgroundId ?? undefined,
-      organizationId: organizationId ?? undefined,
-      userId: user?.id,
-    });
-  }, [getSession, updateSession, queueEvent, campgroundId, organizationId, user]);
+      // Queue event
+      queueEvent({
+        eventName: "admin_page_view",
+        sessionId: session.sessionId,
+        page,
+        pageTitle: options?.pageTitle || document.title,
+        featureArea,
+        occurredAt: new Date().toISOString(),
+        campgroundId: campgroundId ?? undefined,
+        organizationId: organizationId ?? undefined,
+        userId: user?.id,
+      });
+    },
+    [getSession, updateSession, queueEvent, campgroundId, organizationId, user],
+  );
 
   // Track action
-  const trackAction = useCallback((options: {
-    actionType: string;
-    actionTarget?: string;
-    metadata?: Record<string, unknown>;
-  }) => {
-    if (typeof window === "undefined") return;
+  const trackAction = useCallback(
+    (options: {
+      actionType: string;
+      actionTarget?: string;
+      metadata?: Record<string, unknown>;
+    }) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    updateSession({ actions: session.actions + 1 });
+      const session = getSession();
+      updateSession({ actions: session.actions + 1 });
 
-    queueEvent({
-      eventName: "admin_action",
-      sessionId: session.sessionId,
-      page: window.location.pathname,
-      featureArea: getFeatureAreaFromPath(window.location.pathname),
-      actionType: options.actionType,
-      actionTarget: options.actionTarget,
-      metadata: options.metadata,
-      occurredAt: new Date().toISOString(),
-      campgroundId: campgroundId ?? undefined,
-      organizationId: organizationId ?? undefined,
-      userId: user?.id,
-    });
-  }, [getSession, updateSession, queueEvent, campgroundId, organizationId, user]);
+      queueEvent({
+        eventName: "admin_action",
+        sessionId: session.sessionId,
+        page: window.location.pathname,
+        featureArea: getFeatureAreaFromPath(window.location.pathname),
+        actionType: options.actionType,
+        actionTarget: options.actionTarget,
+        metadata: options.metadata,
+        occurredAt: new Date().toISOString(),
+        campgroundId: campgroundId ?? undefined,
+        organizationId: organizationId ?? undefined,
+        userId: user?.id,
+      });
+    },
+    [getSession, updateSession, queueEvent, campgroundId, organizationId, user],
+  );
 
   // Track search
-  const trackSearch = useCallback((query: string, results?: number) => {
-    if (typeof window === "undefined") return;
+  const trackSearch = useCallback(
+    (query: string, results?: number) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    queueEvent({
-      eventName: "admin_search",
-      sessionId: session.sessionId,
-      page: window.location.pathname,
-      featureArea: getFeatureAreaFromPath(window.location.pathname),
-      searchQuery: query,
-      metadata: { resultsCount: results },
-      occurredAt: new Date().toISOString(),
-      campgroundId: campgroundId ?? undefined,
-      organizationId: organizationId ?? undefined,
-      userId: user?.id,
-    });
-  }, [getSession, queueEvent, campgroundId, organizationId, user]);
+      const session = getSession();
+      queueEvent({
+        eventName: "admin_search",
+        sessionId: session.sessionId,
+        page: window.location.pathname,
+        featureArea: getFeatureAreaFromPath(window.location.pathname),
+        searchQuery: query,
+        metadata: { resultsCount: results },
+        occurredAt: new Date().toISOString(),
+        campgroundId: campgroundId ?? undefined,
+        organizationId: organizationId ?? undefined,
+        userId: user?.id,
+      });
+    },
+    [getSession, queueEvent, campgroundId, organizationId, user],
+  );
 
   // Track error
-  const trackError = useCallback((error: Error | string, code?: string) => {
-    if (typeof window === "undefined") return;
+  const trackError = useCallback(
+    (error: Error | string, code?: string) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    updateSession({ errors: session.errors + 1 });
+      const session = getSession();
+      updateSession({ errors: session.errors + 1 });
 
-    const errorMessage = typeof error === "string" ? error : error.message;
+      const errorMessage = typeof error === "string" ? error : error.message;
 
-    queueEvent({
-      eventName: "admin_error",
-      sessionId: session.sessionId,
-      page: window.location.pathname,
-      featureArea: getFeatureAreaFromPath(window.location.pathname),
-      errorMessage,
-      errorCode: code,
-      occurredAt: new Date().toISOString(),
-      campgroundId: campgroundId ?? undefined,
-      organizationId: organizationId ?? undefined,
-      userId: user?.id,
-    });
-  }, [getSession, updateSession, queueEvent, campgroundId, organizationId, user]);
+      queueEvent({
+        eventName: "admin_error",
+        sessionId: session.sessionId,
+        page: window.location.pathname,
+        featureArea: getFeatureAreaFromPath(window.location.pathname),
+        errorMessage,
+        errorCode: code,
+        occurredAt: new Date().toISOString(),
+        campgroundId: campgroundId ?? undefined,
+        organizationId: organizationId ?? undefined,
+        userId: user?.id,
+      });
+    },
+    [getSession, updateSession, queueEvent, campgroundId, organizationId, user],
+  );
 
   // Track feature usage
-  const trackFeature = useCallback((options: {
-    feature: string;
-    subFeature?: string;
-    durationSecs?: number;
-    outcome?: "success" | "failure" | "partial";
-    metadata?: Record<string, unknown>;
-  }) => {
-    if (typeof window === "undefined") return;
+  const trackFeature = useCallback(
+    (options: {
+      feature: string;
+      subFeature?: string;
+      durationSecs?: number;
+      outcome?: "success" | "failure" | "partial";
+      metadata?: Record<string, unknown>;
+    }) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
+      const session = getSession();
 
-    fetch(`${API_BASE}/analytics/enhanced/feature`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
-      },
-      body: JSON.stringify({
-        sessionId: session.sessionId,
-        feature: options.feature,
-        subFeature: options.subFeature,
-        campgroundId,
-        userId: user?.id,
-        durationSecs: options.durationSecs,
-        outcome: options.outcome,
-        metadata: options.metadata,
-      }),
-    }).catch((err) => console.warn("Failed to track feature", err));
-  }, [getSession, campgroundId, user]);
+      fetch(`${API_BASE}/analytics/enhanced/feature`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
+        },
+        body: JSON.stringify({
+          sessionId: session.sessionId,
+          feature: options.feature,
+          subFeature: options.subFeature,
+          campgroundId,
+          userId: user?.id,
+          durationSecs: options.durationSecs,
+          outcome: options.outcome,
+          metadata: options.metadata,
+        }),
+      }).catch((err) => console.warn("Failed to track feature", err));
+    },
+    [getSession, campgroundId, user],
+  );
 
   // Start funnel
-  const startFunnel = useCallback((funnelName: string, stepName?: string) => {
-    if (typeof window === "undefined") return;
+  const startFunnel = useCallback(
+    (funnelName: string, stepName?: string) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    const funnel: FunnelState = {
-      funnelName,
-      step: 1,
-      startedAt: new Date().toISOString(),
-    };
-    funnelsRef.current.set(funnelName, funnel);
-
-    fetch(`${API_BASE}/analytics/enhanced/funnel/step`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
-      },
-      body: JSON.stringify({
-        sessionId: session.sessionId,
+      const session = getSession();
+      const funnel: FunnelState = {
         funnelName,
         step: 1,
-        stepName,
-        campgroundId,
-        organizationId,
-      }),
-    }).catch((err) => console.warn("Failed to start funnel", err));
-  }, [getSession, campgroundId, organizationId]);
+        startedAt: new Date().toISOString(),
+      };
+      funnelsRef.current.set(funnelName, funnel);
+
+      fetch(`${API_BASE}/analytics/enhanced/funnel/step`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
+        },
+        body: JSON.stringify({
+          sessionId: session.sessionId,
+          funnelName,
+          step: 1,
+          stepName,
+          campgroundId,
+          organizationId,
+        }),
+      }).catch((err) => console.warn("Failed to start funnel", err));
+    },
+    [getSession, campgroundId, organizationId],
+  );
 
   // Advance funnel
-  const advanceFunnel = useCallback((funnelName: string, stepName?: string, metadata?: Record<string, unknown>) => {
-    if (typeof window === "undefined") return;
+  const advanceFunnel = useCallback(
+    (funnelName: string, stepName?: string, metadata?: Record<string, unknown>) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    const funnel = funnelsRef.current.get(funnelName);
-    if (!funnel) {
-      // Start new funnel if not exists
-      startFunnel(funnelName, stepName);
-      return;
-    }
+      const session = getSession();
+      const funnel = funnelsRef.current.get(funnelName);
+      if (!funnel) {
+        // Start new funnel if not exists
+        startFunnel(funnelName, stepName);
+        return;
+      }
 
-    funnel.step++;
-    funnelsRef.current.set(funnelName, funnel);
+      funnel.step++;
+      funnelsRef.current.set(funnelName, funnel);
 
-    fetch(`${API_BASE}/analytics/enhanced/funnel/step`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
-      },
-      body: JSON.stringify({
-        sessionId: session.sessionId,
-        funnelName,
-        step: funnel.step,
-        stepName,
-        campgroundId,
-        organizationId,
-        metadata,
-      }),
-    }).catch((err) => console.warn("Failed to advance funnel", err));
-  }, [getSession, startFunnel, campgroundId, organizationId]);
+      fetch(`${API_BASE}/analytics/enhanced/funnel/step`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
+        },
+        body: JSON.stringify({
+          sessionId: session.sessionId,
+          funnelName,
+          step: funnel.step,
+          stepName,
+          campgroundId,
+          organizationId,
+          metadata,
+        }),
+      }).catch((err) => console.warn("Failed to advance funnel", err));
+    },
+    [getSession, startFunnel, campgroundId, organizationId],
+  );
 
   // Complete funnel
-  const completeFunnel = useCallback((funnelName: string, metadata?: Record<string, unknown>) => {
-    if (typeof window === "undefined") return;
+  const completeFunnel = useCallback(
+    (funnelName: string, metadata?: Record<string, unknown>) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    funnelsRef.current.delete(funnelName);
+      const session = getSession();
+      funnelsRef.current.delete(funnelName);
 
-    fetch(`${API_BASE}/analytics/enhanced/funnel/complete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
-      },
-      body: JSON.stringify({
-        sessionId: session.sessionId,
-        funnelName,
-        campgroundId,
-        outcome: "completed",
-        metadata,
-      }),
-    }).catch((err) => console.warn("Failed to complete funnel", err));
-  }, [getSession, campgroundId]);
+      fetch(`${API_BASE}/analytics/enhanced/funnel/complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
+        },
+        body: JSON.stringify({
+          sessionId: session.sessionId,
+          funnelName,
+          campgroundId,
+          outcome: "completed",
+          metadata,
+        }),
+      }).catch((err) => console.warn("Failed to complete funnel", err));
+    },
+    [getSession, campgroundId],
+  );
 
   // Abandon funnel
-  const abandonFunnel = useCallback((funnelName: string, reason?: string) => {
-    if (typeof window === "undefined") return;
+  const abandonFunnel = useCallback(
+    (funnelName: string, reason?: string) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    const funnel = funnelsRef.current.get(funnelName);
-    funnelsRef.current.delete(funnelName);
+      const session = getSession();
+      const funnel = funnelsRef.current.get(funnelName);
+      funnelsRef.current.delete(funnelName);
 
-    fetch(`${API_BASE}/analytics/enhanced/funnel/complete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
-      },
-      body: JSON.stringify({
-        sessionId: session.sessionId,
-        funnelName,
-        campgroundId,
-        outcome: "abandoned",
-        abandonedStep: funnel?.step,
-        abandonReason: reason,
-      }),
-    }).catch((err) => console.warn("Failed to abandon funnel", err));
-  }, [getSession, campgroundId]);
+      fetch(`${API_BASE}/analytics/enhanced/funnel/complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(campgroundId ? { "x-campground-id": campgroundId } : {}),
+        },
+        body: JSON.stringify({
+          sessionId: session.sessionId,
+          funnelName,
+          campgroundId,
+          outcome: "abandoned",
+          abandonedStep: funnel?.step,
+          abandonReason: reason,
+        }),
+      }).catch((err) => console.warn("Failed to abandon funnel", err));
+    },
+    [getSession, campgroundId],
+  );
 
   // Track timing
-  const trackTiming = useCallback((category: string, variable: string, timeMs: number) => {
-    if (typeof window === "undefined") return;
+  const trackTiming = useCallback(
+    (category: string, variable: string, timeMs: number) => {
+      if (typeof window === "undefined") return;
 
-    const session = getSession();
-    queueEvent({
-      eventName: "admin_action",
-      sessionId: session.sessionId,
-      page: window.location.pathname,
-      featureArea: category,
-      actionType: "timing",
-      actionTarget: variable,
-      metadata: { timeMs },
-      occurredAt: new Date().toISOString(),
-      campgroundId: campgroundId ?? undefined,
-      organizationId: organizationId ?? undefined,
-      userId: user?.id,
-    });
-  }, [getSession, queueEvent, campgroundId, organizationId, user]);
+      const session = getSession();
+      queueEvent({
+        eventName: "admin_action",
+        sessionId: session.sessionId,
+        page: window.location.pathname,
+        featureArea: category,
+        actionType: "timing",
+        actionTarget: variable,
+        metadata: { timeMs },
+        occurredAt: new Date().toISOString(),
+        campgroundId: campgroundId ?? undefined,
+        organizationId: organizationId ?? undefined,
+        userId: user?.id,
+      });
+    },
+    [getSession, queueEvent, campgroundId, organizationId, user],
+  );
 
   // Track page leave (time on page + scroll depth)
   const trackPageLeave = useCallback(() => {

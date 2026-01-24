@@ -42,7 +42,7 @@ export function CancellationPolicyCard({
   arrivalDate,
   totalCents,
   className,
-  variant = "full"
+  variant = "full",
 }: CancellationPolicyCardProps) {
   const prefersReducedMotion = useReducedMotion();
   const activePolicy = policy || DEFAULT_POLICY;
@@ -55,18 +55,18 @@ export function CancellationPolicyCard({
     arrival.setHours(0, 0, 0, 0);
 
     const daysUntilArrival = Math.ceil(
-      (arrival.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+      (arrival.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     // Sort rules by days before arrival (descending)
     const sortedRules = [...activePolicy.rules].sort(
-      (a, b) => b.daysBeforeArrival - a.daysBeforeArrival
+      (a, b) => b.daysBeforeArrival - a.daysBeforeArrival,
     );
 
     // Find current applicable rule
-    const currentRule = sortedRules.find(
-      (rule) => daysUntilArrival >= rule.daysBeforeArrival
-    ) || sortedRules[sortedRules.length - 1];
+    const currentRule =
+      sortedRules.find((rule) => daysUntilArrival >= rule.daysBeforeArrival) ||
+      sortedRules[sortedRules.length - 1];
 
     // Calculate deadline for free cancellation
     const freeCancellationRule = sortedRules.find((r) => r.refundPercent === 100);
@@ -76,10 +76,10 @@ export function CancellationPolicyCard({
     if (freeCancellationRule) {
       freeCancellationDeadline = new Date(arrival);
       freeCancellationDeadline.setDate(
-        freeCancellationDeadline.getDate() - freeCancellationRule.daysBeforeArrival
+        freeCancellationDeadline.getDate() - freeCancellationRule.daysBeforeArrival,
       );
       daysUntilDeadline = Math.ceil(
-        (freeCancellationDeadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+        (freeCancellationDeadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
       );
     }
 
@@ -114,7 +114,7 @@ export function CancellationPolicyCard({
           policyDetails.canCancelFree
             ? "bg-emerald-50 border border-emerald-200"
             : "bg-amber-50 border border-amber-200",
-          className
+          className,
         )}
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
         animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
@@ -123,7 +123,7 @@ export function CancellationPolicyCard({
         <div
           className={cn(
             "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center",
-            policyDetails.canCancelFree ? "bg-emerald-100" : "bg-amber-100"
+            policyDetails.canCancelFree ? "bg-emerald-100" : "bg-amber-100",
           )}
         >
           {policyDetails.canCancelFree ? (
@@ -137,7 +137,7 @@ export function CancellationPolicyCard({
           <p
             className={cn(
               "text-sm font-medium",
-              policyDetails.canCancelFree ? "text-emerald-800" : "text-amber-800"
+              policyDetails.canCancelFree ? "text-emerald-800" : "text-amber-800",
             )}
           >
             {policyDetails.canCancelFree
@@ -156,10 +156,7 @@ export function CancellationPolicyCard({
 
   return (
     <motion.div
-      className={cn(
-        "rounded-xl border bg-card overflow-hidden",
-        className
-      )}
+      className={cn("rounded-xl border bg-card overflow-hidden", className)}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
       animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
@@ -181,7 +178,7 @@ export function CancellationPolicyCard({
           "px-4 py-3 border-b",
           policyDetails.canCancelFree
             ? "bg-emerald-50 border-emerald-100"
-            : "bg-amber-50 border-amber-100"
+            : "bg-amber-50 border-amber-100",
         )}
       >
         <div className="flex items-center gap-2">
@@ -224,7 +221,7 @@ export function CancellationPolicyCard({
                   <div
                     className={cn(
                       "absolute left-[11px] top-6 w-0.5 h-8",
-                      isPast ? "bg-muted" : "bg-muted"
+                      isPast ? "bg-muted" : "bg-muted",
                     )}
                   />
                 )}
@@ -238,15 +235,22 @@ export function CancellationPolicyCard({
                         ? rule.refundPercent === 100
                           ? "bg-emerald-500"
                           : rule.refundPercent > 0
-                          ? "bg-amber-500"
-                          : "bg-red-500"
-                        : "bg-muted"
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        : "bg-muted",
                     )}
                   >
                     {rule.refundPercent === 100 ? (
-                      <Check className={cn("h-3 w-3", isActive ? "text-white" : "text-muted-foreground")} />
+                      <Check
+                        className={cn("h-3 w-3", isActive ? "text-white" : "text-muted-foreground")}
+                      />
                     ) : (
-                      <span className={cn("text-xs font-medium", isActive ? "text-white" : "text-muted-foreground")}>
+                      <span
+                        className={cn(
+                          "text-xs font-medium",
+                          isActive ? "text-white" : "text-muted-foreground",
+                        )}
+                      >
                         {rule.refundPercent}%
                       </span>
                     )}
@@ -255,12 +259,17 @@ export function CancellationPolicyCard({
                   {/* Rule content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={cn("text-sm font-medium", isActive ? "text-foreground" : "text-muted-foreground")}>
+                      <span
+                        className={cn(
+                          "text-sm font-medium",
+                          isActive ? "text-foreground" : "text-muted-foreground",
+                        )}
+                      >
                         {rule.daysBeforeArrival === 0
                           ? "Day of arrival"
                           : rule.daysBeforeArrival === 1
-                          ? "1 day before"
-                          : `${rule.daysBeforeArrival}+ days before`}
+                            ? "1 day before"
+                            : `${rule.daysBeforeArrival}+ days before`}
                       </span>
                       {isActive && (
                         <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">
@@ -272,8 +281,8 @@ export function CancellationPolicyCard({
                       {rule.refundPercent === 100
                         ? "Full refund"
                         : rule.refundPercent === 0
-                        ? "No refund"
-                        : `${rule.refundPercent}% refund (${formatCurrency(Math.round((totalCents * rule.refundPercent) / 100))})`}
+                          ? "No refund"
+                          : `${rule.refundPercent}% refund (${formatCurrency(Math.round((totalCents * rule.refundPercent) / 100))})`}
                     </p>
                     {rule.description && (
                       <p className="text-xs text-muted-foreground mt-0.5">{rule.description}</p>

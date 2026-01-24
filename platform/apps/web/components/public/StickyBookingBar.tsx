@@ -36,7 +36,7 @@ export function StickyBookingBar({
         "bg-card border-t border-border shadow-lg",
         "transform transition-transform duration-300 ease-out",
         isVisible ? "translate-y-0" : "translate-y-full",
-        className
+        className,
       )}
     >
       <div className="px-4 py-3 flex items-center justify-between gap-4">
@@ -51,9 +51,7 @@ export function StickyBookingBar({
               <p className="text-xs text-muted-foreground truncate">{campgroundName}</p>
             </>
           ) : (
-            <div className="text-sm font-medium text-foreground truncate">
-              {campgroundName}
-            </div>
+            <div className="text-sm font-medium text-foreground truncate">{campgroundName}</div>
           )}
         </div>
 

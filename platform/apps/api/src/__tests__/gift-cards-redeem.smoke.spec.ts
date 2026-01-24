@@ -7,7 +7,7 @@ import type { AuthUser } from "../auth/auth.types";
 
 // Mock the ledger posting utility
 jest.mock("../ledger/ledger-posting.util", () => ({
-  postBalancedLedgerEntries: jest.fn().mockResolvedValue(undefined)
+  postBalancedLedgerEntries: jest.fn().mockResolvedValue(undefined),
 }));
 
 describe("Gift cards & store credit redeem smoke", () => {
@@ -15,27 +15,27 @@ describe("Gift cards & store credit redeem smoke", () => {
   let moduleRef: TestingModule;
   const storedValue = {
     balanceByAccount: jest.fn(),
-    redeem: jest.fn()
+    redeem: jest.fn(),
   };
 
   const prisma = {
     storedValueCode: {
-      findUnique: jest.fn()
+      findUnique: jest.fn(),
     },
     $transaction: jest.fn(),
     $queryRaw: jest.fn(),
     reservation: {
-      update: jest.fn()
+      update: jest.fn(),
     },
     payment: {
-      create: jest.fn()
+      create: jest.fn(),
     },
     storeOrder: {
-      findUnique: jest.fn()
+      findUnique: jest.fn(),
     },
     site: {
-      findUnique: jest.fn()
-    }
+      findUnique: jest.fn(),
+    },
   };
 
   beforeAll(async () => {
@@ -44,15 +44,14 @@ describe("Gift cards & store credit redeem smoke", () => {
         GiftCardsService,
         {
           provide: PrismaService,
-          useValue: prisma
+          useValue: prisma,
         },
         {
           provide: StoredValueService,
-          useValue: storedValue
-        }
-      ]
-    })
-      .compile();
+          useValue: storedValue,
+        },
+      ],
+    }).compile();
 
     giftCards = moduleRef.get(GiftCardsService);
   });
@@ -75,16 +74,18 @@ describe("Gift cards & store credit redeem smoke", () => {
       "CARD-BOOK-100": {
         accountId: "acc-book",
         active: true,
-        StoredValueAccount: { id: "acc-book", status: "active", currency: "usd", type: "gift" }
+        StoredValueAccount: { id: "acc-book", status: "active", currency: "usd", type: "gift" },
       },
       "CREDIT-POS-20": {
         accountId: "acc-pos",
         active: true,
-        StoredValueAccount: { id: "acc-pos", status: "active", currency: "usd", type: "credit" }
-      }
+        StoredValueAccount: { id: "acc-pos", status: "active", currency: "usd", type: "credit" },
+      },
     };
 
-    prisma.storedValueCode.findUnique.mockImplementation(({ where }: { where: { code: string } }) => storedValueCodes[where.code] ?? null);
+    prisma.storedValueCode.findUnique.mockImplementation(
+      ({ where }: { where: { code: string } }) => storedValueCodes[where.code] ?? null,
+    );
     storedValue.balanceByAccount.mockImplementation((accountId) => {
       if (accountId === "acc-book") return { balanceCents: 10000, availableCents: 10000 };
       if (accountId === "acc-pos") return { balanceCents: 2000, availableCents: 2000 };
@@ -100,15 +101,17 @@ describe("Gift cards & store credit redeem smoke", () => {
     prisma.$transaction.mockImplementation(async (callback) => {
       const mockTx = {
         ...prisma,
-        $queryRaw: jest.fn().mockResolvedValue([{
-          id: "booking-1",
-          campgroundId: "camp-1",
-          guestId: "guest-1",
-          siteId: "site-1",
-          paidAmount: 0,
-          totalAmount: 10000,
-          status: "confirmed"
-        }])
+        $queryRaw: jest.fn().mockResolvedValue([
+          {
+            id: "booking-1",
+            campgroundId: "camp-1",
+            guestId: "guest-1",
+            siteId: "site-1",
+            paidAmount: 0,
+            totalAmount: 10000,
+            status: "confirmed",
+          },
+        ]),
       };
       return callback(mockTx);
     });
@@ -117,22 +120,22 @@ describe("Gift cards & store credit redeem smoke", () => {
       id: "site-1",
       SiteClass: {
         glCode: "SITE_REVENUE",
-        clientAccount: "Site Revenue"
-      }
+        clientAccount: "Site Revenue",
+      },
     });
 
     prisma.storeOrder.findUnique.mockResolvedValue({
       id: "order-99",
-      campgroundId: "camp-1"
+      campgroundId: "camp-1",
     });
 
     prisma.reservation.update.mockResolvedValue({
       id: "booking-1",
-      paidAmount: 2500
+      paidAmount: 2500,
     });
 
     prisma.payment.create.mockResolvedValue({
-      id: "payment-1"
+      id: "payment-1",
     });
   });
 
@@ -151,9 +154,9 @@ describe("Gift cards & store credit redeem smoke", () => {
       {
         id: "membership-1",
         campgroundId: "camp-1",
-        role: UserRole.owner
-      }
-    ]
+        role: UserRole.owner,
+      },
+    ],
   };
 
   it("redeems gift card against booking endpoint and returns updated balance", async () => {
@@ -168,8 +171,8 @@ describe("Gift cards & store credit redeem smoke", () => {
         amountCents: 2500,
         currency: "usd",
         referenceType: "reservation",
-        referenceId: "booking-1"
-      })
+        referenceId: "booking-1",
+      }),
     );
   });
 
@@ -185,8 +188,8 @@ describe("Gift cards & store credit redeem smoke", () => {
         amountCents: 1500,
         currency: "usd",
         referenceType: "pos_order",
-        referenceId: "order-99"
-      })
+        referenceId: "order-99",
+      }),
     );
   });
 });

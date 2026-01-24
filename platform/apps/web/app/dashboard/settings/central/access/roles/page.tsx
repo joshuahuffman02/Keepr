@@ -102,20 +102,21 @@ export default function RolesPage() {
 
     if (!id) {
       // Still show roles without counts
-      setRoles(systemRoles.map(r => ({ ...r, userCount: 0 })));
+      setRoles(systemRoles.map((r) => ({ ...r, userCount: 0 })));
       setLoading(false);
       return;
     }
 
     // Fetch members to count users per role
-    apiClient.getCampgroundMembers(id)
+    apiClient
+      .getCampgroundMembers(id)
       .then((members: CampgroundMember[]) => {
         const roleCounts: Record<string, number> = {};
         members.forEach((member) => {
           roleCounts[member.role] = (roleCounts[member.role] || 0) + 1;
         });
 
-        const rolesWithCounts: Role[] = systemRoles.map(r => ({
+        const rolesWithCounts: Role[] = systemRoles.map((r) => ({
           ...r,
           userCount: roleCounts[r.id] || 0,
         }));
@@ -125,7 +126,7 @@ export default function RolesPage() {
       })
       .catch((err) => {
         console.error("Failed to load members:", err);
-        setRoles(systemRoles.map(r => ({ ...r, userCount: 0 })));
+        setRoles(systemRoles.map((r) => ({ ...r, userCount: 0 })));
         setLoading(false);
       });
   }, []);
@@ -164,28 +165,26 @@ export default function RolesPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          System roles have predefined permissions that cover common campground staff needs.
-          You can create custom roles for specific requirements.
+          System roles have predefined permissions that cover common campground staff needs. You can
+          create custom roles for specific requirements.
         </AlertDescription>
       </Alert>
 
       <div className="space-y-3">
         {roles.map((role) => (
-          <Card
-            key={role.id}
-            className="transition-all hover:shadow-md group"
-          >
+          <Card key={role.id} className="transition-all hover:shadow-md group">
             <CardContent className="py-4">
               <div className="flex items-start justify-between">
                 <div className="flex gap-4">
-                  <div className={cn(
-                    "p-2 rounded-lg",
-                    role.isSystem ? "bg-purple-100" : "bg-muted"
-                  )}>
-                    <Shield className={cn(
-                      "h-5 w-5",
-                      role.isSystem ? "text-purple-600" : "text-muted-foreground"
-                    )} />
+                  <div
+                    className={cn("p-2 rounded-lg", role.isSystem ? "bg-purple-100" : "bg-muted")}
+                  >
+                    <Shield
+                      className={cn(
+                        "h-5 w-5",
+                        role.isSystem ? "text-purple-600" : "text-muted-foreground",
+                      )}
+                    />
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -200,11 +199,7 @@ export default function RolesPage() {
                     <p className="text-sm text-muted-foreground">{role.description}</p>
                     <div className="flex flex-wrap gap-1 mt-2">
                       {role.permissions.slice(0, 4).map((permission) => (
-                        <Badge
-                          key={permission}
-                          variant="secondary"
-                          className="text-xs"
-                        >
+                        <Badge key={permission} variant="secondary" className="text-xs">
                           {permission}
                         </Badge>
                       ))}

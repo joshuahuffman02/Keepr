@@ -210,8 +210,8 @@ export function CancellationRules({
         newFeeType === "full"
           ? 0
           : newFeeType === "flat"
-          ? Math.round(parseFloat(newFeeAmount || "0") * 100) // Convert to cents
-          : parseFloat(newFeeAmount || "0"),
+            ? Math.round(parseFloat(newFeeAmount || "0") * 100) // Convert to cents
+            : parseFloat(newFeeAmount || "0"),
       appliesTo: newAppliesTo.length > 0 ? newAppliesTo : undefined,
     };
 
@@ -233,7 +233,7 @@ export function CancellationRules({
     onChange(
       rules
         .map((rule) => (rule.id === id ? { ...rule, ...updates } : rule))
-        .sort((a, b) => b.daysBeforeArrival - a.daysBeforeArrival)
+        .sort((a, b) => b.daysBeforeArrival - a.daysBeforeArrival),
     );
   };
 
@@ -290,12 +290,8 @@ export function CancellationRules({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-rose-500/20 mb-4">
             <RotateCcw className="w-8 h-8 text-rose-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Cancellation Policy
-          </h2>
-          <p className="text-slate-400">
-            Set tiered refund rules based on cancellation timing
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Cancellation Policy</h2>
+          <p className="text-slate-400">Set tiered refund rules based on cancellation timing</p>
         </motion.div>
 
         {/* Preset selection */}
@@ -325,7 +321,7 @@ export function CancellationRules({
                       "relative w-full p-5 rounded-xl border-2 text-left transition-all",
                       isSelected
                         ? "border-emerald-500 bg-emerald-500/10"
-                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                     )}
                   >
                     {/* Recommended badge */}
@@ -340,13 +336,13 @@ export function CancellationRules({
                       <div
                         className={cn(
                           "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
-                          isSelected ? "bg-emerald-500/20" : "bg-slate-700"
+                          isSelected ? "bg-emerald-500/20" : "bg-slate-700",
                         )}
                       >
                         <Icon
                           className={cn(
                             "w-6 h-6",
-                            isSelected ? "text-emerald-400" : "text-slate-400"
+                            isSelected ? "text-emerald-400" : "text-slate-400",
                           )}
                         />
                       </div>
@@ -357,7 +353,7 @@ export function CancellationRules({
                           <h3
                             className={cn(
                               "font-semibold text-lg",
-                              isSelected ? "text-emerald-400" : "text-white"
+                              isSelected ? "text-emerald-400" : "text-white",
                             )}
                           >
                             {preset.name}
@@ -367,9 +363,7 @@ export function CancellationRules({
                           <div
                             className={cn(
                               "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-                              isSelected
-                                ? "border-emerald-500 bg-emerald-500"
-                                : "border-slate-600"
+                              isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-600",
                             )}
                           >
                             {isSelected && (
@@ -453,8 +447,8 @@ export function CancellationRules({
                                   {rule.daysBeforeArrival === 0
                                     ? "Less than 1 day before arrival"
                                     : rule.daysBeforeArrival === 1
-                                    ? "1 day before arrival"
-                                    : `${rule.daysBeforeArrival}+ days before arrival`}
+                                      ? "1 day before arrival"
+                                      : `${rule.daysBeforeArrival}+ days before arrival`}
                                 </p>
                                 <p className="text-sm text-slate-400 mt-0.5">
                                   {formatFeeDisplay(rule)}
@@ -514,8 +508,8 @@ export function CancellationRules({
                                     {rule.feeType === "flat"
                                       ? "Amount ($)"
                                       : rule.feeType === "percent"
-                                      ? "Percentage"
-                                      : "Number of Nights"}
+                                        ? "Percentage"
+                                        : "Number of Nights"}
                                   </Label>
                                   <Input
                                     type="number"
@@ -545,7 +539,7 @@ export function CancellationRules({
                                 {rule.appliesTo
                                   .map(
                                     (id) =>
-                                      siteClasses.find((sc) => sc.id === id)?.name || "Unknown"
+                                      siteClasses.find((sc) => sc.id === id)?.name || "Unknown",
                                   )
                                   .join(", ")}
                               </div>
@@ -602,9 +596,7 @@ export function CancellationRules({
                         placeholder="e.g., 7"
                         className="bg-slate-800/50 border-slate-700 text-white"
                       />
-                      <p className="text-xs text-slate-500">
-                        Minimum days before check-in
-                      </p>
+                      <p className="text-xs text-slate-500">Minimum days before check-in</p>
                     </div>
 
                     <div className="space-y-2">
@@ -636,8 +628,8 @@ export function CancellationRules({
                           {newFeeType === "flat"
                             ? "Fee Amount ($)"
                             : newFeeType === "percent"
-                            ? "Refund Percentage (%)"
-                            : "Number of Nights"}
+                              ? "Refund Percentage (%)"
+                              : "Number of Nights"}
                         </Label>
                         <Input
                           type="number"
@@ -646,11 +638,7 @@ export function CancellationRules({
                           value={newFeeAmount}
                           onChange={(e) => setNewFeeAmount(e.target.value)}
                           placeholder={
-                            newFeeType === "flat"
-                              ? "25.00"
-                              : newFeeType === "percent"
-                              ? "50"
-                              : "1"
+                            newFeeType === "flat" ? "25.00" : newFeeType === "percent" ? "50" : "1"
                           }
                           className="bg-slate-800/50 border-slate-700 text-white"
                         />
@@ -685,14 +673,12 @@ export function CancellationRules({
             >
               <div>
                 <p className="font-medium text-white">Advanced Options</p>
-                <p className="text-sm text-slate-500">
-                  Set different rules per site type
-                </p>
+                <p className="text-sm text-slate-500">Set different rules per site type</p>
               </div>
               <ChevronDown
                 className={cn(
                   "w-5 h-5 text-slate-400 transition-transform",
-                  showAdvanced && "rotate-180"
+                  showAdvanced && "rotate-180",
                 )}
               />
             </button>
@@ -737,7 +723,7 @@ export function CancellationRules({
                                   "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                                   isApplied
                                     ? "bg-rose-500 text-white"
-                                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                                    : "bg-slate-700 text-slate-300 hover:bg-slate-600",
                                 )}
                               >
                                 {sc.name}
@@ -766,11 +752,9 @@ export function CancellationRules({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              How tiers work:
-            </span>{" "}
-            Rules apply based on when the guest cancels. The system automatically selects
-            the appropriate tier based on days remaining until check-in.
+            <span className="text-slate-300 font-medium">How tiers work:</span> Rules apply based on
+            when the guest cancels. The system automatically selects the appropriate tier based on
+            days remaining until check-in.
           </div>
         </motion.div>
 
@@ -789,7 +773,7 @@ export function CancellationRules({
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-emerald-500 to-teal-500",
                 "hover:from-emerald-400 hover:to-teal-400",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
             >
               {saving ? "Saving..." : "Save Cancellation Policy"}

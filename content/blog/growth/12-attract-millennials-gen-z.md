@@ -18,15 +18,16 @@ Millennials (born 1981-1996) and Gen Z (born 1997-2012) are the future of campin
 
 ### Must-Haves
 
-| Amenity | Priority |
-|---------|----------|
-| Strong WiFi | Critical |
-| Online booking | Essential |
-| Clean facilities | Expected |
-| Photos and reviews | Decision drivers |
-| Instagram-worthy spots | High value |
+| Amenity                | Priority         |
+| ---------------------- | ---------------- |
+| Strong WiFi            | Critical         |
+| Online booking         | Essential        |
+| Clean facilities       | Expected         |
+| Photos and reviews     | Decision drivers |
+| Instagram-worthy spots | High value       |
 
 ### Nice-to-Haves
+
 - Pet-friendly policies
 - Unique experiences (glamping, unique sites)
 - Sustainability practices
@@ -38,18 +39,21 @@ Millennials (born 1981-1996) and Gen Z (born 1997-2012) are the future of campin
 ## Marketing to Younger Audiences
 
 ### Digital Presence
+
 - Instagram before Facebook
 - TikTok for discovery
 - Respond quickly to messages
 - Show real experiences, not stock photos
 
 ### Booking Experience
+
 - Fully online booking (no phone call required)
 - Mobile-optimized website
 - Clear photos of actual sites
 - Instant confirmation
 
 ### Communication Style
+
 - Casual, authentic tone
 - Less formal, more friendly
 - Show personality
@@ -76,4 +80,4 @@ Millennials (born 1981-1996) and Gen Z (born 1997-2012) are the future of campin
 
 ---
 
-*Keepr provides the modern booking experience younger guests expect. [Attract new guests at campreserv.com](https://campreserv.com)*
+_Keepr provides the modern booking experience younger guests expect. [Attract new guests at campreserv.com](https://campreserv.com)_

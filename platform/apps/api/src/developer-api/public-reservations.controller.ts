@@ -3,64 +3,106 @@ import { ApiTokenGuard } from "./guards/api-token.guard";
 import { ApiScopeGuard } from "./guards/api-scope.guard";
 import { ApiScopes } from "./decorators/api-scopes.decorator";
 import { PublicApiService, ApiReservationInput } from "./public-api.service";
-import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from "class-validator";
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBearerAuth } from "@nestjs/swagger";
 import type { Request } from "express";
 import type { ApiPrincipal } from "./types";
 
 class CreateReservationBody implements ApiReservationInput {
   @ApiProperty({ description: "ID of the site to reserve" })
-  @IsString() @IsNotEmpty() siteId!: string;
+  @IsString()
+  @IsNotEmpty()
+  siteId!: string;
 
-  @ApiProperty({ description: "Lock the site so it cannot be auto-reassigned", required: false, default: false })
-  @IsBoolean() @IsOptional() siteLocked?: boolean;
+  @ApiProperty({
+    description: "Lock the site so it cannot be auto-reassigned",
+    required: false,
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  siteLocked?: boolean;
 
   @ApiProperty({ description: "ID of the guest making the reservation" })
-  @IsString() @IsNotEmpty() guestId!: string;
+  @IsString()
+  @IsNotEmpty()
+  guestId!: string;
 
   @ApiProperty({ description: "Arrival date (ISO string)", example: "2024-05-01" })
-  @IsDateString() arrivalDate!: string;
+  @IsDateString()
+  arrivalDate!: string;
 
   @ApiProperty({ description: "Departure date (ISO string)", example: "2024-05-05" })
-  @IsDateString() departureDate!: string;
+  @IsDateString()
+  departureDate!: string;
 
   @ApiProperty({ description: "Number of adults" })
-  @IsNumber() adults!: number;
+  @IsNumber()
+  adults!: number;
 
   @ApiProperty({ description: "Number of children", required: false, default: 0 })
-  @IsNumber() @IsOptional() children?: number;
+  @IsNumber()
+  @IsOptional()
+  children?: number;
 
   @ApiProperty({ description: "Status of reservation", required: false, default: "confirmed" })
-  @IsString() @IsOptional() status?: string;
+  @IsString()
+  @IsOptional()
+  status?: string;
 
   @ApiProperty({ description: "Internal notes", required: false })
-  @IsString() @IsOptional() notes?: string;
+  @IsString()
+  @IsOptional()
+  notes?: string;
 }
 
 class UpdateReservationBody {
   @ApiProperty({ description: "ID of the site to reserve", required: false })
-  @IsString() @IsOptional() siteId?: string;
+  @IsString()
+  @IsOptional()
+  siteId?: string;
 
   @ApiProperty({ description: "Lock the site so it cannot be auto-reassigned", required: false })
-  @IsBoolean() @IsOptional() siteLocked?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  siteLocked?: boolean;
 
   @ApiProperty({ description: "Arrival date (ISO string)", required: false })
-  @IsDateString() @IsOptional() arrivalDate?: string;
+  @IsDateString()
+  @IsOptional()
+  arrivalDate?: string;
 
   @ApiProperty({ description: "Departure date (ISO string)", required: false })
-  @IsDateString() @IsOptional() departureDate?: string;
+  @IsDateString()
+  @IsOptional()
+  departureDate?: string;
 
   @ApiProperty({ description: "Number of adults", required: false })
-  @IsNumber() @IsOptional() adults?: number;
+  @IsNumber()
+  @IsOptional()
+  adults?: number;
 
   @ApiProperty({ description: "Number of children", required: false })
-  @IsNumber() @IsOptional() children?: number;
+  @IsNumber()
+  @IsOptional()
+  children?: number;
 
   @ApiProperty({ description: "Status of reservation", required: false })
-  @IsString() @IsOptional() status?: string;
+  @IsString()
+  @IsOptional()
+  status?: string;
 
   @ApiProperty({ description: "Internal notes", required: false })
-  @IsString() @IsOptional() notes?: string;
+  @IsString()
+  @IsOptional()
+  notes?: string;
 }
 
 class PaymentBody {
@@ -68,7 +110,11 @@ class PaymentBody {
   @IsNumber()
   amountCents!: number;
 
-  @ApiProperty({ description: "Payment method (e.g. 'card', 'cash')", required: false, default: "card" })
+  @ApiProperty({
+    description: "Payment method (e.g. 'card', 'cash')",
+    required: false,
+    default: "card",
+  })
   @IsString()
   @IsOptional()
   method?: string;
@@ -81,7 +127,7 @@ type ApiRequest = Request & { apiPrincipal: ApiPrincipal };
 @Controller("developer/reservations")
 @UseGuards(ApiTokenGuard, ApiScopeGuard)
 export class PublicReservationsController {
-  constructor(private readonly api: PublicApiService) { }
+  constructor(private readonly api: PublicApiService) {}
 
   @Get()
   @ApiScopes("reservations:read")

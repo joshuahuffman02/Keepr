@@ -40,7 +40,8 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
     localStorage.setItem("campreserv:selectedCampground", params.campgroundId);
 
     // Fetch pricing rules using the new V2 API
-    apiClient.getPricingRulesV2(params.campgroundId)
+    apiClient
+      .getPricingRulesV2(params.campgroundId)
       .then((data: PricingRuleV2[]) => {
         setRules(data || []);
         setLoading(false);
@@ -60,8 +61,8 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
     return flat >= 0 ? `+$${flat.toFixed(2)}` : `-$${Math.abs(flat).toFixed(2)}`;
   };
 
-  const demandRules = rules.filter(r => r.type === "demand" && r.active);
-  const otherRules = rules.filter(r => r.type !== "demand" || !r.active);
+  const demandRules = rules.filter((r) => r.type === "demand" && r.active);
+  const otherRules = rules.filter((r) => r.type !== "demand" || !r.active);
 
   return (
     <DashboardShell>
@@ -70,7 +71,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: "Settings", href: `/campgrounds/${params.campgroundId}` },
-            { label: "Dynamic Pricing" }
+            { label: "Dynamic Pricing" },
           ]}
         />
 
@@ -100,9 +101,9 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
         <Alert className="bg-status-info/15">
           <Info className="h-4 w-4 text-status-info" />
           <AlertDescription className="text-status-info">
-            Dynamic pricing rules automatically adjust your rates based on occupancy,
-            demand, and booking patterns. Use the Quick Settings for common adjustments
-            or Advanced Rules for full control.
+            Dynamic pricing rules automatically adjust your rates based on occupancy, demand, and
+            booking patterns. Use the Quick Settings for common adjustments or Advanced Rules for
+            full control.
           </AlertDescription>
         </Alert>
 
@@ -136,36 +137,47 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {demandRules.sort((a, b) => a.priority - b.priority).map((rule) => (
-                      <div
-                        key={rule.id}
-                        className="flex items-center justify-between p-4 rounded-lg border bg-card"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-foreground">{rule.name}</span>
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                              Priority {rule.priority}
+                    {demandRules
+                      .sort((a, b) => a.priority - b.priority)
+                      .map((rule) => (
+                        <div
+                          key={rule.id}
+                          className="flex items-center justify-between p-4 rounded-lg border bg-card"
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-foreground">{rule.name}</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                Priority {rule.priority}
+                              </span>
+                            </div>
+                            <div className="text-sm text-muted-foreground mt-1">
+                              {typeLabels[rule.type] || rule.type} • {rule.stackMode}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span
+                              className={`text-lg font-bold ${
+                                rule.adjustmentValue >= 0
+                                  ? "text-status-success"
+                                  : "text-status-error"
+                              }`}
+                            >
+                              {formatAdjustment(rule)}
                             </span>
-                          </div>
-                          <div className="text-sm text-muted-foreground mt-1">
-                            {typeLabels[rule.type] || rule.type} • {rule.stackMode}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              asChild
+                              aria-label="Open advanced pricing rules"
+                            >
+                              <Link href="/dashboard/settings/pricing-rules">
+                                <Pencil className="h-4 w-4" />
+                              </Link>
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <span className={`text-lg font-bold ${
-                            rule.adjustmentValue >= 0 ? "text-status-success" : "text-status-error"
-                          }`}>
-                            {formatAdjustment(rule)}
-                          </span>
-                          <Button variant="ghost" size="sm" asChild aria-label="Open advanced pricing rules">
-                            <Link href="/dashboard/settings/pricing-rules">
-                              <Pencil className="h-4 w-4" />
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </CardContent>
@@ -190,7 +202,9 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                         }`}
                       >
                         <div className="flex items-center gap-3">
-                          <span className={`font-medium ${rule.active ? "text-foreground" : "text-muted-foreground"}`}>
+                          <span
+                            className={`font-medium ${rule.active ? "text-foreground" : "text-muted-foreground"}`}
+                          >
                             {rule.name}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
@@ -202,9 +216,11 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                             </span>
                           )}
                         </div>
-                        <span className={`font-semibold ${
-                          rule.adjustmentValue >= 0 ? "text-emerald-600" : "text-rose-600"
-                        }`}>
+                        <span
+                          className={`font-semibold ${
+                            rule.adjustmentValue >= 0 ? "text-emerald-600" : "text-rose-600"
+                          }`}
+                        >
                           {formatAdjustment(rule)}
                         </span>
                       </div>

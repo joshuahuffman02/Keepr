@@ -1,9 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import {
-  RecreationGovService,
-  RecreationGovFacility,
-} from "./recreation-gov.service";
+import { RecreationGovService, RecreationGovFacility } from "./recreation-gov.service";
 import { GeoAssociationService } from "./geo-association.service";
 import { CampgroundDataSource, CampgroundClaimStatus } from "@prisma/client";
 import { randomUUID } from "crypto";
@@ -35,7 +32,7 @@ export class CampgroundSeederService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly recreationGov: RecreationGovService,
-    private readonly geoAssociation: GeoAssociationService
+    private readonly geoAssociation: GeoAssociationService,
   ) {}
 
   /**
@@ -43,7 +40,7 @@ export class CampgroundSeederService {
    */
   async seedFromRecreationGov(
     stateCode: string,
-    options: { dryRun?: boolean; updateExisting?: boolean } = {}
+    options: { dryRun?: boolean; updateExisting?: boolean } = {},
   ): Promise<SeedResult> {
     const result: SeedResult = {
       created: 0,
@@ -57,7 +54,7 @@ export class CampgroundSeederService {
     const orgId = await this.ensureSeededOrganization();
 
     this.logger.log(
-      `Starting Recreation.gov seed for state: ${stateCode} (dryRun: ${options.dryRun})`
+      `Starting Recreation.gov seed for state: ${stateCode} (dryRun: ${options.dryRun})`,
     );
 
     // Fetch facilities from Recreation.gov
@@ -65,21 +62,15 @@ export class CampgroundSeederService {
       stateCode,
       (processed, total) => {
         this.logger.log(`Fetching: ${processed}/${total} facilities...`);
-      }
+      },
     );
 
-    this.logger.log(
-      `Fetched ${facilities.length} facilities. Processing...`
-    );
+    this.logger.log(`Fetched ${facilities.length} facilities. Processing...`);
 
     // Process each facility
     for (const facility of facilities) {
       try {
-        const processResult = await this.processFacility(
-          facility,
-          orgId,
-          options
-        );
+        const processResult = await this.processFacility(facility, orgId, options);
         if (processResult === "created") result.created++;
         else if (processResult === "updated") result.updated++;
         else if (processResult === "skipped") result.skipped++;
@@ -89,14 +80,12 @@ export class CampgroundSeederService {
           record: facility.FacilityID,
           error: error instanceof Error ? error.message : String(error),
         });
-        this.logger.error(
-          `Failed to process facility ${facility.FacilityID}: ${error}`
-        );
+        this.logger.error(`Failed to process facility ${facility.FacilityID}: ${error}`);
       }
     }
 
     this.logger.log(
-      `Completed seeding ${stateCode}: created=${result.created}, updated=${result.updated}, skipped=${result.skipped}, errors=${result.errors}`
+      `Completed seeding ${stateCode}: created=${result.created}, updated=${result.updated}, skipped=${result.skipped}, errors=${result.errors}`,
     );
 
     return result;
@@ -108,7 +97,7 @@ export class CampgroundSeederService {
   private async processFacility(
     facility: RecreationGovFacility,
     organizationId: string,
-    options: { dryRun?: boolean; updateExisting?: boolean }
+    options: { dryRun?: boolean; updateExisting?: boolean },
   ): Promise<"created" | "updated" | "skipped"> {
     // Check if already exists
     const existing = await this.prisma.campground.findFirst({
@@ -134,14 +123,11 @@ export class CampgroundSeederService {
     }
 
     // Map to our format
-    const campgroundData = this.recreationGov.mapFacilityToCampground(
-      facility,
-      organizationId
-    );
+    const campgroundData = this.recreationGov.mapFacilityToCampground(facility, organizationId);
 
     if (options.dryRun) {
       this.logger.debug(
-        `[DRY RUN] Would ${existing ? "update" : "create"}: ${campgroundData.name}`
+        `[DRY RUN] Would ${existing ? "update" : "create"}: ${campgroundData.name}`,
       );
       return existing ? "updated" : "created";
     }
@@ -187,7 +173,7 @@ export class CampgroundSeederService {
    * Seed all states from Recreation.gov (full nationwide seed)
    */
   async seedAllStatesFromRecreationGov(
-    options: { dryRun?: boolean; updateExisting?: boolean } = {}
+    options: { dryRun?: boolean; updateExisting?: boolean } = {},
   ): Promise<SeedResult> {
     const states = [
       "AL",

@@ -32,10 +32,7 @@ const steps = [
   },
 ];
 
-export function BookingProgressBar({
-  currentStep,
-  className,
-}: BookingProgressBarProps) {
+export function BookingProgressBar({ currentStep, className }: BookingProgressBarProps) {
   const prefersReducedMotion = useReducedMotion();
   const progressPercent = ((currentStep - 1) / (steps.length - 1)) * 100;
 
@@ -84,10 +81,7 @@ export function BookingProgressBar({
             const Icon = step.icon;
 
             return (
-              <div
-                key={step.number}
-                className="relative flex flex-col items-center z-10"
-              >
+              <div key={step.number} className="relative flex flex-col items-center z-10">
                 {/* Circle */}
                 <motion.div
                   className={cn(
@@ -95,8 +89,8 @@ export function BookingProgressBar({
                     isComplete
                       ? "bg-emerald-500"
                       : isCurrent
-                      ? "bg-emerald-500"
-                      : "bg-card border-2 border-border"
+                        ? "bg-emerald-500"
+                        : "bg-card border-2 border-border",
                   )}
                   initial={false}
                   animate={
@@ -119,10 +113,7 @@ export function BookingProgressBar({
                     <Check className="h-5 w-5 text-white" />
                   ) : (
                     <Icon
-                      className={cn(
-                        "h-5 w-5",
-                        isCurrent ? "text-white" : "text-muted-foreground"
-                      )}
+                      className={cn("h-5 w-5", isCurrent ? "text-white" : "text-muted-foreground")}
                     />
                   )}
                 </motion.div>
@@ -131,9 +122,7 @@ export function BookingProgressBar({
                 <span
                   className={cn(
                     "mt-2 text-sm font-medium",
-                    isComplete || isCurrent
-                      ? "text-foreground"
-                      : "text-muted-foreground"
+                    isComplete || isCurrent ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
                   {step.label}
@@ -150,10 +139,7 @@ export function BookingProgressBar({
 /**
  * Minimal inline progress for tight spaces
  */
-export function BookingProgressInline({
-  currentStep,
-  className,
-}: BookingProgressBarProps) {
+export function BookingProgressInline({ currentStep, className }: BookingProgressBarProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {steps.map((step, idx) => {
@@ -168,23 +154,14 @@ export function BookingProgressInline({
                 isComplete
                   ? "bg-emerald-500 text-white"
                   : isCurrent
-                  ? "bg-emerald-500 text-white"
-                  : "bg-muted text-muted-foreground"
+                    ? "bg-emerald-500 text-white"
+                    : "bg-muted text-muted-foreground",
               )}
             >
-              {isComplete ? (
-                <Check className="h-3 w-3" />
-              ) : (
-                step.number
-              )}
+              {isComplete ? <Check className="h-3 w-3" /> : step.number}
             </div>
             {idx < steps.length - 1 && (
-              <div
-                className={cn(
-                  "w-8 h-0.5",
-                  isComplete ? "bg-emerald-500" : "bg-muted"
-                )}
-              />
+              <div className={cn("w-8 h-0.5", isComplete ? "bg-emerald-500" : "bg-muted")} />
             )}
           </div>
         );
@@ -214,21 +191,11 @@ export function BookingBackButton({
       onClick={onBack}
       className={cn(
         "flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors",
-        className
+        className,
       )}
     >
-      <svg
-        className="h-4 w-4"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M15 19l-7-7 7-7"
-        />
+      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
       </svg>
       Back to {previousStep.label}
     </button>

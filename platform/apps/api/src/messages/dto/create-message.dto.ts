@@ -1,20 +1,20 @@
-import { IsEnum, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 export enum SenderType {
-    guest = 'guest',
-    staff = 'staff',
+  guest = "guest",
+  staff = "staff",
 }
 
 export class CreateMessageDto {
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(5000)
-    content!: string;
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(5000)
+  content!: string;
 
-    @IsEnum(SenderType)
-    senderType!: SenderType;
+  @IsEnum(SenderType)
+  senderType!: SenderType;
 
-    @IsString()
-    @IsNotEmpty()
-    guestId!: string;
+  @IsString()
+  @IsNotEmpty()
+  guestId!: string;
 }

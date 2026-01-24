@@ -42,7 +42,7 @@ import { PaymentCollectionModal } from "@/components/payments/PaymentCollectionM
     console.log("Payment complete:", result);
     refetch();
   }}
-/>
+/>;
 ```
 
 ## Migration by Component
@@ -50,6 +50,7 @@ import { PaymentCollectionModal } from "@/components/payments/PaymentCollectionM
 ### 1. PaymentModal → PaymentCollectionModal
 
 **Old props:**
+
 ```typescript
 interface PaymentModalProps {
   isOpen: boolean;
@@ -64,6 +65,7 @@ interface PaymentModalProps {
 ```
 
 **New props mapping:**
+
 ```typescript
 <PaymentCollectionModal
   isOpen={isOpen}
@@ -100,10 +102,11 @@ import { POSCheckoutFlow } from "@/components/pos/POSCheckoutFlow";
   guestId={guestId}
   guestName={guestName}
   guestEmail={guestEmail}
-/>
+/>;
 ```
 
 **POSCheckoutFlow handles:**
+
 - Step 1: Order configuration (fulfillment type, delivery instructions, location)
 - Step 2: Payment collection via PaymentCollectionModal
 - Offline queuing for non-card payments
@@ -128,10 +131,11 @@ import { PortalCheckoutFlow } from "@/components/portal/PortalCheckoutFlow";
     setCart([]);
     toast({ title: "Order saved offline" });
   }}
-/>
+/>;
 ```
 
 **PortalCheckoutFlow handles:**
+
 - Step 1: Order configuration (fulfillment type, delivery location, instructions)
 - Step 2: Payment collection via PaymentCollectionModal
 - Offline queuing for charge-to-site orders
@@ -180,15 +184,15 @@ import { PortalCheckoutFlow } from "@/components/portal/PortalCheckoutFlow";
 
 ## Context-Specific Method Availability
 
-| Context | Card | Saved | Terminal | Wallet | Cash | Check | Folio | ACH | Digital |
-|---------|------|-------|----------|--------|------|-------|-------|-----|---------|
-| public_booking | Yes | Yes | - | - | - | - | - | Yes | Yes |
-| portal | Yes | Yes | - | Yes | - | - | Yes | - | Yes |
-| kiosk | Yes | - | Yes | - | Yes | - | - | - | Yes |
-| staff_checkin | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - |
-| staff_booking | Yes | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - |
-| pos | Yes | Yes | Yes | Yes | Yes | Yes | Yes | - | - |
-| seasonal | Yes | Yes | - | - | - | Yes | - | Yes | - |
+| Context        | Card | Saved | Terminal | Wallet | Cash | Check | Folio | ACH | Digital |
+| -------------- | ---- | ----- | -------- | ------ | ---- | ----- | ----- | --- | ------- |
+| public_booking | Yes  | Yes   | -        | -      | -    | -     | -     | Yes | Yes     |
+| portal         | Yes  | Yes   | -        | Yes    | -    | -     | Yes   | -   | Yes     |
+| kiosk          | Yes  | -     | Yes      | -      | Yes  | -     | -     | -   | Yes     |
+| staff_checkin  | Yes  | Yes   | Yes      | Yes    | Yes  | Yes   | Yes   | Yes | -       |
+| staff_booking  | Yes  | Yes   | Yes      | Yes    | Yes  | Yes   | Yes   | Yes | -       |
+| pos            | Yes  | Yes   | Yes      | Yes    | Yes  | Yes   | Yes   | -   | -       |
+| seasonal       | Yes  | Yes   | -        | -      | -    | Yes   | -     | Yes | -       |
 
 ## PaymentResult Structure
 
@@ -214,6 +218,7 @@ Payment methods are configured per-campground at:
 `/dashboard/settings/payments` → "Payment Methods" tab
 
 Campground owners can:
+
 - Enable/disable each payment method
 - Restrict accepted card brands
 - Choose fee mode (absorb vs. pass-through)

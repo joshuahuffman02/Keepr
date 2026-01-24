@@ -11,4 +11,3 @@ export class UpdateDepositPolicyDto extends PartialType(CreateDepositPolicyDto) 
   @IsString()
   retryPlanId?: string | null;
 }
-

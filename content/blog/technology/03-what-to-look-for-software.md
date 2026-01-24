@@ -17,6 +17,7 @@ Campground software is a major decision—it touches every aspect of your operat
 ## Essential Features
 
 ### Reservation Management
+
 - [ ] Real-time availability calendar
 - [ ] Online booking capability
 - [ ] Multi-channel sync (website, phone, OTAs)
@@ -24,18 +25,21 @@ Campground software is a major decision—it touches every aspect of your operat
 - [ ] Modification and cancellation handling
 
 ### Payment Processing
+
 - [ ] Integrated payment gateway
 - [ ] Deposits and balances
 - [ ] Refund processing
 - [ ] Multiple payment methods
 
 ### Guest Communication
+
 - [ ] Automated confirmations
 - [ ] Pre-arrival reminders
 - [ ] Post-stay follow-ups
 - [ ] Guest messaging history
 
 ### Reporting
+
 - [ ] Occupancy reports
 - [ ] Revenue summaries
 - [ ] Guest data exports
@@ -46,21 +50,25 @@ Campground software is a major decision—it touches every aspect of your operat
 ## Important Considerations
 
 ### Ease of Use
+
 - How quickly can staff learn it?
 - Is the interface intuitive?
 - Do you need tech support for daily tasks?
 
 ### Mobile Capability
+
 - Can you manage from phone/tablet?
 - Do guests have mobile-friendly booking?
 - Is there an app or mobile-optimized site?
 
 ### Support and Training
+
 - What onboarding is provided?
 - Is support included or extra?
 - How quickly do they respond?
 
 ### Pricing Structure
+
 - Monthly fee vs. per-booking fee?
 - Are there transaction costs?
 - What's the total cost at your volume?
@@ -108,4 +116,4 @@ Campground software is a major decision—it touches every aspect of your operat
 
 ---
 
-*Keepr is built specifically for campgrounds, with intuitive design and responsive support. [See if we're the right fit at campreserv.com](https://campreserv.com)*
+_Keepr is built specifically for campgrounds, with intuitive design and responsive support. [See if we're the right fit at campreserv.com](https://campreserv.com)_

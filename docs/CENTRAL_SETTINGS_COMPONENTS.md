@@ -75,14 +75,27 @@ platform/apps/web/
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Building2, DollarSign, Calendar, ShoppingCart, Shield, Settings
-} from "lucide-react";
+import { Building2, DollarSign, Calendar, ShoppingCart, Shield, Settings } from "lucide-react";
 
 const categories = [
-  { id: "property", label: "Property", icon: Building2, href: "/dashboard/settings/central/property" },
-  { id: "pricing", label: "Pricing", icon: DollarSign, href: "/dashboard/settings/central/pricing" },
-  { id: "bookings", label: "Bookings", icon: Calendar, href: "/dashboard/settings/central/bookings" },
+  {
+    id: "property",
+    label: "Property",
+    icon: Building2,
+    href: "/dashboard/settings/central/property",
+  },
+  {
+    id: "pricing",
+    label: "Pricing",
+    icon: DollarSign,
+    href: "/dashboard/settings/central/pricing",
+  },
+  {
+    id: "bookings",
+    label: "Bookings",
+    icon: Calendar,
+    href: "/dashboard/settings/central/bookings",
+  },
   { id: "store", label: "Store", icon: ShoppingCart, href: "/dashboard/settings/central/store" },
   { id: "access", label: "Access", icon: Shield, href: "/dashboard/settings/central/access" },
   { id: "system", label: "System", icon: Settings, href: "/dashboard/settings/central/system" },
@@ -90,7 +103,7 @@ const categories = [
 
 export function CategoryTabs() {
   const pathname = usePathname();
-  const activeCategory = categories.find(c => pathname.startsWith(c.href))?.id;
+  const activeCategory = categories.find((c) => pathname.startsWith(c.href))?.id;
 
   return (
     <div className="border-b bg-white">
@@ -116,7 +129,7 @@ export function CategoryTabs() {
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset",
                 isActive
                   ? "border-emerald-600 text-emerald-700 bg-emerald-50/50"
-                  : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50"
+                  : "border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-50",
               )}
             >
               <Icon className="h-4 w-4" />
@@ -172,18 +185,14 @@ export function SectionTabs({ sections, categoryId }: SectionTabsProps) {
   }, [pathname]);
 
   return (
-    <div
-      ref={containerRef}
-      className="border-b bg-slate-50 overflow-x-auto scrollbar-hide"
-    >
+    <div ref={containerRef} className="border-b bg-slate-50 overflow-x-auto scrollbar-hide">
       <nav
         role="tablist"
         aria-label={`${categoryId} sections`}
         className="flex items-center gap-1 px-4 min-w-max"
       >
         {sections.map((section) => {
-          const isActive = pathname === section.href ||
-                          pathname.startsWith(`${section.href}/`);
+          const isActive = pathname === section.href || pathname.startsWith(`${section.href}/`);
 
           return (
             <Link
@@ -198,7 +207,7 @@ export function SectionTabs({ sections, categoryId }: SectionTabsProps) {
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset",
                 isActive
                   ? "border-slate-900 text-slate-900 font-medium"
-                  : "border-transparent text-slate-500 hover:text-slate-700"
+                  : "border-transparent text-slate-500 hover:text-slate-700",
               )}
             >
               {section.label}
@@ -328,9 +337,7 @@ export function SettingsTable<T extends { id: string }>({
           )}
         </div>
 
-        {getItemStatus && (
-          <StatusFilter value={status} onChange={handleStatusChange} />
-        )}
+        {getItemStatus && <StatusFilter value={status} onChange={handleStatusChange} />}
       </div>
 
       {/* Table */}
@@ -344,7 +351,7 @@ export function SettingsTable<T extends { id: string }>({
                     key={String(column.key)}
                     className={cn(
                       "px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider",
-                      column.className
+                      column.className,
                     )}
                   >
                     {column.label}
@@ -364,7 +371,7 @@ export function SettingsTable<T extends { id: string }>({
                   onClick={() => onRowClick?.(item)}
                   className={cn(
                     "hover:bg-slate-50 transition-colors",
-                    onRowClick && "cursor-pointer"
+                    onRowClick && "cursor-pointer",
                   )}
                 >
                   {columns.map((column) => (
@@ -377,11 +384,7 @@ export function SettingsTable<T extends { id: string }>({
                         : String(item[column.key as keyof T] ?? "")}
                     </td>
                   ))}
-                  {getRowActions && (
-                    <td className="px-4 py-3 text-right">
-                      {getRowActions(item)}
-                    </td>
-                  )}
+                  {getRowActions && <td className="px-4 py-3 text-right">{getRowActions(item)}</td>}
                 </tr>
               ))}
             </tbody>
@@ -457,7 +460,7 @@ export function StatusFilter({ value, onChange }: StatusFilterProps) {
             "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
             value === option.value
               ? "bg-emerald-100 text-emerald-700"
-              : "text-slate-600 hover:text-slate-900"
+              : "text-slate-600 hover:text-slate-900",
           )}
         >
           {option.label}
@@ -478,9 +481,7 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  AlertTriangle, CheckCircle2, Info, ChevronRight, Loader2
-} from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, ChevronRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Issue {
@@ -522,7 +523,7 @@ const severityConfig = {
 export function SystemCheckCard({ issues, isLoading, onRefresh }: SystemCheckCardProps) {
   const [fixingId, setFixingId] = useState<string | null>(null);
 
-  const actionableCount = issues.filter(i => i.severity !== "info").length;
+  const actionableCount = issues.filter((i) => i.severity !== "info").length;
 
   const handleFix = async (issue: Issue) => {
     if (!issue.onFix) return;
@@ -540,9 +541,7 @@ export function SystemCheckCard({ issues, isLoading, onRefresh }: SystemCheckCar
         <CardContent className="py-8 text-center">
           <CheckCircle2 className="h-10 w-10 mx-auto text-emerald-500" />
           <h3 className="mt-3 font-medium text-slate-900">All systems go!</h3>
-          <p className="text-sm text-slate-500 mt-1">
-            No configuration issues detected
-          </p>
+          <p className="text-sm text-slate-500 mt-1">No configuration issues detected</p>
         </CardContent>
       </Card>
     );
@@ -563,11 +562,7 @@ export function SystemCheckCard({ issues, isLoading, onRefresh }: SystemCheckCar
           )}
           {onRefresh && (
             <Button variant="ghost" size="sm" onClick={onRefresh} disabled={isLoading}>
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Refresh"
-              )}
+              {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Refresh"}
             </Button>
           )}
         </div>
@@ -580,10 +575,7 @@ export function SystemCheckCard({ issues, isLoading, onRefresh }: SystemCheckCar
             const isFixing = fixingId === issue.id;
 
             return (
-              <div
-                key={issue.id}
-                className="flex items-center justify-between py-3 group"
-              >
+              <div key={issue.id} className="flex items-center justify-between py-3 group">
                 <div className="flex items-center gap-3">
                   <div className={cn("p-1 rounded", config.bg)}>
                     <Icon className={cn("h-4 w-4", config.color)} />
@@ -606,9 +598,7 @@ export function SystemCheckCard({ issues, isLoading, onRefresh }: SystemCheckCar
                       </a>
                     ) : (
                       <>
-                        {isFixing ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
+                        {isFixing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                         {issue.actionLabel || "Fix now"}
                       </>
                     )}
@@ -709,11 +699,20 @@ const commonCustomFields = [
   { question: "Do you need a pull-through site?", type: "YES_NO", displayAt: ["RESERVATION"] },
 
   // Special needs
-  { question: "Do you have accessibility requirements?", type: "YES_NO", displayAt: ["RESERVATION"] },
+  {
+    question: "Do you have accessibility requirements?",
+    type: "YES_NO",
+    displayAt: ["RESERVATION"],
+  },
   { question: "Accessibility needs (describe)", type: "TEXT", displayAt: ["RESERVATION"] },
 
   // Preferences
-  { question: "Site preference", type: "DROPDOWN", options: ["No preference", "Waterfront", "Shaded", "Near facilities", "Quiet area"], displayAt: ["RESERVATION"] },
+  {
+    question: "Site preference",
+    type: "DROPDOWN",
+    options: ["No preference", "Waterfront", "Shaded", "Near facilities", "Quiet area"],
+    displayAt: ["RESERVATION"],
+  },
   { question: "How did you hear about us?", type: "DROPDOWN", displayAt: ["RESERVATION"] },
 
   // Check-in
@@ -814,9 +813,9 @@ const equipmentTypes = [
 // /dashboard/settings/central/pricing/rate-groups?tab=calendar&filter=active&page=2
 
 interface SettingsURLState {
-  category: string;       // L1: property, pricing, bookings, store, access, system
-  section: string;        // L2: varies by category
-  contentTab?: string;    // L3: varies by section
+  category: string; // L1: property, pricing, bookings, store, access, system
+  section: string; // L2: varies by category
+  contentTab?: string; // L3: varies by section
   filter?: "active" | "inactive" | "all";
   search?: string;
   page?: number;
@@ -927,22 +926,22 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
 ## Shadcn/ui Components to Leverage
 
-| Component | Use Case |
-|-----------|----------|
-| `Tabs` | Base for L3 content tabs |
-| `Dialog` | Modals (field editor, confirmations) |
-| `Popover` | Color picker, quick actions |
-| `Select` | Mobile category dropdown |
-| `Switch` | Toggle settings |
-| `Toggle` | Multi-select buttons (site classes) |
-| `Input` | Search, text fields |
-| `Button` | Actions throughout |
-| `Badge` | Status indicators, counts |
-| `Card` | Content containers |
-| `Alert` | Trust-building messages |
-| `Toast` | Success/error feedback |
-| `DropdownMenu` | Row actions |
-| `Skeleton` | Loading states |
+| Component      | Use Case                             |
+| -------------- | ------------------------------------ |
+| `Tabs`         | Base for L3 content tabs             |
+| `Dialog`       | Modals (field editor, confirmations) |
+| `Popover`      | Color picker, quick actions          |
+| `Select`       | Mobile category dropdown             |
+| `Switch`       | Toggle settings                      |
+| `Toggle`       | Multi-select buttons (site classes)  |
+| `Input`        | Search, text fields                  |
+| `Button`       | Actions throughout                   |
+| `Badge`        | Status indicators, counts            |
+| `Card`         | Content containers                   |
+| `Alert`        | Trust-building messages              |
+| `Toast`        | Success/error feedback               |
+| `DropdownMenu` | Row actions                          |
+| `Skeleton`     | Loading states                       |
 
 ---
 
@@ -951,40 +950,47 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 Based on domain importance and dependencies:
 
 ### Phase 1: Navigation Foundation
+
 1. `CategoryTabs` - L1 navigation
 2. `SectionTabs` - L2 navigation
 3. `SettingsShell` - Layout wrapper
 4. Route structure setup
 
 ### Phase 2: Core Components
+
 1. `SettingsTable` - Reusable table
 2. `StatusFilter` - Active/Inactive/All
 3. `TablePagination` - Pagination
 4. `SettingsSearch` - Global search
 
 ### Phase 3: System Check (High Impact)
+
 1. `SystemCheckCard` - Dashboard display
 2. System check API endpoint
 3. Issue detection logic
 
 ### Phase 4: Rate Groups (High Value)
+
 1. `RateGroupList` - List view
 2. `ColorPicker` - Color selection
 3. `DateRangeEditor` - Date management
 4. Calendar integration
 
 ### Phase 5: Custom Fields (Flexibility)
+
 1. `CustomFieldList` - Sortable list
 2. `FieldEditorModal` - Create/edit
 3. Reservation form integration
 
 ### Phase 6: Grid Optimization (Advanced)
+
 1. `OptimizationCard` - Settings UI
 2. Optimization engine backend
 3. `OptimizationLog` - Activity history
 4. `PreviewPanel` - Preview mode
 
 ### Phase 7: Supporting Features
+
 1. Equipment Types
 2. Site Closures
 3. Lock Codes

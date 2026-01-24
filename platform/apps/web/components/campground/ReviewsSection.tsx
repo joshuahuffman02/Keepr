@@ -44,8 +44,7 @@ export function ReviewsSection({
   // Calculate rating distribution
   const distribution = useMemo(() => {
     const dist: Record<1 | 2 | 3 | 4 | 5, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-    const isRatingKey = (value: number): value is 1 | 2 | 3 | 4 | 5 =>
-      value >= 1 && value <= 5;
+    const isRatingKey = (value: number): value is 1 | 2 | 3 | 4 | 5 => value >= 1 && value <= 5;
     reviews.forEach((r) => {
       const rounded = Math.round(r.rating);
       if (isRatingKey(rounded)) {
@@ -121,9 +120,7 @@ export function ReviewsSection({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Star className="h-6 w-6 fill-amber-400 text-amber-400" />
-            <span className="text-2xl font-bold text-foreground">
-              {avgRating.toFixed(1)}
-            </span>
+            <span className="text-2xl font-bold text-foreground">{avgRating.toFixed(1)}</span>
           </div>
           <span className="text-muted-foreground">
             {count} review{count === 1 ? "" : "s"}
@@ -141,7 +138,7 @@ export function ReviewsSection({
               className={cn(
                 filter === f
                   ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               {f === "all" && "All"}
@@ -220,9 +217,7 @@ export function ReviewsSection({
                     key={i}
                     className={cn(
                       "h-4 w-4",
-                      i < review.rating
-                        ? "fill-amber-400 text-amber-400"
-                        : "text-muted-foreground"
+                      i < review.rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground",
                     )}
                   />
                 ))}
@@ -232,9 +227,7 @@ export function ReviewsSection({
             {/* Review content */}
             <div className="relative">
               <Quote className="absolute -left-2 -top-2 h-6 w-6 text-muted-foreground" />
-              <p className="text-foreground leading-relaxed pl-4">
-                {review.comment}
-              </p>
+              <p className="text-foreground leading-relaxed pl-4">{review.comment}</p>
             </div>
 
             {/* Review photos */}
@@ -260,7 +253,11 @@ export function ReviewsSection({
             {/* Helpful button */}
             {review.helpful !== undefined && (
               <div className="flex items-center gap-2 mt-4">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                >
                   <ThumbsUp className="h-3.5 w-3.5 mr-1.5" />
                   Helpful{review.helpful > 0 && ` (${review.helpful})`}
                 </Button>
@@ -272,11 +269,7 @@ export function ReviewsSection({
 
       {/* Show more button */}
       {filteredReviews.length > 3 && (
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => setShowAll(!showAll)}
-        >
+        <Button variant="outline" className="w-full" onClick={() => setShowAll(!showAll)}>
           {showAll ? (
             "Show less"
           ) : (
@@ -292,13 +285,7 @@ export function ReviewsSection({
 }
 
 // Compact featured review for sidebar or cards
-export function ReviewHighlight({
-  review,
-  className,
-}: {
-  review: Review;
-  className?: string;
-}) {
+export function ReviewHighlight({ review, className }: { review: Review; className?: string }) {
   return (
     <div className={cn("p-4 bg-amber-50 rounded-xl border border-amber-100", className)}>
       <div className="flex items-center gap-2 mb-2">
@@ -308,20 +295,14 @@ export function ReviewHighlight({
               key={i}
               className={cn(
                 "h-3.5 w-3.5",
-                i < review.rating
-                  ? "fill-amber-400 text-amber-400"
-                  : "text-amber-200"
+                i < review.rating ? "fill-amber-400 text-amber-400" : "text-amber-200",
               )}
             />
           ))}
         </div>
-        <span className="text-sm text-amber-700 font-medium">
-          {review.reviewerName || "Guest"}
-        </span>
+        <span className="text-sm text-amber-700 font-medium">{review.reviewerName || "Guest"}</span>
       </div>
-      <p className="text-sm text-amber-900 line-clamp-3 italic">
-        "{review.comment}"
-      </p>
+      <p className="text-sm text-amber-900 line-clamp-3 italic">"{review.comment}"</p>
     </div>
   );
 }

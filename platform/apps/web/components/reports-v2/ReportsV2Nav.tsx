@@ -36,7 +36,7 @@ export function ReportsV2Nav({
   activeShortcut,
   dateRange,
   filters,
-  pinnedReports = []
+  pinnedReports = [],
 }: ReportsV2NavProps) {
   const [search, setSearch] = useState("");
 
@@ -49,7 +49,7 @@ export function ReportsV2Nav({
           subTab: null,
           label: category.label,
           category: "Overview",
-          description: category.description
+          description: category.description,
         });
         return;
       }
@@ -60,7 +60,7 @@ export function ReportsV2Nav({
           subTab: sub.id,
           label: sub.label,
           category: category.label,
-          description: sub.description
+          description: sub.description,
         });
       });
     });
@@ -70,17 +70,20 @@ export function ReportsV2Nav({
   const matches = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return [];
-    return searchItems.filter((item) => {
-      return (
-        item.label.toLowerCase().includes(term) ||
-        item.category.toLowerCase().includes(term) ||
-        item.description?.toLowerCase().includes(term)
-      );
-    }).slice(0, 8);
+    return searchItems
+      .filter((item) => {
+        return (
+          item.label.toLowerCase().includes(term) ||
+          item.category.toLowerCase().includes(term) ||
+          item.description?.toLowerCase().includes(term)
+        );
+      })
+      .slice(0, 8);
   }, [search, searchItems]);
 
   const pinned = pinnedReports.filter((r) => r.pinned);
-  const resolvedShortcut = activeShortcut ?? (activeTab === null && activeSubTab === null ? "saved" : null);
+  const resolvedShortcut =
+    activeShortcut ?? (activeTab === null && activeSubTab === null ? "saved" : null);
   const isSavedActive = resolvedShortcut === "saved";
   const isPortfolioActive = resolvedShortcut === "portfolio";
   const isDevicesActive = resolvedShortcut === "devices";
@@ -104,7 +107,7 @@ export function ReportsV2Nav({
                 tab: item.tab,
                 subTab: item.subTab,
                 dateRange,
-                filters
+                filters,
               });
               return (
                 <Link
@@ -124,7 +127,9 @@ export function ReportsV2Nav({
 
       {pinned.length > 0 && (
         <div className="space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pinned</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            Pinned
+          </div>
           <div className="flex flex-col gap-1">
             {pinned.map((report) => (
               <Link
@@ -133,7 +138,7 @@ export function ReportsV2Nav({
                   tab: report.tab,
                   subTab: report.subTab ?? null,
                   dateRange: report.dateRange,
-                  filters: report.filters
+                  filters: report.filters,
                 })}
                 className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm text-foreground hover:bg-muted"
               >
@@ -146,7 +151,9 @@ export function ReportsV2Nav({
       )}
 
       <div className="space-y-2">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Categories</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Categories
+        </div>
         <div className="flex flex-col gap-1">
           {reportCatalogV2.map((category) => {
             const isActive = activeTab === category.id;
@@ -158,7 +165,7 @@ export function ReportsV2Nav({
                   size="sm"
                   className={cn(
                     "w-full justify-start",
-                    isActive && "border-primary/30 text-primary"
+                    isActive && "border-primary/30 text-primary",
                   )}
                 >
                   {category.label}
@@ -170,25 +177,43 @@ export function ReportsV2Nav({
       </div>
 
       <div className="space-y-2">
-        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Shortcuts</div>
+        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+          Shortcuts
+        </div>
         <div className="flex flex-col gap-1">
           <Link href="/reports-v2/saved">
-            <Button variant={isSavedActive ? "outline" : "ghost"} size="sm" className="w-full justify-start">
+            <Button
+              variant={isSavedActive ? "outline" : "ghost"}
+              size="sm"
+              className="w-full justify-start"
+            >
               Saved reports
             </Button>
           </Link>
           <Link href="/reports-v2/portfolio">
-            <Button variant={isPortfolioActive ? "outline" : "ghost"} size="sm" className="w-full justify-start">
+            <Button
+              variant={isPortfolioActive ? "outline" : "ghost"}
+              size="sm"
+              className="w-full justify-start"
+            >
               Portfolio
             </Button>
           </Link>
           <Link href="/reports-v2/devices">
-            <Button variant={isDevicesActive ? "outline" : "ghost"} size="sm" className="w-full justify-start">
+            <Button
+              variant={isDevicesActive ? "outline" : "ghost"}
+              size="sm"
+              className="w-full justify-start"
+            >
               Devices
             </Button>
           </Link>
           <Link href="/reports-v2/audit">
-            <Button variant={isAuditActive ? "outline" : "ghost"} size="sm" className="w-full justify-start">
+            <Button
+              variant={isAuditActive ? "outline" : "ghost"}
+              size="sm"
+              className="w-full justify-start"
+            >
               Audit log
             </Button>
           </Link>

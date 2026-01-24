@@ -11,12 +11,14 @@ paths:
 ## Money Handling
 
 1. **ALL amounts in cents (integers)**
+
    ```typescript
    const priceCents = 9999; // $99.99
    // NEVER: const price = 99.99;
    ```
 
 2. **Convert for display only:**
+
    ```typescript
    const displayPrice = (cents / 100).toFixed(2);
    ```
@@ -29,6 +31,7 @@ paths:
 ## Stripe Integration
 
 1. **Each campground has its own Stripe connected account**
+
    ```typescript
    if (!campground.stripeAccountId) {
      throw new BadRequestException("Campground not connected to Stripe");

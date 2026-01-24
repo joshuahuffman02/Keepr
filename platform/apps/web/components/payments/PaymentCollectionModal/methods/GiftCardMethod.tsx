@@ -15,15 +15,10 @@ interface GiftCardMethodProps {
   onCancel: () => void;
 }
 
-export default function GiftCardMethod({
-  onSuccess,
-  onError,
-  onCancel,
-}: GiftCardMethodProps) {
+export default function GiftCardMethod({ onSuccess, onError, onCancel }: GiftCardMethodProps) {
   const { state, actions } = usePaymentContext();
   const { remainingCents } = state;
-  const { giftCard, loading, error, lookupGiftCard, redeemGiftCard, clearGiftCard } =
-    useGiftCard();
+  const { giftCard, loading, error, lookupGiftCard, redeemGiftCard, clearGiftCard } = useGiftCard();
 
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
@@ -159,9 +154,7 @@ export default function GiftCardMethod({
 
           {/* Amount Selection */}
           <div className="space-y-3">
-            <Label className="text-sm font-medium text-foreground">
-              Amount to Redeem
-            </Label>
+            <Label className="text-sm font-medium text-foreground">Amount to Redeem</Label>
 
             <div className="space-y-2">
               <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-muted">
@@ -228,20 +221,13 @@ export default function GiftCardMethod({
 
           {/* Action Buttons */}
           <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              disabled={redeeming}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={onCancel} disabled={redeeming} className="flex-1">
               Cancel
             </Button>
             <Button
               onClick={handleRedeem}
               disabled={
-                redeeming ||
-                (!useFullBalance &&
-                  (!customAmount || parseFloat(customAmount) <= 0))
+                redeeming || (!useFullBalance && (!customAmount || parseFloat(customAmount) <= 0))
               }
               className="flex-1 bg-emerald-600 hover:bg-emerald-700"
             >
@@ -254,9 +240,7 @@ export default function GiftCardMethod({
                 <>
                   <Check className="h-4 w-4 mr-2" />
                   Redeem $
-                  {useFullBalance
-                    ? (maxRedeemable / 100).toFixed(2)
-                    : customAmount || "0.00"}
+                  {useFullBalance ? (maxRedeemable / 100).toFixed(2) : customAmount || "0.00"}
                 </>
               )}
             </Button>

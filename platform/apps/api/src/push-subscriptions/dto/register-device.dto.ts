@@ -1,12 +1,12 @@
-import { IsString, IsOptional, IsIn } from 'class-validator';
+import { IsString, IsOptional, IsIn } from "class-validator";
 
 export class RegisterDeviceDto {
   @IsString()
   deviceToken!: string;
 
   @IsString()
-  @IsIn(['ios', 'android'])
-  platform!: 'ios' | 'android';
+  @IsIn(["ios", "android"])
+  platform!: "ios" | "android";
 
   @IsOptional()
   @IsString()
@@ -26,8 +26,8 @@ export class RegisterDeviceDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['sandbox', 'production'])
-  environment?: 'sandbox' | 'production';
+  @IsIn(["sandbox", "production"])
+  environment?: "sandbox" | "production";
 }
 
 export class UnregisterDeviceDto {

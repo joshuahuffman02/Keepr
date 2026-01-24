@@ -78,8 +78,12 @@ export default function ProductsPage() {
 
     const emptyProducts: ApiProduct[] = [];
     const emptyCategories: ApiCategory[] = [];
-    const productsPromise: Promise<ApiProduct[]> = apiClient.getProducts(id).catch(() => emptyProducts);
-    const categoriesPromise: Promise<ApiCategory[]> = apiClient.getProductCategories(id).catch(() => emptyCategories);
+    const productsPromise: Promise<ApiProduct[]> = apiClient
+      .getProducts(id)
+      .catch(() => emptyProducts);
+    const categoriesPromise: Promise<ApiCategory[]> = apiClient
+      .getProductCategories(id)
+      .catch(() => emptyCategories);
     Promise.all([productsPromise, categoriesPromise]).then(([productList, categoryList]) => {
       const categoryMap = new Map(categoryList.map((category) => [category.id, category.name]));
       const mappedProducts: Product[] = productList.map((product) => ({
@@ -92,7 +96,10 @@ export default function ProductsPage() {
         trackInventory: product.trackInventory === true,
         inventoryCount: product.stockQty ?? null,
         category: product.categoryId
-          ? { id: product.categoryId, name: categoryMap.get(product.categoryId) ?? product.categoryId }
+          ? {
+              id: product.categoryId,
+              name: categoryMap.get(product.categoryId) ?? product.categoryId,
+            }
           : undefined,
       }));
       const mappedCategories: Category[] = categoryList.map((category) => ({
@@ -109,7 +116,7 @@ export default function ProductsPage() {
 
   const activeProducts = products.filter((p) => p.isActive !== false);
   const lowStockProducts = products.filter(
-    (p) => p.trackInventory && p.inventoryCount !== null && p.inventoryCount <= 5
+    (p) => p.trackInventory && p.inventoryCount !== null && p.inventoryCount <= 5,
   );
 
   // Filter products based on current filters
@@ -130,9 +137,7 @@ export default function ProductsPage() {
   });
 
   // Count active filters
-  const activeFilterCount =
-    (categoryFilter !== "all" ? 1 : 0) +
-    (statusFilter !== "all" ? 1 : 0);
+  const activeFilterCount = (categoryFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0);
 
   // Get category name for display
   const getCategoryName = (categoryId: string) => {
@@ -152,9 +157,7 @@ export default function ProductsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Products</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your store inventory and products
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your store inventory and products</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -168,9 +171,7 @@ export default function ProductsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Products</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your store inventory and products
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your store inventory and products</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -188,9 +189,7 @@ export default function ProductsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Products</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage your store inventory and products
-          </p>
+          <p className="text-muted-foreground mt-1">Manage your store inventory and products</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -212,8 +211,8 @@ export default function ProductsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Products are sold through the Point of Sale system. Use the POS to manage
-          inventory, process sales, and track revenue.
+          Products are sold through the Point of Sale system. Use the POS to manage inventory,
+          process sales, and track revenue.
         </AlertDescription>
       </Alert>
 
@@ -261,8 +260,12 @@ export default function ProductsPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${lowStockProducts.length > 0 ? "bg-amber-100" : "bg-muted"}`}>
-                <AlertCircle className={`h-5 w-5 ${lowStockProducts.length > 0 ? "text-amber-600" : "text-muted-foreground"}`} />
+              <div
+                className={`p-2 rounded-lg ${lowStockProducts.length > 0 ? "bg-amber-100" : "bg-muted"}`}
+              >
+                <AlertCircle
+                  className={`h-5 w-5 ${lowStockProducts.length > 0 ? "text-amber-600" : "text-muted-foreground"}`}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{lowStockProducts.length}</p>
@@ -374,9 +377,7 @@ export default function ProductsPage() {
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No products yet
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No products yet</h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
               Add products to your store to start selling through the POS system.
             </p>
@@ -392,7 +393,8 @@ export default function ProductsPage() {
         <Card>
           <CardHeader className="py-3 px-4 bg-muted border-b flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">
-              Products ({filteredProducts.length}{activeFilterCount > 0 ? ` of ${products.length}` : ""})
+              Products ({filteredProducts.length}
+              {activeFilterCount > 0 ? ` of ${products.length}` : ""})
             </CardTitle>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/pos">
@@ -404,63 +406,71 @@ export default function ProductsPage() {
           <CardContent className="p-0 divide-y">
             {filteredProducts.slice(0, 10).map((product, index) => (
               <StaggeredItem key={product.id} delay={0.1 + index * 0.04} variant="slideRight">
-              <div
-                className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${product.isActive !== false ? "bg-blue-100" : "bg-muted"}`}>
-                    <Package className={`h-5 w-5 ${product.isActive !== false ? "text-blue-600" : "text-muted-foreground"}`} />
-                  </div>
-                  <div>
-                    <p className={`font-medium ${product.isActive !== false ? "text-foreground" : "text-muted-foreground"}`}>
-                      {product.name}
-                    </p>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      {product.sku && <span>SKU: {product.sku}</span>}
-                      {product.category && (
-                        <Badge variant="outline" className="text-xs">
-                          {product.category.name}
-                        </Badge>
-                      )}
+                <div className="flex items-center justify-between px-4 py-3 hover:bg-muted transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${product.isActive !== false ? "bg-blue-100" : "bg-muted"}`}
+                    >
+                      <Package
+                        className={`h-5 w-5 ${product.isActive !== false ? "text-blue-600" : "text-muted-foreground"}`}
+                      />
+                    </div>
+                    <div>
+                      <p
+                        className={`font-medium ${product.isActive !== false ? "text-foreground" : "text-muted-foreground"}`}
+                      >
+                        {product.name}
+                      </p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        {product.sku && <span>SKU: {product.sku}</span>}
+                        {product.category && (
+                          <Badge variant="outline" className="text-xs">
+                            {product.category.name}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="font-medium text-foreground">
-                      {formatPrice(product.price)}
-                    </p>
-                    {product.trackInventory && product.inventoryCount !== null && (
-                      <p className={`text-xs ${product.inventoryCount <= 5 ? "text-amber-600" : "text-muted-foreground"}`}>
-                        {product.inventoryCount} in stock
-                      </p>
-                    )}
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="font-medium text-foreground">{formatPrice(product.price)}</p>
+                      {product.trackInventory && product.inventoryCount !== null && (
+                        <p
+                          className={`text-xs ${product.inventoryCount <= 5 ? "text-amber-600" : "text-muted-foreground"}`}
+                        >
+                          {product.inventoryCount} in stock
+                        </p>
+                      )}
+                    </div>
+                    <Badge variant={product.isActive !== false ? "default" : "secondary"}>
+                      {product.isActive !== false ? "Active" : "Inactive"}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="More options"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Link href="/pos" className="w-full">
+                            Edit Product
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Link href="/store" className="w-full">
+                            Update Inventory
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <Badge variant={product.isActive !== false ? "default" : "secondary"}>
-                    {product.isActive !== false ? "Active" : "Inactive"}
-                  </Badge>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="More options"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Link href="/pos" className="w-full">Edit Product</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Link href="/store" className="w-full">Update Inventory</Link>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
                 </div>
-              </div>
               </StaggeredItem>
             ))}
             {filteredProducts.length > 10 && (
@@ -477,12 +487,7 @@ export default function ProductsPage() {
               <div className="px-4 py-8 text-center">
                 <Package className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
                 <p className="text-muted-foreground text-sm">No products match your filters</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2"
-                  onClick={clearAllFilters}
-                >
+                <Button variant="ghost" size="sm" className="mt-2" onClick={clearAllFilters}>
                   Clear all filters
                 </Button>
               </div>

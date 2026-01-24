@@ -11,7 +11,7 @@ import {
   Clock,
   ChevronDown,
   ChevronUp,
-  Plus
+  Plus,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import type { CalendarReservation, CalendarSite } from "./types";
@@ -31,7 +31,7 @@ export function ListView({
   sites,
   onReservationClick,
   onNewBooking,
-  allowOps = false
+  allowOps = false,
 }: ListViewProps) {
   const [groupMode, setGroupMode] = useState<GroupMode>("date");
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
@@ -39,13 +39,13 @@ export function ListView({
   const [newBookingData, setNewBookingData] = useState({
     siteId: "",
     arrivalDate: "",
-    departureDate: ""
+    departureDate: "",
   });
 
   // Group reservations based on mode
   const groupedReservations = useMemo(() => {
-    const sorted = [...reservations].sort((a, b) =>
-      new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime()
+    const sorted = [...reservations].sort(
+      (a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime(),
     );
 
     if (groupMode === "none") {
@@ -54,12 +54,12 @@ export function ListView({
 
     if (groupMode === "date") {
       const groups: Record<string, CalendarReservation[]> = {};
-      sorted.forEach(res => {
+      sorted.forEach((res) => {
         const date = new Date(res.arrivalDate).toLocaleDateString(undefined, {
-          weekday: 'short',
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         });
         if (!groups[date]) groups[date] = [];
         groups[date].push(res);
@@ -69,8 +69,8 @@ export function ListView({
 
     if (groupMode === "site") {
       const groups: Record<string, CalendarReservation[]> = {};
-      sorted.forEach(res => {
-        const site = sites.find(s => s.id === res.siteId);
+      sorted.forEach((res) => {
+        const site = sites.find((s) => s.id === res.siteId);
         const siteName = site?.name || "Unassigned";
         if (!groups[siteName]) groups[siteName] = [];
         groups[siteName].push(res);
@@ -92,7 +92,12 @@ export function ListView({
   };
 
   const handleNewBookingSubmit = () => {
-    if (onNewBooking && newBookingData.siteId && newBookingData.arrivalDate && newBookingData.departureDate) {
+    if (
+      onNewBooking &&
+      newBookingData.siteId &&
+      newBookingData.arrivalDate &&
+      newBookingData.departureDate
+    ) {
       onNewBooking(newBookingData.siteId, newBookingData.arrivalDate, newBookingData.departureDate);
       setNewBookingModalOpen(false);
       setNewBookingData({ siteId: "", arrivalDate: "", departureDate: "" });
@@ -162,7 +167,10 @@ export function ListView({
           const isExpanded = expandedGroups.has(groupKey) || groupMode === "none";
 
           return (
-            <div key={groupKey} className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+            <div
+              key={groupKey}
+              className="rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+            >
               {/* Group Header */}
               {groupMode !== "none" && (
                 <button
@@ -192,7 +200,7 @@ export function ListView({
               {isExpanded && (
                 <div className="divide-y divide-border">
                   {groupReservations.map((res) => {
-                    const site = sites.find(s => s.id === res.siteId);
+                    const site = sites.find((s) => s.id === res.siteId);
                     const balanceAmount =
                       typeof res.balanceAmount === "number" ? res.balanceAmount : 0;
                     const hasBalance = balanceAmount > 0;
@@ -214,10 +222,7 @@ export function ListView({
                                 <div className="font-semibold text-foreground text-base truncate">
                                   {res.guest?.primaryFirstName} {res.guest?.primaryLastName}
                                 </div>
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs capitalize mt-1"
-                                >
+                                <Badge variant="outline" className="text-xs capitalize mt-1">
                                   {res.status?.replace("_", " ")}
                                 </Badge>
                               </div>
@@ -246,7 +251,8 @@ export function ListView({
                             <div className="flex items-center gap-2 text-foreground">
                               <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
                               <span>
-                                {new Date(res.arrivalDate).toLocaleDateString()} → {new Date(res.departureDate).toLocaleDateString()}
+                                {new Date(res.arrivalDate).toLocaleDateString()} →{" "}
+                                {new Date(res.departureDate).toLocaleDateString()}
                               </span>
                             </div>
 
@@ -342,7 +348,9 @@ export function ListView({
                 type="date"
                 className="w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={newBookingData.arrivalDate}
-                onChange={(e) => setNewBookingData({ ...newBookingData, arrivalDate: e.target.value })}
+                onChange={(e) =>
+                  setNewBookingData({ ...newBookingData, arrivalDate: e.target.value })
+                }
               />
             </div>
 
@@ -352,7 +360,9 @@ export function ListView({
                 type="date"
                 className="w-full rounded-md border border-border px-3 py-2 text-sm"
                 value={newBookingData.departureDate}
-                onChange={(e) => setNewBookingData({ ...newBookingData, departureDate: e.target.value })}
+                onChange={(e) =>
+                  setNewBookingData({ ...newBookingData, departureDate: e.target.value })
+                }
               />
             </div>
 
@@ -370,7 +380,11 @@ export function ListView({
               <Button
                 className="flex-1"
                 onClick={handleNewBookingSubmit}
-                disabled={!newBookingData.siteId || !newBookingData.arrivalDate || !newBookingData.departureDate}
+                disabled={
+                  !newBookingData.siteId ||
+                  !newBookingData.arrivalDate ||
+                  !newBookingData.departureDate
+                }
               >
                 Create Booking
               </Button>

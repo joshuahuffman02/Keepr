@@ -191,7 +191,11 @@ export class LocalizationService {
     return fallback;
   }
 
-  updateSettings(userKey: string, orgKey: string | undefined, payload: Partial<LocalizationSettings>) {
+  updateSettings(
+    userKey: string,
+    orgKey: string | undefined,
+    payload: Partial<LocalizationSettings>,
+  ) {
     const key = this.makeKey(userKey, orgKey);
     const current = this.getSettings(userKey, orgKey);
     const next: LocalizationSettings = {

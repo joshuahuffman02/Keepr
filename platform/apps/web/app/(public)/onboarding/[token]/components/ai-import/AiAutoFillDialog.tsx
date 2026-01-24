@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Sparkles,
-  Check,
-  X,
-  AlertTriangle,
-  Loader2,
-  Wand2,
-} from "lucide-react";
+import { Sparkles, Check, X, AlertTriangle, Loader2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -62,7 +55,7 @@ export function AiAutoFillDialog({
   isLoading = false,
 }: AiAutoFillDialogProps) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(
-    new Set(suggestions.map((s) => `${s.rowNumber}-${s.field}`))
+    new Set(suggestions.map((s) => `${s.rowNumber}-${s.field}`)),
   );
 
   const toggleSuggestion = (rowNumber: number, field: string) => {
@@ -87,9 +80,7 @@ export function AiAutoFillDialog({
   };
 
   const handleConfirm = () => {
-    const selected = suggestions.filter((s) =>
-      selectedIds.has(`${s.rowNumber}-${s.field}`)
-    );
+    const selected = suggestions.filter((s) => selectedIds.has(`${s.rowNumber}-${s.field}`));
     onConfirm(selected);
   };
 
@@ -128,8 +119,8 @@ export function AiAutoFillDialog({
             AI Auto-Fill Suggestions
           </DialogTitle>
           <DialogDescription>
-            AI has suggestions for {suggestions.length} missing or uncertain values.
-            Review and select which ones to apply.
+            AI has suggestions for {suggestions.length} missing or uncertain values. Review and
+            select which ones to apply.
           </DialogDescription>
         </DialogHeader>
 
@@ -158,28 +149,22 @@ export function AiAutoFillDialog({
                 animate={{ opacity: 1, y: 0 }}
                 className="border rounded-lg overflow-hidden"
               >
-                <div className="bg-muted/50 px-4 py-2 text-sm font-medium">
-                  Row {rowNum}
-                </div>
+                <div className="bg-muted/50 px-4 py-2 text-sm font-medium">Row {rowNum}</div>
                 <div className="divide-y">
                   {rowSuggestions.map((suggestion) => {
                     const id = `${suggestion.rowNumber}-${suggestion.field}`;
                     const isSelected = selectedIds.has(id);
                     const label =
-                      suggestion.fieldLabel ||
-                      FIELD_LABELS[suggestion.field] ||
-                      suggestion.field;
+                      suggestion.fieldLabel || FIELD_LABELS[suggestion.field] || suggestion.field;
 
                     return (
                       <div
                         key={id}
                         className={cn(
                           "px-4 py-3 flex items-start gap-3 cursor-pointer hover:bg-muted/30 transition-colors",
-                          isSelected && "bg-primary/5"
+                          isSelected && "bg-primary/5",
                         )}
-                        onClick={() =>
-                          toggleSuggestion(suggestion.rowNumber, suggestion.field)
-                        }
+                        onClick={() => toggleSuggestion(suggestion.rowNumber, suggestion.field)}
                       >
                         <Checkbox
                           checked={isSelected}
@@ -192,10 +177,7 @@ export function AiAutoFillDialog({
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-medium text-sm">{label}</span>
                             <span
-                              className={cn(
-                                "text-xs",
-                                getConfidenceColor(suggestion.confidence)
-                              )}
+                              className={cn("text-xs", getConfidenceColor(suggestion.confidence))}
                             >
                               {Math.round(suggestion.confidence * 100)}% confident
                             </span>
@@ -241,10 +223,7 @@ export function AiAutoFillDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleConfirm}
-            disabled={selectedIds.size === 0 || isLoading}
-          >
+          <Button onClick={handleConfirm} disabled={selectedIds.size === 0 || isLoading}>
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />

@@ -42,7 +42,7 @@ export class IntegrationsClient {
     const res = await fetch(`${this.base}/integrations/connections`, {
       method: "POST",
       headers: this.headers(),
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error(`Failed to upsert connection: ${res.statusText}`);
     return res.json();
@@ -50,7 +50,7 @@ export class IntegrationsClient {
 
   async listConnections(campgroundId: string) {
     const res = await fetch(`${this.base}/integrations/connections?campgroundId=${campgroundId}`, {
-      headers: this.headers()
+      headers: this.headers(),
     });
     if (!res.ok) throw new Error(`Failed to list connections: ${res.statusText}`);
     return res.json();
@@ -60,7 +60,7 @@ export class IntegrationsClient {
     const res = await fetch(`${this.base}/integrations/connections/${id}/sync`, {
       method: "POST",
       headers: this.headers(),
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(`Failed to queue sync: ${res.statusText}`);
     return res.json();
@@ -70,9 +70,12 @@ export class IntegrationsClient {
     const q = new URLSearchParams();
     if (params.limit) q.set("limit", String(params.limit));
     if (params.cursor) q.set("cursor", params.cursor);
-    const res = await fetch(`${this.base}/integrations/connections/${id}/logs${q.toString() ? `?${q.toString()}` : ""}`, {
-      headers: this.headers()
-    });
+    const res = await fetch(
+      `${this.base}/integrations/connections/${id}/logs${q.toString() ? `?${q.toString()}` : ""}`,
+      {
+        headers: this.headers(),
+      },
+    );
     if (!res.ok) throw new Error(`Failed to list logs: ${res.statusText}`);
     return res.json();
   }
@@ -81,18 +84,27 @@ export class IntegrationsClient {
     const q = new URLSearchParams();
     if (params.limit) q.set("limit", String(params.limit));
     if (params.cursor) q.set("cursor", params.cursor);
-    const res = await fetch(`${this.base}/integrations/connections/${id}/webhooks${q.toString() ? `?${q.toString()}` : ""}`, {
-      headers: this.headers()
-    });
+    const res = await fetch(
+      `${this.base}/integrations/connections/${id}/webhooks${q.toString() ? `?${q.toString()}` : ""}`,
+      {
+        headers: this.headers(),
+      },
+    );
     if (!res.ok) throw new Error(`Failed to list webhooks: ${res.statusText}`);
     return res.json();
   }
 
-  async queueExport(body: { type: "api" | "sftp"; connectionId?: string; campgroundId?: string; resource?: string; location?: string }) {
+  async queueExport(body: {
+    type: "api" | "sftp";
+    connectionId?: string;
+    campgroundId?: string;
+    resource?: string;
+    location?: string;
+  }) {
     const res = await fetch(`${this.base}/integrations/exports`, {
       method: "POST",
       headers: this.headers(),
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     if (!res.ok) throw new Error(`Failed to queue export: ${res.statusText}`);
     return res.json();

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 
 interface SystemCheckIssue {
   id: string;
@@ -88,9 +81,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
   const [announcement, setAnnouncement] = useState("");
 
   // Calculate count from issues
-  const systemCheckCount = systemCheckIssues.filter(
-    (i) => i.severity !== "info"
-  ).length;
+  const systemCheckCount = systemCheckIssues.filter((i) => i.severity !== "info").length;
 
   // Fetch system check issues from the API
   const refreshSystemCheck = useCallback(async () => {
@@ -102,13 +93,16 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/system-check/${campgroundId}`, {
-        headers: {
-          "Content-Type": "application/json",
-          "X-Campground-Id": campgroundId,
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/system-check/${campgroundId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Campground-Id": campgroundId,
+          },
+          credentials: "include",
         },
-        credentials: "include",
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch system check");
@@ -127,7 +121,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
       const toIssue = (
         severity: SystemCheckIssue["severity"],
         item: SystemCheckItem,
-        idx: number
+        idx: number,
       ): SystemCheckIssue => ({
         id: `${severity}-${idx}`,
         severity,
@@ -205,12 +199,7 @@ export function SettingsProvider({ children }: SettingsProviderProps) {
     <SettingsContext.Provider value={value}>
       {children}
       {/* Live region for screen reader announcements */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
     </SettingsContext.Provider>

@@ -7,8 +7,8 @@ import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 // GL Codes for charity accounting
 const GL_CODES = {
   CHARITY_DONATIONS_PAYABLE: "2400", // Liability - money owed to charity
-  CHARITY_CASH_COLLECTED: "1010",    // Asset - cash received from guests
-  CHARITY_CASH_PAID_OUT: "1010",     // Asset - cash paid to charity
+  CHARITY_CASH_COLLECTED: "1010", // Asset - cash received from guests
+  CHARITY_CASH_PAID_OUT: "1010", // Asset - cash paid to charity
 };
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
@@ -455,13 +455,13 @@ export class CharityService {
       options.startDate || options.endDate
         ? {
             ...(options.startDate ? { gte: options.startDate } : {}),
-            ...(options.endDate ? { lte: options.endDate } : {})
+            ...(options.endDate ? { lte: options.endDate } : {}),
           }
         : undefined;
 
     const where: Prisma.CharityDonationWhereInput = {
       status: { not: "refunded" },
-      ...(createdAtFilter ? { createdAt: createdAtFilter } : {})
+      ...(createdAtFilter ? { createdAt: createdAtFilter } : {}),
     };
 
     if (options.charityId) where.charityId = options.charityId;
@@ -499,9 +499,7 @@ export class CharityService {
     ]);
 
     // Calculate opt-in rate
-    const optInRate = reservationCount > 0
-      ? (donations._count / reservationCount) * 100
-      : 0;
+    const optInRate = reservationCount > 0 ? (donations._count / reservationCount) * 100 : 0;
 
     return {
       totalDonations: donations._count,
@@ -509,9 +507,7 @@ export class CharityService {
       donorCount: donors.length,
       optInRate: Math.round(optInRate * 10) / 10,
       averageDonationCents:
-        donations._count > 0
-          ? Math.round((donations._sum.amountCents ?? 0) / donations._count)
-          : 0,
+        donations._count > 0 ? Math.round((donations._sum.amountCents ?? 0) / donations._count) : 0,
       byStatus: byStatus.map((s) => ({
         status: s.status,
         count: s._count,
@@ -532,10 +528,13 @@ export class CharityService {
       by: ["charityId"],
       where: {
         status: { not: "refunded" },
-        createdAt: startDate || endDate ? {
-          gte: startDate,
-          lte: endDate,
-        } : undefined,
+        createdAt:
+          startDate || endDate
+            ? {
+                gte: startDate,
+                lte: endDate,
+              }
+            : undefined,
       },
       _count: true,
       _sum: { amountCents: true },
@@ -677,7 +676,10 @@ export class CharityService {
             },
           ]);
         } catch (err) {
-          this.logger.error(`Failed to post payout ledger entries for campground ${campgroundId}:`, err);
+          this.logger.error(
+            `Failed to post payout ledger entries for campground ${campgroundId}:`,
+            err,
+          );
         }
       }
 
@@ -720,7 +722,7 @@ export class CharityService {
   calculateRoundUp(
     totalCents: number,
     roundUpType: string,
-    roundUpOptions?: { values: number[] }
+    roundUpOptions?: { values: number[] },
   ): { roundUpAmount: number; newTotal: number } {
     let roundUpAmount = 0;
 

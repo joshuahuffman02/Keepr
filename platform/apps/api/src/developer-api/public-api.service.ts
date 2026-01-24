@@ -51,8 +51,8 @@ export class PublicApiService {
     private readonly guests: GuestsService,
     private readonly pricingV2Service: PricingV2Service,
     private readonly depositPoliciesService: DepositPoliciesService,
-    private readonly audit: AuditService
-  ) { }
+    private readonly audit: AuditService,
+  ) {}
 
   private computePaymentStatus(total: number, paid: number): string {
     if (!total || total <= 0) return "unpaid";
@@ -90,14 +90,20 @@ export class PublicApiService {
   }
 
   private async assertSiteInCampground(siteId: string, campgroundId: string) {
-    const site = await this.prisma.site.findUnique({ where: { id: siteId }, select: { campgroundId: true } });
+    const site = await this.prisma.site.findUnique({
+      where: { id: siteId },
+      select: { campgroundId: true },
+    });
     if (!site || site.campgroundId !== campgroundId) {
       throw new BadRequestException("Site does not belong to this campground");
     }
   }
 
   private async assertReservationCampground(reservationId: string, campgroundId: string) {
-    const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId }, select: { campgroundId: true } });
+    const reservation = await this.prisma.reservation.findUnique({
+      where: { id: reservationId },
+      select: { campgroundId: true },
+    });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found for this campground");
     }
@@ -109,13 +115,13 @@ export class PublicApiService {
       orderBy: { createdAt: "desc" },
       include: {
         Site: { select: { id: true, name: true, siteNumber: true } },
-        Guest: { select: { id: true, primaryFirstName: true, primaryLastName: true, email: true } }
-      }
+        Guest: { select: { id: true, primaryFirstName: true, primaryLastName: true, email: true } },
+      },
     });
     return reservations.map(({ Site, Guest, ...rest }) => ({
       ...rest,
       site: Site,
-      guest: Guest
+      guest: Guest,
     }));
   }
 
@@ -125,8 +131,8 @@ export class PublicApiService {
       include: {
         Site: { select: { id: true, name: true, siteNumber: true } },
         Guest: { select: { id: true, primaryFirstName: true, primaryLastName: true, email: true } },
-        Payment: true
-      }
+        Payment: true,
+      },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
     const { Site, Guest, Payment, ...rest } = reservation;
@@ -138,7 +144,7 @@ export class PublicApiService {
    */
   private async calculateOccupancy(campgroundId: string, arrivalDate: Date): Promise<number> {
     const totalSites = await this.prisma.site.count({
-      where: { campgroundId, isActive: true }
+      where: { campgroundId, isActive: true },
     });
     if (totalSites === 0) return 0;
 
@@ -147,8 +153,8 @@ export class PublicApiService {
         campgroundId,
         arrivalDate: { lte: arrivalDate },
         departureDate: { gt: arrivalDate },
-        status: { in: ["confirmed", "checked_in", "pending"] }
-      }
+        status: { in: ["confirmed", "checked_in", "pending"] },
+      },
     });
 
     return Math.round((occupiedSites / totalSites) * 100);
@@ -171,13 +177,13 @@ export class PublicApiService {
       input.siteId,
       arrival,
       departure,
-      occupancyPct
+      occupancyPct,
     );
 
     // Get campground discount cap setting
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { maxDiscountFraction: true }
+      select: { maxDiscountFraction: true },
     });
     const maxDiscountFraction = Number(campground?.maxDiscountFraction ?? 0.4);
 
@@ -193,20 +199,18 @@ export class PublicApiService {
 
     if (input.totalAmountOverride !== undefined && input.totalAmountOverride !== null) {
       const overrideDelta = input.totalAmountOverride - pricing.totalCents;
-      const discountPct = overrideDelta < 0
-        ? Math.abs(overrideDelta) / pricing.totalCents
-        : 0;
+      const discountPct = overrideDelta < 0 ? Math.abs(overrideDelta) / pricing.totalCents : 0;
 
       // Validate against discount cap
       if (discountPct > maxDiscountFraction) {
         throw new BadRequestException(
-          `Override exceeds maximum discount cap of ${Math.round(maxDiscountFraction * 100)}%`
+          `Override exceeds maximum discount cap of ${Math.round(maxDiscountFraction * 100)}%`,
         );
       }
 
       if (!input.overrideReason) {
         throw new BadRequestException(
-          "overrideReason is required when providing totalAmountOverride"
+          "overrideReason is required when providing totalAmountOverride",
         );
       }
 
@@ -217,14 +221,14 @@ export class PublicApiService {
         calculatedTotal: pricing.totalCents,
         overrideTotal: totalAmount,
         reason: input.overrideReason,
-        discountPercent: Math.round(discountPct * 100)
+        discountPercent: Math.round(discountPct * 100),
       };
     }
 
     // Calculate deposit
     const site = await this.prisma.site.findUnique({
       where: { id: input.siteId },
-      select: { siteClassId: true }
+      select: { siteClassId: true },
     });
 
     const depositCalc = await calculateReservationDepositV2(this.depositPoliciesService, {
@@ -232,7 +236,7 @@ export class PublicApiService {
       siteClassId: site?.siteClassId ?? null,
       totalAmountCents: totalAmount,
       lodgingOnlyCents: pricing.baseSubtotalCents,
-      nights: pricing.nights
+      nights: pricing.nights,
     });
 
     const normalizedStatus = this.normalizeReservationStatus(input.status);
@@ -265,9 +269,10 @@ export class PublicApiService {
         paymentStatus: "unpaid",
         depositAmount: depositCalc.depositAmount,
         depositPolicyVersion: depositCalc.depositPolicyVersion ?? null,
-        pricingRuleVersion: pricingSource === "api_override" ? "api_override" : pricing.pricingRuleVersion,
-        promoCode: input.promoCode ?? null
-      }
+        pricingRuleVersion:
+          pricingSource === "api_override" ? "api_override" : pricing.pricingRuleVersion,
+        promoCode: input.promoCode ?? null,
+      },
     });
 
     if (overrideAudit) {
@@ -281,8 +286,8 @@ export class PublicApiService {
         after: {
           overrideTotal: overrideAudit.overrideTotal,
           reason: overrideAudit.reason,
-          discountPercent: overrideAudit.discountPercent
-        }
+          discountPercent: overrideAudit.discountPercent,
+        },
       });
     }
 
@@ -309,8 +314,8 @@ export class PublicApiService {
         ...(input.children !== undefined ? { children: input.children } : {}),
         ...(normalizedStatus ? { status: normalizedStatus } : {}),
         ...(input.notes !== undefined ? { notes: input.notes } : {}),
-        ...(input.siteLocked !== undefined ? { siteLocked: input.siteLocked } : {})
-      }
+        ...(input.siteLocked !== undefined ? { siteLocked: input.siteLocked } : {}),
+      },
     });
     await this.webhook.emit("reservation.updated", campgroundId, { reservationId: id });
     return updated;
@@ -323,7 +328,12 @@ export class PublicApiService {
     return deleted;
   }
 
-  async recordPayment(campgroundId: string, reservationId: string, amountCents: number, method = "card") {
+  async recordPayment(
+    campgroundId: string,
+    reservationId: string,
+    amountCents: number,
+    method = "card",
+  ) {
     if (amountCents <= 0) {
       throw new BadRequestException("Payment amount must be positive");
     }
@@ -331,87 +341,91 @@ export class PublicApiService {
     const paymentRef = `api-${method}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     // Wrap entire operation in transaction with row-level locking to prevent race conditions
-    const { payment, updated } = await this.prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Lock the reservation row using SELECT FOR UPDATE to prevent concurrent modifications
-      const [lockedReservation] = await tx.$queryRaw<Array<{
-        id: string;
-        campgroundId: string;
-        siteId: string;
-        paidAmount: number | null;
-        totalAmount: number;
-      }>>`
+    const { payment, updated } = await this.prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Lock the reservation row using SELECT FOR UPDATE to prevent concurrent modifications
+        const [lockedReservation] = await tx.$queryRaw<
+          Array<{
+            id: string;
+            campgroundId: string;
+            siteId: string;
+            paidAmount: number | null;
+            totalAmount: number;
+          }>
+        >`
         SELECT id, "campgroundId", "siteId", "paidAmount", "totalAmount"
         FROM "Reservation"
         WHERE id = ${reservationId} AND "campgroundId" = ${campgroundId}
         FOR UPDATE
       `;
-      if (!lockedReservation) {
-        throw new NotFoundException("Reservation not found for this campground");
-      }
-
-      // Calculate new paid amount atomically with the locked row
-      const newPaid = (lockedReservation.paidAmount ?? 0) + amountCents;
-      const paymentFields = this.buildPaymentFields(lockedReservation.totalAmount, newPaid);
-
-      // Get site class for GL code mapping
-      const site = await tx.site.findUnique({
-        where: { id: lockedReservation.siteId },
-        include: { SiteClass: true }
-      });
-
-      const revenueGl = site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
-      const revenueAccount = site?.SiteClass?.clientAccount ?? "Revenue";
-
-      // Update reservation with new payment totals
-      const updatedReservation = await tx.reservation.update({
-        where: { id: reservationId },
-        data: {
-          paidAmount: newPaid,
-          ...paymentFields
+        if (!lockedReservation) {
+          throw new NotFoundException("Reservation not found for this campground");
         }
-      });
 
-      // Create payment record
-      const paymentRecord = await tx.payment.create({
-        data: {
-          id: randomUUID(),
-          campgroundId,
-          reservationId,
-          amountCents,
-          method,
-          direction: "charge",
-          note: "API payment"
-        }
-      });
+        // Calculate new paid amount atomically with the locked row
+        const newPaid = (lockedReservation.paidAmount ?? 0) + amountCents;
+        const paymentFields = this.buildPaymentFields(lockedReservation.totalAmount, newPaid);
 
-      // Post balanced ledger entries (debit cash, credit revenue)
-      await postBalancedLedgerEntries(tx, [
-        {
-          campgroundId,
-          reservationId,
-          glCode: "CASH",
-          account: "Cash",
-          description: `API payment (${method})`,
-          amountCents,
-          direction: "debit",
-          externalRef: paymentRef,
-          dedupeKey: `api:${reservationId}:payment:${paymentRef}:debit`
-        },
-        {
-          campgroundId,
-          reservationId,
-          glCode: revenueGl,
-          account: revenueAccount,
-          description: `API payment (${method})`,
-          amountCents,
-          direction: "credit",
-          externalRef: paymentRef,
-          dedupeKey: `api:${reservationId}:payment:${paymentRef}:credit`
-        }
-      ]);
+        // Get site class for GL code mapping
+        const site = await tx.site.findUnique({
+          where: { id: lockedReservation.siteId },
+          include: { SiteClass: true },
+        });
 
-      return { payment: paymentRecord, updated: updatedReservation };
-    });
+        const revenueGl = site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
+        const revenueAccount = site?.SiteClass?.clientAccount ?? "Revenue";
+
+        // Update reservation with new payment totals
+        const updatedReservation = await tx.reservation.update({
+          where: { id: reservationId },
+          data: {
+            paidAmount: newPaid,
+            ...paymentFields,
+          },
+        });
+
+        // Create payment record
+        const paymentRecord = await tx.payment.create({
+          data: {
+            id: randomUUID(),
+            campgroundId,
+            reservationId,
+            amountCents,
+            method,
+            direction: "charge",
+            note: "API payment",
+          },
+        });
+
+        // Post balanced ledger entries (debit cash, credit revenue)
+        await postBalancedLedgerEntries(tx, [
+          {
+            campgroundId,
+            reservationId,
+            glCode: "CASH",
+            account: "Cash",
+            description: `API payment (${method})`,
+            amountCents,
+            direction: "debit",
+            externalRef: paymentRef,
+            dedupeKey: `api:${reservationId}:payment:${paymentRef}:debit`,
+          },
+          {
+            campgroundId,
+            reservationId,
+            glCode: revenueGl,
+            account: revenueAccount,
+            description: `API payment (${method})`,
+            amountCents,
+            direction: "credit",
+            externalRef: paymentRef,
+            dedupeKey: `api:${reservationId}:payment:${paymentRef}:credit`,
+          },
+        ]);
+
+        return { payment: paymentRecord, updated: updatedReservation };
+      },
+    );
 
     // Audit the payment
     try {
@@ -422,20 +436,23 @@ export class PublicApiService {
         entity: "reservation",
         entityId: reservationId,
         before: {
-          paidAmount: updated.paidAmount ? updated.paidAmount - amountCents : 0
+          paidAmount: updated.paidAmount ? updated.paidAmount - amountCents : 0,
         },
         after: {
           paidAmount: updated.paidAmount,
           paymentMethod: method,
           paymentAmount: amountCents,
-          paymentId: payment.id
-        }
+          paymentId: payment.id,
+        },
       });
     } catch {
       // Audit failures shouldn't fail the payment
     }
 
-    await this.webhook.emit("payment.created", campgroundId, { reservationId, paymentId: payment.id });
+    await this.webhook.emit("payment.created", campgroundId, {
+      reservationId,
+      paymentId: payment.id,
+    });
     return payment;
   }
 
@@ -443,7 +460,7 @@ export class PublicApiService {
     return this.prisma.guest.findMany({
       where: { Reservation: { some: { campgroundId } } },
       orderBy: { createdAt: "desc" },
-      take: 100
+      take: 100,
     });
   }
 
@@ -454,14 +471,14 @@ export class PublicApiService {
         Reservation: {
           where: { campgroundId },
           orderBy: { arrivalDate: "desc" },
-          include: { Site: { select: { id: true, name: true, siteNumber: true } } }
-        }
-      }
+          include: { Site: { select: { id: true, name: true, siteNumber: true } } },
+        },
+      },
     });
     if (!guest) throw new NotFoundException("Guest not found");
     const reservations = guest.Reservation.map(({ Site, ...rest }) => ({
       ...rest,
-      site: Site
+      site: Site,
     }));
     const { Reservation, ...guestData } = guest;
     return { ...guestData, reservations };
@@ -475,7 +492,7 @@ export class PublicApiService {
       primaryFirstName: input.primaryFirstName,
       primaryLastName: input.primaryLastName,
       email: input.email,
-      phone: input.phone
+      phone: input.phone,
     };
     const guest = await this.guests.create(guestInput);
     await this.webhook.emit("guest.created", campgroundId, { guestId: guest.id });
@@ -495,7 +512,7 @@ export class PublicApiService {
   async listSites(campgroundId: string) {
     return this.prisma.site.findMany({
       where: { campgroundId },
-      orderBy: { siteNumber: "asc" }
+      orderBy: { siteNumber: "asc" },
     });
   }
 
@@ -518,8 +535,8 @@ export class PublicApiService {
         siteNumber: input.siteNumber,
         siteType: normalizedSiteType,
         maxOccupancy: input.maxOccupancy,
-        rigMaxLength: input.rigMaxLength ?? null
-      }
+        rigMaxLength: input.rigMaxLength ?? null,
+      },
     });
     await this.webhook.emit("site.created", campgroundId, { siteId: created.id });
     return created;
@@ -538,8 +555,8 @@ export class PublicApiService {
         ...(input.siteNumber ? { siteNumber: input.siteNumber } : {}),
         ...(normalizedSiteType ? { siteType: normalizedSiteType } : {}),
         ...(input.maxOccupancy !== undefined ? { maxOccupancy: input.maxOccupancy } : {}),
-        ...(input.rigMaxLength !== undefined ? { rigMaxLength: input.rigMaxLength } : {})
-      }
+        ...(input.rigMaxLength !== undefined ? { rigMaxLength: input.rigMaxLength } : {}),
+      },
     });
     await this.webhook.emit("site.updated", campgroundId, { siteId: updated.id });
     return updated;

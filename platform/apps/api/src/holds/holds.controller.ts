@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { HoldsService } from "./holds.service";
 import { CreateHoldDto } from "./dto/create-hold.dto";
 import { JwtAuthGuard } from "../auth/guards";
@@ -13,7 +24,7 @@ type CampgroundRequest = Request & { campgroundId?: string | null; user?: AuthUs
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller("holds")
 export class HoldsController {
-  constructor(private readonly holds: HoldsService) { }
+  constructor(private readonly holds: HoldsService) {}
 
   private requireCampgroundId(req: CampgroundRequest, fallback?: string): string {
     const headerValue = req.headers["x-campground-id"];
@@ -26,8 +37,8 @@ export class HoldsController {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser | null): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" || user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
@@ -59,7 +70,7 @@ export class HoldsController {
   release(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: CampgroundRequest
+    @Req() req: CampgroundRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -70,7 +81,7 @@ export class HoldsController {
   @Roles(UserRole.owner, UserRole.manager)
   expireStale(
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: CampgroundRequest
+    @Req() req: CampgroundRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

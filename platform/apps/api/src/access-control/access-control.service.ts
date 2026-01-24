@@ -2,9 +2,14 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  NotFoundException
+  NotFoundException,
 } from "@nestjs/common";
-import { AccessCredentialType, AccessGrantStatus, AccessProviderType, IdempotencyStatus } from "@prisma/client";
+import {
+  AccessCredentialType,
+  AccessGrantStatus,
+  AccessProviderType,
+  IdempotencyStatus,
+} from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import * as crypto from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
@@ -33,11 +38,9 @@ const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   return false;
 };
 
-const toJsonInput = (value: unknown): Prisma.InputJsonValue =>
-  isJsonValue(value) ? value : {};
+const toJsonInput = (value: unknown): Prisma.InputJsonValue => (isJsonValue(value) ? value : {});
 
-const toCredentials = (value: unknown): Record<string, unknown> =>
-  isRecord(value) ? value : {};
+const toCredentials = (value: unknown): Record<string, unknown> => (isRecord(value) ? value : {});
 
 @Injectable()
 export class AccessControlService {
@@ -45,7 +48,7 @@ export class AccessControlService {
     private readonly prisma: PrismaService,
     private readonly registry: AccessProviderRegistry,
     private readonly idempotency: IdempotencyService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
   ) {}
 
   private grantsRepo() {
@@ -73,7 +76,7 @@ export class AccessControlService {
   async getAccessStatus(reservationId: string, campgroundId: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { id: true, campgroundId: true }
+      select: { id: true, campgroundId: true },
     });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found");
@@ -83,8 +86,8 @@ export class AccessControlService {
       this.vehiclesRepo()?.findFirst?.({ where: { reservationId, campgroundId } }),
       this.grantsRepo()?.findMany?.({
         where: { reservationId, campgroundId },
-        orderBy: { createdAt: "desc" }
-      })
+        orderBy: { createdAt: "desc" },
+      }),
     ]);
     return { vehicle, grants: grants ?? [] };
   }
@@ -92,7 +95,7 @@ export class AccessControlService {
   async upsertVehicle(reservationId: string, dto: UpsertVehicleDto, campgroundId: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { id: true, campgroundId: true, guestId: true }
+      select: { id: true, campgroundId: true, guestId: true },
     });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found");
@@ -103,29 +106,29 @@ export class AccessControlService {
 
     const vehicle = existing
       ? await repo.update({
-        where: { id: existing.id },
-        data: {
-          plate: dto.plate ?? existing.plate,
-          state: dto.state ?? existing.state,
-          rigType: dto.rigType ?? existing.rigType,
-          rigLength: dto.rigLength ?? existing.rigLength,
-          description: dto.description ?? existing.description
-        }
-      })
+          where: { id: existing.id },
+          data: {
+            plate: dto.plate ?? existing.plate,
+            state: dto.state ?? existing.state,
+            rigType: dto.rigType ?? existing.rigType,
+            rigLength: dto.rigLength ?? existing.rigLength,
+            description: dto.description ?? existing.description,
+          },
+        })
       : await repo.create({
-        data: {
-          id: crypto.randomUUID(),
-          campgroundId: reservation.campgroundId,
-          reservationId,
-          guestId: reservation.guestId,
-          plate: dto.plate,
-          state: dto.state,
-          rigType: dto.rigType,
-          rigLength: dto.rigLength,
-          description: dto.description,
-          updatedAt: new Date(),
-        }
-      });
+          data: {
+            id: crypto.randomUUID(),
+            campgroundId: reservation.campgroundId,
+            reservationId,
+            guestId: reservation.guestId,
+            plate: dto.plate,
+            state: dto.state,
+            rigType: dto.rigType,
+            rigLength: dto.rigLength,
+            description: dto.description,
+            updatedAt: new Date(),
+          },
+        });
 
     await this.prisma.reservation.update({
       where: { id: reservationId },
@@ -133,16 +136,19 @@ export class AccessControlService {
         vehiclePlate: dto.plate ?? vehicle.plate ?? null,
         vehicleState: dto.state ?? vehicle.state ?? null,
         rigType: dto.rigType ?? vehicle.rigType ?? null,
-        rigLength: dto.rigLength ?? vehicle.rigLength ?? null
-      }
+        rigLength: dto.rigLength ?? vehicle.rigLength ?? null,
+      },
     });
 
     return vehicle;
   }
 
-  private async getIntegration(campgroundId: string, provider: AccessProviderType): Promise<AccessIntegrationConfig> {
+  private async getIntegration(
+    campgroundId: string,
+    provider: AccessProviderType,
+  ): Promise<AccessIntegrationConfig> {
     const record = await this.integrationsRepo()?.findFirst?.({
-      where: { campgroundId, provider }
+      where: { campgroundId, provider },
     });
     if (!record) {
       throw new NotFoundException(`Access provider ${provider} not configured`);
@@ -181,8 +187,8 @@ export class AccessControlService {
       where: {
         campgroundId: options.campgroundId,
         reservationId: options.reservationId,
-        provider: options.provider
-      }
+        provider: options.provider,
+      },
     });
 
     if (existing) return existing;
@@ -200,27 +206,34 @@ export class AccessControlService {
         secretHash: this.hashSecret(options.credentialValue),
         status: AccessGrantStatus.pending,
         updatedAt: new Date(),
-      }
+      },
     });
   }
 
-  async grantAccess(reservationId: string, dto: GrantAccessDto, campgroundId: string, actorId?: string | null) {
+  async grantAccess(
+    reservationId: string,
+    dto: GrantAccessDto,
+    campgroundId: string,
+    actorId?: string | null,
+  ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { Guest: true, Site: true }
+      include: { Guest: true, Site: true },
     });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found");
     }
     if (["cancelled", "checked_out"].includes(reservation.status)) {
-      throw new ConflictException("Access cannot be granted for cancelled or checked out reservations");
+      throw new ConflictException(
+        "Access cannot be granted for cancelled or checked out reservations",
+      );
     }
 
     const idempotencyKey = dto.idempotencyKey || `access-grant:${dto.provider}:${reservationId}`;
     const idemRecord = await this.idempotency.start(idempotencyKey, dto, campgroundId, {
       endpoint: "access/grant",
       requestBody: dto,
-      sequence: dto.idempotencyKey ?? null
+      sequence: dto.idempotencyKey ?? null,
     });
     if (idemRecord?.status === IdempotencyStatus.succeeded && idemRecord.responseJson) {
       return idemRecord.responseJson;
@@ -241,7 +254,7 @@ export class AccessControlService {
       integrationId: integration.id,
       vehicleId: vehicle?.id ?? null,
       credentialType: dto.credentialType,
-      credentialValue: dto.credentialValue ?? null
+      credentialValue: dto.credentialValue ?? null,
     });
 
     const grant = await this.grantsRepo().upsert({
@@ -267,8 +280,8 @@ export class AccessControlService {
         credentialId: credential?.id ?? undefined,
         startsAt: this.toDate(dto.startsAt) ?? undefined,
         endsAt: this.toDate(dto.endsAt) ?? undefined,
-        idempotencyKey
-      }
+        idempotencyKey,
+      },
     });
 
     try {
@@ -278,14 +291,15 @@ export class AccessControlService {
         guestName: reservation.Guest
           ? `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`
           : undefined,
-        vehiclePlate: vehicle?.plate ?? reservation.vehiclePlate ?? dto.credentialValue ?? undefined,
+        vehiclePlate:
+          vehicle?.plate ?? reservation.vehiclePlate ?? dto.credentialValue ?? undefined,
         rigLength: reservation.rigLength ?? undefined,
         rigType: reservation.rigType ?? undefined,
         credentialType: dto.credentialType,
         credentialValue: dto.credentialValue,
         startsAt: this.toDate(dto.startsAt),
         endsAt: this.toDate(dto.endsAt),
-        idempotencyKey
+        idempotencyKey,
       });
 
       const updated = await this.grantsRepo().update({
@@ -293,8 +307,8 @@ export class AccessControlService {
         data: {
           providerAccessId: result.providerAccessId ?? grant.providerAccessId,
           status: result.status ?? AccessGrantStatus.active,
-          lastSyncAt: new Date()
-        }
+          lastSyncAt: new Date(),
+        },
       });
 
       const response = { grant: updated };
@@ -306,7 +320,7 @@ export class AccessControlService {
         entity: "Reservation",
         entityId: reservationId,
         before: { grantId: grant.id, status: grant.status },
-        after: { grantId: updated.id, status: updated.status, provider: dto.provider }
+        after: { grantId: updated.id, status: updated.status, provider: dto.provider },
       });
       return response;
     } catch (err) {
@@ -315,7 +329,12 @@ export class AccessControlService {
     }
   }
 
-  async revokeAccess(reservationId: string, dto: RevokeAccessDto, campgroundId: string, actorId?: string | null) {
+  async revokeAccess(
+    reservationId: string,
+    dto: RevokeAccessDto,
+    campgroundId: string,
+    actorId?: string | null,
+  ) {
     const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId } });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found");
@@ -325,7 +344,7 @@ export class AccessControlService {
     const idemRecord = await this.idempotency.start(idempotencyKey, dto, campgroundId, {
       endpoint: "access/revoke",
       requestBody: dto,
-      sequence: dto.idempotencyKey ?? null
+      sequence: dto.idempotencyKey ?? null,
     });
     if (idemRecord?.status === IdempotencyStatus.succeeded && idemRecord.responseJson) {
       return idemRecord.responseJson;
@@ -338,7 +357,7 @@ export class AccessControlService {
     }
     const integration = await this.getIntegration(campgroundId, dto.provider);
     const grant = await this.grantsRepo().findFirst({
-      where: { reservationId, provider: dto.provider, campgroundId }
+      where: { reservationId, provider: dto.provider, campgroundId },
     });
     if (!grant) throw new NotFoundException("Access grant not found");
 
@@ -346,15 +365,15 @@ export class AccessControlService {
       const result = await adapter.revokeAccess(integration, {
         reservationId,
         providerAccessId: dto.providerAccessId ?? grant.providerAccessId ?? undefined,
-        reason: dto.reason
+        reason: dto.reason,
       });
       const updated = await this.grantsRepo().update({
         where: { id: grant.id },
         data: {
           status: result.status ?? AccessGrantStatus.revoked,
           blockedReason: dto.reason ?? grant.blockedReason ?? null,
-          lastSyncAt: new Date()
-        }
+          lastSyncAt: new Date(),
+        },
       });
       const response = { grant: updated };
       await this.idempotency.complete(idempotencyKey, response);
@@ -365,7 +384,12 @@ export class AccessControlService {
         entity: "Reservation",
         entityId: reservationId,
         before: { grantId: grant.id, status: grant.status },
-        after: { grantId: updated.id, status: updated.status, provider: dto.provider, reason: dto.reason ?? null }
+        after: {
+          grantId: updated.id,
+          status: updated.status,
+          provider: dto.provider,
+          reason: dto.reason ?? null,
+        },
       });
       return response;
     } catch (err) {
@@ -377,19 +401,19 @@ export class AccessControlService {
   async blockAccessForReservation(reservationId: string, reason: string, actorId?: string | null) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { id: true, campgroundId: true }
+      select: { id: true, campgroundId: true },
     });
 
     const result = await this.grantsRepo().updateMany({
       where: {
         reservationId,
-        status: { in: [AccessGrantStatus.active, AccessGrantStatus.pending] }
+        status: { in: [AccessGrantStatus.active, AccessGrantStatus.pending] },
       },
       data: {
         status: AccessGrantStatus.blocked,
         blockedReason: reason,
-        lastSyncAt: new Date()
-      }
+        lastSyncAt: new Date(),
+      },
     });
 
     if (reservation) {
@@ -399,7 +423,7 @@ export class AccessControlService {
         action: "access.block",
         entity: "Reservation",
         entityId: reservationId,
-        after: { reason, updated: result.count }
+        after: { reason, updated: result.count },
       });
     }
   }
@@ -409,11 +433,14 @@ export class AccessControlService {
     const records = (await this.integrationsRepo()?.findMany?.({ where: { campgroundId } })) ?? [];
     return records.map((record) => ({
       ...record,
-      webhookSecret: this.maskSecret(record.webhookSecret)
+      webhookSecret: this.maskSecret(record.webhookSecret),
     }));
   }
 
-  async upsertIntegration(campgroundId: string | null | undefined, dto: UpsertAccessIntegrationDto) {
+  async upsertIntegration(
+    campgroundId: string | null | undefined,
+    dto: UpsertAccessIntegrationDto,
+  ) {
     if (!campgroundId) throw new BadRequestException("campgroundId required");
     const record = await this.integrationsRepo().upsert({
       where: { campgroundId_provider: { campgroundId, provider: dto.provider } },
@@ -431,18 +458,23 @@ export class AccessControlService {
         displayName: dto.displayName ?? undefined,
         status: dto.status ?? undefined,
         credentials: dto.credentials === undefined ? undefined : toJsonInput(dto.credentials),
-        webhookSecret: dto.webhookSecret ?? undefined
-      }
+        webhookSecret: dto.webhookSecret ?? undefined,
+      },
     });
     return {
       ...record,
-      webhookSecret: this.maskSecret(record.webhookSecret)
+      webhookSecret: this.maskSecret(record.webhookSecret),
     };
   }
 
-  async verifyWebhook(provider: AccessProviderType, signature: string | undefined, rawBody: string, campgroundId?: string | null) {
+  async verifyWebhook(
+    provider: AccessProviderType,
+    signature: string | undefined,
+    rawBody: string,
+    campgroundId?: string | null,
+  ) {
     const integration = await this.integrationsRepo()?.findFirst?.({
-      where: { provider, ...(campgroundId ? { campgroundId } : {}) }
+      where: { provider, ...(campgroundId ? { campgroundId } : {}) },
     });
     if (!integration) return false;
     const adapter = this.registry.getAdapter(provider);
@@ -459,27 +491,33 @@ export class AccessControlService {
       integration: integrationConfig,
       signature,
       secret: integration.webhookSecret,
-      rawBody
+      rawBody,
     });
   }
 
   async autoGrantForReservation(reservationId: string, actorId?: string | null) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { Site: true, Guest: true }
+      include: { Site: true, Guest: true },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
-    const integrations = await this.integrationsRepo()?.findMany?.({
-      where: { campgroundId: reservation.campgroundId, status: "enabled" }
-    }) ?? [];
+    const integrations =
+      (await this.integrationsRepo()?.findMany?.({
+        where: { campgroundId: reservation.campgroundId, status: "enabled" },
+      })) ?? [];
     for (const integration of integrations) {
       try {
-        await this.grantAccess(reservationId, {
-          provider: integration.provider,
-          startsAt: reservation.arrivalDate?.toISOString?.() ?? undefined,
-          endsAt: reservation.departureDate?.toISOString?.() ?? undefined,
-          idempotencyKey: `auto-grant:${integration.provider}:${reservationId}`,
-        }, reservation.campgroundId, actorId);
+        await this.grantAccess(
+          reservationId,
+          {
+            provider: integration.provider,
+            startsAt: reservation.arrivalDate?.toISOString?.() ?? undefined,
+            endsAt: reservation.departureDate?.toISOString?.() ?? undefined,
+            idempotencyKey: `auto-grant:${integration.provider}:${reservationId}`,
+          },
+          reservation.campgroundId,
+          actorId,
+        );
       } catch (err) {
         // Continue to next provider; audit is handled in grantAccess
         continue;
@@ -489,16 +527,26 @@ export class AccessControlService {
 
   async revokeAllForReservation(reservationId: string, reason: string, actorId?: string | null) {
     const grants = await this.grantsRepo().findMany({
-      where: { reservationId, status: { in: [AccessGrantStatus.active, AccessGrantStatus.pending, AccessGrantStatus.blocked] } }
+      where: {
+        reservationId,
+        status: {
+          in: [AccessGrantStatus.active, AccessGrantStatus.pending, AccessGrantStatus.blocked],
+        },
+      },
     });
     for (const grant of grants ?? []) {
       try {
-        await this.revokeAccess(reservationId, {
-          provider: grant.provider,
-          providerAccessId: grant.providerAccessId ?? undefined,
-          idempotencyKey: `auto-revoke:${grant.provider}:${reservationId}`,
-          reason,
-        }, grant.campgroundId, actorId);
+        await this.revokeAccess(
+          reservationId,
+          {
+            provider: grant.provider,
+            providerAccessId: grant.providerAccessId ?? undefined,
+            idempotencyKey: `auto-revoke:${grant.provider}:${reservationId}`,
+            reason,
+          },
+          grant.campgroundId,
+          actorId,
+        );
       } catch (err) {
         // swallow to keep loop going; audit handled per call
         continue;

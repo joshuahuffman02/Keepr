@@ -1,5 +1,5 @@
-import { IsObject, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
-import { z } from 'zod';
+import { IsObject, IsOptional, IsString, IsUUID, MaxLength } from "class-validator";
+import { z } from "zod";
 
 export const executeToolSchema = z.object({
   tool: z.string(),

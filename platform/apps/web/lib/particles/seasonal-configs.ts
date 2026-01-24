@@ -51,11 +51,7 @@ export const seasonalConfigs: Record<Season, ParticleConfig> = {
     name: "Snowfall",
     count: 25,
     animationClass: "animate-snowfall",
-    colors: [
-      "text-white",
-      "text-blue-100",
-      "text-slate-100",
-    ],
+    colors: ["text-white", "text-blue-100", "text-slate-100"],
     sizeRange: [4, 12],
     durationRange: [8, 15],
     glow: true,
@@ -68,12 +64,7 @@ export const seasonalConfigs: Record<Season, ParticleConfig> = {
     name: "Cherry Blossoms",
     count: 12,
     animationClass: "animate-petal-fall",
-    colors: [
-      "text-pink-300",
-      "text-pink-200",
-      "text-rose-200",
-      "text-white",
-    ],
+    colors: ["text-pink-300", "text-pink-200", "text-rose-200", "text-white"],
     sizeRange: [8, 16],
     durationRange: [10, 18],
     shapes: [
@@ -85,11 +76,7 @@ export const seasonalConfigs: Record<Season, ParticleConfig> = {
     name: "Fireflies",
     count: 8,
     animationClass: "animate-firefly",
-    colors: [
-      "text-yellow-300",
-      "text-amber-300",
-      "text-lime-300",
-    ],
+    colors: ["text-yellow-300", "text-amber-300", "text-lime-300"],
     sizeRange: [4, 8],
     timeOfDay: ["evening", "night"],
     durationRange: [3, 6],
@@ -103,10 +90,7 @@ export function getSeasonalConfig(season: Season): ParticleConfig {
 }
 
 // Check if particles should be shown based on time
-export function shouldShowParticles(
-  config: ParticleConfig,
-  timeOfDay: string
-): boolean {
+export function shouldShowParticles(config: ParticleConfig, timeOfDay: string): boolean {
   if (!config.timeOfDay || config.timeOfDay.length === 0) {
     return true;
   }

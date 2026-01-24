@@ -7,9 +7,22 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ReportsV2Shell } from "@/components/reports-v2/ReportsV2Shell";
 import { ReportsV2PageHeader } from "@/components/reports-v2/ReportsV2PageHeader";
 import { ReportSection, ReportStatGrid } from "@/components/reports-v2/ReportPanels";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-client";
 import { listSavedReports, type SavedReport } from "@/components/reports/savedReports";
@@ -18,7 +31,11 @@ type FxRate = { base: string; quote: string; rate: number };
 
 function formatCurrency(value: number | null | undefined, currency: string, locale: string) {
   if (value === null || value === undefined) return "—";
-  return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 function formatPercent(value: number | null | undefined) {
@@ -26,7 +43,12 @@ function formatPercent(value: number | null | undefined) {
   return `${(value * 100).toFixed(0)}%`;
 }
 
-function resolveRate(fxRates: FxRate[], baseCurrency: string | undefined, from: string, to: string): number {
+function resolveRate(
+  fxRates: FxRate[],
+  baseCurrency: string | undefined,
+  from: string,
+  to: string,
+): number {
   if (from === to) return 1;
   const direct = fxRates.find((r) => r.base === from && r.quote === to);
   if (direct) return direct.rate;
@@ -89,7 +111,12 @@ export default function ReportsV2PortfolioPage() {
   });
 
   useEffect(() => {
-    if (localesQuery.data && !localesQuery.isFetching && !localesQuery.isRefetching && !localStorage.getItem("campreserv:locale")) {
+    if (
+      localesQuery.data &&
+      !localesQuery.isFetching &&
+      !localesQuery.isRefetching &&
+      !localStorage.getItem("campreserv:locale")
+    ) {
       setLocale(localesQuery.data[0]?.code ?? "en-US");
     }
   }, [localesQuery.data, localesQuery.isFetching, localesQuery.isRefetching]);
@@ -122,7 +149,9 @@ export default function ReportsV2PortfolioPage() {
   })();
 
   const rows = metrics.map((m) => {
-    const rate = fxEnabled ? resolveRate(fxRates, baseCurrency, m.currency, resolvedReportingCurrency) : 1;
+    const rate = fxEnabled
+      ? resolveRate(fxRates, baseCurrency, m.currency, resolvedReportingCurrency)
+      : 1;
     return {
       ...m,
       displayCurrency: fxEnabled ? resolvedReportingCurrency : m.currency,
@@ -152,14 +181,24 @@ export default function ReportsV2PortfolioPage() {
   return (
     <DashboardShell>
       <div className="space-y-5">
-        <Breadcrumbs items={[{ label: "Reports v2", href: "/reports-v2" }, { label: "Portfolio" }]} />
-        <ReportsV2Shell activeTab={null} activeSubTab={null} activeShortcut="portfolio" pinnedReports={savedReports.filter((r) => r.pinned)}>
+        <Breadcrumbs
+          items={[{ label: "Reports v2", href: "/reports-v2" }, { label: "Portfolio" }]}
+        />
+        <ReportsV2Shell
+          activeTab={null}
+          activeSubTab={null}
+          activeShortcut="portfolio"
+          pinnedReports={savedReports.filter((r) => r.pinned)}
+        >
           <ReportsV2PageHeader
             title="Portfolio reporting"
             description="Cross-park occupancy, ADR, RevPAR, and revenue with FX support."
           />
 
-          <ReportSection title="Scope and currency" description="Choose a portfolio and reporting currency.">
+          <ReportSection
+            title="Scope and currency"
+            description="Choose a portfolio and reporting currency."
+          >
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-muted-foreground">Portfolio</span>
@@ -167,7 +206,8 @@ export default function ReportsV2PortfolioPage() {
                   value={portfolioId ?? ""}
                   onValueChange={(value) => {
                     setPortfolioId(value);
-                    if (typeof window !== "undefined") localStorage.setItem("campreserv:selectedPortfolio", value);
+                    if (typeof window !== "undefined")
+                      localStorage.setItem("campreserv:selectedPortfolio", value);
                     qc.invalidateQueries({ queryKey: ["portfolio-report"] });
                   }}
                 >
@@ -184,12 +224,15 @@ export default function ReportsV2PortfolioPage() {
                 </Select>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-muted-foreground">Reporting currency</span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Reporting currency
+                </span>
                 <Select
                   value={resolvedReportingCurrency}
                   onValueChange={(val) => {
                     setReportingCurrency(val);
-                    if (typeof window !== "undefined") localStorage.setItem("campreserv:reportingCurrency", val);
+                    if (typeof window !== "undefined")
+                      localStorage.setItem("campreserv:reportingCurrency", val);
                   }}
                 >
                   <SelectTrigger className="w-48" aria-label="Reporting currency">
@@ -213,10 +256,19 @@ export default function ReportsV2PortfolioPage() {
 
           <ReportStatGrid
             stats={[
-              { label: "Portfolio revenue", value: rollup ? formatCurrency(rollup.revenueHome, rollup.currency, locale) : "—" },
+              {
+                label: "Portfolio revenue",
+                value: rollup ? formatCurrency(rollup.revenueHome, rollup.currency, locale) : "—",
+              },
               { label: "Occupancy", value: rollup ? formatPercent(rollup.occupancy) : "—" },
-              { label: "ADR", value: rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—" },
-              { label: "RevPAR", value: rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—" }
+              {
+                label: "ADR",
+                value: rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—",
+              },
+              {
+                label: "RevPAR",
+                value: rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—",
+              },
             ]}
           />
 
@@ -251,9 +303,15 @@ export default function ReportsV2PortfolioPage() {
                         <TableCell className="font-semibold">{m.name}</TableCell>
                         <TableCell>{m.region}</TableCell>
                         <TableCell>{formatPercent(m.occupancy)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayAdr, m.displayCurrency, locale)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayRevpar, m.displayCurrency, locale)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayRevenue, m.displayCurrency, locale)}</TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayAdr, m.displayCurrency, locale)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayRevpar, m.displayCurrency, locale)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayRevenue, m.displayCurrency, locale)}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">{m.displayCurrency}</Badge>

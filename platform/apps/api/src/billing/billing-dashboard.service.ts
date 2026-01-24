@@ -102,9 +102,9 @@ export class BillingDashboardService {
       },
     });
 
-    const bookingFeeEvents = usageEvents.filter(e => e.eventType === "booking_created");
-    const smsOutboundEvents = usageEvents.filter(e => e.eventType === "sms_sent");
-    const smsInboundEvents = usageEvents.filter(e => e.eventType === "sms_received");
+    const bookingFeeEvents = usageEvents.filter((e) => e.eventType === "booking_created");
+    const smsOutboundEvents = usageEvents.filter((e) => e.eventType === "sms_sent");
+    const smsInboundEvents = usageEvents.filter((e) => e.eventType === "sms_received");
 
     const perBookingFeeCents = bookingFeeEvents.reduce((sum, e) => sum + (e.unitCents ?? 0), 0);
     const smsOutboundCents = smsOutboundEvents.reduce((sum, e) => sum + (e.unitCents ?? 0), 0);
@@ -210,7 +210,11 @@ export class BillingDashboardService {
   /**
    * Get revenue breakdown by channel, site type, and time
    */
-  async getRevenueBreakdown(campgroundId: string, periodStart?: Date, periodEnd?: Date): Promise<RevenueBreakdown> {
+  async getRevenueBreakdown(
+    campgroundId: string,
+    periodStart?: Date,
+    periodEnd?: Date,
+  ): Promise<RevenueBreakdown> {
     const now = new Date();
     const start = periodStart ?? new Date(now.getFullYear() - 1, now.getMonth(), 1);
     const end = periodEnd ?? new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
@@ -314,7 +318,7 @@ export class BillingDashboardService {
           totalChargesCents: usage._sum.unitCents ?? 0,
           paidAt: period.paidAt,
         };
-      })
+      }),
     );
 
     return {

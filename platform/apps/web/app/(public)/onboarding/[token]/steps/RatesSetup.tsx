@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  DollarSign,
-  Check,
-  Tent,
-  Truck,
-  Home,
-  Sparkles,
-  Info,
-} from "lucide-react";
+import { DollarSign, Check, Tent, Truck, Home, Sparkles, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,12 +40,7 @@ const iconMap: Record<string, React.ElementType> = {
   yurt: Sparkles,
 };
 
-export function RatesSetup({
-  siteClasses,
-  onSave,
-  onNext,
-  isLoading = false,
-}: RatesSetupProps) {
+export function RatesSetup({ siteClasses, onSave, onNext, isLoading = false }: RatesSetupProps) {
   const prefersReducedMotion = useReducedMotion();
   const [rates, setRates] = useState<Record<string, number>>(() => {
     // Initialize with existing default rates (convert cents to dollars)
@@ -108,12 +95,8 @@ export function RatesSetup({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 mb-4">
             <DollarSign className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Set Your Rates
-          </h2>
-          <p className="text-slate-400">
-            Enter the base nightly rate for each site type
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Set Your Rates</h2>
+          <p className="text-slate-400">Enter the base nightly rate for each site type</p>
         </motion.div>
 
         {/* Rate cards */}
@@ -152,9 +135,7 @@ export function RatesSetup({
                       min="0"
                       step="0.01"
                       value={rate || ""}
-                      onChange={(e) =>
-                        handleRateChange(siteClass.id, e.target.value)
-                      }
+                      onChange={(e) => handleRateChange(siteClass.id, e.target.value)}
                       className="w-24 bg-slate-800/50 border-slate-700 text-white text-right text-lg font-medium"
                       placeholder="0.00"
                     />
@@ -165,9 +146,7 @@ export function RatesSetup({
                   <div
                     className={cn(
                       "w-8 h-8 rounded-full flex items-center justify-center transition-all",
-                      rate > 0
-                        ? "bg-emerald-500/20"
-                        : "bg-slate-700/50"
+                      rate > 0 ? "bg-emerald-500/20" : "bg-slate-700/50",
                     )}
                   >
                     {rate > 0 && (
@@ -195,11 +174,9 @@ export function RatesSetup({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              These are your base rates.
-            </span>{" "}
-            You can add seasonal pricing, weekend rates, and dynamic pricing
-            rules in your dashboard after setup.
+            <span className="text-slate-300 font-medium">These are your base rates.</span> You can
+            add seasonal pricing, weekend rates, and dynamic pricing rules in your dashboard after
+            setup.
           </div>
         </motion.div>
 
@@ -216,7 +193,7 @@ export function RatesSetup({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

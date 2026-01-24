@@ -12,7 +12,12 @@ describe("Signatures module", () => {
   type PrismaMock = {
     reservation: { findUnique: jest.Mock };
     guest: { findUnique: jest.Mock };
-    signatureRequest: { create: jest.Mock; findUnique: jest.Mock; update: jest.Mock; findMany: jest.Mock };
+    signatureRequest: {
+      create: jest.Mock;
+      findUnique: jest.Mock;
+      update: jest.Mock;
+      findMany: jest.Mock;
+    };
     signatureArtifact: { findUnique: jest.Mock; upsert: jest.Mock };
     coiUpload: { create: jest.Mock; findMany: jest.Mock; update: jest.Mock };
   };
@@ -36,17 +41,17 @@ describe("Signatures module", () => {
         create: jest.fn(),
         findUnique: jest.fn(),
         update: jest.fn(),
-        findMany: jest.fn()
+        findMany: jest.fn(),
       },
       signatureArtifact: {
         findUnique: jest.fn(),
-        upsert: jest.fn()
+        upsert: jest.fn(),
       },
       coiUpload: {
         create: jest.fn(),
         findMany: jest.fn(),
-        update: jest.fn()
-      }
+        update: jest.fn(),
+      },
     };
     email = { sendEmail: jest.fn().mockResolvedValue({}) };
     sms = { sendSms: jest.fn().mockResolvedValue({}) };
@@ -58,8 +63,8 @@ describe("Signatures module", () => {
         { provide: PrismaService, useValue: prisma },
         { provide: EmailService, useValue: email },
         { provide: SmsService, useValue: sms },
-        { provide: AuditService, useValue: audit }
-      ]
+        { provide: AuditService, useValue: audit },
+      ],
     }).compile();
 
     service = moduleRef.get(SignaturesService);
@@ -74,22 +79,31 @@ describe("Signatures module", () => {
     prisma.reservation.findUnique.mockResolvedValue({
       id: "res1",
       campgroundId: "camp1",
-      Guest: { id: "guest1", email: "guest@example.com", primaryFirstName: "Test", primaryLastName: "User" }
+      Guest: {
+        id: "guest1",
+        email: "guest@example.com",
+        primaryFirstName: "Test",
+        primaryLastName: "User",
+      },
     });
-    prisma.signatureRequest.create.mockImplementation((input: { data: Record<string, unknown> }) => ({
-      ...input.data,
-      id: "req1"
-    }));
+    prisma.signatureRequest.create.mockImplementation(
+      (input: { data: Record<string, unknown> }) => ({
+        ...input.data,
+        id: "req1",
+      }),
+    );
 
     const { request, signingUrl } = await service.createAndSend(
       { reservationId: "res1", documentType: "long_term_stay", deliveryChannel: "email" },
-      "user-actor"
+      "user-actor",
     );
 
     expect(request.status).toBe(SignatureRequestStatus.sent);
     expect(signingUrl).toContain("/sign/");
     expect(email.sendEmail).toHaveBeenCalled();
-    expect(audit.record).toHaveBeenCalledWith(expect.objectContaining({ action: "signature.request_sent" }));
+    expect(audit.record).toHaveBeenCalledWith(
+      expect.objectContaining({ action: "signature.request_sent" }),
+    );
   });
 
   it("handles webhook idempotently when already signed", async () => {
@@ -101,22 +115,32 @@ describe("Signatures module", () => {
       token: "tok",
       documentType: "waiver",
       status: SignatureRequestStatus.sent,
-      reminderCount: 0
+      reminderCount: 0,
     };
     prisma.signatureRequest.findUnique.mockImplementation(() => Promise.resolve(record));
-    prisma.signatureRequest.update.mockImplementation((input: { data: Record<string, unknown> }) => {
-      record = { ...record, ...input.data };
-      return Promise.resolve(record);
-    });
+    prisma.signatureRequest.update.mockImplementation(
+      (input: { data: Record<string, unknown> }) => {
+        record = { ...record, ...input.data };
+        return Promise.resolve(record);
+      },
+    );
     prisma.signatureArtifact.findUnique.mockResolvedValue(null);
-    prisma.signatureArtifact.upsert.mockResolvedValue({ id: "art1", requestId: "req1", pdfUrl: "data:pdf" });
+    prisma.signatureArtifact.upsert.mockResolvedValue({
+      id: "art1",
+      requestId: "req1",
+      pdfUrl: "data:pdf",
+    });
 
     await service.handleWebhook({ token: "tok", status: "signed" });
     expect(record.status).toBe(SignatureRequestStatus.signed);
     expect(prisma.signatureArtifact.upsert).toHaveBeenCalledTimes(1);
 
     // Second webhook should not duplicate artifacts
-    prisma.signatureArtifact.findUnique.mockResolvedValue({ id: "art1", requestId: "req1", pdfUrl: "data:pdf" });
+    prisma.signatureArtifact.findUnique.mockResolvedValue({
+      id: "art1",
+      requestId: "req1",
+      pdfUrl: "data:pdf",
+    });
     await service.handleWebhook({ token: "tok", status: "signed" });
     expect(prisma.signatureArtifact.upsert).toHaveBeenCalledTimes(1);
   });

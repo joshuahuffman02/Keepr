@@ -1,6 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 export type ShortcutAction =
@@ -227,7 +235,7 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
           break;
       }
     },
-    [router]
+    [router],
   );
 
   // Track focus state
@@ -323,7 +331,7 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
           if (!hasCmd) continue;
 
           const nonModifierKeys = shortcutKeys.filter(
-            (k) => !["cmd", "ctrl", "shift", "alt"].includes(k)
+            (k) => !["cmd", "ctrl", "shift", "alt"].includes(k),
           );
 
           if (nonModifierKeys.length === 1 && nonModifierKeys[0] === key) {
@@ -351,16 +359,16 @@ export function KeyboardShortcutsProvider({ children }: KeyboardShortcutsProvide
     };
   }, [shortcuts, executeAction]);
 
-interface KeyboardShortcutsCallbacks {
-  onSearch: (fn: () => void) => void;
-  onHelp: (fn: () => void) => void;
-  onNewBooking: (fn: () => void) => void;
-  onCloseModal: (fn: () => void) => void;
-}
+  interface KeyboardShortcutsCallbacks {
+    onSearch: (fn: () => void) => void;
+    onHelp: (fn: () => void) => void;
+    onNewBooking: (fn: () => void) => void;
+    onCloseModal: (fn: () => void) => void;
+  }
 
-interface WindowWithKeyboardShortcuts extends Window {
-  __keyboardShortcuts?: KeyboardShortcutsCallbacks;
-}
+  interface WindowWithKeyboardShortcuts extends Window {
+    __keyboardShortcuts?: KeyboardShortcutsCallbacks;
+  }
 
   // Expose refs for external components to register callbacks
   useEffect(() => {
@@ -394,8 +402,6 @@ interface WindowWithKeyboardShortcuts extends Window {
   };
 
   return (
-    <KeyboardShortcutsContext.Provider value={value}>
-      {children}
-    </KeyboardShortcutsContext.Provider>
+    <KeyboardShortcutsContext.Provider value={value}>{children}</KeyboardShortcutsContext.Provider>
   );
 }

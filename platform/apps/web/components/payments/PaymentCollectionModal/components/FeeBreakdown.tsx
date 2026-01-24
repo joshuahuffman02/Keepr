@@ -12,11 +12,7 @@ interface FeeBreakdownProps {
   showTooltip?: boolean;
 }
 
-export function FeeBreakdown({
-  method,
-  amountCents,
-  showTooltip = true,
-}: FeeBreakdownProps) {
+export function FeeBreakdown({ method, amountCents, showTooltip = true }: FeeBreakdownProps) {
   const { state, actions } = usePaymentContext();
   const { config, selectedMethod, remainingCents } = state;
 
@@ -27,9 +23,7 @@ export function FeeBreakdown({
     return null;
   }
 
-  const feeCents = activeMethod
-    ? actions.calculateFees(activeMethod, activeAmount)
-    : 0;
+  const feeCents = activeMethod ? actions.calculateFees(activeMethod, activeAmount) : 0;
 
   if (feeCents <= 0) {
     return null;
@@ -48,18 +42,14 @@ export function FeeBreakdown({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-medium text-foreground">
-            +${(feeCents / 100).toFixed(2)}
-          </p>
+          <p className="text-sm font-medium text-foreground">+${(feeCents / 100).toFixed(2)}</p>
         </div>
       </div>
 
       {showTooltip && (
         <div className="mt-2 flex items-start gap-2 text-xs text-muted-foreground">
           <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
-          <span>
-            This fee covers payment processing costs and is passed through to you.
-          </span>
+          <span>This fee covers payment processing costs and is passed through to you.</span>
         </div>
       )}
     </div>
@@ -83,18 +73,14 @@ export function FeeBreakdownInline({
     return null;
   }
 
-  const feeCents = activeMethod
-    ? actions.calculateFees(activeMethod, activeAmount)
-    : 0;
+  const feeCents = activeMethod ? actions.calculateFees(activeMethod, activeAmount) : 0;
 
   if (feeCents <= 0) {
     return null;
   }
 
   return (
-    <span className="text-sm text-muted-foreground">
-      + ${(feeCents / 100).toFixed(2)} fee
-    </span>
+    <span className="text-sm text-muted-foreground">+ ${(feeCents / 100).toFixed(2)} fee</span>
   );
 }
 

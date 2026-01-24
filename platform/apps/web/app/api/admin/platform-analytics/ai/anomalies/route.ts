@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE ||
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ||
   (process.env.NODE_ENV === "production"
     ? "https://api.keeprstay.com/api"
     : "http://localhost:4000/api");

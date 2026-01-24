@@ -21,7 +21,13 @@ export class PrivacyController {
   @Post()
   async updateSettings(
     @Param("campgroundId") campgroundId: string,
-    @Body() body: Partial<{ redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number }>
+    @Body()
+    body: Partial<{
+      redactPII: boolean;
+      consentRequired: boolean;
+      backupRetentionDays: number;
+      keyRotationDays: number;
+    }>,
   ) {
     return this.privacy.updateSettings(campgroundId, body);
   }
@@ -31,7 +37,15 @@ export class PrivacyController {
   async recordConsent(
     @Param("campgroundId") campgroundId: string,
     @Body()
-    body: { subject: string; consentType: string; grantedBy: string; method?: string; purpose?: string; expiresAt?: string; metadata?: Record<string, unknown> }
+    body: {
+      subject: string;
+      consentType: string;
+      grantedBy: string;
+      method?: string;
+      purpose?: string;
+      expiresAt?: string;
+      metadata?: Record<string, unknown>;
+    },
   ) {
     return this.privacy.recordConsent({
       campgroundId,
@@ -41,7 +55,7 @@ export class PrivacyController {
       method: body.method,
       purpose: body.purpose,
       expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
-      metadata: body.metadata ?? undefined
+      metadata: body.metadata ?? undefined,
     });
   }
 
@@ -59,13 +73,22 @@ export class PrivacyController {
 
   @Roles(UserRole.owner, UserRole.manager)
   @Post("pii-tags")
-  async upsertTag(@Body() body: { resource: string; field: string; classification: string; redactionMode?: string; createdById?: string }) {
+  async upsertTag(
+    @Body()
+    body: {
+      resource: string;
+      field: string;
+      classification: string;
+      redactionMode?: string;
+      createdById?: string;
+    },
+  ) {
     return this.privacy.upsertPiiTag({
       resource: body.resource,
       field: body.field,
       classification: body.classification,
       redactionMode: body.redactionMode,
-      createdById: body.createdById ?? null
+      createdById: body.createdById ?? null,
     });
   }
 
@@ -79,7 +102,7 @@ export class PrivacyController {
   @Post("preview")
   async preview(
     @Param("campgroundId") campgroundId: string,
-    @Body() body: { resource?: string; sample: unknown }
+    @Body() body: { resource?: string; sample: unknown },
   ) {
     return this.privacy.previewRedaction(campgroundId, body.resource, body.sample);
   }
@@ -89,7 +112,7 @@ export class PrivacyController {
   async export(
     @Param("campgroundId") campgroundId: string,
     @Query("format") format?: string,
-    @Res() res?: Response
+    @Res() res?: Response,
   ) {
     if (format === "csv" && res) {
       return this.privacy.exportConsentCsv(campgroundId, res);

@@ -31,14 +31,14 @@ This guide covers how to generate more positive reviews, respond to feedback eff
 
 Key platforms for campground visibility:
 
-| Platform | Importance | Features |
-|----------|-----------|----------|
-| Google Business | Critical | Shows in search, maps |
-| Facebook | High | Social proof, check-ins |
-| Yelp | Medium | General travel searches |
-| TripAdvisor | Medium | Travel-focused audience |
-| Campground directories | Medium | Niche-specific |
-| Hipcamp, Recreation.gov | Varies | If you list there |
+| Platform                | Importance | Features                |
+| ----------------------- | ---------- | ----------------------- |
+| Google Business         | Critical   | Shows in search, maps   |
+| Facebook                | High       | Social proof, check-ins |
+| Yelp                    | Medium     | General travel searches |
+| TripAdvisor             | Medium     | Travel-focused audience |
+| Campground directories  | Medium     | Niche-specific          |
+| Hipcamp, Recreation.gov | Varies     | If you list there       |
 
 **Priority:** Focus on Google Business first, then Facebook.
 
@@ -53,11 +53,13 @@ Key platforms for campground visibility:
 ### When to Ask
 
 **Best timing:**
+
 - During checkout (in-person)
 - Same day as departure (email/text)
 - 1-2 days after departure (follow-up)
 
 **Avoid:**
+
 - During complaints or problems
 - Before they've experienced the stay
 - Weeks after departure (memory fades)
@@ -65,6 +67,7 @@ Key platforms for campground visibility:
 ### How to Ask
 
 **In-person at checkout:**
+
 > "We really hope you enjoyed your stay! If you get a chance, we'd love a review on Google—it really helps small businesses like ours."
 
 **Same-day email:**
@@ -76,8 +79,8 @@ Hi [Name],
 
 We hope you had a wonderful time at [Campground]!
 
-If you have a minute, we'd really appreciate a quick 
-review on Google. It helps other campers find us and 
+If you have a minute, we'd really appreciate a quick
+review on Google. It helps other campers find us and
 supports our small business.
 
 [Leave a Review on Google] button
@@ -89,8 +92,9 @@ Safe travels, and we hope to see you again soon!
 ```
 
 **Text message option:**
+
 ```
-Thanks for camping with us! We'd love a quick review 
+Thanks for camping with us! We'd love a quick review
 if you enjoyed your stay: [short link]
 ```
 
@@ -121,6 +125,7 @@ Create a QR code linking to your Google review page:
 No marketing trick compensates for actual experience:
 
 **5-star experiences:**
+
 - Clean, well-maintained sites
 - Friendly, helpful staff
 - Smooth check-in process
@@ -128,6 +133,7 @@ No marketing trick compensates for actual experience:
 - Unexpected positive touches
 
 **Review killers:**
+
 - Cleanliness issues
 - Rude or unhelpful staff
 - Difficult booking/check-in
@@ -151,6 +157,7 @@ Small extras generate disproportionate goodwill:
 ### Why Respond
 
 **Responding to all reviews:**
+
 - Shows you care about feedback
 - Influences how other readers perceive you
 - Improves search ranking
@@ -161,8 +168,8 @@ Small extras generate disproportionate goodwill:
 Keep it brief and personal:
 
 ```
-Thank you so much, [Name]! We loved hosting you and 
-[specific detail from their review]. We hope to 
+Thank you so much, [Name]! We loved hosting you and
+[specific detail from their review]. We hope to
 see you again next summer!
 - [Your Name], [Campground]
 ```
@@ -183,12 +190,12 @@ see you again next summer!
 ```
 Hi [Name],
 
-Thank you for sharing your experience, and I'm truly 
-sorry we didn't meet your expectations. The [issue] 
+Thank you for sharing your experience, and I'm truly
+sorry we didn't meet your expectations. The [issue]
 you experienced isn't the standard we set for ourselves.
 
-I'd love the opportunity to discuss this further and 
-make it right. Please reach out directly to me at 
+I'd love the opportunity to discuss this further and
+make it right. Please reach out directly to me at
 [email] so we can talk.
 
 We appreciate all feedback—it helps us improve.
@@ -220,6 +227,7 @@ Sometimes reviews are unfair, exaggerated, or false.
 3. **Drown it out** — Generate more positive reviews
 
 **Review removal criteria (most platforms):**
+
 - Spam or fake reviews
 - Off-topic content
 - Illegal content
@@ -227,6 +235,7 @@ Sometimes reviews are unfair, exaggerated, or false.
 - Personal attacks
 
 **Usually NOT removable:**
+
 - Opinions you disagree with
 - Subjective experience descriptions
 - Low ratings without text
@@ -268,6 +277,7 @@ Empower staff to request reviews:
 ### Avoiding Fake Reviews
 
 **Never:**
+
 - Write reviews for yourself
 - Pay for reviews
 - Offer discounts in exchange for reviews
@@ -290,6 +300,7 @@ Get notified when reviews appear:
 ### Respond Quickly
 
 Ideal response time:
+
 - Negative reviews: Within 24-48 hours
 - Positive reviews: Within a week
 
@@ -317,4 +328,4 @@ Start today: send a review request to your last 10 checkout guests. Set up a sys
 
 ---
 
-*Keepr includes automated review request emails, helping you systematically build your online reputation after every stay. [Grow your reviews at campreserv.com](https://campreserv.com)*
+_Keepr includes automated review request emails, helping you systematically build your online reputation after every stay. [Grow your reviews at campreserv.com](https://campreserv.com)_

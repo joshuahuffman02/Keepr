@@ -11,12 +11,7 @@ import { SiteLayoutEditor, LayoutData, LayoutSite } from "@/components/maps/Site
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Map,
-  HelpCircle,
-  Keyboard,
-  Loader2
-} from "lucide-react";
+import { Map, HelpCircle, Keyboard, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -49,9 +44,11 @@ const getLayerUrl = (layers: Record<string, unknown>, key: string) => {
 const isLayoutData = (value: unknown): value is LayoutData => {
   if (!isRecord(value)) return false;
   if (!Array.isArray(value.sites) || !Array.isArray(value.elements)) return false;
-  return typeof value.gridSize === "number" &&
+  return (
+    typeof value.gridSize === "number" &&
     typeof value.canvasWidth === "number" &&
-    typeof value.canvasHeight === "number";
+    typeof value.canvasHeight === "number"
+  );
 };
 
 const normalizeSiteType = (value: string | null | undefined): LayoutSite["siteType"] => {
@@ -80,25 +77,25 @@ export default function CampgroundMapPage() {
   const campgroundQuery = useQuery<Campground>({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const mapQuery = useQuery<CampgroundMap>({
     queryKey: ["campground-map", campgroundId],
     queryFn: () => apiClient.getCampgroundMap(requireCampgroundId(), {}),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const sitesQuery = useQuery<Site[]>({
     queryKey: ["campground-sites", campgroundId],
     queryFn: () => apiClient.getSites(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const siteClassesQuery = useQuery<SiteClass[]>({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const mapBaseImageUrl = useMemo(() => {
@@ -157,7 +154,9 @@ export default function CampgroundMapPage() {
   const saveMutation = useMutation({
     mutationFn: async (layoutData: LayoutData) => {
       // Save the layout data to the campground map config (stored in layers.layout)
-      const existingLayers = isRecord(mapQuery.data?.config?.layers) ? mapQuery.data?.config?.layers : {};
+      const existingLayers = isRecord(mapQuery.data?.config?.layers)
+        ? mapQuery.data?.config?.layers
+        : {};
       const config = {
         ...mapQuery.data?.config,
         layers: {
@@ -179,7 +178,8 @@ export default function CampgroundMapPage() {
     onError: (error) => {
       toast({
         title: "Save failed",
-        description: error instanceof Error ? error.message : "Could not save the layout. Please try again.",
+        description:
+          error instanceof Error ? error.message : "Could not save the layout. Please try again.",
         variant: "destructive",
       });
     },
@@ -204,7 +204,7 @@ export default function CampgroundMapPage() {
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: campgroundName, href: `/campgrounds/${campgroundId}` },
-            { label: "Site Layout" }
+            { label: "Site Layout" },
           ]}
         />
 
@@ -289,23 +289,38 @@ export default function CampgroundMapPage() {
                 <div className="space-y-4 text-sm text-muted-foreground">
                   <div>
                     <h4 className="font-medium text-foreground">Import a Background Map</h4>
-                    <p>Click "Map Image" in the toolbar to upload a satellite image or site plan as your background reference.</p>
+                    <p>
+                      Click "Map Image" in the toolbar to upload a satellite image or site plan as
+                      your background reference.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Adding Sites</h4>
-                    <p>Select the site tool (tent icon), choose a site type, then click on the canvas to place sites.</p>
+                    <p>
+                      Select the site tool (tent icon), choose a site type, then click on the canvas
+                      to place sites.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Moving Sites</h4>
-                    <p>Use the select tool (arrow), click a site, and drag to move. Sites snap to the grid.</p>
+                    <p>
+                      Use the select tool (arrow), click a site, and drag to move. Sites snap to the
+                      grid.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Editing Properties</h4>
-                    <p>Select a site to see its properties on the right. Change site number, type, size, and rotation.</p>
+                    <p>
+                      Select a site to see its properties on the right. Change site number, type,
+                      size, and rotation.
+                    </p>
                   </div>
                   <div>
                     <h4 className="font-medium text-foreground">Saving</h4>
-                    <p>Click "Save Layout" to store your changes. Use "Export" to download as JSON for backup.</p>
+                    <p>
+                      Click "Save Layout" to store your changes. Use "Export" to download as JSON
+                      for backup.
+                    </p>
                   </div>
                 </div>
               </DialogContent>

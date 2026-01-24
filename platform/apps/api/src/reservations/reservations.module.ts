@@ -33,7 +33,25 @@ import { PermissionsModule } from "../permissions/permissions.module";
 import { RustAvailabilityClientService } from "./rust-availability-client.service";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, PermissionsModule, ConfigModule, forwardRef(() => PaymentsModule)],
+  imports: [
+    WaitlistModule,
+    LoyaltyModule,
+    SeasonalRatesModule,
+    TaxRulesModule,
+    GamificationModule,
+    AuditModule,
+    AccessControlModule,
+    SignaturesModule,
+    PoliciesModule,
+    ApprovalsModule,
+    UsageTrackerModule,
+    RepeatChargesModule,
+    GuestWalletModule,
+    IdempotencyModule,
+    PermissionsModule,
+    ConfigModule,
+    forwardRef(() => PaymentsModule),
+  ],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,
@@ -48,6 +66,6 @@ import { RustAvailabilityClientService } from "./rust-availability-client.servic
     DepositPoliciesService,
     RustAvailabilityClientService,
   ],
-  exports: [ReservationsService, MatchScoreService, RustAvailabilityClientService]
+  exports: [ReservationsService, MatchScoreService, RustAvailabilityClientService],
 })
-export class ReservationsModule { }
+export class ReservationsModule {}

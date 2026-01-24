@@ -84,7 +84,11 @@ const SITE_TYPES = [
   { value: "yurt", label: "Yurt" },
 ];
 
-const TABS: Array<"competitors" | "comparison" | "alerts"> = ["competitors", "comparison", "alerts"];
+const TABS: Array<"competitors" | "comparison" | "alerts"> = [
+  "competitors",
+  "comparison",
+  "alerts",
+];
 
 type Competitor = {
   id: string;
@@ -147,7 +151,9 @@ export default function CompetitorsPage() {
   const [isAddCompetitorOpen, setIsAddCompetitorOpen] = useState(false);
   const [isAddRateOpen, setIsAddRateOpen] = useState(false);
   const [selectedCompetitor, setSelectedCompetitor] = useState<Competitor | null>(null);
-  const [activeTab, setActiveTab] = useState<"competitors" | "comparison" | "alerts">("competitors");
+  const [activeTab, setActiveTab] = useState<"competitors" | "comparison" | "alerts">(
+    "competitors",
+  );
 
   // Form states
   const [competitorForm, setCompetitorForm] = useState({
@@ -193,8 +199,7 @@ export default function CompetitorsPage() {
 
   // Mutations
   const createCompetitorMutation = useMutation({
-    mutationFn: (data: typeof competitorForm) =>
-      apiClient.createCompetitor(campground!.id, data),
+    mutationFn: (data: typeof competitorForm) => apiClient.createCompetitor(campground!.id, data),
     onSuccess: () => {
       toast({ title: "Competitor added successfully" });
       queryClient.invalidateQueries({ queryKey: ["competitors"] });
@@ -202,19 +207,26 @@ export default function CompetitorsPage() {
       setCompetitorForm({ name: "", url: "", notes: "" });
     },
     onError: (error: unknown) => {
-      toast({ title: "Failed to add competitor", description: getErrorMessage(error, "Please try again"), variant: "destructive" });
+      toast({
+        title: "Failed to add competitor",
+        description: getErrorMessage(error, "Please try again"),
+        variant: "destructive",
+      });
     },
   });
 
   const deleteCompetitorMutation = useMutation({
-    mutationFn: (competitorId: string) =>
-      apiClient.deleteCompetitor(campground!.id, competitorId),
+    mutationFn: (competitorId: string) => apiClient.deleteCompetitor(campground!.id, competitorId),
     onSuccess: () => {
       toast({ title: "Competitor deleted" });
       queryClient.invalidateQueries({ queryKey: ["competitors"] });
     },
     onError: (error: unknown) => {
-      toast({ title: "Failed to delete competitor", description: getErrorMessage(error, "Please try again"), variant: "destructive" });
+      toast({
+        title: "Failed to delete competitor",
+        description: getErrorMessage(error, "Please try again"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -229,16 +241,25 @@ export default function CompetitorsPage() {
       queryClient.invalidateQueries({ queryKey: ["competitors"] });
       queryClient.invalidateQueries({ queryKey: ["market-position"] });
       setIsAddRateOpen(false);
-      setRateForm({ competitorId: "", siteType: "rv", rateNightly: "", source: "manual", notes: "" });
+      setRateForm({
+        competitorId: "",
+        siteType: "rv",
+        rateNightly: "",
+        source: "manual",
+        notes: "",
+      });
     },
     onError: (error: unknown) => {
-      toast({ title: "Failed to add rate", description: getErrorMessage(error, "Please try again"), variant: "destructive" });
+      toast({
+        title: "Failed to add rate",
+        description: getErrorMessage(error, "Please try again"),
+        variant: "destructive",
+      });
     },
   });
 
   const acknowledgeAlertMutation = useMutation({
-    mutationFn: (alertId: string) =>
-      apiClient.acknowledgeRateParityAlert(campground!.id, alertId),
+    mutationFn: (alertId: string) => apiClient.acknowledgeRateParityAlert(campground!.id, alertId),
     onSuccess: () => {
       toast({ title: "Alert acknowledged" });
       queryClient.invalidateQueries({ queryKey: ["rate-parity-alerts"] });
@@ -246,8 +267,7 @@ export default function CompetitorsPage() {
   });
 
   const resolveAlertMutation = useMutation({
-    mutationFn: (alertId: string) =>
-      apiClient.resolveRateParityAlert(campground!.id, alertId),
+    mutationFn: (alertId: string) => apiClient.resolveRateParityAlert(campground!.id, alertId),
     onSuccess: () => {
       toast({ title: "Alert resolved" });
       queryClient.invalidateQueries({ queryKey: ["rate-parity-alerts"] });
@@ -261,7 +281,9 @@ export default function CompetitorsPage() {
           <div className="text-center">
             <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h2 className="text-2xl font-bold text-foreground mb-2">No Campground Selected</h2>
-            <p className="text-muted-foreground">Select a campground to view competitive intelligence</p>
+            <p className="text-muted-foreground">
+              Select a campground to view competitive intelligence
+            </p>
           </div>
         </div>
       </DashboardShell>
@@ -318,7 +340,9 @@ export default function CompetitorsPage() {
                       id="name"
                       placeholder="e.g., Sunny RV Park"
                       value={competitorForm.name}
-                      onChange={(e) => setCompetitorForm({ ...competitorForm, name: e.target.value })}
+                      onChange={(e) =>
+                        setCompetitorForm({ ...competitorForm, name: e.target.value })
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -327,7 +351,9 @@ export default function CompetitorsPage() {
                       id="url"
                       placeholder="https://..."
                       value={competitorForm.url}
-                      onChange={(e) => setCompetitorForm({ ...competitorForm, url: e.target.value })}
+                      onChange={(e) =>
+                        setCompetitorForm({ ...competitorForm, url: e.target.value })
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -336,7 +362,9 @@ export default function CompetitorsPage() {
                       id="notes"
                       placeholder="Additional notes about this competitor..."
                       value={competitorForm.notes}
-                      onChange={(e) => setCompetitorForm({ ...competitorForm, notes: e.target.value })}
+                      onChange={(e) =>
+                        setCompetitorForm({ ...competitorForm, notes: e.target.value })
+                      }
                     />
                   </div>
                 </div>
@@ -348,7 +376,9 @@ export default function CompetitorsPage() {
                     onClick={() => createCompetitorMutation.mutate(competitorForm)}
                     disabled={!competitorForm.name || createCompetitorMutation.isPending}
                   >
-                    {createCompetitorMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {createCompetitorMutation.isPending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Add Competitor
                   </Button>
                 </DialogFooter>
@@ -447,9 +477,15 @@ export default function CompetitorsPage() {
                   </Button>
                   <Button
                     onClick={() => createRateMutation.mutate(rateForm)}
-                    disabled={!rateForm.competitorId || !rateForm.rateNightly || createRateMutation.isPending}
+                    disabled={
+                      !rateForm.competitorId ||
+                      !rateForm.rateNightly ||
+                      createRateMutation.isPending
+                    }
                   >
-                    {createRateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {createRateMutation.isPending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Log Rate
                   </Button>
                 </DialogFooter>
@@ -470,9 +506,7 @@ export default function CompetitorsPage() {
               <div className="flex items-center justify-between mb-2">
                 <Building2 className="h-5 w-5 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-foreground">
-                {competitors.length}
-              </div>
+              <div className="text-2xl font-bold text-foreground">{competitors.length}</div>
               <p className="text-xs text-muted-foreground">Tracked Competitors</p>
             </CardContent>
           </Card>
@@ -486,7 +520,7 @@ export default function CompetitorsPage() {
                 {marketPosition.length > 0
                   ? Math.round(
                       marketPosition.reduce((acc, p) => acc + p.position, 0) /
-                        marketPosition.length
+                        marketPosition.length,
                     )
                   : "-"}
               </div>
@@ -501,7 +535,7 @@ export default function CompetitorsPage() {
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {marketPosition.length > 0
-                  ? `$${((marketPosition.reduce((acc, p) => acc + p.averageMarketRate, 0) / marketPosition.length) / 100).toFixed(0)}`
+                  ? `$${(marketPosition.reduce((acc, p) => acc + p.averageMarketRate, 0) / marketPosition.length / 100).toFixed(0)}`
                   : "-"}
               </div>
               <p className="text-xs text-muted-foreground">Avg. Market Rate</p>
@@ -512,7 +546,10 @@ export default function CompetitorsPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <AlertTriangle
-                  className={cn("h-5 w-5", activeAlerts.length > 0 ? "text-status-warning" : "text-muted-foreground")}
+                  className={cn(
+                    "h-5 w-5",
+                    activeAlerts.length > 0 ? "text-status-warning" : "text-muted-foreground",
+                  )}
                 />
               </div>
               <div className="text-2xl font-bold text-foreground">{activeAlerts.length}</div>
@@ -529,7 +566,7 @@ export default function CompetitorsPage() {
               variant="ghost"
               className={cn(
                 "capitalize rounded-b-none border-b-2 border-transparent",
-                activeTab === tab && "border-primary"
+                activeTab === tab && "border-primary",
               )}
               onClick={() => setActiveTab(tab)}
             >
@@ -562,7 +599,9 @@ export default function CompetitorsPage() {
                   <CardContent className="py-12">
                     <div className="text-center">
                       <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                      <h3 className="text-lg font-semibold text-foreground mb-2">No Competitors Added</h3>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        No Competitors Added
+                      </h3>
                       <p className="text-sm text-muted-foreground mb-4">
                         Start tracking competitors to compare your rates and market position.
                       </p>
@@ -597,7 +636,9 @@ export default function CompetitorsPage() {
                                 </a>
                               )}
                               {competitor.notes && (
-                                <p className="text-sm text-muted-foreground mt-1">{competitor.notes}</p>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {competitor.notes}
+                                </p>
                               )}
                             </div>
                           </div>
@@ -615,12 +656,14 @@ export default function CompetitorsPage() {
 
                         {competitor.rates && competitor.rates.length > 0 && (
                           <div className="mt-4 pt-4 border-t">
-                            <h4 className="text-sm font-medium text-muted-foreground mb-2">Latest Rates</h4>
+                            <h4 className="text-sm font-medium text-muted-foreground mb-2">
+                              Latest Rates
+                            </h4>
                             <div className="flex flex-wrap gap-2">
                               {competitor.rates.slice(0, 5).map((rate) => (
                                 <Badge key={rate.id} variant="secondary" className="gap-1">
-                                  <span className="uppercase text-xs">{rate.siteType}:</span>
-                                  ${(rate.rateNightly / 100).toFixed(0)}/night
+                                  <span className="uppercase text-xs">{rate.siteType}:</span>$
+                                  {(rate.rateNightly / 100).toFixed(0)}/night
                                 </Badge>
                               ))}
                             </div>
@@ -651,7 +694,9 @@ export default function CompetitorsPage() {
                   <CardContent className="py-12">
                     <div className="text-center">
                       <BarChart3 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                      <h3 className="text-lg font-semibold text-foreground mb-2">No Comparison Data</h3>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        No Comparison Data
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Add competitors and log their rates to see your market position.
                       </p>
@@ -664,19 +709,32 @@ export default function CompetitorsPage() {
                     <Card key={pos.siteType}>
                       <CardHeader>
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg uppercase">{pos.siteType.replace("_", " ")}</CardTitle>
+                          <CardTitle className="text-lg uppercase">
+                            {pos.siteType.replace("_", " ")}
+                          </CardTitle>
                           <Badge
-                            variant={pos.position === 1 ? "default" : pos.position <= 3 ? "secondary" : "outline"}
+                            variant={
+                              pos.position === 1
+                                ? "default"
+                                : pos.position <= 3
+                                  ? "secondary"
+                                  : "outline"
+                            }
                             className={cn(
-                              pos.position === 1 && "bg-status-success text-status-success-foreground",
-                              pos.position === pos.totalCompetitors && "bg-status-warning text-status-warning-foreground"
+                              pos.position === 1 &&
+                                "bg-status-success text-status-success-foreground",
+                              pos.position === pos.totalCompetitors &&
+                                "bg-status-warning text-status-warning-foreground",
                             )}
                           >
                             {pos.positionLabel}
                           </Badge>
                         </div>
                         <CardDescription>
-                          Your rate: ${(pos.yourRate / 100).toFixed(0)} | Market avg: ${(pos.averageMarketRate / 100).toFixed(0)} | Range: ${(pos.lowestRate / 100).toFixed(0)} - ${(pos.highestRate / 100).toFixed(0)}
+                          Your rate: ${(pos.yourRate / 100).toFixed(0)} | Market avg: $
+                          {(pos.averageMarketRate / 100).toFixed(0)} | Range: $
+                          {(pos.lowestRate / 100).toFixed(0)} - $
+                          {(pos.highestRate / 100).toFixed(0)}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -691,28 +749,35 @@ export default function CompetitorsPage() {
                           <TableBody>
                             <TableRow className="bg-primary/5">
                               <TableCell className="font-medium">Your Rate</TableCell>
-                              <TableCell className="text-right font-bold">${(pos.yourRate / 100).toFixed(0)}</TableCell>
+                              <TableCell className="text-right font-bold">
+                                ${(pos.yourRate / 100).toFixed(0)}
+                              </TableCell>
                               <TableCell className="text-right">-</TableCell>
                             </TableRow>
                             {pos.competitorRates.map((cr) => (
                               <TableRow key={cr.competitorId}>
                                 <TableCell>{cr.competitorName}</TableCell>
-                                <TableCell className="text-right">${(cr.rate / 100).toFixed(0)}</TableCell>
                                 <TableCell className="text-right">
-                                  <span className={cn(
-                                    "flex items-center justify-end gap-1",
-                                    cr.difference > 0
-                                      ? "text-status-success-text"
-                                      : cr.difference < 0
-                                        ? "text-status-error-text"
-                                        : "text-muted-foreground"
-                                  )}>
+                                  ${(cr.rate / 100).toFixed(0)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <span
+                                    className={cn(
+                                      "flex items-center justify-end gap-1",
+                                      cr.difference > 0
+                                        ? "text-status-success-text"
+                                        : cr.difference < 0
+                                          ? "text-status-error-text"
+                                          : "text-muted-foreground",
+                                    )}
+                                  >
                                     {cr.difference > 0 ? (
                                       <TrendingUp className="h-3 w-3" />
                                     ) : cr.difference < 0 ? (
                                       <TrendingDown className="h-3 w-3" />
                                     ) : null}
-                                    {cr.difference > 0 ? "+" : ""}{cr.percentDifference}%
+                                    {cr.difference > 0 ? "+" : ""}
+                                    {cr.percentDifference}%
                                   </span>
                                 </TableCell>
                               </TableRow>
@@ -744,7 +809,9 @@ export default function CompetitorsPage() {
                   <CardContent className="py-12">
                     <div className="text-center">
                       <Check className="h-12 w-12 mx-auto mb-4 text-status-success" />
-                      <h3 className="text-lg font-semibold text-foreground mb-2">No Rate Parity Issues</h3>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        No Rate Parity Issues
+                      </h3>
                       <p className="text-sm text-muted-foreground">
                         Your direct rates are competitive with OTA listings.
                       </p>
@@ -756,17 +823,21 @@ export default function CompetitorsPage() {
                   {alerts.map((alert) => (
                     <Card
                       key={alert.id}
-                      className={cn(alert.status === "active" && "border-l-4 border-l-status-warning")}
+                      className={cn(
+                        alert.status === "active" && "border-l-4 border-l-status-warning",
+                      )}
                     >
                       <CardContent className="p-5">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-4">
-                            <div className={cn(
-                              "flex h-10 w-10 items-center justify-center rounded-lg",
-                              alert.status === "active"
-                                ? "bg-status-warning-bg text-status-warning-text border border-status-warning-border"
-                                : "bg-muted text-muted-foreground"
-                            )}>
+                            <div
+                              className={cn(
+                                "flex h-10 w-10 items-center justify-center rounded-lg",
+                                alert.status === "active"
+                                  ? "bg-status-warning-bg text-status-warning-text border border-status-warning-border"
+                                  : "bg-muted text-muted-foreground",
+                              )}
+                            >
                               <AlertTriangle className="h-5 w-5" />
                             </div>
                             <div>
@@ -774,16 +845,27 @@ export default function CompetitorsPage() {
                                 <h3 className="font-semibold text-foreground uppercase">
                                   {alert.siteType.replace("_", " ")}
                                 </h3>
-                                <Badge variant={alert.status === "active" ? "destructive" : "secondary"}>
+                                <Badge
+                                  variant={alert.status === "active" ? "destructive" : "secondary"}
+                                >
                                   {alert.status}
                                 </Badge>
                               </div>
                               <p className="text-sm text-muted-foreground mt-1">
-                                {alert.otaSource} has this at <span className="font-bold">${(alert.otaRateCents / 100).toFixed(0)}</span>,
-                                but your direct rate is <span className="font-bold">${(alert.directRateCents / 100).toFixed(0)}</span>.
+                                {alert.otaSource} has this at{" "}
+                                <span className="font-bold">
+                                  ${(alert.otaRateCents / 100).toFixed(0)}
+                                </span>
+                                , but your direct rate is{" "}
+                                <span className="font-bold">
+                                  ${(alert.directRateCents / 100).toFixed(0)}
+                                </span>
+                                .
                               </p>
                               <p className="text-xs text-muted-foreground mt-1">
-                                Difference: ${(alert.difference / 100).toFixed(2)} ({Math.round((alert.difference / alert.directRateCents) * 100)}% lower on OTA)
+                                Difference: ${(alert.difference / 100).toFixed(2)} (
+                                {Math.round((alert.difference / alert.directRateCents) * 100)}%
+                                lower on OTA)
                               </p>
                             </div>
                           </div>

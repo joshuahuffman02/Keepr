@@ -15,18 +15,19 @@ import {
   ChargeStatus,
   SeasonalStatus,
   RenewalIntent,
-  SeasonalPaymentMethod
+  SeasonalPaymentMethod,
 } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
 
 // Helpers
-const randomBetween = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const addDays = (date: Date, days: number) => {
   const next = new Date(date);
@@ -39,19 +40,91 @@ const GL_CODES = {
   SITE_REVENUE: "4100",
   FEES_REVENUE: "4200",
   TAX_PAYABLE: "2100",
-  CASH: "1000"
+  CASH: "1000",
 };
 
 // Names for generating guests
-const firstNames = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "Michael", "Linda", "David", "Elizabeth", "William", "Barbara", "Richard", "Susan", "Joseph", "Jessica", "Thomas", "Sarah", "Christopher", "Karen", "Charles", "Lisa", "Daniel", "Nancy", "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra", "Donald", "Ashley", "Steven", "Dorothy", "Paul", "Kimberly", "Andrew", "Emily", "Joshua", "Donna"];
-const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson"];
+const firstNames = [
+  "James",
+  "Mary",
+  "Robert",
+  "Patricia",
+  "John",
+  "Jennifer",
+  "Michael",
+  "Linda",
+  "David",
+  "Elizabeth",
+  "William",
+  "Barbara",
+  "Richard",
+  "Susan",
+  "Joseph",
+  "Jessica",
+  "Thomas",
+  "Sarah",
+  "Christopher",
+  "Karen",
+  "Charles",
+  "Lisa",
+  "Daniel",
+  "Nancy",
+  "Matthew",
+  "Betty",
+  "Anthony",
+  "Margaret",
+  "Mark",
+  "Sandra",
+  "Donald",
+  "Ashley",
+  "Steven",
+  "Dorothy",
+  "Paul",
+  "Kimberly",
+  "Andrew",
+  "Emily",
+  "Joshua",
+  "Donna",
+];
+const lastNames = [
+  "Smith",
+  "Johnson",
+  "Williams",
+  "Brown",
+  "Jones",
+  "Garcia",
+  "Miller",
+  "Davis",
+  "Rodriguez",
+  "Martinez",
+  "Hernandez",
+  "Lopez",
+  "Gonzalez",
+  "Wilson",
+  "Anderson",
+  "Thomas",
+  "Taylor",
+  "Moore",
+  "Jackson",
+  "Martin",
+  "Lee",
+  "Perez",
+  "Thompson",
+  "White",
+  "Harris",
+  "Sanchez",
+  "Clark",
+  "Ramirez",
+  "Lewis",
+  "Robinson",
+];
 
 async function main() {
   console.log("=== Seeding Keepr - Riverbend ===\n");
 
   // Find the campground
   const campground = await prisma.campground.findFirst({
-    where: { slug: "keepr-riverbend" }
+    where: { slug: "keepr-riverbend" },
   });
 
   if (!campground) {
@@ -64,19 +137,19 @@ async function main() {
   // Get existing data
   const sites = await prisma.site.findMany({
     where: { campgroundId: campground.id },
-    select: { id: true, name: true, siteClassId: true, siteType: true }
+    select: { id: true, name: true, siteClassId: true, siteType: true },
   });
   console.log(`Found ${sites.length} sites`);
 
   const siteClasses = await prisma.siteClass.findMany({
     where: { campgroundId: campground.id },
-    select: { id: true, name: true, defaultRate: true }
+    select: { id: true, name: true, defaultRate: true },
   });
   console.log(`Found ${siteClasses.length} site classes`);
 
   const seasonalRates = await prisma.seasonalRate.findMany({
     where: { campgroundId: campground.id },
-    select: { id: true, name: true, siteClassId: true }
+    select: { id: true, name: true, siteClassId: true },
   });
   console.log(`Found ${seasonalRates.length} seasonal rates`);
 
@@ -99,13 +172,21 @@ async function main() {
         emailNormalized,
         phone: `555-${String(randomBetween(100, 999))}-${String(randomBetween(1000, 9999))}`,
         address1: `${randomBetween(100, 9999)} ${pick(["Oak", "Maple", "Pine", "Cedar", "Elm"])} ${pick(["St", "Ave", "Rd", "Dr", "Ln"])}`,
-        city: pick(["Minneapolis", "St. Paul", "Rochester", "Duluth", "Madison", "Milwaukee", "Chicago"]),
+        city: pick([
+          "Minneapolis",
+          "St. Paul",
+          "Rochester",
+          "Duluth",
+          "Madison",
+          "Milwaukee",
+          "Chicago",
+        ]),
         state: pick(["MN", "WI", "IA", "IL"]),
         postalCode: String(randomBetween(50000, 60000)),
         notes: i % 10 === 0 ? "VIP guest - always give best site" : null,
         tags: i % 15 === 0 ? ["vip"] : i % 8 === 0 ? ["seasonal"] : [],
-        vip: i % 15 === 0
-      }
+        vip: i % 15 === 0,
+      },
     });
     guests.push(guest);
     if (i % 50 === 0) console.log(`  Created ${i} guests...`);
@@ -115,7 +196,7 @@ async function main() {
   // ============ CREATE SEASONAL GUESTS ============
   console.log("\n--- Creating 30 Seasonal Guests ---");
   const seasonalGuests = [];
-  const rvSites = sites.filter(s => s.siteType === SiteType.rv);
+  const rvSites = sites.filter((s) => s.siteType === SiteType.rv);
 
   for (let i = 0; i < 30; i++) {
     const guest = guests[i];
@@ -123,7 +204,7 @@ async function main() {
 
     const seasonal = await prisma.seasonalGuest.upsert({
       where: {
-        guestId_campgroundId: { guestId: guest.id, campgroundId: campground.id }
+        guestId_campgroundId: { guestId: guest.id, campgroundId: campground.id },
       },
       update: {},
       create: {
@@ -134,10 +215,22 @@ async function main() {
         seniorityRank: i + 1,
         currentSiteId: site?.id,
         preferredSites: site ? [site.id] : [],
-        status: i < 25 ? SeasonalStatus.active : pick([SeasonalStatus.pending_renewal, SeasonalStatus.churned]),
-        renewalIntent: i < 20 ? RenewalIntent.returning : i < 25 ? RenewalIntent.undecided : RenewalIntent.leaving,
+        status:
+          i < 25
+            ? SeasonalStatus.active
+            : pick([SeasonalStatus.pending_renewal, SeasonalStatus.churned]),
+        renewalIntent:
+          i < 20
+            ? RenewalIntent.returning
+            : i < 25
+              ? RenewalIntent.undecided
+              : RenewalIntent.leaving,
         renewalNotes: i >= 25 ? "Moving out of state" : null,
-        preferredPaymentMethod: pick([SeasonalPaymentMethod.ach, SeasonalPaymentMethod.card, SeasonalPaymentMethod.check]),
+        preferredPaymentMethod: pick([
+          SeasonalPaymentMethod.ach,
+          SeasonalPaymentMethod.card,
+          SeasonalPaymentMethod.check,
+        ]),
         paysInFull: i % 4 === 0,
         autoPayEnabled: i % 3 === 0,
         paymentDay: pick([1, 5, 15]),
@@ -145,14 +238,16 @@ async function main() {
         meteredElectric: i % 2 === 0,
         meteredWater: i % 4 === 0,
         coiExpiresAt: addDays(new Date(), randomBetween(30, 365)),
-        vehiclePlates: [`${pick(["MN", "WI", "IA"])}-${randomBetween(100, 999)}-${String.fromCharCode(65 + randomBetween(0, 25))}${String.fromCharCode(65 + randomBetween(0, 25))}${String.fromCharCode(65 + randomBetween(0, 25))}`],
+        vehiclePlates: [
+          `${pick(["MN", "WI", "IA"])}-${randomBetween(100, 999)}-${String.fromCharCode(65 + randomBetween(0, 25))}${String.fromCharCode(65 + randomBetween(0, 25))}${String.fromCharCode(65 + randomBetween(0, 25))}`,
+        ],
         petCount: randomBetween(0, 2),
         petNotes: i % 3 === 0 ? "2 dogs - friendly" : null,
         emergencyContact: `${pick(firstNames)} ${pick(lastNames)}`,
         emergencyPhone: `555-${randomBetween(100, 999)}-${randomBetween(1000, 9999)}`,
         notes: i % 5 === 0 ? "Long-time seasonal, very helpful around the park" : null,
-        tags: i < 5 ? ["founding-member"] : i < 10 ? ["vip"] : []
-      }
+        tags: i < 5 ? ["founding-member"] : i < 10 ? ["vip"] : [],
+      },
     });
     seasonalGuests.push(seasonal);
   }
@@ -177,8 +272,8 @@ async function main() {
       seasonStartDate: new Date("2025-05-01"),
       seasonEndDate: new Date("2025-10-31"),
       isActive: true,
-      isDefault: true
-    }
+      isDefault: true,
+    },
   });
 
   // Create rate card for 2026
@@ -197,18 +292,22 @@ async function main() {
       seasonStartDate: new Date("2026-05-01"),
       seasonEndDate: new Date("2026-10-31"),
       isActive: true,
-      isDefault: false
-    }
+      isDefault: false,
+    },
   });
 
   // Create pricing records for each seasonal guest (2025)
   for (const sg of seasonalGuests) {
     const baseRate = 3200 + randomBetween(-200, 400); // Some variation
-    const discount = sg.tags?.includes("founding-member") ? 200 : sg.tags?.includes("vip") ? 100 : 0;
+    const discount = sg.tags?.includes("founding-member")
+      ? 200
+      : sg.tags?.includes("vip")
+        ? 100
+        : 0;
 
     await prisma.seasonalGuestPricing.upsert({
       where: {
-        seasonalGuestId_seasonYear: { seasonalGuestId: sg.id, seasonYear: 2025 }
+        seasonalGuestId_seasonYear: { seasonalGuestId: sg.id, seasonYear: 2025 },
       },
       update: {},
       create: {
@@ -219,16 +318,36 @@ async function main() {
         totalDiscount: discount,
         finalRate: baseRate - discount,
         billingFrequency: "monthly",
-        appliedDiscounts: discount > 0 ? JSON.stringify([{ name: sg.tags?.includes("founding-member") ? "Founding Member" : "VIP", amount: discount }]) : "[]",
+        appliedDiscounts:
+          discount > 0
+            ? JSON.stringify([
+                {
+                  name: sg.tags?.includes("founding-member") ? "Founding Member" : "VIP",
+                  amount: discount,
+                },
+              ])
+            : "[]",
         paymentSchedule: JSON.stringify([
           { dueDate: "2025-05-01", amount: (baseRate - discount) / 6, description: "May payment" },
           { dueDate: "2025-06-01", amount: (baseRate - discount) / 6, description: "June payment" },
           { dueDate: "2025-07-01", amount: (baseRate - discount) / 6, description: "July payment" },
-          { dueDate: "2025-08-01", amount: (baseRate - discount) / 6, description: "August payment" },
-          { dueDate: "2025-09-01", amount: (baseRate - discount) / 6, description: "September payment" },
-          { dueDate: "2025-10-01", amount: (baseRate - discount) / 6, description: "October payment" }
-        ])
-      }
+          {
+            dueDate: "2025-08-01",
+            amount: (baseRate - discount) / 6,
+            description: "August payment",
+          },
+          {
+            dueDate: "2025-09-01",
+            amount: (baseRate - discount) / 6,
+            description: "September payment",
+          },
+          {
+            dueDate: "2025-10-01",
+            amount: (baseRate - discount) / 6,
+            description: "October payment",
+          },
+        ]),
+      },
     });
   }
   console.log(`Created rate cards and ${seasonalGuests.length} pricing records for 2025`);
@@ -242,11 +361,18 @@ async function main() {
   for (let i = 0; i < 500; i++) {
     // Determine year and stay type
     const year = pick([2023, 2024, 2024, 2025, 2025, 2025, 2026]);
-    const stayType = pick([StayType.standard, StayType.standard, StayType.standard, StayType.weekly, StayType.monthly, StayType.seasonal]);
+    const stayType = pick([
+      StayType.standard,
+      StayType.standard,
+      StayType.standard,
+      StayType.weekly,
+      StayType.monthly,
+      StayType.seasonal,
+    ]);
     const isFuture = year >= 2025;
 
     // Find available site
-    let site: typeof sites[0] | undefined;
+    let site: (typeof sites)[0] | undefined;
     let arrivalDate: Date;
     let departureDate: Date;
     let nights: number;
@@ -269,17 +395,26 @@ async function main() {
       }
 
       const maxStart = new Date(seasonEnd.getTime() - nights * 24 * 60 * 60 * 1000);
-      const startOffset = randomBetween(0, Math.max(1, Math.floor((maxStart.getTime() - seasonStart.getTime()) / (24 * 60 * 60 * 1000))));
+      const startOffset = randomBetween(
+        0,
+        Math.max(
+          1,
+          Math.floor((maxStart.getTime() - seasonStart.getTime()) / (24 * 60 * 60 * 1000)),
+        ),
+      );
       arrivalDate = addDays(seasonStart, startOffset);
       departureDate = addDays(arrivalDate, nights);
 
       // Check for overlaps
       const bookings = siteBookings.get(candidateSite.id) || [];
-      const hasOverlap = bookings.some(b => arrivalDate < b.end && departureDate > b.start);
+      const hasOverlap = bookings.some((b) => arrivalDate < b.end && departureDate > b.start);
 
       if (!hasOverlap) {
         site = candidateSite;
-        siteBookings.set(candidateSite.id, [...bookings, { start: arrivalDate, end: departureDate }]);
+        siteBookings.set(candidateSite.id, [
+          ...bookings,
+          { start: arrivalDate, end: departureDate },
+        ]);
         break;
       }
     }
@@ -287,40 +422,65 @@ async function main() {
     if (!site) continue;
 
     const guest = pick(guests);
-    const siteClass = siteClasses.find(c => c.id === site!.siteClassId) || siteClasses[0];
+    const siteClass = siteClasses.find((c) => c.id === site!.siteClassId) || siteClasses[0];
     const baseRate = siteClass?.defaultRate ?? 7500;
 
     // Calculate amounts
-    const rateMultiplier = stayType === StayType.seasonal ? 0.85 : stayType === StayType.monthly ? 0.9 : stayType === StayType.weekly ? 0.95 : 1;
+    const rateMultiplier =
+      stayType === StayType.seasonal
+        ? 0.85
+        : stayType === StayType.monthly
+          ? 0.9
+          : stayType === StayType.weekly
+            ? 0.95
+            : 1;
     const baseSubtotal = Math.round(baseRate * nights * rateMultiplier);
     const feesAmount = randomBetween(500, 3500);
     const taxesAmount = Math.round((baseSubtotal + feesAmount) * 0.0835);
-    const discountsAmount = stayType !== StayType.standard && randomBetween(0, 2) === 0 ? randomBetween(1000, 5000) : 0;
+    const discountsAmount =
+      stayType !== StayType.standard && randomBetween(0, 2) === 0 ? randomBetween(1000, 5000) : 0;
     const totalAmount = Math.max(0, baseSubtotal + feesAmount + taxesAmount - discountsAmount);
 
     // Payment status
     let paidAmount: number;
     if (isFuture) {
-      paidAmount = pick([0, Math.round(totalAmount * 0.25), Math.round(totalAmount * 0.5), totalAmount]);
+      paidAmount = pick([
+        0,
+        Math.round(totalAmount * 0.25),
+        Math.round(totalAmount * 0.5),
+        totalAmount,
+      ]);
     } else {
       paidAmount = pick([totalAmount, totalAmount, totalAmount, Math.round(totalAmount * 0.5), 0]);
     }
-    const paymentStatus = paidAmount === 0 ? "unpaid" : paidAmount >= totalAmount ? "paid" : "partial";
+    const paymentStatus =
+      paidAmount === 0 ? "unpaid" : paidAmount >= totalAmount ? "paid" : "partial";
 
     // Reservation status
     const now = new Date();
     let status: ReservationStatus;
     if (departureDate < now) {
-      status = pick([ReservationStatus.checked_out, ReservationStatus.checked_out, ReservationStatus.checked_out, ReservationStatus.cancelled]);
+      status = pick([
+        ReservationStatus.checked_out,
+        ReservationStatus.checked_out,
+        ReservationStatus.checked_out,
+        ReservationStatus.cancelled,
+      ]);
     } else if (arrivalDate < now && departureDate > now) {
       status = ReservationStatus.checked_in;
     } else {
-      status = pick([ReservationStatus.confirmed, ReservationStatus.confirmed, ReservationStatus.pending, ReservationStatus.cancelled]);
+      status = pick([
+        ReservationStatus.confirmed,
+        ReservationStatus.confirmed,
+        ReservationStatus.pending,
+        ReservationStatus.cancelled,
+      ]);
     }
 
-    const seasonalRateId = (stayType === StayType.seasonal || stayType === StayType.monthly)
-      ? seasonalRates.find(r => !r.siteClassId || r.siteClassId === site!.siteClassId)?.id
-      : null;
+    const seasonalRateId =
+      stayType === StayType.seasonal || stayType === StayType.monthly
+        ? seasonalRates.find((r) => !r.siteClassId || r.siteClassId === site!.siteClassId)?.id
+        : null;
 
     const bookedAt = addDays(arrivalDate!, -randomBetween(7, 120));
 
@@ -348,14 +508,17 @@ async function main() {
         checkInWindowEnd: "21:00",
         vehiclePlate: `${pick(["ABC", "XYZ", "MN", "WI"])}-${randomBetween(1000, 9999)}`,
         vehicleState: pick(["MN", "WI", "IA", "IL", "ND", "SD"]),
-        rigType: site.siteType === SiteType.rv ? pick(["Class A", "Class C", "Fifth Wheel", "Travel Trailer", "Pop-up"]) : null,
+        rigType:
+          site.siteType === SiteType.rv
+            ? pick(["Class A", "Class C", "Fifth Wheel", "Travel Trailer", "Pop-up"])
+            : null,
         rigLength: site.siteType === SiteType.rv ? randomBetween(20, 45) : null,
         depositAmount: Math.round(baseRate),
         stayType,
         seasonalRateId,
         bookedAt,
-        notes: i % 20 === 0 ? "Guest requested late checkout" : null
-      }
+        notes: i % 20 === 0 ? "Guest requested late checkout" : null,
+      },
     });
     reservationCount++;
 
@@ -369,8 +532,8 @@ async function main() {
           method: pick(["card", "card", "card", "cash", "check", "ach"]),
           direction: "charge",
           note: paidAmount === totalAmount ? "Full payment" : "Deposit",
-          createdAt: addDays(arrivalDate!, -randomBetween(1, 30))
-        }
+          createdAt: addDays(arrivalDate!, -randomBetween(1, 30)),
+        },
       });
       paymentCount++;
 
@@ -385,7 +548,7 @@ async function main() {
             description: `Payment - ${guest.primaryFirstName} ${guest.primaryLastName}`,
             amountCents: paidAmount,
             direction: "debit",
-            occurredAt: addDays(arrivalDate!, -randomBetween(1, 30))
+            occurredAt: addDays(arrivalDate!, -randomBetween(1, 30)),
           },
           {
             campgroundId: campground.id,
@@ -395,9 +558,9 @@ async function main() {
             description: `Site rental - ${site.name}`,
             amountCents: baseSubtotal,
             direction: "credit",
-            occurredAt: addDays(arrivalDate!, -randomBetween(1, 30))
-          }
-        ]
+            occurredAt: addDays(arrivalDate!, -randomBetween(1, 30)),
+          },
+        ],
       });
     }
 
@@ -410,9 +573,12 @@ async function main() {
             reservationId: reservation.id,
             amount: Math.round(totalAmount / installments),
             dueDate: addDays(arrivalDate!, (j + 1) * 30),
-            status: j === 0 ? ChargeStatus.paid : pick([ChargeStatus.pending, ChargeStatus.pending, ChargeStatus.failed]),
-            paidAt: j === 0 ? addDays(arrivalDate!, 2) : null
-          }
+            status:
+              j === 0
+                ? ChargeStatus.paid
+                : pick([ChargeStatus.pending, ChargeStatus.pending, ChargeStatus.failed]),
+            paidAt: j === 0 ? addDays(arrivalDate!, 2) : null,
+          },
         });
       }
     }
@@ -424,21 +590,81 @@ async function main() {
   // ============ MAINTENANCE TICKETS ============
   console.log("\n--- Creating Maintenance Tickets ---");
   const ticketData = [
-    { title: "Water heater not working in bathhouse", priority: MaintenancePriority.high, status: MaintenanceStatus.in_progress },
-    { title: "Broken picnic table at site P-12", priority: MaintenancePriority.medium, status: MaintenanceStatus.open },
-    { title: "Electrical outlet sparking at site R-05", priority: MaintenancePriority.critical, status: MaintenanceStatus.in_progress },
-    { title: "Tree branch over site T-03", priority: MaintenancePriority.low, status: MaintenanceStatus.open },
-    { title: "Pothole in main road near entrance", priority: MaintenancePriority.medium, status: MaintenanceStatus.open },
-    { title: "Playground swing chain needs replacement", priority: MaintenancePriority.low, status: MaintenanceStatus.completed },
-    { title: "WiFi router down in lodge", priority: MaintenancePriority.high, status: MaintenanceStatus.completed },
-    { title: "Sewer hookup leak at site P-08", priority: MaintenancePriority.critical, status: MaintenanceStatus.open },
-    { title: "Light bulb out in restroom A", priority: MaintenancePriority.low, status: MaintenanceStatus.completed },
-    { title: "Fire pit needs cleaning - site T-07", priority: MaintenancePriority.low, status: MaintenanceStatus.open },
-    { title: "Ice machine not making ice", priority: MaintenancePriority.medium, status: MaintenanceStatus.in_progress },
-    { title: "Gate arm stuck open", priority: MaintenancePriority.high, status: MaintenanceStatus.open },
-    { title: "Pool filter needs backwash", priority: MaintenancePriority.medium, status: MaintenanceStatus.completed },
-    { title: "Laundry dryer #3 not heating", priority: MaintenancePriority.medium, status: MaintenanceStatus.open },
-    { title: "Graffiti on dumpster enclosure", priority: MaintenancePriority.low, status: MaintenanceStatus.open }
+    {
+      title: "Water heater not working in bathhouse",
+      priority: MaintenancePriority.high,
+      status: MaintenanceStatus.in_progress,
+    },
+    {
+      title: "Broken picnic table at site P-12",
+      priority: MaintenancePriority.medium,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Electrical outlet sparking at site R-05",
+      priority: MaintenancePriority.critical,
+      status: MaintenanceStatus.in_progress,
+    },
+    {
+      title: "Tree branch over site T-03",
+      priority: MaintenancePriority.low,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Pothole in main road near entrance",
+      priority: MaintenancePriority.medium,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Playground swing chain needs replacement",
+      priority: MaintenancePriority.low,
+      status: MaintenanceStatus.completed,
+    },
+    {
+      title: "WiFi router down in lodge",
+      priority: MaintenancePriority.high,
+      status: MaintenanceStatus.completed,
+    },
+    {
+      title: "Sewer hookup leak at site P-08",
+      priority: MaintenancePriority.critical,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Light bulb out in restroom A",
+      priority: MaintenancePriority.low,
+      status: MaintenanceStatus.completed,
+    },
+    {
+      title: "Fire pit needs cleaning - site T-07",
+      priority: MaintenancePriority.low,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Ice machine not making ice",
+      priority: MaintenancePriority.medium,
+      status: MaintenanceStatus.in_progress,
+    },
+    {
+      title: "Gate arm stuck open",
+      priority: MaintenancePriority.high,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Pool filter needs backwash",
+      priority: MaintenancePriority.medium,
+      status: MaintenanceStatus.completed,
+    },
+    {
+      title: "Laundry dryer #3 not heating",
+      priority: MaintenancePriority.medium,
+      status: MaintenanceStatus.open,
+    },
+    {
+      title: "Graffiti on dumpster enclosure",
+      priority: MaintenancePriority.low,
+      status: MaintenanceStatus.open,
+    },
   ];
 
   for (const ticket of ticketData) {
@@ -451,8 +677,8 @@ async function main() {
         priority: ticket.priority,
         status: ticket.status,
         notes: `Reported by: ${pick(["Guest", "Staff", "Inspection"])}`,
-        createdAt: addDays(new Date(), -randomBetween(0, 30))
-      }
+        createdAt: addDays(new Date(), -randomBetween(0, 30)),
+      },
     });
   }
   console.log(`Created ${ticketData.length} maintenance tickets`);
@@ -474,23 +700,23 @@ async function main() {
     { name: "Soda Can", sku: "FOOD-003", price: 200, category: "Food" },
     { name: "Coffee (large)", sku: "FOOD-004", price: 300, category: "Food" },
     { name: "Kayak Rental (day)", sku: "RENT-001", price: 5000, category: "Rentals" },
-    { name: "Bike Rental (day)", sku: "RENT-002", price: 3000, category: "Rentals" }
+    { name: "Bike Rental (day)", sku: "RENT-002", price: 3000, category: "Rentals" },
   ];
 
   // Get or create category
   let category = await prisma.productCategory.findFirst({
-    where: { campgroundId: campground.id, name: "General" }
+    where: { campgroundId: campground.id, name: "General" },
   });
   if (!category) {
     category = await prisma.productCategory.create({
-      data: { campgroundId: campground.id, name: "General", sortOrder: 1 }
+      data: { campgroundId: campground.id, name: "General", sortOrder: 1 },
     });
   }
 
   for (const prod of products) {
     // Check if product exists first
     const existing = await prisma.product.findFirst({
-      where: { campgroundId: campground.id, sku: prod.sku }
+      where: { campgroundId: campground.id, sku: prod.sku },
     });
     if (!existing) {
       await prisma.product.create({
@@ -503,8 +729,8 @@ async function main() {
           description: `${prod.name} - ${prod.category}`,
           isActive: true,
           trackInventory: prod.category === "Supplies" || prod.category === "Food",
-          stockQty: prod.category === "Supplies" ? randomBetween(10, 100) : 0
-        }
+          stockQty: prod.category === "Supplies" ? randomBetween(10, 100) : 0,
+        },
       });
     }
   }
@@ -513,12 +739,15 @@ async function main() {
   // ============ STORE ORDERS ============
   console.log("\n--- Creating Store Orders ---");
   const productRecords = await prisma.product.findMany({
-    where: { campgroundId: campground.id }
+    where: { campgroundId: campground.id },
   });
 
   for (let i = 0; i < 50; i++) {
     const guest = pick(guests);
-    const orderProducts = [pick(productRecords), ...(randomBetween(0, 1) ? [pick(productRecords)] : [])];
+    const orderProducts = [
+      pick(productRecords),
+      ...(randomBetween(0, 1) ? [pick(productRecords)] : []),
+    ];
     const subtotal = orderProducts.reduce((sum, p) => sum + p.priceCents, 0);
     const tax = Math.round(subtotal * 0.0835);
 
@@ -532,18 +761,18 @@ async function main() {
         status: pick(["completed", "completed", "completed", "pending"]),
         completedAt: pick([addDays(new Date(), -randomBetween(0, 60)), null]),
         items: {
-          create: orderProducts.map(p => {
+          create: orderProducts.map((p) => {
             const qty = randomBetween(1, 3);
             return {
               product: { connect: { id: p.id } },
               name: p.name,
               qty,
               unitCents: p.priceCents,
-              totalCents: p.priceCents * qty
+              totalCents: p.priceCents * qty,
             };
-          })
-        }
-      }
+          }),
+        },
+      },
     });
   }
   console.log("Created 50 store orders");
@@ -560,7 +789,7 @@ async function main() {
     "Can we add an extra night?",
     "Is there a grocery store nearby?",
     "The water pressure seems low",
-    "Thanks for a great stay!"
+    "Thanks for a great stay!",
   ];
   const staffMessageTemplates = [
     "Check-in is at 3pm, but we can try to accommodate early arrivals!",
@@ -568,14 +797,14 @@ async function main() {
     "The WiFi password is on your check-in sheet",
     "No problem, see you soon!",
     "We'll have maintenance take a look at that",
-    "You're welcome! Hope to see you again!"
+    "You're welcome! Hope to see you again!",
   ];
 
   // Get reservations to link messages
   const reservations = await prisma.reservation.findMany({
     where: { campgroundId: campground.id },
     select: { id: true, guestId: true },
-    take: 100
+    take: 100,
   });
 
   for (let i = 0; i < 30; i++) {
@@ -588,8 +817,8 @@ async function main() {
         guestId: res.guestId,
         senderType: isGuestMessage ? "guest" : "staff",
         content: isGuestMessage ? pick(guestMessageTemplates) : pick(staffMessageTemplates),
-        createdAt: addDays(new Date(), -randomBetween(0, 30))
-      }
+        createdAt: addDays(new Date(), -randomBetween(0, 30)),
+      },
     });
   }
   console.log("Created 30 messages");
@@ -607,8 +836,8 @@ async function main() {
       name: "Post-Stay Survey",
       question: "How likely are you to recommend us to a friend?",
       status: "active",
-      channels: ["email", "inapp"]
-    }
+      channels: ["email", "inapp"],
+    },
   });
 
   for (let i = 0; i < 40; i++) {
@@ -623,13 +852,19 @@ async function main() {
         guestId: guest.id,
         reservationId: res.id,
         score,
-        comment: score >= 9
-          ? pick(["Amazing stay!", "Will definitely come back", "Best campground we've been to", "Love the staff here"])
-          : score >= 7
-            ? pick(["Good overall", "Nice facilities", "Pretty good experience"])
-            : pick(["Could use some improvements", "WiFi was slow", "Sites felt cramped"]),
-        createdAt: addDays(new Date(), -randomBetween(0, 90))
-      }
+        comment:
+          score >= 9
+            ? pick([
+                "Amazing stay!",
+                "Will definitely come back",
+                "Best campground we've been to",
+                "Love the staff here",
+              ])
+            : score >= 7
+              ? pick(["Good overall", "Nice facilities", "Pretty good experience"])
+              : pick(["Could use some improvements", "WiFi was slow", "Sites felt cramped"]),
+        createdAt: addDays(new Date(), -randomBetween(0, 90)),
+      },
     });
   }
   console.log("Created 40 NPS responses");

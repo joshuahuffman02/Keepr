@@ -26,17 +26,18 @@ export class EmailQueueProcessor implements OnModuleInit {
   constructor(private readonly queueService: BullQueueService) {}
 
   onModuleInit() {
-    this.queueService.registerProcessor<EmailJobData>(
-      EMAIL_QUEUE,
-      this.process.bind(this)
-    );
+    this.queueService.registerProcessor<EmailJobData>(EMAIL_QUEUE, this.process.bind(this));
     this.logger.log("Email processor registered");
   }
 
-  private async process(job: JobData<EmailJobData>): Promise<{ sent: boolean; messageId?: string }> {
+  private async process(
+    job: JobData<EmailJobData>,
+  ): Promise<{ sent: boolean; messageId?: string }> {
     const { to, subject, html, text, template, templateData } = job.data;
 
-    this.logger.debug(`Processing email job ${job.id}: ${subject} to ${Array.isArray(to) ? to.join(", ") : to}`);
+    this.logger.debug(
+      `Processing email job ${job.id}: ${subject} to ${Array.isArray(to) ? to.join(", ") : to}`,
+    );
 
     // In production, this would integrate with EmailService
     // For now, simulate email sending with validation

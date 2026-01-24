@@ -126,7 +126,13 @@ export function SetupCelebration({
                 className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl"
                 animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                style={{ width: 200, height: 200, left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+                style={{
+                  width: 200,
+                  height: 200,
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
               />
             )}
 

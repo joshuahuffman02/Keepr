@@ -27,7 +27,7 @@ export class OrgBillingController {
   constructor(
     private billingService: OrgBillingService,
     private subscriptionService: SubscriptionService,
-    private prisma: PrismaService
+    private prisma: PrismaService,
   ) {}
 
   /**
@@ -78,9 +78,7 @@ export class OrgBillingController {
     }
 
     if (period.organizationId !== organizationId) {
-      throw new ForbiddenException(
-        "Billing period does not belong to the specified organization"
-      );
+      throw new ForbiddenException("Billing period does not belong to the specified organization");
     }
   }
 
@@ -88,7 +86,10 @@ export class OrgBillingController {
    * Get billing summary for current period
    */
   @Get("summary")
-  async getBillingSummary(@Param("organizationId") organizationId: string, @Req() req: AuthRequest) {
+  async getBillingSummary(
+    @Param("organizationId") organizationId: string,
+    @Req() req: AuthRequest,
+  ) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.billingService.getBillingSummary(organizationId);
   }
@@ -109,13 +110,10 @@ export class OrgBillingController {
   async getBillingHistory(
     @Param("organizationId") organizationId: string,
     @Req() req: AuthRequest,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
-    return this.billingService.getBillingHistory(
-      organizationId,
-      limit ? parseInt(limit, 10) : 12
-    );
+    return this.billingService.getBillingHistory(organizationId, limit ? parseInt(limit, 10) : 12);
   }
 
   /**
@@ -129,7 +127,7 @@ export class OrgBillingController {
     @Query("periodStart") periodStartStr?: string,
     @Query("periodEnd") periodEndStr?: string,
     @Query("limit") limitStr?: string,
-    @Query("offset") offsetStr?: string
+    @Query("offset") offsetStr?: string,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     const periodStart = periodStartStr ? new Date(periodStartStr) : undefined;
@@ -143,7 +141,7 @@ export class OrgBillingController {
       periodStart,
       periodEnd,
       limit,
-      offset
+      offset,
     );
   }
 
@@ -162,7 +160,7 @@ export class OrgBillingController {
       referenceId?: string;
       metadata?: Record<string, unknown>;
     },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.billingService.recordUsageEvent({
@@ -180,14 +178,14 @@ export class OrgBillingController {
   async finalizePeriod(
     @Param("organizationId") organizationId: string,
     @Param("periodId") periodId: string,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     // Validate period ownership to prevent cross-org manipulation
     await this.validatePeriodOwnership(periodId, organizationId);
-    
+
     // Even for platform admins, validate org access for audit trail
     await this.validateOrgAccess(organizationId, req.user);
-    
+
     return this.billingService.finalizePeriod(periodId);
   }
 
@@ -201,14 +199,14 @@ export class OrgBillingController {
     @Param("organizationId") organizationId: string,
     @Param("periodId") periodId: string,
     @Body() body: { stripePaymentIntentId?: string },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     // Validate period ownership to prevent cross-org manipulation
     await this.validatePeriodOwnership(periodId, organizationId);
-    
+
     // Even for platform admins, validate org access for audit trail
     await this.validateOrgAccess(organizationId, req.user);
-    
+
     return this.billingService.markPeriodPaid(periodId, body.stripePaymentIntentId);
   }
 
@@ -254,13 +252,10 @@ export class OrgBillingController {
   async createSubscription(
     @Param("organizationId") organizationId: string,
     @Body() body: { tier?: string },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
-    return this.subscriptionService.createSubscription(
-      organizationId,
-      body.tier || "standard"
-    );
+    return this.subscriptionService.createSubscription(organizationId, body.tier || "standard");
   }
 
   /**
@@ -270,13 +265,10 @@ export class OrgBillingController {
   async cancelSubscription(
     @Param("organizationId") organizationId: string,
     @Req() req: AuthRequest,
-    @Query("immediately") immediately?: string
+    @Query("immediately") immediately?: string,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
-    return this.subscriptionService.cancelSubscription(
-      organizationId,
-      immediately === "true"
-    );
+    return this.subscriptionService.cancelSubscription(organizationId, immediately === "true");
   }
 
   /**
@@ -286,13 +278,10 @@ export class OrgBillingController {
   async getBillingPortal(
     @Param("organizationId") organizationId: string,
     @Body() body: { returnUrl: string },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
-    const url = await this.subscriptionService.getBillingPortalUrl(
-      organizationId,
-      body.returnUrl
-    );
+    const url = await this.subscriptionService.getBillingPortalUrl(organizationId, body.returnUrl);
     return { url };
   }
 
@@ -312,7 +301,7 @@ export class OrgBillingController {
   async changeTier(
     @Param("organizationId") organizationId: string,
     @Body() body: { tier: string },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.subscriptionService.changeTier(organizationId, body.tier);

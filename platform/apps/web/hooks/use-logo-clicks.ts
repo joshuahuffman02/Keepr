@@ -27,9 +27,7 @@ export function useLogoClicks({
     const now = Date.now();
 
     // Filter out old clicks outside the timeout window
-    clickTimestamps.current = clickTimestamps.current.filter(
-      (t) => now - t < timeout
-    );
+    clickTimestamps.current = clickTimestamps.current.filter((t) => now - t < timeout);
 
     // Add current click
     clickTimestamps.current.push(now);

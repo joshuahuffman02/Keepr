@@ -85,10 +85,7 @@ export abstract class BaseOtaProvider {
    * Fetch with retry logic
    * Pattern from scraping-apis/fetch_apify_actors.js:124-128
    */
-  protected async fetchWithRetry<T>(
-    fetchFn: () => Promise<T>,
-    context: string
-  ): Promise<T> {
+  protected async fetchWithRetry<T>(fetchFn: () => Promise<T>, context: string): Promise<T> {
     let lastError: Error | null = null;
 
     for (let attempt = 1; attempt <= this.MAX_RETRIES; attempt++) {
@@ -98,7 +95,7 @@ export abstract class BaseOtaProvider {
       } catch (error: unknown) {
         lastError = error instanceof Error ? error : new Error(String(error));
         this.logger.error(
-          `${context} failed (attempt ${attempt}/${this.MAX_RETRIES}): ${lastError.message}`
+          `${context} failed (attempt ${attempt}/${this.MAX_RETRIES}): ${lastError.message}`,
         );
 
         if (attempt < this.MAX_RETRIES) {
@@ -144,7 +141,9 @@ export abstract class BaseOtaProvider {
 
     const mmddyyyy = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
     if (mmddyyyy) {
-      return new Date(`${mmddyyyy[3]}-${mmddyyyy[1].padStart(2, "0")}-${mmddyyyy[2].padStart(2, "0")}`);
+      return new Date(
+        `${mmddyyyy[3]}-${mmddyyyy[1].padStart(2, "0")}-${mmddyyyy[2].padStart(2, "0")}`,
+      );
     }
 
     return null;

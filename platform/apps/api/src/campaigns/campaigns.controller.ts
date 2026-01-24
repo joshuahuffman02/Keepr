@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Patch, Delete, Query, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Patch,
+  Delete,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { CampaignsService } from "./campaigns.service";
 import { JwtAuthGuard } from "../auth/guards";
 import { CreateCampaignDto } from "./dto/create-campaign.dto";
@@ -10,7 +20,7 @@ import { SendCampaignDto } from "./dto/send-campaign.dto";
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class CampaignsController {
-  constructor(private readonly campaigns: CampaignsService) { }
+  constructor(private readonly campaigns: CampaignsService) {}
 
   @Get("campaigns")
   list(@Query("campgroundId") campgroundId?: string) {
@@ -50,14 +60,15 @@ export class CampaignsController {
   @Patch("campaign-templates/:id")
   updateTemplate(
     @Param("id") id: string,
-    @Body() body: Partial<{
+    @Body()
+    body: Partial<{
       name: string;
       channel: string;
       category: string;
       subject: string | null;
       html: string | null;
       textBody: string | null;
-    }>
+    }>,
   ) {
     return this.campaigns.updateTemplate(id, body);
   }
@@ -77,4 +88,3 @@ export class CampaignsController {
     return this.campaigns.suggestions(campgroundId);
   }
 }
-

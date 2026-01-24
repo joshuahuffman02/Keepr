@@ -8,7 +8,7 @@ export type ReportFiltersV2 = {
 
 const TAB_ALIASES: Record<string, { tab: ReportTabV2; subTab?: string | null }> = {
   "booking-sources": { tab: "marketing", subTab: "booking-sources" },
-  "guest-origins": { tab: "guests", subTab: "guest-origins" }
+  "guest-origins": { tab: "guests", subTab: "guest-origins" },
 };
 
 type BuildReportHrefInput = {
@@ -20,7 +20,7 @@ type BuildReportHrefInput = {
 
 export function buildReportQueryV2({
   dateRange,
-  filters
+  filters,
 }: {
   dateRange?: { start?: string; end?: string } | null;
   filters?: ReportFiltersV2 | null;
@@ -45,22 +45,23 @@ export function buildReportHrefV2({ tab, subTab, dateRange, filters }: BuildRepo
   }
 
   const { tab: resolvedTab, subTab: resolvedSub } = normalized;
-  const basePath = resolvedTab === "overview"
-    ? "/reports-v2/overview"
-    : `/reports-v2/${resolvedTab}/${resolvedSub}`;
+  const basePath =
+    resolvedTab === "overview"
+      ? "/reports-v2/overview"
+      : `/reports-v2/${resolvedTab}/${resolvedSub}`;
 
   return `${basePath}${buildReportQueryV2({ dateRange, filters })}`;
 }
 
 export function normalizeReportSelectionV2(
   tab: string,
-  subTab?: string | null
+  subTab?: string | null,
 ): { tab: ReportTabV2; subTab: string | null } | null {
   const alias = TAB_ALIASES[tab];
   if (alias) {
     return {
       tab: alias.tab,
-      subTab: alias.subTab ?? subTab ?? getDefaultSubTabV2(alias.tab)
+      subTab: alias.subTab ?? subTab ?? getDefaultSubTabV2(alias.tab),
     };
   }
 
@@ -75,6 +76,6 @@ export function normalizeReportSelectionV2(
 
   return {
     tab,
-    subTab: resolvedSub
+    subTab: resolvedSub,
   };
 }

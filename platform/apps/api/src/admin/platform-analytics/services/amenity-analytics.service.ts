@@ -26,7 +26,11 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 export class AmenityAnalyticsService {
   constructor(private prisma: PrismaService) {}
 
-  private getHookupType(site: { hookupsPower: boolean; hookupsWater: boolean; hookupsSewer: boolean }): string {
+  private getHookupType(site: {
+    hookupsPower: boolean;
+    hookupsWater: boolean;
+    hookupsSewer: boolean;
+  }): string {
     const { hookupsPower, hookupsWater, hookupsSewer } = site;
     if (hookupsPower && hookupsWater && hookupsSewer) return "full";
     if (hookupsPower && hookupsWater) return "water_electric";
@@ -93,13 +97,16 @@ export class AmenityAnalyticsService {
       siteReservations[res.siteId].revenue += res.totalAmount || 0;
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       siteReservations[res.siteId].nights += nights;
     }
 
     // Aggregate by amenity
-    const byAmenity: Record<string, { sites: Set<string>; reservations: number; revenue: number; nights: number }> = {};
+    const byAmenity: Record<
+      string,
+      { sites: Set<string>; reservations: number; revenue: number; nights: number }
+    > = {};
 
     for (const site of sites) {
       const tags = site.amenityTags || [];
@@ -174,7 +181,10 @@ export class AmenityAnalyticsService {
     }
 
     // Group by hookup type
-    const byHookup: Record<string, { sites: Set<string>; reservations: number; revenue: number; nights: number }> = {};
+    const byHookup: Record<
+      string,
+      { sites: Set<string>; reservations: number; revenue: number; nights: number }
+    > = {};
 
     for (const res of reservations) {
       const hookup = siteHookups[res.siteId] || "unknown";
@@ -189,7 +199,7 @@ export class AmenityAnalyticsService {
 
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       byHookup[hookup].nights += nights;
     }
@@ -256,7 +266,7 @@ export class AmenityAnalyticsService {
     for (const res of reservations) {
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       const ratePerNight = nights > 0 ? (res.totalAmount || 0) / nights : 0;
       const siteAmenities = new Set(res.Site?.amenityTags || []);
@@ -273,12 +283,14 @@ export class AmenityAnalyticsService {
     // Calculate impact scores
     return Object.entries(amenityImpact)
       .map(([amenity, data]) => {
-        const avgWith = data.withAmenity.length > 0
-          ? data.withAmenity.reduce((a, b) => a + b, 0) / data.withAmenity.length
-          : 0;
-        const avgWithout = data.withoutAmenity.length > 0
-          ? data.withoutAmenity.reduce((a, b) => a + b, 0) / data.withoutAmenity.length
-          : 0;
+        const avgWith =
+          data.withAmenity.length > 0
+            ? data.withAmenity.reduce((a, b) => a + b, 0) / data.withAmenity.length
+            : 0;
+        const avgWithout =
+          data.withoutAmenity.length > 0
+            ? data.withoutAmenity.reduce((a, b) => a + b, 0) / data.withoutAmenity.length
+            : 0;
 
         const impact = avgWithout > 0 ? ((avgWith - avgWithout) / avgWithout) * 100 : 0;
 
@@ -322,14 +334,22 @@ export class AmenityAnalyticsService {
     });
 
     const revenueMap = new Map(
-      revenueBycamp.map((r) => [r.campgroundId, { revenue: r._sum.totalAmount || 0, count: r._count }])
+      revenueBycamp.map((r) => [
+        r.campgroundId,
+        { revenue: r._sum.totalAmount || 0, count: r._count },
+      ]),
     );
 
     // Aggregate by amenity
-    const byAmenity: Record<string, { campgrounds: number; totalRevenue: number; totalBookings: number }> = {};
+    const byAmenity: Record<
+      string,
+      { campgrounds: number; totalRevenue: number; totalBookings: number }
+    > = {};
 
     for (const campground of campgrounds) {
-      const amenities = isRecord(campground.amenitySummary) ? Object.keys(campground.amenitySummary) : [];
+      const amenities = isRecord(campground.amenitySummary)
+        ? Object.keys(campground.amenitySummary)
+        : [];
       const campRevenue = revenueMap.get(campground.id);
 
       for (const amenity of amenities) {

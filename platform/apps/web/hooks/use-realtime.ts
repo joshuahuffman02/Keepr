@@ -163,7 +163,10 @@ interface UseRealtimeReturn {
   /** Subscribe to a specific event type */
   on: <T extends RealtimeEventData>(event: RealtimeEvent, callback: EventCallback<T>) => () => void;
   /** Subscribe to multiple events at once */
-  onMany: <T extends RealtimeEventData>(events: RealtimeEvent[], callback: EventCallback<T>) => () => void;
+  onMany: <T extends RealtimeEventData>(
+    events: RealtimeEvent[],
+    callback: EventCallback<T>,
+  ) => () => void;
   /** Emit a message to the server (rarely needed) */
   emit: (event: string, data: unknown) => void;
 }
@@ -185,11 +188,7 @@ interface UseRealtimeReturn {
  * ```
  */
 export function useRealtime(options: UseRealtimeOptions = {}): UseRealtimeReturn {
-  const {
-    autoConnect = true,
-    reconnect = true,
-    reconnectionAttempts = 5,
-  } = options;
+  const { autoConnect = true, reconnect = true, reconnectionAttempts = 5 } = options;
 
   const socketRef = useRef<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
@@ -277,34 +276,42 @@ export function useRealtime(options: UseRealtimeOptions = {}): UseRealtimeReturn
   }, []);
 
   // Subscribe to an event
-  const on = useCallback(<T extends RealtimeEventData>(
-    event: RealtimeEvent,
-    callback: EventCallback<T>
-  ): (() => void) => {
-    const socket = socketRef.current;
-    if (!socket) {
-      console.warn("[useRealtime] Socket not connected, event listener will be added when connected");
-    }
+  const on = useCallback(
+    <T extends RealtimeEventData>(
+      event: RealtimeEvent,
+      callback: EventCallback<T>,
+    ): (() => void) => {
+      const socket = socketRef.current;
+      if (!socket) {
+        console.warn(
+          "[useRealtime] Socket not connected, event listener will be added when connected",
+        );
+      }
 
-    const handler = (data: T) => callback(data);
-    socket?.on(event, handler);
+      const handler = (data: T) => callback(data);
+      socket?.on(event, handler);
 
-    // Return unsubscribe function
-    return () => {
-      socket?.off(event, handler);
-    };
-  }, []);
+      // Return unsubscribe function
+      return () => {
+        socket?.off(event, handler);
+      };
+    },
+    [],
+  );
 
   // Subscribe to multiple events
-  const onMany = useCallback(<T extends RealtimeEventData>(
-    events: RealtimeEvent[],
-    callback: EventCallback<T>
-  ): (() => void) => {
-    const unsubscribers = events.map((event) => on<T>(event, callback));
-    return () => {
-      unsubscribers.forEach((unsub) => unsub());
-    };
-  }, [on]);
+  const onMany = useCallback(
+    <T extends RealtimeEventData>(
+      events: RealtimeEvent[],
+      callback: EventCallback<T>,
+    ): (() => void) => {
+      const unsubscribers = events.map((event) => on<T>(event, callback));
+      return () => {
+        unsubscribers.forEach((unsub) => unsub());
+      };
+    },
+    [on],
+  );
 
   // Emit a message
   const emit = useCallback((event: string, data: unknown) => {
@@ -457,7 +464,9 @@ export function useYieldUpdates(handlers: {
       unsubscribers.push(on(RealtimeEvent.YIELD_METRICS_UPDATED, handlers.onMetricsUpdated));
     }
     if (handlers.onRecommendationGenerated) {
-      unsubscribers.push(on(RealtimeEvent.YIELD_RECOMMENDATION_GENERATED, handlers.onRecommendationGenerated));
+      unsubscribers.push(
+        on(RealtimeEvent.YIELD_RECOMMENDATION_GENERATED, handlers.onRecommendationGenerated),
+      );
     }
     if (handlers.onForecastUpdated) {
       unsubscribers.push(on(RealtimeEvent.YIELD_FORECAST_UPDATED, handlers.onForecastUpdated));

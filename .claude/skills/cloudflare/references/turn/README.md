@@ -17,18 +17,22 @@ Cloudflare TURN (Traversal Using Relays around NAT) Service is a managed relay s
 ## Service Addresses and Ports
 
 ### STUN over UDP
+
 - **Primary**: `stun.cloudflare.com:3478/udp`
 - **Alternate**: `stun.cloudflare.com:53/udp` (not recommended as primary, blocked by many ISPs/browsers)
 
 ### TURN over UDP
+
 - **Primary**: `turn.cloudflare.com:3478/udp`
 - **Alternate**: `turn.cloudflare.com:53/udp`
 
 ### TURN over TCP
+
 - **Primary**: `turn.cloudflare.com:3478/tcp`
 - **Alternate**: `turn.cloudflare.com:80/tcp`
 
 ### TURN over TLS
+
 - **Primary**: `turn.cloudflare.com:5349/tcp`
 - **Alternate**: `turn.cloudflare.com:443/tcp`
 
@@ -39,16 +43,19 @@ All API endpoints require authentication with a Cloudflare API token with "Calls
 Base URL: `https://api.cloudflare.com/client/v4`
 
 ### List TURN Keys
+
 ```
 GET /accounts/{account_id}/calls/turn_keys
 ```
 
 ### Get TURN Key Details
+
 ```
 GET /accounts/{account_id}/calls/turn_keys/{key_id}
 ```
 
 ### Create TURN Key
+
 ```
 POST /accounts/{account_id}/calls/turn_keys
 Content-Type: application/json
@@ -59,6 +66,7 @@ Content-Type: application/json
 ```
 
 **Response includes**:
+
 - `uid`: Key identifier
 - `key`: The actual secret key (only returned on creation)
 - `name`: Human-readable name
@@ -66,6 +74,7 @@ Content-Type: application/json
 - `modified`: ISO 8601 timestamp
 
 ### Update TURN Key
+
 ```
 PUT /accounts/{account_id}/calls/turn_keys/{key_id}
 Content-Type: application/json
@@ -76,6 +85,7 @@ Content-Type: application/json
 ```
 
 ### Delete TURN Key
+
 ```
 DELETE /accounts/{account_id}/calls/turn_keys/{key_id}
 ```
@@ -95,6 +105,7 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```json
 {
   "iceServers": {
@@ -123,23 +134,23 @@ interface RTCIceServer {
 }
 
 async function getTURNConfig(): Promise<RTCIceServer[]> {
-  const response = await fetch('/api/turn-credentials');
+  const response = await fetch("/api/turn-credentials");
   const data = await response.json();
-  
+
   return [
     {
-      urls: 'stun:stun.cloudflare.com:3478'
+      urls: "stun:stun.cloudflare.com:3478",
     },
     {
       urls: [
-        'turn:turn.cloudflare.com:3478?transport=udp',
-        'turn:turn.cloudflare.com:3478?transport=tcp',
-        'turns:turn.cloudflare.com:5349?transport=tcp'
+        "turn:turn.cloudflare.com:3478?transport=udp",
+        "turn:turn.cloudflare.com:3478?transport=tcp",
+        "turns:turn.cloudflare.com:5349?transport=tcp",
       ],
       username: data.username,
       credential: data.credential,
-      credentialType: 'password'
-    }
+      credentialType: "password",
+    },
   ];
 }
 
@@ -154,18 +165,18 @@ const peerConnection = new RTCPeerConnection({ iceServers });
 async function generateTURNCredentials(
   turnKeyId: string,
   turnKeySecret: string,
-  ttl: number = 86400
+  ttl: number = 86400,
 ): Promise<{ username: string; credential: string; urls: string[] }> {
   const response = await fetch(
     `https://rtc.live.cloudflare.com/v1/turn/keys/${turnKeyId}/credentials/generate`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${turnKeySecret}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${turnKeySecret}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ttl })
-    }
+      body: JSON.stringify({ ttl }),
+    },
   );
 
   if (!response.ok) {
@@ -176,7 +187,7 @@ async function generateTURNCredentials(
   return {
     username: data.iceServers.username,
     credential: data.iceServers.credential,
-    urls: data.iceServers.urls
+    urls: data.iceServers.urls,
   };
 }
 ```
@@ -187,51 +198,54 @@ async function generateTURNCredentials(
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    
-    if (url.pathname !== '/turn-credentials') {
-      return new Response('Not found', { status: 404 });
+
+    if (url.pathname !== "/turn-credentials") {
+      return new Response("Not found", { status: 404 });
     }
 
     // Validate client (implement your auth logic)
-    const authHeader = request.headers.get('Authorization');
+    const authHeader = request.headers.get("Authorization");
     if (!authHeader) {
-      return new Response('Unauthorized', { status: 401 });
+      return new Response("Unauthorized", { status: 401 });
     }
 
     // Generate credentials
     const response = await fetch(
       `https://rtc.live.cloudflare.com/v1/turn/keys/${env.TURN_KEY_ID}/credentials/generate`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${env.TURN_KEY_SECRET}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${env.TURN_KEY_SECRET}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ttl: 3600 })
-      }
+        body: JSON.stringify({ ttl: 3600 }),
+      },
     );
 
     if (!response.ok) {
-      return new Response('Failed to generate credentials', { status: 500 });
+      return new Response("Failed to generate credentials", { status: 500 });
     }
 
     const data = await response.json();
-    
-    return new Response(JSON.stringify({
-      iceServers: [
-        {
-          urls: 'stun:stun.cloudflare.com:3478'
-        },
-        {
-          urls: data.iceServers.urls,
-          username: data.iceServers.username,
-          credential: data.iceServers.credential
-        }
-      ]
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
-  }
+
+    return new Response(
+      JSON.stringify({
+        iceServers: [
+          {
+            urls: "stun:stun.cloudflare.com:3478",
+          },
+          {
+            urls: data.iceServers.urls,
+            username: data.iceServers.username,
+            credential: data.iceServers.credential,
+          },
+        ],
+      }),
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  },
 };
 ```
 
@@ -246,12 +260,9 @@ class TURNCredentialsManager {
     expiresAt: number;
   } | null = null;
 
-  async getCredentials(
-    turnKeyId: string,
-    turnKeySecret: string
-  ): Promise<RTCIceServer[]> {
+  async getCredentials(turnKeyId: string, turnKeySecret: string): Promise<RTCIceServer[]> {
     const now = Date.now();
-    
+
     // Return cached credentials if still valid
     if (this.credentials && this.credentials.expiresAt > now) {
       return this.buildIceServers(this.credentials);
@@ -260,39 +271,35 @@ class TURNCredentialsManager {
     // Generate new credentials
     const ttl = 3600; // 1 hour
     const data = await this.generateCredentials(turnKeyId, turnKeySecret, ttl);
-    
+
     this.credentials = {
       username: data.username,
       credential: data.credential,
       urls: data.urls,
-      expiresAt: now + (ttl * 1000) - 60000 // Refresh 1 min early
+      expiresAt: now + ttl * 1000 - 60000, // Refresh 1 min early
     };
 
     return this.buildIceServers(this.credentials);
   }
 
-  private async generateCredentials(
-    turnKeyId: string,
-    turnKeySecret: string,
-    ttl: number
-  ) {
+  private async generateCredentials(turnKeyId: string, turnKeySecret: string, ttl: number) {
     const response = await fetch(
       `https://rtc.live.cloudflare.com/v1/turn/keys/${turnKeyId}/credentials/generate`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${turnKeySecret}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${turnKeySecret}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ttl })
-      }
+        body: JSON.stringify({ ttl }),
+      },
     );
 
     const data = await response.json();
     return {
       username: data.iceServers.username,
       credential: data.iceServers.credential,
-      urls: data.iceServers.urls
+      urls: data.iceServers.urls,
     };
   }
 
@@ -302,13 +309,13 @@ class TURNCredentialsManager {
     urls: string[];
   }): RTCIceServer[] {
     return [
-      { urls: 'stun:stun.cloudflare.com:3478' },
+      { urls: "stun:stun.cloudflare.com:3478" },
       {
         urls: creds.urls,
         username: creds.username,
         credential: creds.credential,
-        credentialType: 'password' as const
-      }
+        credentialType: "password" as const,
+      },
     ];
   }
 }
@@ -321,7 +328,7 @@ interface CloudflareTURNConfig {
   keyId: string;
   keySecret: string;
   ttl?: number;
-  protocols?: ('udp' | 'tcp' | 'tls')[];
+  protocols?: ("udp" | "tcp" | "tls")[];
 }
 
 interface TURNCredentials {
@@ -332,40 +339,38 @@ interface TURNCredentials {
 }
 
 function validateRTCIceServer(obj: unknown): obj is RTCIceServer {
-  if (!obj || typeof obj !== 'object') {
+  if (!obj || typeof obj !== "object") {
     return false;
   }
 
   const server = obj as Record<string, unknown>;
 
-  if (typeof server.urls !== 'string' && !Array.isArray(server.urls)) {
+  if (typeof server.urls !== "string" && !Array.isArray(server.urls)) {
     return false;
   }
 
-  if (server.username && typeof server.username !== 'string') {
+  if (server.username && typeof server.username !== "string") {
     return false;
   }
 
-  if (server.credential && typeof server.credential !== 'string') {
+  if (server.credential && typeof server.credential !== "string") {
     return false;
   }
 
   return true;
 }
 
-async function fetchTURNServers(
-  config: CloudflareTURNConfig
-): Promise<RTCIceServer[]> {
+async function fetchTURNServers(config: CloudflareTURNConfig): Promise<RTCIceServer[]> {
   const response = await fetch(
     `https://rtc.live.cloudflare.com/v1/turn/keys/${config.keyId}/credentials/generate`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${config.keySecret}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${config.keySecret}`,
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ttl: config.ttl ?? 3600 })
-    }
+      body: JSON.stringify({ ttl: config.ttl ?? 3600 }),
+    },
   );
 
   if (!response.ok) {
@@ -374,18 +379,18 @@ async function fetchTURNServers(
 
   const data = await response.json();
   const iceServers = [
-    { urls: 'stun:stun.cloudflare.com:3478' },
+    { urls: "stun:stun.cloudflare.com:3478" },
     {
       urls: data.iceServers.urls,
       username: data.iceServers.username,
       credential: data.iceServers.credential,
-      credentialType: 'password' as const
-    }
+      credentialType: "password" as const,
+    },
   ];
 
   // Validate before returning
   if (!iceServers.every(validateRTCIceServer)) {
-    throw new Error('Invalid ICE server configuration received');
+    throw new Error("Invalid ICE server configuration received");
   }
 
   return iceServers;
@@ -395,38 +400,42 @@ async function fetchTURNServers(
 ## Common Use Cases
 
 ### 1. Video Conferencing
+
 Use TURN as fallback when direct peer-to-peer fails due to restrictive NATs/firewalls.
 
 ```typescript
 const config: RTCConfiguration = {
   iceServers: await getTURNConfig(),
-  iceTransportPolicy: 'all' // Try direct connection first
+  iceTransportPolicy: "all", // Try direct connection first
 };
 ```
 
 ### 2. Screen Sharing Applications
+
 Ensure connectivity for high-bandwidth screen sharing streams.
 
 ```typescript
 const iceServers = await getTURNConfig();
-const pc = new RTCPeerConnection({ 
+const pc = new RTCPeerConnection({
   iceServers,
-  bundlePolicy: 'max-bundle' // Reduce overhead
+  bundlePolicy: "max-bundle", // Reduce overhead
 });
 ```
 
 ### 3. IoT Device Communication
+
 Enable WebRTC for devices behind restrictive NATs.
 
 ```typescript
 // Prefer relay for predictable connectivity
 const config: RTCConfiguration = {
   iceServers: await getTURNConfig(),
-  iceTransportPolicy: 'relay' // Force TURN usage
+  iceTransportPolicy: "relay", // Force TURN usage
 };
 ```
 
 ### 4. Live Streaming (WHIP/WHEP)
+
 Integrate with Cloudflare Stream for low-latency broadcasting.
 
 ```typescript
@@ -437,6 +446,7 @@ const turnServers = await getTURNConfig();
 ## Limits and Quotas
 
 Per TURN allocation (per user):
+
 - **IP addresses**: >5 new unique IPs per second
 - **Packet rate**: 5-10k packets per second (inbound/outbound)
 - **Data rate**: 50-100 Mbps (inbound/outbound)
@@ -448,16 +458,19 @@ Limits apply per allocation, not account-wide. Exceeding limits results in packe
 ## TLS Configuration
 
 ### Supported TLS Versions
+
 - TLS 1.1
 - TLS 1.2
 - TLS 1.3
 
 ### Recommended Ciphers (TLS 1.3)
+
 - AEAD-AES128-GCM-SHA256
 - AEAD-AES256-GCM-SHA384
 - AEAD-CHACHA20-POLY1305-SHA256
 
 ### Recommended Ciphers (TLS 1.2)
+
 - ECDHE-ECDSA-AES128-GCM-SHA256
 - ECDHE-RSA-AES128-GCM-SHA256
 - ECDHE-RSA-AES128-SHA (also TLS 1.1)
@@ -475,13 +488,13 @@ TURN_KEY_SECRET=your_turn_key_secret
 
 ```typescript
 // config.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
   CLOUDFLARE_ACCOUNT_ID: z.string().min(1),
   CLOUDFLARE_API_TOKEN: z.string().min(1),
   TURN_KEY_ID: z.string().min(1),
-  TURN_KEY_SECRET: z.string().min(1)
+  TURN_KEY_SECRET: z.string().min(1),
 });
 
 export const config = envSchema.parse(process.env);
@@ -516,18 +529,20 @@ vars = { ENVIRONMENT = "production" }
    - Use a backend API endpoint
 
 2. **Implement rate limiting**
+
    ```typescript
    // Limit credential generation per client
    const rateLimiter = new Map<string, number>();
-   
+
    function checkRateLimit(clientId: string): boolean {
      const lastRequest = rateLimiter.get(clientId) ?? 0;
      const now = Date.now();
-     
-     if (now - lastRequest < 5000) { // 5 second cooldown
+
+     if (now - lastRequest < 5000) {
+       // 5 second cooldown
        return false;
      }
-     
+
      rateLimiter.set(clientId, now);
      return true;
    }
@@ -538,11 +553,12 @@ vars = { ENVIRONMENT = "production" }
    - Long-lived sessions: 86400 seconds (24 hours max recommended)
 
 4. **Validate client authentication**
+
    ```typescript
    async function validateClient(request: Request): Promise<boolean> {
-     const token = request.headers.get('Authorization')?.split(' ')[1];
+     const token = request.headers.get("Authorization")?.split(" ")[1];
      if (!token) return false;
-     
+
      // Implement JWT validation or session check
      return validateToken(token);
    }
@@ -556,21 +572,27 @@ vars = { ENVIRONMENT = "production" }
 ## Troubleshooting
 
 ### Issue: TURN credentials not working
+
 **Check:**
+
 - Key ID and secret are correct
 - Credentials haven't expired (check TTL)
 - Server can reach rtc.live.cloudflare.com
 - Network allows outbound HTTPS
 
 ### Issue: Slow connection establishment
+
 **Solutions:**
+
 - Ensure proper ICE candidate gathering
 - Check network latency to Cloudflare edge
 - Verify firewall allows WebRTC ports
 - Consider using TURN over TLS (port 443)
 
 ### Issue: High packet loss
+
 **Check:**
+
 - Not exceeding rate limits (5-10k pps)
 - Not exceeding bandwidth limits (50-100 Mbps)
 - Not connecting to too many unique IPs (>5/sec)
@@ -579,26 +601,26 @@ vars = { ENVIRONMENT = "production" }
 ### Debugging ICE Connectivity
 
 ```typescript
-pc.addEventListener('icecandidate', (event) => {
+pc.addEventListener("icecandidate", (event) => {
   if (event.candidate) {
-    console.log('ICE candidate:', {
+    console.log("ICE candidate:", {
       type: event.candidate.type,
       protocol: event.candidate.protocol,
       address: event.candidate.address,
-      port: event.candidate.port
+      port: event.candidate.port,
     });
   }
 });
 
-pc.addEventListener('iceconnectionstatechange', () => {
-  console.log('ICE connection state:', pc.iceConnectionState);
+pc.addEventListener("iceconnectionstatechange", () => {
+  console.log("ICE connection state:", pc.iceConnectionState);
 });
 
 // Check which candidate pair was selected
 const stats = await pc.getStats();
-stats.forEach(report => {
-  if (report.type === 'candidate-pair' && report.selected) {
-    console.log('Selected candidate pair:', report);
+stats.forEach((report) => {
+  if (report.type === "candidate-pair" && report.selected) {
+    console.log("Selected candidate pair:", report);
   }
 });
 ```
@@ -618,12 +640,10 @@ class TURNMonitor {
     totalRequests: 0,
     failedRequests: 0,
     averageLatency: 0,
-    activeConnections: 0
+    activeConnections: 0,
   };
 
-  async trackRequest<T>(
-    operation: () => Promise<T>
-  ): Promise<T> {
+  async trackRequest<T>(operation: () => Promise<T>): Promise<T> {
     const start = Date.now();
     this.metrics.totalRequests++;
 
@@ -638,8 +658,7 @@ class TURNMonitor {
   }
 
   private updateLatency(latency: number): void {
-    this.metrics.averageLatency = 
-      (this.metrics.averageLatency + latency) / 2;
+    this.metrics.averageLatency = (this.metrics.averageLatency + latency) / 2;
   }
 
   getMetrics(): TURNMetrics {
@@ -651,24 +670,27 @@ class TURNMonitor {
 ## Architecture Considerations
 
 ### Anycast Benefits
+
 - **Automatic routing**: Clients connect to nearest location
 - **No region selection**: BGP handles routing
 - **Low latency**: 95% of users within 50ms of edge
 - **Fault tolerance**: Network handles failover
 
 ### When to Use TURN
+
 - **Restrictive NATs**: Symmetric NATs that block direct connections
 - **Corporate firewalls**: Environments blocking WebRTC ports
 - **Mobile networks**: Carrier-grade NAT scenarios
 - **Predictable connectivity**: When reliability > efficiency
 
 ### Integration with Cloudflare Calls SFU
+
 ```typescript
 // TURN is automatically used when needed
 // Cloudflare Calls handles TURN + SFU coordination
 const session = await callsClient.createSession({
-  appId: 'your-app-id',
-  sessionId: 'meeting-123'
+  appId: "your-app-id",
+  sessionId: "meeting-123",
 });
 ```
 

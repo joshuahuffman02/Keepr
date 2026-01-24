@@ -7,9 +7,7 @@ interface CentralSettingsLayoutProps {
   children: ReactNode;
 }
 
-export default function CentralSettingsLayout({
-  children,
-}: CentralSettingsLayoutProps) {
+export default function CentralSettingsLayout({ children }: CentralSettingsLayoutProps) {
   return (
     <SettingsProvider>
       <SettingsShell>{children}</SettingsShell>

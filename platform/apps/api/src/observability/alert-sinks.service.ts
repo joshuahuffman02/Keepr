@@ -334,8 +334,7 @@ export class AlertSinksService {
   private readonly enabled: boolean;
 
   constructor() {
-    this.enabled =
-      (process.env.ALERT_SINKS_ENABLED ?? "true").toLowerCase() === "true";
+    this.enabled = (process.env.ALERT_SINKS_ENABLED ?? "true").toLowerCase() === "true";
 
     const maxAlertsPerWindow = Number(process.env.ALERT_RATE_LIMIT_COUNT ?? 5);
     const windowMs = Number(process.env.ALERT_RATE_LIMIT_WINDOW_MS ?? 5 * 60 * 1000);
@@ -349,7 +348,9 @@ export class AlertSinksService {
     if (configuredSinks.length > 0) {
       this.logger.log(`Alert sinks initialized: ${configuredSinks.join(", ")}`);
     } else {
-      this.logger.warn("No alert sinks configured (set PAGERDUTY_ROUTING_KEY or SLACK_WEBHOOK_URL)");
+      this.logger.warn(
+        "No alert sinks configured (set PAGERDUTY_ROUTING_KEY or SLACK_WEBHOOK_URL)",
+      );
     }
   }
 
@@ -424,28 +425,44 @@ export class AlertSinksService {
   /**
    * Convenience method for critical alerts
    */
-  async critical(title: string, message: string, details?: Record<string, unknown>): Promise<Record<string, AlertResult>> {
+  async critical(
+    title: string,
+    message: string,
+    details?: Record<string, unknown>,
+  ): Promise<Record<string, AlertResult>> {
     return this.dispatch({ title, message, severity: "critical", details });
   }
 
   /**
    * Convenience method for error alerts
    */
-  async error(title: string, message: string, details?: Record<string, unknown>): Promise<Record<string, AlertResult>> {
+  async error(
+    title: string,
+    message: string,
+    details?: Record<string, unknown>,
+  ): Promise<Record<string, AlertResult>> {
     return this.dispatch({ title, message, severity: "error", details });
   }
 
   /**
    * Convenience method for warning alerts
    */
-  async warning(title: string, message: string, details?: Record<string, unknown>): Promise<Record<string, AlertResult>> {
+  async warning(
+    title: string,
+    message: string,
+    details?: Record<string, unknown>,
+  ): Promise<Record<string, AlertResult>> {
     return this.dispatch({ title, message, severity: "warning", details });
   }
 
   /**
    * Convenience method for info alerts
    */
-  async info(title: string, message: string, details?: Record<string, unknown>): Promise<Record<string, AlertResult>> {
+  async info(
+    title: string,
+    message: string,
+    details?: Record<string, unknown>,
+  ): Promise<Record<string, AlertResult>> {
     return this.dispatch({ title, message, severity: "info", details });
   }
 }

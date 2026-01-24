@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Headers, Param, Post, Req, UseGuards, Query, BadRequestException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+  Query,
+  BadRequestException,
+} from "@nestjs/common";
 import { AccessProviderType, UserRole } from "@prisma/client";
 import { AccessControlService } from "./access-control.service";
 import { GrantAccessDto, RevokeAccessDto } from "./dto/access-grant.dto";
@@ -33,7 +44,7 @@ export class AccessControlController {
   getStatus(
     @Param("reservationId") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.getAccessStatus(reservationId, requiredCampgroundId);
@@ -46,7 +57,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: UpsertVehicleDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.upsertVehicle(reservationId, dto, requiredCampgroundId);
@@ -59,7 +70,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: GrantAccessDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.grantAccess(reservationId, dto, requiredCampgroundId);
@@ -72,7 +83,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: RevokeAccessDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.revokeAccess(reservationId, dto, requiredCampgroundId);
@@ -81,10 +92,7 @@ export class AccessControlController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("/access/providers")
   @Roles(UserRole.owner, UserRole.manager)
-  listProviders(
-    @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
-  ) {
+  listProviders(@Query("campgroundId") campgroundId: string | undefined, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.listIntegrations(requiredCampgroundId);
   }
@@ -96,12 +104,12 @@ export class AccessControlController {
     @Param("provider") provider: AccessProviderType,
     @Body() dto: UpsertAccessIntegrationDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.upsertIntegration(requiredCampgroundId, {
       ...dto,
-      provider
+      provider,
     });
   }
 
@@ -111,16 +119,17 @@ export class AccessControlController {
     @Param("provider") provider: AccessProviderType,
     @Body() body: unknown,
     @Headers("x-signature") signature: string | undefined,
-    @Req() req: Request & { rawBody?: string | Buffer }
+    @Req() req: Request & { rawBody?: string | Buffer },
   ) {
     const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(body ?? {});
-    const bodySignature = isRecord(body) && typeof body.signature === "string" ? body.signature : undefined;
+    const bodySignature =
+      isRecord(body) && typeof body.signature === "string" ? body.signature : undefined;
     const headerCampgroundId = firstHeader(req.headers["x-campground-id"]);
     const acknowledged = await this.service.verifyWebhook(
       provider,
       signature ?? bodySignature,
       rawBody,
-      headerCampgroundId
+      headerCampgroundId,
     );
     return { acknowledged, provider };
   }

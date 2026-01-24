@@ -8,6 +8,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [StoredValueModule, PermissionsModule],
   controllers: [GiftCardsController],
   providers: [GiftCardsService],
-  exports: [GiftCardsService]
+  exports: [GiftCardsService],
 })
 export class GiftCardsModule {}

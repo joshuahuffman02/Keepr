@@ -70,12 +70,8 @@ export class SeoLocationService {
         slug: dto.slug,
         state: dto.state,
         country: dto.country || "USA",
-        latitude: dto.latitude
-          ? new Prisma.Decimal(dto.latitude)
-          : undefined,
-        longitude: dto.longitude
-          ? new Prisma.Decimal(dto.longitude)
-          : undefined,
+        latitude: dto.latitude ? new Prisma.Decimal(dto.latitude) : undefined,
+        longitude: dto.longitude ? new Prisma.Decimal(dto.longitude) : undefined,
         boundingBox: dto.boundingBox,
         ...(dto.parentId ? { SeoLocation: { connect: { id: dto.parentId } } } : {}),
         metaTitle: dto.metaTitle,
@@ -98,7 +94,7 @@ export class SeoLocationService {
       limit?: number;
       offset?: number;
       sortBy?: "distance" | "rating" | "name";
-    } = {}
+    } = {},
   ): Promise<LocationWithCampgrounds | null> {
     const { limit = 20, offset = 0, sortBy = "name" } = options;
 
@@ -148,20 +144,18 @@ export class SeoLocationService {
       heroImageUrl: location.heroImageUrl,
       description: location.description,
       campgroundCount: location.campgroundCount,
-      campgrounds: location.CampgroundLocation
-        .filter((m) => !m.Campground.deletedAt)
-        .map((m) => ({
-          id: m.Campground.id,
-          name: m.Campground.name,
-          slug: m.Campground.slug,
-          heroImageUrl: m.Campground.heroImageUrl,
-          city: m.Campground.city,
-          state: m.Campground.state,
-          reviewScore: m.Campground.reviewScore?.toNumber() ?? null,
-          reviewCount: m.Campground.reviewCount,
-          amenities: m.Campground.amenities,
-          distanceMiles: m.distanceMiles,
-        })),
+      campgrounds: location.CampgroundLocation.filter((m) => !m.Campground.deletedAt).map((m) => ({
+        id: m.Campground.id,
+        name: m.Campground.name,
+        slug: m.Campground.slug,
+        heroImageUrl: m.Campground.heroImageUrl,
+        city: m.Campground.city,
+        state: m.Campground.state,
+        reviewScore: m.Campground.reviewScore?.toNumber() ?? null,
+        reviewCount: m.Campground.reviewCount,
+        amenities: m.Campground.amenities,
+        distanceMiles: m.distanceMiles,
+      })),
     };
   }
 
@@ -170,7 +164,7 @@ export class SeoLocationService {
    */
   async listByType(
     type: SeoLocationType,
-    options: { published?: boolean; minCampgrounds?: number } = {}
+    options: { published?: boolean; minCampgrounds?: number } = {},
   ) {
     const where: Prisma.SeoLocationWhereInput = { type };
 
@@ -278,9 +272,7 @@ export class SeoLocationService {
       },
     });
 
-    this.logger.log(
-      `Auto-published ${result.count} locations with ${minCampgrounds}+ campgrounds`
-    );
+    this.logger.log(`Auto-published ${result.count} locations with ${minCampgrounds}+ campgrounds`);
     return result.count;
   }
 

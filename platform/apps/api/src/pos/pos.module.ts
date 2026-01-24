@@ -45,8 +45,8 @@ import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
     LightspeedAdapter,
     ShopifyPosAdapter,
     VendAdapter,
-    EmailService
+    EmailService,
   ],
-  exports: [PosService, TillService, PosProviderService, InventorySyncService, PosProviderRegistry]
+  exports: [PosService, TillService, PosProviderService, InventorySyncService, PosProviderRegistry],
 })
 export class PosModule {}

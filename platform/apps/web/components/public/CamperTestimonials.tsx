@@ -21,7 +21,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "Sarah M.",
     location: "Portland, OR",
     rating: 5,
-    quote: "Booking was so easy! No surprise fees and the campground was exactly as pictured. We'll definitely use Keepr again.",
+    quote:
+      "Booking was so easy! No surprise fees and the campground was exactly as pictured. We'll definitely use Keepr again.",
     stayDate: "November 2024",
   },
   {
@@ -29,7 +30,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "Mike & Jenny T.",
     location: "Austin, TX",
     rating: 5,
-    quote: "Finally, a booking site that doesn't charge ridiculous fees. The direct booking feature meant we could ask the campground questions before we arrived.",
+    quote:
+      "Finally, a booking site that doesn't charge ridiculous fees. The direct booking feature meant we could ask the campground questions before we arrived.",
     stayDate: "October 2024",
   },
   {
@@ -37,7 +39,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "David R.",
     location: "Denver, CO",
     rating: 5,
-    quote: "Instant confirmation was a game changer. No more wondering if our spot was actually reserved. Highly recommend!",
+    quote:
+      "Instant confirmation was a game changer. No more wondering if our spot was actually reserved. Highly recommend!",
     stayDate: "September 2024",
   },
   {
@@ -45,7 +48,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "Lisa & Tom K.",
     location: "Seattle, WA",
     rating: 5,
-    quote: "We've tried other booking sites but always got hit with hidden fees at checkout. Keepr shows the real price upfront.",
+    quote:
+      "We've tried other booking sites but always got hit with hidden fees at checkout. Keepr shows the real price upfront.",
     stayDate: "August 2024",
   },
   {
@@ -53,7 +57,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "Chris P.",
     location: "Phoenix, AZ",
     rating: 5,
-    quote: "The photos were accurate, the reviews were genuine, and the whole process was smooth. This is how camping booking should be.",
+    quote:
+      "The photos were accurate, the reviews were genuine, and the whole process was smooth. This is how camping booking should be.",
     stayDate: "October 2024",
   },
   {
@@ -61,7 +66,8 @@ const defaultTestimonials: Testimonial[] = [
     name: "Amanda & Steve B.",
     location: "Nashville, TN",
     rating: 5,
-    quote: "Love that we can book directly with the campground. It feels more personal and we got a great rate.",
+    quote:
+      "Love that we can book directly with the campground. It feels more personal and we got a great rate.",
     stayDate: "November 2024",
   },
 ];
@@ -74,7 +80,9 @@ function StarRating({ rating }: { rating: number }) {
           key={star}
           className={cn(
             "h-4 w-4",
-            star <= rating ? "fill-keepr-clay text-keepr-clay" : "fill-keepr-charcoal/10 text-keepr-charcoal/30"
+            star <= rating
+              ? "fill-keepr-clay text-keepr-clay"
+              : "fill-keepr-charcoal/10 text-keepr-charcoal/30",
           )}
         />
       ))}
@@ -100,17 +108,15 @@ export function CamperTestimonials({
             What Campers Are Saying
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what real campers have to say about booking with Keepr.
+            Don't just take our word for it. Here's what real campers have to say about booking with
+            Keepr.
           </p>
         </div>
 
         {/* Testimonials grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="bg-muted rounded-2xl p-6 relative"
-            >
+            <div key={testimonial.id} className="bg-muted rounded-2xl p-6 relative">
               {/* Quote icon */}
               <Quote className="absolute top-4 right-4 h-8 w-8 text-muted-foreground" />
 
@@ -129,7 +135,10 @@ export function CamperTestimonials({
                 {/* Avatar - initials fallback */}
                 <div className="w-10 h-10 rounded-full bg-keepr-evergreen/10 flex items-center justify-center">
                   <span className="text-keepr-evergreen font-semibold text-sm">
-                    {testimonial.name.split(" ").map((n) => n[0]).join("")}
+                    {testimonial.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </span>
                 </div>
 

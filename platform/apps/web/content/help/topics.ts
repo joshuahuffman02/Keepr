@@ -22,12 +22,12 @@ export const helpTopics: HelpTopic[] = [
       "Open Dashboard to view occupancy, revenue, and arrivals widgets.",
       "Use the date selector to change the time window.",
       "Click a widget to drill into the related report.",
-      "Watch alerts on the right for tasks needing action."
+      "Watch alerts on the right for tasks needing action.",
     ],
     tips: [
       "Refreshes automatically every few minutes; use reload if data looks stale.",
-      "Pin the widgets you use most; they stay in place per user."
-    ]
+      "Pin the widgets you use most; they stay in place per user.",
+    ],
   },
   {
     id: "calendar-availability",
@@ -40,12 +40,12 @@ export const helpTopics: HelpTopic[] = [
       "Open Calendar to view sites by date range.",
       "Hover a site row to see upcoming stays and holds.",
       "Drag across dates to start a new reservation.",
-      "Click a booking block to edit dates, guests, or site."
+      "Click a booking block to edit dates, guests, or site.",
     ],
     tips: [
       "Use filters to show only certain classes or statuses.",
-      "Color legend helps quickly spot holds vs confirmed stays."
-    ]
+      "Color legend helps quickly spot holds vs confirmed stays.",
+    ],
   },
   {
     id: "booking-new",
@@ -59,12 +59,12 @@ export const helpTopics: HelpTopic[] = [
       "Choose arrival/departure and guest count.",
       "Pick an available site; compare price if multiple.",
       "Enter guest contact, vehicles, and notes.",
-      "Collect deposit or full payment and confirm."
+      "Collect deposit or full payment and confirm.",
     ],
     tips: [
       "If a guest exists, search by email/phone to re-use details.",
-      "Apply discounts or promo codes before collecting payment."
-    ]
+      "Apply discounts or promo codes before collecting payment.",
+    ],
   },
   {
     id: "reservation-manage",
@@ -78,12 +78,12 @@ export const helpTopics: HelpTopic[] = [
       "Select the reservation to view timeline and balance.",
       "Change dates or site; system checks conflicts automatically.",
       "Add charges or refunds; issue updated confirmation.",
-      "Log notes and tasks for staff follow-up."
+      "Log notes and tasks for staff follow-up.",
     ],
     tips: [
       "Reassigning sites keeps history; guests see the latest assignment.",
-      "Use hold status if awaiting payment instead of cancelling."
-    ]
+      "Use hold status if awaiting payment instead of cancelling.",
+    ],
   },
   {
     id: "check-in-out",
@@ -97,12 +97,12 @@ export const helpTopics: HelpTopic[] = [
       "Confirm identity, party size, and balance.",
       "Collect remaining payments; issue receipts.",
       "Mark status to Checked In or Checked Out.",
-      "Notify housekeeping/maintenance if required."
+      "Notify housekeeping/maintenance if required.",
     ],
     tips: [
       "Late check-outs can auto-add a fee per policy.",
-      "Add quick notes for issues spotted during checkout."
-    ]
+      "Add quick notes for issues spotted during checkout.",
+    ],
   },
   {
     id: "guests-profiles",
@@ -116,12 +116,12 @@ export const helpTopics: HelpTopic[] = [
       "Open a profile to see past and upcoming stays.",
       "Review balance history and saved payment methods.",
       "Add internal notes or flags for special handling.",
-      "Send confirmation or statement directly from the profile."
+      "Send confirmation or statement directly from the profile.",
     ],
     tips: [
       "Use flags for VIP, do-not-rent, or special access needs.",
-      "Profiles consolidate OTA and direct bookings under matching emails."
-    ]
+      "Profiles consolidate OTA and direct bookings under matching emails.",
+    ],
   },
   {
     id: "payments-collect",
@@ -135,12 +135,12 @@ export const helpTopics: HelpTopic[] = [
       "Click Collect Payment and choose method.",
       "Enter amount (deposit or full) and any notes.",
       "Process the card or record cash/check reference.",
-      "Issue receipt via email or print."
+      "Issue receipt via email or print.",
     ],
     tips: [
       "Partial payments keep remaining balance visible to staff.",
-      "Always add a note for checks (number and bank)."
-    ]
+      "Always add a note for checks (number and bank).",
+    ],
   },
   {
     id: "payments-refund",
@@ -154,12 +154,12 @@ export const helpTopics: HelpTopic[] = [
       "Select Refund and choose the original payment.",
       "Enter refund amount and reason.",
       "Confirm; system records audit trail and updates balance.",
-      "Send updated receipt to the guest."
+      "Send updated receipt to the guest.",
     ],
     tips: [
       "Refunds follow your gateway rules; some card fees are non-refundable.",
-      "Use notes to capture approval reference."
-    ]
+      "Use notes to capture approval reference.",
+    ],
   },
   {
     id: "ledger-close-day",
@@ -173,12 +173,12 @@ export const helpTopics: HelpTopic[] = [
       "Confirm totals by payment type match your terminals.",
       "Resolve pending or failed payments before closing.",
       "Export the ledger CSV/PDF for accounting.",
-      "Lock the day to prevent accidental changes."
+      "Lock the day to prevent accidental changes.",
     ],
     tips: [
       "Locking creates an audit trail; unlock only with manager approval.",
-      "Use repeat charges to schedule recurring invoices."
-    ]
+      "Use repeat charges to schedule recurring invoices.",
+    ],
   },
   {
     id: "reports-overview",
@@ -192,12 +192,12 @@ export const helpTopics: HelpTopic[] = [
       "Set date range, campground, and site filters.",
       "Drill into rows to see underlying reservations.",
       "Save a report view for quick reuse.",
-      "Export CSV or PDF for sharing."
+      "Export CSV or PDF for sharing.",
     ],
     tips: [
       "Use saved reports for weekly digests to stakeholders.",
-      "Audit tab lists every change with who/when."
-    ]
+      "Audit tab lists every change with who/when.",
+    ],
   },
   {
     id: "pricing-rules",
@@ -211,12 +211,12 @@ export const helpTopics: HelpTopic[] = [
       "Add rules for flat or percent adjustments.",
       "Use seasonal windows for peak/off-peak ranges.",
       "Set minimum nights or day-of-week rules.",
-      "Preview final nightly price before saving."
+      "Preview final nightly price before saving.",
     ],
     tips: [
       "Stack rules carefully; the preview shows combined effects.",
-      "Use site classes to update groups of sites at once."
-    ]
+      "Use site classes to update groups of sites at once.",
+    ],
   },
   {
     id: "site-classes",
@@ -230,12 +230,12 @@ export const helpTopics: HelpTopic[] = [
       "Create a class with name, description, and amenities.",
       "Assign sites to the class for shared pricing rules.",
       "Set active/inactive to control availability.",
-      "Save and verify rates inherited in Pricing."
+      "Save and verify rates inherited in Pricing.",
     ],
     tips: [
       "Inactive classes keep history but hide from booking.",
-      "Use clear names (e.g., FHU 50A Pull-Through)."
-    ]
+      "Use clear names (e.g., FHU 50A Pull-Through).",
+    ],
   },
   {
     id: "sites-management",
@@ -249,12 +249,12 @@ export const helpTopics: HelpTopic[] = [
       "Add site number/name, hookups, max length, and notes.",
       "Assign to a class for pricing inheritance.",
       "Set status (active, offline, maintenance).",
-      "Save and verify it appears in availability."
+      "Save and verify it appears in availability.",
     ],
     tips: [
       "Mark offline for temporary issues; history remains intact.",
-      "Include rig length and pad type to reduce booking errors."
-    ]
+      "Include rig length and pad type to reduce booking errors.",
+    ],
   },
   {
     id: "campground-setup",
@@ -268,12 +268,12 @@ export const helpTopics: HelpTopic[] = [
       "Edit name, address, time zone, and contact details.",
       "Set default check-in/out times and quiet hours.",
       "Upload branding (logo/colors) if available.",
-      "Save and review that details show on guest docs."
+      "Save and review that details show on guest docs.",
     ],
     tips: [
       "Keep support phone/email current for guest communications.",
-      "Time zone drives arrivals/departures—verify correctness."
-    ]
+      "Time zone drives arrivals/departures—verify correctness.",
+    ],
   },
   {
     id: "maintenance-work-orders",
@@ -287,12 +287,12 @@ export const helpTopics: HelpTopic[] = [
       "Select site (optional) and describe the issue.",
       "Set priority and due date; assign to a teammate.",
       "Update status as work progresses; add photos if needed.",
-      "Close the task and notify front desk if guest impacted."
+      "Close the task and notify front desk if guest impacted.",
     ],
     tips: [
       "Use priorities to triage: safety first, guest-impact second.",
-      "Due dates help housekeeping and front desk plan around closures."
-    ]
+      "Due dates help housekeeping and front desk plan around closures.",
+    ],
   },
   {
     id: "blackout-dates",
@@ -306,12 +306,12 @@ export const helpTopics: HelpTopic[] = [
       "Choose campground and optional site(s).",
       "Set start/end dates and reason.",
       "Save; blackouts immediately block availability.",
-      "Remove or edit to reopen dates."
+      "Remove or edit to reopen dates.",
     ],
     tips: [
       "Use reasons like weather, maintenance, or private event.",
-      "For partial blocks (specific hours), add a note for staff."
-    ]
+      "For partial blocks (specific hours), add a note for staff.",
+    ],
   },
   {
     id: "messages-inbox",
@@ -325,12 +325,12 @@ export const helpTopics: HelpTopic[] = [
       "Filter by unread to prioritize responses.",
       "Send replies; templates speed up common answers.",
       "Attach reservation links for quick actions.",
-      "Mark resolved when done; unread counts will clear."
+      "Mark resolved when done; unread counts will clear.",
     ],
     tips: [
       "Use templates for WiFi info, directions, and policies.",
-      "System auto-links messages to reservations when possible."
-    ]
+      "System auto-links messages to reservations when possible.",
+    ],
   },
   {
     id: "ota-channels",
@@ -344,12 +344,12 @@ export const helpTopics: HelpTopic[] = [
       "Connect a channel and authorize access.",
       "Map site classes to OTA room types.",
       "Set rate adjustments or fees per channel.",
-      "Sync and verify test availability from the OTA side."
+      "Sync and verify test availability from the OTA side.",
     ],
     tips: [
       "Keep calendars aligned—enable two-way sync where supported.",
-      "Use channel-specific fees to offset commissions."
-    ]
+      "Use channel-specific fees to offset commissions.",
+    ],
   },
   {
     id: "payments-config",
@@ -363,12 +363,12 @@ export const helpTopics: HelpTopic[] = [
       "Connect your payment gateway and test a $1 auth.",
       "Set default deposit rule (flat or percent).",
       "Choose auto-capture timing or manual capture.",
-      "Save; new bookings follow the updated policy."
+      "Save; new bookings follow the updated policy.",
     ],
     tips: [
       "Use lower deposits for long lead times; higher for peak dates.",
-      "Manual capture helps for high-risk bookings; monitor reminders."
-    ]
+      "Manual capture helps for high-risk bookings; monitor reminders.",
+    ],
   },
   {
     id: "users-roles",
@@ -382,12 +382,12 @@ export const helpTopics: HelpTopic[] = [
       "Invite a user by email and choose a role.",
       "Adjust role permissions if needed.",
       "Assign campground access where applicable.",
-      "Deactivate users who no longer need access."
+      "Deactivate users who no longer need access.",
     ],
     tips: [
       "Use least-privilege: limit finance access to trusted staff.",
-      "Reassign conversations and tasks before deactivation."
-    ]
+      "Reassign conversations and tasks before deactivation.",
+    ],
   },
   {
     id: "policies-rules",
@@ -401,12 +401,12 @@ export const helpTopics: HelpTopic[] = [
       "Enter cancellation windows and fees.",
       "Add pets, quiet hours, and vehicle rules.",
       "Save; policies appear on confirmations and guest portal.",
-      "Version changes are logged for audit."
+      "Version changes are logged for audit.",
     ],
     tips: [
       "Keep language short and guest-friendly.",
-      "Update seasonal cancellation windows before peak periods."
-    ]
+      "Update seasonal cancellation windows before peak periods.",
+    ],
   },
   {
     id: "repeat-charges",
@@ -420,12 +420,12 @@ export const helpTopics: HelpTopic[] = [
       "Create a schedule (weekly/monthly) and amount.",
       "Attach to a reservation or account.",
       "Set auto-collect or manual review.",
-      "Monitor upcoming charges in the schedule list."
+      "Monitor upcoming charges in the schedule list.",
     ],
     tips: [
       "Use start/end dates to avoid surprise charges.",
-      "Include tax settings per product/service."
-    ]
+      "Include tax settings per product/service.",
+    ],
   },
   {
     id: "maintenance-cleaning",
@@ -439,12 +439,12 @@ export const helpTopics: HelpTopic[] = [
       "Mark sites as Needs Cleaning during checkout.",
       "Assign cleaning tasks and due times.",
       "Update status to Ready when complete.",
-      "Front desk can now reassign or release the site."
+      "Front desk can now reassign or release the site.",
     ],
     tips: [
       "Use comments for items left behind; coordinate with front desk.",
-      "Track turnaround times to improve staffing estimates."
-    ]
+      "Track turnaround times to improve staffing estimates.",
+    ],
   },
   {
     id: "marketing-promotions",
@@ -458,12 +458,12 @@ export const helpTopics: HelpTopic[] = [
       "Create a code with date range and usage limits.",
       "Choose eligible site classes and channels.",
       "Set discount type (flat or percent).",
-      "Publish and share the code with guests."
+      "Publish and share the code with guests.",
     ],
     tips: [
       "Use channel-specific codes to measure performance.",
-      "Limit redemptions to avoid over-discounting peak dates."
-    ]
+      "Limit redemptions to avoid over-discounting peak dates.",
+    ],
   },
   {
     id: "forms-waivers",
@@ -477,12 +477,12 @@ export const helpTopics: HelpTopic[] = [
       "Choose a template or create a new form.",
       "Attach form to reservation types or site classes.",
       "Send to guest via email/SMS or collect at check-in.",
-      "Track completion status from the reservation."
+      "Track completion status from the reservation.",
     ],
     tips: [
       "Make required fields concise to speed check-in.",
-      "Store signed PDFs with the reservation record."
-    ]
+      "Store signed PDFs with the reservation record.",
+    ],
   },
   {
     id: "branding",
@@ -496,12 +496,12 @@ export const helpTopics: HelpTopic[] = [
       "Upload logo and select brand colors.",
       "Preview receipts and emails with branding applied.",
       "Save to publish across guest-facing touchpoints.",
-      "Update seasonally if branding changes."
+      "Update seasonally if branding changes.",
     ],
     tips: [
       "Use high-res logos with transparent backgrounds.",
-      "Ensure color contrast for accessibility."
-    ]
+      "Ensure color contrast for accessibility.",
+    ],
   },
   {
     id: "support-contact",
@@ -513,12 +513,12 @@ export const helpTopics: HelpTopic[] = [
       "Check this help panel for answers first.",
       "Use in-app chat or email support@keeprstay.com.",
       "Include reservation IDs or screenshots for faster help.",
-      "For outages, provide error messages and time of issue."
+      "For outages, provide error messages and time of issue.",
     ],
     tips: [
       "Describe the path you took to reach the issue.",
-      "If payments fail, include gateway reference IDs."
+      "If payments fail, include gateway reference IDs.",
     ],
-    links: [{ label: "Open support form", href: "/dashboard/help/contact" }]
-  }
+    links: [{ label: "Open support form", href: "/dashboard/help/contact" }],
+  },
 ];

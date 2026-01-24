@@ -52,7 +52,8 @@ const getPaymentMethod = (payload: Record<string, unknown>) =>
 const normalizeActivityPayload = (payload: Record<string, unknown>) => {
   const guestId = typeof payload.guestId === "string" ? payload.guestId : null;
   const quantity = typeof payload.quantity === "number" ? payload.quantity : null;
-  const reservationId = typeof payload.reservationId === "string" ? payload.reservationId : undefined;
+  const reservationId =
+    typeof payload.reservationId === "string" ? payload.reservationId : undefined;
   if (!guestId || quantity === null) return null;
   return { guestId, quantity, reservationId };
 };
@@ -61,7 +62,14 @@ export default function SyncLogPage() {
   const [entries, setEntries] = useState<TelemetryEntry[]>([]);
   const [queues, setQueues] = useState<{ label: string; count: number }[]>([]);
   const [queueStats, setQueueStats] = useState<
-    Array<{ key: string; label: string; count: number; conflicts: number; nextRetry?: number | null; lastError?: string | null }>
+    Array<{
+      key: string;
+      label: string;
+      count: number;
+      conflicts: number;
+      nextRetry?: number | null;
+      lastError?: string | null;
+    }>
   >([]);
   const [flushStatus, setFlushStatus] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<ConflictItem[]>([]);
@@ -89,18 +97,29 @@ export default function SyncLogPage() {
     setQueues(counts);
 
     const conflictItems: ConflictItem[] = [];
-    const stats: { key: string; label: string; count: number; conflicts: number; nextRetry?: number | null; lastError?: string | null }[] = [];
+    const stats: {
+      key: string;
+      label: string;
+      count: number;
+      conflicts: number;
+      nextRetry?: number | null;
+      lastError?: string | null;
+    }[] = [];
     for (const q of queueSources) {
       try {
         const list = loadQueueGeneric<QueueItemBase>(q.key);
         const conflictsForQueue = list.filter((item) => item.conflict);
-        conflictsForQueue.forEach((item) => conflictItems.push({ queueKey: q.key, label: q.label, item }));
+        conflictsForQueue.forEach((item) =>
+          conflictItems.push({ queueKey: q.key, label: q.label, item }),
+        );
         const nextRetry =
           list
             .map((item) => item.nextAttemptAt)
             .filter((n): n is number => typeof n === "number")
             .sort((a: number, b: number) => a - b)[0] ?? null;
-        const lastError = list.map((item) => item.lastError).find((e) => typeof e === "string" && e.length > 0);
+        const lastError = list
+          .map((item) => item.lastError)
+          .find((e) => typeof e === "string" && e.length > 0);
         stats.push({
           key: q.key,
           label: q.label,
@@ -133,7 +152,11 @@ export default function SyncLogPage() {
     setEntries([]);
   };
 
-  const updateQueueItem = (queueKey: string, itemId: string, updater: (item: QueueItemBase) => QueueItemBase | null) => {
+  const updateQueueItem = (
+    queueKey: string,
+    itemId: string,
+    updater: (item: QueueItemBase) => QueueItemBase | null,
+  ) => {
     const list = loadQueueGeneric<QueueItemBase>(queueKey);
     const updated = list
       .map((i) => (i.id === itemId ? updater(i) : i))
@@ -143,13 +166,29 @@ export default function SyncLogPage() {
   };
 
   const retryConflict = (queueKey: string, itemId: string) => {
-    updateQueueItem(queueKey, itemId, (i) => ({ ...i, conflict: false, nextAttemptAt: Date.now() }));
-    recordTelemetry({ source: "sync-log", type: "conflict", status: "pending", message: "Retry requested", meta: { queueKey, itemId } });
+    updateQueueItem(queueKey, itemId, (i) => ({
+      ...i,
+      conflict: false,
+      nextAttemptAt: Date.now(),
+    }));
+    recordTelemetry({
+      source: "sync-log",
+      type: "conflict",
+      status: "pending",
+      message: "Retry requested",
+      meta: { queueKey, itemId },
+    });
   };
 
   const discardConflict = (queueKey: string, itemId: string) => {
     updateQueueItem(queueKey, itemId, () => null);
-    recordTelemetry({ source: "sync-log", type: "conflict", status: "success", message: "Discarded conflicted item", meta: { queueKey, itemId } });
+    recordTelemetry({
+      source: "sync-log",
+      type: "conflict",
+      status: "success",
+      message: "Discarded conflicted item",
+      meta: { queueKey, itemId },
+    });
   };
 
   const flushQueues = useCallback(async () => {
@@ -166,11 +205,28 @@ export default function SyncLogPage() {
         const remaining: QueuedMessage[] = [];
         for (const item of items) {
           try {
-            await apiClient.sendReservationMessage(item.reservationId, item.content, "guest", item.guestId);
-            recordTelemetry({ source: "guest-pwa", type: "sync", status: "success", message: "Manual flush message", meta: { reservationId: item.reservationId } });
+            await apiClient.sendReservationMessage(
+              item.reservationId,
+              item.content,
+              "guest",
+              item.guestId,
+            );
+            recordTelemetry({
+              source: "guest-pwa",
+              type: "sync",
+              status: "success",
+              message: "Manual flush message",
+              meta: { reservationId: item.reservationId },
+            });
           } catch (err: unknown) {
             remaining.push(item);
-            recordTelemetry({ source: "guest-pwa", type: "error", status: "failed", message: "Flush message failed", meta: { error: getErrorMessage(err, "Flush message failed") } });
+            recordTelemetry({
+              source: "guest-pwa",
+              type: "error",
+              status: "failed",
+              message: "Flush message failed",
+              meta: { error: getErrorMessage(err, "Flush message failed") },
+            });
           }
         }
         saveQueueGeneric("campreserv:pwa:queuedMessages", remaining);
@@ -186,14 +242,32 @@ export default function SyncLogPage() {
           try {
             if (!item.campgroundId) {
               remaining.push({ ...item, lastError: "Missing campground ID", conflict: true });
-              recordTelemetry({ source: "pos", type: "error", status: "failed", message: "Flush POS order missing campground ID", meta: { id: item.id } });
+              recordTelemetry({
+                source: "pos",
+                type: "error",
+                status: "failed",
+                message: "Flush POS order missing campground ID",
+                meta: { id: item.id },
+              });
               continue;
             }
             await apiClient.createStoreOrder(item.campgroundId, item.payload);
-            recordTelemetry({ source: "pos", type: "sync", status: "success", message: "Manual flush POS order", meta: { paymentMethod: getPaymentMethod(item.payload) } });
+            recordTelemetry({
+              source: "pos",
+              type: "sync",
+              status: "success",
+              message: "Manual flush POS order",
+              meta: { paymentMethod: getPaymentMethod(item.payload) },
+            });
           } catch (err: unknown) {
             remaining.push(item);
-            recordTelemetry({ source: "pos", type: "error", status: "failed", message: "Flush POS order failed", meta: { error: getErrorMessage(err, "Flush POS order failed") } });
+            recordTelemetry({
+              source: "pos",
+              type: "error",
+              status: "failed",
+              message: "Flush POS order failed",
+              meta: { error: getErrorMessage(err, "Flush POS order failed") },
+            });
           }
         }
         saveQueueGeneric("campreserv:pos:orderQueue", remaining);
@@ -209,10 +283,22 @@ export default function SyncLogPage() {
           try {
             const deviceToken = localStorage.getItem("campreserv:kioskDeviceToken") || undefined;
             await apiClient.kioskCheckIn(item.reservationId, item.upsellTotal, deviceToken);
-            recordTelemetry({ source: "kiosk", type: "sync", status: "success", message: "Manual flush check-in", meta: { reservationId: item.reservationId } });
+            recordTelemetry({
+              source: "kiosk",
+              type: "sync",
+              status: "success",
+              message: "Manual flush check-in",
+              meta: { reservationId: item.reservationId },
+            });
           } catch (err: unknown) {
             remaining.push(item);
-            recordTelemetry({ source: "kiosk", type: "error", status: "failed", message: "Flush check-in failed", meta: { error: getErrorMessage(err, "Flush check-in failed") } });
+            recordTelemetry({
+              source: "kiosk",
+              type: "error",
+              status: "failed",
+              message: "Flush check-in failed",
+              meta: { error: getErrorMessage(err, "Flush check-in failed") },
+            });
           }
         }
         saveQueueGeneric("campreserv:kiosk:checkinQueue", remaining);
@@ -228,14 +314,32 @@ export default function SyncLogPage() {
           try {
             if (!item.campgroundId) {
               remaining.push({ ...item, lastError: "Missing campground ID", conflict: true });
-              recordTelemetry({ source: "portal-store", type: "error", status: "failed", message: "Flush portal order missing campground ID", meta: { id: item.id } });
+              recordTelemetry({
+                source: "portal-store",
+                type: "error",
+                status: "failed",
+                message: "Flush portal order missing campground ID",
+                meta: { id: item.id },
+              });
               continue;
             }
             await apiClient.createStoreOrder(item.campgroundId, item.payload);
-            recordTelemetry({ source: "portal-store", type: "sync", status: "success", message: "Manual flush portal order", meta: { paymentMethod: getPaymentMethod(item.payload) } });
+            recordTelemetry({
+              source: "portal-store",
+              type: "sync",
+              status: "success",
+              message: "Manual flush portal order",
+              meta: { paymentMethod: getPaymentMethod(item.payload) },
+            });
           } catch (err: unknown) {
             remaining.push(item);
-            recordTelemetry({ source: "portal-store", type: "error", status: "failed", message: "Flush portal order failed", meta: { error: getErrorMessage(err, "Flush portal order failed") } });
+            recordTelemetry({
+              source: "portal-store",
+              type: "error",
+              status: "failed",
+              message: "Flush portal order failed",
+              meta: { error: getErrorMessage(err, "Flush portal order failed") },
+            });
           }
         }
         saveQueueGeneric("campreserv:portal:orderQueue", remaining);
@@ -252,14 +356,32 @@ export default function SyncLogPage() {
             const payload = normalizeActivityPayload(item.payload);
             if (!payload) {
               remaining.push({ ...item, lastError: "Invalid activity payload", conflict: true });
-              recordTelemetry({ source: "portal-activities", type: "error", status: "failed", message: "Flush activity booking payload invalid", meta: { id: item.id } });
+              recordTelemetry({
+                source: "portal-activities",
+                type: "error",
+                status: "failed",
+                message: "Flush activity booking payload invalid",
+                meta: { id: item.id },
+              });
               continue;
             }
             await apiClient.bookActivity(item.sessionId, payload);
-            recordTelemetry({ source: "portal-activities", type: "sync", status: "success", message: "Manual flush activity booking", meta: { sessionId: item.sessionId } });
+            recordTelemetry({
+              source: "portal-activities",
+              type: "sync",
+              status: "success",
+              message: "Manual flush activity booking",
+              meta: { sessionId: item.sessionId },
+            });
           } catch (err: unknown) {
             remaining.push(item);
-            recordTelemetry({ source: "portal-activities", type: "error", status: "failed", message: "Flush activity booking failed", meta: { error: getErrorMessage(err, "Flush activity booking failed") } });
+            recordTelemetry({
+              source: "portal-activities",
+              type: "error",
+              status: "failed",
+              message: "Flush activity booking failed",
+              meta: { error: getErrorMessage(err, "Flush activity booking failed") },
+            });
           }
         }
         saveQueueGeneric("campreserv:portal:activityQueue", remaining);
@@ -270,7 +392,13 @@ export default function SyncLogPage() {
       setFlushStatus("Flush complete");
     } catch (err: unknown) {
       setFlushStatus("Flush failed");
-      recordTelemetry({ source: "sync-log", type: "error", status: "failed", message: "Manual flush failed", meta: { error: getErrorMessage(err, "Manual flush failed") } });
+      recordTelemetry({
+        source: "sync-log",
+        type: "error",
+        status: "failed",
+        message: "Manual flush failed",
+        meta: { error: getErrorMessage(err, "Manual flush failed") },
+      });
     } finally {
       refresh();
       setTimeout(() => setFlushStatus(null), 3000);
@@ -283,7 +411,9 @@ export default function SyncLogPage() {
         <div>
           <div className="text-xs uppercase tracking-wide text-slate-400">PWA</div>
           <h1 className="text-xl font-semibold text-slate-50">Sync Log</h1>
-          <p className="text-slate-400 text-sm">Local telemetry for offline queues, cache reads, and retries.</p>
+          <p className="text-slate-400 text-sm">
+            Local telemetry for offline queues, cache reads, and retries.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" size="sm">
@@ -295,7 +425,12 @@ export default function SyncLogPage() {
           <Button variant="secondary" size="sm" onClick={refresh}>
             Refresh
           </Button>
-          <Button variant="secondary" size="sm" onClick={flushQueues} disabled={!!flushStatus && flushStatus.startsWith("Flushing")}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={flushQueues}
+            disabled={!!flushStatus && flushStatus.startsWith("Flushing")}
+          >
             {flushStatus?.startsWith("Flushing") ? "Flushing…" : "Flush queues now"}
           </Button>
           <Button variant="outline" size="sm" onClick={clearTelemetry}>
@@ -319,7 +454,10 @@ export default function SyncLogPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {conflicts.map(({ queueKey, label, item }) => (
-              <div key={item.id} className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 space-y-2">
+              <div
+                key={item.id}
+                className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 space-y-2"
+              >
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold">{label}</div>
                   <Badge variant="secondary">conflict</Badge>
@@ -328,10 +466,18 @@ export default function SyncLogPage() {
                   {item.lastError || "Conflict detected"}
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button size="sm" variant="secondary" onClick={() => retryConflict(queueKey, item.id)}>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => retryConflict(queueKey, item.id)}
+                  >
                     Retry
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => discardConflict(queueKey, item.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => discardConflict(queueKey, item.id)}
+                  >
                     Discard
                   </Button>
                   <span className="text-[11px] text-slate-400">id: {item.id.slice(0, 8)}…</span>
@@ -359,16 +505,29 @@ export default function SyncLogPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {queueStats.map((q) => (
-              <div key={q.key} className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 flex flex-col gap-1">
+              <div
+                key={q.key}
+                className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 flex flex-col gap-1"
+              >
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span>{q.label}</span>
                   <div className="flex items-center gap-2">
                     <Badge variant={q.count > 0 ? "secondary" : "outline"}>{q.count} queued</Badge>
-                    {q.conflicts > 0 && <Badge variant="destructive">{q.conflicts} conflicts</Badge>}
+                    {q.conflicts > 0 && (
+                      <Badge variant="destructive">{q.conflicts} conflicts</Badge>
+                    )}
                   </div>
                 </div>
                 <div className="text-xs text-slate-400 flex flex-wrap gap-3">
-                  <span>Next retry: {q.nextRetry ? new Date(q.nextRetry).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—"}</span>
+                  <span>
+                    Next retry:{" "}
+                    {q.nextRetry
+                      ? new Date(q.nextRetry).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "—"}
+                  </span>
                   <span>Last error: {q.lastError || "—"}</span>
                 </div>
               </div>
@@ -386,21 +545,39 @@ export default function SyncLogPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {entries.map((e) => (
-              <div key={e.id} className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 space-y-1">
+              <div
+                key={e.id}
+                className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 space-y-1"
+              >
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-semibold">{e.source}</div>
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="capitalize">
                       {e.type}
                     </Badge>
-                    <Badge variant={e.status === "failed" ? "destructive" : e.status === "pending" ? "secondary" : e.status === "conflict" ? "secondary" : "outline"}>
+                    <Badge
+                      variant={
+                        e.status === "failed"
+                          ? "destructive"
+                          : e.status === "pending"
+                            ? "secondary"
+                            : e.status === "conflict"
+                              ? "secondary"
+                              : "outline"
+                      }
+                    >
                       {e.status}
                     </Badge>
                   </div>
                 </div>
                 <div className="text-sm text-slate-100">{e.message}</div>
                 <div className="text-xs text-slate-500 flex items-center justify-between">
-                  <span>{new Date(e.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+                  <span>
+                    {new Date(e.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                   {e.meta && <span className="truncate max-w-[60%]">{JSON.stringify(e.meta)}</span>}
                 </div>
               </div>

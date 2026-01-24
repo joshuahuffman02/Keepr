@@ -103,9 +103,7 @@ export function TaxRules({
   };
 
   const updateRuleRate = (index: number, newRate: number) => {
-    setRules((prev) =>
-      prev.map((rule, i) => (i === index ? { ...rule, rate: newRate } : rule))
-    );
+    setRules((prev) => prev.map((rule, i) => (i === index ? { ...rule, rate: newRate } : rule)));
   };
 
   const handleSave = async () => {
@@ -141,12 +139,8 @@ export function TaxRules({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-4">
             <Receipt className="w-8 h-8 text-amber-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Tax Configuration
-          </h2>
-          <p className="text-slate-400">
-            Add lodging taxes that apply to reservations
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Tax Configuration</h2>
+          <p className="text-slate-400">Add lodging taxes that apply to reservations</p>
         </motion.div>
 
         {/* Quick add presets */}
@@ -170,7 +164,7 @@ export function TaxRules({
                     "border",
                     isAdded
                       ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                      : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600 hover:bg-slate-800"
+                      : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600 hover:bg-slate-800",
                   )}
                 >
                   {isAdded ? (
@@ -178,7 +172,8 @@ export function TaxRules({
                   ) : (
                     <Plus className="w-3.5 h-3.5 inline-block mr-1.5" />
                   )}
-                  {preset.name} ({preset.type === "percentage" ? `${preset.rate}%` : `$${preset.rate}`})
+                  {preset.name} (
+                  {preset.type === "percentage" ? `${preset.rate}%` : `$${preset.rate}`})
                 </button>
               );
             })}
@@ -192,9 +187,7 @@ export function TaxRules({
             animate={prefersReducedMotion ? {} : { opacity: 1 }}
             className="space-y-3"
           >
-            <Label className="text-sm text-slate-400">
-              Your Tax Rules ({rules.length})
-            </Label>
+            <Label className="text-sm text-slate-400">Your Tax Rules ({rules.length})</Label>
             <div className="space-y-2">
               <AnimatePresence mode="popLayout">
                 {rules.map((rule, index) => (
@@ -208,9 +201,7 @@ export function TaxRules({
                     <div
                       className={cn(
                         "w-8 h-8 rounded-lg flex items-center justify-center",
-                        rule.type === "percentage"
-                          ? "bg-blue-500/20"
-                          : "bg-green-500/20"
+                        rule.type === "percentage" ? "bg-blue-500/20" : "bg-green-500/20",
                       )}
                     >
                       {rule.type === "percentage" ? (
@@ -223,9 +214,7 @@ export function TaxRules({
                       <p className="font-medium text-white">{rule.name}</p>
                     </div>
                     <div className="flex items-center gap-1">
-                      {rule.type === "flat" && (
-                        <span className="text-slate-400">$</span>
-                      )}
+                      {rule.type === "flat" && <span className="text-slate-400">$</span>}
                       <input
                         type="number"
                         min="0"
@@ -234,9 +223,7 @@ export function TaxRules({
                         onChange={(e) => updateRuleRate(index, parseFloat(e.target.value) || 0)}
                         className="w-16 px-2 py-1 text-right font-medium text-white bg-slate-700/50 border border-slate-600 rounded focus:border-emerald-500 focus:outline-none"
                       />
-                      {rule.type === "percentage" && (
-                        <span className="text-slate-400">%</span>
-                      )}
+                      {rule.type === "percentage" && <span className="text-slate-400">%</span>}
                     </div>
                     <button
                       onClick={() => removeRule(index)}
@@ -357,11 +344,9 @@ export function TaxRules({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              No taxes? That's okay!
-            </span>{" "}
-            You can skip this step and add tax rules later. Advanced options
-            like long-stay exemptions are available in your dashboard.
+            <span className="text-slate-300 font-medium">No taxes? That's okay!</span> You can skip
+            this step and add tax rules later. Advanced options like long-stay exemptions are
+            available in your dashboard.
           </div>
         </motion.div>
 
@@ -380,7 +365,7 @@ export function TaxRules({
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-emerald-500 to-teal-500",
                 "hover:from-emerald-400 hover:to-teal-400",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
             >
               {saving ? "Saving..." : `Save ${rules.length} Tax Rule${rules.length > 1 ? "s" : ""}`}

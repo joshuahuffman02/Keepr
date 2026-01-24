@@ -70,6 +70,7 @@ Major tasks scheduled periodically:
 List every asset that needs maintenance:
 
 **Infrastructure:**
+
 - Utility pedestals (count)
 - Water hookups and lines
 - Sewer/dump station
@@ -78,6 +79,7 @@ List every asset that needs maintenance:
 - Signage
 
 **Facilities:**
+
 - Restrooms/showers
 - Laundry
 - Office
@@ -85,12 +87,14 @@ List every asset that needs maintenance:
 - Pools
 
 **Sites:**
+
 - Fire rings
 - Picnic tables
 - Site markers
 - Landscaping
 
 **Equipment:**
+
 - Mowers
 - Utility vehicles
 - Cleaning equipment
@@ -100,38 +104,42 @@ List every asset that needs maintenance:
 
 Assign maintenance intervals to each item:
 
-| Item | Daily | Weekly | Monthly | Seasonal | Annual |
-|------|:-----:|:------:|:-------:|:--------:|:------:|
-| Restroom cleaning | Yes | Deep | — | — | — |
-| Trash collection | Yes | — | — | — | — |
-| Mowing | — | Yes | — | — | — |
-| Road grading | — | — | — | Yes | — |
-| Electric testing | — | Sample | — | Full | — |
-| Tree trimming | — | — | — | — | Yes |
+| Item              | Daily | Weekly | Monthly | Seasonal | Annual |
+| ----------------- | :---: | :----: | :-----: | :------: | :----: |
+| Restroom cleaning |  Yes  |  Deep  |    —    |    —     |   —    |
+| Trash collection  |  Yes  |   —    |    —    |    —     |   —    |
+| Mowing            |   —   |  Yes   |    —    |    —     |   —    |
+| Road grading      |   —   |   —    |    —    |   Yes    |   —    |
+| Electric testing  |   —   | Sample |    —    |   Full   |   —    |
+| Tree trimming     |   —   |   —    |    —    |    —     |  Yes   |
 
 ### Step 3: Create the Calendar
 
 Map maintenance to your calendar:
 
 **Off-season (November-March):**
+
 - Major projects: electrical upgrades, building repairs
 - Tree work while clear visibility
 - Equipment servicing
 - Winterization tasks
 
 **Pre-season (April-May):**
+
 - De-winterization
 - Full utility testing
 - Cosmetic touch-ups
 - Safety inspections
 
 **Peak season (June-August):**
+
 - Minimize disruption
 - Daily/weekly essentials only
 - Emergency repairs only
 - Note issues for fall
 
 **Shoulder season (September-October):**
+
 - Address accumulated issues
 - Prepare for winterization
 - Evaluate annual projects
@@ -156,16 +164,19 @@ You'll need to take sites offline for:
 Minimize revenue impact:
 
 **Block during low demand:**
+
 - Mid-week rather than weekends
 - Shoulder season rather than peak
 - Consider cancellation/gap situations
 
 **Stagger work:**
+
 - Don't block entire sections at once
 - Spread maintenance across multiple weeks
 - Maintain capacity for expected bookings
 
 **Plan ahead:**
+
 - Block sites in reservation system in advance
 - Prevent bookings during planned work
 - Don't scramble to move booked guests
@@ -189,11 +200,13 @@ When repairs can't wait:
 For smaller campgrounds:
 
 **Daily checklist:**
+
 - Printed forms for daily tasks
 - Staff initials when completed
 - Reviewed by manager
 
 **Work requests:**
+
 - Paper forms for issues discovered
 - Routed to appropriate person
 - Filed when completed
@@ -203,12 +216,14 @@ For smaller campgrounds:
 For larger operations or better organization:
 
 **Spreadsheet tracking:**
+
 - Shared Google Sheet or Excel
 - Tabs for different task types
 - Status columns (pending, in progress, completed)
 - Date and assignee tracking
 
 **Dedicated software:**
+
 - Property management software with maintenance module
 - Work order systems
 - Asset management platforms
@@ -233,13 +248,13 @@ Every maintenance record should include:
 
 Everyone should know their maintenance role:
 
-| Role | Maintenance Responsibility |
-|------|---------------------------|
-| Front Desk | Report observed issues, cleanliness standards |
-| Housekeeping | Restrooms, cabins, common areas |
-| Grounds | Mowing, landscaping, site prep |
-| Maintenance | Repairs, utilities, equipment |
-| Management | Oversight, scheduling, contractors |
+| Role         | Maintenance Responsibility                    |
+| ------------ | --------------------------------------------- |
+| Front Desk   | Report observed issues, cleanliness standards |
+| Housekeeping | Restrooms, cabins, common areas               |
+| Grounds      | Mowing, landscaping, site prep                |
+| Maintenance  | Repairs, utilities, equipment                 |
+| Management   | Oversight, scheduling, contractors            |
 
 ### Daily Briefings
 
@@ -276,6 +291,7 @@ Create a rotation for systematic checks:
 ### Seasonal Checklists
 
 **Spring Opening:**
+
 - [ ] Turn on and test all water systems
 - [ ] Electrical panel inspection
 - [ ] Road assessment after winter
@@ -285,6 +301,7 @@ Create a rotation for systematic checks:
 - [ ] Signage inventory
 
 **Fall Closing:**
+
 - [ ] Winterize water systems
 - [ ] Drain outdoor equipment
 - [ ] Final mowing and cleanup
@@ -302,6 +319,7 @@ Create a rotation for systematic checks:
 Industry rule of thumb: budget 3-5% of revenue for maintenance.
 
 **Budget categories:**
+
 - Routine supplies (cleaning, basics)
 - Repair parts and materials
 - Contractor services
@@ -311,6 +329,7 @@ Industry rule of thumb: budget 3-5% of revenue for maintenance.
 ### Tracking Costs
 
 Monitor spending to:
+
 - Forecast future needs
 - Identify problem areas
 - Plan major purchases
@@ -370,4 +389,4 @@ Build your maintenance schedule around your season, track what's done, and addre
 
 ---
 
-*Keepr includes maintenance tracking features that let you log issues, schedule work, and block sites for repairs—all integrated with your reservation calendar. [Keep your campground maintained at campreserv.com](https://campreserv.com)*
+_Keepr includes maintenance tracking features that let you log issues, schedule work, and block sites for repairs—all integrated with your reservation calendar. [Keep your campground maintained at campreserv.com](https://campreserv.com)_

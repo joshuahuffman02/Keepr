@@ -14,4 +14,3 @@ export class CreateReportExportDto {
   @IsString({ each: true })
   emailTo?: string[];
 }
-

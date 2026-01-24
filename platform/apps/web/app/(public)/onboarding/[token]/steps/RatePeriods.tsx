@@ -52,9 +52,7 @@ const DEFAULT_PERIODS: Omit<RatePeriod, "id">[] = [
   {
     name: "Peak Season",
     icon: "sun",
-    dateRanges: [
-      { startDate: "2025-05-25", endDate: "2025-09-02" },
-    ],
+    dateRanges: [{ startDate: "2025-05-25", endDate: "2025-09-02" }],
     isDefault: false,
   },
   {
@@ -270,7 +268,8 @@ function PeriodCard({
         <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-center gap-2">
           <Info className="w-4 h-4 text-blue-400 flex-shrink-0" />
           <p className="text-sm text-blue-300">
-            This is your default period. It automatically applies to all dates not covered by other periods.
+            This is your default period. It automatically applies to all dates not covered by other
+            periods.
           </p>
         </div>
       )}
@@ -392,7 +391,7 @@ function AddPeriodForm({
                   "w-10 h-10 rounded-lg border-2 transition-all flex items-center justify-center",
                   icon === iconName
                     ? "border-emerald-500 bg-emerald-500/20"
-                    : "border-slate-700 bg-slate-800/50 hover:border-slate-600"
+                    : "border-slate-700 bg-slate-800/50 hover:border-slate-600",
                 )}
               >
                 {iconName === "calendar" && <Calendar className="w-5 h-5 text-slate-300" />}
@@ -508,9 +507,7 @@ export function RatePeriods({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/20 mb-4">
             <Calendar className="w-8 h-8 text-purple-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Rate Periods & Seasons
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Rate Periods & Seasons</h2>
           <p className="text-slate-400">
             Define pricing seasons like Peak, Shoulder, and Off-Season
           </p>
@@ -525,11 +522,9 @@ export function RatePeriods({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              How it works:
-            </span>{" "}
-            Create seasonal periods (like Peak Season) and set different rates for each.
-            Any dates not covered by specific periods will use your default rate.
+            <span className="text-slate-300 font-medium">How it works:</span> Create seasonal
+            periods (like Peak Season) and set different rates for each. Any dates not covered by
+            specific periods will use your default rate.
           </div>
         </motion.div>
 
@@ -541,9 +536,7 @@ export function RatePeriods({
           className="space-y-4"
         >
           <div className="flex items-center justify-between">
-            <Label className="text-sm text-slate-400">
-              Your Periods ({periods.length})
-            </Label>
+            <Label className="text-sm text-slate-400">Your Periods ({periods.length})</Label>
           </div>
 
           <div className="space-y-4">
@@ -602,7 +595,7 @@ export function RatePeriods({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             {hasCustomPeriods

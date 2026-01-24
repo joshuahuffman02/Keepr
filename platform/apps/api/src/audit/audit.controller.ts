@@ -1,4 +1,13 @@
-import { Controller, Get, Query, UseGuards, Param, Res, Req, ForbiddenException } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+  Param,
+  Res,
+  Req,
+  ForbiddenException,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { AuditService } from "./audit.service";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
@@ -19,7 +28,7 @@ const getRequestUserId = (req?: Request): string | undefined => {
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard, PermissionGuard)
 @Controller("campgrounds/:campgroundId/audit")
 export class AuditController {
-  constructor(private readonly audit: AuditService) { }
+  constructor(private readonly audit: AuditService) {}
 
   @Roles(UserRole.owner, UserRole.manager)
   @RequirePermission({ resource: "audit", action: "read" })
@@ -33,7 +42,7 @@ export class AuditController {
     @Query("limit") limit?: string,
     @Query("format") format?: string,
     @Req() req?: Request,
-    @Res() res?: Response
+    @Res() res?: Response,
   ) {
     const params = {
       campgroundId,
@@ -41,7 +50,7 @@ export class AuditController {
       actorId: actorId || undefined,
       start: start ? new Date(start) : undefined,
       end: end ? new Date(end) : undefined,
-      limit: limit ? Math.min(Number(limit) || 100, 500) : 200
+      limit: limit ? Math.min(Number(limit) || 100, 500) : 200,
     };
 
     if (format === "csv" && res) {
@@ -55,7 +64,7 @@ export class AuditController {
         requestedById,
         format: "csv",
         filters: params,
-        recordCount: rows.length
+        recordCount: rows.length,
       });
       return this.audit.exportCsv(params, res);
     }
@@ -70,7 +79,7 @@ export class AuditController {
       requestedById,
       format: "json",
       filters: params,
-      recordCount: rows.length
+      recordCount: rows.length,
     });
     return rows;
   }
@@ -100,13 +109,13 @@ export class AuditController {
     @Param("campgroundId") campgroundId: string,
     @Param("entityType") entityType: string,
     @Param("entityId") entityId: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     return this.audit.listByEntity({
       campgroundId,
       entity: entityType,
       entityId,
-      limit: limit ? Math.min(Number(limit) || 50, 200) : 50
+      limit: limit ? Math.min(Number(limit) || 50, 200) : 50,
     });
   }
 }

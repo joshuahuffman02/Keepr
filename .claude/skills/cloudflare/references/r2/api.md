@@ -9,14 +9,14 @@ await env.MY_BUCKET.put(key, value);
 // With metadata
 await env.MY_BUCKET.put(key, value, {
   httpMetadata: {
-    contentType: 'image/jpeg',
+    contentType: "image/jpeg",
     contentDisposition: 'attachment; filename="photo.jpg"',
-    cacheControl: 'max-age=3600'
+    cacheControl: "max-age=3600",
   },
-  customMetadata: { userId: '123', version: '2' },
-  storageClass: 'Standard', // or 'InfrequentAccess'
+  customMetadata: { userId: "123", version: "2" },
+  storageClass: "Standard", // or 'InfrequentAccess'
   sha256: arrayBufferOrHex, // Integrity check
-  ssecKey: arrayBuffer32bytes // SSE-C encryption
+  ssecKey: arrayBuffer32bytes, // SSE-C encryption
 });
 
 // Value types: ReadableStream | ArrayBuffer | string | Blob
@@ -26,7 +26,7 @@ await env.MY_BUCKET.put(key, value, {
 
 ```typescript
 const object = await env.MY_BUCKET.get(key);
-if (!object) return new Response('Not found', { status: 404 });
+if (!object) return new Response("Not found", { status: 404 });
 
 // Body formats
 const buffer = await object.arrayBuffer();
@@ -36,12 +36,12 @@ const stream = object.body; // ReadableStream
 
 // Ranged reads
 const object = await env.MY_BUCKET.get(key, {
-  range: { offset: 0, length: 1024 }
+  range: { offset: 0, length: 1024 },
 });
 
 // Conditional GET
 const object = await env.MY_BUCKET.get(key, {
-  onlyIf: { etagMatches: '"abc123"' }
+  onlyIf: { etagMatches: '"abc123"' },
 });
 ```
 
@@ -64,10 +64,10 @@ await env.MY_BUCKET.delete([key1, key2, key3]); // Batch (max 1000)
 ```typescript
 const listed = await env.MY_BUCKET.list({
   limit: 1000,
-  prefix: 'photos/',
+  prefix: "photos/",
   cursor: cursorFromPrevious,
-  delimiter: '/',
-  include: ['httpMetadata', 'customMetadata']
+  delimiter: "/",
+  include: ["httpMetadata", "customMetadata"],
 });
 
 // Pagination (always use truncated flag)
@@ -83,7 +83,7 @@ while (listed.truncated) {
 
 ```typescript
 const multipart = await env.MY_BUCKET.createMultipartUpload(key, {
-  httpMetadata: { contentType: 'video/mp4' }
+  httpMetadata: { contentType: "video/mp4" },
 });
 
 const uploadedParts: R2UploadedPart[] = [];
@@ -111,7 +111,7 @@ interface R2Object {
   uploaded: Date;
   httpMetadata: R2HTTPMetadata;
   customMetadata: Record<string, string>;
-  storageClass: 'Standard' | 'InfrequentAccess';
+  storageClass: "Standard" | "InfrequentAccess";
   checksums: R2Checksums;
   writeHttpMetadata(headers: Headers): void;
 }

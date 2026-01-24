@@ -67,7 +67,7 @@ describe("IntegrationsService sandbox QBO", () => {
         data: expect.objectContaining({
           status: "queued",
         }),
-      })
+      }),
     );
     expect(prisma.integrationConnection.update).toHaveBeenCalled();
   });

@@ -7,7 +7,7 @@ import { PropsWithChildren, useState } from "react";
 
 const ReactQueryDevtools = dynamic(
   () => import("@tanstack/react-query-devtools").then((mod) => mod.ReactQueryDevtools),
-  { ssr: false }
+  { ssr: false },
 );
 import { KeyboardShortcutsProvider } from "@/contexts/KeyboardShortcutsContext";
 import { KeyboardShortcutsDialog } from "@/components/ui/keyboard-shortcuts-dialog";

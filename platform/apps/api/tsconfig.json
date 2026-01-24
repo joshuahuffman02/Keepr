@@ -13,27 +13,13 @@
     "outDir": "dist",
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ],
-      "@/prisma": [
-        "prisma"
-      ],
-      "@/shared": [
-        "../../../packages/shared/src"
-      ],
-      "@keepr/sdk": [
-        "../../packages/sdk/dist"
-      ],
-      "@keepr/sdk/*": [
-        "../../packages/sdk/dist/*"
-      ],
-      "@keepr/shared": [
-        "../../packages/shared/dist"
-      ],
-      "@keepr/shared/*": [
-        "../../packages/shared/dist/*"
-      ]
+      "@/*": ["src/*"],
+      "@/prisma": ["prisma"],
+      "@/shared": ["../../../packages/shared/src"],
+      "@keepr/sdk": ["../../packages/sdk/dist"],
+      "@keepr/sdk/*": ["../../packages/sdk/dist/*"],
+      "@keepr/shared": ["../../packages/shared/dist"],
+      "@keepr/shared/*": ["../../packages/shared/dist/*"]
     },
     "incremental": true,
     "strict": true,
@@ -41,12 +27,6 @@
     "useUnknownInCatchVariables": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src/**/*",
-    "src/main.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*", "src/main.ts"],
+  "exclude": ["node_modules", "dist"]
 }

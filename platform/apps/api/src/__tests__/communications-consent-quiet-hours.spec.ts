@@ -48,7 +48,7 @@ describe("Communications consent, quiet hours, and alerts", () => {
       communication: {
         create: jest.fn().mockImplementation(async (data) => ({ id: "comm-1", ...data })),
         update: jest.fn().mockImplementation(async (_opts) => ({ id: "comm-1", status: "sent" })),
-        updateMany: jest.fn().mockResolvedValue({})
+        updateMany: jest.fn().mockResolvedValue({}),
       },
       privacySetting: { findUnique: jest.fn().mockResolvedValue({ consentRequired: true }) },
       consentLog: { findFirst: jest.fn().mockResolvedValue(null) },
@@ -58,14 +58,20 @@ describe("Communications consent, quiet hours, and alerts", () => {
           quietHoursStart: "21:00",
           quietHoursEnd: "07:00",
           timezone: "America/New_York",
-          parkTimeZone: "America/New_York"
-        })
+          parkTimeZone: "America/New_York",
+        }),
       },
-      communicationTemplate: { findUnique: jest.fn() }
+      communicationTemplate: { findUnique: jest.fn() },
     };
 
-    email = { sendEmail: jest.fn().mockResolvedValue({ provider: "postmark", providerMessageId: "pm-1" }) };
-    sms = { sendSms: jest.fn().mockResolvedValue({ success: true, provider: "twilio", providerMessageId: "tw-1" }) };
+    email = {
+      sendEmail: jest.fn().mockResolvedValue({ provider: "postmark", providerMessageId: "pm-1" }),
+    };
+    sms = {
+      sendSms: jest
+        .fn()
+        .mockResolvedValue({ success: true, provider: "twilio", providerMessageId: "tw-1" }),
+    };
     observability = { recordCommsStatus: jest.fn() };
     alerting = { dispatch: jest.fn().mockResolvedValue({ ok: true }) };
 
@@ -85,10 +91,10 @@ describe("Communications consent, quiet hours, and alerts", () => {
           provide: PermissionsService,
           useValue: {
             isPlatformStaff: () => false,
-            checkAccess: async () => ({ allowed: true })
-          }
-        }
-      ]
+            checkAccess: async () => ({ allowed: true }),
+          },
+        },
+      ],
     }).compile();
 
     controller = moduleRef.get(CommunicationsController);
@@ -117,7 +123,7 @@ describe("Communications consent, quiet hours, and alerts", () => {
       campgroundId: "cg-1",
       status: "approved",
       subject: "Hello",
-      bodyHtml: "<p>Body</p>"
+      bodyHtml: "<p>Body</p>",
     });
     await expect(
       controller.send({
@@ -127,8 +133,8 @@ describe("Communications consent, quiet hours, and alerts", () => {
         toAddress: "guest@example.com",
         subject: "Hello",
         body: "Body",
-        templateId: "tpl-1"
-      })
+        templateId: "tpl-1",
+      }),
     ).rejects.toThrow(/Consent required/i);
     expect(prisma.communication.create).not.toHaveBeenCalled();
   });
@@ -139,14 +145,14 @@ describe("Communications consent, quiet hours, and alerts", () => {
       quietHoursStart: null,
       quietHoursEnd: null,
       timezone: "America/New_York",
-      parkTimeZone: "America/New_York"
+      parkTimeZone: "America/New_York",
     });
     prisma.communicationTemplate.findUnique.mockResolvedValueOnce({
       id: "tpl-1",
       campgroundId: "cg-1",
       status: "approved",
       subject: "Hello",
-      bodyHtml: "<p>Body</p>"
+      bodyHtml: "<p>Body</p>",
     });
 
     await expect(
@@ -158,8 +164,8 @@ describe("Communications consent, quiet hours, and alerts", () => {
         subject: "Hello",
         body: "Body",
         consentGranted: true,
-        templateId: "tpl-1"
-      })
+        templateId: "tpl-1",
+      }),
     ).rejects.toThrow(/Consent required/i);
     expect(prisma.communication.create).not.toHaveBeenCalled();
   });
@@ -170,15 +176,18 @@ describe("Communications consent, quiet hours, and alerts", () => {
       quietHoursStart: null,
       quietHoursEnd: null,
       timezone: "America/New_York",
-      parkTimeZone: "America/New_York"
+      parkTimeZone: "America/New_York",
     });
-    prisma.consentLog.findFirst.mockResolvedValueOnce({ grantedAt: new Date().toISOString(), consentType: "email" });
+    prisma.consentLog.findFirst.mockResolvedValueOnce({
+      grantedAt: new Date().toISOString(),
+      consentType: "email",
+    });
     prisma.communicationTemplate.findUnique.mockResolvedValueOnce({
       id: "tpl-1",
       campgroundId: "cg-1",
       status: "approved",
       subject: "Approved",
-      bodyHtml: "<p>Hello</p>"
+      bodyHtml: "<p>Hello</p>",
     });
 
     const res = await controller.send({
@@ -188,7 +197,7 @@ describe("Communications consent, quiet hours, and alerts", () => {
       toAddress: "guest@example.com",
       subject: "Hello",
       body: "Body",
-      templateId: "tpl-1"
+      templateId: "tpl-1",
     });
 
     expect(res.status).toBe("sent");
@@ -203,9 +212,12 @@ describe("Communications consent, quiet hours, and alerts", () => {
       campgroundId: "cg-1",
       status: "approved",
       subject: "Quiet",
-      bodyHtml: "Body"
+      bodyHtml: "Body",
     });
-    prisma.consentLog.findFirst.mockResolvedValueOnce({ grantedAt: new Date().toISOString(), consentType: "email" });
+    prisma.consentLog.findFirst.mockResolvedValueOnce({
+      grantedAt: new Date().toISOString(),
+      consentType: "email",
+    });
     await expect(
       controller.send({
         campgroundId: "cg-1",
@@ -214,8 +226,8 @@ describe("Communications consent, quiet hours, and alerts", () => {
         toAddress: "guest@example.com",
         subject: "Quiet",
         body: "Body",
-        templateId: "tpl-quiet"
-      })
+        templateId: "tpl-quiet",
+      }),
     ).rejects.toThrow(/Quiet hours/i);
   });
 
@@ -224,14 +236,14 @@ describe("Communications consent, quiet hours, and alerts", () => {
     prisma.communicationTemplate.findUnique.mockResolvedValue({
       id: "tpl-1",
       campgroundId: "cg-1",
-      status: "draft"
+      status: "draft",
     });
     prisma.campground.findUnique.mockResolvedValue({
       id: "cg-1",
       quietHoursStart: "21:00",
       quietHoursEnd: "07:00",
       timezone: "America/New_York",
-      parkTimeZone: "America/New_York"
+      parkTimeZone: "America/New_York",
     });
 
     await expect(
@@ -242,8 +254,8 @@ describe("Communications consent, quiet hours, and alerts", () => {
         toAddress: "guest@example.com",
         subject: "Hello",
         body: "Body",
-        templateId: "tpl-1"
-      })
+        templateId: "tpl-1",
+      }),
     ).rejects.toThrow(/Template not approved/i);
   });
 
@@ -253,9 +265,12 @@ describe("Communications consent, quiet hours, and alerts", () => {
       quietHoursStart: null,
       quietHoursEnd: null,
       timezone: "America/New_York",
-      parkTimeZone: "America/New_York"
+      parkTimeZone: "America/New_York",
     });
-    prisma.consentLog.findFirst.mockResolvedValueOnce({ grantedAt: new Date().toISOString(), consentType: "email" });
+    prisma.consentLog.findFirst.mockResolvedValueOnce({
+      grantedAt: new Date().toISOString(),
+      consentType: "email",
+    });
 
     await expect(
       controller.send({
@@ -264,28 +279,35 @@ describe("Communications consent, quiet hours, and alerts", () => {
         direction: "outbound",
         toAddress: "guest@example.com",
         subject: "Hello",
-        body: "Body"
-      })
+        body: "Body",
+      }),
     ).rejects.toThrow(/Template is required/i);
   });
 
   it("dispatches alerts when SMS fails", async () => {
-    prisma.consentLog.findFirst.mockResolvedValueOnce({ grantedAt: new Date().toISOString(), consentType: "sms" });
+    prisma.consentLog.findFirst.mockResolvedValueOnce({
+      grantedAt: new Date().toISOString(),
+      consentType: "sms",
+    });
     prisma.campground.findUnique.mockResolvedValueOnce({
       id: "cg-1",
       quietHoursStart: null,
       quietHoursEnd: null,
       timezone: "America/New_York",
-      parkTimeZone: "America/New_York"
+      parkTimeZone: "America/New_York",
     });
     prisma.communicationTemplate.findUnique.mockResolvedValueOnce({
       id: "tpl-2",
       campgroundId: "cg-1",
       status: "approved",
       subject: "Hi",
-      bodyHtml: "Hi"
+      bodyHtml: "Hi",
     });
-    sms.sendSms.mockResolvedValueOnce({ success: false, provider: "twilio", fallback: "send_failed" });
+    sms.sendSms.mockResolvedValueOnce({
+      success: false,
+      provider: "twilio",
+      fallback: "send_failed",
+    });
 
     await expect(
       controller.send({
@@ -294,8 +316,8 @@ describe("Communications consent, quiet hours, and alerts", () => {
         direction: "outbound",
         toPhone: "5551234567",
         body: "Hi",
-        templateId: "tpl-2"
-      })
+        templateId: "tpl-2",
+      }),
     ).rejects.toThrow(/Failed to send sms/i);
 
     expect(alerting.dispatch).toHaveBeenCalled();
@@ -306,7 +328,7 @@ describe("Communications consent, quiet hours, and alerts", () => {
       MessageID: "msg-1",
       RecordType: "Bounce",
       BounceType: "HardBounce",
-      Description: "Mailbox not found"
+      Description: "Mailbox not found",
     });
 
     expect(prisma.communication.updateMany).toHaveBeenCalled();
@@ -315,7 +337,7 @@ describe("Communications consent, quiet hours, and alerts", () => {
       expect.any(String),
       "warning",
       expect.stringContaining("postmark-bounce-msg-1"),
-      expect.objectContaining({ bounceType: "HardBounce" })
+      expect.objectContaining({ bounceType: "HardBounce" }),
     );
   });
 });

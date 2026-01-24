@@ -5,7 +5,7 @@ import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 
 @Controller()
 export class HealthController {
-  constructor(private readonly health: HealthService) { }
+  constructor(private readonly health: HealthService) {}
 
   @Get("health")
   getLiveness() {
@@ -84,4 +84,3 @@ export class HealthController {
     return result;
   }
 }
-

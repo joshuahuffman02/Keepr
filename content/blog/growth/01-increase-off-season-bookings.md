@@ -21,6 +21,7 @@ The off-season doesn't have to mean empty sites and tight cash flow. With the ri
 The simplest lever: make off-season stays irresistible on price.
 
 **Strategies:**
+
 - 20-40% discount off peak rates
 - Weekly/monthly specials with steeper discounts
 - "Stay 3, pay for 2" or similar packages
@@ -42,6 +43,7 @@ Retirees escaping winter are ideal off-season guests:
 - Lower maintenance requirements
 
 **How to attract snowbirds:**
+
 - Advertise in northern states and Canada
 - Partner with RV clubs and groups
 - Offer seasonal packages
@@ -54,11 +56,13 @@ Retirees escaping winter are ideal off-season guests:
 Give people a reason to come:
 
 **Event ideas by season:**
+
 - **Fall:** Halloween weekends, harvest festivals, fall color tours
 - **Winter:** Holiday celebrations, chili cook-offs, craft weekends
 - **Spring:** Easter events, fishing tournaments, wildflower weekends
 
 **Event success factors:**
+
 - Market heavily in advance
 - Partner with local attractions
 - Create package deals (camping + event)
@@ -73,6 +77,7 @@ Give people a reason to come:
 Off-season visitors often have specific interests:
 
 **Potential partners:**
+
 - Wineries and breweries
 - Hiking/outdoor groups
 - Hunting outfitters
@@ -81,6 +86,7 @@ Off-season visitors often have specific interests:
 - Motorcycle and car clubs
 
 **Partnership structures:**
+
 - Cross-promotion (they promote you, you promote them)
 - Package deals (stay + tickets/activities)
 - Group discounts
@@ -93,12 +99,14 @@ Off-season visitors often have specific interests:
 The rise of remote work creates opportunity:
 
 **What remote workers need:**
+
 - Reliable WiFi (critical!)
 - Quiet daytime environment
 - Comfortable working space
 - Reasonable weekly/monthly rates
 
 **Marketing message:**
+
 > "Work from anywhere—why not work from a beautiful campground? Strong WiFi, peaceful surroundings, and weekly rates that make sense."
 
 ---
@@ -107,15 +115,16 @@ The rise of remote work creates opportunity:
 
 Off-season activities bring targeted audiences:
 
-| Activity | Season | Your Draw |
-|----------|--------|-----------|
-| Hunting | Fall/Winter | Proximity to land, early check-in |
-| Fishing | Spring/Fall | Water access, fish cleaning stations |
-| Hiking | Fall/Spring | Trail access, group sites |
-| Mountain biking | Fall/Spring | Trail proximity |
-| Photography | Fall | Scenic locations, wildlife |
+| Activity        | Season      | Your Draw                            |
+| --------------- | ----------- | ------------------------------------ |
+| Hunting         | Fall/Winter | Proximity to land, early check-in    |
+| Fishing         | Spring/Fall | Water access, fish cleaning stations |
+| Hiking          | Fall/Spring | Trail access, group sites            |
+| Mountain biking | Fall/Spring | Trail proximity                      |
+| Photography     | Fall        | Scenic locations, wildlife           |
 
 **Requirements:**
+
 - Know what activities exist near you
 - Accommodate group needs (storage, early/late hours)
 - Partner with local outfitters
@@ -127,14 +136,17 @@ Off-season activities bring targeted audiences:
 Empty sites earn nothing. Fill them with longer stays:
 
 **Weekly rates:**
+
 - Pay for 5, get 7 nights
 - 15% weekly discount
 
 **Monthly rates:**
+
 - 40-50% off nightly rate
 - Include utilities or cap them
 
 **Seasonal packages:**
+
 - Lock in 3-6 months at guaranteed rate
 - Priority site selection for next year
 
@@ -147,11 +159,13 @@ Empty sites earn nothing. Fill them with longer stays:
 People in your region might not think of local camping:
 
 **Marketing angles:**
+
 - "Escape without the drive"
 - "Weekend getaway 30 minutes from home"
 - "Perfect for quick recharges"
 
 **Local marketing tactics:**
+
 - Facebook and Instagram targeting by location
 - Partner with local businesses
 - Community bulletin boards and newsletters
@@ -164,6 +178,7 @@ People in your region might not think of local camping:
 Make staying comfortable during shoulder seasons:
 
 **Investments that pay off:**
+
 - WiFi upgrades (critical for remote workers, streaming)
 - Heated facilities (restrooms, showers, gathering spaces)
 - Fire pits and wood sales (cool evenings = campfire demand)
@@ -177,6 +192,7 @@ Make staying comfortable during shoulder seasons:
 Your best off-season marketing: direct to past guests.
 
 **Year-round email strategy:**
+
 - Collect emails from every guest
 - Send seasonal newsletters
 - Announce off-season specials first to email list
@@ -190,11 +206,11 @@ Subject: Fall colors are peaking—sites available this weekend!
 
 Hi [Name],
 
-Remember that campfire you loved last summer? It's even 
+Remember that campfire you loved last summer? It's even
 better when the leaves are changing.
 
-We have sites available this weekend at 30% off our 
-regular rates. Perfect weather, no crowds, and the fall 
+We have sites available this weekend at 30% off our
+regular rates. Perfect weather, no crowds, and the fall
 colors are at their peak.
 
 [Book Now] button
@@ -212,6 +228,7 @@ See you soon!
 The real magic: combining strategies.
 
 **Example off-season package:**
+
 - Weekend rate at 30% off
 - Fall festival event ticket included
 - Partnership discount at local winery
@@ -242,4 +259,4 @@ Ready to build your off-season strategy?
 
 ---
 
-*Keepr makes seasonal pricing, event management, and guest marketing simple—so you can focus on filling sites year-round. [Grow your revenue at campreserv.com](https://campreserv.com)*
+_Keepr makes seasonal pricing, event management, and guest marketing simple—so you can focus on filling sites year-round. [Grow your revenue at campreserv.com](https://campreserv.com)_

@@ -11,6 +11,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PrismaModule, EmailModule, SmsModule, AuditModule, PermissionsModule],
   controllers: [SignaturesController],
   providers: [SignaturesService],
-  exports: [SignaturesService]
+  exports: [SignaturesService],
 })
-export class SignaturesModule { }
+export class SignaturesModule {}

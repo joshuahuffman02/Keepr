@@ -26,12 +26,13 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
     return (
       <div className="space-y-1">
         {label && (
-          <Label
-            htmlFor={fieldId}
-            className={cn(hideLabel && "sr-only")}
-          >
+          <Label htmlFor={fieldId} className={cn(hideLabel && "sr-only")}>
             {label}
-            {props.required && <span aria-label="required" className="text-status-error ml-1">*</span>}
+            {props.required && (
+              <span aria-label="required" className="text-status-error ml-1">
+                *
+              </span>
+            )}
           </Label>
         )}
         <div className="relative">
@@ -43,10 +44,10 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
               hasError
                 ? "border-status-error focus-visible:ring-status-error/50"
                 : isValid
-                ? "border-status-success focus-visible:ring-status-success/50"
-                : "border-border focus-visible:ring-ring/20",
+                  ? "border-status-success focus-visible:ring-status-success/50"
+                  : "border-border focus-visible:ring-ring/20",
               isValid && "pr-10",
-              className
+              className,
             )}
             aria-invalid={hasError ? "true" : "false"}
             aria-describedby={describedBy || undefined}
@@ -60,26 +61,18 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
           )}
         </div>
         {error && (
-          <p
-            id={errorId}
-            className="text-sm text-status-error"
-            role="alert"
-            aria-live="polite"
-          >
+          <p id={errorId} className="text-sm text-status-error" role="alert" aria-live="polite">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p
-            id={helperId}
-            className="text-sm text-muted-foreground"
-          >
+          <p id={helperId} className="text-sm text-muted-foreground">
             {helperText}
           </p>
         )}
       </div>
     );
-  }
+  },
 );
 
 FormField.displayName = "FormField";

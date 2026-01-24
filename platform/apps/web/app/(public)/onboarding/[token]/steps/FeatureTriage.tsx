@@ -128,23 +128,21 @@ export function FeatureTriage({
   });
 
   // Track expanded categories
-  const [expandedCategories, setExpandedCategories] = useState<Set<PageCategory>>(
-    () => {
-      // Start with categories that have "setup_now" features expanded
-      const expanded = new Set<PageCategory>();
-      for (const [key, status] of Object.entries(selections)) {
-        if (status === "setup_now") {
-          const feature = SETUPABLE_FEATURES.find((f) => f.key === key);
-          if (feature) {
-            expanded.add(feature.category);
-          }
+  const [expandedCategories, setExpandedCategories] = useState<Set<PageCategory>>(() => {
+    // Start with categories that have "setup_now" features expanded
+    const expanded = new Set<PageCategory>();
+    for (const [key, status] of Object.entries(selections)) {
+      if (status === "setup_now") {
+        const feature = SETUPABLE_FEATURES.find((f) => f.key === key);
+        if (feature) {
+          expanded.add(feature.category);
         }
       }
-      // Also expand "settings" by default
-      expanded.add("settings");
-      return expanded;
     }
-  );
+    // Also expand "settings" by default
+    expanded.add("settings");
+    return expanded;
+  });
 
   // Toggle category expansion
   const toggleCategory = useCallback((category: PageCategory) => {
@@ -160,15 +158,12 @@ export function FeatureTriage({
   }, []);
 
   // Update a single feature's status
-  const updateFeatureStatus = useCallback(
-    (featureKey: string, status: TriageStatus) => {
-      setSelections((prev) => ({
-        ...prev,
-        [featureKey]: status,
-      }));
-    },
-    []
-  );
+  const updateFeatureStatus = useCallback((featureKey: string, status: TriageStatus) => {
+    setSelections((prev) => ({
+      ...prev,
+      [featureKey]: status,
+    }));
+  }, []);
 
   // Calculate summary stats
   const summary = useMemo(() => {
@@ -221,7 +216,7 @@ export function FeatureTriage({
             "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1",
             status === "setup_now"
               ? "bg-emerald-500 text-white"
-              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50"
+              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50",
           )}
         >
           <Check className="w-3 h-3" />
@@ -233,7 +228,7 @@ export function FeatureTriage({
             "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1",
             status === "setup_later"
               ? "bg-amber-500 text-white"
-              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50"
+              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50",
           )}
         >
           <Clock className="w-3 h-3" />
@@ -245,7 +240,7 @@ export function FeatureTriage({
             "px-3 py-1.5 rounded-md text-xs font-medium transition-all flex items-center gap-1",
             status === "skip"
               ? "bg-slate-600 text-white"
-              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50"
+              : "text-slate-400 hover:text-slate-300 hover:bg-slate-700/50",
           )}
         >
           <X className="w-3 h-3" />
@@ -270,8 +265,8 @@ export function FeatureTriage({
           status === "setup_now"
             ? "bg-emerald-500/5 border-emerald-500/30"
             : status === "setup_later"
-            ? "bg-amber-500/5 border-amber-500/30"
-            : "bg-slate-800/20 border-slate-700/50"
+              ? "bg-amber-500/5 border-amber-500/30"
+              : "bg-slate-800/20 border-slate-700/50",
         )}
       >
         <div className="flex-1 min-w-0 mr-4">
@@ -284,9 +279,7 @@ export function FeatureTriage({
             )}
           </div>
           <p className="text-sm text-slate-400 mt-0.5">{feature.description}</p>
-          <p className="text-xs text-slate-500 mt-1">
-            ~{feature.estimatedMinutes} min
-          </p>
+          <p className="text-xs text-slate-500 mt-1">~{feature.estimatedMinutes} min</p>
         </div>
         {renderTriageToggle(feature)}
       </motion.div>
@@ -303,12 +296,8 @@ export function FeatureTriage({
     const categoryLabel = CATEGORY_INFO[category]?.label || category;
 
     // Count features by status in this category
-    const nowCount = features.filter(
-      (f) => selections[f.key] === "setup_now"
-    ).length;
-    const laterCount = features.filter(
-      (f) => selections[f.key] === "setup_later"
-    ).length;
+    const nowCount = features.filter((f) => selections[f.key] === "setup_now").length;
+    const laterCount = features.filter((f) => selections[f.key] === "setup_later").length;
 
     return (
       <motion.div
@@ -330,23 +319,15 @@ export function FeatureTriage({
               <p className="font-medium text-white">{categoryLabel}</p>
               <p className="text-xs text-slate-500">
                 {features.length} feature{features.length !== 1 ? "s" : ""}
-                {nowCount > 0 && (
-                  <span className="text-emerald-400 ml-2">
-                    {nowCount} now
-                  </span>
-                )}
-                {laterCount > 0 && (
-                  <span className="text-amber-400 ml-2">
-                    {laterCount} later
-                  </span>
-                )}
+                {nowCount > 0 && <span className="text-emerald-400 ml-2">{nowCount} now</span>}
+                {laterCount > 0 && <span className="text-amber-400 ml-2">{laterCount} later</span>}
               </p>
             </div>
           </div>
           <ChevronDown
             className={cn(
               "w-5 h-5 text-slate-400 transition-transform",
-              isExpanded && "rotate-180"
+              isExpanded && "rotate-180",
             )}
           />
         </button>
@@ -400,12 +381,8 @@ export function FeatureTriage({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/20 mb-4">
             <ListTodo className="w-8 h-8 text-purple-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Choose Your Features
-          </h2>
-          <p className="text-slate-400">
-            Decide what to set up now, later, or skip
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Choose Your Features</h2>
+          <p className="text-slate-400">Decide what to set up now, later, or skip</p>
         </motion.div>
 
         {/* Summary bar */}
@@ -419,25 +396,17 @@ export function FeatureTriage({
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
               <span className="text-sm text-slate-300">
-                <span className="font-semibold text-white">
-                  {summary.setupNowCount}
-                </span>{" "}
-                now
+                <span className="font-semibold text-white">{summary.setupNowCount}</span> now
                 {summary.setupNowMinutes > 0 && (
-                  <span className="text-slate-500">
-                    {" "}
-                    (~{summary.setupNowMinutes} min)
-                  </span>
+                  <span className="text-slate-500"> (~{summary.setupNowMinutes} min)</span>
                 )}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
               <span className="text-sm text-slate-300">
-                <span className="font-semibold text-white">
-                  {summary.setupLaterCount}
-                </span>{" "}
-                queued for later
+                <span className="font-semibold text-white">{summary.setupLaterCount}</span> queued
+                for later
               </span>
             </div>
           </div>
@@ -482,7 +451,7 @@ export function FeatureTriage({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             {summary.setupNowCount > 0 ? (

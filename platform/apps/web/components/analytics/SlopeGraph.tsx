@@ -90,7 +90,7 @@ export function SlopeGraph({
 
   // Normalize values to positions
   // Each metric has its own scale based on its own min/max range
-  const normalizedData = data.map(d => {
+  const normalizedData = data.map((d) => {
     const min = Math.min(d.leftValue, d.rightValue) * 0.9;
     const max = Math.max(d.leftValue, d.rightValue) * 1.1;
     const range = max - min || 1;
@@ -163,17 +163,16 @@ export function SlopeGraph({
               const rightY = baseY - 20 + d.rightY * 40;
 
               const change = d.rightValue - d.leftValue;
-              const percentChange = d.leftValue !== 0
-                ? ((change / d.leftValue) * 100).toFixed(1)
-                : "0";
+              const percentChange =
+                d.leftValue !== 0 ? ((change / d.leftValue) * 100).toFixed(1) : "0";
               const isPositive = d.isNegativeGood ? change < 0 : change > 0;
               const isNegative = d.isNegativeGood ? change > 0 : change < 0;
 
               const lineColor = isPositive
                 ? "hsl(var(--status-success))"
                 : isNegative
-                ? "hsl(var(--status-error))"
-                : "hsl(var(--muted-foreground))";
+                  ? "hsl(var(--status-error))"
+                  : "hsl(var(--muted-foreground))";
 
               return (
                 <g key={d.label}>
@@ -211,18 +210,8 @@ export function SlopeGraph({
                   />
 
                   {/* Dots at endpoints */}
-                  <circle
-                    cx={padding.left + 50}
-                    cy={leftY}
-                    r={4}
-                    fill={lineColor}
-                  />
-                  <circle
-                    cx={width - padding.right - 50}
-                    cy={rightY}
-                    r={4}
-                    fill={lineColor}
-                  />
+                  <circle cx={padding.left + 50} cy={leftY} r={4} fill={lineColor} />
+                  <circle cx={width - padding.right - 50} cy={rightY} r={4} fill={lineColor} />
 
                   {/* Right value */}
                   <text
@@ -243,10 +232,15 @@ export function SlopeGraph({
                     dominantBaseline="middle"
                     className={cn(
                       "text-xs font-medium",
-                      isPositive ? "fill-status-success" : isNegative ? "fill-status-error" : "fill-muted-foreground"
+                      isPositive
+                        ? "fill-status-success"
+                        : isNegative
+                          ? "fill-status-error"
+                          : "fill-muted-foreground",
                     )}
                   >
-                    {change >= 0 ? "+" : ""}{percentChange}%
+                    {change >= 0 ? "+" : ""}
+                    {percentChange}%
                   </text>
                 </g>
               );

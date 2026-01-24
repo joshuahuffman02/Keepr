@@ -139,10 +139,7 @@ export function EasterEggsProvider({ children }: EasterEggsProviderProps) {
 
       {/* Fast scroll toast */}
       {showSlowDown && !isReducedMotion && (
-        <div
-          className="fixed bottom-6 left-6 z-50 animate-slide-in-left"
-          onClick={dismissSlowDown}
-        >
+        <div className="fixed bottom-6 left-6 z-50 animate-slide-in-left" onClick={dismissSlowDown}>
           <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 shadow-lg flex items-center gap-3 cursor-pointer hover:bg-amber-100 transition-colors">
             <span className="text-2xl">🏃</span>
             <div>

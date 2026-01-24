@@ -22,4 +22,3 @@ export class ProposeRecommendationDto {
   @IsOptional()
   payload?: Record<string, unknown>;
 }
-

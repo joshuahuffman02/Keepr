@@ -42,10 +42,24 @@ import {
 
 type TaskState = "pending" | "in_progress" | "blocked" | "done" | "failed" | "expired";
 type SlaStatus = "on_track" | "at_risk" | "breached";
-type TaskType = "turnover" | "inspection" | "deep_clean" | "touch_up" | "vip_prep" | "linen_change" | "other";
+type TaskType =
+  | "turnover"
+  | "inspection"
+  | "deep_clean"
+  | "touch_up"
+  | "vip_prep"
+  | "linen_change"
+  | "other";
 const EMPTY_SELECT_VALUE = "__empty";
 
-const taskStateValues: TaskState[] = ["pending", "in_progress", "blocked", "done", "failed", "expired"];
+const taskStateValues: TaskState[] = [
+  "pending",
+  "in_progress",
+  "blocked",
+  "done",
+  "failed",
+  "expired",
+];
 const slaStatusValues: SlaStatus[] = ["on_track", "at_risk", "breached"];
 const taskTypeValues: TaskType[] = [
   "turnover",
@@ -101,7 +115,12 @@ type DailyScheduleData = {
     isVIP?: boolean;
     isEarlyArrival?: boolean;
   }>;
-  expectedTurnovers?: Array<{ id: string; siteName?: string; arrivalTime?: string; departureTime?: string }>;
+  expectedTurnovers?: Array<{
+    id: string;
+    siteName?: string;
+    arrivalTime?: string;
+    departureTime?: string;
+  }>;
   stayovers?: Array<{ id: string; siteName?: string; guestName?: string }>;
   prioritySites?: Array<{ id: string; siteName?: string; priority?: string; reason?: string }>;
   priorityUnits?: string[];
@@ -232,7 +251,9 @@ function TaskTypeBadge({ type }: { type: string }) {
     other: "Other",
   };
   return (
-    <span className={`px-2 py-0.5 rounded text-xs font-medium text-white ${styles[type] || styles.other}`}>
+    <span
+      className={`px-2 py-0.5 rounded text-xs font-medium text-white ${styles[type] || styles.other}`}
+    >
       {labels[type] || type}
     </span>
   );
@@ -275,7 +296,9 @@ export default function HousekeepingPage() {
     enabled: !!campgroundId,
   });
 
-  const housekeepingStatsQuery = useQuery<Awaited<ReturnType<typeof apiClient.getHousekeepingStatusStats>>>({
+  const housekeepingStatsQuery = useQuery<
+    Awaited<ReturnType<typeof apiClient.getHousekeepingStatusStats>>
+  >({
     queryKey: ["housekeeping-stats", campgroundId],
     queryFn: () => apiClient.getHousekeepingStatusStats(campgroundId),
     enabled: !!campgroundId,
@@ -422,11 +445,15 @@ export default function HousekeepingPage() {
                 <div className="text-xs text-muted-foreground">Breached</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-status-info">{inspectionStats?.passRate ?? 0}%</div>
+                <div className="text-2xl font-bold text-status-info">
+                  {inspectionStats?.passRate ?? 0}%
+                </div>
                 <div className="text-xs text-muted-foreground">Inspection Pass Rate</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-primary">{inspectionStats?.averageScore ?? 0}</div>
+                <div className="text-2xl font-bold text-primary">
+                  {inspectionStats?.averageScore ?? 0}
+                </div>
                 <div className="text-xs text-muted-foreground">Avg Inspection Score</div>
               </Card>
             </div>
@@ -585,7 +612,9 @@ export default function HousekeepingPage() {
               />
               {dailySchedule && (
                 <div className="text-sm text-muted-foreground">
-                  {dailySchedule.summary?.checkouts ?? 0} checkouts | {dailySchedule.summary?.checkins ?? 0} check-ins | {dailySchedule.summary?.turnovers ?? 0} turnovers
+                  {dailySchedule.summary?.checkouts ?? 0} checkouts |{" "}
+                  {dailySchedule.summary?.checkins ?? 0} check-ins |{" "}
+                  {dailySchedule.summary?.turnovers ?? 0} turnovers
                 </div>
               )}
             </div>
@@ -593,7 +622,9 @@ export default function HousekeepingPage() {
             {dailyScheduleQuery.isLoading ? (
               <div className="text-center py-12 text-muted-foreground">Loading schedule...</div>
             ) : !dailySchedule ? (
-              <div className="text-center py-12 text-muted-foreground">No schedule data available.</div>
+              <div className="text-center py-12 text-muted-foreground">
+                No schedule data available.
+              </div>
             ) : (
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Checkouts */}
@@ -630,8 +661,16 @@ export default function HousekeepingPage() {
                       <div key={checkin.id} className="p-2 border rounded text-sm">
                         <div className="font-medium flex items-center gap-2">
                           {checkin.siteName}
-                          {checkin.isVIP && <Badge variant="destructive" className="text-xs">VIP</Badge>}
-                          {checkin.isEarlyArrival && <Badge variant="secondary" className="text-xs">Early</Badge>}
+                          {checkin.isVIP && (
+                            <Badge variant="destructive" className="text-xs">
+                              VIP
+                            </Badge>
+                          )}
+                          {checkin.isEarlyArrival && (
+                            <Badge variant="secondary" className="text-xs">
+                              Early
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">{checkin.guestName}</div>
                       </div>
@@ -652,7 +691,10 @@ export default function HousekeepingPage() {
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {dailySchedule.priorityUnits?.slice(0, 10).map((siteId: string) => (
-                      <div key={siteId} className="p-2 border border-status-warning/20 bg-status-warning/10 rounded text-sm">
+                      <div
+                        key={siteId}
+                        className="p-2 border border-status-warning/20 bg-status-warning/10 rounded text-sm"
+                      >
                         <div className="font-medium">{siteId.slice(-8)}</div>
                         <div className="text-xs text-status-warning">VIP / Early Arrival</div>
                       </div>
@@ -669,17 +711,20 @@ export default function HousekeepingPage() {
           <TabsContent value="status" className="space-y-4">
             {/* Room Status Overview */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {housekeepingStats?.byStatus && Object.entries(housekeepingStats.byStatus).map(([status, count]) => (
-                <Card key={status} className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-bold">{count}</div>
-                      <div className="text-xs text-muted-foreground capitalize">{status.replace(/_/g, " ")}</div>
+              {housekeepingStats?.byStatus &&
+                Object.entries(housekeepingStats.byStatus).map(([status, count]) => (
+                  <Card key={status} className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-2xl font-bold">{count}</div>
+                        <div className="text-xs text-muted-foreground capitalize">
+                          {status.replace(/_/g, " ")}
+                        </div>
+                      </div>
+                      <HousekeepingStatusBadge status={status} />
                     </div>
-                    <HousekeepingStatusBadge status={status} />
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))}
               {!housekeepingStats?.byStatus && (
                 <div className="col-span-5 text-center py-8 text-muted-foreground">
                   Loading room status...
@@ -705,9 +750,14 @@ export default function HousekeepingPage() {
                         .map((site) => {
                           const zone = getSiteZone(site);
                           return (
-                            <div key={site.id} className="text-sm p-2 border rounded flex justify-between">
+                            <div
+                              key={site.id}
+                              className="text-sm p-2 border rounded flex justify-between"
+                            >
                               <span>{site.name}</span>
-                              {zone && <span className="text-xs text-muted-foreground">{zone}</span>}
+                              {zone && (
+                                <span className="text-xs text-muted-foreground">{zone}</span>
+                              )}
                             </div>
                           );
                         })}
@@ -735,7 +785,9 @@ export default function HousekeepingPage() {
             {staffWorkloadQuery.isLoading ? (
               <div className="text-center py-12 text-muted-foreground">Loading workload...</div>
             ) : Object.keys(staffWorkload).length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">No workload data available.</div>
+              <div className="text-center py-12 text-muted-foreground">
+                No workload data available.
+              </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(staffWorkload).map(([userId, data]) => (
@@ -753,15 +805,21 @@ export default function HousekeepingPage() {
                           <div className="text-xs text-muted-foreground">Total</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-status-success">{data.completed}</div>
+                          <div className="text-xl font-bold text-status-success">
+                            {data.completed}
+                          </div>
                           <div className="text-xs text-muted-foreground">Done</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-status-info">{data.inProgress}</div>
+                          <div className="text-xl font-bold text-status-info">
+                            {data.inProgress}
+                          </div>
                           <div className="text-xs text-muted-foreground">Active</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-muted-foreground">{data.pending}</div>
+                          <div className="text-xl font-bold text-muted-foreground">
+                            {data.pending}
+                          </div>
                           <div className="text-xs text-muted-foreground">Pending</div>
                         </div>
                       </div>
@@ -803,7 +861,9 @@ export default function HousekeepingPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="task-type" className="text-sm font-medium text-foreground">Type</Label>
+                  <Label htmlFor="task-type" className="text-sm font-medium text-foreground">
+                    Type
+                  </Label>
                   <Select
                     value={newTask.type}
                     onValueChange={(value) => {
@@ -828,7 +888,9 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="task-site" className="text-sm font-medium text-foreground">Site</Label>
+                  <Label htmlFor="task-site" className="text-sm font-medium text-foreground">
+                    Site
+                  </Label>
                   <Select
                     value={newTask.siteId || EMPTY_SELECT_VALUE}
                     onValueChange={(value) =>
@@ -853,12 +915,12 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="task-priority" className="text-sm font-medium text-foreground">Priority</Label>
+                  <Label htmlFor="task-priority" className="text-sm font-medium text-foreground">
+                    Priority
+                  </Label>
                   <Select
                     value={newTask.priority}
-                    onValueChange={(value) =>
-                      setNewTask({ ...newTask, priority: value })
-                    }
+                    onValueChange={(value) => setNewTask({ ...newTask, priority: value })}
                   >
                     <SelectTrigger id="task-priority" className="w-full mt-1">
                       <SelectValue />
@@ -872,13 +934,13 @@ export default function HousekeepingPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="task-notes" className="text-sm font-medium text-foreground">Notes</Label>
+                  <Label htmlFor="task-notes" className="text-sm font-medium text-foreground">
+                    Notes
+                  </Label>
                   <Textarea
                     id="task-notes"
                     value={newTask.notes}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, notes: e.target.value })
-                    }
+                    onChange={(e) => setNewTask({ ...newTask, notes: e.target.value })}
                     className="mt-1"
                     rows={3}
                     placeholder="Optional notes..."

@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useRef, useState } from 'react';
-import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart,
   Grid3x3,
@@ -11,87 +11,77 @@ import {
   Calendar,
   MessageSquare,
   Check,
-} from 'lucide-react';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+} from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 const popularFeatures = [
   {
-    id: 'pos',
-    name: 'Point-of-Sale System',
+    id: "pos",
+    name: "Point-of-Sale System",
     icon: ShoppingCart,
-    description: 'Integrated POS for camp store, rentals, and add-ons.',
+    description: "Integrated POS for camp store, rentals, and add-ons.",
     benefits: [
-      'Inventory management',
-      'Multiple payment methods',
-      'Real-time sync with reservations',
-      'Staff permissions & reporting',
+      "Inventory management",
+      "Multiple payment methods",
+      "Real-time sync with reservations",
+      "Staff permissions & reporting",
     ],
-    image: '/images/owners/pos.png',
+    image: "/images/owners/pos.png",
   },
   {
-    id: 'grid',
-    name: 'Grid Optimization',
+    id: "grid",
+    name: "Grid Optimization",
     icon: Grid3x3,
-    description: 'Visual site management with drag-and-drop assignments.',
+    description: "Visual site management with drag-and-drop assignments.",
     benefits: [
-      'Interactive site map',
-      'Drag-and-drop assignments',
-      'Real-time availability',
-      'Site type grouping',
+      "Interactive site map",
+      "Drag-and-drop assignments",
+      "Real-time availability",
+      "Site type grouping",
     ],
-    image: '/images/owners/grid.png',
+    image: "/images/owners/grid.png",
   },
   {
-    id: 'mobile',
-    name: 'Mobile Check-In',
+    id: "mobile",
+    name: "Mobile Check-In",
     icon: Smartphone,
-    description: 'Contactless check-in and guest self-service portal.',
-    benefits: [
-      'QR code check-in',
-      'Digital waivers',
-      'Mobile payments',
-      'Guest messaging',
-    ],
-    image: '/images/owners/mobile-checkin.png',
+    description: "Contactless check-in and guest self-service portal.",
+    benefits: ["QR code check-in", "Digital waivers", "Mobile payments", "Guest messaging"],
+    image: "/images/owners/mobile-checkin.png",
   },
   {
-    id: 'payments',
-    name: 'Payment Processing',
+    id: "payments",
+    name: "Payment Processing",
     icon: CreditCard,
-    description: 'Secure payment processing with multiple gateways.',
+    description: "Secure payment processing with multiple gateways.",
     benefits: [
-      'Stripe & Square integration',
-      'Split payments',
-      'Refund management',
-      'PCI compliance',
+      "Stripe & Square integration",
+      "Split payments",
+      "Refund management",
+      "PCI compliance",
     ],
-    image: '/images/owners/payments.png',
+    image: "/images/owners/payments.png",
   },
   {
-    id: 'booking',
-    name: 'Online Booking Engine',
+    id: "booking",
+    name: "Online Booking Engine",
     icon: Calendar,
-    description: 'Beautiful booking experience for your guests.',
+    description: "Beautiful booking experience for your guests.",
     benefits: [
-      'Real-time availability',
-      'Dynamic pricing',
-      'Add-on selection',
-      'Instant confirmation',
+      "Real-time availability",
+      "Dynamic pricing",
+      "Add-on selection",
+      "Instant confirmation",
     ],
-    image: '/images/owners/booking.png',
+    image: "/images/owners/booking.png",
   },
   {
-    id: 'messaging',
-    name: 'Guest Messaging',
+    id: "messaging",
+    name: "Guest Messaging",
     icon: MessageSquare,
-    description: 'Automated and manual guest communication.',
-    benefits: [
-      'Booking confirmations',
-      'Pre-arrival messages',
-      'SMS & email',
-      'Custom templates',
-    ],
-    image: '/images/owners/messaging.png',
+    description: "Automated and manual guest communication.",
+    benefits: ["Booking confirmations", "Pre-arrival messages", "SMS & email", "Custom templates"],
+    image: "/images/owners/messaging.png",
   },
 ];
 
@@ -101,7 +91,7 @@ export function PopularFeatures() {
   const prefersReducedMotion = useReducedMotionSafe();
   const panelId = "popular-feature-panel";
 
-  const handleSelect = (feature: typeof popularFeatures[number]) => {
+  const handleSelect = (feature: (typeof popularFeatures)[number]) => {
     setActiveFeature(feature);
     if (typeof window !== "undefined" && window.innerWidth < 1024 && detailRef.current) {
       detailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -155,37 +145,40 @@ export function PopularFeatures() {
                   role="tab"
                   aria-selected={isActive}
                   aria-controls={panelId}
-                  className={`w-full text-left p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-white ${isActive
-                    ? 'border-keepr-evergreen bg-white shadow-lg'
-                    : 'border-border bg-white hover:border-keepr-evergreen/30 hover:shadow-md'
-                    }`}
+                  className={`w-full text-left p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-white ${
+                    isActive
+                      ? "border-keepr-evergreen bg-white shadow-lg"
+                      : "border-border bg-white hover:border-keepr-evergreen/30 hover:shadow-md"
+                  }`}
                 >
                   {/* Active indicator bar */}
                   <div
                     className={`absolute left-0 top-0 bottom-0 w-1 bg-keepr-evergreen transition-opacity duration-300 ${
-                      isActive ? 'opacity-100' : 'opacity-0'
+                      isActive ? "opacity-100" : "opacity-0"
                     }`}
                   />
 
                   <div className="flex items-center gap-4">
                     <div
                       className={`flex-shrink-0 h-11 w-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
-                        isActive
-                          ? 'bg-keepr-evergreen shadow-md'
-                          : 'bg-slate-100'
-                        }`}
+                        isActive ? "bg-keepr-evergreen shadow-md" : "bg-slate-100"
+                      }`}
                     >
-                      <Icon className={`h-5 w-5 transition-colors duration-300 ${isActive ? 'text-white' : 'text-muted-foreground'}`} />
+                      <Icon
+                        className={`h-5 w-5 transition-colors duration-300 ${isActive ? "text-white" : "text-muted-foreground"}`}
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
                         className={`text-base font-semibold transition-colors duration-300 ${
-                          isActive ? 'text-keepr-evergreen' : 'text-foreground'
-                          }`}
+                          isActive ? "text-keepr-evergreen" : "text-foreground"
+                        }`}
                       >
                         {feature.name}
                       </h3>
-                      <p className={`text-sm transition-colors duration-300 ${isActive ? 'text-keepr-evergreen/70' : 'text-muted-foreground'}`}>
+                      <p
+                        className={`text-sm transition-colors duration-300 ${isActive ? "text-keepr-evergreen/70" : "text-muted-foreground"}`}
+                      >
                         {feature.description}
                       </p>
                     </div>
@@ -255,9 +248,7 @@ export function PopularFeatures() {
                   transition={{ duration: 0.3 }}
                   className="p-8"
                 >
-                  <h3 className="text-2xl font-bold text-foreground mb-3">
-                    {activeFeature.name}
-                  </h3>
+                  <h3 className="text-2xl font-bold text-foreground mb-3">{activeFeature.name}</h3>
                   <p className="text-muted-foreground mb-6">{activeFeature.description}</p>
 
                   {/* Benefits List */}

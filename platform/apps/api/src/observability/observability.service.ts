@@ -50,7 +50,10 @@ type ObservabilitySnapshot = {
     recentErrors: { path: string; status: number; at: number }[];
   };
   jobs: Aggregate & {
-    queues: Record<string, { running: number; queued: number; oldestMs?: number; rawName?: string }>;
+    queues: Record<
+      string,
+      { running: number; queued: number; oldestMs?: number; rawName?: string }
+    >;
   };
   web: {
     lcp: Aggregate;
@@ -79,7 +82,18 @@ type CommsTotals = {
 export class ObservabilityService {
   private readonly apiSamples: ApiSample[] = [];
   private readonly jobSamples: JobSample[] = [];
-  private readonly queues: Record<string, { running: number; queued: number; oldestMs?: number; maxQueue?: number; concurrency?: number; updatedAt?: number; rawName?: string }> = {};
+  private readonly queues: Record<
+    string,
+    {
+      running: number;
+      queued: number;
+      oldestMs?: number;
+      maxQueue?: number;
+      concurrency?: number;
+      updatedAt?: number;
+      rawName?: string;
+    }
+  > = {};
   private readonly domainEvents: Record<string, DomainSample[]> = {
     redeem: [],
     offline: [],
@@ -91,7 +105,10 @@ export class ObservabilityService {
   };
   private readonly webLcpSamples: DomainSample[] = [];
   private readonly webTtfbSamples: DomainSample[] = [];
-  private readonly syntheticResults: Record<string, { ok: boolean; latencyMs?: number; at: number; message?: string }> = {};
+  private readonly syntheticResults: Record<
+    string,
+    { ok: boolean; latencyMs?: number; at: number; message?: string }
+  > = {};
   private readonly maxSamples = Number(process.env.OBS_MAX_SAMPLES ?? 800);
   private readonly targets = {
     apiP95Ms: Number(process.env.SLO_API_P95_MS ?? 400),
@@ -121,7 +138,13 @@ export class ObservabilityService {
     }
   }
 
-  setQueueState(queue: string, running: number, queued: number, oldestMs?: number, meta?: { maxQueue?: number; concurrency?: number }) {
+  setQueueState(
+    queue: string,
+    running: number,
+    queued: number,
+    oldestMs?: number,
+    meta?: { maxQueue?: number; concurrency?: number },
+  ) {
     const normalized = this.normalizeQueueName(queue);
     this.queues[normalized] = {
       running,
@@ -150,7 +173,10 @@ export class ObservabilityService {
     this.emit("report", { ok, latencyMs, meta });
   }
 
-  recordCommsStatus(status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed", meta?: Record<string, unknown>) {
+  recordCommsStatus(
+    status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed",
+    meta?: Record<string, unknown>,
+  ) {
     const ok = status === "delivered" || status === "sent";
     this.emit("comms", { ok, kind: status, meta });
   }
@@ -189,8 +215,14 @@ export class ObservabilityService {
       const idx = Math.min(sorted.length - 1, Math.floor(p * sorted.length));
       return sorted[idx];
     };
-    const lcpP75 = percentile(this.webLcpSamples.map((s) => s.value ?? 0), 0.75);
-    const ttfbP75 = percentile(this.webTtfbSamples.map((s) => s.value ?? 0), 0.75);
+    const lcpP75 = percentile(
+      this.webLcpSamples.map((s) => s.value ?? 0),
+      0.75,
+    );
+    const ttfbP75 = percentile(
+      this.webTtfbSamples.map((s) => s.value ?? 0),
+      0.75,
+    );
 
     return {
       captured: Math.max(this.apiSamples.length, this.jobSamples.length),
@@ -224,10 +256,18 @@ export class ObservabilityService {
     const queues = snapshot.jobs.queues || {};
     const queueDepthBreaches = Object.entries(queues)
       .filter(([, state]) => (state?.queued ?? 0) > this.queueMaxDepth)
-      .map(([name, state]) => ({ name: state.rawName ?? name, queued: state.queued, running: state.running }));
+      .map(([name, state]) => ({
+        name: state.rawName ?? name,
+        queued: state.queued,
+        running: state.running,
+      }));
     const queueLagBreaches = Object.entries(queues)
       .filter(([, state]) => (state?.oldestMs ?? 0) > this.queueLagThresholdMs)
-      .map(([name, state]) => ({ name: state.rawName ?? name, oldestMs: state.oldestMs, queued: state.queued }));
+      .map(([name, state]) => ({
+        name: state.rawName ?? name,
+        oldestMs: state.oldestMs,
+        queued: state.queued,
+      }));
 
     const percentile = (values: number[], p: number) => {
       if (!values.length) return 0;
@@ -258,30 +298,33 @@ export class ObservabilityService {
       failures: 0,
       byProvider: {},
     };
-    const commsTotals = commsEvents.reduce(
-      (acc, e) => {
-        const status = e.kind ?? "sent";
-        const provider = typeof e.meta?.provider === "string" ? e.meta.provider : "unknown";
-        acc.total += 1;
-        acc.byProvider[provider] = acc.byProvider[provider] ?? { total: 0, delivered: 0, failures: 0 };
-        acc.byProvider[provider].total += 1;
-        if (status === "delivered" || status === "sent") {
-          acc.delivered += 1;
-          acc.byProvider[provider].delivered += 1;
-        }
-        if (status === "bounced") acc.bounced += 1;
-        if (status === "spam_complaint") acc.complaints += 1;
-        if (!e.ok) {
-          acc.failures += 1;
-          acc.byProvider[provider].failures += 1;
-        }
-        return acc;
-      },
-      initialCommsTotals
-    );
-    const commsDeliveryRate = commsTotals.total === 0 ? 1 : commsTotals.delivered / commsTotals.total;
+    const commsTotals = commsEvents.reduce((acc, e) => {
+      const status = e.kind ?? "sent";
+      const provider = typeof e.meta?.provider === "string" ? e.meta.provider : "unknown";
+      acc.total += 1;
+      acc.byProvider[provider] = acc.byProvider[provider] ?? {
+        total: 0,
+        delivered: 0,
+        failures: 0,
+      };
+      acc.byProvider[provider].total += 1;
+      if (status === "delivered" || status === "sent") {
+        acc.delivered += 1;
+        acc.byProvider[provider].delivered += 1;
+      }
+      if (status === "bounced") acc.bounced += 1;
+      if (status === "spam_complaint") acc.complaints += 1;
+      if (!e.ok) {
+        acc.failures += 1;
+        acc.byProvider[provider].failures += 1;
+      }
+      return acc;
+    }, initialCommsTotals);
+    const commsDeliveryRate =
+      commsTotals.total === 0 ? 1 : commsTotals.delivered / commsTotals.total;
     const commsBounceRate = commsTotals.total === 0 ? 0 : commsTotals.bounced / commsTotals.total;
-    const commsComplaintRate = commsTotals.total === 0 ? 0 : commsTotals.complaints / commsTotals.total;
+    const commsComplaintRate =
+      commsTotals.total === 0 ? 0 : commsTotals.complaints / commsTotals.total;
     const twilio = commsTotals.byProvider["twilio"] || { total: 0, failures: 0, delivered: 0 };
     const smsFailureRate = twilio.total === 0 ? 0 : twilio.failures / twilio.total;
 
@@ -302,8 +345,7 @@ export class ObservabilityService {
       readyEvents.filter((e) => e.ok).sort((a, b) => b.at - a.at)[0]?.at ?? null;
     const readyFailures = readyEvents.filter((e) => !e.ok);
     const readyBreach =
-      readyFailures.length > 0 &&
-      (!lastReadyOkAt || Date.now() - lastReadyOkAt > 2 * 60 * 1000);
+      readyFailures.length > 0 && (!lastReadyOkAt || Date.now() - lastReadyOkAt > 2 * 60 * 1000);
 
     return {
       captured: snapshot.captured,
@@ -340,7 +382,9 @@ export class ObservabilityService {
         offlineBacklog: {
           total: offlineStats.total,
           failures: offlineStats.failures,
-          breach: offlineStats.failureRate > 0.1 || queueDepthBreaches.some((q) => q.name.includes("offline")),
+          breach:
+            offlineStats.failureRate > 0.1 ||
+            queueDepthBreaches.some((q) => q.name.includes("offline")),
         },
         offerLag: {
           samples: offerStats.total,

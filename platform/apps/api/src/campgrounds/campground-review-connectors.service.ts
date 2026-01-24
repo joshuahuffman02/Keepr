@@ -30,8 +30,11 @@ const parseGoogleReview = (review: unknown): ExternalReviewItem | null => {
     rating: typeof review.rating === "number" ? review.rating : null,
     text: typeof review.text === "string" ? review.text : null,
     time: typeof review.time === "number" ? review.time : null,
-    relativeTime: typeof review.relative_time_description === "string" ? review.relative_time_description : null,
-    profilePhotoUrl: typeof review.profile_photo_url === "string" ? review.profile_photo_url : null
+    relativeTime:
+      typeof review.relative_time_description === "string"
+        ? review.relative_time_description
+        : null,
+    profilePhotoUrl: typeof review.profile_photo_url === "string" ? review.profile_photo_url : null,
   };
 };
 
@@ -41,7 +44,7 @@ const parseRvLifeReview = (review: unknown): ExternalReviewItem | null => {
     author: typeof review.author_name === "string" ? review.author_name : null,
     rating: typeof review.rating === "number" ? review.rating : null,
     text: typeof review.review_text === "string" ? review.review_text : null,
-    date: typeof review.created_at === "string" ? review.created_at : null
+    date: typeof review.created_at === "string" ? review.created_at : null,
   };
 };
 
@@ -66,15 +69,10 @@ export class CampgroundReviewConnectors {
     const apiKey = process.env.GOOGLE_PLACES_API_KEY;
     if (!apiKey || !placeId) return null;
 
-    const fields = [
-      "rating",
-      "user_ratings_total",
-      "reviews",
-      "url"
-    ].join(",");
+    const fields = ["rating", "user_ratings_total", "reviews", "url"].join(",");
 
     const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
-      placeId
+      placeId,
     )}&fields=${fields}&reviews_sort=newest&language=en&key=${apiKey}`;
 
     try {
@@ -89,7 +87,8 @@ export class CampgroundReviewConnectors {
       }
       const result = isRecord(json) && isRecord(json.result) ? json.result : {};
       const rating = typeof result.rating === "number" ? result.rating : null;
-      const count = typeof result.user_ratings_total === "number" ? result.user_ratings_total : null;
+      const count =
+        typeof result.user_ratings_total === "number" ? result.user_ratings_total : null;
       const reviews = Array.isArray(result.reviews)
         ? result.reviews.slice(0, 10).reduce<ExternalReviewItem[]>((acc, review) => {
             const parsed = parseGoogleReview(review);
@@ -139,12 +138,16 @@ export class CampgroundReviewConnectors {
 
     // Return empty if API not configured
     if (!apiKey) {
-      this.logger.debug(`RV Life API not configured (missing RV_LIFE_API_KEY) for parkId=${parkId}`);
+      this.logger.debug(
+        `RV Life API not configured (missing RV_LIFE_API_KEY) for parkId=${parkId}`,
+      );
       return { source: "rv_life", rating: null, count: null, reviews: [] };
     }
 
     // TODO: Implement actual API call once credentials and documentation are available
-    this.logger.warn(`RV Life API integration pending - credentials configured but implementation incomplete for parkId=${parkId}`);
+    this.logger.warn(
+      `RV Life API integration pending - credentials configured but implementation incomplete for parkId=${parkId}`,
+    );
 
     try {
       // Placeholder for future implementation:

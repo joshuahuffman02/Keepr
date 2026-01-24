@@ -284,13 +284,7 @@ const TECH_LEVEL_OPTIONS: QuestionOption<TechLevel>[] = [
 // Component
 // ============================================
 
-export function SmartQuiz({
-  data,
-  onChange,
-  onNext,
-  onBack,
-  onSkip,
-}: SmartQuizProps) {
+export function SmartQuiz({ data, onChange, onNext, onBack, onSkip }: SmartQuizProps) {
   const prefersReducedMotion = useReducedMotion();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
@@ -307,19 +301,13 @@ export function SmartQuiz({
   const TOTAL_QUESTIONS = 5;
 
   // Update a single answer
-  const updateAnswer = useCallback(
-    <K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => {
-      setAnswers((prev) => ({ ...prev, [key]: value }));
-    },
-    []
-  );
+  const updateAnswer = useCallback(<K extends keyof QuizAnswers>(key: K, value: QuizAnswers[K]) => {
+    setAnswers((prev) => ({ ...prev, [key]: value }));
+  }, []);
 
   // Toggle array value (for multi-select)
   const toggleArrayValue = useCallback(
-    <K extends "operations" | "amenities">(
-      key: K,
-      value: QuizAnswers[K][number]
-    ) => {
+    <K extends "operations" | "amenities">(key: K, value: QuizAnswers[K][number]) => {
       setAnswers((prev) => {
         const current = Array.isArray(prev[key]) ? prev[key] : [];
         const updated = current.includes(value)
@@ -328,7 +316,7 @@ export function SmartQuiz({
         return { ...prev, [key]: updated };
       });
     },
-    []
+    [],
   );
 
   // Navigate to next question or complete
@@ -422,7 +410,7 @@ export function SmartQuiz({
   const renderSingleSelect = <T extends string>(
     options: QuestionOption<T>[],
     selectedValue: T | undefined,
-    onSelect: (value: T) => void
+    onSelect: (value: T) => void,
   ) => (
     <div className="grid gap-3 sm:grid-cols-2">
       {options.map((option) => {
@@ -437,15 +425,13 @@ export function SmartQuiz({
               "flex items-center gap-4 p-4 rounded-xl border text-left transition-all",
               isSelected
                 ? "bg-emerald-500/10 border-emerald-500/50"
-                : "bg-slate-800/30 border-slate-700 hover:border-slate-600"
+                : "bg-slate-800/30 border-slate-700 hover:border-slate-600",
             )}
           >
             <div
               className={cn(
                 "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                isSelected
-                  ? "bg-emerald-500 border-emerald-500"
-                  : "border-slate-600"
+                isSelected ? "bg-emerald-500 border-emerald-500" : "border-slate-600",
               )}
             >
               {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -453,29 +439,17 @@ export function SmartQuiz({
             <div
               className={cn(
                 "w-10 h-10 rounded-lg flex items-center justify-center",
-                isSelected ? "bg-emerald-500/20" : "bg-slate-700/50"
+                isSelected ? "bg-emerald-500/20" : "bg-slate-700/50",
               )}
             >
-              <Icon
-                className={cn(
-                  "w-5 h-5",
-                  isSelected ? "text-emerald-400" : "text-slate-400"
-                )}
-              />
+              <Icon className={cn("w-5 h-5", isSelected ? "text-emerald-400" : "text-slate-400")} />
             </div>
             <div className="flex-1 min-w-0">
-              <p
-                className={cn(
-                  "font-medium",
-                  isSelected ? "text-white" : "text-slate-300"
-                )}
-              >
+              <p className={cn("font-medium", isSelected ? "text-white" : "text-slate-300")}>
                 {option.label}
               </p>
               {option.description && (
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {option.description}
-                </p>
+                <p className="text-xs text-slate-500 mt-0.5">{option.description}</p>
               )}
             </div>
           </button>
@@ -488,7 +462,7 @@ export function SmartQuiz({
   const renderMultiSelect = <T extends string>(
     options: QuestionOption<T>[],
     selectedValues: T[],
-    onToggle: (value: T) => void
+    onToggle: (value: T) => void,
   ) => (
     <div className="grid gap-3 sm:grid-cols-2">
       {options.map((option) => {
@@ -503,15 +477,13 @@ export function SmartQuiz({
               "flex items-center gap-4 p-4 rounded-xl border text-left transition-all",
               isSelected
                 ? "bg-purple-500/10 border-purple-500/50"
-                : "bg-slate-800/30 border-slate-700 hover:border-slate-600"
+                : "bg-slate-800/30 border-slate-700 hover:border-slate-600",
             )}
           >
             <div
               className={cn(
                 "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
-                isSelected
-                  ? "bg-purple-500 border-purple-500"
-                  : "border-slate-600"
+                isSelected ? "bg-purple-500 border-purple-500" : "border-slate-600",
               )}
             >
               {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -519,29 +491,17 @@ export function SmartQuiz({
             <div
               className={cn(
                 "w-10 h-10 rounded-lg flex items-center justify-center",
-                isSelected ? "bg-purple-500/20" : "bg-slate-700/50"
+                isSelected ? "bg-purple-500/20" : "bg-slate-700/50",
               )}
             >
-              <Icon
-                className={cn(
-                  "w-5 h-5",
-                  isSelected ? "text-purple-400" : "text-slate-400"
-                )}
-              />
+              <Icon className={cn("w-5 h-5", isSelected ? "text-purple-400" : "text-slate-400")} />
             </div>
             <div className="flex-1 min-w-0">
-              <p
-                className={cn(
-                  "font-medium",
-                  isSelected ? "text-white" : "text-slate-300"
-                )}
-              >
+              <p className={cn("font-medium", isSelected ? "text-white" : "text-slate-300")}>
                 {option.label}
               </p>
               {option.description && (
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {option.description}
-                </p>
+                <p className="text-xs text-slate-500 mt-0.5">{option.description}</p>
               )}
             </div>
           </button>
@@ -560,14 +520,10 @@ export function SmartQuiz({
               <h3 className="text-lg font-medium text-white mb-2">
                 What best describes your property?
               </h3>
-              <p className="text-sm text-slate-400">
-                This helps us recommend the right features
-              </p>
+              <p className="text-sm text-slate-400">This helps us recommend the right features</p>
             </div>
-            {renderSingleSelect(
-              PARK_TYPE_OPTIONS,
-              answers.parkType,
-              (value) => updateAnswer("parkType", value)
+            {renderSingleSelect(PARK_TYPE_OPTIONS, answers.parkType, (value) =>
+              updateAnswer("parkType", value),
             )}
           </div>
         );
@@ -576,15 +532,11 @@ export function SmartQuiz({
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-white mb-2">
-                What operations do you need?
-              </h3>
-              <p className="text-sm text-slate-400">
-                Select all that apply (or skip if unsure)
-              </p>
+              <h3 className="text-lg font-medium text-white mb-2">What operations do you need?</h3>
+              <p className="text-sm text-slate-400">Select all that apply (or skip if unsure)</p>
             </div>
             {renderMultiSelect(OPERATION_OPTIONS, answers.operations || [], (value) =>
-              toggleArrayValue("operations", value)
+              toggleArrayValue("operations", value),
             )}
           </div>
         );
@@ -596,12 +548,10 @@ export function SmartQuiz({
               <h3 className="text-lg font-medium text-white mb-2">
                 How many people work at your park?
               </h3>
-              <p className="text-sm text-slate-400">
-                Including yourself and seasonal staff
-              </p>
+              <p className="text-sm text-slate-400">Including yourself and seasonal staff</p>
             </div>
             {renderSingleSelect(TEAM_SIZE_OPTIONS, answers.teamSize, (value) =>
-              updateAnswer("teamSize", value)
+              updateAnswer("teamSize", value),
             )}
           </div>
         );
@@ -610,15 +560,11 @@ export function SmartQuiz({
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-white mb-2">
-                What amenities do you offer?
-              </h3>
-              <p className="text-sm text-slate-400">
-                Select all that apply
-              </p>
+              <h3 className="text-lg font-medium text-white mb-2">What amenities do you offer?</h3>
+              <p className="text-sm text-slate-400">Select all that apply</p>
             </div>
             {renderMultiSelect(AMENITY_OPTIONS, answers.amenities || [], (value) =>
-              toggleArrayValue("amenities", value)
+              toggleArrayValue("amenities", value),
             )}
           </div>
         );
@@ -627,15 +573,13 @@ export function SmartQuiz({
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-lg font-medium text-white mb-2">
-                How tech-savvy is your team?
-              </h3>
+              <h3 className="text-lg font-medium text-white mb-2">How tech-savvy is your team?</h3>
               <p className="text-sm text-slate-400">
                 This helps us suggest the right level of features
               </p>
             </div>
             {renderSingleSelect(TECH_LEVEL_OPTIONS, answers.techLevel, (value) =>
-              updateAnswer("techLevel", value)
+              updateAnswer("techLevel", value),
             )}
           </div>
         );
@@ -662,12 +606,8 @@ export function SmartQuiz({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-4">
             <Sparkles className="w-8 h-8 text-amber-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Tell Us About Your Park
-          </h2>
-          <p className="text-slate-400">
-            A few quick questions to personalize your setup
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Tell Us About Your Park</h2>
+          <p className="text-slate-400">A few quick questions to personalize your setup</p>
         </motion.div>
 
         {/* Progress indicator */}
@@ -680,8 +620,8 @@ export function SmartQuiz({
                 i === currentQuestion
                   ? "w-8 bg-amber-500"
                   : i < currentQuestion
-                  ? "bg-emerald-500"
-                  : "bg-slate-700"
+                    ? "bg-emerald-500"
+                    : "bg-slate-700",
               )}
             />
           ))}
@@ -716,7 +656,7 @@ export function SmartQuiz({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+              "disabled:opacity-50 disabled:cursor-not-allowed",
             )}
           >
             {currentQuestion === TOTAL_QUESTIONS - 1 ? (

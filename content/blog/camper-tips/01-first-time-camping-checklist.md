@@ -17,6 +17,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 ## Shelter and Sleep
 
 ### Essentials
+
 - [ ] Tent (practice setup before you go!)
 - [ ] Ground tarp (protects tent floor)
 - [ ] Sleeping bag (rated for expected temps)
@@ -24,6 +25,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 - [ ] Pillow (or stuff sack with clothes)
 
 ### Nice to Have
+
 - [ ] Extra blankets
 - [ ] Tent footprint
 - [ ] Camping cot
@@ -44,6 +46,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 ## Kitchen and Cooking
 
 ### Cooking Gear
+
 - [ ] Camp stove and fuel
 - [ ] Matches/lighter (multiple)
 - [ ] Cooler with ice
@@ -53,6 +56,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 - [ ] Eating utensils
 
 ### Food Prep
+
 - [ ] Can opener
 - [ ] Cutting board
 - [ ] Dish soap and sponge
@@ -61,6 +65,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 - [ ] Aluminum foil
 
 ### Food Ideas
+
 - [ ] Easy breakfast (eggs, pancakes, oatmeal)
 - [ ] Sandwiches and lunch items
 - [ ] Simple dinners (hot dogs, grilled items)
@@ -73,6 +78,7 @@ Planning your first camping trip? The key to a great experience is preparation. 
 ## Clothing
 
 Pack for temperature swings:
+
 - [ ] Layers (mornings/evenings are cool)
 - [ ] Rain gear
 - [ ] Sturdy shoes and camp shoes
@@ -146,4 +152,4 @@ Pack for temperature swings:
 
 ---
 
-*Find your perfect campsite at [campreserv.com](https://campreserv.com)*
+_Find your perfect campsite at [campreserv.com](https://campreserv.com)_

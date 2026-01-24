@@ -15,28 +15,144 @@ import {
 // Mock data
 const mockAmenityData = {
   topSiteAmenities: [
-    { amenity: "WiFi", siteCount: 980, reservations: 8450, revenue: 2112500, averageRate: 68.50, occupancyRate: 72.5 },
-    { amenity: "Full Hookups", siteCount: 650, reservations: 5890, revenue: 1620750, averageRate: 75.20, occupancyRate: 78.4 },
-    { amenity: "Water/Electric", siteCount: 450, reservations: 3780, revenue: 907200, averageRate: 55.80, occupancyRate: 65.2 },
-    { amenity: "Fire Pit", siteCount: 820, reservations: 6120, revenue: 1468800, averageRate: 52.40, occupancyRate: 62.8 },
-    { amenity: "Picnic Table", siteCount: 1100, reservations: 8920, revenue: 2051600, averageRate: 48.50, occupancyRate: 58.6 },
-    { amenity: "Shade", siteCount: 680, reservations: 5440, revenue: 1360000, averageRate: 62.30, occupancyRate: 68.4 },
-    { amenity: "Pull-Through", siteCount: 420, reservations: 3780, revenue: 1021500, averageRate: 72.80, occupancyRate: 74.2 },
-    { amenity: "Pet Friendly", siteCount: 890, reservations: 7120, revenue: 1780000, averageRate: 58.90, occupancyRate: 64.5 },
+    {
+      amenity: "WiFi",
+      siteCount: 980,
+      reservations: 8450,
+      revenue: 2112500,
+      averageRate: 68.5,
+      occupancyRate: 72.5,
+    },
+    {
+      amenity: "Full Hookups",
+      siteCount: 650,
+      reservations: 5890,
+      revenue: 1620750,
+      averageRate: 75.2,
+      occupancyRate: 78.4,
+    },
+    {
+      amenity: "Water/Electric",
+      siteCount: 450,
+      reservations: 3780,
+      revenue: 907200,
+      averageRate: 55.8,
+      occupancyRate: 65.2,
+    },
+    {
+      amenity: "Fire Pit",
+      siteCount: 820,
+      reservations: 6120,
+      revenue: 1468800,
+      averageRate: 52.4,
+      occupancyRate: 62.8,
+    },
+    {
+      amenity: "Picnic Table",
+      siteCount: 1100,
+      reservations: 8920,
+      revenue: 2051600,
+      averageRate: 48.5,
+      occupancyRate: 58.6,
+    },
+    {
+      amenity: "Shade",
+      siteCount: 680,
+      reservations: 5440,
+      revenue: 1360000,
+      averageRate: 62.3,
+      occupancyRate: 68.4,
+    },
+    {
+      amenity: "Pull-Through",
+      siteCount: 420,
+      reservations: 3780,
+      revenue: 1021500,
+      averageRate: 72.8,
+      occupancyRate: 74.2,
+    },
+    {
+      amenity: "Pet Friendly",
+      siteCount: 890,
+      reservations: 7120,
+      revenue: 1780000,
+      averageRate: 58.9,
+      occupancyRate: 64.5,
+    },
   ],
   hookupAnalysis: [
-    { hookupType: "Full Hookups (W/E/S)", siteCount: 520, reservations: 4680, revenue: 1287000, averageNightlyRate: 75.20 },
-    { hookupType: "Water & Electric", siteCount: 380, reservations: 3040, revenue: 729600, averageNightlyRate: 55.80 },
-    { hookupType: "Electric Only", siteCount: 180, reservations: 1260, revenue: 264600, averageNightlyRate: 42.50 },
-    { hookupType: "No Hookups (Dry)", siteCount: 170, reservations: 1020, revenue: 173400, averageNightlyRate: 28.90 },
+    {
+      hookupType: "Full Hookups (W/E/S)",
+      siteCount: 520,
+      reservations: 4680,
+      revenue: 1287000,
+      averageNightlyRate: 75.2,
+    },
+    {
+      hookupType: "Water & Electric",
+      siteCount: 380,
+      reservations: 3040,
+      revenue: 729600,
+      averageNightlyRate: 55.8,
+    },
+    {
+      hookupType: "Electric Only",
+      siteCount: 180,
+      reservations: 1260,
+      revenue: 264600,
+      averageNightlyRate: 42.5,
+    },
+    {
+      hookupType: "No Hookups (Dry)",
+      siteCount: 170,
+      reservations: 1020,
+      revenue: 173400,
+      averageNightlyRate: 28.9,
+    },
   ],
   revenueCorrelation: [
-    { amenity: "Pull-Through", sitesWithAmenity: 420, avgRateWithAmenity: 72.80, avgRateWithoutAmenity: 52.40, revenueImpactPercent: 38.9 },
-    { amenity: "Full Hookups", sitesWithAmenity: 520, avgRateWithAmenity: 75.20, avgRateWithoutAmenity: 55.80, revenueImpactPercent: 34.8 },
-    { amenity: "WiFi", sitesWithAmenity: 980, avgRateWithAmenity: 68.50, avgRateWithoutAmenity: 52.40, revenueImpactPercent: 30.7 },
-    { amenity: "Shade", sitesWithAmenity: 680, avgRateWithAmenity: 62.30, avgRateWithoutAmenity: 48.50, revenueImpactPercent: 28.5 },
-    { amenity: "Pet Friendly", sitesWithAmenity: 890, avgRateWithAmenity: 58.90, avgRateWithoutAmenity: 48.50, revenueImpactPercent: 21.4 },
-    { amenity: "Fire Pit", sitesWithAmenity: 820, avgRateWithAmenity: 52.40, avgRateWithoutAmenity: 48.50, revenueImpactPercent: 8.0 },
+    {
+      amenity: "Pull-Through",
+      sitesWithAmenity: 420,
+      avgRateWithAmenity: 72.8,
+      avgRateWithoutAmenity: 52.4,
+      revenueImpactPercent: 38.9,
+    },
+    {
+      amenity: "Full Hookups",
+      sitesWithAmenity: 520,
+      avgRateWithAmenity: 75.2,
+      avgRateWithoutAmenity: 55.8,
+      revenueImpactPercent: 34.8,
+    },
+    {
+      amenity: "WiFi",
+      sitesWithAmenity: 980,
+      avgRateWithAmenity: 68.5,
+      avgRateWithoutAmenity: 52.4,
+      revenueImpactPercent: 30.7,
+    },
+    {
+      amenity: "Shade",
+      sitesWithAmenity: 680,
+      avgRateWithAmenity: 62.3,
+      avgRateWithoutAmenity: 48.5,
+      revenueImpactPercent: 28.5,
+    },
+    {
+      amenity: "Pet Friendly",
+      sitesWithAmenity: 890,
+      avgRateWithAmenity: 58.9,
+      avgRateWithoutAmenity: 48.5,
+      revenueImpactPercent: 21.4,
+    },
+    {
+      amenity: "Fire Pit",
+      sitesWithAmenity: 820,
+      avgRateWithAmenity: 52.4,
+      avgRateWithoutAmenity: 48.5,
+      revenueImpactPercent: 8.0,
+    },
   ],
   campgroundAmenities: [
     { amenity: "Restrooms", campgroundCount: 48, totalRevenue: 2650000, totalBookings: 11200 },
@@ -147,20 +263,22 @@ export default function AmenitiesPage() {
             <Droplets className="h-5 w-5 text-cyan-400" />
             Hookup Analysis
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Performance by hookup configuration
-          </p>
+          <p className="text-sm text-muted-foreground">Performance by hookup configuration</p>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {data.hookupAnalysis.map((hookup, idx) => (
               <div key={idx} className="p-4 bg-muted/50 rounded-lg">
                 <p className="text-sm text-muted-foreground mb-1">{hookup.hookupType}</p>
-                <p className="text-2xl font-bold text-foreground">{formatCurrency(hookup.averageNightlyRate)}</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {formatCurrency(hookup.averageNightlyRate)}
+                </p>
                 <p className="text-xs text-muted-foreground">/night avg</p>
                 <div className="mt-2 pt-2 border-t border-border">
                   <p className="text-xs text-muted-foreground">{hookup.siteCount} sites</p>
-                  <p className="text-xs text-muted-foreground">{hookup.reservations.toLocaleString()} reservations</p>
+                  <p className="text-xs text-muted-foreground">
+                    {hookup.reservations.toLocaleString()} reservations
+                  </p>
                 </div>
               </div>
             ))}
@@ -180,9 +298,7 @@ export default function AmenitiesPage() {
           <TrendChart
             title=""
             data={data.revenueCorrelation}
-            dataKeys={[
-              { key: "revenueImpactPercent", color: "#10b981", name: "Revenue Impact %" },
-            ]}
+            dataKeys={[{ key: "revenueImpactPercent", color: "#10b981", name: "Revenue Impact %" }]}
             xAxisKey="amenity"
             type="bar"
             height={250}

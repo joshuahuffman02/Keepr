@@ -150,7 +150,14 @@ export class AiDashboardService {
     // Transform and merge into unified activity feed
     type ActivityItem = {
       id: string;
-      type: "auto_reply" | "anomaly" | "pricing" | "maintenance" | "weather" | "phone" | "autonomous";
+      type:
+        | "auto_reply"
+        | "anomaly"
+        | "pricing"
+        | "maintenance"
+        | "weather"
+        | "phone"
+        | "autonomous";
       title: string;
       subtitle: string;
       timestamp: Date;
@@ -181,7 +188,8 @@ export class AiDashboardService {
         subtitle: `${item.severity} severity`,
         timestamp: item.detectedAt,
         icon: "alert-triangle",
-        color: item.severity === "critical" ? "red" : item.severity === "high" ? "orange" : "yellow",
+        color:
+          item.severity === "critical" ? "red" : item.severity === "high" ? "orange" : "yellow",
       });
     }
 
@@ -214,7 +222,8 @@ export class AiDashboardService {
         id: item.id,
         type: "weather",
         title: item.title,
-        subtitle: item.guestsNotified > 0 ? `${item.guestsNotified} guests notified` : item.alertType,
+        subtitle:
+          item.guestsNotified > 0 ? `${item.guestsNotified} guests notified` : item.alertType,
         timestamp: item.createdAt,
         icon: "cloud-rain",
         color: item.severity === "emergency" ? "red" : "blue",
@@ -226,10 +235,13 @@ export class AiDashboardService {
         id: item.id,
         type: "phone",
         title: `Phone call ${item.status}`,
-        subtitle: item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : item.intents.join(", "),
+        subtitle: item.durationSeconds
+          ? `${Math.round(item.durationSeconds / 60)} min`
+          : item.intents.join(", "),
         timestamp: item.startedAt,
         icon: "phone",
-        color: item.status === "completed" ? "green" : item.status === "transferred" ? "blue" : "gray",
+        color:
+          item.status === "completed" ? "green" : item.status === "transferred" ? "blue" : "gray",
       });
     }
 
@@ -256,10 +268,7 @@ export class AiDashboardService {
   /**
    * Get or calculate metrics for a period
    */
-  async getMetrics(
-    campgroundId: string,
-    periodDays: number = 30
-  ) {
+  async getMetrics(campgroundId: string, periodDays: number = 30) {
     const periodStart = new Date();
     periodStart.setDate(periodStart.getDate() - periodDays);
     periodStart.setHours(0, 0, 0, 0);
@@ -285,19 +294,8 @@ export class AiDashboardService {
   /**
    * Calculate metrics for a period
    */
-  async calculateMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    periodEnd: Date
-  ) {
-    const [
-      messages,
-      risks,
-      pricing,
-      phone,
-      waitlist,
-      autonomous,
-    ] = await Promise.all([
+  async calculateMetrics(campgroundId: string, periodStart: Date, periodEnd: Date) {
+    const [messages, risks, pricing, phone, waitlist, autonomous] = await Promise.all([
       // Message metrics
       this.getMessageMetrics(campgroundId, periodStart, periodEnd),
 
@@ -323,8 +321,7 @@ export class AiDashboardService {
       pricing.pricingRevenueDelta +
       waitlist.waitlistRevenue;
 
-    const estimatedRevenueGeneratedCents =
-      phone.bookingRevenue + waitlist.waitlistRevenue;
+    const estimatedRevenueGeneratedCents = phone.bookingRevenue + waitlist.waitlistRevenue;
 
     const aiCostCents = phone.totalCost + autonomous.tokenCost;
 
@@ -388,11 +385,7 @@ export class AiDashboardService {
     return metrics;
   }
 
-  private async getMessageMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    periodEnd: Date
-  ) {
+  private async getMessageMetrics(campgroundId: string, periodStart: Date, periodEnd: Date) {
     const drafts = await this.prisma.aiReplyDraft.findMany({
       where: {
         campgroundId,
@@ -411,7 +404,7 @@ export class AiDashboardService {
 
     const autoSent = drafts.filter((d) => d.status === "auto_sent").length;
     const handled = drafts.filter((d) =>
-      ["approved", "edited", "sent", "auto_sent"].includes(d.status)
+      ["approved", "edited", "sent", "auto_sent"].includes(d.status),
     ).length;
 
     // Calculate avg response time
@@ -419,21 +412,15 @@ export class AiDashboardService {
     const avgResponseTime =
       withResponse.length > 0
         ? withResponse.reduce(
-            (sum, d) =>
-              sum +
-              (d.sentAt!.getTime() - d.createdAt.getTime()) / (1000 * 60),
-            0
+            (sum, d) => sum + (d.sentAt!.getTime() - d.createdAt.getTime()) / (1000 * 60),
+            0,
           ) / withResponse.length
         : null;
 
     return { received, handled, autoSent, avgResponseTime };
   }
 
-  private async getRiskMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    _periodEnd: Date
-  ) {
+  private async getRiskMetrics(campgroundId: string, periodStart: Date, _periodEnd: Date) {
     const noShowRisks = await this.prisma.aiNoShowRisk.findMany({
       where: {
         campgroundId,
@@ -452,19 +439,13 @@ export class AiDashboardService {
 
     return {
       identified: noShowRisks.filter((r) => r.flagged).length,
-      noShowsPrevented: noShowRisks.filter(
-        (r) => r.flagged && r.outcome === "showed"
-      ).length,
+      noShowsPrevented: noShowRisks.filter((r) => r.flagged && r.outcome === "showed").length,
       anomaliesDetected: anomalies.length,
       anomaliesResolved: anomalies.filter((a) => a.status === "resolved").length,
     };
   }
 
-  private async getPricingMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    _periodEnd: Date
-  ) {
+  private async getPricingMetrics(campgroundId: string, periodStart: Date, _periodEnd: Date) {
     const recs = await this.prisma.aiPricingRecommendation.findMany({
       where: {
         campgroundId,
@@ -478,18 +459,11 @@ export class AiDashboardService {
     return {
       suggestions: recs.length,
       applied: applied.length,
-      pricingRevenueDelta: applied.reduce(
-        (sum, r) => sum + (r.estimatedRevenueDelta || 0),
-        0
-      ),
+      pricingRevenueDelta: applied.reduce((sum, r) => sum + (r.estimatedRevenueDelta || 0), 0),
     };
   }
 
-  private async getPhoneMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    _periodEnd: Date
-  ) {
+  private async getPhoneMetrics(campgroundId: string, periodStart: Date, _periodEnd: Date) {
     const sessions = await this.prisma.aiPhoneSession.findMany({
       where: {
         campgroundId,
@@ -501,9 +475,7 @@ export class AiDashboardService {
     const handled = sessions.filter((s) => s.status === "completed");
     const transferred = sessions.filter((s) => s.status === "transferred");
 
-    const durations = sessions
-      .filter((s) => s.durationSeconds)
-      .map((s) => s.durationSeconds!);
+    const durations = sessions.filter((s) => s.durationSeconds).map((s) => s.durationSeconds!);
 
     return {
       received: sessions.length,
@@ -518,11 +490,7 @@ export class AiDashboardService {
     };
   }
 
-  private async getWaitlistMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    _periodEnd: Date
-  ) {
+  private async getWaitlistMetrics(campgroundId: string, periodStart: Date, _periodEnd: Date) {
     const scores = await this.prisma.aiWaitlistScore.findMany({
       where: {
         campgroundId,
@@ -533,9 +501,7 @@ export class AiDashboardService {
       },
     });
 
-    const accepted = scores.filter(
-      (s) => s.WaitlistEntry.status === "fulfilled"
-    );
+    const accepted = scores.filter((s) => s.WaitlistEntry.status === "fulfilled");
 
     return {
       offers: scores.length,
@@ -544,11 +510,7 @@ export class AiDashboardService {
     };
   }
 
-  private async getAutonomousMetrics(
-    campgroundId: string,
-    periodStart: Date,
-    _periodEnd: Date
-  ) {
+  private async getAutonomousMetrics(campgroundId: string, periodStart: Date, _periodEnd: Date) {
     const actions = await this.prisma.aiAutonomousAction.findMany({
       where: {
         campgroundId,
@@ -612,10 +574,7 @@ export class AiDashboardService {
     ]);
 
     const needsAttention =
-      pendingReplies +
-      activeAnomalies +
-      pendingPricing +
-      activeMaintenanceAlerts;
+      pendingReplies + activeAnomalies + pendingPricing + activeMaintenanceAlerts;
 
     return {
       needsAttention,
@@ -655,9 +614,7 @@ export class AiDashboardService {
         await this.calculateMetrics(config.campgroundId, yesterday, today);
         calculated++;
       } catch (error) {
-        this.logger.error(
-          `Failed to calculate metrics for ${config.campgroundId}: ${error}`
-        );
+        this.logger.error(`Failed to calculate metrics for ${config.campgroundId}: ${error}`);
       }
     }
 

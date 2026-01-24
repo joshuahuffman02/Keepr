@@ -64,7 +64,7 @@ export class AiNoShowPredictionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: AiAutopilotConfigService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   // ==================== RISK QUERIES ====================
@@ -187,19 +187,19 @@ export class AiNoShowPredictionService {
 
     // Calculate weighted risk score (0-1)
     const weights = {
-      payment: 0.30,
+      payment: 0.3,
       leadTime: 0.15,
       guestHistory: 0.25,
-      communication: 0.20,
-      bookingPattern: 0.10,
+      communication: 0.2,
+      bookingPattern: 0.1,
     };
 
     const riskScore =
-      (100 - factors.paymentStatusScore) * weights.payment / 100 +
-      (100 - factors.leadTimeScore) * weights.leadTime / 100 +
-      (100 - factors.guestHistoryScore) * weights.guestHistory / 100 +
-      (100 - factors.communicationScore) * weights.communication / 100 +
-      (100 - factors.bookingPatternScore) * weights.bookingPattern / 100;
+      ((100 - factors.paymentStatusScore) * weights.payment) / 100 +
+      ((100 - factors.leadTimeScore) * weights.leadTime) / 100 +
+      ((100 - factors.guestHistoryScore) * weights.guestHistory) / 100 +
+      ((100 - factors.communicationScore) * weights.communication) / 100 +
+      ((100 - factors.bookingPatternScore) * weights.bookingPattern) / 100;
 
     // Determine if flagged based on threshold
     const flagged = riskScore >= config.noShowThreshold;
@@ -258,7 +258,15 @@ export class AiNoShowPredictionService {
             arrivalDate: true,
             departureDate: true,
             status: true,
-            Guest: { select: { id: true, primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
+            Guest: {
+              select: {
+                id: true,
+                primaryFirstName: true,
+                primaryLastName: true,
+                email: true,
+                phone: true,
+              },
+            },
             Site: { select: { id: true, name: true } },
           },
         },
@@ -305,9 +313,9 @@ export class AiNoShowPredictionService {
     const paidPercent = ((totalAmount - balance) / totalAmount) * 100;
 
     if (paidPercent >= 100) return 100; // Fully paid
-    if (paidPercent >= 50) return 70;   // More than half paid
-    if (paidPercent >= 20) return 45;   // Some payment made
-    if (paidPercent > 0) return 30;     // Minimal payment
+    if (paidPercent >= 50) return 70; // More than half paid
+    if (paidPercent >= 20) return 45; // Some payment made
+    if (paidPercent > 0) return 30; // Minimal payment
     return 15; // No payment at all
   }
 
@@ -322,22 +330,26 @@ export class AiNoShowPredictionService {
 
     // Days between booking and arrival
     const leadTimeDays = Math.floor(
-      (arrivalDate.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24)
+      (arrivalDate.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     // Days until arrival from now
     const daysUntilArrival = Math.floor(
-      (arrivalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+      (arrivalDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     let score = 50; // Base score
 
     // Lead time bonus
-    if (leadTimeDays >= 60) score += 30;      // 2+ months advance
-    else if (leadTimeDays >= 30) score += 25; // 1+ month advance
-    else if (leadTimeDays >= 14) score += 15; // 2+ weeks advance
-    else if (leadTimeDays >= 7) score += 5;   // 1+ week advance
-    else if (leadTimeDays < 2) score -= 20;   // Last minute booking
+    if (leadTimeDays >= 60)
+      score += 30; // 2+ months advance
+    else if (leadTimeDays >= 30)
+      score += 25; // 1+ month advance
+    else if (leadTimeDays >= 14)
+      score += 15; // 2+ weeks advance
+    else if (leadTimeDays >= 7)
+      score += 5; // 1+ week advance
+    else if (leadTimeDays < 2) score -= 20; // Last minute booking
 
     // Proximity adjustment (closer = slightly higher risk)
     if (daysUntilArrival <= 1) score -= 10;
@@ -352,7 +364,7 @@ export class AiNoShowPredictionService {
    */
   private async calculateGuestHistoryScore(
     guestId: string | null,
-    campgroundId: string
+    campgroundId: string,
   ): Promise<number> {
     if (!guestId) return 35; // Unknown guest = higher risk
 
@@ -381,14 +393,18 @@ export class AiNoShowPredictionService {
     let score = 50; // Base score
 
     // Positive history
-    if (completed >= 5) score += 35;        // Very loyal guest
-    else if (completed >= 3) score += 25;   // Returning guest
-    else if (completed >= 1) score += 15;   // Has stayed before
+    if (completed >= 5)
+      score += 35; // Very loyal guest
+    else if (completed >= 3)
+      score += 25; // Returning guest
+    else if (completed >= 1) score += 15; // Has stayed before
 
     // Negative history
-    if (noShowRate >= 50) score -= 40;      // Chronic no-show
-    else if (noShows >= 2) score -= 30;     // Multiple no-shows
-    else if (noShows >= 1) score -= 20;     // One no-show
+    if (noShowRate >= 50)
+      score -= 40; // Chronic no-show
+    else if (noShows >= 2)
+      score -= 30; // Multiple no-shows
+    else if (noShows >= 1) score -= 20; // One no-show
 
     // High cancellation rate
     if (cancelled >= 3 && cancelled > completed) score -= 15;
@@ -420,7 +436,7 @@ export class AiNoShowPredictionService {
 
     // Recent communication (within 7 days)
     const recentComm = communications.find(
-      (c) => new Date(c.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000
+      (c) => new Date(c.createdAt).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000,
     );
     if (recentComm) score += 15;
 
@@ -441,14 +457,14 @@ export class AiNoShowPredictionService {
     const source = reservation.source || "unknown";
 
     const sourceScores: Record<string, number> = {
-      direct: 85,           // Direct booking = high commitment
-      admin: 80,            // Staff-created = verified
-      repeat: 90,           // Returning customer
-      referral: 85,         // Referred = committed
-      online: 70,           // Standard online
-      phone: 75,            // Phone = slightly higher
-      walk_in: 65,          // Walk-in = less commitment
-      third_party: 50,      // OTA = higher risk
+      direct: 85, // Direct booking = high commitment
+      admin: 80, // Staff-created = verified
+      repeat: 90, // Returning customer
+      referral: 85, // Referred = committed
+      online: 70, // Standard online
+      phone: 75, // Phone = slightly higher
+      walk_in: 65, // Walk-in = less commitment
+      third_party: 50, // OTA = higher risk
       unknown: 55,
     };
 
@@ -536,13 +552,17 @@ export class AiNoShowPredictionService {
           </table>
         </div>
 
-        ${campground?.phone ? `
+        ${
+          campground?.phone
+            ? `
           <div style="text-align: center; margin-bottom: 24px;">
             <p style="color: #64748b; font-size: 14px; margin: 0;">
               Questions? Call us at <strong>${campground.phone}</strong>
             </p>
           </div>
-        ` : ""}
+        `
+            : ""
+        }
 
         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
           <p style="color: #94a3b8; font-size: 11px; margin: 0;">
@@ -659,7 +679,7 @@ export class AiNoShowPredictionService {
       try {
         const result = await this.recalculateAll(
           config.campgroundId,
-          config.noShowReminderDaysBefore + 2 // A bit more than reminder window
+          config.noShowReminderDaysBefore + 2, // A bit more than reminder window
         );
         totalCalculated += result.calculated;
         totalFlagged += result.flagged;
@@ -668,7 +688,9 @@ export class AiNoShowPredictionService {
       }
     }
 
-    this.logger.log(`Risk recalculation complete: ${totalCalculated} calculated, ${totalFlagged} flagged`);
+    this.logger.log(
+      `Risk recalculation complete: ${totalCalculated} calculated, ${totalFlagged} flagged`,
+    );
   }
 
   /**
@@ -692,7 +714,7 @@ export class AiNoShowPredictionService {
       try {
         // Find flagged reservations arriving within the reminder window
         const reminderWindow = new Date(
-          Date.now() + config.noShowReminderDaysBefore * 24 * 60 * 60 * 1000
+          Date.now() + config.noShowReminderDaysBefore * 24 * 60 * 60 * 1000,
         );
 
         const risks = await this.prisma.aiNoShowRisk.findMany({

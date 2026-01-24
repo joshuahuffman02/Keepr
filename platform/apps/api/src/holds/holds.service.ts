@@ -1,4 +1,11 @@
-import { BadRequestException, Injectable, Logger, NotFoundException, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  OnModuleDestroy,
+  OnModuleInit,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateHoldDto } from "./dto/create-hold.dto";
 import { ReservationStatus, type Prisma } from "@prisma/client";
@@ -23,8 +30,8 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly waitlistService: WaitlistService
-  ) { }
+    private readonly waitlistService: WaitlistService,
+  ) {}
 
   onModuleInit() {
     const intervalMs = Number(process.env.HOLDS_EXPIRE_INTERVAL_MS ?? 5 * 60 * 1000);
@@ -71,8 +78,8 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
         status: "active",
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
         arrivalDate: { lt: departure },
-        departureDate: { gt: arrival }
-      }
+        departureDate: { gt: arrival },
+      },
     });
     if (holdOverlap > 0) throw new BadRequestException("Site is on hold for those dates");
 
@@ -82,10 +89,11 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
         siteId,
         status: { not: ReservationStatus.cancelled },
         departureDate: { gt: arrival },
-        arrivalDate: { lt: departure }
-      }
+        arrivalDate: { lt: departure },
+      },
     });
-    if (reservationOverlap > 0) throw new BadRequestException("Site already reserved for those dates");
+    if (reservationOverlap > 0)
+      throw new BadRequestException("Site already reserved for those dates");
   }
 
   private computeExpiry(holdMinutes?: number) {
@@ -97,7 +105,10 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
 
   async create(dto: CreateHoldDto) {
     const { arrival, departure } = this.parseDates(dto.arrivalDate, dto.departureDate);
-    const site = await this.prisma.site.findUnique({ where: { id: dto.siteId }, select: { id: true, campgroundId: true } });
+    const site = await this.prisma.site.findUnique({
+      where: { id: dto.siteId },
+      select: { id: true, campgroundId: true },
+    });
     if (!site || site.campgroundId !== dto.campgroundId) {
       throw new NotFoundException("Site not found for campground");
     }
@@ -113,19 +124,19 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
         departureDate: departure,
         expiresAt: this.computeExpiry(dto.holdMinutes ?? 15),
         status: "active",
-        note: dto.note ?? null
-      }
+        note: dto.note ?? null,
+      },
     });
   }
 
   async release(campgroundId: string, id: string) {
     const existing = await this.prisma.siteHold.findFirst({
-      where: { id, campgroundId }
+      where: { id, campgroundId },
     });
     if (!existing) throw new NotFoundException("Hold not found");
     return this.prisma.siteHold.update({
       where: { id },
-      data: { status: "released", expiresAt: existing.expiresAt ?? new Date() }
+      data: { status: "released", expiresAt: existing.expiresAt ?? new Date() },
     });
   }
 
@@ -135,10 +146,10 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
       where: {
         campgroundId,
         status: "active",
-        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
+        OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
       },
       include: { Site: { select: { id: true, name: true, siteNumber: true } } },
-      orderBy: { arrivalDate: "asc" }
+      orderBy: { arrivalDate: "asc" },
     });
   }
 
@@ -149,7 +160,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
       : { status: "active", expiresAt: { lte: now } };
     const expired = await this.prisma.siteHold.findMany({
       where,
-      include: { Site: { select: { id: true, siteClassId: true } } }
+      include: { Site: { select: { id: true, siteClassId: true } } },
     });
 
     if (expired.length === 0) return 0;
@@ -158,9 +169,9 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
       expired.map((hold: SiteHoldWithSite) =>
         this.prisma.siteHold.update({
           where: { id: hold.id },
-          data: { status: "expired" }
-        })
-      )
+          data: { status: "expired" },
+        }),
+      ),
     );
 
     // Notify waitlist for each expired hold (fire and forget)
@@ -171,7 +182,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
           hold.arrivalDate,
           hold.departureDate,
           hold.siteId,
-          hold.Site?.siteClassId ?? undefined
+          hold.Site?.siteClassId ?? undefined,
         );
       } catch (err) {
         // Swallow to avoid failing the batch; consider logging in the future

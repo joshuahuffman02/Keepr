@@ -142,7 +142,11 @@ function paymentReducer(state: PaymentContextState, action: PaymentAction): Paym
       return { ...state, configLoading: action.payload };
 
     case "SELECT_METHOD":
-      return { ...state, selectedMethod: action.payload, step: action.payload ? "payment_entry" : "method_select" };
+      return {
+        ...state,
+        selectedMethod: action.payload,
+        step: action.payload ? "payment_entry" : "method_select",
+      };
 
     case "SET_STEP":
       return { ...state, step: action.payload };
@@ -175,7 +179,7 @@ function paymentReducer(state: PaymentContextState, action: PaymentAction): Paym
 
     case "UPDATE_TENDER": {
       const newTenders = state.tenderEntries.map((t) =>
-        t.id === action.payload.id ? { ...t, ...action.payload.updates } : t
+        t.id === action.payload.id ? { ...t, ...action.payload.updates } : t,
       );
       const paidCents = newTenders
         .filter((t) => t.status === "completed")
@@ -202,7 +206,8 @@ function paymentReducer(state: PaymentContextState, action: PaymentAction): Paym
     case "ADD_DISCOUNT": {
       const newDiscounts = [...state.appliedDiscounts, action.payload];
       const discountCents = newDiscounts.reduce((sum, d) => sum + d.discountCents, 0);
-      const totalDueCents = state.originalAmountCents - discountCents + state.donationCents + state.feeCents;
+      const totalDueCents =
+        state.originalAmountCents - discountCents + state.donationCents + state.feeCents;
       return {
         ...state,
         appliedDiscounts: newDiscounts,
@@ -215,7 +220,8 @@ function paymentReducer(state: PaymentContextState, action: PaymentAction): Paym
     case "REMOVE_DISCOUNT": {
       const newDiscounts = state.appliedDiscounts.filter((d) => d.promoCodeId !== action.payload);
       const discountCents = newDiscounts.reduce((sum, d) => sum + d.discountCents, 0);
-      const totalDueCents = state.originalAmountCents - discountCents + state.donationCents + state.feeCents;
+      const totalDueCents =
+        state.originalAmountCents - discountCents + state.donationCents + state.feeCents;
       return {
         ...state,
         appliedDiscounts: newDiscounts,
@@ -227,7 +233,8 @@ function paymentReducer(state: PaymentContextState, action: PaymentAction): Paym
 
     case "SET_CHARITY": {
       const donationCents = action.payload.optedIn ? action.payload.amountCents : 0;
-      const totalDueCents = state.originalAmountCents - state.discountCents + donationCents + state.feeCents;
+      const totalDueCents =
+        state.originalAmountCents - state.discountCents + donationCents + state.feeCents;
       return {
         ...state,
         charityDonation: action.payload,
@@ -311,7 +318,8 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
       .getCampground(modalProps.campgroundId)
       .then((campground) => {
         const billingPlan = toBillingPlan(campground.billingPlan);
-        const defaultPlatformFee = billingPlan === "enterprise" ? 100 : billingPlan === "standard" ? 200 : 300;
+        const defaultPlatformFee =
+          billingPlan === "enterprise" ? 100 : billingPlan === "standard" ? 200 : 300;
         const stripeCapabilitiesRaw = isRecord(campground.stripeCapabilities)
           ? campground.stripeCapabilities
           : undefined;
@@ -324,7 +332,9 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
             card_payments: isStripeCapability(stripeCapabilitiesRaw?.card_payments)
               ? stripeCapabilitiesRaw.card_payments
               : undefined,
-            us_bank_account_ach_payments: isStripeCapability(stripeCapabilitiesRaw?.us_bank_account_ach_payments)
+            us_bank_account_ach_payments: isStripeCapability(
+              stripeCapabilitiesRaw?.us_bank_account_ach_payments,
+            )
               ? stripeCapabilitiesRaw.us_bank_account_ach_payments
               : undefined,
             apple_pay: isStripeCapability(stripeCapabilitiesRaw?.apple_pay)
@@ -346,7 +356,9 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
           enableFolio: getBoolean(campground.enableFolio, true),
           enableGiftCards: getBoolean(campground.enableGiftCards, true),
           enableExternalPOS: getBoolean(campground.enableExternalPOS, false),
-          allowedCardBrands: allowedBrands?.length ? allowedBrands : ["visa", "mastercard", "amex", "discover"],
+          allowedCardBrands: allowedBrands?.length
+            ? allowedBrands
+            : ["visa", "mastercard", "amex", "discover"],
           feeMode: toFeeMode(campground.feeMode),
           feePercentBasisPoints: getNumber(campground.feePercentBasisPoints, 290),
           feeFlatCents: getNumber(campground.feeFlatCents, 30),
@@ -376,7 +388,7 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
           label: reader.label,
           status: toTerminalStatus(reader.status),
           stripeReaderId: reader.stripeReaderId,
-          locationId: reader.locationId ?? undefined
+          locationId: reader.locationId ?? undefined,
         }));
         dispatch({ type: "SET_TERMINAL_READERS", payload: mappedReaders });
       })
@@ -397,7 +409,7 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
           expMonth: null,
           expYear: null,
           isDefault: card.isDefault,
-          nickname: card.nickname
+          nickname: card.nickname,
         }));
         dispatch({ type: "SET_SAVED_CARDS", payload: mappedCards });
       })
@@ -426,7 +438,11 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
 
     // Calculate CC fee if card method is selected
     let totalForRounding = baseTotal;
-    if (state.selectedMethod && CARD_METHODS.includes(state.selectedMethod) && state.config.feeMode === "pass_through") {
+    if (
+      state.selectedMethod &&
+      CARD_METHODS.includes(state.selectedMethod) &&
+      state.config.feeMode === "pass_through"
+    ) {
       const ccFeeCents = calculateProcessingFee(state.config, state.selectedMethod, baseTotal);
       totalForRounding += ccFeeCents;
     }
@@ -447,7 +463,13 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
         },
       });
     }
-  }, [state.selectedMethod, state.config, state.originalAmountCents, state.discountCents, state.charityDonation.optedIn]);
+  }, [
+    state.selectedMethod,
+    state.config,
+    state.originalAmountCents,
+    state.discountCents,
+    state.charityDonation.optedIn,
+  ]);
 
   // ============================================================================
   // ACTIONS
@@ -457,14 +479,17 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
     dispatch({ type: "SELECT_METHOD", payload: method });
   }, []);
 
-  const addTenderEntry = useCallback((entry: Omit<TenderEntry, "id" | "status"> & { status?: TenderEntry["status"] }) => {
-    const newEntry: TenderEntry = {
-      ...entry,
-      id: uuidv4(),
-      status: entry.status ?? "completed", // Default to completed for manual payments
-    };
-    dispatch({ type: "ADD_TENDER", payload: newEntry });
-  }, []);
+  const addTenderEntry = useCallback(
+    (entry: Omit<TenderEntry, "id" | "status"> & { status?: TenderEntry["status"] }) => {
+      const newEntry: TenderEntry = {
+        ...entry,
+        id: uuidv4(),
+        status: entry.status ?? "completed", // Default to completed for manual payments
+      };
+      dispatch({ type: "ADD_TENDER", payload: newEntry });
+    },
+    [],
+  );
 
   const removeTenderEntry = useCallback((id: string) => {
     dispatch({ type: "REMOVE_TENDER", payload: id });
@@ -482,7 +507,7 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
         const result = await apiClient.validatePromoCode(
           modalProps.campgroundId,
           code,
-          state.originalAmountCents
+          state.originalAmountCents,
         );
 
         if (!result.valid) {
@@ -502,32 +527,38 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
         dispatch({ type: "SET_ERROR", payload: null });
         return discount;
       } catch (err) {
-        dispatch({ type: "SET_ERROR", payload: err instanceof Error ? err.message : "Failed to apply promo code" });
+        dispatch({
+          type: "SET_ERROR",
+          payload: err instanceof Error ? err.message : "Failed to apply promo code",
+        });
         return null;
       } finally {
         dispatch({ type: "SET_LOADING", payload: false });
       }
     },
-    [modalProps.campgroundId, modalProps.subject, state.originalAmountCents]
+    [modalProps.campgroundId, modalProps.subject, state.originalAmountCents],
   );
 
   const removeDiscount = useCallback((discountId: string) => {
     dispatch({ type: "REMOVE_DISCOUNT", payload: discountId });
   }, []);
 
-  const setCharityDonation = useCallback((donation: Partial<CharityDonation>) => {
-    dispatch({
-      type: "SET_CHARITY",
-      payload: { ...state.charityDonation, ...donation },
-    });
-  }, [state.charityDonation]);
+  const setCharityDonation = useCallback(
+    (donation: Partial<CharityDonation>) => {
+      dispatch({
+        type: "SET_CHARITY",
+        payload: { ...state.charityDonation, ...donation },
+      });
+    },
+    [state.charityDonation],
+  );
 
   const calculateFees = useCallback(
     (method: PaymentMethodType, amountCents: number): number => {
       if (!state.config) return 0;
       return calculateProcessingFee(state.config, method, amountCents);
     },
-    [state.config]
+    [state.config],
   );
 
   const processPayment = useCallback(async (): Promise<PaymentResult> => {
@@ -540,7 +571,10 @@ export function PaymentProvider({ children, modalProps }: PaymentProviderProps) 
       // For now, return a placeholder
       throw new Error("Payment processing not implemented");
     } catch (err) {
-      dispatch({ type: "SET_ERROR", payload: err instanceof Error ? err.message : "Payment failed" });
+      dispatch({
+        type: "SET_ERROR",
+        payload: err instanceof Error ? err.message : "Payment failed",
+      });
       dispatch({ type: "SET_STEP", payload: "error" });
       throw err;
     } finally {

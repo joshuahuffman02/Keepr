@@ -52,7 +52,9 @@ export function VoiceCommandIndicator({
 
   return (
     <>
-      <div className={cn("fixed z-40 flex items-center gap-2", positionClasses[position], className)}>
+      <div
+        className={cn("fixed z-40 flex items-center gap-2", positionClasses[position], className)}
+      >
         {/* Last command feedback */}
         <AnimatePresence>
           {lastCommand && (
@@ -70,11 +72,11 @@ export function VoiceCommandIndicator({
         {/* Main mic button */}
         <motion.button
           onClick={onToggle}
-            className={cn(
-              "relative p-3 rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+          className={cn(
+            "relative p-3 rounded-full shadow-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
             isListening
               ? "bg-action-primary text-action-primary-foreground focus:ring-action-primary/60"
-              : "bg-card text-foreground hover:bg-muted focus:ring-ring/40"
+              : "bg-card text-foreground hover:bg-muted focus:ring-ring/40",
           )}
           whileTap={{ scale: 0.95 }}
           aria-label={isListening ? "Stop voice commands" : "Start voice commands"}
@@ -134,11 +136,16 @@ export function VoiceCommandIndicator({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2">
-                <Mic className="h-5 w-5 text-action-primary" />
-                <h2 className="font-semibold text-foreground">Voice Commands</h2>
-              </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowHelp(false)} aria-label="Close">
+                <div className="flex items-center gap-2">
+                  <Mic className="h-5 w-5 text-action-primary" />
+                  <h2 className="font-semibold text-foreground">Voice Commands</h2>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowHelp(false)}
+                  aria-label="Close"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -150,10 +157,7 @@ export function VoiceCommandIndicator({
 
                 <div className="space-y-2">
                   {commands.map((cmd, i) => (
-                    <div
-                      key={i}
-                      className="flex items-start gap-3 p-3 bg-muted rounded-lg"
-                    >
+                    <div key={i} className="flex items-start gap-3 p-3 bg-muted rounded-lg">
                       <span className="text-action-primary font-medium text-sm whitespace-nowrap">
                         &quot;{cmd.phrase}&quot;
                       </span>

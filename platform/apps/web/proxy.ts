@@ -4,12 +4,12 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // Public routes that don't require authentication
 const publicRoutes = [
-  "/",              // Public marketplace homepage
-  "/park",          // Public campground detail pages
+  "/", // Public marketplace homepage
+  "/park", // Public campground detail pages
   "/auth",
   "/booking",
   "/marketing",
-  "/api/auth"
+  "/api/auth",
 ];
 
 type ProxyRequest = NextRequest & { auth?: unknown };
@@ -18,7 +18,7 @@ export function proxy(req: ProxyRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public routes
-  const isPublic = publicRoutes.some(route => pathname.startsWith(route));
+  const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
   if (isPublic) {
     return NextResponse.next();
   }
@@ -35,7 +35,5 @@ export function proxy(req: ProxyRequest) {
 
 export const config = {
   // Don't run middleware on static files or Next.js internals
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

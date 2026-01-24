@@ -7,7 +7,13 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ReportsV2Shell } from "@/components/reports-v2/ReportsV2Shell";
 import { ReportsV2PageHeader } from "@/components/reports-v2/ReportsV2PageHeader";
 import { ReportSection } from "@/components/reports-v2/ReportPanels";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-client";
@@ -30,13 +36,14 @@ export default function ReportsV2AuditPage() {
 
   const auditQuery = useQuery({
     queryKey: ["audit-log", campgroundId, actionFilter, start, end],
-    queryFn: () => apiClient.getAuditLogs(campgroundId!, {
-      action: actionFilter === "all" ? undefined : actionFilter,
-      start: start || undefined,
-      end: end || undefined,
-      limit: 200
-    }),
-    enabled: !!campgroundId
+    queryFn: () =>
+      apiClient.getAuditLogs(campgroundId!, {
+        action: actionFilter === "all" ? undefined : actionFilter,
+        start: start || undefined,
+        end: end || undefined,
+        limit: 200,
+      }),
+    enabled: !!campgroundId,
   });
 
   const actions = useMemo(() => {
@@ -63,7 +70,12 @@ export default function ReportsV2AuditPage() {
     <DashboardShell>
       <div className="space-y-5">
         <Breadcrumbs items={[{ label: "Reports v2", href: "/reports-v2" }, { label: "Audit" }]} />
-        <ReportsV2Shell activeTab={null} activeSubTab={null} activeShortcut="audit" pinnedReports={savedReports.filter((r) => r.pinned)}>
+        <ReportsV2Shell
+          activeTab={null}
+          activeSubTab={null}
+          activeShortcut="audit"
+          pinnedReports={savedReports.filter((r) => r.pinned)}
+        >
           <ReportsV2PageHeader
             title="Audit log"
             description="Track staff actions, configuration changes, and system events."
@@ -77,7 +89,10 @@ export default function ReportsV2AuditPage() {
 
           {campgroundId && (
             <>
-              <ReportSection title="Filters" description="Refine the audit log to a specific action, entity, or date range.">
+              <ReportSection
+                title="Filters"
+                description="Refine the audit log to a specific action, entity, or date range."
+              >
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="flex items-center gap-2">
                     <input
@@ -103,7 +118,9 @@ export default function ReportsV2AuditPage() {
                     <SelectContent>
                       <SelectItem value="all">All actions</SelectItem>
                       {actions.map((action) => (
-                        <SelectItem key={action} value={action}>{action}</SelectItem>
+                        <SelectItem key={action} value={action}>
+                          {action}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -114,7 +131,9 @@ export default function ReportsV2AuditPage() {
                     <SelectContent>
                       <SelectItem value="all">All entities</SelectItem>
                       {entities.map((entity) => (
-                        <SelectItem key={entity} value={entity}>{entity}</SelectItem>
+                        <SelectItem key={entity} value={entity}>
+                          {entity}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -135,7 +154,10 @@ export default function ReportsV2AuditPage() {
                       if (start) q.set("start", start);
                       if (end) q.set("end", end);
                       q.set("format", "csv");
-                      window.open(`/api-proxy/campgrounds/${campgroundId}/audit?${q.toString()}`, "_blank");
+                      window.open(
+                        `/api-proxy/campgrounds/${campgroundId}/audit?${q.toString()}`,
+                        "_blank",
+                      );
                     }}
                   >
                     Export CSV
@@ -145,7 +167,10 @@ export default function ReportsV2AuditPage() {
 
               <ReportSection title="Audit activity" description={`Showing ${rows.length} entries`}>
                 {auditQuery.isError && (
-                  <div role="alert" className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error">
+                  <div
+                    role="alert"
+                    className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error"
+                  >
                     Failed to load audit log entries. Please try again.
                   </div>
                 )}
@@ -165,16 +190,22 @@ export default function ReportsV2AuditPage() {
                     <tbody>
                       {auditQuery.isLoading ? (
                         <tr>
-                          <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">Loading...</td>
+                          <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">
+                            Loading...
+                          </td>
                         </tr>
                       ) : rows.length === 0 ? (
                         <tr>
-                          <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">No audit entries yet.</td>
+                          <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">
+                            No audit entries yet.
+                          </td>
                         </tr>
                       ) : (
                         rows.map((row) => (
                           <tr key={row.id} className="border-b border-border">
-                            <td className="px-3 py-2 text-foreground whitespace-nowrap">{new Date(row.createdAt).toLocaleString()}</td>
+                            <td className="px-3 py-2 text-foreground whitespace-nowrap">
+                              {new Date(row.createdAt).toLocaleString()}
+                            </td>
                             <td className="px-3 py-2">
                               <Badge variant="secondary">{row.action}</Badge>
                             </td>
@@ -182,13 +213,19 @@ export default function ReportsV2AuditPage() {
                               {row.entity}:{row.entityId.slice(0, 6)}
                             </td>
                             <td className="px-3 py-2 text-foreground">
-                              {row.actor ? `${row.actor.firstName ?? ""} ${row.actor.lastName ?? ""}`.trim() || row.actor.email : "System"}
+                              {row.actor
+                                ? `${row.actor.firstName ?? ""} ${row.actor.lastName ?? ""}`.trim() ||
+                                  row.actor.email
+                                : "System"}
                             </td>
                             <td className="px-3 py-2 text-foreground">
                               {row.before || row.after ? "Change" : "—"}
                             </td>
                             <td className="px-3 py-2 text-foreground">{row.ip || "—"}</td>
-                            <td className="px-3 py-2 text-foreground max-w-xs truncate" title={row.userAgent || undefined}>
+                            <td
+                              className="px-3 py-2 text-foreground max-w-xs truncate"
+                              title={row.userAgent || undefined}
+                            >
                               {row.userAgent || "—"}
                             </td>
                           </tr>

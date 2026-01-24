@@ -17,21 +17,21 @@ Load the Cloudflare platform skill and help with any Cloudflare development task
 
 Each product in `./references/<product>/` contains:
 
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `README.md` | Overview, when to use | Always read first |
-| `api.md` | Runtime API, types | Writing code |
+| File               | Purpose                 | When to Read         |
+| ------------------ | ----------------------- | -------------------- |
+| `README.md`        | Overview, when to use   | Always read first    |
+| `api.md`           | Runtime API, types      | Writing code         |
 | `configuration.md` | wrangler.toml, bindings | Configuring projects |
-| `patterns.md` | Best practices | Implementation |
-| `gotchas.md` | Pitfalls, limitations | Debugging |
+| `patterns.md`      | Best practices          | Implementation       |
+| `gotchas.md`       | Pitfalls, limitations   | Debugging            |
 
 ## Task Mapping
 
-| Task | Files to Read |
-|------|---------------|
-| New project | `README.md` + `configuration.md` |
-| Implement feature | `README.md` + `api.md` + `patterns.md` |
-| Debug/troubleshoot | `gotchas.md` |
+| Task               | Files to Read                          |
+| ------------------ | -------------------------------------- |
+| New project        | `README.md` + `configuration.md`       |
+| Implement feature  | `README.md` + `api.md` + `patterns.md` |
+| Debug/troubleshoot | `gotchas.md`                           |
 
 ## Available Products
 

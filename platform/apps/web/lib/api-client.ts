@@ -12,7 +12,6 @@ import {
   QuoteSchema,
   LedgerEntrySchema,
   PaymentSchema,
-
   EventSchema,
   CreateEventSchema,
   ProductCategorySchema,
@@ -46,7 +45,7 @@ import {
   ReviewModerationSchema,
   ReviewReplySchema,
   FormTemplateSchema,
-  FormSubmissionSchema
+  FormSubmissionSchema,
 } from "@keepr/shared";
 import { z } from "zod";
 
@@ -63,7 +62,12 @@ const numberish = <T extends z.ZodTypeAny>(schema: T) =>
       return Number.isNaN(parsed) ? val : parsed;
     }
     if (typeof val === "number") return val;
-    if (typeof val === "object" && val !== null && "toString" in val && typeof val.toString === "function") {
+    if (
+      typeof val === "object" &&
+      val !== null &&
+      "toString" in val &&
+      typeof val.toString === "function"
+    ) {
       const str = val.toString();
       const parsed = Number(str);
       return Number.isNaN(parsed) ? val : parsed;
@@ -87,7 +91,7 @@ const CampgroundArray = z.array(CampgroundWithAnalyticsSchema);
 const SiteArray = z.array(SiteSchema);
 const ReservationWithGroupSchema = ReservationSchema.extend({
   groupId: z.string().nullish(),
-  groupRole: z.enum(["primary", "member"]).nullish()
+  groupRole: z.enum(["primary", "member"]).nullish(),
 });
 const ReservationArray = z.array(ReservationWithGroupSchema);
 const AvailabilitySiteArray = z.array(
@@ -101,20 +105,23 @@ const AvailabilitySiteArray = z.array(
     maxOccupancy: numberish(z.number().int().nonnegative()),
     rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
     isActive: z.boolean().optional().default(true),
-    siteClass: z.object({
-      name: z.string(),
-      rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
-      defaultRate: numberish(z.number().int().nonnegative()),
-      maxOccupancy: numberish(z.number().int().nonnegative()).optional()
-    }).nullable().optional()
-  })
+    siteClass: z
+      .object({
+        name: z.string(),
+        rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
+        defaultRate: numberish(z.number().int().nonnegative()),
+        maxOccupancy: numberish(z.number().int().nonnegative()).optional(),
+      })
+      .nullable()
+      .optional(),
+  }),
 );
 const GuestArray = z.array(GuestSchema);
 const SiteClassArray = z.array(SiteClassSchema);
 const MaintenanceArray = z.array(MaintenanceSchema);
 const OverlapCheckSchema = z.object({
   conflict: z.boolean(),
-  reasons: z.array(z.string()).optional().default([])
+  reasons: z.array(z.string()).optional().default([]),
 });
 const OverlapListSchema = z.array(
   z.object({
@@ -124,8 +131,8 @@ const OverlapListSchema = z.array(
     arrivalA: z.string(),
     departureA: z.string(),
     arrivalB: z.string(),
-    departureB: z.string()
-  })
+    departureB: z.string(),
+  }),
 );
 
 // Removed duplicate definitions from here
@@ -139,7 +146,7 @@ const VehicleSchema = z.object({
   rigLength: z.number().int().nonnegative().nullable().optional(),
   description: z.string().nullable().optional(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 const AccessGrantSchema = z.object({
   id: z.string(),
@@ -152,11 +159,11 @@ const AccessGrantSchema = z.object({
   endsAt: z.string().nullable().optional(),
   blockedReason: z.string().nullable().optional(),
   createdAt: z.string(),
-  updatedAt: z.string().optional().nullable()
+  updatedAt: z.string().optional().nullable(),
 });
 const AccessStatusSchema = z.object({
   vehicle: VehicleSchema.nullable().optional(),
-  grants: z.array(AccessGrantSchema)
+  grants: z.array(AccessGrantSchema),
 });
 
 const AccessIntegrationSchema = z.object({
@@ -168,7 +175,7 @@ const AccessIntegrationSchema = z.object({
   credentials: z.unknown(),
   webhookSecret: z.string().nullable().optional(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 const AbandonedCartSchema = z.object({
   id: z.string(),
@@ -211,14 +218,14 @@ const DashboardSummarySchema = z.object({
   revenue: z.number(),
   overdueBalance: z.number(),
   maintenanceOpen: z.number().optional().default(0),
-  maintenanceOverdue: z.number().optional().default(0)
+  maintenanceOverdue: z.number().optional().default(0),
 });
 
 const StoredValueCodeSchema = z.object({
   id: z.string(),
   code: z.string(),
   active: z.boolean(),
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 
 const StoredValueScopeSchema = z.enum(["campground", "organization", "global"]);
@@ -226,44 +233,66 @@ const StoredValueScopeSchema = z.enum(["campground", "organization", "global"]);
 // Additional response types for API methods
 const StayReasonReportSchema = z.unknown(); // Generic report data structure
 const DailyScheduleSchema = z.object({
-  summary: z.object({
-    checkouts: z.number().optional(),
-    checkins: z.number().optional(),
-    turnovers: z.number().optional(),
-    priorityCount: z.number().optional(),
-    stayoverCount: z.number().optional(),
-  }).optional(),
-  expectedCheckouts: z.array(z.object({
-    id: z.string(),
-    siteName: z.string().optional(),
-    guestName: z.string().optional(),
-    time: z.string().optional(),
-  })).optional(),
-  expectedCheckins: z.array(z.object({
-    id: z.string(),
-    siteName: z.string().optional(),
-    guestName: z.string().optional(),
-    time: z.string().optional(),
-    isVIP: z.boolean().optional(),
-    isEarlyArrival: z.boolean().optional(),
-  })).optional(),
-  expectedTurnovers: z.array(z.object({
-    id: z.string(),
-    siteName: z.string().optional(),
-    arrivalTime: z.string().optional(),
-    departureTime: z.string().optional(),
-  })).optional(),
-  stayovers: z.array(z.object({
-    id: z.string(),
-    siteName: z.string().optional(),
-    guestName: z.string().optional(),
-  })).optional(),
-  prioritySites: z.array(z.object({
-    id: z.string(),
-    siteName: z.string().optional(),
-    priority: z.string().optional(),
-    reason: z.string().optional(),
-  })).optional(),
+  summary: z
+    .object({
+      checkouts: z.number().optional(),
+      checkins: z.number().optional(),
+      turnovers: z.number().optional(),
+      priorityCount: z.number().optional(),
+      stayoverCount: z.number().optional(),
+    })
+    .optional(),
+  expectedCheckouts: z
+    .array(
+      z.object({
+        id: z.string(),
+        siteName: z.string().optional(),
+        guestName: z.string().optional(),
+        time: z.string().optional(),
+      }),
+    )
+    .optional(),
+  expectedCheckins: z
+    .array(
+      z.object({
+        id: z.string(),
+        siteName: z.string().optional(),
+        guestName: z.string().optional(),
+        time: z.string().optional(),
+        isVIP: z.boolean().optional(),
+        isEarlyArrival: z.boolean().optional(),
+      }),
+    )
+    .optional(),
+  expectedTurnovers: z
+    .array(
+      z.object({
+        id: z.string(),
+        siteName: z.string().optional(),
+        arrivalTime: z.string().optional(),
+        departureTime: z.string().optional(),
+      }),
+    )
+    .optional(),
+  stayovers: z
+    .array(
+      z.object({
+        id: z.string(),
+        siteName: z.string().optional(),
+        guestName: z.string().optional(),
+      }),
+    )
+    .optional(),
+  prioritySites: z
+    .array(
+      z.object({
+        id: z.string(),
+        siteName: z.string().optional(),
+        priority: z.string().optional(),
+        reason: z.string().optional(),
+      }),
+    )
+    .optional(),
   priorityUnits: z.array(z.string()).optional(),
 });
 const FlexCheckPolicySchema = z.unknown(); // Flex check policy structure
@@ -282,13 +311,15 @@ const StoredValueAccountSchema = z.object({
   metadata: z.record(z.unknown()).nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  campground: z.object({
-    id: z.string(),
-    name: z.string()
-  }).optional(),
+  campground: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+    })
+    .optional(),
   codes: z.array(StoredValueCodeSchema).optional().default([]),
   balanceCents: z.number(),
-  issuedCents: z.number()
+  issuedCents: z.number(),
 });
 
 const StoredValueLedgerSchema = z.object({
@@ -307,29 +338,35 @@ const StoredValueLedgerSchema = z.object({
   referenceId: z.string().optional(),
   channel: z.string().nullable().optional(),
   reason: z.string().nullable().optional(),
-  createdAt: z.string()
+  createdAt: z.string(),
 });
 
-const StoredValueIssueResponseSchema = z.object({
-  accountId: z.string(),
-  balanceCents: z.number(),
-  expiresAt: z.string().nullable().optional(),
-  code: z.string().optional(),
-  pinRequired: z.boolean().optional(),
-  pin: z.string().optional()
-}).passthrough();
+const StoredValueIssueResponseSchema = z
+  .object({
+    accountId: z.string(),
+    balanceCents: z.number(),
+    expiresAt: z.string().nullable().optional(),
+    code: z.string().optional(),
+    pinRequired: z.boolean().optional(),
+    pin: z.string().optional(),
+  })
+  .passthrough();
 
-const StoredValueRedeemResponseSchema = z.object({
-  accountId: z.string(),
-  balanceCents: z.number().optional(),
-  availableCents: z.number().optional(),
-  holdId: z.string().optional()
-}).passthrough();
+const StoredValueRedeemResponseSchema = z
+  .object({
+    accountId: z.string(),
+    balanceCents: z.number().optional(),
+    availableCents: z.number().optional(),
+    holdId: z.string().optional(),
+  })
+  .passthrough();
 
-const StoredValueAdjustResponseSchema = z.object({
-  accountId: z.string(),
-  balanceCents: z.number()
-}).passthrough();
+const StoredValueAdjustResponseSchema = z
+  .object({
+    accountId: z.string(),
+    balanceCents: z.number(),
+  })
+  .passthrough();
 
 const OnboardingStepEnum = z.enum([
   // New step keys
@@ -370,46 +407,60 @@ const OnboardingStepEnum = z.enum([
   "imports",
 ]);
 
-const OnboardingStatusEnum = z.enum(["pending", "in_progress", "completed", "expired", "cancelled"]);
+const OnboardingStatusEnum = z.enum([
+  "pending",
+  "in_progress",
+  "completed",
+  "expired",
+  "cancelled",
+]);
 
 const OnboardingProgressSchema = z.object({
   currentStep: OnboardingStepEnum,
   nextStep: OnboardingStepEnum.nullable(),
   completedSteps: z.array(OnboardingStepEnum),
   remainingSteps: z.array(OnboardingStepEnum),
-  percentage: z.number().min(0).max(100)
+  percentage: z.number().min(0).max(100),
 });
 
-const OnboardingSessionSchema = z.object({
-  id: z.string(),
-  inviteId: z.string(),
-  organizationId: z.string().nullable().optional(),
-  campgroundId: z.string().nullable().optional(),
-  campgroundSlug: z.string().nullable().optional(),
-  status: OnboardingStatusEnum,
-  currentStep: OnboardingStepEnum,
-  completedSteps: z.array(OnboardingStepEnum).default([]),
-  data: z.record(z.unknown()).nullable().optional(),
-  progress: OnboardingProgressSchema.nullable().optional(),
-  expiresAt: z.string().nullable().optional(),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
-}).passthrough();
+const OnboardingSessionSchema = z
+  .object({
+    id: z.string(),
+    inviteId: z.string(),
+    organizationId: z.string().nullable().optional(),
+    campgroundId: z.string().nullable().optional(),
+    campgroundSlug: z.string().nullable().optional(),
+    status: OnboardingStatusEnum,
+    currentStep: OnboardingStepEnum,
+    completedSteps: z.array(OnboardingStepEnum).default([]),
+    data: z.record(z.unknown()).nullable().optional(),
+    progress: OnboardingProgressSchema.nullable().optional(),
+    expiresAt: z.string().nullable().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  })
+  .passthrough();
 
 const OnboardingSessionResponseSchema = z.object({
   session: OnboardingSessionSchema,
-  progress: OnboardingProgressSchema
+  progress: OnboardingProgressSchema,
 });
 
 const OnboardingInviteResponseSchema = z.object({
   inviteId: z.string(),
   token: z.string(),
-  expiresAt: z.string()
+  expiresAt: z.string(),
 });
 
 // Product schemas are imported from @keepr/shared
 
-const FulfillmentStatusSchema = z.enum(["unassigned", "assigned", "preparing", "ready", "completed"]);
+const FulfillmentStatusSchema = z.enum([
+  "unassigned",
+  "assigned",
+  "preparing",
+  "ready",
+  "completed",
+]);
 
 const StoreOrderItemSchema = z.object({
   id: z.string(),
@@ -418,7 +469,7 @@ const StoreOrderItemSchema = z.object({
   unitCents: z.number().optional(),
   totalCents: z.number().optional(),
   productId: z.string().nullable().optional(),
-  addOnId: z.string().nullable().optional()
+  addOnId: z.string().nullable().optional(),
 });
 
 const StoreOrderAdjustmentSchema = z.object({
@@ -427,13 +478,20 @@ const StoreOrderAdjustmentSchema = z.object({
   amountCents: z.number(),
   note: z.string().nullable().optional(),
   createdAt: z.string(),
-  createdBy: z.object({ id: z.string().optional(), name: z.string().nullable().optional() }).nullable().optional(),
-  items: z.array(z.object({
-    itemId: z.string().optional(),
-    name: z.string().optional(),
-    qty: z.number().optional(),
-    amountCents: z.number().optional(),
-  })).default([])
+  createdBy: z
+    .object({ id: z.string().optional(), name: z.string().nullable().optional() })
+    .nullable()
+    .optional(),
+  items: z
+    .array(
+      z.object({
+        itemId: z.string().optional(),
+        name: z.string().optional(),
+        qty: z.number().optional(),
+        amountCents: z.number().optional(),
+      }),
+    )
+    .default([]),
 });
 
 const StoreOrderSchema = z.object({
@@ -445,7 +503,10 @@ const StoreOrderSchema = z.object({
   status: z.string(),
   paymentMethod: z.string().optional(),
   channel: z.enum(["pos", "online", "kiosk", "portal", "internal"]).optional(),
-  fulfillmentType: z.enum(["pickup", "curbside", "delivery", "table_service"]).nullable().optional(),
+  fulfillmentType: z
+    .enum(["pickup", "curbside", "delivery", "table_service"])
+    .nullable()
+    .optional(),
   fulfillmentStatus: FulfillmentStatusSchema.default("unassigned"),
   fulfillmentLocationId: z.string().nullable().default(null),
   assignedAt: z.string().nullable().default(null),
@@ -455,7 +516,7 @@ const StoreOrderSchema = z.object({
   siteNumber: z.string().nullable().optional(),
   createdAt: z.string().optional(),
   items: z.array(StoreOrderItemSchema).default([]),
-  adjustments: z.array(StoreOrderAdjustmentSchema).default([])
+  adjustments: z.array(StoreOrderAdjustmentSchema).default([]),
 });
 
 // Public campground schemas
@@ -474,10 +535,12 @@ const PublicCampgroundListSchema = z.array(
     isExternal: z.boolean().optional().default(false),
     isBookable: z.boolean().optional().default(true),
     externalUrl: z.string().nullable().optional(),
-    reviewScore: z.preprocess(
-      (val) => (val === null || val === undefined ? null : Number(val)),
-      z.number().nullable()
-    ).optional(),
+    reviewScore: z
+      .preprocess(
+        (val) => (val === null || val === undefined ? null : Number(val)),
+        z.number().nullable(),
+      )
+      .optional(),
     reviewCount: z.number().optional(),
     amenitySummary: z.record(z.unknown()).nullable().optional(),
     // NPS fields
@@ -496,8 +559,8 @@ const PublicCampgroundListSchema = z.array(
     // Past Campground of the Year awards
     pastCampgroundOfYearAwards: z.array(z.number()).optional().default([]),
     // ADA Accessibility Certification
-    adaCertificationLevel: z.string().nullable().optional()
-  })
+    adaCertificationLevel: z.string().nullable().optional(),
+  }),
 );
 
 const PromotionSchema = z.object({
@@ -507,7 +570,7 @@ const PromotionSchema = z.object({
   value: z.number(),
   description: z.string().nullable(),
   validFrom: z.string().nullable(),
-  validTo: z.string().nullable()
+  validTo: z.string().nullable(),
 });
 const ReferralProgramSchema = z.object({
   id: z.string(),
@@ -521,7 +584,7 @@ const ReferralProgramSchema = z.object({
   isActive: z.boolean(),
   notes: z.string().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 const FormTemplateArray = z.array(FormTemplateSchema);
 const FormSubmissionArray = z.array(FormSubmissionSchema);
@@ -544,7 +607,7 @@ export const CreatePublicWaitlistSchema = z.object({
   arrivalDate: z.string(),
   departureDate: z.string(),
   siteId: z.string().optional(),
-  siteClassId: z.string().optional()
+  siteClassId: z.string().optional(),
 });
 export type CreatePublicWaitlistDto = z.infer<typeof CreatePublicWaitlistSchema>;
 
@@ -553,12 +616,14 @@ const LoyaltyProfileSchema = z.object({
   guestId: z.string(),
   pointsBalance: z.number(),
   tier: z.string(),
-  transactions: z.array(z.object({
-    id: z.string(),
-    amount: z.number(),
-    reason: z.string(),
-    createdAt: z.string()
-  }))
+  transactions: z.array(
+    z.object({
+      id: z.string(),
+      amount: z.number(),
+      reason: z.string(),
+      createdAt: z.string(),
+    }),
+  ),
 });
 
 const GuestEquipmentSchema = z.object({
@@ -571,7 +636,7 @@ const GuestEquipmentSchema = z.object({
   plateNumber: z.string().nullable(),
   plateState: z.string().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 
 const CampaignSchema = z.object({
@@ -587,7 +652,7 @@ const CampaignSchema = z.object({
   status: z.enum(["draft", "scheduled", "sending", "sent", "cancelled"]),
   scheduledAt: z.string().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 
 const CampaignTemplateSchema = z.object({
@@ -600,60 +665,94 @@ const CampaignTemplateSchema = z.object({
   html: z.string().nullable(),
   textBody: z.string().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 
 const CommunicationListSchema = z.object({
   items: z.array(CommunicationSchema),
-  nextCursor: z.string().nullable()
+  nextCursor: z.string().nullable(),
 });
 
-const OtaChannelSchema = z.object({
-  id: z.string(),
-  campgroundId: z.string(),
-  name: z.string(),
-  provider: z.string(),
-  status: z.string(),
-  rateMultiplier: z.number().optional().default(1),
-  defaultStatus: z.string().optional().default("confirmed"),
-  sendEmailNotifications: z.boolean().optional().default(false),
-  ignoreSiteRestrictions: z.boolean().optional().default(false),
-  ignoreCategoryRestrictions: z.boolean().optional().default(false),
-  feeMode: z.string().optional().default("absorb"),
-  webhookSecret: z.string().nullable().optional(),
-  lastSyncAt: z.union([z.string(), z.date()]).nullable().optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  createdAt: z.union([z.string(), z.date()]).optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  updatedAt: z.union([z.string(), z.date()]).optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  mappings: z.array(z.unknown()).optional()
-}).passthrough();
+const OtaChannelSchema = z
+  .object({
+    id: z.string(),
+    campgroundId: z.string(),
+    name: z.string(),
+    provider: z.string(),
+    status: z.string(),
+    rateMultiplier: z.number().optional().default(1),
+    defaultStatus: z.string().optional().default("confirmed"),
+    sendEmailNotifications: z.boolean().optional().default(false),
+    ignoreSiteRestrictions: z.boolean().optional().default(false),
+    ignoreCategoryRestrictions: z.boolean().optional().default(false),
+    feeMode: z.string().optional().default("absorb"),
+    webhookSecret: z.string().nullable().optional(),
+    lastSyncAt: z
+      .union([z.string(), z.date()])
+      .nullable()
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    createdAt: z
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    updatedAt: z
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    mappings: z.array(z.unknown()).optional(),
+  })
+  .passthrough();
 
-const OtaMappingSchema = z.object({
-  id: z.string(),
-  channelId: z.string(),
-  siteId: z.string().nullable().optional(),
-  siteClassId: z.string().nullable().optional(),
-  externalId: z.string(),
-  status: z.string().optional().default("mapped"),
-  lastSyncAt: z.union([z.string(), z.date()]).nullable().optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  lastError: z.string().nullable().optional(),
-  icalToken: z.string().nullable().optional(),
-  icalUrl: z.string().nullable().optional(),
-  createdAt: z.union([z.string(), z.date()]).optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  updatedAt: z.union([z.string(), z.date()]).optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  site: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
-  siteClass: z.object({ id: z.string(), name: z.string() }).nullable().optional()
-}).passthrough();
+const OtaMappingSchema = z
+  .object({
+    id: z.string(),
+    channelId: z.string(),
+    siteId: z.string().nullable().optional(),
+    siteClassId: z.string().nullable().optional(),
+    externalId: z.string(),
+    status: z.string().optional().default("mapped"),
+    lastSyncAt: z
+      .union([z.string(), z.date()])
+      .nullable()
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    lastError: z.string().nullable().optional(),
+    icalToken: z.string().nullable().optional(),
+    icalUrl: z.string().nullable().optional(),
+    createdAt: z
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    updatedAt: z
+      .union([z.string(), z.date()])
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    site: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
+    siteClass: z.object({ id: z.string(), name: z.string() }).nullable().optional(),
+  })
+  .passthrough();
 
-const OtaImportSchema = z.object({
-  id: z.string(),
-  channelId: z.string(),
-  externalReservationId: z.string(),
-  reservationId: z.string().nullable().optional(),
-  status: z.string().optional().default("pending"),
-  message: z.string().nullable().optional(),
-  createdAt: z.union([z.string(), z.date()]).nullable().optional().transform(v => v instanceof Date ? v.toISOString() : v),
-  updatedAt: z.union([z.string(), z.date()]).nullable().optional().transform(v => v instanceof Date ? v.toISOString() : v)
-}).passthrough();
+const OtaImportSchema = z
+  .object({
+    id: z.string(),
+    channelId: z.string(),
+    externalReservationId: z.string(),
+    reservationId: z.string().nullable().optional(),
+    status: z.string().optional().default("pending"),
+    message: z.string().nullable().optional(),
+    createdAt: z
+      .union([z.string(), z.date()])
+      .nullable()
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+    updatedAt: z
+      .union([z.string(), z.date()])
+      .nullable()
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+  })
+  .passthrough();
 
 const OtaConfigSchema = z.object({
   campgroundId: z.string(),
@@ -667,7 +766,7 @@ const OtaConfigSchema = z.object({
   lastSyncAt: z.string().nullable().optional(),
   lastSyncMessage: z.string().nullable().optional(),
   lastUpdatedAt: z.string().nullable().optional(),
-  pendingSyncs: z.number().optional()
+  pendingSyncs: z.number().optional(),
 });
 
 const OtaSyncStatusSchema = z.object({
@@ -675,19 +774,25 @@ const OtaSyncStatusSchema = z.object({
   lastSyncStatus: z.string(),
   lastSyncAt: z.string().nullable().optional(),
   lastSyncMessage: z.string().nullable().optional(),
-  pendingSyncs: z.number().optional()
+  pendingSyncs: z.number().optional(),
 });
 
-const OtaLogSchema = z.object({
-  id: z.string(),
-  channelId: z.string(),
-  direction: z.string().optional().default("pull"),
-  eventType: z.string().optional().default("unknown"),
-  status: z.string().optional().default("pending"),
-  message: z.string().nullable().optional(),
-  payload: z.unknown().nullable().optional(),
-  createdAt: z.union([z.string(), z.date()]).nullable().optional().transform(v => v instanceof Date ? v.toISOString() : v)
-}).passthrough();
+const OtaLogSchema = z
+  .object({
+    id: z.string(),
+    channelId: z.string(),
+    direction: z.string().optional().default("pull"),
+    eventType: z.string().optional().default("unknown"),
+    status: z.string().optional().default("pending"),
+    message: z.string().nullable().optional(),
+    payload: z.unknown().nullable().optional(),
+    createdAt: z
+      .union([z.string(), z.date()])
+      .nullable()
+      .optional()
+      .transform((v) => (v instanceof Date ? v.toISOString() : v)),
+  })
+  .passthrough();
 
 export type OtaChannel = z.infer<typeof OtaChannelSchema>;
 export type OtaMapping = z.infer<typeof OtaMappingSchema>;
@@ -778,7 +883,10 @@ function withCampgroundId(path: string, campgroundId?: string) {
 }
 
 async function fetchJSON<T>(path: string, schema: z.ZodType<T>, headers?: Record<string, string>) {
-  const res = await fetch(`${API_BASE}${path}`, { next: { revalidate: 0 }, headers: scopedHeaders(headers) });
+  const res = await fetch(`${API_BASE}${path}`, {
+    next: { revalidate: 0 },
+    headers: scopedHeaders(headers),
+  });
   return parseResponse(res, schema);
 }
 
@@ -823,7 +931,7 @@ const LeadRecordSchema = z.object({
   status: LeadStatusEnum,
   source: z.string().optional(),
   createdAt: z.string(),
-  lastSyncedAt: z.string().nullable().optional()
+  lastSyncedAt: z.string().nullable().optional(),
 });
 
 export type LeadStatus = z.infer<typeof LeadStatusEnum>;
@@ -937,7 +1045,15 @@ function updateLead(id: string, updater: (lead: LeadRecord) => LeadRecord) {
   return updated;
 }
 
-const StaffRoleEnum = z.enum(["owner", "manager", "front_desk", "maintenance", "finance", "marketing", "readonly"]);
+const StaffRoleEnum = z.enum([
+  "owner",
+  "manager",
+  "front_desk",
+  "maintenance",
+  "finance",
+  "marketing",
+  "readonly",
+]);
 const GamificationCategoryEnum = z.enum([
   "task",
   "maintenance",
@@ -1038,28 +1154,35 @@ const GamificationDashboardSchema = z.object({
 });
 
 const GamificationLeaderboardSchema = z.object({
-  leaderboard: z.array(z.object({
-    userId: z.string(),
-    rank: z.number(),
-    xp: z.number(),
-    name: z.string(),
-    role: StaffRoleEnum.nullable()
-  })),
-  viewer: z.object({
-    userId: z.string(),
-    rank: z.number().nullable(),
-    xp: z.number(),
-    name: z.string(),
-    role: StaffRoleEnum.nullable()
-  }).nullable().optional(),
+  leaderboard: z.array(
+    z.object({
+      userId: z.string(),
+      rank: z.number(),
+      xp: z.number(),
+      name: z.string(),
+      role: StaffRoleEnum.nullable(),
+    }),
+  ),
+  viewer: z
+    .object({
+      userId: z.string(),
+      rank: z.number().nullable(),
+      xp: z.number(),
+      name: z.string(),
+      role: StaffRoleEnum.nullable(),
+    })
+    .nullable()
+    .optional(),
   since: z.string(),
 });
 
 const GamificationStatsSchema = z.object({
-  categories: z.array(z.object({
-    category: GamificationCategoryEnum,
-    xp: z.number(),
-  })),
+  categories: z.array(
+    z.object({
+      category: GamificationCategoryEnum,
+      xp: z.number(),
+    }),
+  ),
   since: z.string(),
 });
 
@@ -1081,7 +1204,7 @@ const SocialPostSchema = z.object({
   assetUrls: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
   ideaParkingLot: z.boolean().default(false),
-  suggestionId: z.string().nullable().optional()
+  suggestionId: z.string().nullable().optional(),
 });
 
 const SocialTemplateSchemaLocal = z.object({
@@ -1095,7 +1218,7 @@ const SocialTemplateSchemaLocal = z.object({
   captionFillIns: z.string().nullable().optional(),
   imageGuidance: z.string().nullable().optional(),
   hashtagSet: z.array(z.string()).default([]),
-  bestTime: z.string().nullable().optional()
+  bestTime: z.string().nullable().optional(),
 });
 
 const SocialAssetSchema = z.object({
@@ -1105,7 +1228,7 @@ const SocialAssetSchema = z.object({
   type: z.string(),
   url: z.string(),
   tags: z.array(z.string()).default([]),
-  notes: z.string().nullable().optional()
+  notes: z.string().nullable().optional(),
 });
 
 const SocialSuggestionSchema = z.object({
@@ -1119,7 +1242,7 @@ const SocialSuggestionSchema = z.object({
   proposedDate: z.string().nullable().optional(),
   opportunityAt: z.string().nullable().optional(),
   postId: z.string().nullable().optional(),
-  reason: z.unknown().nullable().optional()
+  reason: z.unknown().nullable().optional(),
 });
 
 const SocialWeeklyIdeaSchema = z.object({
@@ -1127,7 +1250,7 @@ const SocialWeeklyIdeaSchema = z.object({
   campgroundId: z.string(),
   generatedFor: z.string(),
   ideas: z.array(z.object({ type: z.string(), idea: z.string(), platform: z.string() })).optional(),
-  cadence: z.array(z.object({ day: z.string(), theme: z.string() })).optional()
+  cadence: z.array(z.object({ day: z.string(), theme: z.string() })).optional(),
 });
 
 const SocialStrategySchema = z.object({
@@ -1135,7 +1258,7 @@ const SocialStrategySchema = z.object({
   campgroundId: z.string(),
   month: z.string(),
   annual: z.boolean(),
-  plan: z.unknown()
+  plan: z.unknown(),
 });
 
 const SocialAlertSchema = z.object({
@@ -1145,26 +1268,28 @@ const SocialAlertSchema = z.object({
   message: z.string(),
   startsAt: z.string().nullable().optional(),
   endsAt: z.string().nullable().optional(),
-  dismissed: z.boolean().optional()
+  dismissed: z.boolean().optional(),
 });
 
 const SocialReportSchema = z.object({
   posts: z.number(),
   templates: z.number(),
   openSuggestions: z.number(),
-  performance: z.object({
-    likes: z.number().optional().default(0),
-    reach: z.number().optional().default(0),
-    comments: z.number().optional().default(0),
-    shares: z.number().optional().default(0),
-    saves: z.number().optional().default(0)
-  }).default({
-    likes: 0,
-    reach: 0,
-    comments: 0,
-    shares: 0,
-    saves: 0
-  })
+  performance: z
+    .object({
+      likes: z.number().optional().default(0),
+      reach: z.number().optional().default(0),
+      comments: z.number().optional().default(0),
+      shares: z.number().optional().default(0),
+      saves: z.number().optional().default(0),
+    })
+    .default({
+      likes: 0,
+      reach: 0,
+      comments: 0,
+      shares: 0,
+      saves: 0,
+    }),
 });
 
 const IntegrationConnectionSchema = z.object({
@@ -1183,43 +1308,51 @@ const IntegrationConnectionSchema = z.object({
   lastError: z.string().nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  logs: z.array(z.object({
-    id: z.string(),
-    status: z.string(),
-    message: z.string().nullable().optional(),
-    scope: z.string().nullable().optional(),
-    direction: z.string().nullable().optional(),
-    occurredAt: z.string().optional()
-  })).optional()
+  logs: z
+    .array(
+      z.object({
+        id: z.string(),
+        status: z.string(),
+        message: z.string().nullable().optional(),
+        scope: z.string().nullable().optional(),
+        direction: z.string().nullable().optional(),
+        occurredAt: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 
 const IntegrationLogPageSchema = z.object({
-  items: z.array(z.object({
-    id: z.string(),
-    connectionId: z.string(),
-    direction: z.string(),
-    scope: z.string(),
-    status: z.string(),
-    message: z.string().nullable().optional(),
-    payload: z.unknown().nullable().optional(),
-    occurredAt: z.string().optional()
-  })),
-  nextCursor: z.string().nullable()
+  items: z.array(
+    z.object({
+      id: z.string(),
+      connectionId: z.string(),
+      direction: z.string(),
+      scope: z.string(),
+      status: z.string(),
+      message: z.string().nullable().optional(),
+      payload: z.unknown().nullable().optional(),
+      occurredAt: z.string().optional(),
+    }),
+  ),
+  nextCursor: z.string().nullable(),
 });
 
 const IntegrationWebhookPageSchema = z.object({
-  items: z.array(z.object({
-    id: z.string(),
-    connectionId: z.string().nullable().optional(),
-    provider: z.string(),
-    eventType: z.string().nullable().optional(),
-    status: z.string(),
-    signatureValid: z.boolean().nullable().optional(),
-    message: z.string().nullable().optional(),
-    payload: z.unknown().nullable().optional(),
-    receivedAt: z.string().optional()
-  })),
-  nextCursor: z.string().nullable()
+  items: z.array(
+    z.object({
+      id: z.string(),
+      connectionId: z.string().nullable().optional(),
+      provider: z.string(),
+      eventType: z.string().nullable().optional(),
+      status: z.string(),
+      signatureValid: z.boolean().nullable().optional(),
+      message: z.string().nullable().optional(),
+      payload: z.unknown().nullable().optional(),
+      receivedAt: z.string().optional(),
+    }),
+  ),
+  nextCursor: z.string().nullable(),
 });
 
 const WebhookEndpointSchema = z.object({
@@ -1229,7 +1362,7 @@ const WebhookEndpointSchema = z.object({
   eventTypes: z.array(z.string()).default([]),
   isActive: z.boolean(),
   description: z.string().nullable(),
-  createdAt: z.string()
+  createdAt: z.string(),
 });
 
 const WebhookDeliverySchema = z.object({
@@ -1238,7 +1371,7 @@ const WebhookDeliverySchema = z.object({
   status: z.string(),
   responseStatus: z.string().nullable().optional(),
   webhookEndpoint: z.object({ url: z.string() }).nullable().optional(),
-  createdAt: z.string()
+  createdAt: z.string(),
 });
 
 const IntegrationExportJobSchema = z.object({
@@ -1256,7 +1389,7 @@ const IntegrationExportJobSchema = z.object({
   filters: z.unknown().nullable().optional(),
   downloadUrl: z.string().nullable().optional(),
   summary: z.unknown().nullable().optional(),
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 
 const AiRecommendationSchema = z.object({
@@ -1264,7 +1397,7 @@ const AiRecommendationSchema = z.object({
   title: z.string(),
   reason: z.string(),
   cta: z.string().optional(),
-  targetId: z.string().optional()
+  targetId: z.string().optional(),
 });
 
 const AiRecommendationResponseSchema = z.object({
@@ -1272,7 +1405,7 @@ const AiRecommendationResponseSchema = z.object({
   guestId: z.string().nullable(),
   intent: z.string(),
   items: z.array(AiRecommendationSchema),
-  generatedAt: z.string()
+  generatedAt: z.string(),
 });
 
 const AiPricingSuggestionSchema = z.object({
@@ -1280,16 +1413,18 @@ const AiPricingSuggestionSchema = z.object({
   siteClassId: z.string().nullable(),
   window: z.object({
     arrivalDate: z.string().nullable(),
-    departureDate: z.string().nullable()
+    departureDate: z.string().nullable(),
   }),
   baseRateCents: z.number(),
   suggestedRateCents: z.number(),
   currency: z.string(),
   demandIndex: z.number(),
   factors: z.array(z.object({ label: z.string(), value: z.string(), weight: z.number() })),
-  comparableSites: z.array(z.object({ name: z.string(), rateCents: z.number(), distanceMiles: z.number() })),
+  comparableSites: z.array(
+    z.object({ name: z.string(), rateCents: z.number(), distanceMiles: z.number() }),
+  ),
   notes: z.string(),
-  generatedAt: z.string()
+  generatedAt: z.string(),
 });
 
 const AiSemanticSearchResponseSchema = z.object({
@@ -1301,10 +1436,10 @@ const AiSemanticSearchResponseSchema = z.object({
       id: z.string(),
       title: z.string(),
       snippet: z.string(),
-      score: z.number()
-    })
+      score: z.number(),
+    }),
   ),
-  generatedAt: z.string()
+  generatedAt: z.string(),
 });
 
 const AiCopilotResponseSchema = z.object({
@@ -1320,11 +1455,15 @@ const AiCopilotResponseSchema = z.object({
   impact: z.string().optional(),
   tone: z.string().optional(),
   // Help action
-  availableActions: z.array(z.object({
-    action: z.string(),
-    description: z.string(),
-    params: z.array(z.string()).optional(),
-  })).optional(),
+  availableActions: z
+    .array(
+      z.object({
+        action: z.string(),
+        description: z.string(),
+        params: z.array(z.string()).optional(),
+      }),
+    )
+    .optional(),
   // Pricing actions
   recommendations: z.array(z.unknown()).optional(),
   summary: z.unknown().optional(),
@@ -1343,16 +1482,9 @@ const AiCopilotResponseSchema = z.object({
   activity: z.array(z.unknown()).optional(),
 });
 
-type JsonRenderDynamicValue =
-  | string
-  | number
-  | boolean
-  | null
-  | { path: string };
+type JsonRenderDynamicValue = string | number | boolean | null | { path: string };
 
-type JsonRenderDynamicNumberValue =
-  | number
-  | { path: string };
+type JsonRenderDynamicNumberValue = number | { path: string };
 
 type JsonRenderLogicExpression =
   | { and: JsonRenderLogicExpression[] }
@@ -1394,10 +1526,7 @@ const JsonRenderDynamicValueSchema = z.union([
   z.object({ path: z.string() }),
 ]);
 
-const JsonRenderDynamicNumberValueSchema = z.union([
-  z.number(),
-  z.object({ path: z.string() }),
-]);
+const JsonRenderDynamicNumberValueSchema = z.union([z.number(), z.object({ path: z.string() })]);
 
 const JsonRenderLogicExpressionSchema: z.ZodType<JsonRenderLogicExpression> = z.lazy(() =>
   z.union([
@@ -1407,11 +1536,19 @@ const JsonRenderLogicExpressionSchema: z.ZodType<JsonRenderLogicExpression> = z.
     z.object({ path: z.string() }),
     z.object({ eq: z.tuple([JsonRenderDynamicValueSchema, JsonRenderDynamicValueSchema]) }),
     z.object({ neq: z.tuple([JsonRenderDynamicValueSchema, JsonRenderDynamicValueSchema]) }),
-    z.object({ gt: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]) }),
-    z.object({ gte: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]) }),
-    z.object({ lt: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]) }),
-    z.object({ lte: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]) }),
-  ])
+    z.object({
+      gt: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]),
+    }),
+    z.object({
+      gte: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]),
+    }),
+    z.object({
+      lt: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]),
+    }),
+    z.object({
+      lte: z.tuple([JsonRenderDynamicNumberValueSchema, JsonRenderDynamicNumberValueSchema]),
+    }),
+  ]),
 );
 
 const JsonRenderVisibilityConditionSchema: z.ZodType<JsonRenderVisibilityCondition> = z.union([
@@ -1496,7 +1633,7 @@ const PortfolioReportSchema = z.object({
       revenueHome: z.number(),
       fxToHome: z.number().optional(),
       taxSummary: z.string().optional(),
-    })
+    }),
   ),
   rollup: z.object({
     currency: z.string(),
@@ -1512,7 +1649,7 @@ const PortfolioReportSchema = z.object({
         adminHost: z.string().nullable().optional(),
         guestHost: z.string().nullable().optional(),
         path: z.string().nullable().optional(),
-      })
+      }),
     )
     .optional(),
   recommendations: z
@@ -1522,7 +1659,7 @@ const PortfolioReportSchema = z.object({
         title: z.string(),
         impact: z.string(),
         area: z.string(),
-      })
+      }),
     )
     .optional(),
 });
@@ -1581,7 +1718,7 @@ const CurrencyTaxConfigSchema = z.object({
       parkId: z.string(),
       currency: z.string(),
       taxProfileId: z.string(),
-    })
+    }),
   ),
   updatedAt: z.string(),
 });
@@ -1632,7 +1769,7 @@ const ApprovalListSchema = z.object({
 const RestoreSimulationSchema = z.object({
   status: z.enum(["idle", "running", "ok", "error"]),
   lastRunAt: z.string().nullable(),
-  message: z.string().nullable().optional()
+  message: z.string().nullable().optional(),
 });
 
 const BackupStatusSchema = z.object({
@@ -1640,7 +1777,7 @@ const BackupStatusSchema = z.object({
   lastBackupAt: z.string(),
   lastBackupLocation: z.string(),
   retentionDays: z.number(),
-  restoreSimulation: RestoreSimulationSchema
+  restoreSimulation: RestoreSimulationSchema,
 });
 
 const IncidentTaskSchema = z.object({
@@ -1730,10 +1867,14 @@ export const UtilityMeterSchema = z.object({
   lastBilledReadAt: z.string().nullable().optional(),
   active: z.boolean().optional(),
   metadata: z.record(z.unknown()).nullable().optional(),
-  reads: z.array(z.object({
-    readingValue: numberish(z.number()),
-    readAt: z.string().or(z.date()),
-  })).optional(),
+  reads: z
+    .array(
+      z.object({
+        readingValue: numberish(z.number()),
+        readAt: z.string().or(z.date()),
+      }),
+    )
+    .optional(),
 });
 
 export const SmartLockSchema = z.object({
@@ -1812,20 +1953,22 @@ const MapSiteSchema = z.object({
   rotation: z.number().nullable().optional(),
   ada: z.boolean().optional(),
   amenityTags: z.array(z.string()).default([]),
-  rigConstraints: z.object({
-    length: z.number().nullable().optional(),
-    width: z.number().nullable().optional(),
-    height: z.number().nullable().optional(),
-    pullThrough: z.boolean().optional()
-  }).partial(),
+  rigConstraints: z
+    .object({
+      length: z.number().nullable().optional(),
+      width: z.number().nullable().optional(),
+      height: z.number().nullable().optional(),
+      pullThrough: z.boolean().optional(),
+    })
+    .partial(),
   hookups: z.object({
     power: z.boolean().default(false),
     powerAmps: z.array(z.number()).default([]),
     water: z.boolean().default(false),
-    sewer: z.boolean().default(false)
+    sewer: z.boolean().default(false),
   }),
   status: z.string().nullable().optional(),
-  conflicts: z.array(MapConflictSchema).default([])
+  conflicts: z.array(MapConflictSchema).default([]),
 });
 
 const MapShapeSchema = z.object({
@@ -1834,7 +1977,7 @@ const MapShapeSchema = z.object({
   geometry: z.unknown(),
   centroid: z.unknown().nullable().optional(),
   metadata: z.unknown().nullable().optional(),
-  assignedSiteId: z.string().nullable().optional()
+  assignedSiteId: z.string().nullable().optional(),
 });
 
 const MapConfigSchema = z.object({
@@ -1842,31 +1985,31 @@ const MapConfigSchema = z.object({
   defaultCenter: z.unknown().nullable().optional(),
   defaultZoom: z.number().nullable().optional(),
   layers: z.unknown().nullable().optional(),
-  legend: z.unknown().nullable().optional()
+  legend: z.unknown().nullable().optional(),
 });
 
 const CampgroundMapSchema = z.object({
   config: MapConfigSchema.nullable().optional(),
   sites: z.array(MapSiteSchema),
-  shapes: z.array(MapShapeSchema).optional()
+  shapes: z.array(MapShapeSchema).optional(),
 });
 
 const PreviewAssignmentSchema = z.object({
   siteId: z.string(),
   reasons: z.array(z.string()).default([]),
-  conflicts: z.array(MapConflictSchema).default([])
+  conflicts: z.array(MapConflictSchema).default([]),
 });
 
 const PreviewAssignmentsResultSchema = z.object({
   eligible: z.array(PreviewAssignmentSchema),
-  ineligible: z.array(PreviewAssignmentSchema)
+  ineligible: z.array(PreviewAssignmentSchema),
 });
 
 const PrivacySettingsSchema = z.object({
   redactPII: z.boolean(),
   consentRequired: z.boolean(),
   backupRetentionDays: z.number(),
-  keyRotationDays: z.number()
+  keyRotationDays: z.number(),
 });
 
 const ConsentSchema = z.object({
@@ -1878,7 +2021,7 @@ const ConsentSchema = z.object({
   purpose: z.string().optional(),
   method: z.string().optional(),
   expiresAt: z.string().optional(),
-  revokedAt: z.string().optional()
+  revokedAt: z.string().optional(),
 });
 
 const IdSchema = z.object({ id: z.string() });
@@ -1887,14 +2030,14 @@ const CountSchema = z.object({ count: z.number() });
 
 const AiPartnerEvidenceLinkSchema = z.object({
   label: z.string(),
-  url: z.string()
+  url: z.string(),
 });
 
 const AiPartnerImpactSchema = z.object({
   level: z.enum(["low", "medium", "high"]),
   summary: z.string(),
   warnings: z.array(z.string()).optional(),
-  saferAlternative: z.string().optional()
+  saferAlternative: z.string().optional(),
 });
 
 const AiPartnerActionDraftSchema = z.object({
@@ -1908,50 +2051,56 @@ const AiPartnerActionDraftSchema = z.object({
   sensitivity: z.enum(["low", "medium", "high"]).optional(),
   impact: AiPartnerImpactSchema.optional(),
   evidenceLinks: z.array(AiPartnerEvidenceLinkSchema).optional(),
-  result: z.record(z.unknown()).optional()
+  result: z.record(z.unknown()).optional(),
 });
 
 const AiPartnerConfirmationSchema = z.object({
   id: z.string(),
-  prompt: z.string()
+  prompt: z.string(),
 });
 
 const AiPartnerDenialSchema = z.object({
   reason: z.string(),
-  guidance: z.string().optional()
+  guidance: z.string().optional(),
 });
 
-const AiPartnerChatResponseSchema = z.object({
-  message: z.string().optional(),
-  actionDrafts: z.array(AiPartnerActionDraftSchema).optional(),
-  confirmations: z.array(AiPartnerConfirmationSchema).optional(),
-  denials: z.array(AiPartnerDenialSchema).optional(),
-  questions: z.array(z.string()).optional(),
-  evidenceLinks: z.array(AiPartnerEvidenceLinkSchema).optional()
-}).passthrough();
+const AiPartnerChatResponseSchema = z
+  .object({
+    message: z.string().optional(),
+    actionDrafts: z.array(AiPartnerActionDraftSchema).optional(),
+    confirmations: z.array(AiPartnerConfirmationSchema).optional(),
+    denials: z.array(AiPartnerDenialSchema).optional(),
+    questions: z.array(z.string()).optional(),
+    evidenceLinks: z.array(AiPartnerEvidenceLinkSchema).optional(),
+  })
+  .passthrough();
 
 export const apiClient = {
   // Public sites (QR)
   async getPublicSite(slug: string, code: string) {
     const data = await fetchJSONUnknown(`/public/campgrounds/${slug}/sites/${code}`);
-    return z.object({
-      site: SiteSchema.extend({ siteClass: SiteClassSchema.nullable().optional() }),
-      status: z.string(),
-      currentReservation: z.object({
-        id: z.string(),
+    return z
+      .object({
+        site: SiteSchema.extend({ siteClass: SiteClassSchema.nullable().optional() }),
         status: z.string(),
-        arrivalDate: z.string(),
-        departureDate: z.string(),
-        guestId: z.string(),
-      }).nullable()
-    }).parse(data);
+        currentReservation: z
+          .object({
+            id: z.string(),
+            status: z.string(),
+            arrivalDate: z.string(),
+            departureDate: z.string(),
+            guestId: z.string(),
+          })
+          .nullable(),
+      })
+      .parse(data);
   },
 
   async signUpload(payload: { filename: string; contentType: string }) {
     const res = await fetch(`${API_BASE}/uploads/sign`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) {
       throw new Error("Uploads disabled or failed to sign");
@@ -1962,49 +2111,63 @@ export const apiClient = {
         uploadUrl: z.string(),
         publicUrl: z.string(),
         key: z.string(),
-        error: z.string().optional()
-      })
+        error: z.string().optional(),
+      }),
     );
   },
   async getCampgrounds() {
     // Use scopedHeaders to include auth token
-    const res = await fetch(`${API_BASE}/campgrounds`, { next: { revalidate: 0 }, headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds`, {
+      next: { revalidate: 0 },
+      headers: scopedHeaders(),
+    });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundArray.parse(data);
   },
   async getCampgroundReservations(campgroundId?: string) {
-    const id = campgroundId || (typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : "");
+    const id =
+      campgroundId ||
+      (typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : "");
     const res = await fetch(`${API_BASE}/reservations${id ? `?campgroundId=${id}` : ""}`, {
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationArray.parse(data);
   },
   async getReservationImportSchema(campgroundId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/import/schema`, {
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownSchema);
   },
   async importReservations(
     campgroundId: string,
-    payload: { format: "csv" | "json"; payload: unknown; dryRun?: boolean; idempotencyKey?: string; filename?: string }
+    payload: {
+      format: "csv" | "json";
+      payload: unknown;
+      dryRun?: boolean;
+      idempotencyKey?: string;
+      filename?: string;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/import`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...scopedHeaders(),
-        ...(payload.idempotencyKey ? { "Idempotency-Key": payload.idempotencyKey } : {})
+        ...(payload.idempotencyKey ? { "Idempotency-Key": payload.idempotencyKey } : {}),
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
   async getReservationImportStatus(campgroundId: string, jobId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/import/${jobId}`, {
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/reservations/import/${jobId}`,
+      {
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
   async exportReservationsPage(
@@ -2016,7 +2179,7 @@ export const apiClient = {
       includePII?: boolean;
       status?: string;
       source?: string;
-    }
+    },
   ) {
     const qs = new URLSearchParams();
     if (params?.format) qs.set("format", params.format);
@@ -2028,25 +2191,28 @@ export const apiClient = {
     const res = await fetch(
       `${API_BASE}/campgrounds/${campgroundId}/reservations/export${qs.toString() ? `?${qs.toString()}` : ""}`,
       {
-        headers: scopedHeaders()
-      }
+        headers: scopedHeaders(),
+      },
     );
     return parseResponse(res, UnknownSchema);
   },
   async listReservationExportJobs(campgroundId: string, limit = 10) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/export/jobs?limit=${limit}`, {
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/reservations/export/jobs?limit=${limit}`,
+      {
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
   async queueReservationExportJob(
     campgroundId: string,
-    payload: { format?: "json" | "csv"; filters?: Record<string, unknown> }
+    payload: { format?: "json" | "csv"; filters?: Record<string, unknown> },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/export/jobs`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload ?? {})
+      body: JSON.stringify(payload ?? {}),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -2068,12 +2234,12 @@ export const apiClient = {
       apiKey: string;
       channelId: string;
       notes: string;
-    }>
+    }>,
   ) {
     const res = await fetch(`${API_BASE}/ota/campgrounds/${campgroundId}/config`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OtaConfigSchema.parse(data);
@@ -2086,57 +2252,70 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/ota/campgrounds/${campgroundId}/channels`);
     return z.array(OtaChannelSchema).parse(data);
   },
-  async createOtaChannel(campgroundId: string, payload: {
-    name: string;
-    provider: string;
-    status?: string;
-    rateMultiplier?: number;
-    defaultStatus?: string;
-    sendEmailNotifications?: boolean;
-    ignoreSiteRestrictions?: boolean;
-    ignoreCategoryRestrictions?: boolean;
-    feeMode?: string;
-    webhookSecret?: string;
-  }) {
+  async createOtaChannel(
+    campgroundId: string,
+    payload: {
+      name: string;
+      provider: string;
+      status?: string;
+      rateMultiplier?: number;
+      defaultStatus?: string;
+      sendEmailNotifications?: boolean;
+      ignoreSiteRestrictions?: boolean;
+      ignoreCategoryRestrictions?: boolean;
+      feeMode?: string;
+      webhookSecret?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/ota/campgrounds/${campgroundId}/channels`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OtaChannelSchema.parse(data);
   },
-  async updateOtaChannel(id: string, payload: Partial<{
-    name: string;
-    provider: string;
-    status: string;
-    rateMultiplier: number;
-    defaultStatus: string;
-    sendEmailNotifications: boolean;
-    ignoreSiteRestrictions: boolean;
-    ignoreCategoryRestrictions: boolean;
-    feeMode: string;
-    webhookSecret: string;
-  }>, campgroundId?: string) {
+  async updateOtaChannel(
+    id: string,
+    payload: Partial<{
+      name: string;
+      provider: string;
+      status: string;
+      rateMultiplier: number;
+      defaultStatus: string;
+      sendEmailNotifications: boolean;
+      ignoreSiteRestrictions: boolean;
+      ignoreCategoryRestrictions: boolean;
+      feeMode: string;
+      webhookSecret: string;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/ota/channels/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OtaChannelSchema.parse(data);
   },
   async listOtaMappings(channelId: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/ota/channels/${channelId}/mappings`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/ota/channels/${channelId}/mappings`, campgroundId),
+    );
     return z.array(OtaMappingSchema).parse(data);
   },
   async listOtaImports(channelId: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/ota/channels/${channelId}/imports`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/ota/channels/${channelId}/imports`, campgroundId),
+    );
     return z.array(OtaImportSchema).parse(data);
   },
   async listOtaLogs(channelId: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/ota/channels/${channelId}/logs`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/ota/channels/${channelId}/logs`, campgroundId),
+    );
     return z.array(OtaLogSchema).parse(data);
   },
   async listIntegrationConnections(campgroundId: string) {
@@ -2157,82 +2336,96 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/integrations/connections`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return IntegrationConnectionSchema.parse(data);
   },
-  async updateIntegrationConnection(id: string, payload: Partial<{
-    organizationId: string;
-    status: string;
-    authType: string;
-    credentials: Record<string, unknown>;
-    settings: Record<string, unknown>;
-    webhookSecret: string;
-  }>) {
+  async updateIntegrationConnection(
+    id: string,
+    payload: Partial<{
+      organizationId: string;
+      status: string;
+      authType: string;
+      credentials: Record<string, unknown>;
+      settings: Record<string, unknown>;
+      webhookSecret: string;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/integrations/connections/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return IntegrationConnectionSchema.parse(data);
   },
-  async triggerIntegrationSync(id: string, payload: { direction?: string; scope?: string; note?: string } = {}) {
+  async triggerIntegrationSync(
+    id: string,
+    payload: { direction?: string; scope?: string; note?: string } = {},
+  ) {
     const res = await fetch(`${API_BASE}/integrations/connections/${id}/sync`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(
       res,
       z.object({
         ok: z.boolean(),
         status: z.string(),
-        connectionId: z.string()
-      })
+        connectionId: z.string(),
+      }),
     );
   },
   async deleteIntegrationConnection(id: string) {
     const res = await fetch(`${API_BASE}/integrations/connections/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(
       res,
       z.object({
         ok: z.boolean(),
-        deleted: z.string()
-      })
+        deleted: z.string(),
+      }),
     );
   },
   async getIntegrationOAuthUrl(provider: string, campgroundId: string, redirectUri?: string) {
     const params = new URLSearchParams({ campgroundId });
     if (redirectUri) params.set("redirectUri", redirectUri);
-    const data = await fetchJSONUnknown(`/integrations/oauth/${provider}/authorize?${params.toString()}`);
-    return z.object({
-      provider: z.string(),
-      authorizationUrl: z.string().optional(),
-      state: z.string().optional(),
-      requiresManualSetup: z.boolean().optional(),
-      instructions: z.string().optional(),
-      webhookUrl: z.string().optional(),
-      error: z.string().optional(),
-      message: z.string().optional()
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/integrations/oauth/${provider}/authorize?${params.toString()}`,
+    );
+    return z
+      .object({
+        provider: z.string(),
+        authorizationUrl: z.string().optional(),
+        state: z.string().optional(),
+        requiresManualSetup: z.boolean().optional(),
+        instructions: z.string().optional(),
+        webhookUrl: z.string().optional(),
+        error: z.string().optional(),
+        message: z.string().optional(),
+      })
+      .parse(data);
   },
   async listIntegrationLogs(id: string, params: { limit?: number; cursor?: string } = {}) {
     const query = new URLSearchParams();
     if (params.limit) query.set("limit", String(params.limit));
     if (params.cursor) query.set("cursor", params.cursor);
-    const data = await fetchJSONUnknown(`/integrations/connections/${id}/logs${query.toString() ? `?${query.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/integrations/connections/${id}/logs${query.toString() ? `?${query.toString()}` : ""}`,
+    );
     return IntegrationLogPageSchema.parse(data);
   },
   async listIntegrationWebhooks(id: string, params: { limit?: number; cursor?: string } = {}) {
     const query = new URLSearchParams();
     if (params.limit) query.set("limit", String(params.limit));
     if (params.cursor) query.set("cursor", params.cursor);
-    const data = await fetchJSONUnknown(`/integrations/connections/${id}/webhooks${query.toString() ? `?${query.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/integrations/connections/${id}/webhooks${query.toString() ? `?${query.toString()}` : ""}`,
+    );
     return IntegrationWebhookPageSchema.parse(data);
   },
   async queueIntegrationExport(payload: {
@@ -2246,7 +2439,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/integrations/exports`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return IntegrationExportJobSchema.parse(data);
@@ -2255,30 +2448,36 @@ export const apiClient = {
     const path = withCampgroundId(`/ota/channels/${channelId}/push`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(
       res,
       z.object({
         ok: z.boolean(),
-        mappingCount: z.number().optional()
-      })
+        mappingCount: z.number().optional(),
+      }),
     );
   },
   async getAiRecommendations(payload: { campgroundId: string; guestId?: string; intent?: string }) {
     const res = await fetch(`${API_BASE}/ai/recommendations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AiRecommendationResponseSchema.parse(data);
   },
-  async getAiPricingSuggestions(payload: { campgroundId: string; siteClassId?: string; arrivalDate?: string; departureDate?: string; demandIndex?: number }) {
+  async getAiPricingSuggestions(payload: {
+    campgroundId: string;
+    siteClassId?: string;
+    arrivalDate?: string;
+    departureDate?: string;
+    demandIndex?: number;
+  }) {
     const res = await fetch(`${API_BASE}/ai/pricing-suggestions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AiPricingSuggestionSchema.parse(data);
@@ -2287,16 +2486,21 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/ai/semantic-search`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AiSemanticSearchResponseSchema.parse(data);
   },
-  async runCopilot(payload: { campgroundId: string; action: string; prompt?: string; payload?: Record<string, unknown> }) {
+  async runCopilot(payload: {
+    campgroundId: string;
+    action: string;
+    prompt?: string;
+    payload?: Record<string, unknown>;
+  }) {
     const res = await fetch(`${API_BASE}/ai/copilot`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AiCopilotResponseSchema.parse(data);
@@ -2309,22 +2513,26 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/ai/campgrounds/${payload.campgroundId}/ui-builder`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ builder: payload.builder, prompt: payload.prompt })
+      body: JSON.stringify({ builder: payload.builder, prompt: payload.prompt }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AiUiBuilderResponseSchema.parse(data);
   },
-  async upsertOtaMapping(channelId: string, payload: {
-    externalId: string;
-    siteId?: string;
-    siteClassId?: string;
-    status?: string;
-  }, campgroundId?: string) {
+  async upsertOtaMapping(
+    channelId: string,
+    payload: {
+      externalId: string;
+      siteId?: string;
+      siteClassId?: string;
+      status?: string;
+    },
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/ota/channels/${channelId}/mappings`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OtaMappingSchema.parse(data);
@@ -2333,7 +2541,7 @@ export const apiClient = {
     const path = withCampgroundId(`/ota/mappings/${mappingId}/ical/token`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const token = await parseResponse(res, z.string());
     return token;
@@ -2343,7 +2551,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ url })
+      body: JSON.stringify({ url }),
     });
     return parseResponse(res, z.object({ ok: z.boolean() }));
   },
@@ -2351,36 +2559,49 @@ export const apiClient = {
     const path = withCampgroundId(`/ota/mappings/${mappingId}/ical/import`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(
       res,
       z.object({
         ok: z.boolean(),
-        imported: z.number()
-      })
+        imported: z.number(),
+      }),
     );
   },
-  async acceptInvite(payload: { token: string; password: string; firstName: string; lastName: string }) {
+  async acceptInvite(payload: {
+    token: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+  }) {
     const res = await fetch(`${API_BASE}/auth/invitations/accept`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      email: z.string(),
-      firstName: z.string(),
-      lastName: z.string(),
-      token: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        email: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+        token: z.string(),
+      })
+      .parse(data);
   },
-  async createOnboardingInvite(payload: { email: string; organizationId?: string; campgroundId?: string; campgroundName?: string; expiresInHours?: number }) {
+  async createOnboardingInvite(payload: {
+    email: string;
+    organizationId?: string;
+    campgroundId?: string;
+    campgroundName?: string;
+    expiresInHours?: number;
+  }) {
     const res = await fetch(`${API_BASE}/onboarding/invitations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OnboardingInviteResponseSchema.parse(data);
@@ -2388,7 +2609,7 @@ export const apiClient = {
   async resendOnboardingInvite(inviteId: string) {
     const res = await fetch(`${API_BASE}/onboarding/invitations/${inviteId}/resend`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OnboardingInviteResponseSchema.parse(data);
@@ -2397,15 +2618,18 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/onboarding/session/start`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
+      body: JSON.stringify({ token }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OnboardingSessionResponseSchema.parse(data);
   },
   async getOnboardingSession(sessionId: string, token: string) {
-    const res = await fetch(`${API_BASE}/onboarding/session/${sessionId}?token=${encodeURIComponent(token)}`, {
-      headers: { "x-onboarding-token": token }
-    });
+    const res = await fetch(
+      `${API_BASE}/onboarding/session/${sessionId}?token=${encodeURIComponent(token)}`,
+      {
+        headers: { "x-onboarding-token": token },
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
     return OnboardingSessionResponseSchema.parse(data);
   },
@@ -2414,14 +2638,17 @@ export const apiClient = {
     token: string,
     step: z.infer<typeof OnboardingStepEnum>,
     payload: Record<string, unknown>,
-    idempotencyKey?: string
+    idempotencyKey?: string,
   ) {
-    const headers: Record<string, string> = { "Content-Type": "application/json", "x-onboarding-token": token };
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "x-onboarding-token": token,
+    };
     if (idempotencyKey) headers["idempotency-key"] = idempotencyKey;
     const res = await fetch(`${API_BASE}/onboarding/session/${sessionId}/step`, {
       method: "PATCH",
       headers,
-      body: JSON.stringify({ step, payload, token })
+      body: JSON.stringify({ step, payload, token }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return OnboardingSessionResponseSchema.parse(data);
@@ -2433,17 +2660,19 @@ export const apiClient = {
   async listReportExports(campgroundId: string, limit = 10) {
     const query = new URLSearchParams();
     if (limit) query.set("limit", String(limit));
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/exports${query.toString() ? `?${query.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/exports${query.toString() ? `?${query.toString()}` : ""}`,
+    );
     return z.array(IntegrationExportJobSchema).parse(data);
   },
   async queueReportExport(
     campgroundId: string,
-    payload: { filters?: Record<string, unknown>; format?: string; emailTo?: string[] } = {}
+    payload: { filters?: Record<string, unknown>; format?: string; emailTo?: string[] } = {},
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reports/exports`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return IntegrationExportJobSchema.parse(data);
@@ -2453,53 +2682,67 @@ export const apiClient = {
     return IntegrationExportJobSchema.parse(data);
   },
   async rerunReportExport(campgroundId: string, exportId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reports/exports/${exportId}/rerun`, {
-      method: "POST",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/reports/exports/${exportId}/rerun`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
     return IntegrationExportJobSchema.parse(data);
   },
-  async listReportCatalog(campgroundId: string, params: { category?: string; search?: string; includeHeavy?: boolean } = {}) {
+  async listReportCatalog(
+    campgroundId: string,
+    params: { category?: string; search?: string; includeHeavy?: boolean } = {},
+  ) {
     const query = new URLSearchParams();
     if (params.category) query.set("category", params.category);
     if (params.search) query.set("search", params.search);
     if (params.includeHeavy) query.set("includeHeavy", "true");
     const data = await fetchJSONUnknown(
-      `/campgrounds/${campgroundId}/reports/catalog${query.toString() ? `?${query.toString()}` : ""}`
+      `/campgrounds/${campgroundId}/reports/catalog${query.toString() ? `?${query.toString()}` : ""}`,
     );
-    return z.object({
-      size: z.number(),
-      total: z.number(),
-      catalog: z.array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          category: z.string(),
-          dimensions: z.array(z.object({ id: z.string(), label: z.string() })),
-          metrics: z.array(z.object({ id: z.string(), label: z.string() })),
-          chartTypes: z.array(z.string())
-        })
-      )
-    }).parse(data);
+    return z
+      .object({
+        size: z.number(),
+        total: z.number(),
+        catalog: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            category: z.string(),
+            dimensions: z.array(z.object({ id: z.string(), label: z.string() })),
+            metrics: z.array(z.object({ id: z.string(), label: z.string() })),
+            chartTypes: z.array(z.string()),
+          }),
+        ),
+      })
+      .parse(data);
   },
-  async runReport(campgroundId: string, payload: {
-    reportId: string;
-    dimensions?: string[];
-    filters?: Record<string, unknown>;
-    timeRange?: Record<string, unknown>;
-    limit?: number;
-    offset?: number;
-    sample?: boolean;
-  }) {
+  async runReport(
+    campgroundId: string,
+    payload: {
+      reportId: string;
+      dimensions?: string[];
+      filters?: Record<string, unknown>;
+      timeRange?: Record<string, unknown>;
+      limit?: number;
+      offset?: number;
+      sample?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reports/run`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
-  async getCampgroundMap(campgroundId: string, params: { startDate?: string; endDate?: string } = {}) {
+  async getCampgroundMap(
+    campgroundId: string,
+    params: { startDate?: string; endDate?: string } = {},
+  ) {
     const query = new URLSearchParams();
     if (params.startDate) query.set("startDate", params.startDate);
     if (params.endDate) query.set("endDate", params.endDate);
@@ -2509,24 +2752,35 @@ export const apiClient = {
   },
   async upsertCampgroundMap(
     campgroundId: string,
-    payload: { config?: z.infer<typeof MapConfigSchema> | null; sites?: Array<Partial<z.infer<typeof MapSiteSchema>>> }
+    payload: {
+      config?: z.infer<typeof MapConfigSchema> | null;
+      sites?: Array<Partial<z.infer<typeof MapSiteSchema>>>;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundMapSchema.parse(data);
   },
   async upsertCampgroundMapShapes(
     campgroundId: string,
-    payload: { shapes: Array<{ id?: string; name?: string | null; geometry: unknown; centroid?: unknown; metadata?: unknown }> }
+    payload: {
+      shapes: Array<{
+        id?: string;
+        name?: string | null;
+        geometry: unknown;
+        centroid?: unknown;
+        metadata?: unknown;
+      }>;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map/shapes`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundMapSchema.parse(data);
@@ -2534,19 +2788,27 @@ export const apiClient = {
   async deleteCampgroundMapShape(campgroundId: string, shapeId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map/shapes/${shapeId}`, {
       method: "DELETE",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundMapSchema.parse(data);
   },
   async upsertCampgroundMapAssignments(
     campgroundId: string,
-    payload: { assignments: Array<{ siteId: string; shapeId: string; label?: string | null; rotation?: number | null; metadata?: unknown }> }
+    payload: {
+      assignments: Array<{
+        siteId: string;
+        shapeId: string;
+        label?: string | null;
+        rotation?: number | null;
+        metadata?: unknown;
+      }>;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map/assignments`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundMapSchema.parse(data);
@@ -2554,7 +2816,7 @@ export const apiClient = {
   async unassignCampgroundMapSite(campgroundId: string, siteId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map/assignments/${siteId}`, {
       method: "DELETE",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundMapSchema.parse(data);
@@ -2569,12 +2831,12 @@ export const apiClient = {
       requiredAmenities?: string[];
       partySize?: number;
       siteIds?: string[];
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/assignments/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return PreviewAssignmentsResultSchema.parse(data);
@@ -2589,12 +2851,12 @@ export const apiClient = {
       needsADA?: boolean;
       requiredAmenities?: string[];
       partySize?: number;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/assignments/check`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return PreviewAssignmentSchema.parse(await parseResponse(res, UnknownSchema));
   },
@@ -2603,57 +2865,94 @@ export const apiClient = {
     return CampgroundWithAnalyticsSchema.parse(data);
   },
   async getCampgroundMembers(campgroundId: string) {
-    const RoleEnum = z.enum(["owner", "manager", "front_desk", "maintenance", "finance", "marketing", "readonly"]);
+    const RoleEnum = z.enum([
+      "owner",
+      "manager",
+      "front_desk",
+      "maintenance",
+      "finance",
+      "marketing",
+      "readonly",
+    ]);
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/members`);
-    return z.array(z.object({
-      id: z.string(),
-      role: RoleEnum,
-      createdAt: z.string(),
-      user: z.object({
-        id: z.string(),
-        firstName: z.string().nullable(),
-        lastName: z.string().nullable(),
-        email: z.string(),
-        isActive: z.boolean().optional()
-      }),
-      lastInviteSentAt: z.string().nullable(),
-      lastInviteRedeemedAt: z.string().nullable(),
-      inviteExpiresAt: z.string().nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          role: RoleEnum,
+          createdAt: z.string(),
+          user: z.object({
+            id: z.string(),
+            firstName: z.string().nullable(),
+            lastName: z.string().nullable(),
+            email: z.string(),
+            isActive: z.boolean().optional(),
+          }),
+          lastInviteSentAt: z.string().nullable(),
+          lastInviteRedeemedAt: z.string().nullable(),
+          inviteExpiresAt: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
-  async addCampgroundMember(campgroundId: string, payload: { email: string; firstName?: string; lastName?: string; role: "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly"; }) {
+  async addCampgroundMember(
+    campgroundId: string,
+    payload: {
+      email: string;
+      firstName?: string;
+      lastName?: string;
+      role:
+        | "owner"
+        | "manager"
+        | "front_desk"
+        | "maintenance"
+        | "finance"
+        | "marketing"
+        | "readonly";
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/members`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, ...payload })
+      body: JSON.stringify({ campgroundId, ...payload }),
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateCampgroundMemberRole(campgroundId: string, membershipId: string, role: "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly") {
+  async updateCampgroundMemberRole(
+    campgroundId: string,
+    membershipId: string,
+    role: "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly",
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/members/${membershipId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ role })
+      body: JSON.stringify({ role }),
     });
     return parseResponse(res, UnknownSchema);
   },
   async removeCampgroundMember(campgroundId: string, membershipId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/members/${membershipId}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) throw new Error("Failed to remove member");
     return true;
   },
   async resendCampgroundInvite(campgroundId: string, membershipId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/members/${membershipId}/resend-invite`, {
-      method: "POST",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/members/${membershipId}/resend-invite`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     if (!res.ok) throw new Error("Failed to resend invite");
     return true;
   },
-  async getAuditLogs(campgroundId: string, params?: { action?: string; actorId?: string; limit?: number; start?: string; end?: string }) {
+  async getAuditLogs(
+    campgroundId: string,
+    params?: { action?: string; actorId?: string; limit?: number; start?: string; end?: string },
+  ) {
     const q = new URLSearchParams();
     if (params?.action) q.set("action", params.action);
     if (params?.actorId) q.set("actorId", params.actorId);
@@ -2662,25 +2961,31 @@ export const apiClient = {
     if (params?.limit) q.set("limit", String(params.limit));
     const suffix = q.toString() ? `?${q.toString()}` : "";
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/audit${suffix}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      actorId: z.string().nullable(),
-      action: z.string(),
-      entity: z.string(),
-      entityId: z.string(),
-      before: z.unknown().nullable(),
-      after: z.unknown().nullable(),
-      createdAt: z.string(),
-      ip: z.string().nullable(),
-      userAgent: z.string().nullable(),
-      actor: z.object({
-        id: z.string(),
-        email: z.string(),
-        firstName: z.string().nullable(),
-        lastName: z.string().nullable()
-      }).nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          actorId: z.string().nullable(),
+          action: z.string(),
+          entity: z.string(),
+          entityId: z.string(),
+          before: z.unknown().nullable(),
+          after: z.unknown().nullable(),
+          createdAt: z.string(),
+          ip: z.string().nullable(),
+          userAgent: z.string().nullable(),
+          actor: z
+            .object({
+              id: z.string(),
+              email: z.string(),
+              firstName: z.string().nullable(),
+              lastName: z.string().nullable(),
+            })
+            .nullable(),
+        }),
+      )
+      .parse(data);
   },
   async getSecurityQuickAudit(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/audit/quick`);
@@ -2696,30 +3001,34 @@ export const apiClient = {
       createdAt: z.string(),
       ip: z.string().nullable(),
       userAgent: z.string().nullable(),
-      actor: z.object({
-        id: z.string(),
-        email: z.string(),
-        firstName: z.string().nullable(),
-        lastName: z.string().nullable()
-      }).nullable()
+      actor: z
+        .object({
+          id: z.string(),
+          email: z.string(),
+          firstName: z.string().nullable(),
+          lastName: z.string().nullable(),
+        })
+        .nullable(),
     });
     const PiiTagSchema = z.object({
       resource: z.string(),
       field: z.string(),
       classification: z.string(),
-      redactionMode: z.string().nullable().optional()
+      redactionMode: z.string().nullable().optional(),
     });
-    return z.object({
-      privacyDefaults: z.object({
-        redactPII: z.boolean(),
-        consentRequired: z.boolean(),
-        backupRetentionDays: z.number(),
-        keyRotationDays: z.number()
-      }),
-      piiTagCount: z.number(),
-      piiTagsPreview: z.array(PiiTagSchema).default([]),
-      auditEvents: z.array(AuditLogSchema)
-    }).parse(data);
+    return z
+      .object({
+        privacyDefaults: z.object({
+          redactPII: z.boolean(),
+          consentRequired: z.boolean(),
+          backupRetentionDays: z.number(),
+          keyRotationDays: z.number(),
+        }),
+        piiTagCount: z.number(),
+        piiTagsPreview: z.array(PiiTagSchema).default([]),
+        auditEvents: z.array(AuditLogSchema),
+      })
+      .parse(data);
   },
   async getBackupStatus(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/backup/status`);
@@ -2728,24 +3037,24 @@ export const apiClient = {
   async simulateRestore(campgroundId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/backup/restore-sim`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return BackupStatusSchema.extend({
       startedAt: z.string().optional(),
-      completedAt: z.string().optional()
+      completedAt: z.string().optional(),
     }).parse(data);
   },
   async updateCampgroundDeposit(
     id: string,
     depositRule: z.infer<typeof CampgroundSchema>["depositRule"],
     depositPercentage?: number | null,
-    depositConfig?: unknown
+    depositConfig?: unknown,
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${id}/deposit`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ depositRule, depositPercentage, depositConfig })
+      body: JSON.stringify({ depositRule, depositPercentage, depositConfig }),
     });
     if (!res.ok) throw new Error("Failed to update deposit rule");
     const data = await res.json();
@@ -2755,47 +3064,55 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campgrounds/${id}/store-hours`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
-  async createCampground(organizationId: string, payload: Omit<z.input<typeof CampgroundSchema>, "organizationId" | "id">) {
+  async createCampground(
+    organizationId: string,
+    payload: Omit<z.input<typeof CampgroundSchema>, "organizationId" | "id">,
+  ) {
     const res = await fetch(`${API_BASE}/organizations/${organizationId}/campgrounds`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
   async updateCampgroundAnalytics(
     campgroundId: string,
-    payload: { gaMeasurementId?: string | null; metaPixelId?: string | null }
+    payload: { gaMeasurementId?: string | null; metaPixelId?: string | null },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/analytics`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
   async updateCampgroundNps(
     campgroundId: string,
-    payload: { npsAutoSendEnabled?: boolean; npsSendHour?: number | null; npsTemplateId?: string | null; npsSchedule?: unknown }
+    payload: {
+      npsAutoSendEnabled?: boolean;
+      npsSendHour?: number | null;
+      npsTemplateId?: string | null;
+      npsSchedule?: unknown;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/nps`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
   },
   async getSmsSettings(campgroundId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/sms-settings`, {
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(
       res,
@@ -2805,8 +3122,8 @@ export const apiClient = {
         twilioAccountSid: z.string().nullable(),
         twilioFromNumber: z.string().nullable(),
         smsWelcomeMessage: z.string().nullable(),
-        twilioAuthTokenSet: z.boolean()
-      })
+        twilioAuthTokenSet: z.boolean(),
+      }),
     );
   },
   async updateSmsSettings(
@@ -2817,12 +3134,12 @@ export const apiClient = {
       twilioAuthToken?: string | null;
       twilioFromNumber?: string | null;
       smsWelcomeMessage?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/sms-settings`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(
       res,
@@ -2831,8 +3148,8 @@ export const apiClient = {
         smsEnabled: z.boolean(),
         twilioAccountSid: z.string().nullable(),
         twilioFromNumber: z.string().nullable(),
-        smsWelcomeMessage: z.string().nullable()
-      })
+        smsWelcomeMessage: z.string().nullable(),
+      }),
     );
   },
   async updateCampgroundBranding(
@@ -2847,12 +3164,12 @@ export const apiClient = {
       emailHeader?: string | null;
       receiptFooter?: string | null;
       brandingNote?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/branding`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
@@ -2884,12 +3201,12 @@ export const apiClient = {
       checkInTime: string | null;
       checkOutTime: string | null;
       timezone: string | null;
-    }>
+    }>,
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
@@ -2898,7 +3215,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/sla`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ slaMinutes })
+      body: JSON.stringify({ slaMinutes }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
@@ -2907,7 +3224,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/sender-domain`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ domain })
+      body: JSON.stringify({ domain }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
@@ -2919,12 +3236,12 @@ export const apiClient = {
       quietHoursEnd?: string | null;
       routingAssigneeId?: string | null;
       officeClosesAt?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${id}/ops`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     const result = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(result);
@@ -2938,12 +3255,12 @@ export const apiClient = {
       taxIdName?: string | null;
       taxState?: number | null;
       taxLocal?: number | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${id}/financials`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     const result = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(result);
@@ -2959,12 +3276,12 @@ export const apiClient = {
       adaVerified?: boolean;
       adaVerifiedAt?: string | null;
       adaVerifiedBy?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/accessibility`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     const result = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(result);
@@ -2980,12 +3297,12 @@ export const apiClient = {
       securityVerifiedBy?: string | null;
       securityAuditorEmail?: string | null;
       securityAuditorOrg?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/security`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
     const result = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(result);
@@ -2997,47 +3314,73 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/communications/templates?${params.toString()}`);
     return z.array(CommunicationTemplateSchema).parse(data);
   },
-  async createTemplate(payload: { campgroundId: string; name: string; subject?: string; bodyHtml?: string }) {
+  async createTemplate(payload: {
+    campgroundId: string;
+    name: string;
+    subject?: string;
+    bodyHtml?: string;
+  }) {
     const res = await fetch(`${API_BASE}/communications/templates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationTemplateSchema.parse(data);
   },
-  async updateTemplate(id: string, payload: { campgroundId?: string; name?: string; subject?: string; bodyHtml?: string; status?: string }) {
+  async updateTemplate(
+    id: string,
+    payload: {
+      campgroundId?: string;
+      name?: string;
+      subject?: string;
+      bodyHtml?: string;
+      status?: string;
+    },
+  ) {
     const params = new URLSearchParams();
     if (payload.campgroundId) params.set("campgroundId", payload.campgroundId);
     const res = await fetch(`${API_BASE}/communications/templates/${id}?${params.toString()}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationTemplateSchema.parse(data);
   },
-  async approveTemplate(id: string, payload: { reason?: string; campgroundId?: string; actorId?: string }) {
+  async approveTemplate(
+    id: string,
+    payload: { reason?: string; campgroundId?: string; actorId?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload.campgroundId) params.set("campgroundId", payload.campgroundId);
     if (payload.actorId) params.set("actorId", payload.actorId);
-    const res = await fetch(`${API_BASE}/communications/templates/${id}/approve?${params.toString()}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ reason: payload.reason })
-    });
+    const res = await fetch(
+      `${API_BASE}/communications/templates/${id}/approve?${params.toString()}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ reason: payload.reason }),
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationTemplateSchema.parse(data);
   },
-  async rejectTemplate(id: string, payload: { reason?: string; campgroundId?: string; actorId?: string }) {
+  async rejectTemplate(
+    id: string,
+    payload: { reason?: string; campgroundId?: string; actorId?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload.campgroundId) params.set("campgroundId", payload.campgroundId);
     if (payload.actorId) params.set("actorId", payload.actorId);
-    const res = await fetch(`${API_BASE}/communications/templates/${id}/reject?${params.toString()}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ reason: payload.reason })
-    });
+    const res = await fetch(
+      `${API_BASE}/communications/templates/${id}/reject?${params.toString()}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ reason: payload.reason }),
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationTemplateSchema.parse(data);
   },
@@ -3062,28 +3405,31 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/communications/playbooks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationPlaybookSchema.parse(data);
   },
-  async updatePlaybook(id: string, payload: Partial<{
-    campgroundId: string;
-    enabled: boolean;
-    templateId: string | null;
-    channel: "email" | "sms" | null;
-    offsetMinutes: number | null;
-    quietHoursStart: string | null;
-    quietHoursEnd: string | null;
-    throttlePerMinute: number | null;
-    routingAssigneeId: string | null;
-  }>) {
+  async updatePlaybook(
+    id: string,
+    payload: Partial<{
+      campgroundId: string;
+      enabled: boolean;
+      templateId: string | null;
+      channel: "email" | "sms" | null;
+      offsetMinutes: number | null;
+      quietHoursStart: string | null;
+      quietHoursEnd: string | null;
+      throttlePerMinute: number | null;
+      routingAssigneeId: string | null;
+    }>,
+  ) {
     const params = new URLSearchParams();
     if (payload.campgroundId) params.set("campgroundId", payload.campgroundId);
     const res = await fetch(`${API_BASE}/communications/playbooks/${id}?${params.toString()}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationPlaybookSchema.parse(data);
@@ -3098,10 +3444,13 @@ export const apiClient = {
   async retryPlaybookJob(jobId: string, campgroundId?: string) {
     const params = new URLSearchParams();
     if (campgroundId) params.set("campgroundId", campgroundId);
-    const res = await fetch(`${API_BASE}/communications/playbooks/jobs/${jobId}/retry?${params.toString()}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
-    });
+    const res = await fetch(
+      `${API_BASE}/communications/playbooks/jobs/${jobId}/retry?${params.toString()}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationPlaybookJobSchema.parse(data);
   },
@@ -3114,12 +3463,12 @@ export const apiClient = {
       cancellationFeeFlatCents?: number | null;
       cancellationFeePercent?: number | null;
       cancellationNotes?: string | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/policies`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampgroundWithAnalyticsSchema.parse(data);
@@ -3157,12 +3506,12 @@ export const apiClient = {
       siteClassId?: string | null;
       siteId?: string | null;
       policyConfig?: Record<string, unknown> | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/policy-templates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return data;
@@ -3181,13 +3530,13 @@ export const apiClient = {
       siteId?: string | null;
       policyConfig?: Record<string, unknown> | null;
     },
-    campgroundId?: string
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/policy-templates/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -3195,7 +3544,7 @@ export const apiClient = {
     const path = withCampgroundId(`/policy-templates/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -3204,7 +3553,7 @@ export const apiClient = {
     return SiteArray.parse(data);
   },
   async getLedgerEntries(campgroundId: string) {
-    // Note: This endpoint might return a large dataset. 
+    // Note: This endpoint might return a large dataset.
     // In production, we'd want server-side filtering by date range.
     // For now, we'll fetch all and filter client-side to match other reports.
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/ledger`);
@@ -3212,33 +3561,43 @@ export const apiClient = {
   },
   async getPayments(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/payments`);
-    // Define schema locally or use z.unknown() if we want to be loose for now, 
+    // Define schema locally or use z.unknown() if we want to be loose for now,
     // but ideally we define PaymentSchema. For now let's use a simple array checks.
     // Actually, let's define PaymentSchema momentarily or just return unknown and cast in component?
     // Better: Define schema.
-    return z.array(z.object({
-      id: z.string(),
-      amountCents: z.number(),
-      method: z.string(),
-      direction: z.string().optional(),
-      createdAt: z.string().or(z.date()),
-      formattedAmount: z.string().optional(), // In case server sends it
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          amountCents: z.number(),
+          method: z.string(),
+          direction: z.string().optional(),
+          createdAt: z.string().or(z.date()),
+          formattedAmount: z.string().optional(), // In case server sends it
+        }),
+      )
+      .parse(data);
   },
   async getSite(id: string) {
     const data = await fetchJSONUnknown(`/sites/${id}`);
     return SiteSchema.parse(data);
   },
   async deleteCampground(id: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete campground");
     return true;
   },
-  async createSite(campgroundId: string, payload: Omit<z.input<typeof SiteSchema>, "id" | "campgroundId">) {
+  async createSite(
+    campgroundId: string,
+    payload: Omit<z.input<typeof SiteSchema>, "id" | "campgroundId">,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/sites`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SiteSchema.parse(data);
@@ -3247,13 +3606,16 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/sites/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SiteSchema.parse(data);
   },
   async deleteSite(id: string) {
-    const res = await fetch(`${API_BASE}/sites/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/sites/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete site");
     return true;
   },
@@ -3264,31 +3626,41 @@ export const apiClient = {
   async searchReservations(campgroundId: string, query: string, activeOnly = true) {
     const params = new URLSearchParams({ q: query });
     if (!activeOnly) params.set("activeOnly", "false");
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reservations/search?${params}`);
-    return z.array(z.object({
-      id: z.string(),
-      confirmationCode: z.string(),
-      status: z.string(),
-      arrivalDate: z.string(),
-      departureDate: z.string(),
-      totalAmount: z.number(),
-      paidAmount: z.number(),
-      balanceAmount: z.number(),
-      guest: z.object({
-        id: z.string(),
-        firstName: z.string(),
-        lastName: z.string(),
-        email: z.string(),
-        phone: z.string()
-      }).nullable(),
-      site: z.object({
-        id: z.string(),
-        number: z.string(),
-        name: z.string().nullable(),
-        siteClass: z.object({ id: z.string(), name: z.string() }).nullable()
-      }).nullable(),
-      displayLabel: z.string()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reservations/search?${params}`,
+    );
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          confirmationCode: z.string(),
+          status: z.string(),
+          arrivalDate: z.string(),
+          departureDate: z.string(),
+          totalAmount: z.number(),
+          paidAmount: z.number(),
+          balanceAmount: z.number(),
+          guest: z
+            .object({
+              id: z.string(),
+              firstName: z.string(),
+              lastName: z.string(),
+              email: z.string(),
+              phone: z.string(),
+            })
+            .nullable(),
+          site: z
+            .object({
+              id: z.string(),
+              number: z.string(),
+              name: z.string().nullable(),
+              siteClass: z.object({ id: z.string(), name: z.string() }).nullable(),
+            })
+            .nullable(),
+          displayLabel: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async getReservation(id: string) {
     const data = await fetchJSONUnknown(`/reservations/${id}`);
@@ -3297,7 +3669,7 @@ export const apiClient = {
   async checkInReservation(id: string) {
     const res = await fetch(`${API_BASE}/reservations/${id}/check-in`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -3306,7 +3678,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reservations/${id}/check-out`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ force: options?.force ?? true }) // Default to force=true since UI handles payment flow
+      body: JSON.stringify({ force: options?.force ?? true }), // Default to force=true since UI handles payment flow
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -3314,39 +3686,55 @@ export const apiClient = {
   async cancelReservation(id: string) {
     const res = await fetch(`${API_BASE}/reservations/${id}/cancel`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
   },
   async getAccessStatus(reservationId: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/reservations/${reservationId}/access`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/reservations/${reservationId}/access`, campgroundId),
+    );
     return AccessStatusSchema.parse(data);
   },
   async upsertVehicle(
     reservationId: string,
-    payload: { plate?: string; state?: string; rigType?: string; rigLength?: number; description?: string },
-    campgroundId?: string
+    payload: {
+      plate?: string;
+      state?: string;
+      rigType?: string;
+      rigLength?: number;
+      description?: string;
+    },
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/reservations/${reservationId}/access/vehicle`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return VehicleSchema.parse(data);
   },
   async grantAccess(
     reservationId: string,
-    payload: { provider: string; credentialType?: string; credentialValue?: string; startsAt?: string; endsAt?: string; idempotencyKey?: string; vehicleId?: string },
-    campgroundId?: string
+    payload: {
+      provider: string;
+      credentialType?: string;
+      credentialValue?: string;
+      startsAt?: string;
+      endsAt?: string;
+      idempotencyKey?: string;
+      vehicleId?: string;
+    },
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/reservations/${reservationId}/access/grant`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     const grant = isRecord(data) && "grant" in data ? data.grant : data;
@@ -3354,14 +3742,19 @@ export const apiClient = {
   },
   async revokeAccess(
     reservationId: string,
-    payload: { provider: string; providerAccessId?: string; idempotencyKey?: string; reason?: string },
-    campgroundId?: string
+    payload: {
+      provider: string;
+      providerAccessId?: string;
+      idempotencyKey?: string;
+      reason?: string;
+    },
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/reservations/${reservationId}/access/revoke`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     const grant = isRecord(data) && "grant" in data ? data.grant : data;
@@ -3374,12 +3767,21 @@ export const apiClient = {
   async upsertAccessProvider(
     campgroundId: string,
     provider: string,
-    payload: { displayName?: string; status?: string; credentials: Record<string, unknown>; webhookSecret?: string }
+    payload: {
+      displayName?: string;
+      status?: string;
+      credentials: Record<string, unknown>;
+      webhookSecret?: string;
+    },
   ) {
     const res = await fetch(`${API_BASE}/access/providers/${provider}/config`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders(), "X-Campground-Id": campgroundId },
-      body: JSON.stringify(payload)
+      headers: {
+        "Content-Type": "application/json",
+        ...scopedHeaders(),
+        "X-Campground-Id": campgroundId,
+      },
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AccessIntegrationSchema.parse(data);
@@ -3389,27 +3791,33 @@ export const apiClient = {
     return SiteClassArray.parse(data);
   },
 
-
   async getSiteClass(id: string, campgroundId?: string) {
     const path = withCampgroundId(`/site-classes/${id}`, campgroundId);
     const data = await fetchJSONUnknown(path);
     return SiteClassSchema.parse(data);
   },
-  async createSiteClass(campgroundId: string, payload: Omit<z.input<typeof SiteClassSchema>, "id" | "campgroundId">) {
+  async createSiteClass(
+    campgroundId: string,
+    payload: Omit<z.input<typeof SiteClassSchema>, "id" | "campgroundId">,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/site-classes`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SiteClassSchema.parse(data);
   },
-  async updateSiteClass(id: string, payload: Partial<z.input<typeof SiteClassSchema>>, campgroundId?: string) {
+  async updateSiteClass(
+    id: string,
+    payload: Partial<z.input<typeof SiteClassSchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/site-classes/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SiteClassSchema.parse(data);
@@ -3441,7 +3849,15 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/guests/${id}`);
     return GuestSchema.parse(data);
   },
-  async listCommunications(params: { campgroundId: string; reservationId?: string; guestId?: string; type?: string; direction?: string; cursor?: string; limit?: number }) {
+  async listCommunications(params: {
+    campgroundId: string;
+    reservationId?: string;
+    guestId?: string;
+    type?: string;
+    direction?: string;
+    cursor?: string;
+    limit?: number;
+  }) {
     const search = new URLSearchParams();
     search.set("campgroundId", params.campgroundId);
     if (params.reservationId) search.set("reservationId", params.reservationId);
@@ -3457,7 +3873,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/communications`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationSchema.parse(data);
@@ -3477,7 +3893,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/communications/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CommunicationSchema.parse(data);
@@ -3489,7 +3905,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/guests${query}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GuestSchema.parse(data);
@@ -3498,13 +3914,16 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reservations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
   },
   async deleteReservation(id: string) {
-    const res = await fetch(`${API_BASE}/reservations/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/reservations/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete reservation");
     return true;
   },
@@ -3512,7 +3931,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reservations/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -3520,13 +3939,13 @@ export const apiClient = {
   async recordReservationPayment(
     id: string,
     amountCents: number,
-    tenders?: { method: "card" | "cash" | "check" | "folio"; amountCents: number; note?: string }[]
+    tenders?: { method: "card" | "cash" | "check" | "folio"; amountCents: number; note?: string }[],
   ) {
     const body = tenders && tenders.length > 0 ? { amountCents, tenders } : { amountCents };
     const res = await fetch(`${API_BASE}/reservations/${id}/payments`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -3539,59 +3958,76 @@ export const apiClient = {
       email: string;
       payments: Array<{ method: string; amountCents: number; reference?: string }>;
       totalPaidCents: number;
-    }
+    },
   ) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/reservations/${reservationId}/receipt`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/reservations/${reservationId}/receipt`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify(payload),
+      },
+    );
     return parseResponse(res, z.object({ success: z.boolean() }));
   },
 
   async splitReservation(
     id: string,
-    payload: { segments: Array<{ siteId: string; startDate: string; endDate: string }>; sendNotification?: boolean }
+    payload: {
+      segments: Array<{ siteId: string; startDate: string; endDate: string }>;
+      sendNotification?: boolean;
+    },
   ) {
     const res = await fetch(`${API_BASE}/reservations/${id}/split`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return data;
   },
 
   async getReservationSegments(id: string) {
-    const res = await fetch(`${API_BASE}/reservations/${id}/segments`, { headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/reservations/${id}/segments`, {
+      headers: scopedHeaders(),
+    });
     const data = await parseResponse(res, UnknownSchema);
-    return z.array(z.object({
-      id: z.string(),
-      siteId: z.string(),
-      startDate: z.string(),
-      endDate: z.string(),
-      subtotalCents: z.number(),
-      site: z.object({ name: z.string().nullable().optional() }).nullable().optional()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          siteId: z.string(),
+          startDate: z.string(),
+          endDate: z.string(),
+          subtotalCents: z.number(),
+          site: z.object({ name: z.string().nullable().optional() }).nullable().optional(),
+        }),
+      )
+      .parse(data);
   },
 
   async refreshPaymentCapabilities(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payments/capabilities/refresh`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payments/capabilities/refresh`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+      },
+    );
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      stripeAccountId: z.string().nullable().optional(),
-      applicationFeeFlatCents: z.number().nullable().optional(),
-      perBookingFeeCents: z.number().nullable().optional(),
-      monthlyFeeCents: z.number().nullable().optional(),
-      billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
-      feeMode: z.enum(["absorb", "pass_through"]).nullable().optional(),
-      stripeCapabilities: z.record(z.string(), z.string()).nullable().optional(),
-      stripeCapabilitiesFetchedAt: z.string().nullable().optional(),
-      connected: z.boolean().optional()
-    }).parse(data);
+    return z
+      .object({
+        stripeAccountId: z.string().nullable().optional(),
+        applicationFeeFlatCents: z.number().nullable().optional(),
+        perBookingFeeCents: z.number().nullable().optional(),
+        monthlyFeeCents: z.number().nullable().optional(),
+        billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
+        feeMode: z.enum(["absorb", "pass_through"]).nullable().optional(),
+        stripeCapabilities: z.record(z.string(), z.string()).nullable().optional(),
+        stripeCapabilitiesFetchedAt: z.string().nullable().optional(),
+        connected: z.boolean().optional(),
+      })
+      .parse(data);
   },
 
   async getPublicReservation(id: string, token?: string) {
@@ -3601,10 +4037,16 @@ export const apiClient = {
     const data = await fetchJSONUnknown(url);
     return ReservationSchema.extend({
       guest: GuestSchema.pick({ primaryFirstName: true, primaryLastName: true }),
-      campground: CampgroundSchema.pick({ name: true, slug: true, city: true, state: true, timezone: true }),
+      campground: CampgroundSchema.pick({
+        name: true,
+        slug: true,
+        city: true,
+        state: true,
+        timezone: true,
+      }),
       site: SiteSchema.extend({
-        siteClass: SiteClassSchema.pick({ name: true, photos: true }).optional().nullable()
-      })
+        siteClass: SiteClassSchema.pick({ name: true, photos: true }).optional().nullable(),
+      }),
     }).parse(data);
   },
 
@@ -3613,16 +4055,16 @@ export const apiClient = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(kioskToken ? { "x-kiosk-token": kioskToken } : {})
+        ...(kioskToken ? { "x-kiosk-token": kioskToken } : {}),
       },
-      body: JSON.stringify({ upsellTotalCents })
+      body: JSON.stringify({ upsellTotalCents }),
     });
     return parseResponse(res, UnknownSchema);
   },
   async refundReservationPayment(
     id: string,
     amountCents: number,
-    options?: { destination?: "card" | "wallet"; reason?: string }
+    options?: { destination?: "card" | "wallet"; reason?: string },
   ) {
     const res = await fetch(`${API_BASE}/reservations/${id}/refunds`, {
       method: "POST",
@@ -3630,8 +4072,8 @@ export const apiClient = {
       body: JSON.stringify({
         amountCents,
         destination: options?.destination,
-        reason: options?.reason
-      })
+        reason: options?.reason,
+      }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -3641,11 +4083,13 @@ export const apiClient = {
    * This method uses an incorrect endpoint path missing the campgroundId.
    */
   async adjustStock(id: string, adjustment: number) {
-    console.warn("adjustStock is deprecated. Use updateStoreStock(campgroundId, id, { delta }) instead.");
+    console.warn(
+      "adjustStock is deprecated. Use updateStoreStock(campgroundId, id, { delta }) instead.",
+    );
     const res = await fetch(`${API_BASE}/store/products/${id}/stock`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ adjustment })
+      body: JSON.stringify({ adjustment }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductSchema.parse(data);
@@ -3658,13 +4102,16 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/guests/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GuestSchema.parse(data);
   },
   async deleteGuest(id: string) {
-    const res = await fetch(`${API_BASE}/guests/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/guests/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete guest");
     return true;
   },
@@ -3672,102 +4119,140 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/guests/merge`, {
       method: "POST",
       headers: scopedHeaders(),
-      body: JSON.stringify({ primaryId, secondaryId })
+      body: JSON.stringify({ primaryId, secondaryId }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GuestSchema.parse(data);
   },
   async getAvailability(
     campgroundId: string,
-    payload: { arrivalDate: string; departureDate: string; rigType?: string; rigLength?: string | number }
+    payload: {
+      arrivalDate: string;
+      departureDate: string;
+      rigType?: string;
+      rigLength?: string | number;
+    },
   ) {
     const params = new URLSearchParams();
     params.set("arrivalDate", payload.arrivalDate);
     params.set("departureDate", payload.departureDate);
     if (payload.rigType) params.set("rigType", payload.rigType);
-    if (payload.rigLength !== undefined && payload.rigLength !== null && `${payload.rigLength}` !== "") {
+    if (
+      payload.rigLength !== undefined &&
+      payload.rigLength !== null &&
+      `${payload.rigLength}` !== ""
+    ) {
       params.set("rigLength", String(payload.rigLength));
     }
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/availability?${params.toString()}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/availability?${params.toString()}`,
+    );
     return AvailabilitySiteArray.parse(data);
   },
-  async getSitesWithStatus(campgroundId: string, payload?: { arrivalDate?: string; departureDate?: string }) {
+  async getSitesWithStatus(
+    campgroundId: string,
+    payload?: { arrivalDate?: string; departureDate?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload?.arrivalDate) params.set("arrivalDate", payload.arrivalDate);
     if (payload?.departureDate) params.set("departureDate", payload.departureDate);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/sites/status${qs ? `?${qs}` : ""}`);
-    return z.array(
-      z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        name: z.string(),
-        siteNumber: z.string(),
-        siteType: z.string(),
-        siteClassId: z.string().nullable(),
-        siteClassName: z.string().nullable(),
-        maxOccupancy: z.number(),
-        latitude: z.number().nullable().optional(),
-        longitude: z.number().nullable().optional(),
-        defaultRate: z.number().nullable().optional(),
-        status: z.enum(["available", "occupied", "maintenance"]),
-        statusDetail: z.string().nullable()
-      })
-    ).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/sites/status${qs ? `?${qs}` : ""}`,
+    );
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          siteNumber: z.string(),
+          siteType: z.string(),
+          siteClassId: z.string().nullable(),
+          siteClassName: z.string().nullable(),
+          maxOccupancy: z.number(),
+          latitude: z.number().nullable().optional(),
+          longitude: z.number().nullable().optional(),
+          defaultRate: z.number().nullable().optional(),
+          status: z.enum(["available", "occupied", "maintenance"]),
+          statusDetail: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
   async getMatchedSites(campgroundId: string, guestId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/matches?guestId=${guestId}`);
-    return z.array(
-      z.object({
-        site: SiteSchema.extend({
-          siteClass: SiteClassSchema.optional().nullable()
+    return z
+      .array(
+        z.object({
+          site: SiteSchema.extend({
+            siteClass: SiteClassSchema.optional().nullable(),
+          }),
+          score: z.number(),
+          reasons: z.array(z.string()),
         }),
-        score: z.number(),
-        reasons: z.array(z.string())
-      })
-    ).parse(data);
+      )
+      .parse(data);
   },
 
   // Holds
-  async createHold(payload: { campgroundId: string; siteId: string; arrivalDate: string; departureDate: string; holdMinutes?: number }) {
+  async createHold(payload: {
+    campgroundId: string;
+    siteId: string;
+    arrivalDate: string;
+    departureDate: string;
+    holdMinutes?: number;
+  }) {
     const res = await fetch(`${API_BASE}/holds`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
   async releaseHold(id: string) {
     const res = await fetch(`${API_BASE}/holds/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) throw new Error("Failed to release hold");
     return true;
   },
   async listHolds(campgroundId: string) {
     const data = await fetchJSONUnknown(`/holds/campgrounds/${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      siteId: z.string(),
-      arrivalDate: z.string(),
-      departureDate: z.string(),
-      expiresAt: z.string().nullable(),
-      status: z.string(),
-      site: z.object({ id: z.string(), name: z.string().optional(), siteNumber: z.string().optional() }).optional()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          siteId: z.string(),
+          arrivalDate: z.string(),
+          departureDate: z.string(),
+          expiresAt: z.string().nullable(),
+          status: z.string(),
+          site: z
+            .object({
+              id: z.string(),
+              name: z.string().optional(),
+              siteNumber: z.string().optional(),
+            })
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
   async checkOverlap(
     campgroundId: string,
-    payload: { siteId: string; arrivalDate: string; departureDate: string; ignoreId?: string }
+    payload: { siteId: string; arrivalDate: string; departureDate: string; ignoreId?: string },
   ) {
     const params = new URLSearchParams();
     params.set("siteId", payload.siteId);
     params.set("arrivalDate", payload.arrivalDate);
     params.set("departureDate", payload.departureDate);
     if (payload.ignoreId) params.set("ignoreId", payload.ignoreId);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reservations/overlap-check?${params.toString()}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reservations/overlap-check?${params.toString()}`,
+    );
     return OverlapCheckSchema.parse(data);
   },
   async listOverlaps(campgroundId: string) {
@@ -3796,7 +4281,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/maintenance`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return MaintenanceSchema.parse(data);
@@ -3805,14 +4290,17 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/maintenance/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return MaintenanceSchema.parse(data);
   },
 
   // Operations / Housekeeping
-  async listTasks(campgroundId: string, payload?: { type?: string; state?: string; slaStatus?: string }) {
+  async listTasks(
+    campgroundId: string,
+    payload?: { type?: string; state?: string; slaStatus?: string },
+  ) {
     const params = new URLSearchParams({ campgroundId });
     if (payload?.type) params.set("type", payload.type);
     if (payload?.state) params.set("state", payload.state);
@@ -3824,37 +4312,39 @@ export const apiClient = {
       "blocked",
       "done",
       "failed",
-      "expired"
+      "expired",
     ];
     const slaStatuses: ["on_track", "at_risk", "breached"] = ["on_track", "at_risk", "breached"];
     const TaskStateSchema = z.enum(taskStates);
     const SlaStatusSchema = z.enum(slaStatuses);
-    return z.array(
-      z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        title: z.string(),
-        description: z.string().nullable(),
-        type: z.string(),
-        state: TaskStateSchema,
-        priority: z.string().nullable().default("medium"),
-        assignedTo: z.string().nullable(),
-        assignedToUserId: z.string().nullable().optional(),
-        assignedToTeamId: z.string().nullable().optional(),
-        slaDueAt: z.string().nullable().optional(),
-        slaStatus: SlaStatusSchema.nullable().optional(),
-        dueDate: z.string().nullable(),
-        completedAt: z.string().nullable(),
-        siteId: z.string().nullable(),
-        site: z
-          .object({
-            id: z.string(),
-            name: z.string().optional(),
-            siteNumber: z.string().optional()
-          })
-          .nullable()
-      })
-    ).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          title: z.string(),
+          description: z.string().nullable(),
+          type: z.string(),
+          state: TaskStateSchema,
+          priority: z.string().nullable().default("medium"),
+          assignedTo: z.string().nullable(),
+          assignedToUserId: z.string().nullable().optional(),
+          assignedToTeamId: z.string().nullable().optional(),
+          slaDueAt: z.string().nullable().optional(),
+          slaStatus: SlaStatusSchema.nullable().optional(),
+          dueDate: z.string().nullable(),
+          completedAt: z.string().nullable(),
+          siteId: z.string().nullable(),
+          site: z
+            .object({
+              id: z.string(),
+              name: z.string().optional(),
+              siteNumber: z.string().optional(),
+            })
+            .nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   // Events
@@ -3870,7 +4360,7 @@ export const apiClient = {
     if (start) params.set("start", start);
     if (end) params.set("end", end);
     const res = await fetch(`${API_BASE}/events/public/list?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await parseResponse(res, UnknownSchema);
     return z.array(EventSchema).parse(data);
@@ -3881,7 +4371,7 @@ export const apiClient = {
     const params = new URLSearchParams({ campgroundId });
     if (categoryId) params.set("categoryId", categoryId);
     const res = await fetch(`${API_BASE}/portal/store/products?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await parseResponse(res, UnknownSchema);
     return z.array(ProductSchema).parse(data);
@@ -3889,7 +4379,7 @@ export const apiClient = {
   async getPortalAddOns(token: string, campgroundId: string) {
     const params = new URLSearchParams({ campgroundId });
     const res = await fetch(`${API_BASE}/portal/store/addons?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await parseResponse(res, UnknownSchema);
     return z.array(AddOnSchema).parse(data);
@@ -3900,12 +4390,12 @@ export const apiClient = {
       reservationId: string;
       items: { productId?: string; addOnId?: string; qty: number }[];
       notes?: string;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/portal/store/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreOrderSchema.parse(data);
@@ -3915,55 +4405,75 @@ export const apiClient = {
   async getStoreOrders(campgroundId: string, params?: { status?: string }) {
     const qs = new URLSearchParams();
     if (params?.status) qs.set("status", params.status);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/orders${qs.toString() ? `?${qs.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/orders${qs.toString() ? `?${qs.toString()}` : ""}`,
+    );
     return z.array(StoreOrderSchema).parse(data);
   },
   async getStoreOrderSummary(campgroundId: string, params?: { start?: string; end?: string }) {
     const qs = new URLSearchParams();
     if (params?.start) qs.set("start", params.start);
     if (params?.end) qs.set("end", params.end);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/orders/summary${qs.toString() ? `?${qs.toString()}` : ""}`);
-    return z.object({
-      byChannel: z.array(z.object({
-        channel: z.string().nullable().optional(),
-        _count: z.object({ _all: z.number() }),
-        _sum: z.object({ totalCents: z.number().nullable().optional() })
-      })),
-      byFulfillment: z.array(z.object({
-        fulfillmentType: z.string().nullable().optional(),
-        _count: z.object({ _all: z.number() }),
-        _sum: z.object({ totalCents: z.number().nullable().optional() })
-      })),
-      byStatus: z.array(z.object({
-        status: z.string().nullable().optional(),
-        _count: z.object({ _all: z.number() }),
-        _sum: z.object({ totalCents: z.number().nullable().optional() })
-      })),
-      averages: z.object({
-        prepMinutesPlanned: z.number().nullable().optional(),
-        prepMinutesActual: z.number().nullable().optional(),
-      }),
-      averagesByFulfillment: z.array(z.object({
-        fulfillmentType: z.string().nullable().optional(),
-        prepMinutesPlanned: z.number().nullable().optional(),
-        prepMinutesActual: z.number().nullable().optional(),
-      })).default([])
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/orders/summary${qs.toString() ? `?${qs.toString()}` : ""}`,
+    );
+    return z
+      .object({
+        byChannel: z.array(
+          z.object({
+            channel: z.string().nullable().optional(),
+            _count: z.object({ _all: z.number() }),
+            _sum: z.object({ totalCents: z.number().nullable().optional() }),
+          }),
+        ),
+        byFulfillment: z.array(
+          z.object({
+            fulfillmentType: z.string().nullable().optional(),
+            _count: z.object({ _all: z.number() }),
+            _sum: z.object({ totalCents: z.number().nullable().optional() }),
+          }),
+        ),
+        byStatus: z.array(
+          z.object({
+            status: z.string().nullable().optional(),
+            _count: z.object({ _all: z.number() }),
+            _sum: z.object({ totalCents: z.number().nullable().optional() }),
+          }),
+        ),
+        averages: z.object({
+          prepMinutesPlanned: z.number().nullable().optional(),
+          prepMinutesActual: z.number().nullable().optional(),
+        }),
+        averagesByFulfillment: z
+          .array(
+            z.object({
+              fulfillmentType: z.string().nullable().optional(),
+              prepMinutesPlanned: z.number().nullable().optional(),
+              prepMinutesActual: z.number().nullable().optional(),
+            }),
+          )
+          .default([]),
+      })
+      .parse(data);
   },
   async getStoreUnseen(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/orders/unseen`);
-    return z.array(z.object({
-      id: z.string(),
-      createdAt: z.string(),
-      reservationId: z.string().nullable(),
-      siteNumber: z.string().nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          createdAt: z.string(),
+          reservationId: z.string().nullable(),
+          siteNumber: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
   async markStoreOrderSeen(id: string, campgroundId?: string) {
     const path = withCampgroundId(`/store/orders/${id}/seen`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -3971,37 +4481,44 @@ export const apiClient = {
     const path = withCampgroundId(`/store/orders/${id}/complete`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownSchema);
   },
   async updateStoreOrderStatus(
     id: string,
     status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded",
-    campgroundId?: string
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/store/orders/${id}/status`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     });
     return parseResponse(res, UnknownSchema);
   },
   async getStoreOrderHistory(id: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/store/orders/${id}/history`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/store/orders/${id}/history`, campgroundId),
+    );
     return z.array(StoreOrderAdjustmentSchema).parse(data);
   },
   async createStoreOrderAdjustment(
     id: string,
-    payload: { type?: "refund" | "exchange"; items?: Array<{ itemId?: string; qty?: number; amountCents?: number }>; amountCents?: number; note?: string | null },
-    campgroundId?: string
+    payload: {
+      type?: "refund" | "exchange";
+      items?: Array<{ itemId?: string; qty?: number; amountCents?: number }>;
+      amountCents?: number;
+      note?: string | null;
+    },
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/store/orders/${id}/refunds`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreOrderAdjustmentSchema.parse(data);
@@ -4010,7 +4527,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return EventSchema.parse(data);
@@ -4019,13 +4536,16 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/events/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return EventSchema.parse(data);
   },
   async deleteEvent(id: string) {
-    const res = await fetch(`${API_BASE}/events/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/events/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete event");
     return true;
   },
@@ -4037,7 +4557,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/pricing-rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return PricingRuleSchema.parse(data);
@@ -4045,13 +4565,13 @@ export const apiClient = {
   async updatePricingRule(
     id: string,
     payload: Partial<z.input<typeof PricingRuleSchema>>,
-    campgroundId?: string
+    campgroundId?: string,
   ) {
     const path = withCampgroundId(`/pricing-rules/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return PricingRuleSchema.parse(data);
@@ -4063,13 +4583,20 @@ export const apiClient = {
     return true;
   },
   async getPrivacySettings(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy`, { headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy`, {
+      headers: scopedHeaders(),
+    });
     const data = await parseResponse(res, UnknownSchema);
     return PrivacySettingsSchema.parse(data);
   },
   async updatePrivacySettings(
     campgroundId: string,
-    payload: Partial<{ redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number }>
+    payload: Partial<{
+      redactPII: boolean;
+      consentRequired: boolean;
+      backupRetentionDays: number;
+      keyRotationDays: number;
+    }>,
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy`, {
       method: "POST",
@@ -4081,7 +4608,15 @@ export const apiClient = {
   },
   async recordConsent(
     campgroundId: string,
-    payload: { subject: string; consentType: string; grantedBy: string; method?: string; purpose?: string; expiresAt?: string; metadata?: Record<string, unknown> }
+    payload: {
+      subject: string;
+      consentType: string;
+      grantedBy: string;
+      method?: string;
+      purpose?: string;
+      expiresAt?: string;
+      metadata?: Record<string, unknown>;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/consents`, {
       method: "POST",
@@ -4092,24 +4627,39 @@ export const apiClient = {
     return ConsentSchema.parse(data);
   },
   async listConsents(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/consents`, { headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/consents`, {
+      headers: scopedHeaders(),
+    });
     const data = await parseResponse(res, UnknownSchema);
     return z.array(ConsentSchema).parse(data);
   },
   async listPiiTags(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/pii-tags`, { headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/pii-tags`, {
+      headers: scopedHeaders(),
+    });
     return parseResponse(res, UnknownSchema);
   },
-  async upsertPiiTag(campgroundId: string, payload: { resource: string; field: string; classification: string; redactionMode?: string; createdById?: string }) {
+  async upsertPiiTag(
+    campgroundId: string,
+    payload: {
+      resource: string;
+      field: string;
+      classification: string;
+      redactionMode?: string;
+      createdById?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/pii-tags`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
   async listRecentRedactions(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/redactions/recent`, { headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/privacy/redactions/recent`, {
+      headers: scopedHeaders(),
+    });
     return parseResponse(res, UnknownSchema);
   },
   async previewRedaction(campgroundId: string, payload: { resource?: string; sample: unknown }) {
@@ -4133,21 +4683,31 @@ export const apiClient = {
         contentType: res.headers.get("content-type") ?? "text/csv",
       };
     }
-    return z.object({
-      exportVersion: z.string(),
-      campgroundId: z.string(),
-      generatedAt: z.string(),
-      settings: UnknownRecordSchema,
-      consents: UnknownArraySchema,
-      piiTags: UnknownArraySchema
-    }).parse(await res.json());
+    return z
+      .object({
+        exportVersion: z.string(),
+        campgroundId: z.string(),
+        generatedAt: z.string(),
+        settings: UnknownRecordSchema,
+        consents: UnknownArraySchema,
+        piiTags: UnknownArraySchema,
+      })
+      .parse(await res.json());
   },
   async getPermissionPolicies(campgroundId?: string) {
     const qs = campgroundId ? `?campgroundId=${campgroundId}` : "";
     const res = await fetch(`${API_BASE}/permissions/policies${qs}`, { headers: scopedHeaders() });
     return parseResponse(res, UnknownSchema);
   },
-  async upsertPermissionRule(payload: { campgroundId?: string; role: string; resource: string; action: string; fields?: string[]; effect?: string; createdById?: string }) {
+  async upsertPermissionRule(payload: {
+    campgroundId?: string;
+    role: string;
+    resource: string;
+    action: string;
+    fields?: string[];
+    effect?: string;
+    createdById?: string;
+  }) {
     const res = await fetch(`${API_BASE}/permissions/rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -4155,7 +4715,15 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async submitApproval(payload: { action: string; requestedBy: string; campgroundId?: string; resource?: string; targetId?: string; justification?: string; payload?: Record<string, unknown> }) {
+  async submitApproval(payload: {
+    action: string;
+    requestedBy: string;
+    campgroundId?: string;
+    resource?: string;
+    targetId?: string;
+    justification?: string;
+    payload?: Record<string, unknown>;
+  }) {
     const res = await fetch(`${API_BASE}/permissions/approvals`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -4171,11 +4739,14 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async getQuote(campgroundId: string, payload: { siteId: string; arrivalDate: string; departureDate: string }) {
+  async getQuote(
+    campgroundId: string,
+    payload: { siteId: string; arrivalDate: string; departureDate: string },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/quote`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to quote reservation");
     const data = await res.json();
@@ -4191,7 +4762,9 @@ export const apiClient = {
     return z.array(LedgerEntrySchema).parse(data);
   },
   async getLedgerByReservation(reservationId: string, campgroundId?: string) {
-    const data = await fetchJSONUnknown(withCampgroundId(`/reservations/${reservationId}/ledger`, campgroundId));
+    const data = await fetchJSONUnknown(
+      withCampgroundId(`/reservations/${reservationId}/ledger`, campgroundId),
+    );
     return z.array(LedgerEntrySchema).parse(data);
   },
   async getLedgerSummary(campgroundId: string, opts?: { start?: string; end?: string }) {
@@ -4199,26 +4772,40 @@ export const apiClient = {
     if (opts?.start) params.set("start", opts.start);
     if (opts?.end) params.set("end", opts.end);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/ledger/summary${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/ledger/summary${qs ? `?${qs}` : ""}`,
+    );
     return z
       .array(
         z.object({
           glCode: z.string(),
-          netCents: z.number()
-        })
+          netCents: z.number(),
+        }),
       )
       .parse(data);
   },
   async getAging(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/aging`);
-    return z.object({ current: z.number(), "31_60": z.number(), "61_90": z.number(), "90_plus": z.number() }).parse(data);
+    return z
+      .object({
+        current: z.number(),
+        "31_60": z.number(),
+        "61_90": z.number(),
+        "90_plus": z.number(),
+      })
+      .parse(data);
   },
-  async getBookingSources(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
+  async getBookingSources(
+    campgroundId: string,
+    payload?: { startDate?: string; endDate?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload?.startDate) params.set("startDate", payload.startDate);
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/booking-sources${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/booking-sources${qs ? `?${qs}` : ""}`,
+    );
     return UnknownRecordSchema.parse(data);
   },
   async getGuestOrigins(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
@@ -4226,23 +4813,35 @@ export const apiClient = {
     if (payload?.startDate) params.set("startDate", payload.startDate);
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/guest-origins${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/guest-origins${qs ? `?${qs}` : ""}`,
+    );
     return UnknownRecordSchema.parse(data);
   },
-  async getReferralPerformance(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
+  async getReferralPerformance(
+    campgroundId: string,
+    payload?: { startDate?: string; endDate?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload?.startDate) params.set("startDate", payload.startDate);
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/referrals${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/referrals${qs ? `?${qs}` : ""}`,
+    );
     return UnknownRecordSchema.parse(data);
   },
-  async getStayReasonBreakdown(campgroundId: string, payload?: { startDate?: string; endDate?: string }) {
+  async getStayReasonBreakdown(
+    campgroundId: string,
+    payload?: { startDate?: string; endDate?: string },
+  ) {
     const params = new URLSearchParams();
     if (payload?.startDate) params.set("startDate", payload.startDate);
     if (payload?.endDate) params.set("endDate", payload.endDate);
     const qs = params.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/stay-reasons${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/stay-reasons${qs ? `?${qs}` : ""}`,
+    );
     return StayReasonReportSchema.parse(data);
   },
   async listReferralPrograms(campgroundId: string) {
@@ -4260,12 +4859,12 @@ export const apiClient = {
       incentiveValue: number;
       isActive?: boolean;
       notes?: string;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/referral-programs`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReferralProgramSchema.parse(data);
@@ -4282,12 +4881,12 @@ export const apiClient = {
       incentiveValue: number;
       isActive?: boolean;
       notes?: string;
-    }>
+    }>,
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/referral-programs/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReferralProgramSchema.parse(data);
@@ -4300,30 +4899,41 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/categories`);
     return z.array(ProductCategorySchema).parse(data);
   },
-  async createStoreOrder(campgroundId: string, payload: Record<string, unknown>, headers?: Record<string, string>) {
+  async createStoreOrder(
+    campgroundId: string,
+    payload: Record<string, unknown>,
+    headers?: Record<string, string>,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders(), ...(headers ?? {}) },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreOrderSchema.parse(data);
   },
-  async createPaymentIntent(amountCents: number, currency: string, reservationId: string, autoCapture: boolean = true) {
+  async createPaymentIntent(
+    amountCents: number,
+    currency: string,
+    reservationId: string,
+    autoCapture: boolean = true,
+  ) {
     const res = await fetch(`${API_BASE}/payments/intents`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ amountCents, currency, reservationId, autoCapture })
+      body: JSON.stringify({ amountCents, currency, reservationId, autoCapture }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      clientSecret: z.string(),
-      amountCents: z.number(),
-      currency: z.string(),
-      reservationId: z.string(),
-      status: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        clientSecret: z.string(),
+        amountCents: z.number(),
+        currency: z.string(),
+        reservationId: z.string(),
+        status: z.string(),
+      })
+      .parse(data);
   },
 
   /**
@@ -4334,7 +4944,7 @@ export const apiClient = {
     reservationId: string;
     currency?: string;
     guestEmail?: string;
-    captureMethod?: 'automatic' | 'manual';
+    captureMethod?: "automatic" | "manual";
     idempotencyKey?: string;
   }) {
     const { idempotencyKey, ...payload } = params;
@@ -4343,18 +4953,20 @@ export const apiClient = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Idempotency-Key": idempotencyKey || fallbackKey
+        "Idempotency-Key": idempotencyKey || fallbackKey,
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      clientSecret: z.string(),
-      amountCents: z.number(),
-      currency: z.string(),
-      status: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        clientSecret: z.string(),
+        amountCents: z.number(),
+        currency: z.string(),
+        status: z.string(),
+      })
+      .parse(data);
   },
 
   /**
@@ -4365,15 +4977,17 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/public/payments/intents/${paymentIntentId}/confirm`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ reservationId })
+      body: JSON.stringify({ reservationId }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      success: z.boolean(),
-      status: z.string(),
-      paymentId: z.string().optional(),
-      reservationId: z.string()
-    }).parse(data);
+    return z
+      .object({
+        success: z.boolean(),
+        status: z.string(),
+        paymentId: z.string().optional(),
+        reservationId: z.string(),
+      })
+      .parse(data);
   },
 
   /**
@@ -4381,16 +4995,18 @@ export const apiClient = {
    */
   async getPaymentIntentStatus(paymentIntentId: string) {
     const data = await fetchJSONUnknown(`/payments/intents/${paymentIntentId}`);
-    return z.object({
-      id: z.string(),
-      status: z.string(),
-      amountCents: z.number(),
-      amountReceivedCents: z.number(),
-      currency: z.string(),
-      metadata: z.record(z.string()).optional(),
-      captureMethod: z.string(),
-      createdAt: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        status: z.string(),
+        amountCents: z.number(),
+        amountReceivedCents: z.number(),
+        currency: z.string(),
+        metadata: z.record(z.string()).optional(),
+        captureMethod: z.string(),
+        createdAt: z.string(),
+      })
+      .parse(data);
   },
 
   /**
@@ -4400,55 +5016,70 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/payments/intents/${paymentIntentId}/capture`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ amountCents })
+      body: JSON.stringify({ amountCents }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      status: z.string(),
-      amountCents: z.number(),
-      amountReceivedCents: z.number(),
-      currency: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        status: z.string(),
+        amountCents: z.number(),
+        amountReceivedCents: z.number(),
+        currency: z.string(),
+      })
+      .parse(data);
   },
 
   /**
    * Issue a refund for a payment intent (staff only)
    */
-  async refundPaymentIntent(paymentIntentId: string, params?: {
-    amountCents?: number;
-    reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
-  }) {
+  async refundPaymentIntent(
+    paymentIntentId: string,
+    params?: {
+      amountCents?: number;
+      reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+    },
+  ) {
     const res = await fetch(`${API_BASE}/payments/intents/${paymentIntentId}/refund`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(params || {})
+      body: JSON.stringify(params || {}),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      status: z.string(),
-      amountCents: z.number().nullable(),
-      paymentIntentId: z.string(),
-      reason: z.string().nullable()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        status: z.string(),
+        amountCents: z.number().nullable(),
+        paymentIntentId: z.string(),
+        reason: z.string().nullable(),
+      })
+      .parse(data);
   },
 
   async getCampgroundPaymentSettings(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}`);
-    const parsed = z.object({
-      id: z.string(),
-      name: z.string(),
-      stripeAccountId: z.string().nullable().optional(),
-      applicationFeeFlatCents: z.number().nullable().optional(),
-      perBookingFeeCents: z.number().nullable().optional(),
-      monthlyFeeCents: z.number().nullable().optional(),
-      billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
-      feeMode: z.enum(["absorb", "pass_through"]).nullable().optional(),
-      stripeCapabilities: z.record(z.string(), z.string()).nullable().optional(),
-      stripeCapabilitiesFetchedAt: z.string().nullable().optional()
-    }).safeParse(data);
-    if (!parsed.success) return { stripeAccountId: null, applicationFeeFlatCents: null, stripeCapabilities: null, stripeCapabilitiesFetchedAt: null };
+    const parsed = z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        stripeAccountId: z.string().nullable().optional(),
+        applicationFeeFlatCents: z.number().nullable().optional(),
+        perBookingFeeCents: z.number().nullable().optional(),
+        monthlyFeeCents: z.number().nullable().optional(),
+        billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
+        feeMode: z.enum(["absorb", "pass_through"]).nullable().optional(),
+        stripeCapabilities: z.record(z.string(), z.string()).nullable().optional(),
+        stripeCapabilitiesFetchedAt: z.string().nullable().optional(),
+      })
+      .safeParse(data);
+    if (!parsed.success)
+      return {
+        stripeAccountId: null,
+        applicationFeeFlatCents: null,
+        stripeCapabilities: null,
+        stripeCapabilitiesFetchedAt: null,
+      };
     return {
       stripeAccountId: parsed.data.stripeAccountId ?? null,
       applicationFeeFlatCents: parsed.data.applicationFeeFlatCents ?? null,
@@ -4458,35 +5089,37 @@ export const apiClient = {
       feeMode: parsed.data.feeMode ?? "absorb",
       name: parsed.data.name,
       stripeCapabilities: parsed.data.stripeCapabilities ?? null,
-      stripeCapabilitiesFetchedAt: parsed.data.stripeCapabilitiesFetchedAt ?? null
+      stripeCapabilitiesFetchedAt: parsed.data.stripeCapabilitiesFetchedAt ?? null,
     };
   },
 
   async getPaymentGatewayConfig(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/payment-gateway`);
-    const parsed = z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      gateway: z.enum(["stripe", "adyen", "authorize_net", "other"]),
-      mode: z.enum(["test", "prod"]),
-      feeMode: z.enum(["absorb", "pass_through"]),
-      feePercentBasisPoints: z.number().nullable().optional(),
-      feeFlatCents: z.number().nullable().optional(),
-      feePresetId: z.string().nullable().optional(),
-      feePresetLabel: z.string().nullable().optional(),
-      effectiveFee: z.object({
-        percentBasisPoints: z.number(),
-        flatFeeCents: z.number()
-      }),
-      credentials: z.object({
-        publishableKeySecretId: z.string().nullable(),
-        secretKeySecretId: z.string().nullable(),
-        merchantAccountIdSecretId: z.string().nullable(),
-        webhookSecretId: z.string().nullable()
-      }),
-      hasProductionCredentials: z.boolean(),
-      additionalConfig: z.record(z.unknown()).nullable().optional()
-    }).parse(data);
+    const parsed = z
+      .object({
+        id: z.string(),
+        campgroundId: z.string(),
+        gateway: z.enum(["stripe", "adyen", "authorize_net", "other"]),
+        mode: z.enum(["test", "prod"]),
+        feeMode: z.enum(["absorb", "pass_through"]),
+        feePercentBasisPoints: z.number().nullable().optional(),
+        feeFlatCents: z.number().nullable().optional(),
+        feePresetId: z.string().nullable().optional(),
+        feePresetLabel: z.string().nullable().optional(),
+        effectiveFee: z.object({
+          percentBasisPoints: z.number(),
+          flatFeeCents: z.number(),
+        }),
+        credentials: z.object({
+          publishableKeySecretId: z.string().nullable(),
+          secretKeySecretId: z.string().nullable(),
+          merchantAccountIdSecretId: z.string().nullable(),
+          webhookSecretId: z.string().nullable(),
+        }),
+        hasProductionCredentials: z.boolean(),
+        additionalConfig: z.record(z.unknown()).nullable().optional(),
+      })
+      .parse(data);
     return parsed;
   },
 
@@ -4504,78 +5137,92 @@ export const apiClient = {
       merchantAccountIdSecretId?: string | null;
       webhookSecretId?: string | null;
       additionalConfig?: Record<string, unknown> | null;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-gateway`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      gateway: z.enum(["stripe", "adyen", "authorize_net", "other"]),
-      mode: z.enum(["test", "prod"]),
-      feeMode: z.enum(["absorb", "pass_through"]),
-      effectiveFee: z.object({
-        percentBasisPoints: z.number(),
-        flatFeeCents: z.number()
-      }),
-      feePercentBasisPoints: z.number().nullable().optional(),
-      feeFlatCents: z.number().nullable().optional(),
-      feePresetId: z.string().nullable().optional(),
-      feePresetLabel: z.string().nullable().optional(),
-      credentials: z.object({
-        publishableKeySecretId: z.string().nullable(),
-        secretKeySecretId: z.string().nullable(),
-        merchantAccountIdSecretId: z.string().nullable(),
-        webhookSecretId: z.string().nullable()
-      }),
-      hasProductionCredentials: z.boolean(),
-      additionalConfig: z.record(z.unknown()).nullable().optional()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        campgroundId: z.string(),
+        gateway: z.enum(["stripe", "adyen", "authorize_net", "other"]),
+        mode: z.enum(["test", "prod"]),
+        feeMode: z.enum(["absorb", "pass_through"]),
+        effectiveFee: z.object({
+          percentBasisPoints: z.number(),
+          flatFeeCents: z.number(),
+        }),
+        feePercentBasisPoints: z.number().nullable().optional(),
+        feeFlatCents: z.number().nullable().optional(),
+        feePresetId: z.string().nullable().optional(),
+        feePresetLabel: z.string().nullable().optional(),
+        credentials: z.object({
+          publishableKeySecretId: z.string().nullable(),
+          secretKeySecretId: z.string().nullable(),
+          merchantAccountIdSecretId: z.string().nullable(),
+          webhookSecretId: z.string().nullable(),
+        }),
+        hasProductionCredentials: z.boolean(),
+        additionalConfig: z.record(z.unknown()).nullable().optional(),
+      })
+      .parse(data);
   },
 
   async connectCampgroundPayments(campgroundId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payments/connect`, {
       method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() }
+      headers: { "Content-Type": "application/json", ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      accountId: z.string(),
-      onboardingUrl: z.string()
-    }).parse(data);
+    return z
+      .object({
+        accountId: z.string(),
+        onboardingUrl: z.string(),
+      })
+      .parse(data);
   },
 
-  async updateCampgroundPaymentSettings(campgroundId: string, payload: {
-    applicationFeeFlatCents?: number;
-    perBookingFeeCents?: number;
-    monthlyFeeCents?: number;
-    billingPlan?: "ota_only" | "standard" | "enterprise";
-    feeMode?: "absorb" | "pass_through";
-  }) {
+  async updateCampgroundPaymentSettings(
+    campgroundId: string,
+    payload: {
+      applicationFeeFlatCents?: number;
+      perBookingFeeCents?: number;
+      monthlyFeeCents?: number;
+      billingPlan?: "ota_only" | "standard" | "enterprise";
+      feeMode?: "absorb" | "pass_through";
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payments/settings`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      stripeAccountId: z.string().nullable().optional(),
-      applicationFeeFlatCents: z.number().nullable().optional(),
-      perBookingFeeCents: z.number().nullable().optional(),
-      monthlyFeeCents: z.number().nullable().optional(),
-      billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
-      feeMode: z.enum(["absorb", "pass_through"]).nullable().optional()
-    }).parse(data);
+    return z
+      .object({
+        stripeAccountId: z.string().nullable().optional(),
+        applicationFeeFlatCents: z.number().nullable().optional(),
+        perBookingFeeCents: z.number().nullable().optional(),
+        monthlyFeeCents: z.number().nullable().optional(),
+        billingPlan: z.enum(["ota_only", "standard", "enterprise"]).nullable().optional(),
+        feeMode: z.enum(["absorb", "pass_through"]).nullable().optional(),
+      })
+      .parse(data);
   },
 
-  async listPayouts(campgroundId: string, status?: "pending" | "in_transit" | "paid" | "failed" | "canceled") {
+  async listPayouts(
+    campgroundId: string,
+    status?: "pending" | "in_transit" | "paid" | "failed" | "canceled",
+  ) {
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/payouts${qs.toString() ? `?${qs.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/payouts${qs.toString() ? `?${qs.toString()}` : ""}`,
+    );
     const PayoutSchema = z.object({
       id: z.string(),
       stripePayoutId: z.string(),
@@ -4590,18 +5237,22 @@ export const apiClient = {
       paidAt: z.string().nullable().optional(),
       statementDescriptor: z.string().nullable().optional(),
       createdAt: z.string().optional(),
-      lines: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        amountCents: z.number(),
-        currency: z.string(),
-        description: z.string().nullable().optional(),
-        reservationId: z.string().nullable().optional(),
-        paymentIntentId: z.string().nullable().optional(),
-        chargeId: z.string().nullable().optional(),
-        balanceTransactionId: z.string().nullable().optional(),
-        createdAt: z.string().optional()
-      })).optional()
+      lines: z
+        .array(
+          z.object({
+            id: z.string(),
+            type: z.string(),
+            amountCents: z.number(),
+            currency: z.string(),
+            description: z.string().nullable().optional(),
+            reservationId: z.string().nullable().optional(),
+            paymentIntentId: z.string().nullable().optional(),
+            chargeId: z.string().nullable().optional(),
+            balanceTransactionId: z.string().nullable().optional(),
+            createdAt: z.string().optional(),
+          }),
+        )
+        .optional(),
     });
     return z.array(PayoutSchema).parse(data);
   },
@@ -4620,41 +5271,47 @@ export const apiClient = {
       paidAt: z.string().nullable().optional(),
       statementDescriptor: z.string().nullable().optional(),
       createdAt: z.string().optional(),
-      lines: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        amountCents: z.number(),
-        currency: z.string(),
-        description: z.string().nullable().optional(),
-        reservationId: z.string().nullable().optional(),
-        paymentIntentId: z.string().nullable().optional(),
-        chargeId: z.string().nullable().optional(),
-        balanceTransactionId: z.string().nullable().optional(),
-        createdAt: z.string().optional()
-      })).optional()
+      lines: z
+        .array(
+          z.object({
+            id: z.string(),
+            type: z.string(),
+            amountCents: z.number(),
+            currency: z.string(),
+            description: z.string().nullable().optional(),
+            reservationId: z.string().nullable().optional(),
+            paymentIntentId: z.string().nullable().optional(),
+            chargeId: z.string().nullable().optional(),
+            balanceTransactionId: z.string().nullable().optional(),
+            createdAt: z.string().optional(),
+          }),
+        )
+        .optional(),
     });
     return PayoutSchema.parse(data);
   },
 
   async getPayoutRecon(campgroundId: string, payoutId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/payouts/${payoutId}/recon`);
-    return z.object({
-      payoutId: z.string(),
-      campgroundId: z.string(),
-      payoutAmountCents: z.number(),
-      payoutFeeCents: z.number(),
-      payoutNetCents: z.number(),
-      lineSumCents: z.number(),
-      ledgerNetCents: z.number(),
-      driftVsLinesCents: z.number(),
-      driftVsLedgerCents: z.number()
-    }).parse(data);
+    return z
+      .object({
+        payoutId: z.string(),
+        campgroundId: z.string(),
+        payoutAmountCents: z.number(),
+        payoutFeeCents: z.number(),
+        payoutNetCents: z.number(),
+        lineSumCents: z.number(),
+        ledgerNetCents: z.number(),
+        driftVsLinesCents: z.number(),
+        driftVsLedgerCents: z.number(),
+      })
+      .parse(data);
   },
 
   async exportPayoutCsv(campgroundId: string, payoutId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payouts/${payoutId}/export`, {
       method: "GET",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     if (!res.ok) {
       throw new Error(`Failed to export payout: ${res.statusText}`);
@@ -4669,10 +5326,13 @@ export const apiClient = {
   },
 
   async exportPayoutLedgerCsv(campgroundId: string, payoutId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payouts/${payoutId}/ledger-export`, {
-      method: "GET",
-      headers: { ...scopedHeaders() }
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payouts/${payoutId}/ledger-export`,
+      {
+        method: "GET",
+        headers: { ...scopedHeaders() },
+      },
+    );
     if (!res.ok) {
       throw new Error(`Failed to export payout ledger: ${res.statusText}`);
     }
@@ -4688,10 +5348,13 @@ export const apiClient = {
   async exportDisputesCsv(campgroundId: string, status?: string) {
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/disputes/export${qs.toString() ? `?${qs.toString()}` : ""}`, {
-      method: "GET",
-      headers: { ...scopedHeaders() }
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/disputes/export${qs.toString() ? `?${qs.toString()}` : ""}`,
+      {
+        method: "GET",
+        headers: { ...scopedHeaders() },
+      },
+    );
     if (!res.ok) throw new Error(`Failed to export disputes: ${res.statusText}`);
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
@@ -4724,7 +5387,7 @@ export const apiClient = {
       evidenceDueBy: z.string().nullable().optional(),
       createdAt: z.string().optional(),
       updatedAt: z.string().optional(),
-      notes: z.string().nullable().optional()
+      notes: z.string().nullable().optional(),
     });
     return DisputeSchema.parse(data);
   },
@@ -4732,7 +5395,9 @@ export const apiClient = {
   async listDisputes(campgroundId: string, status?: string) {
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/disputes${qs.toString() ? `?${qs.toString()}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/disputes${qs.toString() ? `?${qs.toString()}` : ""}`,
+    );
     const DisputeSchema = z.object({
       id: z.string(),
       stripeDisputeId: z.string(),
@@ -4748,11 +5413,10 @@ export const apiClient = {
       evidenceDueBy: z.string().nullable().optional(),
       createdAt: z.string().optional(),
       updatedAt: z.string().optional(),
-      notes: z.string().nullable().optional()
+      notes: z.string().nullable().optional(),
     });
     return z.array(DisputeSchema).parse(data);
   },
-
 
   // Public API methods (no auth required)
   async getPublicCampgrounds(options?: { limit?: number }) {
@@ -4764,10 +5428,9 @@ export const apiClient = {
     const query = params.toString();
     const data = await fetchJSONUnknown(`/public/campgrounds${query ? `?${query}` : ""}`);
     // Handle both array response and {results, total} response for backwards compatibility
-    const parsed = z.union([
-      z.array(z.unknown()),
-      z.object({ results: z.array(z.unknown()) })
-    ]).parse(data);
+    const parsed = z
+      .union([z.array(z.unknown()), z.object({ results: z.array(z.unknown()) })])
+      .parse(data);
     const results = Array.isArray(parsed) ? parsed : parsed.results;
     return PublicCampgroundListSchema.parse(results);
   },
@@ -4789,36 +5452,42 @@ export const apiClient = {
     const query = searchParams.toString();
     const data = await fetchJSONUnknown(`/public/events${query ? `?${query}` : ""}`);
     // Response is { results, total }
-    const response = z.object({
-      results: z.array(z.unknown()),
-      total: z.number()
-    }).parse(data);
+    const response = z
+      .object({
+        results: z.array(z.unknown()),
+        total: z.number(),
+      })
+      .parse(data);
     return {
-      results: z.array(z.object({
-        id: z.string(),
-        title: z.string(),
-        description: z.string().nullable(),
-        eventType: z.string(),
-        startDate: z.string(),
-        endDate: z.string().nullable(),
-        startTime: z.string().nullable(),
-        endTime: z.string().nullable(),
-        isAllDay: z.boolean(),
-        imageUrl: z.string().nullable(),
-        priceCents: z.number(),
-        capacity: z.number().nullable(),
-        currentSignups: z.number(),
-        location: z.string().nullable(),
-        campground: z.object({
-          id: z.string(),
-          slug: z.string().nullable(),
-          name: z.string(),
-          city: z.string().nullable(),
-          state: z.string().nullable(),
-          heroImageUrl: z.string().nullable()
-        })
-      })).parse(response.results),
-      total: response.total
+      results: z
+        .array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            description: z.string().nullable(),
+            eventType: z.string(),
+            startDate: z.string(),
+            endDate: z.string().nullable(),
+            startTime: z.string().nullable(),
+            endTime: z.string().nullable(),
+            isAllDay: z.boolean(),
+            imageUrl: z.string().nullable(),
+            priceCents: z.number(),
+            capacity: z.number().nullable(),
+            currentSignups: z.number(),
+            location: z.string().nullable(),
+            campground: z.object({
+              id: z.string(),
+              slug: z.string().nullable(),
+              name: z.string(),
+              city: z.string().nullable(),
+              state: z.string().nullable(),
+              heroImageUrl: z.string().nullable(),
+            }),
+          }),
+        )
+        .parse(response.results),
+      total: response.total,
     };
   },
   async getPublicCampground(slug: string, previewToken?: string) {
@@ -4834,18 +5503,29 @@ export const apiClient = {
       throw parseError;
     }
   },
-  async abandonPublicCart(payload: { campgroundId: string; email?: string; phone?: string; abandonedAt?: string }) {
+  async abandonPublicCart(payload: {
+    campgroundId: string;
+    email?: string;
+    phone?: string;
+    abandonedAt?: string;
+  }) {
     const res = await fetch(`${API_BASE}/public/reservations/abandon`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, z.object({ ok: z.boolean() }));
   },
   async getPublicAvailability(
     slug: string,
-    dates: { arrivalDate: string; departureDate: string; rigType?: string; rigLength?: string | number; needsAccessible?: boolean },
-    previewToken?: string
+    dates: {
+      arrivalDate: string;
+      departureDate: string;
+      rigType?: string;
+      rigLength?: string | number;
+      needsAccessible?: boolean;
+    },
+    previewToken?: string,
   ) {
     const params = new URLSearchParams();
     params.set("arrivalDate", dates.arrivalDate);
@@ -4856,33 +5536,41 @@ export const apiClient = {
     }
     if (dates.needsAccessible) params.set("needsAccessible", "true");
     if (previewToken) params.set("token", previewToken);
-    const data = await fetchJSONUnknown(`/public/campgrounds/${slug}/availability?${params.toString()}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      siteNumber: z.string(),
-      siteType: z.string(),
-      maxOccupancy: numberish(z.number().int().nonnegative()),
-      rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
-      accessible: z.boolean().optional().default(false),
-      pullThrough: z.boolean().optional(),
-      status: z.enum(['available', 'booked', 'locked', 'maintenance']),
-      siteClass: z.object({
-        id: z.string(),
-        name: z.string(),
-        defaultRate: numberish(z.number().int().nonnegative()),
-        siteType: z.string(),
-        maxOccupancy: numberish(z.number().int().nonnegative()),
-        hookupsPower: z.boolean(),
-        hookupsWater: z.boolean(),
-        hookupsSewer: z.boolean(),
-        petFriendly: z.boolean(),
-        description: z.string().nullable(),
-        accessible: z.boolean().optional().default(false),
-        rvOrientation: z.string().nullish(),
-        photoUrl: z.string().nullable().optional()
-      }).nullable()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/public/campgrounds/${slug}/availability?${params.toString()}`,
+    );
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          siteNumber: z.string(),
+          siteType: z.string(),
+          maxOccupancy: numberish(z.number().int().nonnegative()),
+          rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
+          accessible: z.boolean().optional().default(false),
+          pullThrough: z.boolean().optional(),
+          status: z.enum(["available", "booked", "locked", "maintenance"]),
+          siteClass: z
+            .object({
+              id: z.string(),
+              name: z.string(),
+              defaultRate: numberish(z.number().int().nonnegative()),
+              siteType: z.string(),
+              maxOccupancy: numberish(z.number().int().nonnegative()),
+              hookupsPower: z.boolean(),
+              hookupsWater: z.boolean(),
+              hookupsSewer: z.boolean(),
+              petFriendly: z.boolean(),
+              description: z.string().nullable(),
+              accessible: z.boolean().optional().default(false),
+              rvOrientation: z.string().nullish(),
+              photoUrl: z.string().nullable().optional(),
+            })
+            .nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   /**
@@ -4892,15 +5580,11 @@ export const apiClient = {
    * - "Cabin for 4 adults July 4th weekend"
    * - "Waterfront tent site with hookups this Friday to Sunday"
    */
-  async naturalLanguageSearch(
-    slug: string,
-    query: string,
-    sessionId?: string
-  ) {
+  async naturalLanguageSearch(slug: string, query: string, sessionId?: string) {
     const res = await fetch(`${API_BASE}/public/campgrounds/${slug}/search`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query, sessionId })
+      body: JSON.stringify({ query, sessionId }),
     });
     const data = await parseResponse(res, UnknownSchema);
 
@@ -4913,59 +5597,65 @@ export const apiClient = {
         maxOccupancy: numberish(z.number().int().nonnegative()),
         rigMaxLength: numberish(z.number().int().nonnegative().nullable()).optional(),
         accessible: z.boolean().optional().default(false),
-        siteClass: z.object({
-          id: z.string(),
-          name: z.string(),
-          defaultRate: numberish(z.number().int().nonnegative()),
-          siteType: z.string(),
-          maxOccupancy: numberish(z.number().int().nonnegative()),
-          hookupsPower: z.boolean(),
-          hookupsWater: z.boolean(),
-          hookupsSewer: z.boolean(),
-          petFriendly: z.boolean(),
-          description: z.string().nullable(),
-          accessible: z.boolean().optional().default(false)
-        }).nullable()
+        siteClass: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            defaultRate: numberish(z.number().int().nonnegative()),
+            siteType: z.string(),
+            maxOccupancy: numberish(z.number().int().nonnegative()),
+            hookupsPower: z.boolean(),
+            hookupsWater: z.boolean(),
+            hookupsSewer: z.boolean(),
+            petFriendly: z.boolean(),
+            description: z.string().nullable(),
+            accessible: z.boolean().optional().default(false),
+          })
+          .nullable(),
       }),
       matchScore: z.number(),
       matchReasons: z.array(z.string()),
-      pricePerNight: numberish(z.number().int().nonnegative()).optional()
+      pricePerNight: numberish(z.number().int().nonnegative()).optional(),
     });
 
-    return z.object({
-      results: z.array(NLSearchResultSchema),
-      intent: z.object({
-        arrivalDate: z.string().optional(),
-        departureDate: z.string().optional(),
-        nights: z.number().optional(),
-        flexible: z.boolean().optional(),
-        siteType: z.enum(["rv", "tent", "cabin", "glamping", "lodging"]).nullable().optional(),
-        rigType: z.string().optional(),
-        rigLength: z.number().optional(),
-        amenities: z.array(z.string()).optional(),
-        petFriendly: z.boolean().optional(),
-        waterfront: z.boolean().optional(),
-        hookups: z.object({
-          power: z.boolean().optional(),
-          water: z.boolean().optional(),
-          sewer: z.boolean().optional()
-        }).optional(),
-        accessible: z.boolean().optional(),
-        adults: z.number().optional(),
-        children: z.number().optional(),
-        pets: z.number().optional(),
-        maxPricePerNight: z.number().optional(),
-        minPricePerNight: z.number().optional(),
-        quiet: z.boolean().optional(),
-        nearAmenities: z.boolean().optional(),
-        confidence: z.number(),
-        clarificationNeeded: z.string().optional(),
-        interpretedQuery: z.string().optional()
-      }),
-      sessionId: z.string().optional(),
-      searchDuration: z.number().optional(),
-      aiEnabled: z.boolean()
-    }).parse(data);
+    return z
+      .object({
+        results: z.array(NLSearchResultSchema),
+        intent: z.object({
+          arrivalDate: z.string().optional(),
+          departureDate: z.string().optional(),
+          nights: z.number().optional(),
+          flexible: z.boolean().optional(),
+          siteType: z.enum(["rv", "tent", "cabin", "glamping", "lodging"]).nullable().optional(),
+          rigType: z.string().optional(),
+          rigLength: z.number().optional(),
+          amenities: z.array(z.string()).optional(),
+          petFriendly: z.boolean().optional(),
+          waterfront: z.boolean().optional(),
+          hookups: z
+            .object({
+              power: z.boolean().optional(),
+              water: z.boolean().optional(),
+              sewer: z.boolean().optional(),
+            })
+            .optional(),
+          accessible: z.boolean().optional(),
+          adults: z.number().optional(),
+          children: z.number().optional(),
+          pets: z.number().optional(),
+          maxPricePerNight: z.number().optional(),
+          minPricePerNight: z.number().optional(),
+          quiet: z.boolean().optional(),
+          nearAmenities: z.boolean().optional(),
+          confidence: z.number(),
+          clarificationNeeded: z.string().optional(),
+          interpretedQuery: z.string().optional(),
+        }),
+        sessionId: z.string().optional(),
+        searchDuration: z.number().optional(),
+        aiEnabled: z.boolean(),
+      })
+      .parse(data);
   },
 
   async getPublicQuote(
@@ -4987,12 +5677,12 @@ export const apiClient = {
       petCount?: number;
       petTypes?: string[];
       previewToken?: string;
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/public/campgrounds/${slug}/quote`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
 
@@ -5005,7 +5695,7 @@ export const apiClient = {
       siteId: z.string().nullable().optional(),
       siteClassId: z.string().nullable().optional(),
       documentType: z.string().optional(),
-      config: z.record(z.unknown()).optional().default({})
+      config: z.record(z.unknown()).optional().default({}),
     });
 
     const QuoteResponseSchema = z.object({
@@ -5026,8 +5716,8 @@ export const apiClient = {
             id: z.string(),
             type: z.string().optional(),
             amountCents: numberish(z.number()),
-            capped: z.boolean().optional().default(false)
-          })
+            capped: z.boolean().optional().default(false),
+          }),
         )
         .optional()
         .default([]),
@@ -5035,8 +5725,8 @@ export const apiClient = {
         .array(
           z.object({
             id: z.string(),
-            reason: z.string().optional()
-          })
+            reason: z.string().optional(),
+          }),
         )
         .optional()
         .default([]),
@@ -5049,19 +5739,20 @@ export const apiClient = {
       referralIncentiveValue: numberish(z.number()).nullable().optional().default(0),
       referralSource: z.string().nullable().optional(),
       referralChannel: z.string().nullable().optional(),
-      policyRequirements: z.array(PolicyRequirementSchema).optional().default([])
+      policyRequirements: z.array(PolicyRequirementSchema).optional().default([]),
     });
 
     const parsed = QuoteResponseSchema.parse(data);
     const totalAfterDiscount =
-      parsed.totalAfterDiscountCents ?? Math.max(0, parsed.totalCents - (parsed.discountCents || 0));
+      parsed.totalAfterDiscountCents ??
+      Math.max(0, parsed.totalCents - (parsed.discountCents || 0));
     const taxes = parsed.taxesCents ?? 0;
 
     return {
       ...parsed,
       totalAfterDiscountCents: totalAfterDiscount,
       taxesCents: taxes,
-      totalWithTaxesCents: parsed.totalWithTaxesCents ?? totalAfterDiscount + taxes
+      totalWithTaxesCents: parsed.totalWithTaxesCents ?? totalAfterDiscount + taxes,
     };
   },
   async createPublicReservation(payload: {
@@ -5108,7 +5799,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/public/reservations`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -5119,11 +5810,13 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/loyalty/guests/${guestId}`);
     return LoyaltyProfileSchema.parse(data);
   },
-  async getLoyaltyProfilesBatch(guestIds: string[]): Promise<{ guestId: string; tier: string; pointsBalance: number }[]> {
+  async getLoyaltyProfilesBatch(
+    guestIds: string[],
+  ): Promise<{ guestId: string; tier: string; pointsBalance: number }[]> {
     const res = await fetch(`${API_BASE}/loyalty/batch`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ guestIds })
+      body: JSON.stringify({ guestIds }),
     });
     return parseResponse(
       res,
@@ -5131,16 +5824,16 @@ export const apiClient = {
         z.object({
           guestId: z.string(),
           tier: z.string(),
-          pointsBalance: z.number()
-        })
-      )
+          pointsBalance: z.number(),
+        }),
+      ),
     );
   },
   async awardPoints(guestId: string, amount: number, reason: string) {
     const res = await fetch(`${API_BASE}/loyalty/guests/${guestId}/points`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ amount, reason })
+      body: JSON.stringify({ amount, reason }),
     });
     const data = await parseResponse(res, UnknownSchema);
     // The API returns the transaction result which includes the updated profile
@@ -5166,8 +5859,8 @@ export const apiClient = {
         scopeId: z.string().nullable(),
         balanceCents: z.number(),
         availableCents: z.number(),
-        currency: z.string()
-      })
+        currency: z.string(),
+      }),
     );
   },
 
@@ -5185,9 +5878,9 @@ export const apiClient = {
           availableCents: z.number(),
           currency: z.string(),
           campgroundName: z.string().optional(),
-          campgroundSlug: z.string().optional()
-        })
-      )
+          campgroundSlug: z.string().optional(),
+        }),
+      ),
     );
   },
 
@@ -5197,24 +5890,33 @@ export const apiClient = {
     amountCents: number,
     reason?: string,
     scopeType?: "campground" | "organization" | "global",
-    scopeId?: string
+    scopeId?: string,
   ) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/guests/${guestId}/wallet/credit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ amountCents, reason, scopeType, scopeId })
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/guests/${guestId}/wallet/credit`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ amountCents, reason, scopeType, scopeId }),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         walletId: z.string(),
         balanceCents: z.number(),
-        transactionId: z.string()
-      })
+        transactionId: z.string(),
+      }),
     );
   },
 
-  async getWalletTransactions(campgroundId: string, guestId: string, limit?: number, offset?: number, walletId?: string) {
+  async getWalletTransactions(
+    campgroundId: string,
+    guestId: string,
+    limit?: number,
+    offset?: number,
+    walletId?: string,
+  ) {
     const params = new URLSearchParams();
     if (limit) params.set("limit", String(limit));
     if (offset) params.set("offset", String(offset));
@@ -5233,11 +5935,11 @@ export const apiClient = {
             referenceType: z.string(),
             referenceId: z.string(),
             reason: z.string().nullable(),
-            createdAt: z.string()
-          })
+            createdAt: z.string(),
+          }),
         ),
-        total: z.number()
-      })
+        total: z.number(),
+      }),
     );
   },
 
@@ -5248,27 +5950,34 @@ export const apiClient = {
     referenceType: string,
     referenceId: string,
     walletId?: string,
-    currency?: string
+    currency?: string,
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/wallet/debit`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ guestId, amountCents, referenceType, referenceId, walletId, currency })
+      body: JSON.stringify({
+        guestId,
+        amountCents,
+        referenceType,
+        referenceId,
+        walletId,
+        currency,
+      }),
     });
     return parseResponse(
       res,
       z.object({
         walletId: z.string(),
         balanceCents: z.number(),
-        transactionId: z.string()
-      })
+        transactionId: z.string(),
+      }),
     );
   },
 
   // Guest Portal - Wallet (uses guest token)
   async getPortalWallets(token: string) {
     const res = await fetch(`${API_BASE}/portal/wallet`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     return parseResponse(
       res,
@@ -5281,20 +5990,26 @@ export const apiClient = {
           campgroundName: z.string(),
           balanceCents: z.number(),
           availableCents: z.number(),
-          currency: z.string()
-        })
-      )
+          currency: z.string(),
+        }),
+      ),
     );
   },
 
-  async getPortalWalletTransactions(token: string, campgroundId: string, limit?: number, offset?: number, walletId?: string) {
+  async getPortalWalletTransactions(
+    token: string,
+    campgroundId: string,
+    limit?: number,
+    offset?: number,
+    walletId?: string,
+  ) {
     const params = new URLSearchParams();
     if (limit) params.set("limit", String(limit));
     if (offset) params.set("offset", String(offset));
     if (walletId) params.set("walletId", walletId);
     const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`${API_BASE}/portal/wallet/${campgroundId}/transactions${query}`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     return parseResponse(
       res,
@@ -5309,11 +6024,11 @@ export const apiClient = {
             referenceType: z.string(),
             referenceId: z.string(),
             reason: z.string().nullable(),
-            createdAt: z.string()
-          })
+            createdAt: z.string(),
+          }),
         ),
-        total: z.number()
-      })
+        total: z.number(),
+      }),
     );
   },
 
@@ -5322,21 +6037,28 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/categories`);
     return z.array(ProductCategorySchema).parse(data);
   },
-  async createStoreCategory(campgroundId: string, payload: Omit<z.input<typeof CreateProductCategorySchema>, "campgroundId">) {
+  async createStoreCategory(
+    campgroundId: string,
+    payload: Omit<z.input<typeof CreateProductCategorySchema>, "campgroundId">,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductCategorySchema.parse(data);
   },
-  async updateStoreCategory(id: string, payload: Partial<z.input<typeof CreateProductCategorySchema>>, campgroundId?: string) {
+  async updateStoreCategory(
+    id: string,
+    payload: Partial<z.input<typeof CreateProductCategorySchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/store/categories/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductCategorySchema.parse(data);
@@ -5352,30 +6074,45 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/products`);
     return z.array(ProductSchema).parse(data);
   },
-  async createStoreProduct(campgroundId: string, payload: Omit<z.input<typeof CreateProductSchema>, "campgroundId">) {
+  async createStoreProduct(
+    campgroundId: string,
+    payload: Omit<z.input<typeof CreateProductSchema>, "campgroundId">,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/products`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductSchema.parse(data);
   },
-  async updateStoreProduct(id: string, payload: Partial<z.input<typeof CreateProductSchema>>, campgroundId?: string) {
+  async updateStoreProduct(
+    id: string,
+    payload: Partial<z.input<typeof CreateProductSchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/store/products/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductSchema.parse(data);
   },
-  async updateStoreStock(campgroundId: string, id: string, payload: { stockQty?: number; delta?: number; channel?: "pos" | "online" | "portal" | "kiosk" | "internal" }) {
+  async updateStoreStock(
+    campgroundId: string,
+    id: string,
+    payload: {
+      stockQty?: number;
+      delta?: number;
+      channel?: "pos" | "online" | "portal" | "kiosk" | "internal";
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/products/${id}/stock`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ProductSchema.parse(data);
@@ -5391,21 +6128,28 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/addons`);
     return z.array(AddOnSchema).parse(data);
   },
-  async createStoreAddOn(campgroundId: string, payload: Omit<z.input<typeof CreateAddOnSchema>, "campgroundId">) {
+  async createStoreAddOn(
+    campgroundId: string,
+    payload: Omit<z.input<typeof CreateAddOnSchema>, "campgroundId">,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/addons`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AddOnSchema.parse(data);
   },
-  async updateStoreAddOn(id: string, payload: Partial<z.input<typeof CreateAddOnSchema>>, campgroundId?: string) {
+  async updateStoreAddOn(
+    id: string,
+    payload: Partial<z.input<typeof CreateAddOnSchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/store/addons/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return AddOnSchema.parse(data);
@@ -5432,21 +6176,28 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/locations/default`);
     return StoreLocationSchema.nullable().parse(data);
   },
-  async createStoreLocation(campgroundId: string, payload: z.input<typeof CreateStoreLocationSchema>) {
+  async createStoreLocation(
+    campgroundId: string,
+    payload: z.input<typeof CreateStoreLocationSchema>,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/locations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreLocationSchema.parse(data);
   },
-  async updateStoreLocation(id: string, payload: Partial<z.input<typeof CreateStoreLocationSchema>>, campgroundId?: string) {
+  async updateStoreLocation(
+    id: string,
+    payload: Partial<z.input<typeof CreateStoreLocationSchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/store/locations/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreLocationSchema.parse(data);
@@ -5461,10 +6212,13 @@ export const apiClient = {
     return true;
   },
   async ensureDefaultStoreLocation(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/locations/ensure-default`, {
-      method: "POST",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/store/locations/ensure-default`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     const data = await parseResponse(res, z.string());
     return data;
   },
@@ -5474,16 +6228,27 @@ export const apiClient = {
     const searchParams = new URLSearchParams();
     if (productId) searchParams.set("productId", productId);
     const qs = searchParams.toString();
-    const path = withCampgroundId(`/store/locations/${locationId}/inventory${qs ? `?${qs}` : ""}`, campgroundId);
+    const path = withCampgroundId(
+      `/store/locations/${locationId}/inventory${qs ? `?${qs}` : ""}`,
+      campgroundId,
+    );
     const data = await fetchJSONUnknown(path);
     return z.array(LocationInventorySchema).parse(data);
   },
-  async updateLocationInventory(locationId: string, productId: string, payload: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string }, campgroundId?: string) {
-    const path = withCampgroundId(`/store/locations/${locationId}/inventory/${productId}`, campgroundId);
+  async updateLocationInventory(
+    locationId: string,
+    productId: string,
+    payload: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string },
+    campgroundId?: string,
+  ) {
+    const path = withCampgroundId(
+      `/store/locations/${locationId}/inventory/${productId}`,
+      campgroundId,
+    );
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return LocationInventorySchema.parse(data);
@@ -5495,35 +6260,45 @@ export const apiClient = {
     const data = await fetchJSONUnknown(path);
     return z.array(LocationPriceOverrideSchema).parse(data);
   },
-  async createLocationPriceOverride(locationId: string, payload: { productId: string; priceCents: number; reason?: string }, campgroundId?: string) {
+  async createLocationPriceOverride(
+    locationId: string,
+    payload: { productId: string; priceCents: number; reason?: string },
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/store/locations/${locationId}/prices`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return LocationPriceOverrideSchema.parse(data);
   },
   async deleteLocationPriceOverride(locationId: string, productId: string, campgroundId?: string) {
-    const path = withCampgroundId(`/store/locations/${locationId}/prices/${productId}`, campgroundId);
+    const path = withCampgroundId(
+      `/store/locations/${locationId}/prices/${productId}`,
+      campgroundId,
+    );
     const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) throw new Error("Failed to delete price override");
     return true;
   },
 
   // Inventory Movements (Audit Log)
-  async getInventoryMovements(campgroundId: string, params?: {
-    productId?: string;
-    locationId?: string;
-    movementType?: string;
-    startDate?: string;
-    endDate?: string;
-    limit?: number;
-  }) {
+  async getInventoryMovements(
+    campgroundId: string,
+    params?: {
+      productId?: string;
+      locationId?: string;
+      movementType?: string;
+      startDate?: string;
+      endDate?: string;
+      limit?: number;
+    },
+  ) {
     const searchParams = new URLSearchParams();
     if (params?.productId) searchParams.set("productId", params.productId);
     if (params?.locationId) searchParams.set("locationId", params.locationId);
@@ -5532,22 +6307,29 @@ export const apiClient = {
     if (params?.endDate) searchParams.set("endDate", params.endDate);
     if (params?.limit) searchParams.set("limit", String(params.limit));
     const qs = searchParams.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/inventory/movements${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/inventory/movements${qs ? `?${qs}` : ""}`,
+    );
     return z.array(InventoryMovementSchema).parse(data);
   },
 
   // Inventory Transfers
-  async getInventoryTransfers(campgroundId: string, params?: {
-    status?: string;
-    fromLocationId?: string;
-    toLocationId?: string;
-  }) {
+  async getInventoryTransfers(
+    campgroundId: string,
+    params?: {
+      status?: string;
+      fromLocationId?: string;
+      toLocationId?: string;
+    },
+  ) {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.set("status", params.status);
     if (params?.fromLocationId) searchParams.set("fromLocationId", params.fromLocationId);
     if (params?.toLocationId) searchParams.set("toLocationId", params.toLocationId);
     const qs = searchParams.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/transfers${qs ? `?${qs}` : ""}`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/transfers${qs ? `?${qs}` : ""}`,
+    );
     return z.array(InventoryTransferSchema).parse(data);
   },
   async getInventoryTransfer(id: string, campgroundId?: string) {
@@ -5555,11 +6337,14 @@ export const apiClient = {
     const data = await fetchJSONUnknown(path);
     return InventoryTransferSchema.parse(data);
   },
-  async createInventoryTransfer(campgroundId: string, payload: z.input<typeof CreateInventoryTransferSchema>) {
+  async createInventoryTransfer(
+    campgroundId: string,
+    payload: z.input<typeof CreateInventoryTransferSchema>,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/transfers`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return InventoryTransferSchema.parse(data);
@@ -5568,7 +6353,7 @@ export const apiClient = {
     const path = withCampgroundId(`/store/transfers/${id}/approve`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const data = await parseResponse(res, UnknownSchema);
     return InventoryTransferSchema.parse(data);
@@ -5577,7 +6362,7 @@ export const apiClient = {
     const path = withCampgroundId(`/store/transfers/${id}/complete`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const data = await parseResponse(res, UnknownSchema);
     return InventoryTransferSchema.parse(data);
@@ -5586,7 +6371,7 @@ export const apiClient = {
     const path = withCampgroundId(`/store/transfers/${id}/cancel`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     const data = await parseResponse(res, UnknownSchema);
     return InventoryTransferSchema.parse(data);
@@ -5595,38 +6380,63 @@ export const apiClient = {
   // POS Location Integration
   async getProductsForLocation(campgroundId: string, locationId?: string) {
     const params = locationId ? `?locationId=${locationId}` : "";
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/products-for-location${params}`);
-    return z.array(ProductSchema.extend({
-      effectivePriceCents: z.number(),
-      effectiveStock: z.number().nullable(),
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/products-for-location${params}`,
+    );
+    return z
+      .array(
+        ProductSchema.extend({
+          effectivePriceCents: z.number(),
+          effectiveStock: z.number().nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   // Fulfillment Queue
-  async getFulfillmentQueue(campgroundId: string, params?: {
-    status?: string;
-    locationId?: string;
-    limit?: number;
-  }) {
+  async getFulfillmentQueue(
+    campgroundId: string,
+    params?: {
+      status?: string;
+      locationId?: string;
+      limit?: number;
+    },
+  ) {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.set("status", params.status);
     if (params?.locationId) searchParams.set("locationId", params.locationId);
     if (params?.limit) searchParams.set("limit", String(params.limit));
     const qs = searchParams.toString();
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/orders/fulfillment-queue${qs ? `?${qs}` : ""}`);
-    return z.array(StoreOrderSchema.extend({
-      fulfillmentLocation: StoreLocationSchema.pick({ id: true, name: true, code: true }).nullable().optional(),
-      assignedBy: z.object({ id: z.string(), name: z.string().nullable(), email: z.string() }).nullable().optional(),
-      guest: z.object({
-        id: z.string(),
-        firstName: z.string().nullable(),
-        lastName: z.string().nullable(),
-        phone: z.string().nullable(),
-      }).nullable().optional(),
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/orders/fulfillment-queue${qs ? `?${qs}` : ""}`,
+    );
+    return z
+      .array(
+        StoreOrderSchema.extend({
+          fulfillmentLocation: StoreLocationSchema.pick({ id: true, name: true, code: true })
+            .nullable()
+            .optional(),
+          assignedBy: z
+            .object({ id: z.string(), name: z.string().nullable(), email: z.string() })
+            .nullable()
+            .optional(),
+          guest: z
+            .object({
+              id: z.string(),
+              firstName: z.string().nullable(),
+              lastName: z.string().nullable(),
+              phone: z.string().nullable(),
+            })
+            .nullable()
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
   async getFulfillmentCounts(campgroundId: string) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/store/orders/fulfillment-counts`);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/store/orders/fulfillment-counts`,
+    );
     return z.record(z.string(), z.number()).parse(data);
   },
   async assignOrderToLocation(orderId: string, locationId: string, campgroundId?: string) {
@@ -5634,7 +6444,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ locationId })
+      body: JSON.stringify({ locationId }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreOrderSchema.parse(data);
@@ -5644,14 +6454,21 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoreOrderSchema.parse(data);
   },
-  async getLocationFulfillmentOrders(locationId: string, includeCompleted = false, campgroundId?: string) {
+  async getLocationFulfillmentOrders(
+    locationId: string,
+    includeCompleted = false,
+    campgroundId?: string,
+  ) {
     const params = includeCompleted ? "?includeCompleted=true" : "";
-    const path = withCampgroundId(`/store/locations/${locationId}/fulfillment-orders${params}`, campgroundId);
+    const path = withCampgroundId(
+      `/store/locations/${locationId}/fulfillment-orders${params}`,
+      campgroundId,
+    );
     const data = await fetchJSONUnknown(path);
     return z.array(StoreOrderSchema).parse(data);
   },
@@ -5659,7 +6476,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/store/orders/bulk-assign`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ orderIds, locationId })
+      body: JSON.stringify({ orderIds, locationId }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return z.object({ assignedCount: z.number() }).parse(data);
@@ -5674,17 +6491,21 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/blackouts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return BlackoutDateSchema.parse(data);
   },
-  async updateBlackout(id: string, payload: Partial<z.input<typeof CreateBlackoutDateSchema>>, campgroundId?: string) {
+  async updateBlackout(
+    id: string,
+    payload: Partial<z.input<typeof CreateBlackoutDateSchema>>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/blackouts/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return BlackoutDateSchema.parse(data);
@@ -5699,21 +6520,25 @@ export const apiClient = {
   // Promotions
   async getPromotions(campgroundId: string) {
     const data = await fetchJSONUnknown(`/promotions/campgrounds/${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      code: z.string(),
-      type: z.enum(["percentage", "flat"]),
-      value: z.number(),
-      validFrom: z.string().nullable(),
-      validTo: z.string().nullable(),
-      usageLimit: z.number().nullable(),
-      usageCount: z.number(),
-      isActive: z.boolean(),
-      description: z.string().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          code: z.string(),
+          type: z.enum(["percentage", "flat"]),
+          value: z.number(),
+          validFrom: z.string().nullable(),
+          validTo: z.string().nullable(),
+          usageLimit: z.number().nullable(),
+          usageCount: z.number(),
+          isActive: z.boolean(),
+          description: z.string().nullable(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async createPromotion(payload: {
     campgroundId: string;
@@ -5729,25 +6554,29 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/promotions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
-  async updatePromotion(id: string, payload: {
-    code?: string;
-    type?: "percentage" | "flat";
-    value?: number;
-    validFrom?: string | null;
-    validTo?: string | null;
-    usageLimit?: number | null;
-    isActive?: boolean;
-    description?: string | null;
-  }, campgroundId?: string) {
+  async updatePromotion(
+    id: string,
+    payload: {
+      code?: string;
+      type?: "percentage" | "flat";
+      value?: number;
+      validFrom?: string | null;
+      validTo?: string | null;
+      usageLimit?: number | null;
+      isActive?: boolean;
+      description?: string | null;
+    },
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/promotions/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
@@ -5761,21 +6590,26 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/promotions/validate`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, code, subtotal })
+      body: JSON.stringify({ campgroundId, code, subtotal }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      valid: z.boolean(),
-      discountCents: z.number(),
-      promotionId: z.string(),
-      code: z.string(),
-      type: z.string(),
-      value: z.number()
-    }).parse(data);
+    return z
+      .object({
+        valid: z.boolean(),
+        discountCents: z.number(),
+        promotionId: z.string(),
+        code: z.string(),
+        type: z.string(),
+        value: z.number(),
+      })
+      .parse(data);
   },
 
   // Campground photos
-  async updateCampgroundPhotos(campgroundId: string, payload: { photos: string[]; heroImageUrl?: string | null }) {
+  async updateCampgroundPhotos(
+    campgroundId: string,
+    payload: { photos: string[]; heroImageUrl?: string | null },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/photos`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -5785,7 +6619,10 @@ export const apiClient = {
   },
 
   // Campground FAQs
-  async updateCampgroundFaqs(campgroundId: string, faqs: Array<{ id: string; question: string; answer: string; order: number }>) {
+  async updateCampgroundFaqs(
+    campgroundId: string,
+    faqs: Array<{ id: string; question: string; answer: string; order: number }>,
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/faqs`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -5814,44 +6651,58 @@ export const apiClient = {
     validityDays?: number | null;
     sendReminder?: boolean;
     reminderDaysBefore?: number | null;
-    displayConditions?: Array<{ field: string; operator: string; value: string | number | string[] }>;
+    displayConditions?: Array<{
+      field: string;
+      operator: string;
+      value: string | number | string[];
+    }>;
     conditionLogic?: "all" | "any";
   }) {
     const res = await fetch(`${API_BASE}/forms`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return FormTemplateSchema.parse(data);
   },
-  async updateFormTemplate(id: string, payload: Partial<{
-    title: string;
-    type: "waiver" | "vehicle" | "intake" | "custom";
-    description?: string | null;
-    fields?: Record<string, unknown> | null;
-    isActive?: boolean;
-    autoAttachMode?: "manual" | "all_bookings" | "site_classes";
-    siteClassIds?: string[];
-    showAt?: string[];
-    isRequired?: boolean;
-    allowSkipWithNote?: boolean;
-    validityDays?: number | null;
-    sendReminder?: boolean;
-    reminderDaysBefore?: number | null;
-    displayConditions?: Array<{ field: string; operator: string; value: string | number | string[] }>;
-    conditionLogic?: "all" | "any";
-  }>) {
+  async updateFormTemplate(
+    id: string,
+    payload: Partial<{
+      title: string;
+      type: "waiver" | "vehicle" | "intake" | "custom";
+      description?: string | null;
+      fields?: Record<string, unknown> | null;
+      isActive?: boolean;
+      autoAttachMode?: "manual" | "all_bookings" | "site_classes";
+      siteClassIds?: string[];
+      showAt?: string[];
+      isRequired?: boolean;
+      allowSkipWithNote?: boolean;
+      validityDays?: number | null;
+      sendReminder?: boolean;
+      reminderDaysBefore?: number | null;
+      displayConditions?: Array<{
+        field: string;
+        operator: string;
+        value: string | number | string[];
+      }>;
+      conditionLogic?: "all" | "any";
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/forms/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return FormTemplateSchema.parse(data);
   },
   async deleteFormTemplate(id: string) {
-    const res = await fetch(`${API_BASE}/forms/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/forms/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete form");
     return true;
   },
@@ -5872,22 +6723,31 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/forms/submissions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return FormSubmissionSchema.parse(data);
   },
-  async updateFormSubmission(id: string, payload: Partial<{ status: "pending" | "completed" | "void"; responses: Record<string, unknown> }>) {
+  async updateFormSubmission(
+    id: string,
+    payload: Partial<{
+      status: "pending" | "completed" | "void";
+      responses: Record<string, unknown>;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/forms/submissions/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return FormSubmissionSchema.parse(data);
   },
   async deleteFormSubmission(id: string) {
-    const res = await fetch(`${API_BASE}/forms/submissions/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/forms/submissions/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete form submission");
     return true;
   },
@@ -5897,7 +6757,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/guest-auth/magic-link`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email }),
     });
     if (!res.ok) throw new Error("Failed to send magic link");
     return true;
@@ -5907,66 +6767,79 @@ export const apiClient = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token }),
-      credentials: 'include' // SECURITY: Receive httpOnly cookie from API
+      credentials: "include", // SECURITY: Receive httpOnly cookie from API
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      token: z.string(),
-      guest: z.object({
-        id: z.string(),
-        firstName: z.string(),
-        lastName: z.string(),
-        email: z.string()
+    return z
+      .object({
+        token: z.string(),
+        guest: z.object({
+          id: z.string(),
+          firstName: z.string(),
+          lastName: z.string(),
+          email: z.string(),
+        }),
       })
-    }).parse(data);
+      .parse(data);
   },
   async getGuestMe(token?: string) {
     // SECURITY: Prefer httpOnly cookie over localStorage token
     const res = await fetch(`${API_BASE}/guest-auth/me`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
-      credentials: 'include' // Send httpOnly cookie if set
+      credentials: "include", // Send httpOnly cookie if set
     });
     const data = await parseResponse(res, UnknownSchema);
     // We can refine this schema later, for now just return raw data or basic guest schema
     return GuestSchema.extend({
-      reservations: z.array(ReservationSchema.extend({
-        campground: z.object({
-          name: z.string(),
-          slug: z.string(),
-          heroImageUrl: z.string().nullable(),
-          amenities: z.array(z.string()),
-          checkInTime: z.string().nullable(),
-          checkOutTime: z.string().nullable()
+      reservations: z.array(
+        ReservationSchema.extend({
+          campground: z.object({
+            name: z.string(),
+            slug: z.string(),
+            heroImageUrl: z.string().nullable(),
+            amenities: z.array(z.string()),
+            checkInTime: z.string().nullable(),
+            checkOutTime: z.string().nullable(),
+          }),
+          site: SiteSchema,
         }),
-        site: SiteSchema
-      }))
+      ),
     }).parse(data);
   },
 
   // Messages API
   async getReservationMessages(reservationId: string) {
     const data = await fetchJSONUnknown(`/reservations/${reservationId}/messages`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      reservationId: z.string(),
-      guestId: z.string(),
-      senderType: z.enum(["guest", "staff"]),
-      content: z.string(),
-      readAt: z.string().nullable(),
-      createdAt: z.string(),
-      guest: z.object({
-        id: z.string(),
-        primaryFirstName: z.string(),
-        primaryLastName: z.string()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          reservationId: z.string(),
+          guestId: z.string(),
+          senderType: z.enum(["guest", "staff"]),
+          content: z.string(),
+          readAt: z.string().nullable(),
+          createdAt: z.string(),
+          guest: z.object({
+            id: z.string(),
+            primaryFirstName: z.string(),
+            primaryLastName: z.string(),
+          }),
+        }),
+      )
+      .parse(data);
   },
-  async sendReservationMessage(reservationId: string, content: string, senderType: "guest" | "staff", guestId: string) {
+  async sendReservationMessage(
+    reservationId: string,
+    content: string,
+    senderType: "guest" | "staff",
+    guestId: string,
+  ) {
     const res = await fetch(`${API_BASE}/reservations/${reservationId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ content, senderType, guestId })
+      body: JSON.stringify({ content, senderType, guestId }),
     });
     return parseResponse(res, IdSchema);
   },
@@ -5974,7 +6847,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reservations/${reservationId}/messages/read`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ senderType })
+      body: JSON.stringify({ senderType }),
     });
     return parseResponse(res, CountSchema);
   },
@@ -5993,62 +6866,81 @@ export const apiClient = {
       content: z.string(),
       readAt: z.string().nullable(),
       createdAt: z.string(),
-      guest: z.object({
-        id: z.string(),
-        primaryFirstName: z.string().nullable(),
-        primaryLastName: z.string().nullable()
-      }).nullable()
+      guest: z
+        .object({
+          id: z.string(),
+          primaryFirstName: z.string().nullable(),
+          primaryLastName: z.string().nullable(),
+        })
+        .nullable(),
     });
-    return z.array(z.object({
-      reservationId: z.string(),
-      guestName: z.string(),
-      guestEmail: z.string().nullable().optional(),
-      guestPhone: z.string().nullable().optional(),
-      guestId: z.string().nullable().optional(),
-      siteName: z.string(),
-      siteType: z.string().nullable().optional(),
-      status: z.string(),
-      arrivalDate: z.string().nullable().optional(),
-      departureDate: z.string().nullable().optional(),
-      adults: z.number().nullable().optional(),
-      children: z.number().nullable().optional(),
-      pets: z.number().nullable().optional(),
-      totalAmountCents: z.number().nullable().optional(),
-      notes: z.string().nullable().optional(),
-      unreadCount: z.number(),
-      messages: z.array(messageSchema),
-      lastMessage: messageSchema.nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          reservationId: z.string(),
+          guestName: z.string(),
+          guestEmail: z.string().nullable().optional(),
+          guestPhone: z.string().nullable().optional(),
+          guestId: z.string().nullable().optional(),
+          siteName: z.string(),
+          siteType: z.string().nullable().optional(),
+          status: z.string(),
+          arrivalDate: z.string().nullable().optional(),
+          departureDate: z.string().nullable().optional(),
+          adults: z.number().nullable().optional(),
+          children: z.number().nullable().optional(),
+          pets: z.number().nullable().optional(),
+          totalAmountCents: z.number().nullable().optional(),
+          notes: z.string().nullable().optional(),
+          unreadCount: z.number(),
+          messages: z.array(messageSchema),
+          lastMessage: messageSchema.nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   // Internal Conversations
   async getInternalConversations(campgroundId: string) {
     const data = await fetchJSONUnknown(`/internal-conversations?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string().nullable(),
-      type: z.enum(["channel", "dm"]),
-      participants: z.array(z.object({
-        user: z.object({
+    return z
+      .array(
+        z.object({
           id: z.string(),
-          firstName: z.string(),
-          lastName: z.string(),
-          email: z.string()
-        })
-      })),
-      messages: z.array(z.object({
-        content: z.string(),
-        createdAt: z.string(),
-        senderId: z.string()
-      })).optional()
-    })).parse(data);
+          name: z.string().nullable(),
+          type: z.enum(["channel", "dm"]),
+          participants: z.array(
+            z.object({
+              user: z.object({
+                id: z.string(),
+                firstName: z.string(),
+                lastName: z.string(),
+                email: z.string(),
+              }),
+            }),
+          ),
+          messages: z
+            .array(
+              z.object({
+                content: z.string(),
+                createdAt: z.string(),
+                senderId: z.string(),
+              }),
+            )
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
 
-  async createInternalConversation(campgroundId: string, payload: { name?: string; type: "channel" | "dm"; participantIds: string[] }) {
+  async createInternalConversation(
+    campgroundId: string,
+    payload: { name?: string; type: "channel" | "dm"; participantIds: string[] },
+  ) {
     const res = await fetch(`${API_BASE}/internal-conversations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ ...payload, campgroundId })
+      body: JSON.stringify({ ...payload, campgroundId }),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6056,24 +6948,28 @@ export const apiClient = {
   // Internal Messages (Staff-to-Staff)
   async getInternalMessages(conversationId: string) {
     const data = await fetchJSONUnknown(`/internal-messages?conversationId=${conversationId}`);
-    return z.array(z.object({
-      id: z.string(),
-      content: z.string(),
-      createdAt: z.string(),
-      senderId: z.string(),
-      sender: z.object({
-        id: z.string(),
-        firstName: z.string(),
-        lastName: z.string(),
-        email: z.string()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          content: z.string(),
+          createdAt: z.string(),
+          senderId: z.string(),
+          sender: z.object({
+            id: z.string(),
+            firstName: z.string(),
+            lastName: z.string(),
+            email: z.string(),
+          }),
+        }),
+      )
+      .parse(data);
   },
   async sendInternalMessage(conversationId: string, content: string) {
     const res = await fetch(`${API_BASE}/internal-messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ content, conversationId })
+      body: JSON.stringify({ content, conversationId }),
     });
     return parseResponse(
       res,
@@ -6085,9 +6981,9 @@ export const apiClient = {
           id: z.string(),
           firstName: z.string(),
           lastName: z.string(),
-          email: z.string()
-        })
-      })
+          email: z.string(),
+        }),
+      }),
     );
   },
 
@@ -6096,29 +6992,30 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/waitlist`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return WaitlistEntrySchema.parse(data);
   },
   async getWaitlist(campgroundId: string, type?: string) {
-    const url = type && type !== 'all'
-      ? `/waitlist?campgroundId=${campgroundId}&type=${type}`
-      : `/waitlist?campgroundId=${campgroundId}`;
+    const url =
+      type && type !== "all"
+        ? `/waitlist?campgroundId=${campgroundId}&type=${type}`
+        : `/waitlist?campgroundId=${campgroundId}`;
     const data = await fetchJSONUnknown(url);
     return z.array(WaitlistEntrySchema).parse(data);
   },
   async deleteWaitlistEntry(id: string) {
     const res = await fetch(`${API_BASE}/waitlist/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) throw new Error("Failed to delete waitlist entry");
     return true;
   },
   async createStaffWaitlistEntry(payload: {
     campgroundId: string;
-    type: 'regular' | 'seasonal';
+    type: "regular" | "seasonal";
     contactName: string;
     contactEmail?: string;
     contactPhone?: string;
@@ -6130,18 +7027,17 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/waitlist/staff`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to add to waitlist");
     return WaitlistEntrySchema.parse(await res.json());
   },
 
-
   async createPublicWaitlistEntry(payload: z.input<typeof CreatePublicWaitlistSchema>) {
     const res = await fetch(`${API_BASE}/public/waitlist`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to join waitlist");
     return WaitlistEntrySchema.parse(await res.json());
@@ -6150,30 +7046,34 @@ export const apiClient = {
   // Portal messages (guest-jwt protected)
   async getPortalMessages(reservationId: string, token: string) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/messages`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      reservationId: z.string(),
-      guestId: z.string(),
-      senderType: z.enum(["guest", "staff"]),
-      content: z.string(),
-      readAt: z.string().nullable(),
-      createdAt: z.string(),
-      guest: z.object({
-        id: z.string(),
-        primaryFirstName: z.string(),
-        primaryLastName: z.string()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          reservationId: z.string(),
+          guestId: z.string(),
+          senderType: z.enum(["guest", "staff"]),
+          content: z.string(),
+          readAt: z.string().nullable(),
+          createdAt: z.string(),
+          guest: z.object({
+            id: z.string(),
+            primaryFirstName: z.string(),
+            primaryLastName: z.string(),
+          }),
+        }),
+      )
+      .parse(data);
   },
   async sendPortalMessage(reservationId: string, content: string, token: string) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ content })
+      body: JSON.stringify({ content }),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6181,71 +7081,91 @@ export const apiClient = {
   // Portal Self-Service
   async getPortalGuest(token: string) {
     const res = await fetch(`${API_BASE}/portal/me`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      primaryFirstName: z.string(),
-      primaryLastName: z.string(),
-      email: z.string(),
-      reservations: z.array(z.object({
+    return z
+      .object({
         id: z.string(),
-        arrivalDate: z.string(),
-        departureDate: z.string(),
-        status: z.string(),
-        adults: z.number(),
-        children: z.number(),
-        totalCents: z.number().default(0),
-        paidCents: z.number().default(0),
-        campground: z.object({
-          name: z.string(),
-          slug: z.string(),
-          heroImageUrl: z.string().nullable().optional(),
-          amenities: z.array(z.string()).default([]),
-          checkInTime: z.string().nullable().optional(),
-          checkOutTime: z.string().nullable().optional()
-        }),
-        site: z.object({
-          name: z.string().optional(),
-          siteNumber: z.string(),
-          siteType: z.string().optional()
-        })
-      }))
-    }).parse(data);
+        primaryFirstName: z.string(),
+        primaryLastName: z.string(),
+        email: z.string(),
+        reservations: z.array(
+          z.object({
+            id: z.string(),
+            arrivalDate: z.string(),
+            departureDate: z.string(),
+            status: z.string(),
+            adults: z.number(),
+            children: z.number(),
+            totalCents: z.number().default(0),
+            paidCents: z.number().default(0),
+            campground: z.object({
+              name: z.string(),
+              slug: z.string(),
+              heroImageUrl: z.string().nullable().optional(),
+              amenities: z.array(z.string()).default([]),
+              checkInTime: z.string().nullable().optional(),
+              checkOutTime: z.string().nullable().optional(),
+            }),
+            site: z.object({
+              name: z.string().optional(),
+              siteNumber: z.string(),
+              siteType: z.string().optional(),
+            }),
+          }),
+        ),
+      })
+      .parse(data);
   },
-  async requestPortalDateChange(token: string, reservationId: string, payload: { newArrival: string; newDeparture: string }) {
+  async requestPortalDateChange(
+    token: string,
+    reservationId: string,
+    payload: { newArrival: string; newDeparture: string },
+  ) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/modify-dates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to request date change");
     return parseResponse(res, SuccessSchema);
   },
-  async requestPortalSiteChange(token: string, reservationId: string, payload: { reason?: string }) {
+  async requestPortalSiteChange(
+    token: string,
+    reservationId: string,
+    payload: { reason?: string },
+  ) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/change-site`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to request site change");
     return parseResponse(res, SuccessSchema);
   },
-  async updatePortalGuestCount(token: string, reservationId: string, payload: { adults: number; children: number }) {
+  async updatePortalGuestCount(
+    token: string,
+    reservationId: string,
+    payload: { adults: number; children: number },
+  ) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/guest-count`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to update guest count");
     return parseResponse(res, SuccessSchema);
   },
-  async requestPortalCancellation(token: string, reservationId: string, payload: { reason?: string }) {
+  async requestPortalCancellation(
+    token: string,
+    reservationId: string,
+    payload: { reason?: string },
+  ) {
     const res = await fetch(`${API_BASE}/portal/reservations/${reservationId}/cancel`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     if (!res.ok) throw new Error("Failed to cancel reservation");
     return parseResponse(res, SuccessSchema);
@@ -6254,20 +7174,24 @@ export const apiClient = {
   // Tax Rules
   async getTaxRules(campgroundId: string) {
     const data = await fetchJSONUnknown(`/tax-rules/campground/${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      type: z.enum(["percentage", "flat", "exemption"]),
-      rate: z.number().nullable(),
-      minNights: z.number().nullable(),
-      maxNights: z.number().nullable(),
-      requiresWaiver: z.boolean(),
-      waiverText: z.string().nullable(),
-      isActive: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          type: z.enum(["percentage", "flat", "exemption"]),
+          rate: z.number().nullable(),
+          minNights: z.number().nullable(),
+          maxNights: z.number().nullable(),
+          requiresWaiver: z.boolean(),
+          waiverText: z.string().nullable(),
+          isActive: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async createTaxRule(payload: {
     campgroundId: string;
@@ -6282,25 +7206,29 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/tax-rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
-  async updateTaxRule(id: string, payload: Partial<{
-    name: string;
-    type: "percentage" | "flat" | "exemption";
-    rate: number;
-    minNights: number;
-    maxNights: number;
-    requiresWaiver: boolean;
-    waiverText: string;
-    isActive: boolean;
-  }>, campgroundId?: string) {
+  async updateTaxRule(
+    id: string,
+    payload: Partial<{
+      name: string;
+      type: "percentage" | "flat" | "exemption";
+      rate: number;
+      minNights: number;
+      maxNights: number;
+      requiresWaiver: boolean;
+      waiverText: string;
+      isActive: boolean;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/tax-rules/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6308,7 +7236,7 @@ export const apiClient = {
     const path = withCampgroundId(`/tax-rules/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6316,25 +7244,35 @@ export const apiClient = {
   // Seasonal Rates
   async getSeasonalRates(campgroundId: string) {
     const data = await fetchJSONUnknown(`/seasonal-rates/campground/${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      siteClassId: z.string().nullable(),
-      name: z.string(),
-      rateType: z.enum(["nightly", "weekly", "monthly", "seasonal"]),
-      amount: z.number(),
-      minNights: z.number().nullable(),
-      startDate: z.string().nullable(),
-      endDate: z.string().nullable(),
-      isActive: z.boolean(),
-      paymentSchedule: z.enum(["single", "weekly", "monthly", "as_you_stay", "offseason_installments"]),
-      pricingStructure: z.enum(["per_night", "flat_week", "flat_month", "flat_season"]),
-      offseasonInterval: z.number().nullable(),
-      offseasonAmount: z.number().nullable(),
-      prorateExcess: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          siteClassId: z.string().nullable(),
+          name: z.string(),
+          rateType: z.enum(["nightly", "weekly", "monthly", "seasonal"]),
+          amount: z.number(),
+          minNights: z.number().nullable(),
+          startDate: z.string().nullable(),
+          endDate: z.string().nullable(),
+          isActive: z.boolean(),
+          paymentSchedule: z.enum([
+            "single",
+            "weekly",
+            "monthly",
+            "as_you_stay",
+            "offseason_installments",
+          ]),
+          pricingStructure: z.enum(["per_night", "flat_week", "flat_month", "flat_season"]),
+          offseasonInterval: z.number().nullable(),
+          offseasonAmount: z.number().nullable(),
+          prorateExcess: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async createSeasonalRate(payload: {
     campgroundId: string;
@@ -6354,29 +7292,33 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/seasonal-rates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
-  async updateSeasonalRate(id: string, payload: Partial<{
-    name: string;
-    rateType: "nightly" | "weekly" | "monthly" | "seasonal";
-    amount: number;
-    minNights: number;
-    startDate: string;
-    endDate: string;
-    isActive: boolean;
-    paymentSchedule: "single" | "weekly" | "monthly" | "as_you_stay" | "offseason_installments";
-    pricingStructure: "per_night" | "flat_week" | "flat_month" | "flat_season";
-    offseasonInterval: number;
-    offseasonAmount: number;
-    prorateExcess: boolean;
-  }>, campgroundId?: string) {
+  async updateSeasonalRate(
+    id: string,
+    payload: Partial<{
+      name: string;
+      rateType: "nightly" | "weekly" | "monthly" | "seasonal";
+      amount: number;
+      minNights: number;
+      startDate: string;
+      endDate: string;
+      isActive: boolean;
+      paymentSchedule: "single" | "weekly" | "monthly" | "as_you_stay" | "offseason_installments";
+      pricingStructure: "per_night" | "flat_week" | "flat_month" | "flat_season";
+      offseasonInterval: number;
+      offseasonAmount: number;
+      prorateExcess: boolean;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/seasonal-rates/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6384,23 +7326,27 @@ export const apiClient = {
     const path = withCampgroundId(`/seasonal-rates/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, IdSchema);
   },
   async getRepeatChargesByReservation(reservationId: string, campgroundId?: string) {
     const path = withCampgroundId(`/repeat-charges/reservation/${reservationId}`, campgroundId);
     const data = await fetchJSONUnknown(path);
-    return z.array(z.object({
-      id: z.string(),
-      reservationId: z.string(),
-      dueDate: z.string(),
-      amount: z.number(),
-      status: z.enum(["pending", "paid", "failed", "cancelled"]),
-      paidAt: z.string().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          reservationId: z.string(),
+          dueDate: z.string(),
+          amount: z.number(),
+          status: z.enum(["pending", "paid", "failed", "cancelled"]),
+          paidAt: z.string().nullable(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
 
   // Guest Equipment
@@ -6408,34 +7354,40 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/guests/${guestId}/equipment`);
     return z.array(GuestEquipmentSchema).parse(data);
   },
-  async createGuestEquipment(guestId: string, payload: {
-    type: string;
-    make?: string;
-    model?: string;
-    length?: number;
-    plateNumber?: string;
-    plateState?: string;
-  }) {
+  async createGuestEquipment(
+    guestId: string,
+    payload: {
+      type: string;
+      make?: string;
+      model?: string;
+      length?: number;
+      plateNumber?: string;
+      plateState?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/guests/${guestId}/equipment`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GuestEquipmentSchema.parse(data);
   },
-  async updateGuestEquipment(id: string, payload: {
-    type?: string;
-    make?: string;
-    model?: string;
-    length?: number;
-    plateNumber?: string;
-    plateState?: string;
-  }) {
+  async updateGuestEquipment(
+    id: string,
+    payload: {
+      type?: string;
+      make?: string;
+      model?: string;
+      length?: number;
+      plateNumber?: string;
+      plateState?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/guests/equipment/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GuestEquipmentSchema.parse(data);
@@ -6443,7 +7395,7 @@ export const apiClient = {
   async deleteGuestEquipment(id: string) {
     const res = await fetch(`${API_BASE}/guests/equipment/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6451,45 +7403,58 @@ export const apiClient = {
   // Repeat Charges
   // Repeat Charges
   async generateRepeatCharges(reservationId: string, campgroundId?: string) {
-    const path = withCampgroundId(`/repeat-charges/reservation/${reservationId}/generate`, campgroundId);
+    const path = withCampgroundId(
+      `/repeat-charges/reservation/${reservationId}/generate`,
+      campgroundId,
+    );
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownSchema);
   },
   async getRepeatChargesByCampground(campgroundId: string) {
     const path = withCampgroundId(`/repeat-charges`, campgroundId);
     const data = await fetchJSONUnknown(path);
-    return z.array(z.object({
-      id: z.string(),
-      reservationId: z.string(),
-      amount: z.number(),
-      dueDate: z.string(),
-      status: z.enum(["pending", "paid", "failed"]),
-      paidAt: z.string().nullable(),
-      failedAt: z.string().nullable(),
-      failureReason: z.string().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      reservation: z.object({
-        id: z.string(),
-        guest: z.object({
-          primaryFirstName: z.string(),
-          primaryLastName: z.string(),
-          email: z.string()
-        }).optional(),
-        site: z.object({
-          siteNumber: z.string()
-        }).optional()
-      }).optional()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          reservationId: z.string(),
+          amount: z.number(),
+          dueDate: z.string(),
+          status: z.enum(["pending", "paid", "failed"]),
+          paidAt: z.string().nullable(),
+          failedAt: z.string().nullable(),
+          failureReason: z.string().nullable(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          reservation: z
+            .object({
+              id: z.string(),
+              guest: z
+                .object({
+                  primaryFirstName: z.string(),
+                  primaryLastName: z.string(),
+                  email: z.string(),
+                })
+                .optional(),
+              site: z
+                .object({
+                  siteNumber: z.string(),
+                })
+                .optional(),
+            })
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
   async processRepeatCharge(id: string, campgroundId?: string) {
     const path = withCampgroundId(`/repeat-charges/${id}/process`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, IdSchema);
   },
@@ -6497,18 +7462,22 @@ export const apiClient = {
   // Activities
   async getActivities(campgroundId: string) {
     const data = await fetchJSONUnknown(`/activities?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      price: z.number(),
-      duration: z.number(),
-      capacity: z.number(),
-      images: z.array(z.string()),
-      isActive: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          price: z.number(),
+          duration: z.number(),
+          capacity: z.number(),
+          images: z.array(z.string()),
+          isActive: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
 
   async getActivityCapacity(activityId: string) {
@@ -6516,31 +7485,39 @@ export const apiClient = {
     return ActivityCapacitySchema.parse(data);
   },
 
-  async updateActivityCapacity(activityId: string, payload: { capacity?: number; waitlistEnabled?: boolean; booked?: number }) {
+  async updateActivityCapacity(
+    activityId: string,
+    payload: { capacity?: number; waitlistEnabled?: boolean; booked?: number },
+  ) {
     const res = await fetch(`${API_BASE}/activities/${activityId}/capacity`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ActivityCapacitySchema.parse(data);
   },
 
-  async addActivityWaitlistEntry(activityId: string, payload: { guestName: string; partySize?: number; contact?: string }) {
+  async addActivityWaitlistEntry(
+    activityId: string,
+    payload: { guestName: string; partySize?: number; contact?: string },
+  ) {
     const res = await fetch(`${API_BASE}/activities/${activityId}/waitlist`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({ entry: ActivityWaitlistEntrySchema, snapshot: ActivityCapacitySchema }).parse(data);
+    return z
+      .object({ entry: ActivityWaitlistEntrySchema, snapshot: ActivityCapacitySchema })
+      .parse(data);
   },
 
   async createActivity(campgroundId: string, payload: Record<string, unknown>) {
     const res = await fetch(`${API_BASE}/activities`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ ...payload, campgroundId })
+      body: JSON.stringify({ ...payload, campgroundId }),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6549,45 +7526,55 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/activities/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
   async deleteActivity(id: string) {
-    const res = await fetch(`${API_BASE}/activities/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/activities/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete activity");
     return true;
   },
 
   async getSessions(activityId: string) {
     const data = await fetchJSONUnknown(`/activities/${activityId}/sessions`);
-    return z.array(z.object({
-      id: z.string(),
-      activityId: z.string(),
-      startTime: z.string(),
-      endTime: z.string(),
-      capacity: z.number(),
-      bookedCount: z.number(),
-      status: z.string(),
-      bookings: z.array(z.unknown()).optional()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          activityId: z.string(),
+          startTime: z.string(),
+          endTime: z.string(),
+          capacity: z.number(),
+          bookedCount: z.number(),
+          status: z.string(),
+          bookings: z.array(z.unknown()).optional(),
+        }),
+      )
+      .parse(data);
   },
 
   async createSession(activityId: string, payload: Record<string, unknown>) {
     const res = await fetch(`${API_BASE}/activities/${activityId}/sessions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
-  async bookActivity(sessionId: string, payload: { guestId: string; quantity: number; reservationId?: string }) {
+  async bookActivity(
+    sessionId: string,
+    payload: { guestId: string; quantity: number; reservationId?: string },
+  ) {
     const res = await fetch(`${API_BASE}/activities/sessions/${sessionId}/book`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6595,25 +7582,28 @@ export const apiClient = {
   async cancelActivityBooking(id: string) {
     const res = await fetch(`${API_BASE}/activities/bookings/${id}/cancel`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownSchema);
   },
 
   // Bulk session generation
-  async previewGeneratedSessions(activityId: string, payload: {
-    patternType: 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
-    daysOfWeek?: number[];
-    startTime: string;
-    endTime?: string;
-    startDate: string;
-    endDate: string;
-    capacity?: number;
-  }) {
+  async previewGeneratedSessions(
+    activityId: string,
+    payload: {
+      patternType: "none" | "daily" | "weekly" | "biweekly" | "monthly";
+      daysOfWeek?: number[];
+      startTime: string;
+      endTime?: string;
+      startDate: string;
+      endDate: string;
+      capacity?: number;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/activities/${activityId}/sessions/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(
       res,
@@ -6623,58 +7613,65 @@ export const apiClient = {
             startTime: z.string(),
             endTime: z.string(),
             dayOfWeek: z.string(),
-            isWeekend: z.boolean()
-          })
+            isWeekend: z.boolean(),
+          }),
         ),
         totalCount: z.number(),
-        patternDescription: z.string()
-      })
+        patternDescription: z.string(),
+      }),
     );
   },
 
-  async generateSessions(activityId: string, payload: {
-    patternType: 'none' | 'daily' | 'weekly' | 'biweekly' | 'monthly';
-    daysOfWeek?: number[];
-    startTime: string;
-    endTime?: string;
-    startDate: string;
-    endDate: string;
-    capacity?: number;
-    savePattern?: boolean;
-  }) {
+  async generateSessions(
+    activityId: string,
+    payload: {
+      patternType: "none" | "daily" | "weekly" | "biweekly" | "monthly";
+      daysOfWeek?: number[];
+      startTime: string;
+      endTime?: string;
+      startDate: string;
+      endDate: string;
+      capacity?: number;
+      savePattern?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/activities/${activityId}/sessions/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(
       res,
       z.object({
         created: z.number(),
-        patternId: z.string().optional()
-      })
+        patternId: z.string().optional(),
+      }),
     );
   },
 
   async getRecurrencePatterns(activityId: string) {
     const data = await fetchJSONUnknown(`/activities/${activityId}/patterns`);
-    return z.array(z.object({
-      id: z.string(),
-      patternType: z.string(),
-      daysOfWeek: z.array(z.number()),
-      startTime: z.string(),
-      endTime: z.string(),
-      validFrom: z.string(),
-      validUntil: z.string().nullable(),
-      capacity: z.number().nullable(),
-      isActive: z.boolean()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          patternType: z.string(),
+          daysOfWeek: z.array(z.number()),
+          startTime: z.string(),
+          endTime: z.string(),
+          validFrom: z.string(),
+          validUntil: z.string().nullable(),
+          capacity: z.number().nullable(),
+          isActive: z.boolean(),
+        }),
+      )
+      .parse(data);
   },
 
   async deleteRecurrencePattern(patternId: string) {
     const res = await fetch(`${API_BASE}/activities/patterns/${patternId}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     await parseResponse(res, UnknownSchema);
   },
@@ -6682,54 +7679,66 @@ export const apiClient = {
   // Activity bundles
   async getActivityBundles(campgroundId: string) {
     const data = await fetchJSONUnknown(`/activities/bundles?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      price: z.number(),
-      discountType: z.string(),
-      discountValue: z.number().nullable(),
-      isActive: z.boolean(),
-      items: z.array(z.object({
-        id: z.string(),
-        activityId: z.string(),
-        quantity: z.number(),
-        activity: z.object({
+    return z
+      .array(
+        z.object({
           id: z.string(),
           name: z.string(),
-          price: z.number()
-        })
-      }))
-    })).parse(data);
+          description: z.string().nullable(),
+          price: z.number(),
+          discountType: z.string(),
+          discountValue: z.number().nullable(),
+          isActive: z.boolean(),
+          items: z.array(
+            z.object({
+              id: z.string(),
+              activityId: z.string(),
+              quantity: z.number(),
+              activity: z.object({
+                id: z.string(),
+                name: z.string(),
+                price: z.number(),
+              }),
+            }),
+          ),
+        }),
+      )
+      .parse(data);
   },
 
-  async createActivityBundle(campgroundId: string, payload: {
-    name: string;
-    description?: string;
-    price: number;
-    discountType?: 'fixed' | 'percent';
-    discountValue?: number;
-    activityIds: string[];
-  }) {
+  async createActivityBundle(
+    campgroundId: string,
+    payload: {
+      name: string;
+      description?: string;
+      price: number;
+      discountType?: "fixed" | "percent";
+      discountValue?: number;
+      activityIds: string[];
+    },
+  ) {
     const res = await fetch(`${API_BASE}/activities/bundles?campgroundId=${campgroundId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateActivityBundle(id: string, payload: {
-    name?: string;
-    description?: string;
-    price?: number;
-    isActive?: boolean;
-    activityIds?: string[];
-  }) {
+  async updateActivityBundle(
+    id: string,
+    payload: {
+      name?: string;
+      description?: string;
+      price?: number;
+      isActive?: boolean;
+      activityIds?: string[];
+    },
+  ) {
     const res = await fetch(`${API_BASE}/activities/bundles/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6737,7 +7746,7 @@ export const apiClient = {
   async deleteActivityBundle(id: string) {
     const res = await fetch(`${API_BASE}/activities/bundles/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     await parseResponse(res, UnknownSchema);
   },
@@ -6745,22 +7754,26 @@ export const apiClient = {
   // Memberships
   async getMembershipTypes(campgroundId: string) {
     const data = await fetchJSONUnknown(`/memberships/types?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      price: z.number(),
-      durationDays: z.number(),
-      discountPercent: z.number(),
-      isActive: z.boolean()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          price: z.number(),
+          durationDays: z.number(),
+          discountPercent: z.number(),
+          isActive: z.boolean(),
+        }),
+      )
+      .parse(data);
   },
 
   async createMembershipType(campgroundId: string, payload: Record<string, unknown>) {
     const res = await fetch(`${API_BASE}/memberships/types`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ ...payload, campgroundId })
+      body: JSON.stringify({ ...payload, campgroundId }),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6769,13 +7782,16 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/memberships/types/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
   async deleteMembershipType(id: string) {
-    const res = await fetch(`${API_BASE}/memberships/types/${id}`, { method: "DELETE", headers: scopedHeaders() });
+    const res = await fetch(`${API_BASE}/memberships/types/${id}`, {
+      method: "DELETE",
+      headers: scopedHeaders(),
+    });
     if (!res.ok) throw new Error("Failed to delete membership type");
     return true;
   },
@@ -6784,25 +7800,29 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/memberships/purchase`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
   async getGuestMemberships(guestId: string) {
     const data = await fetchJSONUnknown(`/memberships/guest/${guestId}`);
-    return z.array(z.object({
-      id: z.string(),
-      membershipTypeId: z.string(),
-      guestId: z.string(),
-      startDate: z.string(),
-      endDate: z.string(),
-      status: z.string(),
-      membershipType: z.object({
-        name: z.string(),
-        discountPercent: z.number()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          membershipTypeId: z.string(),
+          guestId: z.string(),
+          startDate: z.string(),
+          endDate: z.string(),
+          status: z.string(),
+          membershipType: z.object({
+            name: z.string(),
+            discountPercent: z.number(),
+          }),
+        }),
+      )
+      .parse(data);
   },
 
   // Campaigns
@@ -6830,53 +7850,61 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campaigns`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampaignSchema.parse(data);
   },
-  async updateCampaign(id: string, payload: Partial<{
-    name: string;
-    subject: string;
-    fromEmail: string;
-    fromName?: string;
-    html: string;
-    textBody?: string;
-    channel?: "email" | "sms" | "both";
-    templateId?: string;
-    audienceJson?: unknown;
-    suggestedReason?: string;
-    status: "draft" | "scheduled" | "sending" | "sent" | "cancelled";
-    scheduledAt?: string | null;
-  }>) {
+  async updateCampaign(
+    id: string,
+    payload: Partial<{
+      name: string;
+      subject: string;
+      fromEmail: string;
+      fromName?: string;
+      html: string;
+      textBody?: string;
+      channel?: "email" | "sms" | "both";
+      templateId?: string;
+      audienceJson?: unknown;
+      suggestedReason?: string;
+      status: "draft" | "scheduled" | "sending" | "sent" | "cancelled";
+      scheduledAt?: string | null;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/campaigns/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampaignSchema.parse(data);
   },
-  async sendCampaign(id: string, opts?: { scheduledAt?: string | null; batchPerMinute?: number | null }) {
+  async sendCampaign(
+    id: string,
+    opts?: { scheduledAt?: string | null; batchPerMinute?: number | null },
+  ) {
     const res = await fetch(`${API_BASE}/campaigns/${id}/send`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify({
         scheduledAt: opts?.scheduledAt ?? null,
-        batchPerMinute: opts?.batchPerMinute ?? null
-      })
+        batchPerMinute: opts?.batchPerMinute ?? null,
+      }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      sent: z.number().optional(),
-      scheduledAt: z.string().optional()
-    }).parse(data);
+    return z
+      .object({
+        sent: z.number().optional(),
+        scheduledAt: z.string().optional(),
+      })
+      .parse(data);
   },
   async testCampaign(id: string, payload: { email?: string; phone?: string }) {
     const res = await fetch(`${API_BASE}/campaigns/${id}/test`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -6889,44 +7917,53 @@ export const apiClient = {
   async getCampaignTemplates(campgroundId: string) {
     return this.listCampaignTemplates(campgroundId);
   },
-  async createCampaignTemplate(campgroundIdOrPayload: string | {
-    campgroundId: string;
-    name: string;
-    channel?: "email" | "sms" | "both";
-    category?: string;
-    subject?: string;
-    html?: string;
-    textBody?: string;
-  }, payloadArg?: {
-    name: string;
-    channel?: "email" | "sms" | "both";
-    category?: string;
-    subject?: string;
-    html?: string;
-    textBody?: string;
-  }) {
-    const payload = typeof campgroundIdOrPayload === "string"
-      ? { campgroundId: campgroundIdOrPayload, ...payloadArg! }
-      : campgroundIdOrPayload;
+  async createCampaignTemplate(
+    campgroundIdOrPayload:
+      | string
+      | {
+          campgroundId: string;
+          name: string;
+          channel?: "email" | "sms" | "both";
+          category?: string;
+          subject?: string;
+          html?: string;
+          textBody?: string;
+        },
+    payloadArg?: {
+      name: string;
+      channel?: "email" | "sms" | "both";
+      category?: string;
+      subject?: string;
+      html?: string;
+      textBody?: string;
+    },
+  ) {
+    const payload =
+      typeof campgroundIdOrPayload === "string"
+        ? { campgroundId: campgroundIdOrPayload, ...payloadArg! }
+        : campgroundIdOrPayload;
     const res = await fetch(`${API_BASE}/campaign-templates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampaignTemplateSchema.parse(data);
   },
-  async updateCampaignTemplate(id: string, payload: {
-    name?: string;
-    category?: string;
-    subject?: string;
-    html?: string;
-    textBody?: string;
-  }) {
+  async updateCampaignTemplate(
+    id: string,
+    payload: {
+      name?: string;
+      category?: string;
+      subject?: string;
+      html?: string;
+      textBody?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campaign-templates/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return CampaignTemplateSchema.parse(data);
@@ -6934,7 +7971,7 @@ export const apiClient = {
   async deleteCampaignTemplate(id: string) {
     const res = await fetch(`${API_BASE}/campaign-templates/${id}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) throw new Error("Failed to delete template");
     return true;
@@ -6954,26 +7991,34 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/campaigns/audience/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      count: z.number(),
-      sample: z.array(z.object({
-        id: z.string(),
-        name: z.string().optional(),
-        email: z.string().nullable().optional(),
-        phone: z.string().nullable().optional(),
-        lastStay: z.string().nullable().optional()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        count: z.number(),
+        sample: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string().optional(),
+            email: z.string().nullable().optional(),
+            phone: z.string().nullable().optional(),
+            lastStay: z.string().nullable().optional(),
+          }),
+        ),
+      })
+      .parse(data);
   },
   async getCampaignSuggestions(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campaigns/suggestions?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      reason: z.string(),
-      filters: z.unknown()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          reason: z.string(),
+          filters: z.unknown(),
+        }),
+      )
+      .parse(data);
   },
 
   // Marketing leads (stubbed; client-side only)
@@ -7026,41 +8071,48 @@ export const apiClient = {
   async getWhoami(token?: string) {
     const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
     const data = await fetchJSONUnknown("/permissions/whoami", headers);
-    return z.object({
-      user: z.object({
-        id: z.string(),
-        email: z.string(),
-        firstName: z.string().nullable().optional(),
-        lastName: z.string().nullable().optional(),
-        region: z.string().nullable(),
-        platformRole: z.string().nullable().optional(),
-        platformRegion: z.string().nullable().optional(),
-        platformActive: z.boolean().nullable().optional(),
-        ownershipRoles: z.array(z.string()).default([]),
-        memberships: z.array(
-          z.object({
-            campgroundId: z.string(),
-            role: z.string(),
-            campground: z.object({
-              id: z.string(),
-              name: z.string(),
-              slug: z.string().nullable().optional()
-            }).nullable().optional()
-          })
-        ).default([])
-      }),
-      allowed: z.object({
-        supportRead: z.boolean().optional().default(false),
-        supportAssign: z.boolean().optional().default(false),
-        supportAnalytics: z.boolean().optional().default(false),
-        operationsWrite: z.boolean().optional().default(false),
-        financeRead: z.boolean().optional().default(false),
-        reportsRead: z.boolean().optional().default(false),
-        usersWrite: z.boolean().optional().default(false),
-        settingsWrite: z.boolean().optional().default(false),
-        pricingWrite: z.boolean().optional().default(false)
+    return z
+      .object({
+        user: z.object({
+          id: z.string(),
+          email: z.string(),
+          firstName: z.string().nullable().optional(),
+          lastName: z.string().nullable().optional(),
+          region: z.string().nullable(),
+          platformRole: z.string().nullable().optional(),
+          platformRegion: z.string().nullable().optional(),
+          platformActive: z.boolean().nullable().optional(),
+          ownershipRoles: z.array(z.string()).default([]),
+          memberships: z
+            .array(
+              z.object({
+                campgroundId: z.string(),
+                role: z.string(),
+                campground: z
+                  .object({
+                    id: z.string(),
+                    name: z.string(),
+                    slug: z.string().nullable().optional(),
+                  })
+                  .nullable()
+                  .optional(),
+              }),
+            )
+            .default([]),
+        }),
+        allowed: z.object({
+          supportRead: z.boolean().optional().default(false),
+          supportAssign: z.boolean().optional().default(false),
+          supportAnalytics: z.boolean().optional().default(false),
+          operationsWrite: z.boolean().optional().default(false),
+          financeRead: z.boolean().optional().default(false),
+          reportsRead: z.boolean().optional().default(false),
+          usersWrite: z.boolean().optional().default(false),
+          settingsWrite: z.boolean().optional().default(false),
+          pricingWrite: z.boolean().optional().default(false),
+        }),
       })
-    }).parse(data);
+      .parse(data);
   },
 
   // Growth & recovery
@@ -7068,7 +8120,12 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/abandoned-carts?campgroundId=${campgroundId}`);
     return z.array(AbandonedCartSchema).parse(data);
   },
-  async enqueueAbandonedCart(payload: { campgroundId: string; email?: string; phone?: string; abandonedAt?: string }) {
+  async enqueueAbandonedCart(payload: {
+    campgroundId: string;
+    email?: string;
+    phone?: string;
+    abandonedAt?: string;
+  }) {
     const res = await fetch(`${API_BASE}/abandoned-carts/queue`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -7091,108 +8148,83 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/operations/sites/${siteId}/housekeeping`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ status })
+      body: JSON.stringify({ status }),
     });
     return parseResponse(res, UnknownSchema);
   },
 
   async getHousekeepingStats(campgroundId: string) {
-    const data = await fetchJSONUnknown(`/operations/stats/housekeeping?campgroundId=${campgroundId}`);
-    return z.object({
-      clean: z.number(),
-      dirty: z.number(),
-      inspecting: z.number(),
-      total: z.number()
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/operations/stats/housekeeping?campgroundId=${campgroundId}`,
+    );
+    return z
+      .object({
+        clean: z.number(),
+        dirty: z.number(),
+        inspecting: z.number(),
+        total: z.number(),
+      })
+      .parse(data);
   },
   async getAutoTasking(campgroundId: string) {
     const data = await fetchJSONUnknown(`/operations/auto-tasking?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      trigger: z.string(),
-      task: z.string(),
-      status: z.string(),
-      dueMinutes: z.number().optional(),
-      owner: z.string().optional(),
-      playbook: z.string().optional(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          trigger: z.string(),
+          task: z.string(),
+          status: z.string(),
+          dueMinutes: z.number().optional(),
+          owner: z.string().optional(),
+          playbook: z.string().optional(),
+        }),
+      )
+      .parse(data);
   },
   async triggerAutoTask(campgroundId: string, trigger: string) {
     const res = await fetch(`${API_BASE}/operations/auto-tasking/trigger`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, trigger })
+      body: JSON.stringify({ campgroundId, trigger }),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      triggered: z.boolean(),
-      trigger: z.string(),
-      created: z.array(z.object({
-        id: z.string(),
-        title: z.string(),
-        status: z.string(),
-        priority: z.string().optional(),
-        dueAt: z.string().optional(),
-        owner: z.string().optional(),
-      }))
-    }).parse(data);
+    return z
+      .object({
+        triggered: z.boolean(),
+        trigger: z.string(),
+        created: z.array(
+          z.object({
+            id: z.string(),
+            title: z.string(),
+            status: z.string(),
+            priority: z.string().optional(),
+            dueAt: z.string().optional(),
+            owner: z.string().optional(),
+          }),
+        ),
+      })
+      .parse(data);
   },
   async listChecklists(campgroundId: string) {
     const data = await fetchJSONUnknown(`/operations/checklists?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      steps: z.array(z.string()),
-      status: z.string(),
-      owner: z.string().optional(),
-      dueMinutes: z.number().optional(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          steps: z.array(z.string()),
+          status: z.string(),
+          owner: z.string().optional(),
+          dueMinutes: z.number().optional(),
+        }),
+      )
+      .parse(data);
   },
   async listReorders(campgroundId: string) {
     const data = await fetchJSONUnknown(`/operations/reorders?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      item: z.string(),
-      qty: z.number(),
-      threshold: z.number(),
-      status: z.string(),
-      vendor: z.string().optional(),
-      reorderQty: z.number().optional(),
-    })).parse(data);
-  },
-  async listOpsSuggestions(campgroundId: string) {
-    const data = await fetchJSONUnknown(`/operations/copilot/suggestions?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      suggestion: z.string(),
-      impact: z.string(),
-      action: z.string(),
-      status: z.string(),
-    })).parse(data);
-  },
-
-  async getOpsHealth(campgroundId: string) {
-    const data = await fetchJSONUnknown(`/operations/ops-health?campgroundId=${campgroundId}`);
-    return z.object({
-      campgroundId: z.string(),
-      capturedAt: z.string(),
-      autoTasking: z.object({
-        recentRuns: z.array(z.object({
-          trigger: z.string(),
-          status: z.string(),
-          createdTasks: z.number(),
-          durationMs: z.number(),
-          at: z.string(),
-        })),
-        tasksCreatedLast24h: z.number(),
-      }),
-      checklists: z.object({
-        completionRate: z.number(),
-        active: z.number(),
-        overdue: z.number(),
-      }),
-      reorders: z.object({
-        pending: z.number(),
-        items: z.array(z.object({
+    return z
+      .array(
+        z.object({
           id: z.string(),
           item: z.string(),
           qty: z.number(),
@@ -7200,9 +8232,66 @@ export const apiClient = {
           status: z.string(),
           vendor: z.string().optional(),
           reorderQty: z.number().optional(),
-        })),
-      }),
-    }).parse(data);
+        }),
+      )
+      .parse(data);
+  },
+  async listOpsSuggestions(campgroundId: string) {
+    const data = await fetchJSONUnknown(
+      `/operations/copilot/suggestions?campgroundId=${campgroundId}`,
+    );
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          suggestion: z.string(),
+          impact: z.string(),
+          action: z.string(),
+          status: z.string(),
+        }),
+      )
+      .parse(data);
+  },
+
+  async getOpsHealth(campgroundId: string) {
+    const data = await fetchJSONUnknown(`/operations/ops-health?campgroundId=${campgroundId}`);
+    return z
+      .object({
+        campgroundId: z.string(),
+        capturedAt: z.string(),
+        autoTasking: z.object({
+          recentRuns: z.array(
+            z.object({
+              trigger: z.string(),
+              status: z.string(),
+              createdTasks: z.number(),
+              durationMs: z.number(),
+              at: z.string(),
+            }),
+          ),
+          tasksCreatedLast24h: z.number(),
+        }),
+        checklists: z.object({
+          completionRate: z.number(),
+          active: z.number(),
+          overdue: z.number(),
+        }),
+        reorders: z.object({
+          pending: z.number(),
+          items: z.array(
+            z.object({
+              id: z.string(),
+              item: z.string(),
+              qty: z.number(),
+              threshold: z.number(),
+              status: z.string(),
+              vendor: z.string().optional(),
+              reorderQty: z.number().optional(),
+            }),
+          ),
+        }),
+      })
+      .parse(data);
   },
 
   async sendOpsHealthAlert(
@@ -7232,7 +8321,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/nps/surveys`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return NpsSurveySchema.parse(data);
@@ -7241,11 +8330,18 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/nps/surveys?campgroundId=${campgroundId}`);
     return z.array(NpsSurveySchema.extend({ rules: z.array(z.unknown()).optional() })).parse(data);
   },
-  async createNpsRule(payload: { surveyId: string; trigger: string; percentage?: number; cooldownDays?: number; segmentJson?: unknown; isActive?: boolean }) {
+  async createNpsRule(payload: {
+    surveyId: string;
+    trigger: string;
+    percentage?: number;
+    cooldownDays?: number;
+    segmentJson?: unknown;
+    isActive?: boolean;
+  }) {
     const res = await fetch(`${API_BASE}/nps/rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7263,7 +8359,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/nps/invites`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return NpsInviteSchema.parse(data);
@@ -7272,7 +8368,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/nps/respond`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return NpsResponseSchema.parse(data);
@@ -7296,44 +8392,65 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reviews/requests`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReviewRequestSchema.parse(data);
   },
-  async submitReview(payload: { token: string; rating: number; title?: string; body?: string; photos?: string[]; tags?: string[] }) {
+  async submitReview(payload: {
+    token: string;
+    rating: number;
+    title?: string;
+    body?: string;
+    photos?: string[];
+    tags?: string[];
+  }) {
     const res = await fetch(`${API_BASE}/reviews/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReviewSchema.parse(data);
   },
   async getPublicReviews(campgroundId: string) {
     const data = await fetchJSONUnknown(`/reviews/public?campgroundId=${campgroundId}`);
-    return z.array(ReviewSchema.extend({ replies: z.array(ReviewReplySchema).optional() })).parse(data);
+    return z
+      .array(ReviewSchema.extend({ replies: z.array(ReviewReplySchema).optional() }))
+      .parse(data);
   },
   async getAdminReviews(campgroundId: string, status?: string) {
     const qs = new URLSearchParams({ campgroundId });
     if (status) qs.set("status", status);
     const data = await fetchJSONUnknown(`/reviews?${qs.toString()}`);
-    return z.array(ReviewSchema.extend({
-      moderation: ReviewModerationSchema.nullish(),
-      guest: z.object({
-        primaryFirstName: z.string().optional().nullable(),
-        primaryLastName: z.string().optional().nullable(),
-        email: z.string().optional().nullable()
-      }).optional().nullable(),
-      reservation: z.object({ id: z.string() }).optional().nullable(),
-      replies: z.array(ReviewReplySchema).optional()
-    })).parse(data);
+    return z
+      .array(
+        ReviewSchema.extend({
+          moderation: ReviewModerationSchema.nullish(),
+          guest: z
+            .object({
+              primaryFirstName: z.string().optional().nullable(),
+              primaryLastName: z.string().optional().nullable(),
+              email: z.string().optional().nullable(),
+            })
+            .optional()
+            .nullable(),
+          reservation: z.object({ id: z.string() }).optional().nullable(),
+          replies: z.array(ReviewReplySchema).optional(),
+        }),
+      )
+      .parse(data);
   },
-  async moderateReview(payload: { reviewId: string; status: "approved" | "rejected" | "pending"; reasons?: string[]; notes?: string }) {
+  async moderateReview(payload: {
+    reviewId: string;
+    status: "approved" | "rejected" | "pending";
+    reasons?: string[];
+    notes?: string;
+  }) {
     const res = await fetch(`${API_BASE}/reviews/moderate`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7341,15 +8458,20 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/reviews/vote`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
-  async replyReview(payload: { reviewId: string; authorType: "staff" | "guest"; authorId?: string; body: string }) {
+  async replyReview(payload: {
+    reviewId: string;
+    authorType: "staff" | "guest";
+    authorId?: string;
+    body: string;
+  }) {
     const res = await fetch(`${API_BASE}/reviews/reply`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7358,104 +8480,148 @@ export const apiClient = {
   // Analytics & Decision Engine
   // -------------------------------------------------------------------------
   async getAnalyticsFunnel(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/funnel?campgroundId=${campgroundId}&days=${days}`);
-    return z.object({
-      windowDays: z.number(),
-      steps: z.object({
-        views: z.number(),
-        addToStay: z.number(),
-        starts: z.number(),
-        abandoned: z.number(),
-        completed: z.number(),
-      }),
-      conversionRate: z.number(),
-      abandonmentRate: z.number(),
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/funnel?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .object({
+        windowDays: z.number(),
+        steps: z.object({
+          views: z.number(),
+          addToStay: z.number(),
+          starts: z.number(),
+          abandoned: z.number(),
+          completed: z.number(),
+        }),
+        conversionRate: z.number(),
+        abandonmentRate: z.number(),
+      })
+      .parse(data);
   },
   async getAnalyticsImagePerformance(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/images?campgroundId=${campgroundId}&days=${days}`);
-    return z.array(z.object({
-      imageId: z.string(),
-      views: z.number(),
-      clicks: z.number(),
-      ctr: z.number(),
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/images?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .array(
+        z.object({
+          imageId: z.string(),
+          views: z.number(),
+          clicks: z.number(),
+          ctr: z.number(),
+        }),
+      )
+      .parse(data);
   },
   async getAnalyticsDealPerformance(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/deals?campgroundId=${campgroundId}&days=${days}`);
-    return z.array(z.object({
-      promotionId: z.string(),
-      views: z.number(),
-      applies: z.number(),
-      applyRate: z.number(),
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/deals?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .array(
+        z.object({
+          promotionId: z.string(),
+          views: z.number(),
+          applies: z.number(),
+          applyRate: z.number(),
+        }),
+      )
+      .parse(data);
   },
   async getAnalyticsAttribution(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/attribution?campgroundId=${campgroundId}&days=${days}`);
-    return z.array(z.object({
-      referrer: z.string().nullable(),
-      count: z.number(),
-      share: z.number(),
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/attribution?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .array(
+        z.object({
+          referrer: z.string().nullable(),
+          count: z.number(),
+          share: z.number(),
+        }),
+      )
+      .parse(data);
   },
   async getAnalyticsPricingSignals(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/pricing?campgroundId=${campgroundId}&days=${days}`);
-    return z.object({
-      windowDays: z.number(),
-      availabilityChecks: z.number(),
-      addToStay: z.number(),
-      completes: z.number(),
-      conversionFromAvailability: z.number(),
-      conversionFromAddToStay: z.number(),
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/pricing?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .object({
+        windowDays: z.number(),
+        availabilityChecks: z.number(),
+        addToStay: z.number(),
+        completes: z.number(),
+        conversionFromAvailability: z.number(),
+        conversionFromAddToStay: z.number(),
+      })
+      .parse(data);
   },
   async getAnalyticsRecommendations(campgroundId: string) {
     const data = await fetchJSONUnknown(`/analytics/recommendations?campgroundId=${campgroundId}`);
-    return z.object({
-      recommendations: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        title: z.string(),
-        explanation: z.string(),
-        confidence: z.string(),
-        projectedImpact: z.string(),
-        action: z.string(),
-        applyAllowed: z.boolean(),
-        requiresApproval: z.boolean(),
-      })),
-      windowDays: z.number(),
-      stats: z.record(z.unknown()),
-    }).parse(data);
+    return z
+      .object({
+        recommendations: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string(),
+            title: z.string(),
+            explanation: z.string(),
+            confidence: z.string(),
+            projectedImpact: z.string(),
+            action: z.string(),
+            applyAllowed: z.boolean(),
+            requiresApproval: z.boolean(),
+          }),
+        ),
+        windowDays: z.number(),
+        stats: z.record(z.unknown()),
+      })
+      .parse(data);
   },
   async getAnalyticsAnnualReport(campgroundId: string, year?: number, format?: "json" | "csv") {
     const params = new URLSearchParams({ campgroundId });
     if (year) params.append("year", String(year));
     if (format) params.append("format", format);
     const data = await fetchJSONUnknown(`/analytics/reports/annual?${params.toString()}`);
-    return z.object({
-      year: z.number(),
-      csv: z.string().optional(),
-      events: z.array(z.object({ eventName: z.string(), count: z.number() })).optional(),
-      deals: z.array(z.object({ promotionId: z.string(), views: z.number(), applies: z.number() })).optional(),
-      images: z.array(z.object({ imageId: z.string(), views: z.number(), clicks: z.number() })).optional(),
-    }).parse(data);
+    return z
+      .object({
+        year: z.number(),
+        csv: z.string().optional(),
+        events: z.array(z.object({ eventName: z.string(), count: z.number() })).optional(),
+        deals: z
+          .array(z.object({ promotionId: z.string(), views: z.number(), applies: z.number() }))
+          .optional(),
+        images: z
+          .array(z.object({ imageId: z.string(), views: z.number(), clicks: z.number() }))
+          .optional(),
+      })
+      .parse(data);
   },
   async getDeviceBreakdown(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/analytics/reports/devices?campgroundId=${campgroundId}&days=${days}`);
-    return z.object({
-      period: z.object({ days: z.number(), since: z.string() }),
-      devices: z.array(z.object({
-        deviceType: z.string(),
-        sessions: z.number(),
-        bookings: z.number(),
-        conversionRate: z.number(),
-      })),
-      trends: z.array(z.object({
-        date: z.string(),
-        deviceType: z.string(),
-        sessions: z.number(),
-      })),
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/analytics/reports/devices?campgroundId=${campgroundId}&days=${days}`,
+    );
+    return z
+      .object({
+        period: z.object({ days: z.number(), since: z.string() }),
+        devices: z.array(
+          z.object({
+            deviceType: z.string(),
+            sessions: z.number(),
+            bookings: z.number(),
+            conversionRate: z.number(),
+          }),
+        ),
+        trends: z.array(
+          z.object({
+            date: z.string(),
+            deviceType: z.string(),
+            sessions: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
   async logAnalyticsEvent(payload: {
     sessionId: string;
@@ -7483,19 +8649,32 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async applyAnalyticsRecommendation(payload: { recommendationId: string; campgroundId: string; type?: string; action?: string; targetId?: string; payload?: Record<string, unknown> }) {
+  async applyAnalyticsRecommendation(payload: {
+    recommendationId: string;
+    campgroundId: string;
+    type?: string;
+    action?: string;
+    targetId?: string;
+    payload?: Record<string, unknown>;
+  }) {
     const res = await fetch(`${API_BASE}/analytics/recommendations/apply`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
-  async proposeAnalyticsRecommendation(payload: { recommendationId: string; campgroundId: string; type?: string; targetId?: string; payload?: Record<string, unknown> }) {
+  async proposeAnalyticsRecommendation(payload: {
+    recommendationId: string;
+    campgroundId: string;
+    type?: string;
+    targetId?: string;
+    payload?: Record<string, unknown>;
+  }) {
     const res = await fetch(`${API_BASE}/analytics/recommendations/propose`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7514,12 +8693,14 @@ export const apiClient = {
       z.object({
         suggestions: z.string(),
         windowDays: z.number(),
-        usage: z.object({
-          promptTokens: z.number().nullable(),
-          completionTokens: z.number().nullable(),
-          totalTokens: z.number().nullable()
-        }).optional()
-      })
+        usage: z
+          .object({
+            promptTokens: z.number().nullable(),
+            completionTokens: z.number().nullable(),
+            totalTokens: z.number().nullable(),
+          })
+          .optional(),
+      }),
     );
   },
   async askAi(payload: { campgroundId: string; question: string; includeActions?: boolean }) {
@@ -7532,17 +8713,23 @@ export const apiClient = {
       res,
       z.object({
         answer: z.string(),
-        usage: z.object({
-          promptTokens: z.number().nullable(),
-          completionTokens: z.number().nullable(),
-          totalTokens: z.number().nullable()
-        }).optional()
-      })
+        usage: z
+          .object({
+            promptTokens: z.number().nullable(),
+            completionTokens: z.number().nullable(),
+            totalTokens: z.number().nullable(),
+          })
+          .optional(),
+      }),
     );
   },
   async aiPartnerChat(
     campgroundId: string,
-    payload: { sessionId?: string; message: string; history?: { role: "user" | "assistant"; content: string }[] }
+    payload: {
+      sessionId?: string;
+      message: string;
+      history?: { role: "user" | "assistant"; content: string }[];
+    },
   ) {
     const res = await fetch(`${API_BASE}/ai/campgrounds/${campgroundId}/partner`, {
       method: "POST",
@@ -7560,7 +8747,7 @@ export const apiClient = {
         sensitivity?: "low" | "medium" | "high";
         impactArea?: string;
       };
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/ai/campgrounds/${campgroundId}/partner/confirm`, {
       method: "POST",
@@ -7581,7 +8768,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/posts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialPostSchema.parse(data);
@@ -7590,7 +8777,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/posts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialPostSchema.parse(data);
@@ -7598,7 +8785,7 @@ export const apiClient = {
   async deleteSocialPost(id: string) {
     const res = await fetch(`${API_BASE}/social-planner/posts/${id}`, {
       method: "DELETE",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7611,7 +8798,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/templates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialTemplateSchemaLocal.parse(data);
@@ -7620,7 +8807,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/templates/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialTemplateSchemaLocal.parse(data);
@@ -7628,7 +8815,7 @@ export const apiClient = {
   async deleteSocialTemplate(id: string) {
     const res = await fetch(`${API_BASE}/social-planner/templates/${id}`, {
       method: "DELETE",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7641,7 +8828,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/assets`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialAssetSchema.parse(data);
@@ -7650,7 +8837,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/assets/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialAssetSchema.parse(data);
@@ -7658,7 +8845,7 @@ export const apiClient = {
   async deleteSocialAsset(id: string) {
     const res = await fetch(`${API_BASE}/social-planner/assets/${id}`, {
       method: "DELETE",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7673,7 +8860,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/suggestions/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId })
+      body: JSON.stringify({ campgroundId }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return z.array(SocialSuggestionSchema).parse(data);
@@ -7682,7 +8869,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/suggestions/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialSuggestionSchema.parse(data);
@@ -7691,7 +8878,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/suggestions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialSuggestionSchema.parse(data);
@@ -7701,7 +8888,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/weekly`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId })
+      body: JSON.stringify({ campgroundId }),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialWeeklyIdeaSchema.parse(data);
@@ -7715,7 +8902,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/strategies`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialStrategySchema.parse(data);
@@ -7729,7 +8916,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/alerts`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialAlertSchema.parse(data);
@@ -7737,7 +8924,7 @@ export const apiClient = {
   async dismissSocialAlert(id: string) {
     const res = await fetch(`${API_BASE}/social-planner/alerts/${id}/dismiss`, {
       method: "POST",
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownSchema);
     return SocialAlertSchema.parse(data);
@@ -7747,7 +8934,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/social-planner/performance`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -7784,7 +8971,13 @@ export const apiClient = {
     const data = await fetchJSONUnknown("/localization/settings");
     return LocalizationSettingsSchema.parse(data);
   },
-  async updateLocalizationSettings(payload: { locale?: string; currency?: string; timezone?: string; orgLocale?: string; orgCurrency?: string }) {
+  async updateLocalizationSettings(payload: {
+    locale?: string;
+    currency?: string;
+    timezone?: string;
+    orgLocale?: string;
+    orgCurrency?: string;
+  }) {
     const res = await fetch(`${API_BASE}/localization/settings`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -7797,7 +8990,7 @@ export const apiClient = {
     const qs = new URLSearchParams({
       locale: params.locale,
       currency: params.currency,
-      timezone: params.timezone
+      timezone: params.timezone,
     });
     const data = await fetchJSONUnknown(`/localization/preview?${qs.toString()}`);
     return LocalizationPreviewSchema.parse(data);
@@ -7811,7 +9004,15 @@ export const apiClient = {
     reportingCurrency?: string;
     fxProvider?: string;
     fxRates?: { base: string; quote: string; rate: number; asOf?: string }[];
-    taxProfiles?: { id: string; name: string; region: string; type: "vat" | "gst" | "sales"; rate: number; inclusive: boolean; notes?: string }[];
+    taxProfiles?: {
+      id: string;
+      name: string;
+      region: string;
+      type: "vat" | "gst" | "sales";
+      rate: number;
+      inclusive: boolean;
+      notes?: string;
+    }[];
     parkCurrencies?: { parkId: string; currency: string; taxProfileId: string }[];
   }) {
     const res = await fetch(`${API_BASE}/currency-tax`, {
@@ -7891,16 +9092,19 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return ApprovalPolicySchema.parse(data);
   },
-  async updateApprovalPolicy(id: string, payload: {
-    name?: string;
-    appliesTo?: string[];
-    thresholdCents?: number | null;
-    currency?: string;
-    approversNeeded?: number;
-    description?: string | null;
-    approverRoles?: string[];
-    isActive?: boolean;
-  }) {
+  async updateApprovalPolicy(
+    id: string,
+    payload: {
+      name?: string;
+      appliesTo?: string[];
+      thresholdCents?: number | null;
+      currency?: string;
+      approversNeeded?: number;
+      description?: string | null;
+      approverRoles?: string[];
+      isActive?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/approvals/policies/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -7918,8 +9122,8 @@ export const apiClient = {
       res,
       z.object({
         success: z.boolean(),
-        id: z.string()
-      })
+        id: z.string(),
+      }),
     );
   },
 
@@ -7934,11 +9138,15 @@ export const apiClient = {
     const data = await fetchJSONUnknown(`/gamification/settings?campgroundId=${campgroundId}`);
     return GamificationSettingSchema.parse(data);
   },
-  async updateGamificationSettings(payload: { campgroundId: string; enabled: boolean; enabledRoles: z.infer<typeof StaffRoleEnum>[] }) {
+  async updateGamificationSettings(payload: {
+    campgroundId: string;
+    enabled: boolean;
+    enabledRoles: z.infer<typeof StaffRoleEnum>[];
+  }) {
     const res = await fetch(`${API_BASE}/gamification/settings`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GamificationSettingSchema.parse(data);
@@ -7958,7 +9166,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/gamification/rules`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GamificationRuleSchema.parse(data);
@@ -7978,7 +9186,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/gamification/award`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return GamificationAwardResultSchema.parse(data);
@@ -7989,23 +9197,27 @@ export const apiClient = {
   },
   async getGamificationLeaderboard(campgroundId: string, days?: number) {
     const suffix = days !== undefined ? `&days=${days}` : "";
-    const data = await fetchJSONUnknown(`/gamification/leaderboard?campgroundId=${campgroundId}${suffix}`);
+    const data = await fetchJSONUnknown(
+      `/gamification/leaderboard?campgroundId=${campgroundId}${suffix}`,
+    );
     return GamificationLeaderboardSchema.parse(data);
   },
   async getGamificationStats(campgroundId: string, days?: number) {
     const suffix = days ? `&days=${days}` : "";
-    const data = await fetchJSONUnknown(`/gamification/stats?campgroundId=${campgroundId}${suffix}`);
+    const data = await fetchJSONUnknown(
+      `/gamification/stats?campgroundId=${campgroundId}${suffix}`,
+    );
     return GamificationStatsSchema.parse(data);
   },
 
   async updateReservationGroup(
     id: string,
-    payload: { groupId: string | null; role?: "primary" | "member" | null }
+    payload: { groupId: string | null; role?: "primary" | "member" | null },
   ) {
     const res = await fetch(`${API_BASE}/reservations/${id}/group`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return ReservationWithGroupSchema.parse(data);
@@ -8037,12 +9249,15 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateBlock(blockId: string, payload: {
-    state?: "active" | "released";
-    windowStart?: string;
-    windowEnd?: string;
-    reason?: string;
-  }) {
+  async updateBlock(
+    blockId: string,
+    payload: {
+      state?: "active" | "released";
+      windowStart?: string;
+      windowEnd?: string;
+      reason?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/blocks/${blockId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8063,45 +9278,52 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getPricingRulesV2(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/pricing-rules/v2`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      type: z.enum(["season", "weekend", "holiday", "event", "demand"]),
-      priority: z.number(),
-      stackMode: z.enum(["additive", "max", "override"]),
-      adjustmentType: z.enum(["percent", "flat"]),
-      adjustmentValue: z.coerce.number(), // Prisma Decimal comes as string
-      siteClassId: z.string().nullable(),
-      calendarRefId: z.string().nullable(),
-      demandBandId: z.string().nullable(),
-      dowMask: z.array(z.number()).nullable(),
-      startDate: z.string().nullable(),
-      endDate: z.string().nullable(),
-      minRateCap: z.coerce.number().nullable(), // Prisma Decimal comes as string
-      maxRateCap: z.coerce.number().nullable(), // Prisma Decimal comes as string
-      active: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          type: z.enum(["season", "weekend", "holiday", "event", "demand"]),
+          priority: z.number(),
+          stackMode: z.enum(["additive", "max", "override"]),
+          adjustmentType: z.enum(["percent", "flat"]),
+          adjustmentValue: z.coerce.number(), // Prisma Decimal comes as string
+          siteClassId: z.string().nullable(),
+          calendarRefId: z.string().nullable(),
+          demandBandId: z.string().nullable(),
+          dowMask: z.array(z.number()).nullable(),
+          startDate: z.string().nullable(),
+          endDate: z.string().nullable(),
+          minRateCap: z.coerce.number().nullable(), // Prisma Decimal comes as string
+          maxRateCap: z.coerce.number().nullable(), // Prisma Decimal comes as string
+          active: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
-  async createPricingRuleV2(campgroundId: string, payload: {
-    name: string;
-    type: "season" | "weekend" | "holiday" | "event" | "demand";
-    priority: number;
-    stackMode: "additive" | "max" | "override";
-    adjustmentType: "percent" | "flat";
-    adjustmentValue: number;
-    siteClassId?: string | null;
-    calendarRefId?: string | null;
-    demandBandId?: string | null;
-    dowMask?: number[];
-    startDate?: string | null;
-    endDate?: string | null;
-    minRateCap?: number | null;
-    maxRateCap?: number | null;
-    active?: boolean;
-  }) {
+  async createPricingRuleV2(
+    campgroundId: string,
+    payload: {
+      name: string;
+      type: "season" | "weekend" | "holiday" | "event" | "demand";
+      priority: number;
+      stackMode: "additive" | "max" | "override";
+      adjustmentType: "percent" | "flat";
+      adjustmentValue: number;
+      siteClassId?: string | null;
+      calendarRefId?: string | null;
+      demandBandId?: string | null;
+      dowMask?: number[];
+      startDate?: string | null;
+      endDate?: string | null;
+      minRateCap?: number | null;
+      maxRateCap?: number | null;
+      active?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/pricing-rules/v2`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8109,23 +9331,27 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updatePricingRuleV2(id: string, payload: Partial<{
-    name: string;
-    type: "season" | "weekend" | "holiday" | "event" | "demand";
-    priority: number;
-    stackMode: "additive" | "max" | "override";
-    adjustmentType: "percent" | "flat";
-    adjustmentValue: number;
-    siteClassId: string | null;
-    calendarRefId: string | null;
-    demandBandId: string | null;
-    dowMask: number[];
-    startDate: string | null;
-    endDate: string | null;
-    minRateCap: number | null;
-    maxRateCap: number | null;
-    active: boolean;
-  }>, campgroundId?: string) {
+  async updatePricingRuleV2(
+    id: string,
+    payload: Partial<{
+      name: string;
+      type: "season" | "weekend" | "holiday" | "event" | "demand";
+      priority: number;
+      stackMode: "additive" | "max" | "override";
+      adjustmentType: "percent" | "flat";
+      adjustmentValue: number;
+      siteClassId: string | null;
+      calendarRefId: string | null;
+      demandBandId: string | null;
+      dowMask: number[];
+      startDate: string | null;
+      endDate: string | null;
+      minRateCap: number | null;
+      maxRateCap: number | null;
+      active: boolean;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/pricing-rules/v2/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
@@ -8148,38 +9374,45 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getDepositPolicies(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/deposit-policies`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      strategy: z.enum(["first_night", "percent", "fixed"]),
-      value: z.number(),
-      applyTo: z.enum(["lodging_only", "lodging_and_fees"]),
-      dueTiming: z.enum(["at_booking", "before_arrival"]),
-      dueHoursBeforeArrival: z.number().nullable(),
-      minCap: z.number().nullable(),
-      maxCap: z.number().nullable(),
-      siteClassId: z.string().nullable(),
-      retryPlanId: z.string().nullable(),
-      active: z.boolean(),
-      version: z.number(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          strategy: z.enum(["first_night", "percent", "fixed"]),
+          value: z.number(),
+          applyTo: z.enum(["lodging_only", "lodging_and_fees"]),
+          dueTiming: z.enum(["at_booking", "before_arrival"]),
+          dueHoursBeforeArrival: z.number().nullable(),
+          minCap: z.number().nullable(),
+          maxCap: z.number().nullable(),
+          siteClassId: z.string().nullable(),
+          retryPlanId: z.string().nullable(),
+          active: z.boolean(),
+          version: z.number(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
-  async createDepositPolicy(campgroundId: string, payload: {
-    name: string;
-    strategy: "first_night" | "percent" | "fixed";
-    value: number;
-    applyTo?: "lodging_only" | "lodging_and_fees";
-    dueTiming?: "at_booking" | "before_arrival";
-    dueHoursBeforeArrival?: number | null;
-    minCap?: number | null;
-    maxCap?: number | null;
-    siteClassId?: string | null;
-    retryPlanId?: string | null;
-    active?: boolean;
-  }) {
+  async createDepositPolicy(
+    campgroundId: string,
+    payload: {
+      name: string;
+      strategy: "first_night" | "percent" | "fixed";
+      value: number;
+      applyTo?: "lodging_only" | "lodging_and_fees";
+      dueTiming?: "at_booking" | "before_arrival";
+      dueHoursBeforeArrival?: number | null;
+      minCap?: number | null;
+      maxCap?: number | null;
+      siteClassId?: string | null;
+      retryPlanId?: string | null;
+      active?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/deposit-policies`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8187,19 +9420,23 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateDepositPolicy(id: string, payload: Partial<{
-    name: string;
-    strategy: "first_night" | "percent" | "fixed";
-    value: number;
-    applyTo: "lodging_only" | "lodging_and_fees";
-    dueTiming: "at_booking" | "before_arrival";
-    dueHoursBeforeArrival: number | null;
-    minCap: number | null;
-    maxCap: number | null;
-    siteClassId: string | null;
-    retryPlanId: string | null;
-    active: boolean;
-  }>, campgroundId?: string) {
+  async updateDepositPolicy(
+    id: string,
+    payload: Partial<{
+      name: string;
+      strategy: "first_night" | "percent" | "fixed";
+      value: number;
+      applyTo: "lodging_only" | "lodging_and_fees";
+      dueTiming: "at_booking" | "before_arrival";
+      dueHoursBeforeArrival: number | null;
+      minCap: number | null;
+      maxCap: number | null;
+      siteClassId: string | null;
+      retryPlanId: string | null;
+      active: boolean;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/deposit-policies/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
@@ -8222,33 +9459,40 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getUpsellItems(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/upsells`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      priceType: z.enum(["flat", "per_night", "per_guest", "per_site"]),
-      priceCents: z.number(),
-      siteClassId: z.string().nullable(),
-      taxCode: z.string().nullable(),
-      inventoryTracking: z.boolean(),
-      inventoryQty: z.number().nullable(),
-      active: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          priceType: z.enum(["flat", "per_night", "per_guest", "per_site"]),
+          priceCents: z.number(),
+          siteClassId: z.string().nullable(),
+          taxCode: z.string().nullable(),
+          inventoryTracking: z.boolean(),
+          inventoryQty: z.number().nullable(),
+          active: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
-  async createUpsellItem(campgroundId: string, payload: {
-    name: string;
-    description?: string | null;
-    priceType: "flat" | "per_night" | "per_guest" | "per_site";
-    priceCents: number;
-    siteClassId?: string | null;
-    taxCode?: string | null;
-    inventoryTracking?: boolean;
-    inventoryQty?: number | null;
-    active?: boolean;
-  }) {
+  async createUpsellItem(
+    campgroundId: string,
+    payload: {
+      name: string;
+      description?: string | null;
+      priceType: "flat" | "per_night" | "per_guest" | "per_site";
+      priceCents: number;
+      siteClassId?: string | null;
+      taxCode?: string | null;
+      inventoryTracking?: boolean;
+      inventoryQty?: number | null;
+      active?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/upsells`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8256,17 +9500,21 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateUpsellItem(id: string, payload: Partial<{
-    name: string;
-    description: string | null;
-    priceType: "flat" | "per_night" | "per_guest" | "per_site";
-    priceCents: number;
-    siteClassId: string | null;
-    taxCode: string | null;
-    inventoryTracking: boolean;
-    inventoryQty: number | null;
-    active: boolean;
-  }>, campgroundId?: string) {
+  async updateUpsellItem(
+    id: string,
+    payload: Partial<{
+      name: string;
+      description: string | null;
+      priceType: "flat" | "per_night" | "per_guest" | "per_site";
+      priceCents: number;
+      siteClassId: string | null;
+      taxCode: string | null;
+      inventoryTracking: boolean;
+      inventoryQty: number | null;
+      active: boolean;
+    }>,
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/upsells/${id}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
@@ -8287,13 +9535,16 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   // Phase 2: Tasks / Housekeeping
   // ---------------------------------------------------------------------------
-  async getTasks(campgroundId: string, filters?: {
-    siteId?: string;
-    state?: "pending" | "in_progress" | "done" | "failed" | "expired";
-    slaStatus?: "on_track" | "at_risk" | "breached";
-    type?: "turnover" | "inspection" | "maintenance" | "custom";
-    assignedToUserId?: string;
-  }) {
+  async getTasks(
+    campgroundId: string,
+    filters?: {
+      siteId?: string;
+      state?: "pending" | "in_progress" | "done" | "failed" | "expired";
+      slaStatus?: "on_track" | "at_risk" | "breached";
+      type?: "turnover" | "inspection" | "maintenance" | "custom";
+      assignedToUserId?: string;
+    },
+  ) {
     const params = new URLSearchParams({ tenantId: campgroundId });
     if (filters?.siteId) params.set("siteId", filters.siteId);
     if (filters?.state) params.set("state", filters.state);
@@ -8301,63 +9552,72 @@ export const apiClient = {
     if (filters?.type) params.set("type", filters.type);
     if (filters?.assignedToUserId) params.set("assignedToUserId", filters.assignedToUserId);
     const data = await fetchJSONUnknown(`/tasks?${params.toString()}`);
-    return z.array(z.object({
-      id: z.string(),
-      tenantId: z.string(),
-      type: z.enum(["turnover", "inspection", "maintenance", "custom"]),
-      state: z.enum(["pending", "in_progress", "done", "failed", "expired"]),
-      priority: z.string().nullable(),
-      siteId: z.string(),
-      reservationId: z.string().nullable(),
-      assignedToUserId: z.string().nullable(),
-      assignedToTeamId: z.string().nullable(),
-      slaDueAt: z.string().nullable(),
-      slaStatus: z.enum(["on_track", "at_risk", "breached"]),
-      checklist: z.unknown().nullable(),
-      photos: z.unknown().nullable(),
-      notes: z.string().nullable(),
-      source: z.string().nullable(),
-      createdBy: z.string(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          tenantId: z.string(),
+          type: z.enum(["turnover", "inspection", "maintenance", "custom"]),
+          state: z.enum(["pending", "in_progress", "done", "failed", "expired"]),
+          priority: z.string().nullable(),
+          siteId: z.string(),
+          reservationId: z.string().nullable(),
+          assignedToUserId: z.string().nullable(),
+          assignedToTeamId: z.string().nullable(),
+          slaDueAt: z.string().nullable(),
+          slaStatus: z.enum(["on_track", "at_risk", "breached"]),
+          checklist: z.unknown().nullable(),
+          photos: z.unknown().nullable(),
+          notes: z.string().nullable(),
+          source: z.string().nullable(),
+          createdBy: z.string(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async getTask(id: string) {
     const data = await fetchJSONUnknown(`/tasks/${id}`);
-    return z.object({
-      id: z.string(),
-      tenantId: z.string(),
-      type: z.enum(["turnover", "inspection", "maintenance", "custom"]),
-      state: z.enum(["pending", "in_progress", "done", "failed", "expired"]),
-      priority: z.string().nullable(),
-      siteId: z.string(),
-      reservationId: z.string().nullable(),
-      assignedToUserId: z.string().nullable(),
-      assignedToTeamId: z.string().nullable(),
-      slaDueAt: z.string().nullable(),
-      slaStatus: z.enum(["on_track", "at_risk", "breached"]),
-      checklist: z.unknown().nullable(),
-      photos: z.unknown().nullable(),
-      notes: z.string().nullable(),
-      source: z.string().nullable(),
-      createdBy: z.string(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        tenantId: z.string(),
+        type: z.enum(["turnover", "inspection", "maintenance", "custom"]),
+        state: z.enum(["pending", "in_progress", "done", "failed", "expired"]),
+        priority: z.string().nullable(),
+        siteId: z.string(),
+        reservationId: z.string().nullable(),
+        assignedToUserId: z.string().nullable(),
+        assignedToTeamId: z.string().nullable(),
+        slaDueAt: z.string().nullable(),
+        slaStatus: z.enum(["on_track", "at_risk", "breached"]),
+        checklist: z.unknown().nullable(),
+        photos: z.unknown().nullable(),
+        notes: z.string().nullable(),
+        source: z.string().nullable(),
+        createdBy: z.string(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+      })
+      .parse(data);
   },
-  async createTask(campgroundId: string, payload: {
-    type: string;
-    siteId: string;
-    reservationId?: string;
-    priority?: string;
-    slaDueAt?: string;
-    checklist?: unknown;
-    assignedToUserId?: string;
-    assignedToTeamId?: string;
-    notes?: string;
-    source?: string;
-    createdBy: string;
-  }) {
+  async createTask(
+    campgroundId: string,
+    payload: {
+      type: string;
+      siteId: string;
+      reservationId?: string;
+      priority?: string;
+      slaDueAt?: string;
+      checklist?: unknown;
+      assignedToUserId?: string;
+      assignedToTeamId?: string;
+      notes?: string;
+      source?: string;
+      createdBy: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8365,16 +9625,19 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateTask(id: string, payload: Partial<{
-    state: "pending" | "in_progress" | "blocked" | "done" | "failed" | "expired";
-    priority: string;
-    slaDueAt: string;
-    assignedToUserId: string;
-    assignedToTeamId: string;
-    checklist: unknown;
-    photos: unknown;
-    notes: string;
-  }>) {
+  async updateTask(
+    id: string,
+    payload: Partial<{
+      state: "pending" | "in_progress" | "blocked" | "done" | "failed" | "expired";
+      priority: string;
+      slaDueAt: string;
+      assignedToUserId: string;
+      assignedToTeamId: string;
+      checklist: unknown;
+      photos: unknown;
+      notes: string;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/tasks/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8395,56 +9658,71 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getGroups(campgroundId: string) {
     const data = await fetchJSONUnknown(`/groups?tenantId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      tenantId: z.string(),
-      sharedPayment: z.boolean(),
-      sharedComm: z.boolean(),
-      primaryReservationId: z.string().nullable(),
-      reservationCount: z.number(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          tenantId: z.string(),
+          sharedPayment: z.boolean(),
+          sharedComm: z.boolean(),
+          primaryReservationId: z.string().nullable(),
+          reservationCount: z.number(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
   async getGroup(id: string) {
     const data = await fetchJSONUnknown(`/groups/${id}`);
-    return z.object({
-      id: z.string(),
-      tenantId: z.string(),
-      sharedPayment: z.boolean(),
-      sharedComm: z.boolean(),
-      primaryReservationId: z.string().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      reservations: z.array(z.object({
+    return z
+      .object({
         id: z.string(),
-        groupRole: z.enum(["primary", "member"]).nullable(),
-        arrivalDate: z.string(),
-        departureDate: z.string(),
-        status: z.string(),
-        guestId: z.string(),
-        siteId: z.string(),
-        guest: z.object({
-          id: z.string(),
-          primaryFirstName: z.string().nullable(),
-          primaryLastName: z.string().nullable(),
-          email: z.string().nullable(),
-        }).nullable(),
-        site: z.object({
-          id: z.string(),
-          name: z.string(),
-          siteNumber: z.string(),
-        }).nullable(),
-      })),
-    }).parse(data);
+        tenantId: z.string(),
+        sharedPayment: z.boolean(),
+        sharedComm: z.boolean(),
+        primaryReservationId: z.string().nullable(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        reservations: z.array(
+          z.object({
+            id: z.string(),
+            groupRole: z.enum(["primary", "member"]).nullable(),
+            arrivalDate: z.string(),
+            departureDate: z.string(),
+            status: z.string(),
+            guestId: z.string(),
+            siteId: z.string(),
+            guest: z
+              .object({
+                id: z.string(),
+                primaryFirstName: z.string().nullable(),
+                primaryLastName: z.string().nullable(),
+                email: z.string().nullable(),
+              })
+              .nullable(),
+            site: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                siteNumber: z.string(),
+              })
+              .nullable(),
+          }),
+        ),
+      })
+      .parse(data);
   },
-  async createGroup(campgroundId: string, payload: {
-    name?: string;
-    sharedPayment?: boolean;
-    sharedComm?: boolean;
-    reservationIds?: string[];
-    primaryReservationId?: string;
-  }) {
+  async createGroup(
+    campgroundId: string,
+    payload: {
+      name?: string;
+      sharedPayment?: boolean;
+      sharedComm?: boolean;
+      reservationIds?: string[];
+      primaryReservationId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/groups`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8452,12 +9730,15 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateGroup(id: string, payload: Partial<{
-    sharedPayment: boolean;
-    sharedComm: boolean;
-    addReservationIds: string[];
-    removeReservationIds: string[];
-  }>) {
+  async updateGroup(
+    id: string,
+    payload: Partial<{
+      sharedPayment: boolean;
+      sharedComm: boolean;
+      addReservationIds: string[];
+      removeReservationIds: string[];
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/groups/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8478,23 +9759,28 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getCheckinStatus(reservationId: string) {
     const data = await fetchJSONUnknown(`/reservations/${reservationId}/checkin-status`);
-    return z.object({
-      id: z.string(),
-      checkInStatus: z.enum(["pending", "in_progress", "completed", "failed"]).nullable(),
-      checkOutStatus: z.enum(["pending", "in_progress", "completed", "failed"]).nullable(),
-      siteReady: z.boolean(),
-      siteReadyAt: z.string().nullable(),
-      selfCheckInAt: z.string().nullable(),
-      selfCheckOutAt: z.string().nullable(),
-      idVerificationRequired: z.boolean(),
-      waiverRequired: z.boolean(),
-      paymentRequired: z.boolean(),
-      lateArrivalFlag: z.boolean(),
-      paymentStatus: z.string().nullable(),
-      balanceAmount: z.number(),
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        checkInStatus: z.enum(["pending", "in_progress", "completed", "failed"]).nullable(),
+        checkOutStatus: z.enum(["pending", "in_progress", "completed", "failed"]).nullable(),
+        siteReady: z.boolean(),
+        siteReadyAt: z.string().nullable(),
+        selfCheckInAt: z.string().nullable(),
+        selfCheckOutAt: z.string().nullable(),
+        idVerificationRequired: z.boolean(),
+        waiverRequired: z.boolean(),
+        paymentRequired: z.boolean(),
+        lateArrivalFlag: z.boolean(),
+        paymentStatus: z.string().nullable(),
+        balanceAmount: z.number(),
+      })
+      .parse(data);
   },
-  async selfCheckin(reservationId: string, options?: { lateArrival?: boolean; override?: boolean }) {
+  async selfCheckin(
+    reservationId: string,
+    options?: { lateArrival?: boolean; override?: boolean },
+  ) {
     const res = await fetch(`${API_BASE}/reservations/${reservationId}/self-checkin`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8505,15 +9791,18 @@ export const apiClient = {
       z.object({
         status: z.enum(["completed", "failed"]),
         reason: z.string().optional(),
-        selfCheckInAt: z.string().optional()
-      })
+        selfCheckInAt: z.string().optional(),
+      }),
     );
   },
-  async selfCheckout(reservationId: string, options?: {
-    damageNotes?: string;
-    damagePhotos?: string[];
-    override?: boolean;
-  }) {
+  async selfCheckout(
+    reservationId: string,
+    options?: {
+      damageNotes?: string;
+      damagePhotos?: string[];
+      override?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/reservations/${reservationId}/self-checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8524,8 +9813,8 @@ export const apiClient = {
       z.object({
         status: z.enum(["completed", "failed"]),
         reason: z.string().optional(),
-        selfCheckOutAt: z.string().optional()
-      })
+        selfCheckOutAt: z.string().optional(),
+      }),
     );
   },
 
@@ -8533,62 +9822,80 @@ export const apiClient = {
   // Phase 3: Dashboard Metrics & Analytics
   // ---------------------------------------------------------------------------
   async getDashboardMetrics(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/dashboard-metrics?days=${days}`);
-    return z.object({
-      period: z.object({
-        start: z.string(),
-        end: z.string(),
-        days: z.number()
-      }),
-      revenue: z.object({
-        totalCents: z.number(),
-        adrCents: z.number(),
-        revparCents: z.number(),
-        changePct: z.number()
-      }),
-      occupancy: z.object({
-        pct: z.number(),
-        totalNights: z.number(),
-        availableNights: z.number()
-      }),
-      balances: z.object({
-        outstandingCents: z.number()
-      }),
-      today: z.object({
-        arrivals: z.number(),
-        departures: z.number()
-      }),
-      futureBookings: z.number(),
-      totalSites: z.number()
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/dashboard-metrics?days=${days}`,
+    );
+    return z
+      .object({
+        period: z.object({
+          start: z.string(),
+          end: z.string(),
+          days: z.number(),
+        }),
+        revenue: z.object({
+          totalCents: z.number(),
+          adrCents: z.number(),
+          revparCents: z.number(),
+          changePct: z.number(),
+        }),
+        occupancy: z.object({
+          pct: z.number(),
+          totalNights: z.number(),
+          availableNights: z.number(),
+        }),
+        balances: z.object({
+          outstandingCents: z.number(),
+        }),
+        today: z.object({
+          arrivals: z.number(),
+          departures: z.number(),
+        }),
+        futureBookings: z.number(),
+        totalSites: z.number(),
+      })
+      .parse(data);
   },
   async getRevenueTrend(campgroundId: string, months: number = 12) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/revenue-trend?months=${months}`);
-    return z.array(z.object({
-      month: z.string(),
-      year: z.number(),
-      revenueCents: z.number(),
-      bookings: z.number()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/revenue-trend?months=${months}`,
+    );
+    return z
+      .array(
+        z.object({
+          month: z.string(),
+          year: z.number(),
+          revenueCents: z.number(),
+          bookings: z.number(),
+        }),
+      )
+      .parse(data);
   },
   async getOccupancyForecast(campgroundId: string, days: number = 30) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/occupancy-forecast?days=${days}`);
-    return z.array(z.object({
-      date: z.string(),
-      occupiedSites: z.number(),
-      totalSites: z.number(),
-      pct: z.number()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/reports/occupancy-forecast?days=${days}`,
+    );
+    return z
+      .array(
+        z.object({
+          date: z.string(),
+          occupiedSites: z.number(),
+          totalSites: z.number(),
+          pct: z.number(),
+        }),
+      )
+      .parse(data);
   },
   async getTaskMetrics(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/reports/task-metrics`);
-    return z.object({
-      pending: z.number(),
-      inProgress: z.number(),
-      breached: z.number(),
-      atRisk: z.number(),
-      completedToday: z.number()
-    }).parse(data);
+    return z
+      .object({
+        pending: z.number(),
+        inProgress: z.number(),
+        breached: z.number(),
+        atRisk: z.number(),
+        completedToday: z.number(),
+      })
+      .parse(data);
   },
 
   // ---------------------------------------------------------------------------
@@ -8596,29 +9903,34 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getWaitlistStats(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/waitlist/stats`);
-    return z.object({
-      active: z.number(),
-      offered: z.number(),
-      converted: z.number(),
-      expired: z.number(),
-      total: z.number()
-    }).parse(data);
+    return z
+      .object({
+        active: z.number(),
+        offered: z.number(),
+        converted: z.number(),
+        expired: z.number(),
+        total: z.number(),
+      })
+      .parse(data);
   },
-  async updateWaitlistEntry(id: string, payload: Partial<{
-    contactName: string;
-    contactEmail: string;
-    contactPhone: string;
-    notes: string;
-    siteId: string;
-    siteTypeId: string;
-    arrivalDate: string;
-    departureDate: string;
-    priority: number;
-    autoOffer: boolean;
-    maxPrice: number;
-    flexibleDates: boolean;
-    flexibleDays: number;
-  }>) {
+  async updateWaitlistEntry(
+    id: string,
+    payload: Partial<{
+      contactName: string;
+      contactEmail: string;
+      contactPhone: string;
+      notes: string;
+      siteId: string;
+      siteTypeId: string;
+      arrivalDate: string;
+      departureDate: string;
+      priority: number;
+      autoOffer: boolean;
+      maxPrice: number;
+      flexibleDates: boolean;
+      flexibleDays: number;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/waitlist/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8653,7 +9965,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/stored-value/issue`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoredValueIssueResponseSchema.parse(data);
@@ -8672,7 +9984,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/stored-value/redeem`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoredValueRedeemResponseSchema.parse(data);
@@ -8681,7 +9993,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/stored-value/adjust`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
     return StoredValueAdjustResponseSchema.parse(data);
@@ -8692,32 +10004,42 @@ export const apiClient = {
   // ---------------------------------------------------------------------------
   async getNotificationTriggers(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/notification-triggers`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      event: z.string(),
-      channel: z.enum(["email", "sms", "both"]),
-      enabled: z.boolean(),
-      templateId: z.string().nullable(),
-      delayMinutes: z.number(),
-      conditions: z.unknown().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      template: z.object({
-        id: z.string(),
-        name: z.string(),
-        subject: z.string().nullable()
-      }).nullable().optional()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          event: z.string(),
+          channel: z.enum(["email", "sms", "both"]),
+          enabled: z.boolean(),
+          templateId: z.string().nullable(),
+          delayMinutes: z.number(),
+          conditions: z.unknown().nullable(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          template: z
+            .object({
+              id: z.string(),
+              name: z.string(),
+              subject: z.string().nullable(),
+            })
+            .nullable()
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
-  async createNotificationTrigger(campgroundId: string, payload: {
-    event: string;
-    channel: "email" | "sms" | "both";
-    enabled?: boolean;
-    templateId?: string;
-    delayMinutes?: number;
-    conditions?: Record<string, unknown>;
-  }) {
+  async createNotificationTrigger(
+    campgroundId: string,
+    payload: {
+      event: string;
+      channel: "email" | "sms" | "both";
+      enabled?: boolean;
+      templateId?: string;
+      delayMinutes?: number;
+      conditions?: Record<string, unknown>;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/notification-triggers`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8725,14 +10047,17 @@ export const apiClient = {
     });
     return parseResponse(res, UnknownSchema);
   },
-  async updateNotificationTrigger(id: string, payload: Partial<{
-    event: string;
-    channel: "email" | "sms" | "both";
-    enabled: boolean;
-    templateId: string | null;
-    delayMinutes: number;
-    conditions: Record<string, unknown> | null;
-  }>) {
+  async updateNotificationTrigger(
+    id: string,
+    payload: Partial<{
+      event: string;
+      channel: "email" | "sms" | "both";
+      enabled: boolean;
+      templateId: string | null;
+      delayMinutes: number;
+      conditions: Record<string, unknown> | null;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/notification-triggers/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8785,15 +10110,18 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentSchema.parse(data);
   },
-  async updateIncident(id: string, payload: Partial<{
-    type: string;
-    status: string;
-    severity: string;
-    notes: string;
-    photos: string[];
-    witnesses: unknown;
-    occurredAt: string;
-  }>) {
+  async updateIncident(
+    id: string,
+    payload: Partial<{
+      type: string;
+      status: string;
+      severity: string;
+      notes: string;
+      photos: string[];
+      witnesses: unknown;
+      occurredAt: string;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8811,13 +10139,16 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentSchema.parse(data);
   },
-  async addIncidentEvidence(id: string, payload: {
-    type?: string;
-    url?: string;
-    storageKey?: string;
-    description?: string;
-    uploadedBy?: string;
-  }) {
+  async addIncidentEvidence(
+    id: string,
+    payload: {
+      type?: string;
+      url?: string;
+      storageKey?: string;
+      description?: string;
+      uploadedBy?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}/evidence`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8826,7 +10157,10 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentEvidenceSchema.parse(data);
   },
-  async linkIncidentClaim(id: string, payload: { claimId: string; provider?: string; notes?: string }) {
+  async linkIncidentClaim(
+    id: string,
+    payload: { claimId: string; provider?: string; notes?: string },
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}/claim`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8844,7 +10178,10 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentSchema.parse(data);
   },
-  async createIncidentTask(id: string, payload: { title: string; dueAt?: string; reminderAt?: string; assignedTo?: string }) {
+  async createIncidentTask(
+    id: string,
+    payload: { title: string; dueAt?: string; reminderAt?: string; assignedTo?: string },
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8853,7 +10190,11 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentTaskSchema.parse(data);
   },
-  async updateIncidentTask(id: string, taskId: string, payload: Partial<{ status: string; dueAt: string; reminderAt: string; assignedTo: string }>) {
+  async updateIncidentTask(
+    id: string,
+    taskId: string,
+    payload: Partial<{ status: string; dueAt: string; reminderAt: string; assignedTo: string }>,
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}/tasks/${taskId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8862,15 +10203,18 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return IncidentTaskSchema.parse(data);
   },
-  async attachIncidentCoi(id: string, payload: {
-    fileUrl: string;
-    provider?: string;
-    policyNumber?: string;
-    coverageType?: string;
-    effectiveDate?: string;
-    expiresAt?: string;
-    uploadedBy?: string;
-  }) {
+  async attachIncidentCoi(
+    id: string,
+    payload: {
+      fileUrl: string;
+      provider?: string;
+      policyNumber?: string;
+      coverageType?: string;
+      effectiveDate?: string;
+      expiresAt?: string;
+      uploadedBy?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/incidents/${id}/coi`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8898,7 +10242,16 @@ export const apiClient = {
   },
   async createUtilityMeter(
     campgroundId: string,
-    payload: { siteId: string; type: string; serialNumber?: string; ratePlanId?: string; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean }
+    payload: {
+      siteId: string;
+      type: string;
+      serialNumber?: string;
+      ratePlanId?: string;
+      billingMode?: string;
+      billTo?: string;
+      multiplier?: number;
+      autoEmail?: boolean;
+    },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/meters`, {
       method: "POST",
@@ -8908,7 +10261,17 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return UtilityMeterSchema.parse(data);
   },
-  async addUtilityMeterRead(meterId: string, payload: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string }, campgroundId?: string) {
+  async addUtilityMeterRead(
+    meterId: string,
+    payload: {
+      readingValue: number;
+      readAt: string;
+      readBy?: string;
+      note?: string;
+      source?: string;
+    },
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/meters/${meterId}/reads`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "POST",
@@ -8918,7 +10281,17 @@ export const apiClient = {
     const data = await parseResponse(res, UnknownSchema);
     return UtilityMeterReadSchema.parse(data);
   },
-  async importUtilityMeterReads(payload: { campgroundId: string; reads: Array<{ meterId: string; readingValue: number; readAt: string; note?: string; readBy?: string; source?: string }> }) {
+  async importUtilityMeterReads(payload: {
+    campgroundId: string;
+    reads: Array<{
+      meterId: string;
+      readingValue: number;
+      readAt: string;
+      note?: string;
+      readBy?: string;
+      source?: string;
+    }>;
+  }) {
     const res = await fetch(`${API_BASE}/meters/import`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -8928,15 +10301,27 @@ export const apiClient = {
       res,
       z.object({
         imported: z.number(),
-        skipped: z.number()
-      })
+        skipped: z.number(),
+      }),
     );
   },
   async listUtilityRatePlans(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/utility-rate-plans`);
     return z.array(UtilityRatePlanSchema).parse(data);
   },
-  async updateUtilityMeter(meterId: string, payload: { ratePlanId?: string | null; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean; active?: boolean; serialNumber?: string | null }, campgroundId?: string) {
+  async updateUtilityMeter(
+    meterId: string,
+    payload: {
+      ratePlanId?: string | null;
+      billingMode?: string;
+      billTo?: string;
+      multiplier?: number;
+      autoEmail?: boolean;
+      active?: boolean;
+      serialNumber?: string | null;
+    },
+    campgroundId?: string,
+  ) {
     const path = withCampgroundId(`/meters/${meterId}`, campgroundId);
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
@@ -8964,15 +10349,22 @@ export const apiClient = {
       res,
       z.object({
         created: z.number(),
-        totalSites: z.number()
-      })
+        totalSites: z.number(),
+      }),
     );
   },
-  async listUtilityMeterReads(meterId: string, params?: { start?: string; end?: string }, campgroundId?: string) {
+  async listUtilityMeterReads(
+    meterId: string,
+    params?: { start?: string; end?: string },
+    campgroundId?: string,
+  ) {
     const qs = new URLSearchParams();
     if (params?.start) qs.set("start", params.start);
     if (params?.end) qs.set("end", params.end);
-    const path = withCampgroundId(`/meters/${meterId}/reads${qs.toString() ? `?${qs.toString()}` : ""}`, campgroundId);
+    const path = withCampgroundId(
+      `/meters/${meterId}/reads${qs.toString() ? `?${qs.toString()}` : ""}`,
+      campgroundId,
+    );
     const data = await fetchJSONUnknown(path);
     return z.array(UtilityMeterReadSchema).parse(data);
   },
@@ -9005,7 +10397,7 @@ export const apiClient = {
   },
   async uploadCampgroundMap(
     campgroundId: string,
-    payload: { url?: string; dataUrl?: string; contentType?: string; filename?: string }
+    payload: { url?: string; dataUrl?: string; contentType?: string; filename?: string },
   ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/map`, {
       method: "POST",
@@ -9025,7 +10417,7 @@ export const apiClient = {
       isActive: z.boolean(),
       scopes: z.array(z.string()).default([]),
       createdAt: z.string(),
-      lastUsedAt: z.string().nullable().optional()
+      lastUsedAt: z.string().nullable().optional(),
     });
     return z.array(ApiClientSchema).parse(data);
   },
@@ -9034,7 +10426,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/developer/clients`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, name, scopes: [] })
+      body: JSON.stringify({ campgroundId, name, scopes: [] }),
     });
     return parseResponse(
       res,
@@ -9046,10 +10438,10 @@ export const apiClient = {
           isActive: z.boolean(),
           scopes: z.array(z.string()).default([]),
           createdAt: z.string(),
-          lastUsedAt: z.string().nullable().optional()
+          lastUsedAt: z.string().nullable().optional(),
         }),
-        clientSecret: z.string()
-      })
+        clientSecret: z.string(),
+      }),
     );
   },
 
@@ -9069,10 +10461,10 @@ export const apiClient = {
           isActive: z.boolean(),
           scopes: z.array(z.string()).default([]),
           createdAt: z.string(),
-          lastUsedAt: z.string().nullable().optional()
+          lastUsedAt: z.string().nullable().optional(),
         }),
-        clientSecret: z.string()
-      })
+        clientSecret: z.string(),
+      }),
     );
   },
 
@@ -9081,7 +10473,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ isActive })
+      body: JSON.stringify({ isActive }),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -9099,24 +10491,27 @@ export const apiClient = {
   async listWebhooks(campgroundId: string) {
     const qs = new URLSearchParams({ campgroundId });
     const res = await fetch(`${API_BASE}/developer/webhooks?${qs.toString()}`, {
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownArraySchema);
     return z.array(WebhookEndpointSchema).parse(data);
   },
 
-  async createWebhook(campgroundId: string, payload: { url: string; eventTypes: string[]; description?: string }) {
+  async createWebhook(
+    campgroundId: string,
+    payload: { url: string; eventTypes: string[]; description?: string },
+  ) {
     const res = await fetch(`${API_BASE}/developer/webhooks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, ...payload })
+      body: JSON.stringify({ campgroundId, ...payload }),
     });
     return parseResponse(
       res,
       z.object({
         endpoint: UnknownSchema,
-        secret: z.string()
-      })
+        secret: z.string(),
+      }),
     );
   },
 
@@ -9125,7 +10520,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}${path}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ isActive })
+      body: JSON.stringify({ isActive }),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -9133,7 +10528,7 @@ export const apiClient = {
   async listWebhookDeliveries(campgroundId: string) {
     const qs = new URLSearchParams({ campgroundId });
     const res = await fetch(`${API_BASE}/developer/webhooks/deliveries?${qs.toString()}`, {
-      headers: { ...scopedHeaders() }
+      headers: { ...scopedHeaders() },
     });
     const data = await parseResponse(res, UnknownArraySchema);
     return z.array(WebhookDeliverySchema).parse(data);
@@ -9170,21 +10565,23 @@ export const apiClient = {
   // AI Settings
   async getAiSettings(campgroundId: string) {
     const data = await fetchJSONUnknown(`/ai/campgrounds/${campgroundId}/settings`);
-    return z.object({
-      id: z.string(),
-      name: z.string(),
-      aiEnabled: z.boolean(),
-      aiReplyAssistEnabled: z.boolean(),
-      aiBookingAssistEnabled: z.boolean(),
-      aiAnalyticsEnabled: z.boolean(),
-      aiForecastingEnabled: z.boolean(),
-      aiAnonymizationLevel: z.string(),
-      aiProvider: z.string(),
-      aiApiKey: z.string().nullable(),
-      hasCustomApiKey: z.boolean(),
-      aiMonthlyBudgetCents: z.number().nullable(),
-      aiTotalTokensUsed: z.number()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        name: z.string(),
+        aiEnabled: z.boolean(),
+        aiReplyAssistEnabled: z.boolean(),
+        aiBookingAssistEnabled: z.boolean(),
+        aiAnalyticsEnabled: z.boolean(),
+        aiForecastingEnabled: z.boolean(),
+        aiAnonymizationLevel: z.string(),
+        aiProvider: z.string(),
+        aiApiKey: z.string().nullable(),
+        hasCustomApiKey: z.boolean(),
+        aiMonthlyBudgetCents: z.number().nullable(),
+        aiTotalTokensUsed: z.number(),
+      })
+      .parse(data);
   },
 
   async updateAiSettings(campgroundId: string, settings: Record<string, unknown>) {
@@ -9198,25 +10595,32 @@ export const apiClient = {
 
   async getAiUsage(campgroundId: string) {
     const data = await fetchJSONUnknown(`/ai/campgrounds/${campgroundId}/usage`);
-    return z.object({
-      period: z.object({ days: z.number(), since: z.string() }),
-      byFeature: z.array(z.object({
-        feature: z.string(),
-        interactions: z.number(),
-        tokensUsed: z.number(),
-        costCents: z.number(),
-        avgLatencyMs: z.number()
-      })),
-      totals: z.object({
-        interactions: z.number(),
-        tokensUsed: z.number(),
-        costCents: z.number()
+    return z
+      .object({
+        period: z.object({ days: z.number(), since: z.string() }),
+        byFeature: z.array(
+          z.object({
+            feature: z.string(),
+            interactions: z.number(),
+            tokensUsed: z.number(),
+            costCents: z.number(),
+            avgLatencyMs: z.number(),
+          }),
+        ),
+        totals: z.object({
+          interactions: z.number(),
+          tokensUsed: z.number(),
+          costCents: z.number(),
+        }),
       })
-    }).parse(data);
+      .parse(data);
   },
 
   // AI Sentiment Analysis
-  async getSentimentStats(campgroundId: string, options?: { startDate?: string; endDate?: string }) {
+  async getSentimentStats(
+    campgroundId: string,
+    options?: { startDate?: string; endDate?: string },
+  ) {
     const params = new URLSearchParams();
     if (options?.startDate) params.set("startDate", options.startDate);
     if (options?.endDate) params.set("endDate", options.endDate);
@@ -9225,32 +10629,38 @@ export const apiClient = {
       ? `/ai/campgrounds/${campgroundId}/sentiment/range${query}`
       : `/ai/campgrounds/${campgroundId}/sentiment`;
     const data = await fetchJSONUnknown(endpoint);
-    return z.object({
-      total: z.number(),
-      breakdown: z.object({ positive: z.number(), neutral: z.number(), negative: z.number() }),
-      percentages: z.object({ positive: z.number(), neutral: z.number(), negative: z.number() }),
-      urgency: z.object({ critical: z.number(), high: z.number() }),
-      needsAttention: z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        subject: z.string().nullable(),
-        preview: z.string().nullable(),
-        sentiment: z.string().nullable(),
-        urgencyLevel: z.string().nullable(),
-        detectedIntent: z.string().nullable(),
-        createdAt: z.string(),
-        guest: z.object({
-          primaryFirstName: z.string().nullable(),
-          primaryLastName: z.string().nullable()
-        }).nullable()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        total: z.number(),
+        breakdown: z.object({ positive: z.number(), neutral: z.number(), negative: z.number() }),
+        percentages: z.object({ positive: z.number(), neutral: z.number(), negative: z.number() }),
+        urgency: z.object({ critical: z.number(), high: z.number() }),
+        needsAttention: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string(),
+            subject: z.string().nullable(),
+            preview: z.string().nullable(),
+            sentiment: z.string().nullable(),
+            urgencyLevel: z.string().nullable(),
+            detectedIntent: z.string().nullable(),
+            createdAt: z.string(),
+            guest: z
+              .object({
+                primaryFirstName: z.string().nullable(),
+                primaryLastName: z.string().nullable(),
+              })
+              .nullable(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   async analyzeCommunicationSentiment(communicationId: string) {
     const res = await fetch(`${API_BASE}/ai/communications/${communicationId}/analyze-sentiment`, {
       method: "POST",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(
       res,
@@ -9261,53 +10671,63 @@ export const apiClient = {
           urgencyLevel: z.enum(["low", "normal", "high", "critical"]),
           detectedIntent: z.string(),
           confidence: z.number(),
-          summary: z.string().optional()
+          summary: z.string().optional(),
         }),
-        z.null()
-      ])
+        z.null(),
+      ]),
     );
   },
 
   // Charity / Round-Up for Donations
   async getCampgroundCharity(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/charity`);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      charityId: z.string(),
-      isEnabled: z.boolean(),
-      customMessage: z.string().nullable(),
-      roundUpType: z.string(),
-      roundUpOptions: UnknownRecordSchema.nullable(),
-      defaultOptIn: z.boolean(),
-      charity: z.object({
+    return z
+      .object({
         id: z.string(),
-        name: z.string(),
-        description: z.string().nullable(),
-        logoUrl: z.string().nullable(),
-        category: z.string().nullable(),
-        isVerified: z.boolean()
+        campgroundId: z.string(),
+        charityId: z.string(),
+        isEnabled: z.boolean(),
+        customMessage: z.string().nullable(),
+        roundUpType: z.string(),
+        roundUpOptions: UnknownRecordSchema.nullable(),
+        defaultOptIn: z.boolean(),
+        charity: z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          logoUrl: z.string().nullable(),
+          category: z.string().nullable(),
+          isVerified: z.boolean(),
+        }),
       })
-    }).nullable().parse(data);
+      .nullable()
+      .parse(data);
   },
 
   async calculateRoundUp(campgroundId: string, amountCents: number) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/charity/calculate-roundup?amountCents=${amountCents}`);
-    return z.object({
-      originalAmountCents: z.number(),
-      roundedAmountCents: z.number(),
-      donationAmountCents: z.number(),
-      charityName: z.string(),
-      charityId: z.string()
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/charity/calculate-roundup?amountCents=${amountCents}`,
+    );
+    return z
+      .object({
+        originalAmountCents: z.number(),
+        roundedAmountCents: z.number(),
+        donationAmountCents: z.number(),
+        charityName: z.string(),
+        charityId: z.string(),
+      })
+      .parse(data);
   },
 
-  async createCharityDonation(campgroundId: string, payload: {
-    reservationId: string;
-    charityId: string;
-    amountCents: number;
-    guestId?: string;
-  }) {
+  async createCharityDonation(
+    campgroundId: string,
+    payload: {
+      reservationId: string;
+      charityId: string;
+      amountCents: number;
+      guestId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/charity/donations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9318,8 +10738,8 @@ export const apiClient = {
       z.object({
         id: z.string(),
         amountCents: z.number(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
@@ -9328,57 +10748,66 @@ export const apiClient = {
     if (options?.category) params.set("category", options.category);
     if (options?.activeOnly !== undefined) params.set("activeOnly", String(options.activeOnly));
     const data = await fetchJSONUnknown(`/charity?${params.toString()}`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      description: z.string().nullable(),
-      logoUrl: z.string().nullable(),
-      taxId: z.string().nullable(),
-      website: z.string().nullable(),
-      category: z.string().nullable(),
-      isActive: z.boolean(),
-      isVerified: z.boolean(),
-      _count: z.object({ campgroundCharities: z.number(), donations: z.number() })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          logoUrl: z.string().nullable(),
+          taxId: z.string().nullable(),
+          website: z.string().nullable(),
+          category: z.string().nullable(),
+          isActive: z.boolean(),
+          isVerified: z.boolean(),
+          _count: z.object({ campgroundCharities: z.number(), donations: z.number() }),
+        }),
+      )
+      .parse(data);
   },
 
-  async setCampgroundCharity(campgroundId: string, payload: {
-    charityId?: string;
-    newCharity?: {
-      name: string;
-      description?: string;
-      taxId?: string;
-      website?: string;
-    };
-    isEnabled?: boolean;
-    customMessage?: string;
-    roundUpType?: string;
-    roundUpOptions?: { values: number[] };
-    defaultOptIn?: boolean;
-    glCode?: string;
-  }) {
+  async setCampgroundCharity(
+    campgroundId: string,
+    payload: {
+      charityId?: string;
+      newCharity?: {
+        name: string;
+        description?: string;
+        taxId?: string;
+        website?: string;
+      };
+      isEnabled?: boolean;
+      customMessage?: string;
+      roundUpType?: string;
+      roundUpOptions?: { values: number[] };
+      defaultOptIn?: boolean;
+      glCode?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/charity`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
       body: JSON.stringify(payload),
     });
     const data = await parseResponse(res, UnknownSchema);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      charityId: z.string(),
-      isEnabled: z.boolean(),
-      customMessage: z.string().nullable(),
-      roundUpType: z.string(),
-      roundUpOptions: UnknownRecordSchema.nullable(),
-      defaultOptIn: z.boolean(),
-      charity: z.object({
+    return z
+      .object({
         id: z.string(),
-        name: z.string(),
-        description: z.string().nullable(),
-        logoUrl: z.string().nullable()
+        campgroundId: z.string(),
+        charityId: z.string(),
+        isEnabled: z.boolean(),
+        customMessage: z.string().nullable(),
+        roundUpType: z.string(),
+        roundUpOptions: UnknownRecordSchema.nullable(),
+        defaultOptIn: z.boolean(),
+        charity: z.object({
+          id: z.string(),
+          name: z.string(),
+          description: z.string().nullable(),
+          logoUrl: z.string().nullable(),
+        }),
       })
-    }).parse(data);
+      .parse(data);
   },
 
   async disableCampgroundCharity(campgroundId: string) {
@@ -9393,19 +10822,25 @@ export const apiClient = {
     const params = new URLSearchParams();
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/charity/stats?${params.toString()}`);
-    return z.object({
-      totalDonations: z.number(),
-      totalAmountCents: z.number(),
-      donorCount: z.number(),
-      optInRate: z.number(),
-      averageDonationCents: z.number(),
-      byStatus: z.array(z.object({
-        status: z.string(),
-        count: z.number(),
-        amountCents: z.number()
-      }))
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/charity/stats?${params.toString()}`,
+    );
+    return z
+      .object({
+        totalDonations: z.number(),
+        totalAmountCents: z.number(),
+        donorCount: z.number(),
+        optInRate: z.number(),
+        averageDonationCents: z.number(),
+        byStatus: z.array(
+          z.object({
+            status: z.string(),
+            count: z.number(),
+            amountCents: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   async getPlatformCharityStats(startDate?: string, endDate?: string) {
@@ -9413,79 +10848,101 @@ export const apiClient = {
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     const data = await fetchJSONUnknown(`/charity/stats/platform?${params.toString()}`);
-    return z.object({
-      totalDonations: z.number(),
-      totalAmountCents: z.number(),
-      donorCount: z.number(),
-      optInRate: z.number(),
-      averageDonationCents: z.number(),
-      byStatus: z.array(z.object({
-        status: z.string(),
-        count: z.number(),
-        amountCents: z.number()
-      })),
-      byCharity: z.array(z.object({
-        charity: z.object({
-          id: z.string(),
-          name: z.string(),
-          logoUrl: z.string().nullable()
-        }).optional(),
-        count: z.number(),
-        amountCents: z.number()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        totalDonations: z.number(),
+        totalAmountCents: z.number(),
+        donorCount: z.number(),
+        optInRate: z.number(),
+        averageDonationCents: z.number(),
+        byStatus: z.array(
+          z.object({
+            status: z.string(),
+            count: z.number(),
+            amountCents: z.number(),
+          }),
+        ),
+        byCharity: z.array(
+          z.object({
+            charity: z
+              .object({
+                id: z.string(),
+                name: z.string(),
+                logoUrl: z.string().nullable(),
+              })
+              .optional(),
+            count: z.number(),
+            amountCents: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   // Platform Stats (public - no auth required)
   async getPlatformStats() {
     const data = await fetchJSONUnknown("/public/platform-stats");
-    return z.object({
-      campgrounds: z.object({
-        total: z.number(),
-        claimed: z.number(),
-        byState: z.array(z.object({ state: z.string(), count: z.number() }))
-      }),
-      activity: z.object({
-        pageViewsToday: z.number(),
-        pageViewsThisWeek: z.number(),
-        searchesToday: z.number(),
-        searchesThisWeek: z.number(),
-        uniqueVisitorsToday: z.number()
-      }),
-      recentActivity: z.array(z.object({
-        type: z.enum(["page_view", "search", "booking"]),
-        campgroundName: z.string().nullable(),
-        campgroundSlug: z.string().nullable(),
-        state: z.string().nullable(),
-        minutesAgo: z.number()
-      })),
-      topRegions: z.array(z.object({
-        state: z.string(),
-        activityCount: z.number()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        campgrounds: z.object({
+          total: z.number(),
+          claimed: z.number(),
+          byState: z.array(z.object({ state: z.string(), count: z.number() })),
+        }),
+        activity: z.object({
+          pageViewsToday: z.number(),
+          pageViewsThisWeek: z.number(),
+          searchesToday: z.number(),
+          searchesThisWeek: z.number(),
+          uniqueVisitorsToday: z.number(),
+        }),
+        recentActivity: z.array(
+          z.object({
+            type: z.enum(["page_view", "search", "booking"]),
+            campgroundName: z.string().nullable(),
+            campgroundSlug: z.string().nullable(),
+            state: z.string().nullable(),
+            minutesAgo: z.number(),
+          }),
+        ),
+        topRegions: z.array(
+          z.object({
+            state: z.string(),
+            activityCount: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   // Data Import
   async getImportSchema(campgroundId: string, entityType: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/import/schema/${entityType}`);
-    return z.object({
-      entityType: z.string(),
-      requiredFields: z.array(z.string()),
-      optionalFields: z.array(z.string()),
-      fieldDescriptions: z.record(z.string()),
-      exampleCSV: z.string()
-    }).parse(data);
+    return z
+      .object({
+        entityType: z.string(),
+        requiredFields: z.array(z.string()),
+        optionalFields: z.array(z.string()),
+        fieldDescriptions: z.record(z.string()),
+        exampleCSV: z.string(),
+      })
+      .parse(data);
   },
 
   async getImportTemplate(campgroundId: string, entityType: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/template/${entityType}`, {
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/import/template/${entityType}`,
+      {
+        headers: scopedHeaders(),
+      },
+    );
     return res.text();
   },
 
-  async detectImportFormat(campgroundId: string, payload: { csvContent: string; entityType: string }) {
+  async detectImportFormat(
+    campgroundId: string,
+    payload: { csvContent: string; entityType: string },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/detect`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9497,20 +10954,25 @@ export const apiClient = {
         format: z.string(),
         confidence: z.number(),
         headers: z.array(z.string()),
-        suggestedMappings: z.array(z.object({
-          sourceField: z.string(),
-          suggestedTarget: z.string(),
-          confidence: z.number()
-        }))
-      })
+        suggestedMappings: z.array(
+          z.object({
+            sourceField: z.string(),
+            suggestedTarget: z.string(),
+            confidence: z.number(),
+          }),
+        ),
+      }),
     );
   },
 
-  async previewImport(campgroundId: string, payload: {
-    csvContent: string;
-    entityType: string;
-    fieldMappings: Array<{ sourceField: string; targetField: string }>;
-  }) {
+  async previewImport(
+    campgroundId: string,
+    payload: {
+      csvContent: string;
+      entityType: string;
+      fieldMappings: Array<{ sourceField: string; targetField: string }>;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9528,23 +10990,28 @@ export const apiClient = {
         duplicateEmails: z.number().optional(),
         errors: z.array(z.object({ row: z.number(), message: z.string() })),
         warnings: z.array(z.object({ row: z.number(), message: z.string() })),
-        preview: z.array(z.object({
-          rowNumber: z.number(),
-          data: UnknownRecordSchema,
-          action: z.enum(["create", "update", "skip"]),
-          existingSite: z.object({ id: z.string(), siteNumber: z.string() }).optional(),
-          existingGuest: z.object({ id: z.string(), email: z.string() }).optional()
-        }))
-      })
+        preview: z.array(
+          z.object({
+            rowNumber: z.number(),
+            data: UnknownRecordSchema,
+            action: z.enum(["create", "update", "skip"]),
+            existingSite: z.object({ id: z.string(), siteNumber: z.string() }).optional(),
+            existingGuest: z.object({ id: z.string(), email: z.string() }).optional(),
+          }),
+        ),
+      }),
     );
   },
 
-  async executeImport(campgroundId: string, payload: {
-    csvContent: string;
-    entityType: string;
-    fieldMappings: Array<{ sourceField: string; targetField: string }>;
-    updateExisting?: boolean;
-  }) {
+  async executeImport(
+    campgroundId: string,
+    payload: {
+      csvContent: string;
+      entityType: string;
+      fieldMappings: Array<{ sourceField: string; targetField: string }>;
+      updateExisting?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/import/execute`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9558,29 +11025,31 @@ export const apiClient = {
         created: z.number(),
         updated: z.number(),
         skipped: z.number(),
-        errors: z.array(z.object({ row: z.number(), message: z.string() }))
-      })
+        errors: z.array(z.object({ row: z.number(), message: z.string() })),
+      }),
     );
   },
 
   async getImportJobStatus(jobId: string) {
     const data = await fetchJSONUnknown(`/import/jobs/${jobId}`);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      entityType: z.string(),
-      format: z.string(),
-      status: z.enum(["pending", "processing", "completed", "failed"]),
-      totalRows: z.number(),
-      processedRows: z.number(),
-      createdCount: z.number(),
-      updatedCount: z.number(),
-      skippedCount: z.number(),
-      errorCount: z.number(),
-      errors: z.array(z.object({ row: z.number(), message: z.string() })),
-      createdAt: z.string(),
-      completedAt: z.string().optional()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        campgroundId: z.string(),
+        entityType: z.string(),
+        format: z.string(),
+        status: z.enum(["pending", "processing", "completed", "failed"]),
+        totalRows: z.number(),
+        processedRows: z.number(),
+        createdCount: z.number(),
+        updatedCount: z.number(),
+        skippedCount: z.number(),
+        errorCount: z.number(),
+        errors: z.array(z.object({ row: z.number(), message: z.string() })),
+        createdAt: z.string(),
+        completedAt: z.string().optional(),
+      })
+      .parse(data);
   },
 
   // ==================== HOUSEKEEPING ====================
@@ -9593,10 +11062,12 @@ export const apiClient = {
 
   async getHousekeepingStatusStats(campgroundId: string) {
     const data = await fetchJSONUnknown(`/housekeeping/stats?campgroundId=${campgroundId}`);
-    return z.object({
-      total: z.number(),
-      byStatus: z.record(z.number())
-    }).parse(data);
+    return z
+      .object({
+        total: z.number(),
+        byStatus: z.record(z.number()),
+      })
+      .parse(data);
   },
 
   async getSiteStatuses(campgroundId?: string) {
@@ -9625,12 +11096,16 @@ export const apiClient = {
     const query = new URLSearchParams({ campgroundId });
     if (date) query.set("date", date);
     const data = await fetchJSONUnknown(`/housekeeping/workload?${query.toString()}`);
-    return z.record(z.object({
-      total: z.number(),
-      completed: z.number(),
-      inProgress: z.number(),
-      pending: z.number()
-    })).parse(data);
+    return z
+      .record(
+        z.object({
+          total: z.number(),
+          completed: z.number(),
+          inProgress: z.number(),
+          pending: z.number(),
+        }),
+      )
+      .parse(data);
   },
 
   async getCleaningTemplates(campgroundId: string) {
@@ -9658,16 +11133,19 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateCleaningTemplate(id: string, payload: Partial<{
-    name: string;
-    estimatedMinutes: number;
-    checklist: unknown;
-    suppliesNeeded: unknown;
-    priority: number;
-    slaMinutes: number;
-    requiresInspection: boolean;
-    isActive: boolean;
-  }>) {
+  async updateCleaningTemplate(
+    id: string,
+    payload: Partial<{
+      name: string;
+      estimatedMinutes: number;
+      checklist: unknown;
+      suppliesNeeded: unknown;
+      priority: number;
+      slaMinutes: number;
+      requiresInspection: boolean;
+      isActive: boolean;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/housekeeping/templates/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9717,15 +11195,17 @@ export const apiClient = {
     if (startDate) query.set("startDate", startDate);
     if (endDate) query.set("endDate", endDate);
     const data = await fetchJSONUnknown(`/housekeeping/inspections/stats?${query.toString()}`);
-    return z.object({
-      total: z.number(),
-      passed: z.number(),
-      failed: z.number(),
-      partial: z.number(),
-      passRate: z.number(),
-      averageScore: z.number(),
-      recleanRate: z.number()
-    }).parse(data);
+    return z
+      .object({
+        total: z.number(),
+        passed: z.number(),
+        failed: z.number(),
+        partial: z.number(),
+        passRate: z.number(),
+        averageScore: z.number(),
+        recleanRate: z.number(),
+      })
+      .parse(data);
   },
 
   // ==================== FLEX CHECK ====================
@@ -9735,16 +11215,19 @@ export const apiClient = {
     return FlexCheckPolicySchema.parse(data);
   },
 
-  async updateFlexCheckPolicy(campgroundId: string, payload: {
-    earlyCheckInEnabled?: boolean;
-    earlyCheckInMinHours?: number;
-    earlyCheckInPricing?: unknown;
-    earlyCheckInAutoApprove?: boolean;
-    lateCheckoutEnabled?: boolean;
-    lateCheckoutMaxHours?: number;
-    lateCheckoutPricing?: unknown;
-    lateCheckoutAutoApprove?: boolean;
-  }) {
+  async updateFlexCheckPolicy(
+    campgroundId: string,
+    payload: {
+      earlyCheckInEnabled?: boolean;
+      earlyCheckInMinHours?: number;
+      earlyCheckInPricing?: unknown;
+      earlyCheckInAutoApprove?: boolean;
+      lateCheckoutEnabled?: boolean;
+      lateCheckoutMaxHours?: number;
+      lateCheckoutPricing?: unknown;
+      lateCheckoutAutoApprove?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/flex-check/policy?campgroundId=${campgroundId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9789,24 +11272,30 @@ export const apiClient = {
 
   async getPendingFlexRequests(campgroundId: string) {
     const data = await fetchJSONUnknown(`/flex-check/pending?campgroundId=${campgroundId}`);
-    return z.object({
-      earlyCheckIn: z.array(z.object({
-        reservationId: z.string(),
-        guestName: z.string(),
-        siteName: z.string(),
-        requestedTime: z.string(),
-        arrivalDate: z.string(),
-        proposedCharge: z.number()
-      })),
-      lateCheckout: z.array(z.object({
-        reservationId: z.string(),
-        guestName: z.string(),
-        siteName: z.string(),
-        requestedTime: z.string(),
-        departureDate: z.string(),
-        proposedCharge: z.number()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        earlyCheckIn: z.array(
+          z.object({
+            reservationId: z.string(),
+            guestName: z.string(),
+            siteName: z.string(),
+            requestedTime: z.string(),
+            arrivalDate: z.string(),
+            proposedCharge: z.number(),
+          }),
+        ),
+        lateCheckout: z.array(
+          z.object({
+            reservationId: z.string(),
+            guestName: z.string(),
+            siteName: z.string(),
+            requestedTime: z.string(),
+            departureDate: z.string(),
+            proposedCharge: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   // ==================== ROOM MOVES ====================
@@ -9855,7 +11344,10 @@ export const apiClient = {
 
   // ==================== GROUP BOOKINGS ====================
 
-  async getGroupBookings(campgroundId: string, filters?: { groupType?: string; assignmentStatus?: string }) {
+  async getGroupBookings(
+    campgroundId: string,
+    filters?: { groupType?: string; assignmentStatus?: string },
+  ) {
     const query = new URLSearchParams({ campgroundId });
     if (filters?.groupType) query.set("groupType", filters.groupType);
     if (filters?.assignmentStatus) query.set("assignmentStatus", filters.assignmentStatus);
@@ -9889,17 +11381,20 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateGroupBooking(id: string, payload: Partial<{
-    groupName: string;
-    groupType: string;
-    preferAdjacent: boolean;
-    preferSameFloor: boolean;
-    preferConnecting: boolean;
-    preferredZone: string;
-    billingType: string;
-    groupArrivalTime: string;
-    groupDepartureTime: string;
-  }>) {
+  async updateGroupBooking(
+    id: string,
+    payload: Partial<{
+      groupName: string;
+      groupType: string;
+      preferAdjacent: boolean;
+      preferSameFloor: boolean;
+      preferConnecting: boolean;
+      preferredZone: string;
+      billingType: string;
+      groupArrivalTime: string;
+      groupDepartureTime: string;
+    }>,
+  ) {
     const res = await fetch(`${API_BASE}/group-bookings/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -9930,52 +11425,60 @@ export const apiClient = {
     if (startDate) query.set("startDate", startDate);
     if (endDate) query.set("endDate", endDate);
     const data = await fetchJSONUnknown(`/group-bookings/stats?${query.toString()}`);
-    return z.object({
-      totalGroups: z.number(),
-      totalRooms: z.number(),
-      averageGroupSize: z.number(),
-      byType: z.record(z.number()),
-      byStatus: z.record(z.number())
-    }).parse(data);
+    return z
+      .object({
+        totalGroups: z.number(),
+        totalRooms: z.number(),
+        averageGroupSize: z.number(),
+        byType: z.record(z.number()),
+        byStatus: z.record(z.number()),
+      })
+      .parse(data);
   },
 
   // ==================== POS INTEGRATIONS ====================
 
   async listPosIntegrations(campgroundId: string) {
     const data = await fetchJSONUnknown(`/pos/integrations?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      provider: z.string(),
-      displayName: z.string().nullable(),
-      status: z.string(),
-      capabilities: z.array(z.string()),
-      lastSyncAt: z.string().nullable(),
-      lastSyncStatus: z.string().nullable(),
-      lastError: z.string().nullable(),
-      mappingCount: z.number().optional(),
-      createdAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          provider: z.string(),
+          displayName: z.string().nullable(),
+          status: z.string(),
+          capabilities: z.array(z.string()),
+          lastSyncAt: z.string().nullable(),
+          lastSyncStatus: z.string().nullable(),
+          lastError: z.string().nullable(),
+          mappingCount: z.number().optional(),
+          createdAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
 
   async getPosIntegration(id: string) {
     const data = await fetchJSONUnknown(`/pos/integrations/${id}`);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      provider: z.string(),
-      displayName: z.string().nullable(),
-      status: z.string(),
-      capabilities: z.array(z.string()),
-      credentials: UnknownRecordSchema,
-      settings: UnknownRecordSchema.nullable(),
-      locationMappings: z.record(z.string()).nullable(),
-      lastSyncAt: z.string().nullable(),
-      lastSyncStatus: z.string().nullable(),
-      lastError: z.string().nullable(),
-      createdAt: z.string(),
-      updatedAt: z.string()
-    }).parse(data);
+    return z
+      .object({
+        id: z.string(),
+        campgroundId: z.string(),
+        provider: z.string(),
+        displayName: z.string().nullable(),
+        status: z.string(),
+        capabilities: z.array(z.string()),
+        credentials: UnknownRecordSchema,
+        settings: UnknownRecordSchema.nullable(),
+        locationMappings: z.record(z.string()).nullable(),
+        lastSyncAt: z.string().nullable(),
+        lastSyncStatus: z.string().nullable(),
+        lastError: z.string().nullable(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+      })
+      .parse(data);
   },
 
   async createPosIntegration(payload: {
@@ -9996,18 +11499,21 @@ export const apiClient = {
       z.object({
         id: z.string(),
         provider: z.string(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
-  async updatePosIntegration(id: string, payload: {
-    displayName?: string;
-    credentials?: Record<string, unknown>;
-    settings?: Record<string, unknown>;
-    capabilities?: string[];
-    status?: string;
-  }) {
+  async updatePosIntegration(
+    id: string,
+    payload: {
+      displayName?: string;
+      credentials?: Record<string, unknown>;
+      settings?: Record<string, unknown>;
+      capabilities?: string[];
+      status?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/pos/integrations/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10034,8 +11540,8 @@ export const apiClient = {
       z.object({
         success: z.boolean(),
         message: z.string().optional(),
-        details: UnknownRecordSchema.optional()
-      })
+        details: UnknownRecordSchema.optional(),
+      }),
     );
   },
 
@@ -10050,8 +11556,8 @@ export const apiClient = {
       z.object({
         jobId: z.string().optional(),
         status: z.string(),
-        message: z.string().optional()
-      })
+        message: z.string().optional(),
+      }),
     );
   },
 
@@ -10060,24 +11566,28 @@ export const apiClient = {
     const query = new URLSearchParams({ campgroundId });
     if (provider) query.set("provider", provider);
     const data = await fetchJSONUnknown(`/pos/product-mappings?${query.toString()}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      productId: z.string(),
-      provider: z.string(),
-      externalId: z.string(),
-      externalSku: z.string().nullable(),
-      lastSyncedAt: z.string().nullable(),
-      syncStatus: z.string().nullable(),
-      syncError: z.string().nullable(),
-      metadata: UnknownRecordSchema.nullable(),
-      product: z.object({
-        id: z.string(),
-        name: z.string(),
-        sku: z.string().nullable(),
-        priceCents: z.number()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          productId: z.string(),
+          provider: z.string(),
+          externalId: z.string(),
+          externalSku: z.string().nullable(),
+          lastSyncedAt: z.string().nullable(),
+          syncStatus: z.string().nullable(),
+          syncError: z.string().nullable(),
+          metadata: UnknownRecordSchema.nullable(),
+          product: z.object({
+            id: z.string(),
+            name: z.string(),
+            sku: z.string().nullable(),
+            priceCents: z.number(),
+          }),
+        }),
+      )
+      .parse(data);
   },
 
   async importExternalProducts(integrationId: string) {
@@ -10097,10 +11607,10 @@ export const apiClient = {
             externalSku: z.string().nullable(),
             name: z.string(),
             priceCents: z.number(),
-            category: z.string().nullable()
-          })
-        )
-      })
+            category: z.string().nullable(),
+          }),
+        ),
+      }),
     );
   },
 
@@ -10119,8 +11629,8 @@ export const apiClient = {
       res,
       z.object({
         id: z.string(),
-        syncStatus: z.string()
-      })
+        syncStatus: z.string(),
+      }),
     );
   },
 
@@ -10141,8 +11651,8 @@ export const apiClient = {
       res,
       z.object({
         matched: z.number(),
-        unmatched: z.number()
-      })
+        unmatched: z.number(),
+      }),
     );
   },
 
@@ -10158,8 +11668,8 @@ export const apiClient = {
       z.object({
         pushed: z.number(),
         failed: z.number(),
-        results: UnknownArraySchema
-      })
+        results: UnknownArraySchema,
+      }),
     );
   },
 
@@ -10175,36 +11685,44 @@ export const apiClient = {
         processed: z.number(),
         deducted: z.number(),
         skipped: z.number(),
-        errors: z.array(z.string())
-      })
+        errors: z.array(z.string()),
+      }),
     );
   },
 
   async getSyncLogs(integrationId: string, limit?: number) {
     const query = limit ? `?limit=${limit}` : "";
     const data = await fetchJSONUnknown(`/pos/integrations/${integrationId}/logs${query}`);
-    return z.array(z.object({
-      id: z.string(),
-      integrationId: z.string(),
-      direction: z.string(),
-      type: z.string(),
-      status: z.string(),
-      itemsProcessed: z.number(),
-      itemsFailed: z.number(),
-      errors: z.array(z.string()),
-      startedAt: z.string(),
-      completedAt: z.string().nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          integrationId: z.string(),
+          direction: z.string(),
+          type: z.string(),
+          status: z.string(),
+          itemsProcessed: z.number(),
+          itemsFailed: z.number(),
+          errors: z.array(z.string()),
+          startedAt: z.string(),
+          completedAt: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   async getUnmatchedExternalProducts(integrationId: string) {
     const data = await fetchJSONUnknown(`/pos/integrations/${integrationId}/unmatched`);
-    return z.array(z.object({
-      id: z.string(),
-      externalId: z.string(),
-      externalSku: z.string().nullable(),
-      metadata: UnknownRecordSchema.nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          externalId: z.string(),
+          externalSku: z.string().nullable(),
+          metadata: UnknownRecordSchema.nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   // ==================== KIOSK DEVICE PAIRING ====================
@@ -10229,9 +11747,9 @@ export const apiClient = {
           slug: z.string(),
           heroImageUrl: z.string().nullable(),
           latitude: z.number().nullable(),
-          longitude: z.number().nullable()
-        })
-      })
+          longitude: z.number().nullable(),
+        }),
+      }),
     );
   },
 
@@ -10250,22 +11768,26 @@ export const apiClient = {
         error: z.string().optional(),
         deviceId: z.string().optional(),
         deviceName: z.string().optional(),
-        campground: z.object({
-          id: z.string(),
-          name: z.string(),
-          slug: z.string(),
-          heroImageUrl: z.string().nullable(),
-          latitude: z.number().nullable(),
-          longitude: z.number().nullable(),
-          checkInTime: z.string().nullable(),
-          checkOutTime: z.string().nullable()
-        }).optional(),
-        features: z.object({
-          allowWalkIns: z.boolean(),
-          allowCheckIn: z.boolean(),
-          allowPayments: z.boolean()
-        }).optional()
-      })
+        campground: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            slug: z.string(),
+            heroImageUrl: z.string().nullable(),
+            latitude: z.number().nullable(),
+            longitude: z.number().nullable(),
+            checkInTime: z.string().nullable(),
+            checkOutTime: z.string().nullable(),
+          })
+          .optional(),
+        features: z
+          .object({
+            allowWalkIns: z.boolean(),
+            allowCheckIn: z.boolean(),
+            allowPayments: z.boolean(),
+          })
+          .optional(),
+      }),
     );
   },
 
@@ -10291,7 +11813,7 @@ export const apiClient = {
         type: string;
         plateNumber?: string;
       };
-    }
+    },
   ) {
     const res = await fetch(`${API_BASE}/kiosk/reservations`, {
       method: "POST",
@@ -10312,13 +11834,19 @@ export const apiClient = {
         children: z.number(),
         totalAmount: z.number(),
         paidAmount: z.number(),
-        site: z.object({ id: z.string(), name: z.string(), siteNumber: z.string() }).nullable().optional(),
-        guest: z.object({
-          primaryFirstName: z.string(),
-          primaryLastName: z.string(),
-          email: z.string()
-        }).nullable().optional()
-      })
+        site: z
+          .object({ id: z.string(), name: z.string(), siteNumber: z.string() })
+          .nullable()
+          .optional(),
+        guest: z
+          .object({
+            primaryFirstName: z.string(),
+            primaryLastName: z.string(),
+            email: z.string(),
+          })
+          .nullable()
+          .optional(),
+      }),
     );
   },
 
@@ -10334,8 +11862,8 @@ export const apiClient = {
       res,
       z.object({
         code: z.string(),
-        expiresAt: z.string()
-      })
+        expiresAt: z.string(),
+      }),
     );
   },
 
@@ -10344,29 +11872,37 @@ export const apiClient = {
    */
   async kioskListDevices(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/kiosk/devices`);
-    return z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      status: z.string(),
-      lastSeenAt: z.string().nullable(),
-      userAgent: z.string().nullable(),
-      allowWalkIns: z.boolean(),
-      allowCheckIn: z.boolean(),
-      allowPayments: z.boolean(),
-      createdAt: z.string(),
-      revokedAt: z.string().nullable()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          status: z.string(),
+          lastSeenAt: z.string().nullable(),
+          userAgent: z.string().nullable(),
+          allowWalkIns: z.boolean(),
+          allowCheckIn: z.boolean(),
+          allowPayments: z.boolean(),
+          createdAt: z.string(),
+          revokedAt: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
 
   /**
    * Update a kiosk device's settings (staff auth required)
    */
-  async kioskUpdateDevice(campgroundId: string, deviceId: string, data: {
-    name?: string;
-    allowWalkIns?: boolean;
-    allowCheckIn?: boolean;
-    allowPayments?: boolean;
-  }) {
+  async kioskUpdateDevice(
+    campgroundId: string,
+    deviceId: string,
+    data: {
+      name?: string;
+      allowWalkIns?: boolean;
+      allowCheckIn?: boolean;
+      allowPayments?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/kiosk/devices/${deviceId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10379,10 +11915,13 @@ export const apiClient = {
    * Revoke a kiosk device (staff auth required)
    */
   async kioskRevokeDevice(campgroundId: string, deviceId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/kiosk/devices/${deviceId}/revoke`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/kiosk/devices/${deviceId}/revoke`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
@@ -10390,10 +11929,13 @@ export const apiClient = {
    * Re-enable a revoked kiosk device (staff auth required)
    */
   async kioskEnableDevice(campgroundId: string, deviceId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/kiosk/devices/${deviceId}/enable`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/kiosk/devices/${deviceId}/enable`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
@@ -10436,9 +11978,9 @@ export const apiClient = {
           sentAt: z.string().nullable(),
           readAt: z.string().nullable(),
           clickedAt: z.string().nullable(),
-          createdAt: z.string()
-        })
-      )
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
@@ -10454,8 +11996,8 @@ export const apiClient = {
       res,
       z.object({
         id: z.string(),
-        readAt: z.string()
-      })
+        readAt: z.string(),
+      }),
     );
   },
 
@@ -10494,23 +12036,26 @@ export const apiClient = {
   // ============================================================
 
   // Tasks
-  async getOpTasks(campgroundId: string, filters?: {
-    categories?: string[];
-    category?: string;
-    states?: string[];
-    state?: string;
-    priorities?: string[];
-    priority?: string;
-    assignedToUserId?: string;
-    assignedToTeamId?: string;
-    siteId?: string;
-    slaStatus?: string;
-    dueBefore?: string;
-    dueAfter?: string;
-    excludeCompleted?: boolean;
-    limit?: number;
-    offset?: number;
-  }) {
+  async getOpTasks(
+    campgroundId: string,
+    filters?: {
+      categories?: string[];
+      category?: string;
+      states?: string[];
+      state?: string;
+      priorities?: string[];
+      priority?: string;
+      assignedToUserId?: string;
+      assignedToTeamId?: string;
+      siteId?: string;
+      slaStatus?: string;
+      dueBefore?: string;
+      dueAfter?: string;
+      excludeCompleted?: boolean;
+      limit?: number;
+      offset?: number;
+    },
+  ) {
     const params = new URLSearchParams();
     if (filters?.categories?.length) params.set("categories", filters.categories.join(","));
     if (filters?.category) params.set("category", filters.category);
@@ -10568,22 +12113,25 @@ export const apiClient = {
     return parseResponse(res, UnknownArraySchema);
   },
 
-  async createOpTask(campgroundId: string, payload: {
-    category: string;
-    title: string;
-    description?: string;
-    priority?: string;
-    siteId?: string;
-    reservationId?: string;
-    locationDescription?: string;
-    assignedToUserId?: string;
-    assignedToTeamId?: string;
-    slaDueAt?: string;
-    checklist?: Array<{ id: string; text: string; completed: boolean; required?: boolean }>;
-    notes?: string;
-    isBlocking?: boolean;
-    templateId?: string;
-  }) {
+  async createOpTask(
+    campgroundId: string,
+    payload: {
+      category: string;
+      title: string;
+      description?: string;
+      priority?: string;
+      siteId?: string;
+      reservationId?: string;
+      locationDescription?: string;
+      assignedToUserId?: string;
+      assignedToTeamId?: string;
+      slaDueAt?: string;
+      checklist?: Array<{ id: string; text: string; completed: boolean; required?: boolean }>;
+      notes?: string;
+      isBlocking?: boolean;
+      templateId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10592,18 +12140,22 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateOpTask(campgroundId: string, taskId: string, payload: {
-    state?: string;
-    priority?: string;
-    title?: string;
-    description?: string;
-    assignedToUserId?: string;
-    assignedToTeamId?: string;
-    slaDueAt?: string;
-    checklist?: Array<{ id: string; text: string; completed: boolean }>;
-    notes?: string;
-    isBlocking?: boolean;
-  }) {
+  async updateOpTask(
+    campgroundId: string,
+    taskId: string,
+    payload: {
+      state?: string;
+      priority?: string;
+      title?: string;
+      description?: string;
+      assignedToUserId?: string;
+      assignedToTeamId?: string;
+      slaDueAt?: string;
+      checklist?: Array<{ id: string; text: string; completed: boolean }>;
+      notes?: string;
+      isBlocking?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10620,7 +12172,11 @@ export const apiClient = {
     await parseResponse(res, UnknownSchema);
   },
 
-  async assignOpTask(campgroundId: string, taskId: string, payload: { userId?: string; teamId?: string }) {
+  async assignOpTask(
+    campgroundId: string,
+    taskId: string,
+    payload: { userId?: string; teamId?: string },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/tasks/${taskId}/assign`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10665,21 +12221,30 @@ export const apiClient = {
     return parseResponse(res, UnknownArraySchema);
   },
 
-  async createOpTemplate(campgroundId: string, payload: {
-    name: string;
-    description?: string;
-    category: string;
-    priority?: string;
-    checklistTemplate?: Array<{ id: string; text: string; required?: boolean; category?: string; estimatedMinutes?: number }>;
-    suppliesNeeded?: Array<{ item: string; quantity?: number; notes?: string }>;
-    estimatedMinutes?: number;
-    slaMinutes?: number;
-    defaultTeamId?: string;
-    defaultAssigneeId?: string;
-    siteClassIds?: string[];
-    siteIds?: string[];
-    xpValue?: number;
-  }) {
+  async createOpTemplate(
+    campgroundId: string,
+    payload: {
+      name: string;
+      description?: string;
+      category: string;
+      priority?: string;
+      checklistTemplate?: Array<{
+        id: string;
+        text: string;
+        required?: boolean;
+        category?: string;
+        estimatedMinutes?: number;
+      }>;
+      suppliesNeeded?: Array<{ item: string; quantity?: number; notes?: string }>;
+      estimatedMinutes?: number;
+      slaMinutes?: number;
+      defaultTeamId?: string;
+      defaultAssigneeId?: string;
+      siteClassIds?: string[];
+      siteIds?: string[];
+      xpValue?: number;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10688,7 +12253,11 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateOpTemplate(campgroundId: string, templateId: string, payload: Record<string, unknown>) {
+  async updateOpTemplate(
+    campgroundId: string,
+    templateId: string,
+    payload: Record<string, unknown>,
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10706,11 +12275,14 @@ export const apiClient = {
   },
 
   async duplicateOpTemplate(campgroundId: string, templateId: string, name?: string) {
-    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}/duplicate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ name }),
-    });
+    const res = await fetch(
+      `${API_BASE}/op-tasks/${campgroundId}/templates/${templateId}/duplicate`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ name }),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
@@ -10740,22 +12312,25 @@ export const apiClient = {
     return parseResponse(res, UnknownArraySchema);
   },
 
-  async createOpTrigger(campgroundId: string, payload: {
-    name: string;
-    triggerEvent: string;
-    templateId: string;
-    conditions?: {
-      siteClassIds?: string[];
-      siteIds?: string[];
-      minNights?: number;
-      maxNights?: number;
-      hasPets?: boolean;
-      stayType?: string;
-    };
-    slaOffsetMinutes?: number;
-    assignToTeamId?: string;
-    assignToUserId?: string;
-  }) {
+  async createOpTrigger(
+    campgroundId: string,
+    payload: {
+      name: string;
+      triggerEvent: string;
+      templateId: string;
+      conditions?: {
+        siteClassIds?: string[];
+        siteIds?: string[];
+        minNights?: number;
+        maxNights?: number;
+        hasPets?: boolean;
+        stayType?: string;
+      };
+      slaOffsetMinutes?: number;
+      assignToTeamId?: string;
+      assignToUserId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/triggers`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10782,7 +12357,10 @@ export const apiClient = {
   },
 
   // Recurrence Rules
-  async getOpRecurrenceRules(campgroundId: string, filters?: { pattern?: string; isActive?: boolean }) {
+  async getOpRecurrenceRules(
+    campgroundId: string,
+    filters?: { pattern?: string; isActive?: boolean },
+  ) {
     const params = new URLSearchParams();
     if (filters?.pattern) params.set("pattern", filters.pattern);
     if (filters?.isActive !== undefined) params.set("isActive", String(filters.isActive));
@@ -10799,20 +12377,23 @@ export const apiClient = {
     return parseResponse(res, UnknownArraySchema);
   },
 
-  async createOpRecurrenceRule(campgroundId: string, payload: {
-    name: string;
-    templateId: string;
-    pattern: string;
-    daysOfWeek?: number[];
-    daysOfMonth?: number[];
-    generateAtHour?: number;
-    generateAtMinute?: number;
-    siteClassIds?: string[];
-    siteIds?: string[];
-    locationFilter?: string;
-    assignToTeamId?: string;
-    assignToUserId?: string;
-  }) {
+  async createOpRecurrenceRule(
+    campgroundId: string,
+    payload: {
+      name: string;
+      templateId: string;
+      pattern: string;
+      daysOfWeek?: number[];
+      daysOfMonth?: number[];
+      generateAtHour?: number;
+      generateAtMinute?: number;
+      siteClassIds?: string[];
+      siteIds?: string[];
+      locationFilter?: string;
+      assignToTeamId?: string;
+      assignToUserId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10821,7 +12402,11 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateOpRecurrenceRule(campgroundId: string, ruleId: string, payload: Record<string, unknown>) {
+  async updateOpRecurrenceRule(
+    campgroundId: string,
+    ruleId: string,
+    payload: Record<string, unknown>,
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/recurrence/${ruleId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10884,7 +12469,10 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async createOpTeam(campgroundId: string, payload: { name: string; description?: string; color?: string }) {
+  async createOpTeam(
+    campgroundId: string,
+    payload: { name: string; description?: string; color?: string },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10893,7 +12481,11 @@ export const apiClient = {
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateOpTeam(campgroundId: string, teamId: string, payload: { name?: string; description?: string; color?: string; isActive?: boolean }) {
+  async updateOpTeam(
+    campgroundId: string,
+    teamId: string,
+    payload: { name?: string; description?: string; color?: string; isActive?: boolean },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10910,7 +12502,11 @@ export const apiClient = {
     await parseResponse(res, UnknownSchema);
   },
 
-  async addOpTeamMember(campgroundId: string, teamId: string, payload: { userId: string; role?: string }) {
+  async addOpTeamMember(
+    campgroundId: string,
+    teamId: string,
+    payload: { userId: string; role?: string },
+  ) {
     const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -10920,19 +12516,25 @@ export const apiClient = {
   },
 
   async removeOpTeamMember(campgroundId: string, teamId: string, userId: string) {
-    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`, {
-      method: "DELETE",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     await parseResponse(res, UnknownSchema);
   },
 
   async updateOpTeamMemberRole(campgroundId: string, teamId: string, userId: string, role: string) {
-    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ role }),
-    });
+    const res = await fetch(
+      `${API_BASE}/op-tasks/${campgroundId}/teams/${teamId}/members/${userId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ role }),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
@@ -10956,20 +12558,23 @@ export const apiClient = {
           onTrack: z.number(),
           atRisk: z.number(),
           breached: z.number(),
-          total: z.number()
+          total: z.number(),
         }),
         today: z.object({
           completed: z.number(),
           onTime: z.number(),
           late: z.number(),
-          complianceRate: z.number()
+          complianceRate: z.number(),
         }),
-        week: z.object({ completed: z.number() })
-      })
+        week: z.object({ completed: z.number() }),
+      }),
     );
   },
 
-  async getUpcomingDeadlines(campgroundId: string, options?: { limit?: number; hoursAhead?: number }) {
+  async getUpcomingDeadlines(
+    campgroundId: string,
+    options?: { limit?: number; hoursAhead?: number },
+  ) {
     const params = new URLSearchParams();
     if (options?.limit) params.set("limit", String(options.limit));
     if (options?.hoursAhead) params.set("hoursAhead", String(options.hoursAhead));
@@ -10992,14 +12597,16 @@ export const apiClient = {
     });
     return parseResponse(
       res,
-      z.array(z.object({
-        teamId: z.string(),
-        teamName: z.string(),
-        totalCompleted: z.number(),
-        onTime: z.number(),
-        late: z.number(),
-        complianceRate: z.number()
-      }))
+      z.array(
+        z.object({
+          teamId: z.string(),
+          teamName: z.string(),
+          totalCompleted: z.number(),
+          onTime: z.number(),
+          late: z.number(),
+          complianceRate: z.number(),
+        }),
+      ),
     );
   },
 
@@ -11009,14 +12616,16 @@ export const apiClient = {
     });
     return parseResponse(
       res,
-      z.array(z.object({
-        userId: z.string(),
-        userName: z.string(),
-        totalCompleted: z.number(),
-        onTime: z.number(),
-        late: z.number(),
-        complianceRate: z.number()
-      }))
+      z.array(
+        z.object({
+          userId: z.string(),
+          userName: z.string(),
+          totalCompleted: z.number(),
+          onTime: z.number(),
+          late: z.number(),
+          complianceRate: z.number(),
+        }),
+      ),
     );
   },
 
@@ -11033,27 +12642,35 @@ export const apiClient = {
   // GAMIFICATION
   // ============================================================================
 
-  async getLeaderboard(campgroundId: string, options?: { period?: 'week' | 'month' | 'all_time'; limit?: number }) {
+  async getLeaderboard(
+    campgroundId: string,
+    options?: { period?: "week" | "month" | "all_time"; limit?: number },
+  ) {
     const params = new URLSearchParams();
-    if (options?.period) params.append('period', options.period);
-    if (options?.limit) params.append('limit', String(options.limit));
+    if (options?.period) params.append("period", options.period);
+    if (options?.limit) params.append("limit", String(options.limit));
     const queryString = params.toString();
-    const res = await fetch(`${API_BASE}/op-tasks/${campgroundId}/gamification/leaderboard${queryString ? `?${queryString}` : ''}`, {
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/op-tasks/${campgroundId}/gamification/leaderboard${queryString ? `?${queryString}` : ""}`,
+      {
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(
       res,
-      z.array(z.object({
-        userId: z.string(),
-        userName: z.string(),
-        totalPoints: z.number(),
-        periodPoints: z.number(),
-        rank: z.number(),
-        level: z.number(),
-        tasksCompleted: z.number(),
-        streak: z.number(),
-        badges: z.number()
-      }))
+      z.array(
+        z.object({
+          userId: z.string(),
+          userName: z.string(),
+          totalPoints: z.number(),
+          periodPoints: z.number(),
+          rank: z.number(),
+          level: z.number(),
+          tasksCompleted: z.number(),
+          streak: z.number(),
+          badges: z.number(),
+        }),
+      ),
     );
   },
 
@@ -11063,17 +12680,19 @@ export const apiClient = {
     });
     return parseResponse(
       res,
-      z.array(z.object({
-        id: z.string(),
-        code: z.string(),
-        name: z.string(),
-        description: z.string(),
-        icon: z.string(),
-        category: z.string(),
-        tier: z.string(),
-        points: z.number(),
-        earnedCount: z.number()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          code: z.string(),
+          name: z.string(),
+          description: z.string(),
+          icon: z.string(),
+          category: z.string(),
+          tier: z.string(),
+          points: z.number(),
+          earnedCount: z.number(),
+        }),
+      ),
     );
   },
 
@@ -11105,19 +12724,23 @@ export const apiClient = {
         slaComplianceRate: z.number(),
         weeklyRank: z.number().nullable(),
         monthlyRank: z.number().nullable(),
-        badges: z.array(z.object({
-          id: z.string(),
-          name: z.string(),
-          icon: z.string(),
-          tier: z.string(),
-          earnedAt: z.string()
-        })),
-        recentActivity: z.array(z.object({
-          date: z.string(),
-          tasksCompleted: z.number(),
-          pointsEarned: z.number()
-        }))
-      })
+        badges: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            icon: z.string(),
+            tier: z.string(),
+            earnedAt: z.string(),
+          }),
+        ),
+        recentActivity: z.array(
+          z.object({
+            date: z.string(),
+            tasksCompleted: z.number(),
+            pointsEarned: z.number(),
+          }),
+        ),
+      }),
     );
   },
 
@@ -11141,19 +12764,23 @@ export const apiClient = {
         slaComplianceRate: z.number(),
         weeklyRank: z.number().nullable(),
         monthlyRank: z.number().nullable(),
-        badges: z.array(z.object({
-          id: z.string(),
-          name: z.string(),
-          icon: z.string(),
-          tier: z.string(),
-          earnedAt: z.string()
-        })),
-        recentActivity: z.array(z.object({
-          date: z.string(),
-          tasksCompleted: z.number(),
-          pointsEarned: z.number()
-        }))
-      })
+        badges: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            icon: z.string(),
+            tier: z.string(),
+            earnedAt: z.string(),
+          }),
+        ),
+        recentActivity: z.array(
+          z.object({
+            date: z.string(),
+            tasksCompleted: z.number(),
+            pointsEarned: z.number(),
+          }),
+        ),
+      }),
     );
   },
 
@@ -11163,18 +12790,20 @@ export const apiClient = {
     });
     return parseResponse(
       res,
-      z.array(z.object({
-        userId: z.string(),
-        userName: z.string(),
-        level: z.number(),
-        totalPoints: z.number(),
-        weekPoints: z.number(),
-        monthPoints: z.number(),
-        currentStreak: z.number(),
-        tasksCompleted: z.number(),
-        slaComplianceRate: z.number(),
-        badgeCount: z.number()
-      }))
+      z.array(
+        z.object({
+          userId: z.string(),
+          userName: z.string(),
+          level: z.number(),
+          totalPoints: z.number(),
+          weekPoints: z.number(),
+          monthPoints: z.number(),
+          currentStreak: z.number(),
+          tasksCompleted: z.number(),
+          slaComplianceRate: z.number(),
+          badgeCount: z.number(),
+        }),
+      ),
     );
   },
 
@@ -11205,8 +12834,8 @@ export const apiClient = {
         noShowThreshold: z.number(),
         noShowAutoReminder: z.boolean(),
         noShowReminderDaysBefore: z.number(),
-        weatherAlertsEnabled: z.boolean().optional()
-      })
+        weatherAlertsEnabled: z.boolean().optional(),
+      }),
     );
   },
 
@@ -11225,20 +12854,25 @@ export const apiClient = {
     if (category) params.set("category", category);
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/context?${params}`,
-      z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        question: z.string().optional(),
-        answer: z.string(),
-        category: z.string().optional(),
-        priority: z.number(),
-        isActive: z.boolean(),
-        source: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          question: z.string().optional(),
+          answer: z.string(),
+          category: z.string().optional(),
+          priority: z.number(),
+          isActive: z.boolean(),
+          source: z.string(),
+        }),
+      ),
     );
   },
 
-  async createAutopilotContext(campgroundId: string, data: { type: string; question?: string; answer: string; category?: string; priority?: number }) {
+  async createAutopilotContext(
+    campgroundId: string,
+    data: { type: string; question?: string; answer: string; category?: string; priority?: number },
+  ) {
     const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/context`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -11265,16 +12899,19 @@ export const apiClient = {
   },
 
   async autoPopulateContext(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/context/auto-populate`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/context/auto-populate`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         success: z.boolean(),
-        created: z.number()
-      })
+        created: z.number(),
+      }),
     );
   },
 
@@ -11283,23 +12920,30 @@ export const apiClient = {
     if (status) params.set("status", status);
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/reply-drafts?${params}`,
-      z.array(z.object({
-        id: z.string(),
-        communicationId: z.string(),
-        inboundSubject: z.string().optional(),
-        inboundPreview: z.string().optional(),
-        draftContent: z.string(),
-        confidence: z.number(),
-        detectedIntent: z.string().optional(),
-        detectedTone: z.string().optional(),
-        status: z.string(),
-        createdAt: z.string(),
-        autoSendScheduledAt: z.string().optional()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          communicationId: z.string(),
+          inboundSubject: z.string().optional(),
+          inboundPreview: z.string().optional(),
+          draftContent: z.string(),
+          confidence: z.number(),
+          detectedIntent: z.string().optional(),
+          detectedTone: z.string().optional(),
+          status: z.string(),
+          createdAt: z.string(),
+          autoSendScheduledAt: z.string().optional(),
+        }),
+      ),
     );
   },
 
-  async reviewReplyDraft(id: string, action: "approve" | "edit" | "reject", editedContent?: string, rejectionReason?: string) {
+  async reviewReplyDraft(
+    id: string,
+    action: "approve" | "edit" | "reject",
+    editedContent?: string,
+    rejectionReason?: string,
+  ) {
     const res = await fetch(`${API_BASE}/ai/autopilot/reply-drafts/${id}/review`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -11322,25 +12966,31 @@ export const apiClient = {
     if (severity) params.set("severity", severity);
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/anomalies?${params}`,
-      z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        severity: z.string(),
-        title: z.string(),
-        summary: z.string(),
-        aiAnalysis: z.string().optional(),
-        suggestedAction: z.string().optional(),
-        metric: z.string(),
-        currentValue: z.number(),
-        expectedValue: z.number(),
-        deviation: z.number(),
-        status: z.string(),
-        detectedAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          severity: z.string(),
+          title: z.string(),
+          summary: z.string(),
+          aiAnalysis: z.string().optional(),
+          suggestedAction: z.string().optional(),
+          metric: z.string(),
+          currentValue: z.number(),
+          expectedValue: z.number(),
+          deviation: z.number(),
+          status: z.string(),
+          detectedAt: z.string(),
+        }),
+      ),
     );
   },
 
-  async updateAnomalyStatus(id: string, status: "acknowledged" | "resolved" | "dismissed", dismissedReason?: string) {
+  async updateAnomalyStatus(
+    id: string,
+    status: "acknowledged" | "resolved" | "dismissed",
+    dismissedReason?: string,
+  ) {
     const res = await fetch(`${API_BASE}/ai/autopilot/anomalies/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -11350,16 +13000,19 @@ export const apiClient = {
   },
 
   async runAnomalyCheck(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/anomalies/check`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/anomalies/check`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         checked: z.boolean(),
-        alerts: UnknownArraySchema
-      })
+        alerts: UnknownArraySchema,
+      }),
     );
   },
 
@@ -11369,99 +13022,112 @@ export const apiClient = {
     if (daysAhead) params.set("daysAhead", String(daysAhead));
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/no-show-risks?${params}`,
-      z.array(z.object({
-        id: z.string(),
-        reservationId: z.string(),
-        riskScore: z.number(),
-        paymentStatusScore: z.number(),
-        leadTimeScore: z.number(),
-        guestHistoryScore: z.number(),
-        communicationScore: z.number(),
-        bookingPatternScore: z.number(),
-        riskReason: z.string().optional(),
-        flagged: z.boolean(),
-        guestConfirmed: z.boolean(),
-        reminderSentAt: z.string().optional(),
-        reservation: z.object({
+      z.array(
+        z.object({
           id: z.string(),
-          confirmationNumber: z.string(),
-          arrivalDate: z.string(),
-          departureDate: z.string(),
-          status: z.string(),
-          guest: z.object({
+          reservationId: z.string(),
+          riskScore: z.number(),
+          paymentStatusScore: z.number(),
+          leadTimeScore: z.number(),
+          guestHistoryScore: z.number(),
+          communicationScore: z.number(),
+          bookingPatternScore: z.number(),
+          riskReason: z.string().optional(),
+          flagged: z.boolean(),
+          guestConfirmed: z.boolean(),
+          reminderSentAt: z.string().optional(),
+          reservation: z.object({
             id: z.string(),
-            primaryFirstName: z.string().optional(),
-            primaryLastName: z.string().optional(),
-            email: z.string().optional()
+            confirmationNumber: z.string(),
+            arrivalDate: z.string(),
+            departureDate: z.string(),
+            status: z.string(),
+            guest: z.object({
+              id: z.string(),
+              primaryFirstName: z.string().optional(),
+              primaryLastName: z.string().optional(),
+              email: z.string().optional(),
+            }),
+            site: z.object({ id: z.string(), name: z.string() }).optional(),
           }),
-          site: z.object({ id: z.string(), name: z.string() }).optional()
-        })
-      }))
+        }),
+      ),
     );
   },
 
   async sendNoShowReminder(reservationId: string) {
-    const res = await fetch(`${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/remind`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/remind`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         sent: z.boolean(),
-        to: z.string()
-      })
+        to: z.string(),
+      }),
     );
   },
 
   async markNoShowConfirmed(reservationId: string, source?: string) {
-    const res = await fetch(`${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/confirm`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ source }),
-    });
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/reservations/${reservationId}/no-show-risk/confirm`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ source }),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
   async getWaitlistAiScores(campgroundId: string) {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/waitlist/ai-scores`,
-      z.array(z.object({
-        id: z.string(),
-        waitlistEntryId: z.string(),
-        aiScore: z.number(),
-        baseScore: z.number(),
-        guestLtvScore: z.number(),
-        bookingLikelihood: z.number(),
-        seasonalFitScore: z.number(),
-        communicationScore: z.number(),
-        aiReason: z.string().optional(),
-        waitlistEntry: z.object({
+      z.array(
+        z.object({
           id: z.string(),
-          guest: z.object({
+          waitlistEntryId: z.string(),
+          aiScore: z.number(),
+          baseScore: z.number(),
+          guestLtvScore: z.number(),
+          bookingLikelihood: z.number(),
+          seasonalFitScore: z.number(),
+          communicationScore: z.number(),
+          aiReason: z.string().optional(),
+          waitlistEntry: z.object({
             id: z.string(),
-            primaryFirstName: z.string().optional(),
-            primaryLastName: z.string().optional(),
-            email: z.string().optional()
+            guest: z.object({
+              id: z.string(),
+              primaryFirstName: z.string().optional(),
+              primaryLastName: z.string().optional(),
+              email: z.string().optional(),
+            }),
+            site: z.object({ id: z.string(), name: z.string() }).optional(),
+            siteClass: z.object({ id: z.string(), name: z.string() }).optional(),
           }),
-          site: z.object({ id: z.string(), name: z.string() }).optional(),
-          siteClass: z.object({ id: z.string(), name: z.string() }).optional()
-        })
-      }))
+        }),
+      ),
     );
   },
 
   async rescoreWaitlist(campgroundId: string) {
-    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/waitlist/rescore`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/waitlist/rescore`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         scored: z.number(),
-        total: z.number()
-      })
+        total: z.number(),
+      }),
     );
   },
 
@@ -11479,7 +13145,7 @@ export const apiClient = {
           pendingPricing: z.number(),
           activeMaintenanceAlerts: z.number(),
           activeWeatherAlerts: z.number(),
-          todayCalls: z.number()
+          todayCalls: z.number(),
         }),
         metrics: z.object({
           messagesHandled: z.number(),
@@ -11490,18 +13156,20 @@ export const apiClient = {
           phoneCallsHandled: z.number(),
           estimatedRevenueSavedCents: z.number(),
           aiCostCents: z.number(),
-          roiPercent: z.number()
+          roiPercent: z.number(),
         }),
-        activity: z.array(z.object({
-          id: z.string(),
-          type: z.string(),
-          title: z.string(),
-          subtitle: z.string(),
-          timestamp: z.string(),
-          icon: z.string(),
-          color: z.string()
-        }))
-      })
+        activity: z.array(
+          z.object({
+            id: z.string(),
+            type: z.string(),
+            title: z.string(),
+            subtitle: z.string(),
+            timestamp: z.string(),
+            icon: z.string(),
+            color: z.string(),
+          }),
+        ),
+      }),
     );
   },
 
@@ -11509,15 +13177,17 @@ export const apiClient = {
     const params = limit ? `?limit=${limit}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/dashboard/activity${params}`,
-      z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        title: z.string(),
-        subtitle: z.string(),
-        timestamp: z.string(),
-        icon: z.string(),
-        color: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          title: z.string(),
+          subtitle: z.string(),
+          timestamp: z.string(),
+          icon: z.string(),
+          color: z.string(),
+        }),
+      ),
     );
   },
 
@@ -11526,20 +13196,22 @@ export const apiClient = {
     const params = status ? `?status=${status}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/pricing/recommendations${params}`,
-      z.array(z.object({
-        id: z.string(),
-        siteClassId: z.string().nullable(),
-        dateStart: z.string(),
-        dateEnd: z.string(),
-        recommendationType: z.string(),
-        currentPriceCents: z.number(),
-        suggestedPriceCents: z.number(),
-        adjustmentPercent: z.number(),
-        confidence: z.number(),
-        reasoning: z.string(),
-        status: z.string(),
-        estimatedRevenueDelta: z.number().nullable()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          siteClassId: z.string().nullable(),
+          dateStart: z.string(),
+          dateEnd: z.string(),
+          recommendationType: z.string(),
+          currentPriceCents: z.number(),
+          suggestedPriceCents: z.number(),
+          adjustmentPercent: z.number(),
+          confidence: z.number(),
+          reasoning: z.string(),
+          status: z.string(),
+          estimatedRevenueDelta: z.number().nullable(),
+        }),
+      ),
     );
   },
 
@@ -11567,8 +13239,8 @@ export const apiClient = {
         pendingRecommendations: z.number(),
         appliedLast30Days: z.number(),
         estimatedRevenueDeltaCents: z.number(),
-        averageAdjustmentPercent: z.number()
-      })
+        averageAdjustmentPercent: z.number(),
+      }),
     );
   },
 
@@ -11579,13 +13251,15 @@ export const apiClient = {
       z.object({
         elasticity: z.number(),
         optimalPriceRange: z.object({ min: z.number(), max: z.number() }),
-        pricePoints: z.array(z.object({
-          price: z.number(),
-          conversionRate: z.number(),
-          bookings: z.number()
-        })),
-        insight: z.string()
-      })
+        pricePoints: z.array(
+          z.object({
+            price: z.number(),
+            conversionRate: z.number(),
+            bookings: z.number(),
+          }),
+        ),
+        insight: z.string(),
+      }),
     );
   },
 
@@ -11594,17 +13268,19 @@ export const apiClient = {
     const params = status ? `?status=${status}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/revenue/insights${params}`,
-      z.array(z.object({
-        id: z.string(),
-        insightType: z.string(),
-        title: z.string(),
-        summary: z.string(),
-        impactCents: z.number(),
-        difficulty: z.string(),
-        priority: z.number(),
-        recommendations: z.array(z.object({ action: z.string(), details: z.string() })),
-        status: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          insightType: z.string(),
+          title: z.string(),
+          summary: z.string(),
+          impactCents: z.number(),
+          difficulty: z.string(),
+          priority: z.number(),
+          recommendations: z.array(z.object({ action: z.string(), details: z.string() })),
+          status: z.string(),
+        }),
+      ),
     );
   },
 
@@ -11640,8 +13316,8 @@ export const apiClient = {
         totalOpportunityCents: z.number(),
         activeInsights: z.number(),
         newInsights: z.number(),
-        byType: z.record(z.object({ count: z.number(), impact: z.number() }))
-      })
+        byType: z.record(z.object({ count: z.number(), impact: z.number() })),
+      }),
     );
   },
 
@@ -11660,59 +13336,66 @@ export const apiClient = {
           periodADR: z.number(),
           periodRevPAN: z.number(),
           periodNights: z.number(),
-          yoyChange: z.object({
-            occupancy: z.number(),
-            revenue: z.number(),
-            adr: z.number()
-          }).nullable(),
+          yoyChange: z
+            .object({
+              occupancy: z.number(),
+              revenue: z.number(),
+              adr: z.number(),
+            })
+            .nullable(),
           next7DaysOccupancy: z.number(),
           next30DaysOccupancy: z.number(),
           forecastRevenue30Days: z.number(),
           gapNights: z.number(),
           pendingRecommendations: z.number(),
-          potentialRevenue: z.number()
+          potentialRevenue: z.number(),
         }),
-        occupancyTrend: z.array(z.object({
-          date: z.string(),
-          occupancy: z.number(),
-          revenue: z.number()
-        })),
-        forecasts: z.array(z.object({
-          date: z.string(),
-          occupiedSites: z.number(),
-          totalSites: z.number(),
-          occupancyPct: z.number(),
-          projectedRevenue: z.number()
-        })),
-        topRecommendations: z.array(z.object({
-          id: z.string(),
-          siteClassId: z.string(),
-          dateStart: z.string(),
-          dateEnd: z.string(),
-          currentPrice: z.number(),
-          suggestedPrice: z.number(),
-          adjustmentPercent: z.number(),
-          confidence: z.number(),
-          estimatedRevenueDelta: z.number(),
-          status: z.string()
-        })),
-        revenueInsights: z.array(z.object({
-          id: z.string(),
-          insightType: z.string(),
-          title: z.string(),
-          description: z.string(),
-          priority: z.number(),
-          estimatedValueCents: z.number().nullable(),
-          status: z.string()
-        }))
-      })
+        occupancyTrend: z.array(
+          z.object({
+            date: z.string(),
+            occupancy: z.number(),
+            revenue: z.number(),
+          }),
+        ),
+        forecasts: z.array(
+          z.object({
+            date: z.string(),
+            occupiedSites: z.number(),
+            totalSites: z.number(),
+            occupancyPct: z.number(),
+            projectedRevenue: z.number(),
+          }),
+        ),
+        topRecommendations: z.array(
+          z.object({
+            id: z.string(),
+            siteClassId: z.string(),
+            dateStart: z.string(),
+            dateEnd: z.string(),
+            currentPrice: z.number(),
+            suggestedPrice: z.number(),
+            adjustmentPercent: z.number(),
+            confidence: z.number(),
+            estimatedRevenueDelta: z.number(),
+            status: z.string(),
+          }),
+        ),
+        revenueInsights: z.array(
+          z.object({
+            id: z.string(),
+            insightType: z.string(),
+            title: z.string(),
+            description: z.string(),
+            priority: z.number(),
+            estimatedValueCents: z.number().nullable(),
+            status: z.string(),
+          }),
+        ),
+      }),
     );
   },
 
-  async getYieldMetrics(
-    campgroundId: string,
-    options?: { startDate?: string; endDate?: string }
-  ) {
+  async getYieldMetrics(campgroundId: string, options?: { startDate?: string; endDate?: string }) {
     const params = new URLSearchParams();
     if (options?.startDate) params.append("startDate", options.startDate);
     if (options?.endDate) params.append("endDate", options.endDate);
@@ -11729,18 +13412,20 @@ export const apiClient = {
         periodADR: z.number(),
         periodRevPAN: z.number(),
         periodNights: z.number(),
-        yoyChange: z.object({
-          occupancy: z.number(),
-          revenue: z.number(),
-          adr: z.number()
-        }).nullable(),
+        yoyChange: z
+          .object({
+            occupancy: z.number(),
+            revenue: z.number(),
+            adr: z.number(),
+          })
+          .nullable(),
         next7DaysOccupancy: z.number(),
         next30DaysOccupancy: z.number(),
         forecastRevenue30Days: z.number(),
         gapNights: z.number(),
         pendingRecommendations: z.number(),
-        potentialRevenue: z.number()
-      })
+        potentialRevenue: z.number(),
+      }),
     );
   },
 
@@ -11748,7 +13433,7 @@ export const apiClient = {
     const query = days ? `?days=${days}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/yield/occupancy-trend${query}`,
-      z.array(z.object({ date: z.string(), occupancy: z.number(), revenue: z.number() }))
+      z.array(z.object({ date: z.string(), occupancy: z.number(), revenue: z.number() })),
     );
   },
 
@@ -11757,34 +13442,33 @@ export const apiClient = {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/yield/forecast${query}`,
       z.object({
-        forecasts: z.array(z.object({
-          date: z.string(),
-          occupiedSites: z.number(),
-          totalSites: z.number(),
-          occupancyPct: z.number(),
-          projectedRevenue: z.number()
-        })),
+        forecasts: z.array(
+          z.object({
+            date: z.string(),
+            occupiedSites: z.number(),
+            totalSites: z.number(),
+            occupancyPct: z.number(),
+            projectedRevenue: z.number(),
+          }),
+        ),
         avgOccupancy: z.number(),
-        totalRevenue: z.number()
-      })
+        totalRevenue: z.number(),
+      }),
     );
   },
 
   async backfillYieldSnapshots(campgroundId: string, days?: number) {
-    const res = await fetch(
-      `${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/yield/backfill`,
-      {
-        method: "POST",
-        headers: scopedHeaders(),
-        body: JSON.stringify({ days: days || 90 }),
-      }
-    );
+    const res = await fetch(`${API_BASE}/ai/autopilot/campgrounds/${campgroundId}/yield/backfill`, {
+      method: "POST",
+      headers: scopedHeaders(),
+      body: JSON.stringify({ days: days || 90 }),
+    });
     return parseResponse(
       res,
       z.object({
         success: z.boolean(),
-        recordedDays: z.number()
-      })
+        recordedDays: z.number(),
+      }),
     );
   },
 
@@ -11794,24 +13478,28 @@ export const apiClient = {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/demand/forecast${query}`,
       z.object({
-        forecasts: z.array(z.object({
-          date: z.string(),
-          predictedOccupancy: z.number(),
-          predictedRevenue: z.number(),
-          confidenceLow: z.number(),
-          confidenceHigh: z.number(),
-          demandLevel: z.enum(["very_low", "low", "moderate", "high", "very_high"]),
-          factors: z.array(z.object({ name: z.string(), impact: z.number(), description: z.string() })),
-          existingBookings: z.number()
-        })),
+        forecasts: z.array(
+          z.object({
+            date: z.string(),
+            predictedOccupancy: z.number(),
+            predictedRevenue: z.number(),
+            confidenceLow: z.number(),
+            confidenceHigh: z.number(),
+            demandLevel: z.enum(["very_low", "low", "moderate", "high", "very_high"]),
+            factors: z.array(
+              z.object({ name: z.string(), impact: z.number(), description: z.string() }),
+            ),
+            existingBookings: z.number(),
+          }),
+        ),
         summary: z.object({
           avgPredictedOccupancy: z.number(),
           totalPredictedRevenue: z.number(),
           highDemandDays: z.number(),
           lowDemandDays: z.number(),
-          confidenceScore: z.number()
-        })
-      })
+          confidenceScore: z.number(),
+        }),
+      }),
     );
   },
 
@@ -11822,16 +13510,18 @@ export const apiClient = {
     const query = params.toString() ? `?${params.toString()}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/demand/heatmap${query}`,
-      z.array(z.object({
-        date: z.string(),
-        demandScore: z.number(),
-        demandLevel: z.enum(["very_low", "low", "moderate", "high", "very_high"]),
-        predictedOccupancy: z.number(),
-        existingOccupancy: z.number(),
-        isWeekend: z.boolean(),
-        isHoliday: z.boolean(),
-        holidayName: z.string().optional()
-      }))
+      z.array(
+        z.object({
+          date: z.string(),
+          demandScore: z.number(),
+          demandLevel: z.enum(["very_low", "low", "moderate", "high", "very_high"]),
+          predictedOccupancy: z.number(),
+          existingOccupancy: z.number(),
+          isWeekend: z.boolean(),
+          isHoliday: z.boolean(),
+          holidayName: z.string().optional(),
+        }),
+      ),
     );
   },
 
@@ -11839,24 +13529,30 @@ export const apiClient = {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/demand/insights`,
       z.object({
-        peakDemandPeriods: z.array(z.object({
-          startDate: z.string(),
-          endDate: z.string(),
-          avgDemand: z.number(),
-          reason: z.string()
-        })),
-        lowDemandPeriods: z.array(z.object({
-          startDate: z.string(),
-          endDate: z.string(),
-          avgDemand: z.number(),
-          suggestion: z.string()
-        })),
-        upcomingOpportunities: z.array(z.object({
-          date: z.string(),
-          type: z.string(),
-          description: z.string()
-        }))
-      })
+        peakDemandPeriods: z.array(
+          z.object({
+            startDate: z.string(),
+            endDate: z.string(),
+            avgDemand: z.number(),
+            reason: z.string(),
+          }),
+        ),
+        lowDemandPeriods: z.array(
+          z.object({
+            startDate: z.string(),
+            endDate: z.string(),
+            avgDemand: z.number(),
+            suggestion: z.string(),
+          }),
+        ),
+        upcomingOpportunities: z.array(
+          z.object({
+            date: z.string(),
+            type: z.string(),
+            description: z.string(),
+          }),
+        ),
+      }),
     );
   },
 
@@ -11865,20 +13561,24 @@ export const apiClient = {
       `/ai/autopilot/campgrounds/${campgroundId}/demand/analysis`,
       z.object({
         baselineOccupancy: z.number(),
-        seasonality: z.array(z.object({
-          month: z.number(),
-          factor: z.number(),
-          isHighSeason: z.boolean()
-        })),
-        dayOfWeek: z.array(z.object({
-          dayOfWeek: z.number(),
-          factor: z.number(),
-          avgOccupancy: z.number()
-        })),
+        seasonality: z.array(
+          z.object({
+            month: z.number(),
+            factor: z.number(),
+            isHighSeason: z.boolean(),
+          }),
+        ),
+        dayOfWeek: z.array(
+          z.object({
+            dayOfWeek: z.number(),
+            factor: z.number(),
+            avgOccupancy: z.number(),
+          }),
+        ),
         recentTrend: z.number(),
         variance: z.number(),
-        dataPoints: z.number()
-      })
+        dataPoints: z.number(),
+      }),
     );
   },
 
@@ -11887,20 +13587,22 @@ export const apiClient = {
     const params = status ? `?status=${status}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/maintenance/alerts${params}`,
-      z.array(z.object({
-        id: z.string(),
-        siteId: z.string().nullable(),
-        alertType: z.string(),
-        severity: z.string(),
-        category: z.string(),
-        title: z.string(),
-        summary: z.string(),
-        incidentCount: z.number(),
-        confidence: z.number(),
-        suggestedAction: z.string(),
-        estimatedCostCents: z.number().nullable(),
-        status: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          siteId: z.string().nullable(),
+          alertType: z.string(),
+          severity: z.string(),
+          category: z.string(),
+          title: z.string(),
+          summary: z.string(),
+          incidentCount: z.number(),
+          confidence: z.number(),
+          suggestedAction: z.string(),
+          estimatedCostCents: z.number().nullable(),
+          status: z.string(),
+        }),
+      ),
     );
   },
 
@@ -11929,8 +13631,8 @@ export const apiClient = {
         high: z.number(),
         medium: z.number(),
         low: z.number(),
-        requiresAttention: z.number()
-      })
+        requiresAttention: z.number(),
+      }),
     );
   },
 
@@ -11949,48 +13651,54 @@ export const apiClient = {
           description: z.string(),
           icon: z.string(),
           updatedAt: z.string().optional(),
-          alerts: z.array(z.object({
-            event: z.string(),
-            severity: z.string(),
-            headline: z.string(),
-            start: z.string(),
-            end: z.string()
-          }))
+          alerts: z.array(
+            z.object({
+              event: z.string(),
+              severity: z.string(),
+              headline: z.string(),
+              start: z.string(),
+              end: z.string(),
+            }),
+          ),
         }),
-        z.null()
-      ])
+        z.null(),
+      ]),
     );
   },
 
   async getWeatherForecast(campgroundId: string) {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/weather/forecast`,
-      z.array(z.object({
-        date: z.string(),
-        tempHigh: z.number(),
-        tempLow: z.number(),
-        description: z.string(),
-        icon: z.string(),
-        pop: z.number(),
-        windSpeed: z.number()
-      }))
+      z.array(
+        z.object({
+          date: z.string(),
+          tempHigh: z.number(),
+          tempLow: z.number(),
+          description: z.string(),
+          icon: z.string(),
+          pop: z.number(),
+          windSpeed: z.number(),
+        }),
+      ),
     );
   },
 
   async getWeatherAlerts(campgroundId: string) {
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/weather/alerts`,
-      z.array(z.object({
-        id: z.string(),
-        alertType: z.string(),
-        severity: z.string(),
-        title: z.string(),
-        message: z.string(),
-        startTime: z.string(),
-        guestsAffected: z.number(),
-        guestsNotified: z.number(),
-        status: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          alertType: z.string(),
+          severity: z.string(),
+          title: z.string(),
+          message: z.string(),
+          startTime: z.string(),
+          guestsAffected: z.number(),
+          guestsNotified: z.number(),
+          status: z.string(),
+        }),
+      ),
     );
   },
 
@@ -12003,8 +13711,8 @@ export const apiClient = {
       res,
       z.object({
         sent: z.number(),
-        total: z.number()
-      })
+        total: z.number(),
+      }),
     );
   },
 
@@ -12016,17 +13724,19 @@ export const apiClient = {
     const query = params.toString() ? `?${params}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/phone/sessions${query}`,
-      z.array(z.object({
-        id: z.string(),
-        callerPhone: z.string(),
-        status: z.string(),
-        startedAt: z.string(),
-        endedAt: z.string().nullable(),
-        durationSeconds: z.number().nullable(),
-        intents: z.array(z.string()),
-        summary: z.string().nullable(),
-        resolutionStatus: z.string().nullable()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          callerPhone: z.string(),
+          status: z.string(),
+          startedAt: z.string(),
+          endedAt: z.string().nullable(),
+          durationSeconds: z.number().nullable(),
+          intents: z.array(z.string()),
+          summary: z.string().nullable(),
+          resolutionStatus: z.string().nullable(),
+        }),
+      ),
     );
   },
 
@@ -12041,8 +13751,8 @@ export const apiClient = {
         voicemails: z.number(),
         avgDurationSeconds: z.number(),
         totalCostCents: z.number(),
-        resolutionRate: z.number()
-      })
+        resolutionRate: z.number(),
+      }),
     );
   },
 
@@ -12054,18 +13764,20 @@ export const apiClient = {
     const query = params.toString() ? `?${params}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/autonomous-actions${query}`,
-      z.array(z.object({
-        id: z.string(),
-        actionType: z.string(),
-        entityType: z.string(),
-        entityId: z.string(),
-        description: z.string(),
-        confidence: z.number().nullable(),
-        reversible: z.boolean(),
-        reversedAt: z.string().nullable(),
-        outcome: z.string().nullable(),
-        createdAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          actionType: z.string(),
+          entityType: z.string(),
+          entityId: z.string(),
+          description: z.string(),
+          confidence: z.number().nullable(),
+          reversible: z.boolean(),
+          reversedAt: z.string().nullable(),
+          outcome: z.string().nullable(),
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
@@ -12082,11 +13794,13 @@ export const apiClient = {
     const params = days ? `?days=${days}` : "";
     return fetchJSON(
       `/ai/autopilot/campgrounds/${campgroundId}/autonomous-actions/summary${params}`,
-      z.record(z.object({
-        total: z.number(),
-        success: z.number(),
-        reversed: z.number()
-      }))
+      z.record(
+        z.object({
+          total: z.number(),
+          success: z.number(),
+          reversed: z.number(),
+        }),
+      ),
     );
   },
 
@@ -12098,30 +13812,44 @@ export const apiClient = {
   async getTerminalLocations(campgroundId: string) {
     return fetchJSON(
       `/campgrounds/${campgroundId}/terminal/locations`,
-      z.array(z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        stripeLocationId: z.string(),
-        displayName: z.string(),
-        address: z.object({
-          line1: z.string(),
-          line2: z.string().optional(),
-          city: z.string(),
-          state: z.string(),
-          postal_code: z.string(),
-          country: z.string().optional()
-        }).nullable(),
-        isActive: z.boolean(),
-        readerCount: z.number(),
-        createdAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          stripeLocationId: z.string(),
+          displayName: z.string(),
+          address: z
+            .object({
+              line1: z.string(),
+              line2: z.string().optional(),
+              city: z.string(),
+              state: z.string(),
+              postal_code: z.string(),
+              country: z.string().optional(),
+            })
+            .nullable(),
+          isActive: z.boolean(),
+          readerCount: z.number(),
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
-  async createTerminalLocation(campgroundId: string, payload: {
-    displayName: string;
-    address: { line1: string; line2?: string; city: string; state: string; postal_code: string; country?: string };
-  }) {
+  async createTerminalLocation(
+    campgroundId: string,
+    payload: {
+      displayName: string;
+      address: {
+        line1: string;
+        line2?: string;
+        city: string;
+        state: string;
+        postal_code: string;
+        country?: string;
+      };
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/locations`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12131,16 +13859,19 @@ export const apiClient = {
       res,
       z.object({
         id: z.string(),
-        stripeLocationId: z.string()
-      })
+        stripeLocationId: z.string(),
+      }),
     );
   },
 
   async deleteTerminalLocation(campgroundId: string, locationId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/locations/${locationId}`, {
-      method: "DELETE",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/terminal/locations/${locationId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     if (!res.ok) throw new Error("Failed to delete terminal location");
     return true;
   },
@@ -12150,28 +13881,33 @@ export const apiClient = {
     const params = locationId ? `?locationId=${locationId}` : "";
     return fetchJSON(
       `/campgrounds/${campgroundId}/terminal/readers${params}`,
-      z.array(z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        locationId: z.string().nullable(),
-        stripeReaderId: z.string(),
-        label: z.string(),
-        deviceType: z.string(),
-        status: z.string(),
-        serialNumber: z.string().nullable(),
-        ipAddress: z.string().nullable(),
-        lastSeenAt: z.string().nullable(),
-        createdAt: z.string(),
-        location: z.object({ displayName: z.string() }).nullable().optional()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          locationId: z.string().nullable(),
+          stripeReaderId: z.string(),
+          label: z.string(),
+          deviceType: z.string(),
+          status: z.string(),
+          serialNumber: z.string().nullable(),
+          ipAddress: z.string().nullable(),
+          lastSeenAt: z.string().nullable(),
+          createdAt: z.string(),
+          location: z.object({ displayName: z.string() }).nullable().optional(),
+        }),
+      ),
     );
   },
 
-  async registerTerminalReader(campgroundId: string, payload: {
-    registrationCode: string;
-    label: string;
-    locationId?: string;
-  }) {
+  async registerTerminalReader(
+    campgroundId: string,
+    payload: {
+      registrationCode: string;
+      label: string;
+      locationId?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/readers`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12181,47 +13917,59 @@ export const apiClient = {
       res,
       z.object({
         id: z.string(),
-        stripeReaderId: z.string()
-      })
+        stripeReaderId: z.string(),
+      }),
     );
   },
 
   async updateTerminalReader(campgroundId: string, readerId: string, payload: { label: string }) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify(payload),
+      },
+    );
     return parseResponse(res, IdSchema);
   },
 
   async deleteTerminalReader(campgroundId: string, readerId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}`, {
-      method: "DELETE",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     if (!res.ok) throw new Error("Failed to delete terminal reader");
     return true;
   },
 
   async getTerminalConnectionToken(campgroundId: string, readerId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}/connection-token`, {
-      method: "POST",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/terminal/readers/${readerId}/connection-token`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, z.object({ secret: z.string() }));
   },
 
   // Terminal Payments
-  async createTerminalPayment(campgroundId: string, payload: {
-    readerId: string;
-    amountCents: number;
-    currency?: string;
-    guestId?: string;
-    reservationId?: string;
-    saveCard?: boolean;
-    metadata?: Record<string, string>;
-  }) {
+  async createTerminalPayment(
+    campgroundId: string,
+    payload: {
+      readerId: string;
+      amountCents: number;
+      currency?: string;
+      guestId?: string;
+      reservationId?: string;
+      saveCard?: boolean;
+      metadata?: Record<string, string>;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/payments`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12232,8 +13980,8 @@ export const apiClient = {
       z.object({
         paymentIntentId: z.string(),
         clientSecret: z.string(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
@@ -12249,42 +13997,55 @@ export const apiClient = {
         success: z.boolean(),
         status: z.string(),
         paymentId: z.string().optional(),
-        error: z.string().optional()
-      })
+        error: z.string().optional(),
+      }),
     );
   },
 
   async cancelTerminalPayment(campgroundId: string, paymentIntentId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/terminal/payments/${paymentIntentId}`, {
-      method: "DELETE",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/terminal/payments/${paymentIntentId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, z.object({ canceled: z.boolean() }));
   },
 
   // Guest Payment Methods (Saved Cards)
-  async createPaymentMethodSetupIntent(campgroundId: string, guestId: string, metadata?: Record<string, string>) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-methods/setup-intent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ guestId, metadata }),
-    });
+  async createPaymentMethodSetupIntent(
+    campgroundId: string,
+    guestId: string,
+    metadata?: Record<string, string>,
+  ) {
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payment-methods/setup-intent`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ guestId, metadata }),
+      },
+    );
     return parseResponse(
       res,
       z.object({
         setupIntentId: z.string(),
         clientSecret: z.string(),
-        customerId: z.string()
-      })
+        customerId: z.string(),
+      }),
     );
   },
 
-  async attachPaymentMethod(campgroundId: string, payload: {
-    guestId: string;
-    stripePaymentMethodId: string;
-    nickname?: string;
-    setAsDefault?: boolean;
-  }) {
+  async attachPaymentMethod(
+    campgroundId: string,
+    payload: {
+      guestId: string;
+      stripePaymentMethodId: string;
+      nickname?: string;
+      setAsDefault?: boolean;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-methods/attach`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12295,67 +14056,85 @@ export const apiClient = {
       z.object({
         id: z.string(),
         last4: z.string(),
-        brand: z.string()
-      })
+        brand: z.string(),
+      }),
     );
   },
 
   async getGuestPaymentMethods(campgroundId: string, guestId: string) {
     return fetchJSON(
       `/campgrounds/${campgroundId}/payment-methods/guest/${guestId}`,
-      z.array(z.object({
-        id: z.string(),
-        stripePaymentMethodId: z.string(),
-        type: z.string(),
-        last4: z.string().nullable(),
-        brand: z.string().nullable(),
-        expMonth: z.number().nullable(),
-        expYear: z.number().nullable(),
-        isDefault: z.boolean(),
-        nickname: z.string().nullable(),
-        addedBy: z.string(),
-        createdAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          stripePaymentMethodId: z.string(),
+          type: z.string(),
+          last4: z.string().nullable(),
+          brand: z.string().nullable(),
+          expMonth: z.number().nullable(),
+          expYear: z.number().nullable(),
+          isDefault: z.boolean(),
+          nickname: z.string().nullable(),
+          addedBy: z.string(),
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
-  async updatePaymentMethod(campgroundId: string, paymentMethodId: string, payload: { nickname?: string }) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload),
-    });
+  async updatePaymentMethod(
+    campgroundId: string,
+    paymentMethodId: string,
+    payload: { nickname?: string },
+  ) {
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify(payload),
+      },
+    );
     return parseResponse(res, IdSchema);
   },
 
   async deletePaymentMethod(campgroundId: string, paymentMethodId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}`, {
-      method: "DELETE",
-      headers: scopedHeaders(),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     if (!res.ok) throw new Error("Failed to delete payment method");
     return true;
   },
 
   async setDefaultPaymentMethod(campgroundId: string, guestId: string, paymentMethodId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}/default`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ guestId }),
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/payment-methods/${paymentMethodId}/default`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ guestId }),
+      },
+    );
     return parseResponse(res, IdSchema);
   },
 
   // Charge Saved Cards
-  async chargeSavedCard(campgroundId: string, payload: {
-    guestId: string;
-    paymentMethodId: string;
-    amountCents: number;
-    currency?: string;
-    reservationId?: string;
-    description?: string;
-    metadata?: Record<string, string>;
-  }) {
+  async chargeSavedCard(
+    campgroundId: string,
+    payload: {
+      guestId: string;
+      paymentMethodId: string;
+      amountCents: number;
+      currency?: string;
+      reservationId?: string;
+      description?: string;
+      metadata?: Record<string, string>;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/saved-cards/charge`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12367,18 +14146,21 @@ export const apiClient = {
         success: z.boolean(),
         paymentId: z.string(),
         paymentIntentId: z.string(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
-  async chargeDefaultCard(campgroundId: string, payload: {
-    guestId: string;
-    amountCents: number;
-    currency?: string;
-    reservationId?: string;
-    metadata?: Record<string, string>;
-  }) {
+  async chargeDefaultCard(
+    campgroundId: string,
+    payload: {
+      guestId: string;
+      amountCents: number;
+      currency?: string;
+      reservationId?: string;
+      metadata?: Record<string, string>;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/saved-cards/charge-default`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12390,22 +14172,24 @@ export const apiClient = {
         success: z.boolean(),
         paymentId: z.string(),
         paymentIntentId: z.string(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
   async getChargeablePaymentMethods(campgroundId: string, guestId: string) {
     return fetchJSON(
       `/campgrounds/${campgroundId}/saved-cards/guest/${guestId}/chargeable`,
-      z.array(z.object({
-        id: z.string(),
-        type: z.string(),
-        last4: z.string().nullable(),
-        brand: z.string().nullable(),
-        isDefault: z.boolean(),
-        nickname: z.string().nullable()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          type: z.string(),
+          last4: z.string().nullable(),
+          brand: z.string().nullable(),
+          isDefault: z.boolean(),
+          nickname: z.string().nullable(),
+        }),
+      ),
     );
   },
 
@@ -12419,20 +14203,26 @@ export const apiClient = {
         maxRefundCents: z.number(),
         alreadyRefundedCents: z.number(),
         originalAmountCents: z.number(),
-        originalPaymentMethod: z.object({
-          type: z.string(),
-          last4: z.string().optional(),
-          brand: z.string().optional()
-        }).nullable()
-      })
+        originalPaymentMethod: z
+          .object({
+            type: z.string(),
+            last4: z.string().optional(),
+            brand: z.string().optional(),
+          })
+          .nullable(),
+      }),
     );
   },
 
-  async processRefund(campgroundId: string, paymentId: string, payload: {
-    amountCents?: number;
-    reason?: "duplicate" | "fraudulent" | "requested_by_customer";
-    note?: string;
-  }) {
+  async processRefund(
+    campgroundId: string,
+    paymentId: string,
+    payload: {
+      amountCents?: number;
+      reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+      note?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/refunds/${paymentId}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
@@ -12444,22 +14234,24 @@ export const apiClient = {
         refundId: z.string(),
         stripeRefundId: z.string(),
         amountCents: z.number(),
-        status: z.string()
-      })
+        status: z.string(),
+      }),
     );
   },
 
   async getRefundHistory(campgroundId: string, paymentId: string) {
     return fetchJSON(
       `/campgrounds/${campgroundId}/refunds/${paymentId}/history`,
-      z.array(z.object({
-        id: z.string(),
-        stripeRefundId: z.string(),
-        amountCents: z.number(),
-        status: z.string(),
-        reason: z.string().nullable(),
-        createdAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          stripeRefundId: z.string(),
+          amountCents: z.number(),
+          status: z.string(),
+          reason: z.string().nullable(),
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
@@ -12470,19 +14262,21 @@ export const apiClient = {
     });
     return parseResponse(
       res,
-      z.array(z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        campgroundName: z.string(),
-        type: z.string(),
-        last4: z.string().nullable(),
-        brand: z.string().nullable(),
-        expMonth: z.number().nullable(),
-        expYear: z.number().nullable(),
-        isDefault: z.boolean(),
-        nickname: z.string().nullable(),
-        createdAt: z.string()
-      }))
+      z.array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          campgroundName: z.string(),
+          type: z.string(),
+          last4: z.string().nullable(),
+          brand: z.string().nullable(),
+          expMonth: z.number().nullable(),
+          expYear: z.number().nullable(),
+          isDefault: z.boolean(),
+          nickname: z.string().nullable(),
+          createdAt: z.string(),
+        }),
+      ),
     );
   },
 
@@ -12496,8 +14290,8 @@ export const apiClient = {
       res,
       z.object({
         setupIntentId: z.string(),
-        clientSecret: z.string()
-      })
+        clientSecret: z.string(),
+      }),
     );
   },
 
@@ -12514,67 +14308,89 @@ export const apiClient = {
   // SMS Conversations (Threading)
   // =========================================================================
   async getSmsConversations(campgroundId: string) {
-    const data = await fetchJSONUnknown(`/communications/sms/conversations?campgroundId=${campgroundId}`);
-    return z.array(z.object({
-      conversationId: z.string(),
-      lastMessageId: z.string(),
-      lastMessagePreview: z.string(),
-      lastMessageDirection: z.enum(["inbound", "outbound"]),
-      lastMessageAt: z.string(),
-      messageCount: z.number(),
-      unreadCount: z.number(),
-      guestId: z.string().nullable(),
-      guestName: z.string().nullable(),
-      phoneNumber: z.string().nullable()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/communications/sms/conversations?campgroundId=${campgroundId}`,
+    );
+    return z
+      .array(
+        z.object({
+          conversationId: z.string(),
+          lastMessageId: z.string(),
+          lastMessagePreview: z.string(),
+          lastMessageDirection: z.enum(["inbound", "outbound"]),
+          lastMessageAt: z.string(),
+          messageCount: z.number(),
+          unreadCount: z.number(),
+          guestId: z.string().nullable(),
+          guestName: z.string().nullable(),
+          phoneNumber: z.string().nullable(),
+        }),
+      )
+      .parse(data);
   },
   async getSmsConversation(conversationId: string, campgroundId: string, limit?: number) {
     const url = `/communications/sms/conversations/${encodeURIComponent(conversationId)}?campgroundId=${campgroundId}${limit ? `&limit=${limit}` : ""}`;
     const data = await fetchJSONUnknown(url);
-    return z.object({
-      conversationId: z.string(),
-      messages: z.array(z.object({
-        id: z.string(),
-        campgroundId: z.string(),
-        guestId: z.string().nullable(),
-        reservationId: z.string().nullable(),
-        direction: z.string(),
-        body: z.string().nullable(),
-        status: z.string(),
-        toAddress: z.string().nullable(),
-        fromAddress: z.string().nullable(),
-        createdAt: z.string(),
-        guest: z.object({
-          id: z.string(),
-          primaryFirstName: z.string().nullable(),
-          primaryLastName: z.string().nullable(),
-          phone: z.string().nullable()
-        }).nullable(),
-        reservation: z.object({
-          id: z.string(),
-          arrivalDate: z.string(),
-          departureDate: z.string(),
-          status: z.string(),
-          site: z.object({
-            siteNumber: z.string()
-          }).nullable()
-        }).nullable()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        conversationId: z.string(),
+        messages: z.array(
+          z.object({
+            id: z.string(),
+            campgroundId: z.string(),
+            guestId: z.string().nullable(),
+            reservationId: z.string().nullable(),
+            direction: z.string(),
+            body: z.string().nullable(),
+            status: z.string(),
+            toAddress: z.string().nullable(),
+            fromAddress: z.string().nullable(),
+            createdAt: z.string(),
+            guest: z
+              .object({
+                id: z.string(),
+                primaryFirstName: z.string().nullable(),
+                primaryLastName: z.string().nullable(),
+                phone: z.string().nullable(),
+              })
+              .nullable(),
+            reservation: z
+              .object({
+                id: z.string(),
+                arrivalDate: z.string(),
+                departureDate: z.string(),
+                status: z.string(),
+                site: z
+                  .object({
+                    siteNumber: z.string(),
+                  })
+                  .nullable(),
+              })
+              .nullable(),
+          }),
+        ),
+      })
+      .parse(data);
   },
   async replySmsConversation(conversationId: string, campgroundId: string, message: string) {
-    const res = await fetch(`${API_BASE}/communications/sms/conversations/${encodeURIComponent(conversationId)}/reply`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ campgroundId, message })
-    });
+    const res = await fetch(
+      `${API_BASE}/communications/sms/conversations/${encodeURIComponent(conversationId)}/reply`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ campgroundId, message }),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
   async markSmsConversationRead(conversationId: string, campgroundId: string) {
-    const res = await fetch(`${API_BASE}/communications/sms/conversations/${encodeURIComponent(conversationId)}/read?campgroundId=${campgroundId}`, {
-      method: "PATCH",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/communications/sms/conversations/${encodeURIComponent(conversationId)}/read?campgroundId=${campgroundId}`,
+      {
+        method: "PATCH",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, z.object({ updated: z.number() }));
   },
 
@@ -12585,7 +14401,7 @@ export const apiClient = {
     if (seasonYear) params.set("seasonYear", String(seasonYear));
     const query = params.toString() ? `?${params.toString()}` : "";
     const res = await fetch(`${API_BASE}/seasonals/campground/${campgroundId}/rate-cards${query}`, {
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     return parseResponse(res, UnknownArraySchema);
   },
@@ -12606,7 +14422,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/seasonals/pricing/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(dto)
+      body: JSON.stringify(dto),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -12635,7 +14451,7 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/seasonals`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(dto)
+      body: JSON.stringify(dto),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -12644,75 +14460,106 @@ export const apiClient = {
 
   async getCompetitors(campgroundId: string, includeInactive = false) {
     const params = includeInactive ? "?includeInactive=true" : "";
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/competitors${params}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      url: z.string().optional(),
-      notes: z.string().optional(),
-      isActive: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      rates: z.array(z.object({
-        id: z.string(),
-        competitorId: z.string(),
-        siteType: z.string(),
-        rateNightly: z.number(),
-        source: z.string(),
-        capturedAt: z.string(),
-        validFrom: z.string().optional(),
-        validTo: z.string().optional(),
-        notes: z.string().optional()
-      })).optional()
-    })).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/competitive/competitors${params}`,
+    );
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          name: z.string(),
+          url: z.string().optional(),
+          notes: z.string().optional(),
+          isActive: z.boolean(),
+          createdAt: z.string(),
+          updatedAt: z.string(),
+          rates: z
+            .array(
+              z.object({
+                id: z.string(),
+                competitorId: z.string(),
+                siteType: z.string(),
+                rateNightly: z.number(),
+                source: z.string(),
+                capturedAt: z.string(),
+                validFrom: z.string().optional(),
+                validTo: z.string().optional(),
+                notes: z.string().optional(),
+              }),
+            )
+            .optional(),
+        }),
+      )
+      .parse(data);
   },
 
   async getCompetitor(campgroundId: string, competitorId: string) {
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`);
-    return z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      name: z.string(),
-      url: z.string().optional(),
-      notes: z.string().optional(),
-      isActive: z.boolean(),
-      createdAt: z.string(),
-      updatedAt: z.string(),
-      rates: z.array(z.object({
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`,
+    );
+    return z
+      .object({
         id: z.string(),
-        competitorId: z.string(),
-        siteType: z.string(),
-        rateNightly: z.number(),
-        source: z.string(),
-        capturedAt: z.string()
-      })).optional()
-    }).parse(data);
+        campgroundId: z.string(),
+        name: z.string(),
+        url: z.string().optional(),
+        notes: z.string().optional(),
+        isActive: z.boolean(),
+        createdAt: z.string(),
+        updatedAt: z.string(),
+        rates: z
+          .array(
+            z.object({
+              id: z.string(),
+              competitorId: z.string(),
+              siteType: z.string(),
+              rateNightly: z.number(),
+              source: z.string(),
+              capturedAt: z.string(),
+            }),
+          )
+          .optional(),
+      })
+      .parse(data);
   },
 
-  async createCompetitor(campgroundId: string, payload: { name: string; url?: string; notes?: string }) {
+  async createCompetitor(
+    campgroundId: string,
+    payload: { name: string; url?: string; notes?: string },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
 
-  async updateCompetitor(campgroundId: string, competitorId: string, payload: { name?: string; url?: string; notes?: string; isActive?: boolean }) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
-    });
+  async updateCompetitor(
+    campgroundId: string,
+    competitorId: string,
+    payload: { name?: string; url?: string; notes?: string; isActive?: boolean },
+  ) {
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify(payload),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
   async deleteCompetitor(campgroundId: string, competitorId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`, {
-      method: "DELETE",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/competitive/competitors/${competitorId}`,
+      {
+        method: "DELETE",
+        headers: scopedHeaders(),
+      },
+    );
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
       throw new Error(error.message || "Failed to delete competitor");
@@ -12723,34 +14570,41 @@ export const apiClient = {
   async getCompetitorRates(campgroundId: string, siteType?: string) {
     const params = siteType ? `?siteType=${siteType}` : "";
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/rates${params}`);
-    return z.array(z.object({
-      id: z.string(),
-      competitorId: z.string(),
-      siteType: z.string(),
-      rateNightly: z.number(),
-      source: z.string(),
-      capturedAt: z.string(),
-      validFrom: z.string().optional(),
-      validTo: z.string().optional(),
-      notes: z.string().optional(),
-      competitor: z.object({
-        id: z.string(),
-        name: z.string()
-      })
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          competitorId: z.string(),
+          siteType: z.string(),
+          rateNightly: z.number(),
+          source: z.string(),
+          capturedAt: z.string(),
+          validFrom: z.string().optional(),
+          validTo: z.string().optional(),
+          notes: z.string().optional(),
+          competitor: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+        }),
+      )
+      .parse(data);
   },
 
-  async createCompetitorRate(campgroundId: string, payload: {
-    competitorId: string;
-    siteType: string;
-    rateNightly: number;
-    source?: string;
-    notes?: string;
-  }) {
+  async createCompetitorRate(
+    campgroundId: string,
+    payload: {
+      competitorId: string;
+      siteType: string;
+      rateNightly: number;
+      source?: string;
+      notes?: string;
+    },
+  ) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/rates`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     return parseResponse(res, UnknownSchema);
   },
@@ -12758,7 +14612,7 @@ export const apiClient = {
   async deleteCompetitorRate(campgroundId: string, rateId: string) {
     const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/rates/${rateId}`, {
       method: "DELETE",
-      headers: scopedHeaders()
+      headers: scopedHeaders(),
     });
     if (!res.ok) {
       const error = await res.json().catch(() => ({}));
@@ -12769,111 +14623,148 @@ export const apiClient = {
 
   async getMarketPosition(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/market-position`);
-    return z.array(z.object({
-      siteType: z.string(),
-      yourRate: z.number(),
-      position: z.number(),
-      totalCompetitors: z.number(),
-      positionLabel: z.string(),
-      averageMarketRate: z.number(),
-      lowestRate: z.number(),
-      highestRate: z.number(),
-      competitorRates: z.array(z.object({
-        competitorId: z.string(),
-        competitorName: z.string(),
-        rate: z.number(),
-        difference: z.number(),
-        percentDifference: z.number()
-      }))
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          siteType: z.string(),
+          yourRate: z.number(),
+          position: z.number(),
+          totalCompetitors: z.number(),
+          positionLabel: z.string(),
+          averageMarketRate: z.number(),
+          lowestRate: z.number(),
+          highestRate: z.number(),
+          competitorRates: z.array(
+            z.object({
+              competitorId: z.string(),
+              competitorName: z.string(),
+              rate: z.number(),
+              difference: z.number(),
+              percentDifference: z.number(),
+            }),
+          ),
+        }),
+      )
+      .parse(data);
   },
 
   async getCompetitorComparison(campgroundId: string, siteType: string, date?: string) {
     const params = date ? `?date=${date}` : "";
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/comparison/${siteType}${params}`);
-    return z.object({
-      siteType: z.string(),
-      yourRate: z.number(),
-      position: z.number(),
-      totalCompetitors: z.number(),
-      positionLabel: z.string(),
-      averageMarketRate: z.number(),
-      lowestRate: z.number(),
-      highestRate: z.number(),
-      competitorRates: z.array(z.object({
-        competitorId: z.string(),
-        competitorName: z.string(),
-        rate: z.number(),
-        difference: z.number(),
-        percentDifference: z.number()
-      }))
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/competitive/comparison/${siteType}${params}`,
+    );
+    return z
+      .object({
+        siteType: z.string(),
+        yourRate: z.number(),
+        position: z.number(),
+        totalCompetitors: z.number(),
+        positionLabel: z.string(),
+        averageMarketRate: z.number(),
+        lowestRate: z.number(),
+        highestRate: z.number(),
+        competitorRates: z.array(
+          z.object({
+            competitorId: z.string(),
+            competitorName: z.string(),
+            rate: z.number(),
+            difference: z.number(),
+            percentDifference: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   async checkRateParity(campgroundId: string) {
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/rate-parity`);
-    return z.object({
-      hasParityIssues: z.boolean(),
-      alerts: z.array(z.object({
-        siteType: z.string(),
-        directRate: z.number(),
-        otaRate: z.number(),
-        otaSource: z.string(),
-        difference: z.number()
-      }))
-    }).parse(data);
+    return z
+      .object({
+        hasParityIssues: z.boolean(),
+        alerts: z.array(
+          z.object({
+            siteType: z.string(),
+            directRate: z.number(),
+            otaRate: z.number(),
+            otaSource: z.string(),
+            difference: z.number(),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   async getRateParityAlerts(campgroundId: string, status?: string) {
     const params = status ? `?status=${status}` : "";
     const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/alerts${params}`);
-    return z.array(z.object({
-      id: z.string(),
-      campgroundId: z.string(),
-      siteType: z.string(),
-      directRateCents: z.number(),
-      otaRateCents: z.number(),
-      otaSource: z.string(),
-      difference: z.number(),
-      status: z.enum(["active", "acknowledged", "resolved"]),
-      acknowledgedBy: z.string().optional(),
-      acknowledgedAt: z.string().optional(),
-      resolvedAt: z.string().optional(),
-      createdAt: z.string()
-    })).parse(data);
+    return z
+      .array(
+        z.object({
+          id: z.string(),
+          campgroundId: z.string(),
+          siteType: z.string(),
+          directRateCents: z.number(),
+          otaRateCents: z.number(),
+          otaSource: z.string(),
+          difference: z.number(),
+          status: z.enum(["active", "acknowledged", "resolved"]),
+          acknowledgedBy: z.string().optional(),
+          acknowledgedAt: z.string().optional(),
+          resolvedAt: z.string().optional(),
+          createdAt: z.string(),
+        }),
+      )
+      .parse(data);
   },
 
   async acknowledgeRateParityAlert(campgroundId: string, alertId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/acknowledge`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", ...scopedHeaders() },
-      body: JSON.stringify({ userId: "current" }) // The backend will get actual user from JWT
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/acknowledge`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...scopedHeaders() },
+        body: JSON.stringify({ userId: "current" }), // The backend will get actual user from JWT
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
   async resolveRateParityAlert(campgroundId: string, alertId: string) {
-    const res = await fetch(`${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/resolve`, {
-      method: "POST",
-      headers: scopedHeaders()
-    });
+    const res = await fetch(
+      `${API_BASE}/campgrounds/${campgroundId}/competitive/alerts/${alertId}/resolve`,
+      {
+        method: "POST",
+        headers: scopedHeaders(),
+      },
+    );
     return parseResponse(res, UnknownSchema);
   },
 
-  async getRateTrends(campgroundId: string, siteType: string, startDate?: string, endDate?: string) {
+  async getRateTrends(
+    campgroundId: string,
+    siteType: string,
+    startDate?: string,
+    endDate?: string,
+  ) {
     const params = new URLSearchParams();
     if (startDate) params.set("startDate", startDate);
     if (endDate) params.set("endDate", endDate);
     const query = params.toString() ? `?${params.toString()}` : "";
-    const data = await fetchJSONUnknown(`/campgrounds/${campgroundId}/competitive/trends/${siteType}${query}`);
-    return z.object({
-      siteType: z.string(),
-      trends: z.array(z.object({
-        competitorId: z.string(),
-        competitorName: z.string(),
-        dataPoints: z.array(z.object({ date: z.string(), rate: z.number() }))
-      }))
-    }).parse(data);
+    const data = await fetchJSONUnknown(
+      `/campgrounds/${campgroundId}/competitive/trends/${siteType}${query}`,
+    );
+    return z
+      .object({
+        siteType: z.string(),
+        trends: z.array(
+          z.object({
+            competitorId: z.string(),
+            competitorName: z.string(),
+            dataPoints: z.array(z.object({ date: z.string(), rate: z.number() })),
+          }),
+        ),
+      })
+      .parse(data);
   },
 
   // -------------------------------------------------------------------------
@@ -12889,17 +14780,19 @@ export const apiClient = {
       res,
       z.object({
         query: z.string(),
-        results: z.array(z.object({
-          id: z.string(),
-          name: z.string(),
-          slug: z.string(),
-          description: z.string().nullable(),
-          city: z.string().nullable(),
-          state: z.string().nullable(),
-          similarity: z.number()
-        })),
-        count: z.number()
-      })
+        results: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            slug: z.string(),
+            description: z.string().nullable(),
+            city: z.string().nullable(),
+            state: z.string().nullable(),
+            similarity: z.number(),
+          }),
+        ),
+        count: z.number(),
+      }),
     );
   },
 
@@ -12908,7 +14801,10 @@ export const apiClient = {
   // -------------------------------------------------------------------------
   async get<T>(
     url: string,
-    options: { params?: Record<string, string | number | boolean | undefined | null>; schema: z.ZodType<T> }
+    options: {
+      params?: Record<string, string | number | boolean | undefined | null>;
+      schema: z.ZodType<T>;
+    },
   ): Promise<{ data: T }> {
     const searchParams = new URLSearchParams();
     if (options?.params) {
@@ -12923,7 +14819,11 @@ export const apiClient = {
     return { data };
   },
 
-  async post<T>(url: string, body: unknown | undefined, schema: z.ZodType<T>): Promise<{ data: T }> {
+  async post<T>(
+    url: string,
+    body: unknown | undefined,
+    schema: z.ZodType<T>,
+  ): Promise<{ data: T }> {
     const res = await fetch(`${API_BASE}${url}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...scopedHeaders() },

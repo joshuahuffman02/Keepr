@@ -8,10 +8,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api"
  * Dynamic ticket route - handles operations on specific tickets
  */
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const res = await fetch(`${API_BASE}/tickets/${params.id}`, {
       method: "GET",
@@ -35,10 +32,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const body = await req.json();
 
@@ -64,10 +58,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
   try {
     const res = await fetch(`${API_BASE}/tickets/${params.id}`, {
       method: "DELETE",

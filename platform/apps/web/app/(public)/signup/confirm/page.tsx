@@ -4,14 +4,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  Mail,
-  ArrowRight,
-  RefreshCw,
-  CheckCircle2,
-  Sparkles,
-  PartyPopper
-} from "lucide-react";
+import { Mail, ArrowRight, RefreshCw, CheckCircle2, Sparkles, PartyPopper } from "lucide-react";
 import { useState, Suspense } from "react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -30,7 +23,7 @@ function ConfirmContent() {
       await fetch(`${API_BASE}/auth/resend-verification`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
       setResent(true);
     } catch (err) {
@@ -47,9 +40,9 @@ function ConfirmContent() {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants: Variants = {
@@ -57,8 +50,8 @@ function ConfirmContent() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 24 }
-    }
+      transition: { type: "spring", stiffness: 300, damping: 24 },
+    },
   };
 
   return (
@@ -154,9 +147,17 @@ function ConfirmContent() {
           </h3>
           <ol className="space-y-4">
             {[
-              { step: 1, text: "Open the email from Keepr", subtext: "Check spam if you don't see it" },
+              {
+                step: 1,
+                text: "Open the email from Keepr",
+                subtext: "Check spam if you don't see it",
+              },
               { step: 2, text: "Click the verification link", subtext: "It expires in 24 hours" },
-              { step: 3, text: "Complete your campground setup", subtext: "Takes about 10 minutes" }
+              {
+                step: 3,
+                text: "Complete your campground setup",
+                subtext: "Takes about 10 minutes",
+              },
             ].map(({ step, text, subtext }, i) => (
               <motion.li
                 key={step}
@@ -202,10 +203,7 @@ function ConfirmContent() {
         )}
 
         {/* Resend */}
-        <motion.div
-          variants={prefersReducedMotion ? undefined : itemVariants}
-          className="mb-8"
-        >
+        <motion.div variants={prefersReducedMotion ? undefined : itemVariants} className="mb-8">
           <p className="text-slate-500 text-sm mb-3">Didn't receive the email?</p>
           {resent ? (
             <motion.div
@@ -264,10 +262,7 @@ function ConfirmContent() {
           className="mt-8 text-slate-500 text-sm"
         >
           Having trouble?{" "}
-          <a
-            href="mailto:support@keeprstay.com"
-            className="text-emerald-400 hover:underline"
-          >
+          <a href="mailto:support@keeprstay.com" className="text-emerald-400 hover:underline">
             We're here to help
           </a>
         </motion.p>
@@ -281,11 +276,7 @@ export default function ConfirmPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-slate-400"
-          >
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-slate-400">
             Loading...
           </motion.div>
         </div>

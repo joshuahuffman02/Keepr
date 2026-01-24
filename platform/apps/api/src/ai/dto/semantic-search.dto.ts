@@ -10,5 +10,3 @@ export class SemanticSearchDto {
   @MaxLength(64)
   campgroundId?: string;
 }
-
-

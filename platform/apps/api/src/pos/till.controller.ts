@@ -1,8 +1,25 @@
-import { Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { Response } from "express";
 import { JwtAuthGuard } from "../auth/guards";
 import { TillService } from "./till.service";
-import { CloseTillDto, OpenTillDto, TillMovementDto, ListTillsDto, DailyTillReportQueryDto } from "./till.dto";
+import {
+  CloseTillDto,
+  OpenTillDto,
+  TillMovementDto,
+  ListTillsDto,
+  DailyTillReportQueryDto,
+} from "./till.dto";
 import type { Request } from "express";
 
 @UseGuards(JwtAuthGuard)
@@ -31,7 +48,11 @@ export class TillController {
   }
 
   @Get("report/daily.csv")
-  async dailyCsv(@Query() query: DailyTillReportQueryDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async dailyCsv(
+    @Query() query: DailyTillReportQueryDto,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const { filename, csv } = await this.service.dailyReportCsv(query, requireActor(req));
     res.setHeader("Content-Type", "text/csv");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);

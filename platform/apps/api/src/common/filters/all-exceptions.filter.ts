@@ -6,9 +6,9 @@ import {
   HttpException,
   HttpStatus,
   Logger,
-} from '@nestjs/common';
-import { HttpAdapterHost } from '@nestjs/core';
-import { Prisma } from '@prisma/client';
+} from "@nestjs/common";
+import { HttpAdapterHost } from "@nestjs/core";
+import { Prisma } from "@prisma/client";
 
 interface ErrorResponse {
   statusCode: number;
@@ -20,7 +20,7 @@ interface ErrorResponse {
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
+  typeof value === "object" && value !== null && !Array.isArray(value);
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -32,24 +32,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const { httpAdapter } = this.httpAdapterHost;
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
-    const requestId = request.headers['x-request-id'] || undefined;
+    const requestId = request.headers["x-request-id"] || undefined;
 
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
-    let error = 'Internal Server Error';
+    let message = "Internal server error";
+    let error = "Internal Server Error";
 
     // Handle HTTP exceptions
     if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();
 
-      if (typeof response === 'string') {
+      if (typeof response === "string") {
         message = response;
       } else if (isRecord(response)) {
-        if (typeof response.message === 'string') {
+        if (typeof response.message === "string") {
           message = response.message;
         }
-        if (typeof response.error === 'string') {
+        if (typeof response.error === "string") {
           error = response.error;
         } else {
           error = exception.name;
@@ -59,63 +59,61 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Handle Prisma known errors
     else if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       switch (exception.code) {
-        case 'P2002': // Unique constraint violation
+        case "P2002": // Unique constraint violation
           statusCode = HttpStatus.CONFLICT;
-          message = 'A record with this value already exists';
-          error = 'Conflict';
+          message = "A record with this value already exists";
+          error = "Conflict";
           break;
-        case 'P2025': // Record not found
+        case "P2025": // Record not found
           statusCode = HttpStatus.NOT_FOUND;
-          message = 'Record not found';
-          error = 'Not Found';
+          message = "Record not found";
+          error = "Not Found";
           break;
-        case 'P2003': // Foreign key constraint failed
+        case "P2003": // Foreign key constraint failed
           statusCode = HttpStatus.BAD_REQUEST;
-          message = 'Referenced record does not exist';
-          error = 'Bad Request';
+          message = "Referenced record does not exist";
+          error = "Bad Request";
           break;
         default:
           statusCode = HttpStatus.BAD_REQUEST;
-          message = 'Database operation failed';
-          error = 'Bad Request';
+          message = "Database operation failed";
+          error = "Bad Request";
       }
 
-      this.logger.warn(
-        `Prisma error ${exception.code}: ${exception.message}`,
-        { requestId, path: request.url }
-      );
+      this.logger.warn(`Prisma error ${exception.code}: ${exception.message}`, {
+        requestId,
+        path: request.url,
+      });
     }
     // Handle Prisma validation errors
     else if (exception instanceof Prisma.PrismaClientValidationError) {
       statusCode = HttpStatus.BAD_REQUEST;
       // SECURITY: Don't expose internal schema details to clients
-      message = 'Invalid data provided';
-      error = 'Bad Request';
+      message = "Invalid data provided";
+      error = "Bad Request";
 
       // Log full error server-side for debugging
-      this.logger.warn(
-        `Prisma validation error: ${exception.message}`,
-        { requestId, path: request.url }
-      );
+      this.logger.warn(`Prisma validation error: ${exception.message}`, {
+        requestId,
+        path: request.url,
+      });
     }
     // Handle other errors
     else if (exception instanceof Error) {
       // SECURITY: Don't expose internal error details to clients in production
-      const isProduction = process.env.NODE_ENV === 'production';
-      message = isProduction ? 'An unexpected error occurred' : (exception.message || message);
+      const isProduction = process.env.NODE_ENV === "production";
+      message = isProduction ? "An unexpected error occurred" : exception.message || message;
 
       // Log the full error for debugging
-      this.logger.error(
-        `Unhandled exception: ${exception.message}`,
-        exception.stack,
-        { requestId, path: request.url }
-      );
+      this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack, {
+        requestId,
+        path: request.url,
+      });
     } else {
-      this.logger.error(
-        'Unknown exception type',
-        JSON.stringify(exception),
-        { requestId, path: request.url }
-      );
+      this.logger.error("Unknown exception type", JSON.stringify(exception), {
+        requestId,
+        path: request.url,
+      });
     }
 
     const responseBody: ErrorResponse = {

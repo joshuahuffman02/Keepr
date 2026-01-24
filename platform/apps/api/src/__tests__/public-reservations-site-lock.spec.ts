@@ -93,12 +93,28 @@ describe("PublicReservationsService site lock validation", () => {
         { provide: PromotionsService, useValue: {} },
         { provide: EmailService, useValue: {} },
         { provide: AbandonedCartService, useValue: {} },
-        { provide: MembershipsService, useValue: { getActiveMembershipById: jest.fn(), getActiveMembershipByGuest: jest.fn() } },
+        {
+          provide: MembershipsService,
+          useValue: { getActiveMembershipById: jest.fn(), getActiveMembershipByGuest: jest.fn() },
+        },
         { provide: SignaturesService, useValue: {} },
-        { provide: PoliciesService, useValue: { evaluatePolicies: jest.fn().mockResolvedValue({ waiverRequired: false, signatureRequired: false }) } },
+        {
+          provide: PoliciesService,
+          useValue: {
+            evaluatePolicies: jest
+              .fn()
+              .mockResolvedValue({ waiverRequired: false, signatureRequired: false }),
+          },
+        },
         { provide: AccessControlService, useValue: {} },
         { provide: PricingV2Service, useValue: {} },
-        { provide: DepositPoliciesService, useValue: { resolve: jest.fn().mockResolvedValue(null), calculateDeposit: jest.fn().mockResolvedValue(null) } },
+        {
+          provide: DepositPoliciesService,
+          useValue: {
+            resolve: jest.fn().mockResolvedValue(null),
+            calculateDeposit: jest.fn().mockResolvedValue(null),
+          },
+        },
         { provide: StripeService, useValue: {} },
       ],
     }).compile();
@@ -135,7 +151,7 @@ describe("PublicReservationsService site lock validation", () => {
           phone: "555-555-1212",
           zipCode: "12345",
         },
-      })
+      }),
     ).rejects.toThrow("siteLocked requires siteId.");
   });
 });

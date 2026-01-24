@@ -15,7 +15,7 @@ export class SiteClassesService {
   async findOne(campgroundId: string, id: string) {
     const siteClass = await this.prisma.siteClass.findFirst({
       where: { id, campgroundId },
-      include: { Campground: true }
+      include: { Campground: true },
     });
     if (!siteClass) {
       throw new NotFoundException("Site class not found");
@@ -33,7 +33,7 @@ export class SiteClassesService {
       throw new BadRequestException("Invalid siteType");
     }
     return this.prisma.siteClass.create({
-      data: { id: randomUUID(), ...rest, siteType }
+      data: { id: randomUUID(), ...rest, siteType },
     });
   }
 
@@ -50,7 +50,7 @@ export class SiteClassesService {
         // Map frontend field names to Prisma field names
         ...(extraAdultFee !== undefined ? { extraAdultFeeCents: extraAdultFee } : {}),
         ...(extraChildFee !== undefined ? { extraChildFeeCents: extraChildFee } : {}),
-      }
+      },
     });
   }
 

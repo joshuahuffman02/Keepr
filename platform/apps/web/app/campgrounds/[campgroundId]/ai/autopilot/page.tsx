@@ -11,15 +11,43 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import {
-  Brain, MessageSquare, AlertTriangle, Users, Calendar,
-  Settings, FileText, Mail, RefreshCw, Check, X, Send,
-  ChevronRight, Sparkles, TrendingDown, Clock, Edit2, Trash2, Plus
+  Brain,
+  MessageSquare,
+  AlertTriangle,
+  Users,
+  Calendar,
+  Settings,
+  FileText,
+  Mail,
+  RefreshCw,
+  Check,
+  X,
+  Send,
+  ChevronRight,
+  Sparkles,
+  TrendingDown,
+  Clock,
+  Edit2,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { formatDistanceToNow, format } from "date-fns";
@@ -88,17 +116,21 @@ export default function AiAutopilotPage() {
 
   // Mutations
   const updateConfig = useMutation({
-    mutationFn: (updates: Record<string, unknown>) => apiClient.updateAutopilotConfig(campgroundId, updates),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["autopilot-config", campgroundId] }),
+    mutationFn: (updates: Record<string, unknown>) =>
+      apiClient.updateAutopilotConfig(campgroundId, updates),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["autopilot-config", campgroundId] }),
   });
 
   const autoPopulate = useMutation({
     mutationFn: () => apiClient.autoPopulateContext(campgroundId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["autopilot-context", campgroundId] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["autopilot-context", campgroundId] }),
   });
 
   const createContext = useMutation({
-    mutationFn: (data: CreateContextPayload) => apiClient.createAutopilotContext(campgroundId, data),
+    mutationFn: (data: CreateContextPayload) =>
+      apiClient.createAutopilotContext(campgroundId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["autopilot-context", campgroundId] });
       setShowContextForm(false);
@@ -107,7 +139,8 @@ export default function AiAutopilotPage() {
 
   const deleteContext = useMutation({
     mutationFn: (id: string) => apiClient.deleteAutopilotContext(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["autopilot-context", campgroundId] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["autopilot-context", campgroundId] }),
   });
 
   const reviewDraft = useMutation({
@@ -135,7 +168,8 @@ export default function AiAutopilotPage() {
   });
 
   const markConfirmed = useMutation({
-    mutationFn: (reservationId: string) => apiClient.markNoShowConfirmed(reservationId, "staff_verification"),
+    mutationFn: (reservationId: string) =>
+      apiClient.markNoShowConfirmed(reservationId, "staff_verification"),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["no-show-risks", campgroundId] }),
   });
 
@@ -200,23 +234,27 @@ export default function AiAutopilotPage() {
             <TabsTrigger value="drafts" className="flex items-center gap-2">
               <Mail className="w-4 h-4" />
               Drafts
-              {replyDrafts?.filter(d => d.status === "pending").length ? (
-                <Badge variant="secondary" className="ml-1">{replyDrafts.filter(d => d.status === "pending").length}</Badge>
+              {replyDrafts?.filter((d) => d.status === "pending").length ? (
+                <Badge variant="secondary" className="ml-1">
+                  {replyDrafts.filter((d) => d.status === "pending").length}
+                </Badge>
               ) : null}
             </TabsTrigger>
             <TabsTrigger value="anomalies" className="flex items-center gap-2">
               <AlertTriangle className="w-4 h-4" />
               Anomalies
-              {anomalies?.filter(a => a.status === "new").length ? (
-                <Badge variant="destructive" className="ml-1">{anomalies.filter(a => a.status === "new").length}</Badge>
+              {anomalies?.filter((a) => a.status === "new").length ? (
+                <Badge variant="destructive" className="ml-1">
+                  {anomalies.filter((a) => a.status === "new").length}
+                </Badge>
               ) : null}
             </TabsTrigger>
             <TabsTrigger value="no-shows" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               No-Shows
-              {noShowRisks?.filter(r => r.flagged && !r.guestConfirmed).length ? (
+              {noShowRisks?.filter((r) => r.flagged && !r.guestConfirmed).length ? (
                 <Badge variant="outline" className="ml-1 border-orange-300 text-orange-700">
-                  {noShowRisks.filter(r => r.flagged && !r.guestConfirmed).length}
+                  {noShowRisks.filter((r) => r.flagged && !r.guestConfirmed).length}
                 </Badge>
               ) : null}
             </TabsTrigger>
@@ -235,7 +273,9 @@ export default function AiAutopilotPage() {
                     </div>
                     <Switch
                       checked={config?.autoReplyEnabled}
-                      onCheckedChange={(checked) => updateConfig.mutate({ autoReplyEnabled: checked })}
+                      onCheckedChange={(checked) =>
+                        updateConfig.mutate({ autoReplyEnabled: checked })
+                      }
                     />
                   </div>
                   <CardDescription>AI drafts responses to guest messages</CardDescription>
@@ -260,13 +300,18 @@ export default function AiAutopilotPage() {
                     {config?.autoReplyMode === "auto" && (
                       <>
                         <div className="space-y-2">
-                          <Label>Confidence Threshold: {Math.round((config?.autoReplyConfidenceThreshold || 0.8) * 100)}%</Label>
+                          <Label>
+                            Confidence Threshold:{" "}
+                            {Math.round((config?.autoReplyConfidenceThreshold || 0.8) * 100)}%
+                          </Label>
                           <Slider
                             value={[config?.autoReplyConfidenceThreshold || 0.8]}
                             min={0.5}
                             max={1}
                             step={0.05}
-                            onValueChange={([v]) => updateConfig.mutate({ autoReplyConfidenceThreshold: v })}
+                            onValueChange={([v]) =>
+                              updateConfig.mutate({ autoReplyConfidenceThreshold: v })
+                            }
                           />
                         </div>
                         <div className="space-y-2">
@@ -276,7 +321,11 @@ export default function AiAutopilotPage() {
                             min={0}
                             max={60}
                             value={config?.autoReplyDelayMinutes}
-                            onChange={(e) => updateConfig.mutate({ autoReplyDelayMinutes: parseInt(e.target.value) })}
+                            onChange={(e) =>
+                              updateConfig.mutate({
+                                autoReplyDelayMinutes: parseInt(e.target.value),
+                              })
+                            }
                           />
                         </div>
                       </>
@@ -295,7 +344,9 @@ export default function AiAutopilotPage() {
                     </div>
                     <Switch
                       checked={config?.smartWaitlistEnabled}
-                      onCheckedChange={(checked) => updateConfig.mutate({ smartWaitlistEnabled: checked })}
+                      onCheckedChange={(checked) =>
+                        updateConfig.mutate({ smartWaitlistEnabled: checked })
+                      }
                     />
                   </div>
                   <CardDescription>AI scores waitlist entries for optimal matching</CardDescription>
@@ -319,9 +370,16 @@ export default function AiAutopilotPage() {
                     </div>
                     <div className="text-xs text-muted-foreground space-y-1">
                       <p>Scoring Weights:</p>
-                      <p>Guest Value: {Math.round((config?.waitlistGuestValueWeight || 0.3) * 100)}%</p>
-                      <p>Booking Likelihood: {Math.round((config?.waitlistLikelihoodWeight || 0.3) * 100)}%</p>
-                      <p>Seasonal Fit: {Math.round((config?.waitlistSeasonalWeight || 0.2) * 100)}%</p>
+                      <p>
+                        Guest Value: {Math.round((config?.waitlistGuestValueWeight || 0.3) * 100)}%
+                      </p>
+                      <p>
+                        Booking Likelihood:{" "}
+                        {Math.round((config?.waitlistLikelihoodWeight || 0.3) * 100)}%
+                      </p>
+                      <p>
+                        Seasonal Fit: {Math.round((config?.waitlistSeasonalWeight || 0.2) * 100)}%
+                      </p>
                     </div>
                   </CardContent>
                 )}
@@ -337,7 +395,9 @@ export default function AiAutopilotPage() {
                     </div>
                     <Switch
                       checked={config?.anomalyDetectionEnabled}
-                      onCheckedChange={(checked) => updateConfig.mutate({ anomalyDetectionEnabled: checked })}
+                      onCheckedChange={(checked) =>
+                        updateConfig.mutate({ anomalyDetectionEnabled: checked })
+                      }
                     />
                   </div>
                   <CardDescription>AI alerts when metrics deviate from patterns</CardDescription>
@@ -390,7 +450,9 @@ export default function AiAutopilotPage() {
                     </div>
                     <Switch
                       checked={config?.noShowPredictionEnabled}
-                      onCheckedChange={(checked) => updateConfig.mutate({ noShowPredictionEnabled: checked })}
+                      onCheckedChange={(checked) =>
+                        updateConfig.mutate({ noShowPredictionEnabled: checked })
+                      }
                     />
                   </div>
                   <CardDescription>AI flags high-risk reservations</CardDescription>
@@ -398,7 +460,9 @@ export default function AiAutopilotPage() {
                 {config?.noShowPredictionEnabled && (
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label>Risk Threshold: {Math.round((config?.noShowThreshold || 0.7) * 100)}%</Label>
+                      <Label>
+                        Risk Threshold: {Math.round((config?.noShowThreshold || 0.7) * 100)}%
+                      </Label>
                       <Slider
                         value={[config?.noShowThreshold || 0.7]}
                         min={0.3}
@@ -411,7 +475,9 @@ export default function AiAutopilotPage() {
                       <Label>Auto-Send Reminders</Label>
                       <Switch
                         checked={config?.noShowAutoReminder}
-                        onCheckedChange={(checked) => updateConfig.mutate({ noShowAutoReminder: checked })}
+                        onCheckedChange={(checked) =>
+                          updateConfig.mutate({ noShowAutoReminder: checked })
+                        }
                       />
                     </div>
                     {config?.noShowAutoReminder && (
@@ -422,7 +488,11 @@ export default function AiAutopilotPage() {
                           min={1}
                           max={14}
                           value={config?.noShowReminderDaysBefore}
-                          onChange={(e) => updateConfig.mutate({ noShowReminderDaysBefore: parseInt(e.target.value) })}
+                          onChange={(e) =>
+                            updateConfig.mutate({
+                              noShowReminderDaysBefore: parseInt(e.target.value),
+                            })
+                          }
                         />
                       </div>
                     )}
@@ -471,7 +541,12 @@ export default function AiAutopilotPage() {
                         <p className="text-sm text-muted-foreground line-clamp-2">{item.answer}</p>
                       </div>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => setEditingContext(item)} aria-label="Edit">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => setEditingContext(item)}
+                          aria-label="Edit"
+                        >
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         <Button
@@ -506,18 +581,23 @@ export default function AiAutopilotPage() {
           <TabsContent value="drafts" className="space-y-4">
             <div className="space-y-3">
               {replyDrafts?.map((draft) => (
-                <Card key={draft.id} className={cn(
-                  draft.status === "pending" && "bg-status-info/15"
-                )}>
+                <Card
+                  key={draft.id}
+                  className={cn(draft.status === "pending" && "bg-status-info/15")}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={
-                            draft.status === "pending" ? "default" :
-                            draft.status === "approved" || draft.status === "sent" ? "secondary" :
-                            "outline"
-                          }>
+                          <Badge
+                            variant={
+                              draft.status === "pending"
+                                ? "default"
+                                : draft.status === "approved" || draft.status === "sent"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
                             {draft.status}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
@@ -526,12 +606,19 @@ export default function AiAutopilotPage() {
                           {draft.autoSendScheduledAt && draft.status === "pending" && (
                             <span className="text-xs text-orange-600 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
-                              Auto-send {formatDistanceToNow(new Date(draft.autoSendScheduledAt), { addSuffix: true })}
+                              Auto-send{" "}
+                              {formatDistanceToNow(new Date(draft.autoSendScheduledAt), {
+                                addSuffix: true,
+                              })}
                             </span>
                           )}
                         </div>
-                        <p className="font-medium text-sm mb-1">{draft.inboundSubject || "No subject"}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{draft.draftContent}</p>
+                        <p className="font-medium text-sm mb-1">
+                          {draft.inboundSubject || "No subject"}
+                        </p>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {draft.draftContent}
+                        </p>
                         <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                           <span>Confidence: {Math.round(draft.confidence * 100)}%</span>
                           {draft.detectedIntent && <span>Intent: {draft.detectedIntent}</span>}
@@ -579,13 +666,16 @@ export default function AiAutopilotPage() {
           <TabsContent value="anomalies" className="space-y-4">
             <div className="space-y-3">
               {anomalies?.map((anomaly) => (
-                <Card key={anomaly.id} className={cn(
-                  "border-l-4",
-                  anomaly.severity === "critical" && "border-l-red-500",
-                  anomaly.severity === "high" && "border-l-orange-500",
-                  anomaly.severity === "medium" && "border-l-yellow-500",
-                  anomaly.severity === "low" && "border-l-blue-500"
-                )}>
+                <Card
+                  key={anomaly.id}
+                  className={cn(
+                    "border-l-4",
+                    anomaly.severity === "critical" && "border-l-red-500",
+                    anomaly.severity === "high" && "border-l-orange-500",
+                    anomaly.severity === "medium" && "border-l-yellow-500",
+                    anomaly.severity === "low" && "border-l-blue-500",
+                  )}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -610,8 +700,11 @@ export default function AiAutopilotPage() {
                           <span>Metric: {anomaly.metric}</span>
                           <span>Current: {anomaly.currentValue}</span>
                           <span>Expected: {anomaly.expectedValue}</span>
-                          <span className={anomaly.deviation < 0 ? "text-red-600" : "text-green-600"}>
-                            {anomaly.deviation > 0 ? "+" : ""}{anomaly.deviation.toFixed(1)}%
+                          <span
+                            className={anomaly.deviation < 0 ? "text-red-600" : "text-green-600"}
+                          >
+                            {anomaly.deviation > 0 ? "+" : ""}
+                            {anomaly.deviation.toFixed(1)}%
                           </span>
                         </div>
                       </div>
@@ -620,13 +713,17 @@ export default function AiAutopilotPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => updateAnomaly.mutate({ id: anomaly.id, status: "acknowledged" })}
+                            onClick={() =>
+                              updateAnomaly.mutate({ id: anomaly.id, status: "acknowledged" })
+                            }
                           >
                             Acknowledge
                           </Button>
                           <Button
                             size="sm"
-                            onClick={() => updateAnomaly.mutate({ id: anomaly.id, status: "resolved" })}
+                            onClick={() =>
+                              updateAnomaly.mutate({ id: anomaly.id, status: "resolved" })
+                            }
                           >
                             Resolve
                           </Button>
@@ -654,31 +751,44 @@ export default function AiAutopilotPage() {
           <TabsContent value="no-shows" className="space-y-4">
             <div className="space-y-3">
               {noShowRisks?.map((risk) => (
-                <Card key={risk.id} className={cn(
-                  risk.flagged && !risk.guestConfirmed && "bg-status-warning/15"
-                )}>
+                <Card
+                  key={risk.id}
+                  className={cn(risk.flagged && !risk.guestConfirmed && "bg-status-warning/15")}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={
-                            risk.guestConfirmed ? "secondary" :
-                            risk.flagged ? "destructive" : "outline"
-                          }>
-                            {risk.guestConfirmed ? "Confirmed" :
-                             risk.flagged ? "High Risk" : "Normal"}
+                          <Badge
+                            variant={
+                              risk.guestConfirmed
+                                ? "secondary"
+                                : risk.flagged
+                                  ? "destructive"
+                                  : "outline"
+                            }
+                          >
+                            {risk.guestConfirmed
+                              ? "Confirmed"
+                              : risk.flagged
+                                ? "High Risk"
+                                : "Normal"}
                           </Badge>
                           <span className="text-lg font-semibold">
                             {Math.round(risk.riskScore * 100)}%
                           </span>
                           {risk.reminderSentAt && (
                             <span className="text-xs text-muted-foreground">
-                              Reminder sent {formatDistanceToNow(new Date(risk.reminderSentAt), { addSuffix: true })}
+                              Reminder sent{" "}
+                              {formatDistanceToNow(new Date(risk.reminderSentAt), {
+                                addSuffix: true,
+                              })}
                             </span>
                           )}
                         </div>
                         <p className="font-medium">
-                          {risk.reservation.guest.primaryFirstName} {risk.reservation.guest.primaryLastName}
+                          {risk.reservation.guest.primaryFirstName}{" "}
+                          {risk.reservation.guest.primaryLastName}
                           <span className="text-muted-foreground font-normal ml-2">
                             #{risk.reservation.confirmationNumber}
                           </span>
@@ -745,21 +855,25 @@ export default function AiAutopilotPage() {
           <DialogHeader>
             <DialogTitle>Add Context Item</DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e: FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-            const typeValue = formData.get("type");
-            const answerValue = formData.get("answer");
-            if (typeof typeValue !== "string" || typeof answerValue !== "string") return;
-            const questionValue = formData.get("question");
-            const categoryValue = formData.get("category");
-            createContext.mutate({
-              type: typeValue,
-              question: typeof questionValue === "string" && questionValue ? questionValue : undefined,
-              answer: answerValue,
-              category: typeof categoryValue === "string" && categoryValue ? categoryValue : undefined,
-            });
-          }}>
+          <form
+            onSubmit={(e: FormEvent<HTMLFormElement>) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const typeValue = formData.get("type");
+              const answerValue = formData.get("answer");
+              if (typeof typeValue !== "string" || typeof answerValue !== "string") return;
+              const questionValue = formData.get("question");
+              const categoryValue = formData.get("category");
+              createContext.mutate({
+                type: typeValue,
+                question:
+                  typeof questionValue === "string" && questionValue ? questionValue : undefined,
+                answer: answerValue,
+                category:
+                  typeof categoryValue === "string" && categoryValue ? categoryValue : undefined,
+              });
+            }}
+          >
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="type">Type</Label>
@@ -814,34 +928,32 @@ export default function AiAutopilotPage() {
               </div>
               <div className="space-y-2">
                 <Label>AI Response</Label>
-                <Textarea
-                  defaultValue={selectedDraft.draftContent}
-                  id="editedContent"
-                  rows={6}
-                />
+                <Textarea defaultValue={selectedDraft.draftContent} id="editedContent" rows={6} />
               </div>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span>Confidence: {Math.round(selectedDraft.confidence * 100)}%</span>
-                {selectedDraft.detectedIntent && <span>Intent: {selectedDraft.detectedIntent}</span>}
+                {selectedDraft.detectedIntent && (
+                  <span>Intent: {selectedDraft.detectedIntent}</span>
+                )}
                 {selectedDraft.detectedTone && <span>Tone: {selectedDraft.detectedTone}</span>}
               </div>
             </div>
           )}
           <DialogFooter className="flex justify-between">
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  if (!selectedDraft) return;
-                  reviewDraft.mutate({ id: selectedDraft.id, action: "reject" });
-                }}
-              >
-                <X className="w-4 h-4 mr-1" />
-                Reject
-              </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!selectedDraft) return;
+                reviewDraft.mutate({ id: selectedDraft.id, action: "reject" });
+              }}
+            >
+              <X className="w-4 h-4 mr-1" />
+              Reject
+            </Button>
             <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
+              <Button
+                variant="outline"
+                onClick={() => {
                   if (!selectedDraft) return;
                   const content = getEditedContent();
                   reviewDraft.mutate({ id: selectedDraft.id, action: "edit", content });

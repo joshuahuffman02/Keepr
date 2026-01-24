@@ -17,6 +17,7 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 ## What is Glamping?
 
 ### Types of Glamping Units
+
 - Safari tents / canvas tents
 - Yurts
 - Tiny homes / cabins
@@ -25,6 +26,7 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 - Domes and A-frames
 
 ### What Guests Expect
+
 - Comfortable beds (real mattresses)
 - Climate control (heat/AC)
 - Private bathroom access
@@ -36,6 +38,7 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 ## The Business Case
 
 ### Pros
+
 - Higher nightly rates ($150-400+ vs. $50)
 - Attracts non-traditional campers
 - Year-round booking potential
@@ -43,6 +46,7 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 - Differentiation from competitors
 
 ### Cons
+
 - Significant upfront investment ($20K-100K+ per unit)
 - Higher maintenance and cleaning
 - Different operational requirements
@@ -54,16 +58,19 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 ## Questions to Ask
 
 ### Market Fit
+
 - Is there glamping demand in your area?
 - What do competitors offer?
 - What would you charge?
 
 ### Operational Fit
+
 - Do you have suitable locations?
 - Can you handle housekeeping?
 - Do you want different guest expectations?
 
 ### Financial Fit
+
 - Can you fund the investment?
 - What's the projected ROI?
 - How long to break even?
@@ -73,6 +80,7 @@ Glamping—glamorous camping—has grown from a niche trend to a mainstream cate
 ## Starting Small
 
 If uncertain, test before committing:
+
 - Add one unit first
 - Partner with glamping rental company
 - Try a trial period
@@ -88,4 +96,4 @@ If uncertain, test before committing:
 
 ---
 
-*Keepr supports any accommodation type, from tent sites to luxury glamping. [Manage your property at campreserv.com](https://campreserv.com)*
+_Keepr supports any accommodation type, from tent sites to luxury glamping. [Manage your property at campreserv.com](https://campreserv.com)_

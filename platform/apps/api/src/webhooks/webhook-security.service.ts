@@ -34,7 +34,7 @@ export class WebhookSecurityService {
   generateSignature(
     secret: string,
     payload: string,
-    timestampSeconds?: number
+    timestampSeconds?: number,
   ): { signature: string; timestamp: number } {
     const timestamp = timestampSeconds || Math.floor(Date.now() / 1000);
     const signaturePayload = `${timestamp}.${payload}`;
@@ -58,11 +58,7 @@ export class WebhookSecurityService {
    * @param timestampMs - Unix timestamp in milliseconds
    * @returns Combined signature string
    */
-  generateLegacySignature(
-    secret: string,
-    payload: string,
-    timestampMs: number
-  ): string {
+  generateLegacySignature(secret: string, payload: string, timestampMs: number): string {
     const signaturePayload = `${timestampMs}.${payload}`;
     const hmac = createHmac("sha256", secret);
     hmac.update(signaturePayload);
@@ -84,13 +80,11 @@ export class WebhookSecurityService {
     secret: string,
     payload: string,
     signatureHeader: string,
-    timestampHeader: string | number
+    timestampHeader: string | number,
   ): boolean {
     // Parse timestamp
     const timestamp =
-      typeof timestampHeader === "string"
-        ? parseInt(timestampHeader, 10)
-        : timestampHeader;
+      typeof timestampHeader === "string" ? parseInt(timestampHeader, 10) : timestampHeader;
 
     if (isNaN(timestamp)) {
       throw new UnauthorizedException("Invalid timestamp");
@@ -102,7 +96,7 @@ export class WebhookSecurityService {
 
     if (age > this.SIGNATURE_MAX_AGE_SECONDS) {
       throw new UnauthorizedException(
-        `Signature too old. Age: ${age}s, Max: ${this.SIGNATURE_MAX_AGE_SECONDS}s`
+        `Signature too old. Age: ${age}s, Max: ${this.SIGNATURE_MAX_AGE_SECONDS}s`,
       );
     }
 
@@ -123,7 +117,7 @@ export class WebhookSecurityService {
     const { signature: expectedSignatureHeader } = this.generateSignature(
       secret,
       payload,
-      timestamp
+      timestamp,
     );
     const expectedSignature = expectedSignatureHeader.replace("v1=", "");
 
@@ -150,11 +144,7 @@ export class WebhookSecurityService {
    * @param combinedSignature - The combined signature string
    * @returns true if signature is valid
    */
-  verifyLegacySignature(
-    secret: string,
-    payload: string,
-    combinedSignature: string
-  ): boolean {
+  verifyLegacySignature(secret: string, payload: string, combinedSignature: string): boolean {
     // Parse legacy format: t=<timestamp>,v1=<digest>
     const match = combinedSignature.match(/^t=(\d+),v1=([a-f0-9]+)$/i);
     if (!match) {
@@ -204,7 +194,7 @@ export class WebhookSecurityService {
     deliveryId: string,
     signature: string,
     timestamp: number,
-    attempt: number
+    attempt: number,
   ): Record<string, string> {
     return {
       "Content-Type": "application/json",

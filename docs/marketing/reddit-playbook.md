@@ -3,6 +3,7 @@
 ## Overview
 
 Reddit is valuable for campground software because:
+
 - Active subreddits for campground owners and RVers
 - High-intent discussions about software and operations
 - Long-tail SEO value from helpful answers
@@ -16,22 +17,22 @@ Reddit is valuable for campground software because:
 
 ### Primary (Engage Weekly)
 
-| Subreddit | Focus | Our Angle |
-|-----------|-------|-----------|
-| r/CampgroundOwners | Campground business | Direct target audience |
-| r/Campgrounds | Mixed campers + owners | Help with booking/ops questions |
-| r/RVLiving | RV lifestyle | Guest perspective, park recommendations |
-| r/gorving | RV owners | Guest expectations |
-| r/RVParks | Park-specific | Quality standards |
+| Subreddit          | Focus                  | Our Angle                               |
+| ------------------ | ---------------------- | --------------------------------------- |
+| r/CampgroundOwners | Campground business    | Direct target audience                  |
+| r/Campgrounds      | Mixed campers + owners | Help with booking/ops questions         |
+| r/RVLiving         | RV lifestyle           | Guest perspective, park recommendations |
+| r/gorving          | RV owners              | Guest expectations                      |
+| r/RVParks          | Park-specific          | Quality standards                       |
 
 ### Secondary (Monitor Monthly)
 
-| Subreddit | Focus | Opportunity |
-|-----------|-------|-------------|
+| Subreddit       | Focus           | Opportunity            |
+| --------------- | --------------- | ---------------------- |
 | r/smallbusiness | Business owners | Tech/operations advice |
-| r/SaaS | Software | Building in public |
-| r/startups | Founders | Journey stories |
-| r/Entrepreneur | Business | Niche market insights |
+| r/SaaS          | Software        | Building in public     |
+| r/startups      | Founders        | Journey stories        |
+| r/Entrepreneur  | Business        | Niche market insights  |
 
 ---
 
@@ -328,6 +329,7 @@ What's your biggest constraint right now - awareness or conversion?
 ## Engagement Rules
 
 ### DO
+
 - Answer questions thoroughly even if there's no product opportunity
 - Acknowledge you work in the space when relevant
 - Ask follow-up questions to understand their situation
@@ -335,6 +337,7 @@ What's your biggest constraint right now - awareness or conversion?
 - Upvote and engage with others' good answers
 
 ### DON'T
+
 - Post promotional content as its own post
 - Mention Keepr in every comment
 - Be defensive if someone criticizes the industry
@@ -342,6 +345,7 @@ What's your biggest constraint right now - awareness or conversion?
 - Comment on posts where you have nothing to add
 
 ### Account Health
+
 - Build karma in non-promotional ways first
 - Maintain 10:1 ratio (helpful content vs product mentions)
 - Use the same account consistently (builds history)
@@ -352,6 +356,7 @@ What's your biggest constraint right now - awareness or conversion?
 ## Tracking
 
 ### Metrics
+
 - Comments made per week
 - Karma gained
 - DMs received
@@ -361,8 +366,8 @@ What's your biggest constraint right now - awareness or conversion?
 ### Log Template
 
 | Date | Subreddit | Thread | Comment Type | Product Mention? | Response |
-|------|-----------|--------|--------------|------------------|----------|
-| | | | | | |
+| ---- | --------- | ------ | ------------ | ---------------- | -------- |
+|      |           |        |              |                  |          |
 
 ---
 

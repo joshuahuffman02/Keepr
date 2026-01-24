@@ -102,7 +102,7 @@ export class GoalsService {
       campgroundName: goal.Campground?.name,
       progress: goal.target > 0 ? (goal.current / goal.target) * 100 : 0,
       daysRemaining: Math.ceil(
-        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       ),
       trend: this.determineTrend(goal.current, goal.target, goal.status),
     }));
@@ -141,7 +141,7 @@ export class GoalsService {
       campgroundName: goal.Campground?.name,
       progress: goal.target > 0 ? (goal.current / goal.target) * 100 : 0,
       daysRemaining: Math.ceil(
-        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       ),
       trend: this.determineTrend(goal.current, goal.target, goal.status),
     };
@@ -194,7 +194,7 @@ export class GoalsService {
       campgroundName: goal.Campground?.name,
       progress: 0,
       daysRemaining: Math.ceil(
-        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       ),
       trend: "flat",
     };
@@ -245,7 +245,7 @@ export class GoalsService {
       campgroundName: goal.Campground?.name,
       progress: goal.target > 0 ? (goal.current / goal.target) * 100 : 0,
       daysRemaining: Math.ceil(
-        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+        (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
       ),
       trend: this.determineTrend(goal.current, goal.target, goal.status),
     };
@@ -401,14 +401,15 @@ export class GoalsService {
             .map((res) => {
               const nights = Math.ceil(
                 (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-                (1000 * 60 * 60 * 24)
+                  (1000 * 60 * 60 * 24),
               );
               return nights > 0 ? (res.totalAmount || 0) / nights : null;
             })
             .filter((rate): rate is number => rate !== null);
-          currentValue = nightlyRates.length > 0
-            ? nightlyRates.reduce((sum, rate) => sum + rate, 0) / nightlyRates.length
-            : 0;
+          currentValue =
+            nightlyRates.length > 0
+              ? nightlyRates.reduce((sum, rate) => sum + rate, 0) / nightlyRates.length
+              : 0;
           break;
       }
 
@@ -416,7 +417,7 @@ export class GoalsService {
         // Determine status based on progress
         const progress = (currentValue / goal.target) * 100;
         const daysRemaining = Math.ceil(
-          (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+          (goal.dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
         );
         const expectedProgress = 100 - (daysRemaining / 90) * 100; // Assume 90-day goals
 
@@ -442,11 +443,7 @@ export class GoalsService {
     }
   }
 
-  private determineTrend(
-    current: number,
-    target: number,
-    status: string
-  ): "up" | "down" | "flat" {
+  private determineTrend(current: number, target: number, status: string): "up" | "down" | "flat" {
     // Simple trend determination based on status
     if (status === "achieved" || status === "on_track") return "up";
     if (status === "behind") return "down";

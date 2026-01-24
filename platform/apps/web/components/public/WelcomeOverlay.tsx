@@ -93,7 +93,7 @@ export function WelcomeOverlay() {
                 className="absolute inset-0 bg-keepr-clay/30 rounded-full blur-2xl -z-10"
                 animate={{
                   opacity: [0.3, 0.6, 0.3],
-                  scale: [1, 1.2, 1]
+                  scale: [1, 1.2, 1],
                 }}
                 transition={{ duration: 1.5, repeat: Infinity }}
               />

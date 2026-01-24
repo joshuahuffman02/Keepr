@@ -1,6 +1,12 @@
-import { INestApplication, Injectable, Logger, OnModuleInit, InternalServerErrorException } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import {
+  INestApplication,
+  Injectable,
+  Logger,
+  OnModuleInit,
+  InternalServerErrorException,
+} from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -9,12 +15,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   constructor() {
     const connectionString = process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL;
     if (!connectionString) {
-      throw new InternalServerErrorException('DATABASE_URL or PLATFORM_DATABASE_URL must be set');
+      throw new InternalServerErrorException("DATABASE_URL or PLATFORM_DATABASE_URL must be set");
     }
 
     // Connection pool configuration
-    const poolSize = parseInt(process.env.DATABASE_POOL_SIZE || '10', 10);
-    const poolTimeout = parseInt(process.env.DATABASE_POOL_TIMEOUT || '30', 10);
+    const poolSize = parseInt(process.env.DATABASE_POOL_SIZE || "10", 10);
+    const poolTimeout = parseInt(process.env.DATABASE_POOL_TIMEOUT || "30", 10);
 
     const adapter = new PrismaPg({
       connectionString,
@@ -31,7 +37,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
   }
 
   async enableShutdownHooks(app: INestApplication) {
-    process.on('beforeExit', async () => {
+    process.on("beforeExit", async () => {
       await app.close();
     });
   }

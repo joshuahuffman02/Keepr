@@ -3,6 +3,7 @@
 ## Common Issues
 
 ### Container Not Ready
+
 **Error**: `CONTAINER_NOT_READY`  
 **Cause**: Container still provisioning (first request or after sleep)  
 **Fix**: Retry after 2-3s
@@ -13,8 +14,8 @@ async function execWithRetry(sandbox, cmd) {
     try {
       return await sandbox.exec(cmd);
     } catch (e) {
-      if (e.code === 'CONTAINER_NOT_READY') {
-        await new Promise(r => setTimeout(r, 2000));
+      if (e.code === "CONTAINER_NOT_READY") {
+        await new Promise((r) => setTimeout(r, 2000));
         continue;
       }
       throw e;
@@ -24,25 +25,31 @@ async function execWithRetry(sandbox, cmd) {
 ```
 
 ### Port Exposure Fails in Dev
+
 **Error**: "Connection refused: container port not found"  
 **Cause**: Missing `EXPOSE` directive in Dockerfile  
 **Fix**: Add `EXPOSE <port>` to Dockerfile (only needed for `wrangler dev`, production auto-exposes)
 
 ### Preview URLs Not Working
+
 **Checklist**:
+
 1. Custom domain configured? (not `.workers.dev`)
 2. Wildcard DNS set up? (`*.domain.com → worker.domain.com`)
 3. `normalizeId: true` in getSandbox?
 4. `proxyToSandbox()` called first in fetch?
 
 ### Slow First Request
+
 **Cause**: Cold start (container provisioning)  
 **Solutions**:
+
 - Use `sleepAfter` instead of creating new sandboxes
 - Pre-warm with cron triggers
 - Set `keepAlive: true` for critical sandboxes
 
 ### File Not Persisting
+
 **Cause**: Files in `/tmp` or other ephemeral paths  
 **Fix**: Use `/workspace` for persistent files
 
@@ -58,21 +65,21 @@ const sandbox = getSandbox(env.Sandbox, `user-${Date.now()}`);
 const sandbox = getSandbox(env.Sandbox, `user-${userId}`);
 
 // ✅ GOOD: Reuse for temporary tasks
-const sandbox = getSandbox(env.Sandbox, 'shared-runner');
+const sandbox = getSandbox(env.Sandbox, "shared-runner");
 ```
 
 ### Sleep Configuration
 
 ```typescript
 // Cost-optimized: Sleep after 30min inactivity
-const sandbox = getSandbox(env.Sandbox, 'id', {
-  sleepAfter: '30m',
-  keepAlive: false
+const sandbox = getSandbox(env.Sandbox, "id", {
+  sleepAfter: "30m",
+  keepAlive: false,
 });
 
 // Always-on (higher cost, faster response)
-const sandbox = getSandbox(env.Sandbox, 'id', {
-  keepAlive: true
+const sandbox = getSandbox(env.Sandbox, "id", {
+  keepAlive: true,
 });
 ```
 
@@ -80,16 +87,19 @@ const sandbox = getSandbox(env.Sandbox, 'id', {
 
 ```jsonc
 {
-  "containers": [{
-    "class_name": "Sandbox",
-    "max_instances": 50  // Allow 50 concurrent sandboxes
-  }]
+  "containers": [
+    {
+      "class_name": "Sandbox",
+      "max_instances": 50, // Allow 50 concurrent sandboxes
+    },
+  ],
 }
 ```
 
 ## Security Best Practices
 
 ### Sandbox Isolation
+
 - Each sandbox = isolated container (filesystem, network, processes)
 - Use unique sandbox IDs per tenant for multi-tenant apps
 - Sandboxes cannot communicate directly
@@ -101,16 +111,16 @@ const sandbox = getSandbox(env.Sandbox, 'id', {
 const result = await sandbox.exec(`python3 -c "${userCode}"`);
 
 // ✅ SAFE: Write to file, execute file
-await sandbox.writeFile('/workspace/user_code.py', userCode);
-const result = await sandbox.exec('python3 /workspace/user_code.py');
+await sandbox.writeFile("/workspace/user_code.py", userCode);
+const result = await sandbox.exec("python3 /workspace/user_code.py");
 ```
 
 ### Resource Limits
 
 ```typescript
 // Timeout long-running commands
-const result = await sandbox.exec('python3 script.py', {
-  timeout: 30000  // 30 seconds
+const result = await sandbox.exec("python3 script.py", {
+  timeout: 30000, // 30 seconds
 });
 ```
 
@@ -118,22 +128,25 @@ const result = await sandbox.exec('python3 script.py', {
 
 ```typescript
 // ❌ NEVER hardcode secrets
-const token = 'ghp_abc123';
+const token = "ghp_abc123";
 
 // ✅ Use environment secrets
 const token = env.GITHUB_TOKEN;
 
 // Pass to sandbox via exec env
-const result = await sandbox.exec('git clone ...', {
-  env: { GIT_TOKEN: token }
+const result = await sandbox.exec("git clone ...", {
+  env: { GIT_TOKEN: token },
 });
 ```
 
 ### Preview URL Security
+
 Preview URLs include auto-generated tokens:
+
 ```
 https://8080-sandbox-abc123def456.yourdomain.com
 ```
+
 Token changes on each expose operation, preventing unauthorized access.
 
 ## Limits

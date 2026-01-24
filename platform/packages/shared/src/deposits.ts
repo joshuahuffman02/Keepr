@@ -1,4 +1,9 @@
-import { DepositConfig, DepositConfigSchema, DepositRule, DepositScopeRule } from "./deposits.types";
+import {
+  DepositConfig,
+  DepositConfigSchema,
+  DepositRule,
+  DepositScopeRule,
+} from "./deposits.types";
 
 type DepositContext = {
   total: number;
@@ -28,13 +33,12 @@ const isBetweenMonthDay = (arrival: string, start: string, end: string) => {
   return arrMd >= start || arrMd <= end;
 };
 
-const matchesScope = (
-  scope: DepositScopeRule,
-  ctx: DepositContext
-) => {
+const matchesScope = (scope: DepositScopeRule, ctx: DepositContext) => {
   if (scope.channels?.length && ctx.channel && !scope.channels.includes(ctx.channel)) return false;
-  if (scope.ratePlanIds?.length && ctx.ratePlanId && !scope.ratePlanIds.includes(ctx.ratePlanId)) return false;
-  if (scope.siteTypeIds?.length && ctx.siteTypeId && !scope.siteTypeIds.includes(ctx.siteTypeId)) return false;
+  if (scope.ratePlanIds?.length && ctx.ratePlanId && !scope.ratePlanIds.includes(ctx.ratePlanId))
+    return false;
+  if (scope.siteTypeIds?.length && ctx.siteTypeId && !scope.siteTypeIds.includes(ctx.siteTypeId))
+    return false;
   if (scope.discountCodes?.length) {
     const codes = (ctx.discountCodes || []).map((c: string) => c.toLowerCase());
     const needed = scope.discountCodes.map((c: string) => c.toLowerCase());
@@ -71,7 +75,7 @@ export const computeDepositDue = (input: DepositInput) => {
     channel: input.channel,
     ratePlanId: input.ratePlanId,
     discountCodes: input.discountCodes,
-    siteTypeId: input.siteTypeId
+    siteTypeId: input.siteTypeId,
   };
 
   const pickRuleFromConfig = (): DepositRule | null => {
@@ -85,7 +89,7 @@ export const computeDepositDue = (input: DepositInput) => {
     if (depositConfig.seasons && ctx.arrivalDate) {
       const arrivalDate = ctx.arrivalDate; // Narrow type for closure
       const seasonMatch = depositConfig.seasons.find((s) =>
-        isBetweenMonthDay(arrivalDate, s.startMonthDay, s.endMonthDay)
+        isBetweenMonthDay(arrivalDate, s.startMonthDay, s.endMonthDay),
       );
       if (seasonMatch) rule = seasonMatch.rule;
     }
@@ -122,7 +126,8 @@ export const computeDepositDue = (input: DepositInput) => {
     const normalized = (depositRule || "none").toLowerCase();
     if (normalized === "full") amount = total;
     else if (normalized === "half" || normalized === "percentage_50") amount = total / 2;
-    else if (normalized === "first_night" || normalized === "first_night_fees") amount = nights > 0 ? total / Math.max(nights, 1) : total;
+    else if (normalized === "first_night" || normalized === "first_night_fees")
+      amount = nights > 0 ? total / Math.max(nights, 1) : total;
     else if (normalized === "percentage") amount = ((depositPercentage ?? 0) / 100) * total;
     else amount = 0;
   }
@@ -138,4 +143,3 @@ export const parseDepositConfig = (config: unknown) => {
     return null;
   }
 };
-

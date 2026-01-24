@@ -27,7 +27,7 @@ const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -54,7 +54,7 @@ const getErrorStack = (error: unknown): string | undefined =>
 export class IntegrationsService {
   private readonly logger = new Logger(IntegrationsService.name);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private prismaClient() {
     return this.prisma;
@@ -68,8 +68,8 @@ export class IntegrationsService {
         campgroundId_type_provider: {
           campgroundId: dto.campgroundId,
           type: dto.type,
-          provider: dto.provider
-        }
+          provider: dto.provider,
+        },
       },
       create: {
         id: crypto.randomUUID(),
@@ -89,10 +89,11 @@ export class IntegrationsService {
         organizationId: dto.organizationId ?? null,
         status: dto.status ?? undefined,
         authType: dto.authType ?? undefined,
-        credentials: dto.credentials === undefined ? undefined : toNullableJsonInput(dto.credentials),
+        credentials:
+          dto.credentials === undefined ? undefined : toNullableJsonInput(dto.credentials),
         settings: dto.settings === undefined ? undefined : toNullableJsonInput(dto.settings),
         webhookSecret: dto.webhookSecret ?? undefined,
-      }
+      },
     });
   }
 
@@ -103,12 +104,12 @@ export class IntegrationsService {
       where: { campgroundId },
       orderBy: { updatedAt: "desc" },
       include: {
-        IntegrationSyncLog: { orderBy: { occurredAt: "desc" }, take: 1 }
-      }
+        IntegrationSyncLog: { orderBy: { occurredAt: "desc" }, take: 1 },
+      },
     });
     return connections.map(({ IntegrationSyncLog, ...rest }) => ({
       ...rest,
-      logs: IntegrationSyncLog
+      logs: IntegrationSyncLog,
     }));
   }
 
@@ -120,10 +121,11 @@ export class IntegrationsService {
         organizationId: dto.organizationId ?? undefined,
         status: dto.status ?? undefined,
         authType: dto.authType ?? undefined,
-        credentials: dto.credentials === undefined ? undefined : toNullableJsonInput(dto.credentials),
+        credentials:
+          dto.credentials === undefined ? undefined : toNullableJsonInput(dto.credentials),
         settings: dto.settings === undefined ? undefined : toNullableJsonInput(dto.settings),
         webhookSecret: dto.webhookSecret ?? undefined,
-      }
+      },
     });
   }
 
@@ -145,21 +147,24 @@ export class IntegrationsService {
    * In production, these would come from environment variables
    */
   private getOAuthConfig(provider: string) {
-    const configs: Record<string, {
-      authUrl: string;
-      tokenUrl: string;
-      clientId: string;
-      clientSecret: string;
-      scopes: string[];
-      integrationType: string;
-    }> = {
+    const configs: Record<
+      string,
+      {
+        authUrl: string;
+        tokenUrl: string;
+        clientId: string;
+        clientSecret: string;
+        scopes: string[];
+        integrationType: string;
+      }
+    > = {
       qbo: {
         authUrl: "https://appcenter.intuit.com/connect/oauth2",
         tokenUrl: "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
         clientId: process.env.QBO_CLIENT_ID || "",
         clientSecret: process.env.QBO_CLIENT_SECRET || "",
         scopes: ["com.intuit.quickbooks.accounting"],
-        integrationType: "accounting"
+        integrationType: "accounting",
       },
       xero: {
         authUrl: "https://login.xero.com/identity/connect/authorize",
@@ -167,7 +172,7 @@ export class IntegrationsService {
         clientId: process.env.XERO_CLIENT_ID || "",
         clientSecret: process.env.XERO_CLIENT_SECRET || "",
         scopes: ["openid", "profile", "email", "accounting.transactions", "accounting.contacts"],
-        integrationType: "accounting"
+        integrationType: "accounting",
       },
       hubspot: {
         authUrl: "https://app.hubspot.com/oauth/authorize",
@@ -175,7 +180,7 @@ export class IntegrationsService {
         clientId: process.env.HUBSPOT_CLIENT_ID || "",
         clientSecret: process.env.HUBSPOT_CLIENT_SECRET || "",
         scopes: ["crm.objects.contacts.read", "crm.objects.contacts.write"],
-        integrationType: "crm"
+        integrationType: "crm",
       },
       zendesk: {
         authUrl: "https://www.zendesk.com/oauth/authorizations/new",
@@ -183,8 +188,8 @@ export class IntegrationsService {
         clientId: process.env.ZENDESK_CLIENT_ID || "",
         clientSecret: process.env.ZENDESK_CLIENT_SECRET || "",
         scopes: ["read", "write"],
-        integrationType: "crm"
-      }
+        integrationType: "crm",
+      },
     };
 
     return configs[provider.toLowerCase()] || null;
@@ -198,7 +203,7 @@ export class IntegrationsService {
       campgroundId,
       provider,
       timestamp: Date.now(),
-      nonce: crypto.randomBytes(16).toString("hex")
+      nonce: crypto.randomBytes(16).toString("hex"),
     };
     // In production, this should be encrypted/signed
     return Buffer.from(JSON.stringify(payload)).toString("base64url");
@@ -241,7 +246,7 @@ export class IntegrationsService {
         provider,
         requiresManualSetup: true,
         instructions: this.getManualSetupInstructions(provider),
-        webhookUrl: `${process.env.API_BASE_URL || "https://api.campreserv.com"}/integrations/webhooks/${provider}`
+        webhookUrl: `${process.env.API_BASE_URL || "https://api.campreserv.com"}/integrations/webhooks/${provider}`,
       };
     }
 
@@ -249,25 +254,27 @@ export class IntegrationsService {
       return {
         provider,
         error: "not_configured",
-        message: `${provider.toUpperCase()} integration is not yet configured. Please contact support.`
+        message: `${provider.toUpperCase()} integration is not yet configured. Please contact support.`,
       };
     }
 
     const state = this.generateOAuthState(campgroundId, provider);
-    const redirectUri = customRedirectUri || `${process.env.API_BASE_URL || "http://localhost:4000/api"}/integrations/oauth/${provider}/callback`;
+    const redirectUri =
+      customRedirectUri ||
+      `${process.env.API_BASE_URL || "http://localhost:4000/api"}/integrations/oauth/${provider}/callback`;
 
     const params = new URLSearchParams({
       client_id: config.clientId,
       redirect_uri: redirectUri,
       response_type: "code",
       scope: config.scopes.join(" "),
-      state
+      state,
     });
 
     return {
       provider,
       authorizationUrl: `${config.authUrl}?${params.toString()}`,
-      state
+      state,
     };
   }
 
@@ -278,7 +285,7 @@ export class IntegrationsService {
     provider: string,
     code: string,
     state: string,
-    error?: string
+    error?: string,
   ): Promise<{ success: boolean; connectionId?: string; error?: string }> {
     if (error) {
       return { success: false, error };
@@ -302,15 +309,15 @@ export class IntegrationsService {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
-          Accept: "application/json"
+          Accept: "application/json",
         },
         body: new URLSearchParams({
           grant_type: "authorization_code",
           code,
           redirect_uri: redirectUri,
           client_id: config.clientId,
-          client_secret: config.clientSecret
-        }).toString()
+          client_secret: config.clientSecret,
+        }).toString(),
       });
 
       if (!tokenResponse.ok) {
@@ -328,8 +335,8 @@ export class IntegrationsService {
           campgroundId_type_provider: {
             campgroundId: stateData.campgroundId,
             type: config.integrationType,
-            provider
-          }
+            provider,
+          },
         },
         create: {
           id: crypto.randomUUID(),
@@ -346,10 +353,10 @@ export class IntegrationsService {
             tokenType: tokens.token_type,
             // Provider-specific fields
             realmId: tokens.realmId, // QuickBooks
-            tenantId: tokens.tenantId // Xero
+            tenantId: tokens.tenantId, // Xero
           }),
           settings: toNullableJsonInput({}),
-          lastSyncStatus: "connected"
+          lastSyncStatus: "connected",
         },
         update: {
           status: "connected",
@@ -359,11 +366,11 @@ export class IntegrationsService {
             expiresAt: tokens.expires_in ? Date.now() + tokens.expires_in * 1000 : null,
             tokenType: tokens.token_type,
             realmId: tokens.realmId,
-            tenantId: tokens.tenantId
+            tenantId: tokens.tenantId,
           }),
           lastSyncStatus: "connected",
-          lastError: null
-        }
+          lastError: null,
+        },
       });
 
       // Log the successful connection
@@ -373,7 +380,7 @@ export class IntegrationsService {
         `OAuth connection established with ${provider}`,
         { provider, authType: "oauth" },
         config.integrationType,
-        "connect"
+        "connect",
       );
 
       return { success: true, connectionId: connection.id };
@@ -392,7 +399,7 @@ export class IntegrationsService {
       sftp: "Configure your SFTP server details including host, port, username, and private key or password.",
       api: "Use the webhook URL below to receive events. Configure your external service to POST JSON payloads to this endpoint.",
       openpath: "Enter your OpenPath API credentials to enable automatic gate code generation.",
-      salto: "Enter your Salto system credentials to sync access control."
+      salto: "Enter your Salto system credentials to sync access control.",
     };
 
     return instructions[provider.toLowerCase()] || "Contact support for setup instructions.";
@@ -405,7 +412,7 @@ export class IntegrationsService {
       where: { connectionId },
       orderBy: { occurredAt: "desc" },
       take: take + 1,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     });
     const hasMore = logs.length > take;
     const items = hasMore ? logs.slice(0, take) : logs;
@@ -419,7 +426,7 @@ export class IntegrationsService {
       where: { connectionId },
       orderBy: { receivedAt: "desc" },
       take: take + 1,
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
+      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
     });
     const hasMore = events.length > take;
     const items = hasMore ? events.slice(0, take) : events;
@@ -432,7 +439,7 @@ export class IntegrationsService {
     message?: string,
     payload?: unknown,
     scope?: string,
-    direction?: string
+    direction?: string,
   ) {
     const prisma = this.prismaClient();
     return prisma.integrationSyncLog.create({
@@ -443,12 +450,16 @@ export class IntegrationsService {
         message: message ?? null,
         payload: toNullableJsonInput(payload ?? null),
         scope: scope ?? "accounting",
-        direction: direction ?? "pull"
-      }
+        direction: direction ?? "pull",
+      },
     });
   }
 
-  private async runQboSandboxPull(connection: IntegrationConnection, direction?: string, scope?: string) {
+  private async runQboSandboxPull(
+    connection: IntegrationConnection,
+    direction?: string,
+    scope?: string,
+  ) {
     const token = process.env.QBO_SANDBOX_TOKEN;
     const realmId = getRealmIdFromSettings(connection.settings) || process.env.QBO_SANDBOX_REALMID;
     const base = process.env.QBO_SANDBOX_BASE || "https://sandbox-quickbooks.api.intuit.com";
@@ -464,8 +475,8 @@ export class IntegrationsService {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
-          "Content-Type": "application/text"
-        }
+          "Content-Type": "application/text",
+        },
       });
       if (!res.ok) {
         return { ok: false, reason: `qbo_http_${res.status}` };
@@ -488,22 +499,40 @@ export class IntegrationsService {
           return {
             id: getString(account["Id"]) ?? "",
             name: getString(account["Name"]) ?? "",
-            type: getString(account["AccountType"]) ?? ""
+            type: getString(account["AccountType"]) ?? "",
           };
-        })
+        }),
       };
-      await this.recordSyncLog(connection.id, "success", "QBO sandbox pull complete", summary, scope ?? "accounting", direction ?? "pull");
+      await this.recordSyncLog(
+        connection.id,
+        "success",
+        "QBO sandbox pull complete",
+        summary,
+        scope ?? "accounting",
+        direction ?? "pull",
+      );
       await this.prismaClient().integrationConnection.update({
         where: { id: connection.id },
-        data: { lastSyncAt: new Date(), lastSyncStatus: "success", lastError: null }
+        data: { lastSyncAt: new Date(), lastSyncStatus: "success", lastError: null },
       });
       return { ok: true, summary };
     } catch (err: unknown) {
       const message = getErrorMessage(err);
-      await this.recordSyncLog(connection.id, "failed", message || "QBO sandbox pull failed", null, scope ?? "accounting", direction ?? "pull");
+      await this.recordSyncLog(
+        connection.id,
+        "failed",
+        message || "QBO sandbox pull failed",
+        null,
+        scope ?? "accounting",
+        direction ?? "pull",
+      );
       await this.prismaClient().integrationConnection.update({
         where: { id: connection.id },
-        data: { lastSyncAt: new Date(), lastSyncStatus: "error", lastError: message || "Unknown error" }
+        data: {
+          lastSyncAt: new Date(),
+          lastSyncStatus: "error",
+          lastError: message || "Unknown error",
+        },
       });
       return { ok: false, reason: "exception", error: message };
     }
@@ -511,16 +540,36 @@ export class IntegrationsService {
 
   async triggerSync(connectionId: string, body: SyncRequestDto) {
     const prisma = this.prismaClient();
-    const connection = await prisma.integrationConnection.findUnique({ where: { id: connectionId } });
+    const connection = await prisma.integrationConnection.findUnique({
+      where: { id: connectionId },
+    });
     if (!connection) throw new BadRequestException("Connection not found");
-    await this.recordSyncLog(connectionId, "queued", body?.note ?? "Manual sync queued", null, body.scope ?? connection.type, body.direction ?? "pull");
+    await this.recordSyncLog(
+      connectionId,
+      "queued",
+      body?.note ?? "Manual sync queued",
+      null,
+      body.scope ?? connection.type,
+      body.direction ?? "pull",
+    );
 
     // Sandbox provider wiring: run a lightweight simulated sync for known providers (e.g., QBO sandbox).
-    const sandboxEnabled = (process.env.INTEGRATIONS_SANDBOX_ENABLED || "true").toLowerCase() !== "false";
-    if (sandboxEnabled && connection.provider?.toLowerCase() === "qbo" && connection.type === "accounting") {
+    const sandboxEnabled =
+      (process.env.INTEGRATIONS_SANDBOX_ENABLED || "true").toLowerCase() !== "false";
+    if (
+      sandboxEnabled &&
+      connection.provider?.toLowerCase() === "qbo" &&
+      connection.type === "accounting"
+    ) {
       const result = await this.runQboSandboxPull(connection, body.direction, body.scope);
       if (result.ok) {
-        return { ok: true, connectionId, status: "success", sandbox: true, summary: result.summary };
+        return {
+          ok: true,
+          connectionId,
+          status: "success",
+          sandbox: true,
+          summary: result.summary,
+        };
       }
       // If sandbox pull failed due to missing creds, fall back to stub data to keep the manual sync usable.
       const samplePayload = {
@@ -540,11 +589,11 @@ export class IntegrationsService {
           status: "success",
           message: "Sandbox QBO pull (stub) complete",
           payload: toNullableJsonInput(samplePayload),
-        }
+        },
       });
       await prisma.integrationConnection.update({
         where: { id: connectionId },
-        data: { lastSyncAt: new Date(), lastSyncStatus: "success", lastError: null }
+        data: { lastSyncAt: new Date(), lastSyncStatus: "success", lastError: null },
       });
       return { ok: true, connectionId, status: "success", sandbox: true, summary: samplePayload };
     }
@@ -565,11 +614,18 @@ export class IntegrationsService {
         status: "queued",
         location: dto.location ?? null,
         requestedById: dto.requestedById ?? null,
-        filters: toNullableJsonInput(dto.filters ?? null)
-      }
+        filters: toNullableJsonInput(dto.filters ?? null),
+      },
     });
     if (dto.connectionId) {
-      await this.recordSyncLog(dto.connectionId, "queued", "Export job queued", { jobId: job.id, resource: dto.resource }, dto.resource ?? "export", "export");
+      await this.recordSyncLog(
+        dto.connectionId,
+        "queued",
+        "Export job queued",
+        { jobId: job.id, resource: dto.resource },
+        dto.resource ?? "export",
+        "export",
+      );
     }
     return job;
   }
@@ -577,33 +633,42 @@ export class IntegrationsService {
   verifyHmac(raw: string, secret: string, signature?: string): { valid: boolean; reason?: string } {
     // SECURITY: Never allow unsigned webhooks - require secret configuration
     if (!secret) {
-      this.logger.warn('Webhook secret not configured - rejecting request');
-      return { valid: false, reason: 'webhook_secret_not_configured' };
+      this.logger.warn("Webhook secret not configured - rejecting request");
+      return { valid: false, reason: "webhook_secret_not_configured" };
     }
     const provided = (signature || "").replace(/^sha256=/i, "");
     if (!provided) {
-      return { valid: false, reason: 'no_signature_provided' };
+      return { valid: false, reason: "no_signature_provided" };
     }
     const computed = crypto.createHmac("sha256", secret).update(raw).digest("hex");
     if (provided.length !== computed.length) {
-      return { valid: false, reason: 'signature_length_mismatch' };
+      return { valid: false, reason: "signature_length_mismatch" };
     }
     const isValid = crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(provided));
-    return { valid: isValid, reason: isValid ? undefined : 'signature_mismatch' };
+    return { valid: isValid, reason: isValid ? undefined : "signature_mismatch" };
   }
 
-  async handleWebhook(provider: string, body: unknown, rawBody: string, signature?: string, campgroundId?: string) {
+  async handleWebhook(
+    provider: string,
+    body: unknown,
+    rawBody: string,
+    signature?: string,
+    campgroundId?: string,
+  ) {
     const prisma = this.prismaClient();
     const connection = await prisma.integrationConnection.findFirst({
       where: {
         provider,
-        ...(campgroundId ? { campgroundId } : {})
-      }
+        ...(campgroundId ? { campgroundId } : {}),
+      },
     });
 
     // SECURITY: Require webhook secret - no fallback to empty string
-    const secret = connection?.webhookSecret || process.env.INTEGRATIONS_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
-    const verification = this.verifyHmac(rawBody, secret || '', signature);
+    const secret =
+      connection?.webhookSecret ||
+      process.env.INTEGRATIONS_WEBHOOK_SECRET ||
+      process.env.WEBHOOK_SECRET;
+    const verification = this.verifyHmac(rawBody, secret || "", signature);
     const signatureValid = verification.valid;
 
     const payload = isJsonValue(body) ? body : null;
@@ -615,9 +680,9 @@ export class IntegrationsService {
         eventType: getEventType(body),
         status: signatureValid ? "received" : "failed",
         signatureValid,
-        message: signatureValid ? null : `Invalid signature: ${verification.reason || 'unknown'}`,
+        message: signatureValid ? null : `Invalid signature: ${verification.reason || "unknown"}`,
         payload: toNullableJsonInput(payload),
-      }
+      },
     });
 
     if (connection?.id) {
@@ -627,10 +692,15 @@ export class IntegrationsService {
         signatureValid ? "Webhook received" : `Webhook signature invalid: ${verification.reason}`,
         { webhookEventId: event.id },
         connection.type,
-        "webhook"
+        "webhook",
       );
     }
 
-    return { ok: signatureValid, connectionId: connection?.id ?? null, eventId: event.id, reason: verification.reason };
+    return {
+      ok: signatureValid,
+      connectionId: connection?.id ?? null,
+      eventId: event.id,
+      reason: verification.reason,
+    };
   }
 }

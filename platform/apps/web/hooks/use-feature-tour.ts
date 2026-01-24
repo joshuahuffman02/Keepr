@@ -6,7 +6,7 @@ import {
   isTourCompleted,
   markTourCompleted,
   type FeatureTour,
-  type TourStep
+  type TourStep,
 } from "@/lib/tours/feature-tours";
 
 interface UseFeatureTourReturn {
@@ -117,7 +117,7 @@ export function useFeatureTour(): UseFeatureTourReturn {
         setCurrentStepIndex(index);
       }
     },
-    [tour]
+    [tour],
   );
 
   // Scroll target element into view when step changes
@@ -141,7 +141,7 @@ export function useFeatureTour(): UseFeatureTourReturn {
     prevStep,
     skipTour,
     endTour,
-    goToStep
+    goToStep,
   };
 }
 

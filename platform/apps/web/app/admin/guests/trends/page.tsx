@@ -2,13 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,7 +86,13 @@ const emptyTrendsData: TrendsData = {
   snowbirdTrends: [],
 };
 
-function TrendIndicator({ change, size = "default" }: { change: number; size?: "default" | "large" }) {
+function TrendIndicator({
+  change,
+  size = "default",
+}: {
+  change: number;
+  size?: "default" | "large";
+}) {
   const isPositive = change > 0;
   const isNeutral = Math.abs(change) < 1;
   const sizeClasses = size === "large" ? "text-lg" : "text-sm";
@@ -107,13 +107,16 @@ function TrendIndicator({ change, size = "default" }: { change: number; size?: "
   }
 
   return (
-    <span className={`flex items-center ${isPositive ? "text-emerald-600" : "text-rose-600"} ${sizeClasses}`}>
+    <span
+      className={`flex items-center ${isPositive ? "text-emerald-600" : "text-rose-600"} ${sizeClasses}`}
+    >
       {isPositive ? (
         <TrendingUp className={size === "large" ? "h-5 w-5 mr-1" : "h-4 w-4 mr-1"} />
       ) : (
         <TrendingDown className={size === "large" ? "h-5 w-5 mr-1" : "h-4 w-4 mr-1"} />
       )}
-      {isPositive ? "+" : ""}{change.toFixed(1)}%
+      {isPositive ? "+" : ""}
+      {change.toFixed(1)}%
     </span>
   );
 }
@@ -150,7 +153,15 @@ function MetricCard({ metric }: { metric: TrendMetric }) {
   );
 }
 
-function SimpleAreaChart({ data, dataKey, color }: { data: ChartDatum[]; dataKey: string; color: string }) {
+function SimpleAreaChart({
+  data,
+  dataKey,
+  color,
+}: {
+  data: ChartDatum[];
+  dataKey: string;
+  color: string;
+}) {
   const values = data.map((d) => Number(d[dataKey]) || 0);
   const max = Math.max(...values);
   const min = Math.min(...values);
@@ -200,7 +211,7 @@ export default function GuestTrendsPage() {
         // In the future, create a dedicated /admin/guest-analytics/trends endpoint
         const res = await fetch(`${apiUrl}/admin/guest-analytics?range=${dateRange}`, {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -228,30 +239,31 @@ export default function GuestTrendsPage() {
                 currentValue: totalGuests,
                 previousValue: totalGuests * 0.85,
                 change: 15,
-                format: "number"
+                format: "number",
               },
               {
                 label: "Repeat Rate",
                 currentValue: repeatRate,
                 previousValue: repeatRate * 0.9,
                 change: 10,
-                format: "percent"
+                format: "percent",
               },
               {
                 label: "Avg Stay Length",
                 currentValue: avgStayLength,
                 previousValue: avgStayLength * 0.95,
                 change: 5,
-                format: "days"
+                format: "days",
               },
             ],
-            regionalTrends: result.geographic?.byState?.slice(0, 5).map((state) => ({
-              region: state.state,
-              currentBookings: state.count,
-              previousBookings: Math.floor(state.count * 0.85),
-              change: 15,
-              topOriginState: state.state.substring(0, 2).toUpperCase(),
-            })) || [],
+            regionalTrends:
+              result.geographic?.byState?.slice(0, 5).map((state) => ({
+                region: state.state,
+                currentBookings: state.count,
+                previousBookings: Math.floor(state.count * 0.85),
+                change: 15,
+                topOriginState: state.state.substring(0, 2).toUpperCase(),
+              })) || [],
             monthlyTrends: result.seasonalTrends?.byMonth || [],
             snowbirdTrends: [],
           });
@@ -276,7 +288,7 @@ export default function GuestTrendsPage() {
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-muted rounded w-64" />
           <div className="grid grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="h-32 bg-muted rounded-lg" />
             ))}
           </div>
@@ -392,269 +404,312 @@ export default function GuestTrendsPage() {
 
       {/* Key Metrics Grid */}
       {hasData && trendsData.metrics.length > 0 && (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {trendsData.metrics.map((metric, i) => (
-          <MetricCard key={i} metric={metric} />
-        ))}
-      </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {trendsData.metrics.map((metric, i) => (
+            <MetricCard key={i} metric={metric} />
+          ))}
+        </div>
       )}
 
       {/* Charts Row */}
       {hasData && trendsData.monthlyTrends.length > 0 && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Bookings Trend */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-emerald-500" />
-              Booking Volume Trend
-            </CardTitle>
-            <CardDescription>Monthly booking counts over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="reservations" color="bg-emerald-600" />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>{trendsData.monthlyTrends[0]?.month}</span>
-              <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Bookings Trend */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-emerald-500" />
+                Booking Volume Trend
+              </CardTitle>
+              <CardDescription>Monthly booking counts over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SimpleAreaChart
+                data={trendsData.monthlyTrends}
+                dataKey="reservations"
+                color="bg-emerald-600"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>{trendsData.monthlyTrends[0]?.month}</span>
+                <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Revenue Trend */}
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-500" />
-              Revenue Trend
-            </CardTitle>
-            <CardDescription>Monthly revenue over time</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="revenue" color="bg-blue-600" />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>{trendsData.monthlyTrends[0]?.month}</span>
-              <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Revenue Trend */}
+          <Card className="bg-card border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-blue-500" />
+                Revenue Trend
+              </CardTitle>
+              <CardDescription>Monthly revenue over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SimpleAreaChart
+                data={trendsData.monthlyTrends}
+                dataKey="revenue"
+                color="bg-blue-600"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>{trendsData.monthlyTrends[0]?.month}</span>
+                <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Regional Performance */}
       {hasData && trendsData.regionalTrends.length > 0 && (
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-amber-500" />
-            Regional Performance
-          </CardTitle>
-          <CardDescription>Booking trends by destination region</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left text-sm font-medium text-muted-foreground pb-3">Region</th>
-                  <th className="text-right text-sm font-medium text-muted-foreground pb-3">Current Period</th>
-                  <th className="text-right text-sm font-medium text-muted-foreground pb-3">Previous Period</th>
-                  <th className="text-right text-sm font-medium text-muted-foreground pb-3">Change</th>
-                  <th className="text-right text-sm font-medium text-muted-foreground pb-3">Top Origin</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trendsData.regionalTrends.map((region, i) => (
-                  <tr key={i} className="border-b border-border last:border-0">
-                    <td className="py-3 text-foreground font-medium">{region.region}</td>
-                    <td className="py-3 text-right text-foreground">
-                      {region.currentBookings.toLocaleString()}
-                    </td>
-                    <td className="py-3 text-right text-muted-foreground">
-                      {region.previousBookings.toLocaleString()}
-                    </td>
-                    <td className="py-3 text-right">
-                      <TrendIndicator change={region.change} />
-                    </td>
-                    <td className="py-3 text-right">
-                      <Badge variant="outline" className="text-foreground">
-                        {region.topOriginState}
-                      </Badge>
-                    </td>
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-amber-500" />
+              Regional Performance
+            </CardTitle>
+            <CardDescription>Booking trends by destination region</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left text-sm font-medium text-muted-foreground pb-3">
+                      Region
+                    </th>
+                    <th className="text-right text-sm font-medium text-muted-foreground pb-3">
+                      Current Period
+                    </th>
+                    <th className="text-right text-sm font-medium text-muted-foreground pb-3">
+                      Previous Period
+                    </th>
+                    <th className="text-right text-sm font-medium text-muted-foreground pb-3">
+                      Change
+                    </th>
+                    <th className="text-right text-sm font-medium text-muted-foreground pb-3">
+                      Top Origin
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+                </thead>
+                <tbody>
+                  {trendsData.regionalTrends.map((region, i) => (
+                    <tr key={i} className="border-b border-border last:border-0">
+                      <td className="py-3 text-foreground font-medium">{region.region}</td>
+                      <td className="py-3 text-right text-foreground">
+                        {region.currentBookings.toLocaleString()}
+                      </td>
+                      <td className="py-3 text-right text-muted-foreground">
+                        {region.previousBookings.toLocaleString()}
+                      </td>
+                      <td className="py-3 text-right">
+                        <TrendIndicator change={region.change} />
+                      </td>
+                      <td className="py-3 text-right">
+                        <Badge variant="outline" className="text-foreground">
+                          {region.topOriginState}
+                        </Badge>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Snowbird Migration Trends */}
       {hasData && trendsData.snowbirdTrends.length > 0 && (
-      <Card className="bg-status-info/10 border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-blue-600" />
-            Snowbird Migration Trends
-          </CardTitle>
-          <CardDescription>
-            Year-over-year analysis of northern guests traveling south
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {trendsData.snowbirdTrends.map((trend, i) => (
-              <div key={i} className="bg-card rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-foreground">{trend.year}</span>
-                  {i < trendsData.snowbirdTrends.length - 1 && (
-                    <TrendIndicator
-                      change={
-                        ((trend.totalMigrants - trendsData.snowbirdTrends[i + 1].totalMigrants) /
-                          trendsData.snowbirdTrends[i + 1].totalMigrants) *
-                        100
-                      }
-                    />
-                  )}
+        <Card className="bg-status-info/10 border-border">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-blue-600" />
+              Snowbird Migration Trends
+            </CardTitle>
+            <CardDescription>
+              Year-over-year analysis of northern guests traveling south
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {trendsData.snowbirdTrends.map((trend, i) => (
+                <div key={i} className="bg-card rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-lg font-bold text-foreground">{trend.year}</span>
+                    {i < trendsData.snowbirdTrends.length - 1 && (
+                      <TrendIndicator
+                        change={
+                          ((trend.totalMigrants - trendsData.snowbirdTrends[i + 1].totalMigrants) /
+                            trendsData.snowbirdTrends[i + 1].totalMigrants) *
+                          100
+                        }
+                      />
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Total Migrants</span>
+                      <span className="text-foreground font-medium">
+                        {trend.totalMigrants.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg Departure</span>
+                      <span className="text-foreground font-medium">
+                        {
+                          [
+                            "Jan",
+                            "Feb",
+                            "Mar",
+                            "Apr",
+                            "May",
+                            "Jun",
+                            "Jul",
+                            "Aug",
+                            "Sep",
+                            "Oct",
+                            "Nov",
+                            "Dec",
+                          ][Math.floor(trend.avgDepartureMonth) - 1]
+                        }
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Avg Stay</span>
+                      <span className="text-foreground font-medium">
+                        {trend.avgStayLength} nights
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Canadian %</span>
+                      <span className="text-foreground font-medium">
+                        {trend.canadianPercentage}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <span className="text-xs text-muted-foreground">Top Destinations:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {trend.topDestinations.map((dest, j) => (
+                        <Badge key={j} variant="secondary" className="text-xs bg-muted">
+                          {dest}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Total Migrants</span>
-                    <span className="text-foreground font-medium">
-                      {trend.totalMigrants.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Avg Departure</span>
-                    <span className="text-foreground font-medium">
-                      {["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][
-                        Math.floor(trend.avgDepartureMonth) - 1
-                      ]}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Avg Stay</span>
-                    <span className="text-foreground font-medium">{trend.avgStayLength} nights</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Canadian %</span>
-                    <span className="text-foreground font-medium">{trend.canadianPercentage}%</span>
-                  </div>
-                </div>
-                <div className="pt-2 border-t border-border">
-                  <span className="text-xs text-muted-foreground">Top Destinations:</span>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {trend.topDestinations.map((dest, j) => (
-                      <Badge key={j} variant="secondary" className="text-xs bg-muted">
-                        {dest}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Guest Type Trends */}
       {hasData && trendsData.monthlyTrends.length > 0 && (
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* New vs Repeat */}
-        {trendsData.monthlyTrends.some(m => m.newGuests && m.repeatGuests) && (
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-violet-500" />
-              New vs Repeat Guests
-            </CardTitle>
-            <CardDescription>Monthly breakdown of guest types</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {trendsData.monthlyTrends.slice(-6).map((month, i) => {
-                const total = month.newGuests + month.repeatGuests;
-                const newPercent = (month.newGuests / total) * 100;
-                const repeatPercent = (month.repeatGuests / total) * 100;
-                return (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{month.month}</span>
-                      <span className="text-muted-foreground">{total} guests</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* New vs Repeat */}
+          {trendsData.monthlyTrends.some((m) => m.newGuests && m.repeatGuests) && (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-violet-500" />
+                  New vs Repeat Guests
+                </CardTitle>
+                <CardDescription>Monthly breakdown of guest types</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {trendsData.monthlyTrends.slice(-6).map((month, i) => {
+                    const total = month.newGuests + month.repeatGuests;
+                    const newPercent = (month.newGuests / total) * 100;
+                    const repeatPercent = (month.repeatGuests / total) * 100;
+                    return (
+                      <div key={i} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-muted-foreground">{month.month}</span>
+                          <span className="text-muted-foreground">{total} guests</span>
+                        </div>
+                        <div className="flex h-4 rounded overflow-hidden">
+                          <div
+                            className="bg-violet-600"
+                            style={{ width: `${newPercent}%` }}
+                            title={`New: ${month.newGuests}`}
+                          />
+                          <div
+                            className="bg-emerald-600"
+                            style={{ width: `${repeatPercent}%` }}
+                            title={`Repeat: ${month.repeatGuests}`}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                  <div className="flex items-center gap-4 pt-2 text-xs">
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-violet-600 rounded" />
+                      <span className="text-muted-foreground">New Guests</span>
                     </div>
-                    <div className="flex h-4 rounded overflow-hidden">
-                      <div
-                        className="bg-violet-600"
-                        style={{ width: `${newPercent}%` }}
-                        title={`New: ${month.newGuests}`}
-                      />
-                      <div
-                        className="bg-emerald-600"
-                        style={{ width: `${repeatPercent}%` }}
-                        title={`Repeat: ${month.repeatGuests}`}
-                      />
+                    <div className="flex items-center gap-1">
+                      <div className="w-3 h-3 bg-emerald-600 rounded" />
+                      <span className="text-muted-foreground">Repeat Guests</span>
                     </div>
                   </div>
-                );
-              })}
-              <div className="flex items-center gap-4 pt-2 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-violet-600 rounded" />
-                  <span className="text-muted-foreground">New Guests</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 bg-emerald-600 rounded" />
-                  <span className="text-muted-foreground">Repeat Guests</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        )}
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Stay Length Trends */}
-        {trendsData.monthlyTrends.some(m => m.avgStay) && (
-        <Card className="bg-card border-border">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-amber-500" />
-              Average Stay Length
-            </CardTitle>
-            <CardDescription>How long guests are staying each month</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SimpleAreaChart data={trendsData.monthlyTrends} dataKey="avgStay" color="bg-amber-600" />
-            <div className="flex justify-between text-xs text-muted-foreground mt-2">
-              <span>{trendsData.monthlyTrends[0]?.month}</span>
-              <span>{trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
-              <div className="text-center">
-                <div className="text-lg font-bold text-foreground">
-                  {Math.min(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
+          {/* Stay Length Trends */}
+          {trendsData.monthlyTrends.some((m) => m.avgStay) && (
+            <Card className="bg-card border-border">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-amber-500" />
+                  Average Stay Length
+                </CardTitle>
+                <CardDescription>How long guests are staying each month</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SimpleAreaChart
+                  data={trendsData.monthlyTrends}
+                  dataKey="avgStay"
+                  color="bg-amber-600"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                  <span>{trendsData.monthlyTrends[0]?.month}</span>
+                  <span>
+                    {trendsData.monthlyTrends[trendsData.monthlyTrends.length - 1]?.month}
+                  </span>
                 </div>
-                <div className="text-xs text-muted-foreground">Min (nights)</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-foreground">
-                  {(trendsData.monthlyTrends.reduce((sum, m) => sum + (m.avgStay || 0), 0) / trendsData.monthlyTrends.length).toFixed(1)}
+                <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-border">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">
+                      {Math.min(...trendsData.monthlyTrends.map((m) => m.avgStay || 0)).toFixed(1)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Min (nights)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">
+                      {(
+                        trendsData.monthlyTrends.reduce((sum, m) => sum + (m.avgStay || 0), 0) /
+                        trendsData.monthlyTrends.length
+                      ).toFixed(1)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Average (nights)</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-foreground">
+                      {Math.max(...trendsData.monthlyTrends.map((m) => m.avgStay || 0)).toFixed(1)}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Max (nights)</div>
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground">Average (nights)</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-foreground">
-                  {Math.max(...trendsData.monthlyTrends.map(m => m.avgStay || 0)).toFixed(1)}
-                </div>
-                <div className="text-xs text-muted-foreground">Max (nights)</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        )}
-      </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
-
     </div>
   );
 }

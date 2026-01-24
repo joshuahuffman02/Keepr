@@ -27,7 +27,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
@@ -65,7 +66,7 @@ export class AiAutonomousActionService {
       });
 
       this.logger.log(
-        `Logged autonomous action: ${params.actionType} for ${params.entityType}/${params.entityId}`
+        `Logged autonomous action: ${params.actionType} for ${params.entityType}/${params.entityId}`,
       );
 
       return action;
@@ -85,7 +86,7 @@ export class AiAutonomousActionService {
       limit?: number;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const { actionType, limit = 50, startDate, endDate } = options;
 
@@ -189,7 +190,7 @@ export class AiAutonomousActionService {
   async updateOutcome(
     id: string,
     outcome: "success" | "partial" | "failed",
-    outcomeDetails?: string
+    outcomeDetails?: string,
   ) {
     return this.prisma.aiAutonomousAction.update({
       where: { id },

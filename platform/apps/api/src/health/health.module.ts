@@ -11,5 +11,4 @@ import { ObservabilityModule } from "../observability/observability.module";
   providers: [HealthService],
   exports: [HealthService],
 })
-export class HealthModule { }
-
+export class HealthModule {}

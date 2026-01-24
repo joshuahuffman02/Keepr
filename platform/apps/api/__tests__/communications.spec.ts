@@ -97,7 +97,7 @@ describe("Communications smoke (approvals & playbooks)", () => {
         toAddress: "user@example.com",
         fromAddress: "bad@notallowed.com",
         body: "hi",
-      })
+      }),
     ).rejects.toThrow(/Unverified sender domain/);
     expect(prisma.communication?.create).toBeUndefined();
   });
@@ -113,7 +113,9 @@ describe("Communications smoke (approvals & playbooks)", () => {
       auditLog: [],
     };
     prisma.communicationTemplate.findUnique.mockResolvedValue(existing);
-    prisma.communicationTemplate.update.mockImplementation(({ data }: { data: Record<string, unknown> }) => data);
+    prisma.communicationTemplate.update.mockImplementation(
+      ({ data }: { data: Record<string, unknown> }) => data,
+    );
 
     const updated = await controller.updateTemplate("t1", { name: "New name" }, "cg1");
 
@@ -150,7 +152,7 @@ describe("Communications smoke (approvals & playbooks)", () => {
           scheduledAt: expect.any(Date),
           attempts: 1,
         }),
-      })
+      }),
     );
     expect(emailService.sendEmail).not.toHaveBeenCalled();
   });
@@ -178,12 +180,14 @@ describe("Communications smoke (approvals & playbooks)", () => {
       reservationId: "r1",
     });
 
-    expect(emailService.sendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: "user@example.com" }));
+    expect(emailService.sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({ to: "user@example.com" }),
+    );
     expect(prisma.communicationPlaybookJob.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: "job1" },
         data: expect.objectContaining({ status: "sent" }),
-      })
+      }),
     );
   });
 });

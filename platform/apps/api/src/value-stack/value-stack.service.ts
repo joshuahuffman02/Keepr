@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { PrismaService } from '../prisma/prisma.service';
-import { GuaranteeType } from '@prisma/client';
+import { PrismaService } from "../prisma/prisma.service";
+import { GuaranteeType } from "@prisma/client";
 
 @Injectable()
 export class ValueStackService {
@@ -12,7 +12,7 @@ export class ValueStackService {
   async getGuarantees(campgroundId: string) {
     return this.prisma.campgroundGuarantee.findMany({
       where: { campgroundId, isActive: true },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { sortOrder: "asc" },
     });
   }
 
@@ -46,9 +46,9 @@ export class ValueStackService {
     }>,
   ) {
     const guarantee = await this.prisma.campgroundGuarantee.findUnique({ where: { id } });
-    if (!guarantee) throw new NotFoundException('Guarantee not found');
+    if (!guarantee) throw new NotFoundException("Guarantee not found");
     if (guarantee.campgroundId !== campgroundId) {
-      throw new ForbiddenException('Access denied to this guarantee');
+      throw new ForbiddenException("Access denied to this guarantee");
     }
     return this.prisma.campgroundGuarantee.update({
       where: { id },
@@ -58,9 +58,9 @@ export class ValueStackService {
 
   async deleteGuarantee(id: string, campgroundId: string) {
     const guarantee = await this.prisma.campgroundGuarantee.findUnique({ where: { id } });
-    if (!guarantee) throw new NotFoundException('Guarantee not found');
+    if (!guarantee) throw new NotFoundException("Guarantee not found");
     if (guarantee.campgroundId !== campgroundId) {
-      throw new ForbiddenException('Access denied to this guarantee');
+      throw new ForbiddenException("Access denied to this guarantee");
     }
     return this.prisma.campgroundGuarantee.delete({ where: { id } });
   }
@@ -70,7 +70,7 @@ export class ValueStackService {
   async getBonuses(campgroundId: string) {
     return this.prisma.campgroundBonus.findMany({
       where: { campgroundId, isActive: true },
-      orderBy: { sortOrder: 'asc' },
+      orderBy: { sortOrder: "asc" },
     });
   }
 
@@ -108,9 +108,9 @@ export class ValueStackService {
     }>,
   ) {
     const bonus = await this.prisma.campgroundBonus.findUnique({ where: { id } });
-    if (!bonus) throw new NotFoundException('Bonus not found');
+    if (!bonus) throw new NotFoundException("Bonus not found");
     if (bonus.campgroundId !== campgroundId) {
-      throw new ForbiddenException('Access denied to this bonus');
+      throw new ForbiddenException("Access denied to this bonus");
     }
     return this.prisma.campgroundBonus.update({
       where: { id },
@@ -120,9 +120,9 @@ export class ValueStackService {
 
   async deleteBonus(id: string, campgroundId: string) {
     const bonus = await this.prisma.campgroundBonus.findUnique({ where: { id } });
-    if (!bonus) throw new NotFoundException('Bonus not found');
+    if (!bonus) throw new NotFoundException("Bonus not found");
     if (bonus.campgroundId !== campgroundId) {
-      throw new ForbiddenException('Access denied to this bonus');
+      throw new ForbiddenException("Access denied to this bonus");
     }
     return this.prisma.campgroundBonus.delete({ where: { id } });
   }
@@ -137,19 +137,19 @@ export class ValueStackService {
     // Return defaults if not configured
     if (!config) {
       config = {
-        id: '',
+        id: "",
         campgroundId,
         eventsEnabled: true,
-        eventsHeadline: 'Something exciting is coming...',
-        eventsSubtext: 'Sign up to be the first to know about special events and deals',
-        eventsButtonText: 'Notify Me',
+        eventsHeadline: "Something exciting is coming...",
+        eventsSubtext: "Sign up to be the first to know about special events and deals",
+        eventsButtonText: "Notify Me",
         newsletterEnabled: true,
-        newsletterHeadline: 'Get the inside scoop',
-        newsletterSubtext: 'Exclusive deals, event announcements, and camping tips',
-        newsletterButtonText: 'Subscribe',
+        newsletterHeadline: "Get the inside scoop",
+        newsletterSubtext: "Exclusive deals, event announcements, and camping tips",
+        newsletterButtonText: "Subscribe",
         firstBookingEnabled: true,
         firstBookingDiscount: 10,
-        firstBookingHeadline: 'First time? Get 10% off',
+        firstBookingHeadline: "First time? Get 10% off",
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -191,7 +191,7 @@ export class ValueStackService {
     // Return defaults if not configured
     if (!config) {
       config = {
-        id: '',
+        id: "",
         campgroundId,
         heroHeadline: null,
         heroSubline: null,
@@ -201,8 +201,8 @@ export class ValueStackService {
         showScarcity: true,
         showLiveViewers: false,
         showLimitedAvail: true,
-        bookButtonText: 'Book Now',
-        checkAvailText: 'Check availability',
+        bookButtonText: "Book Now",
+        checkAvailText: "Check availability",
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -265,7 +265,7 @@ export class ValueStackService {
         campgroundId,
         ...(source ? { source } : {}),
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -320,7 +320,7 @@ export class ValueStackService {
     const donationStats = await this.prisma.charityDonation.aggregate({
       where: {
         campgroundId,
-        status: { not: 'refunded' },
+        status: { not: "refunded" },
       },
       _count: true,
       _sum: { amountCents: true },
@@ -328,10 +328,10 @@ export class ValueStackService {
 
     // Get unique donor count
     const donors = await this.prisma.charityDonation.groupBy({
-      by: ['guestId'],
+      by: ["guestId"],
       where: {
         campgroundId,
-        status: { not: 'refunded' },
+        status: { not: "refunded" },
         guestId: { not: null },
       },
     });

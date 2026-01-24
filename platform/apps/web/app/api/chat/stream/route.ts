@@ -18,7 +18,7 @@ const toAttachments = (value: unknown) => {
       isRecord(entry) &&
       typeof entry.name === "string" &&
       typeof entry.contentType === "string" &&
-      typeof entry.size === "number"
+      typeof entry.size === "number",
   );
   return attachments.length > 0 ? attachments : undefined;
 };
@@ -29,7 +29,7 @@ const toHistory = (value: unknown) => {
     (entry) =>
       isRecord(entry) &&
       (entry.role === "user" || entry.role === "assistant") &&
-      typeof entry.content === "string"
+      typeof entry.content === "string",
   );
   return entries.length > 0 ? entries : undefined;
 };
@@ -43,7 +43,10 @@ const chunkText = (text: string) => {
   return chunks;
 };
 
-const sendEvent = (controller: ReadableStreamDefaultController, payload: Record<string, unknown>) => {
+const sendEvent = (
+  controller: ReadableStreamDefaultController,
+  payload: Record<string, unknown>,
+) => {
   controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
 };
 
@@ -84,7 +87,11 @@ export async function POST(request: Request) {
   if ((mode === "public" || mode === "support") && !trimmedMessage) {
     return new Response("Message is required", { status: 400 });
   }
-  if ((mode === "guest" || mode === "staff") && !trimmedMessage && (!attachments || attachments.length === 0)) {
+  if (
+    (mode === "guest" || mode === "staff") &&
+    !trimmedMessage &&
+    (!attachments || attachments.length === 0)
+  ) {
     return new Response("Message or attachment is required", { status: 400 });
   }
 
@@ -160,7 +167,8 @@ export async function POST(request: Request) {
     if (isRecord(data)) {
       content = getString(data.message) ?? "";
       if (Array.isArray(data.recommendations)) meta.recommendations = data.recommendations;
-      if (Array.isArray(data.clarifyingQuestions)) meta.clarifyingQuestions = data.clarifyingQuestions;
+      if (Array.isArray(data.clarifyingQuestions))
+        meta.clarifyingQuestions = data.clarifyingQuestions;
       if (typeof data.action === "string") meta.action = data.action;
       if (isRecord(data.bookingDetails)) meta.bookingDetails = data.bookingDetails;
     }

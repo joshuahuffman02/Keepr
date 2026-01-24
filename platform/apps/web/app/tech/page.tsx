@@ -29,10 +29,7 @@ const isPerfSnapshot = (value: unknown): value is PerfSnapshot =>
   isNumber(value.limiter.org);
 
 const isRecentError = (value: unknown): value is { path: string; status: number; at: number } =>
-  isRecord(value) &&
-  typeof value.path === "string" &&
-  isNumber(value.status) &&
-  isNumber(value.at);
+  isRecord(value) && typeof value.path === "string" && isNumber(value.status) && isNumber(value.at);
 
 const isQueueEntry = (value: unknown): value is { running: number; queued: number } =>
   isRecord(value) && isNumber(value.running) && isNumber(value.queued);
@@ -107,13 +104,28 @@ type ObservabilitySnapshot = {
 };
 
 const stack = [
-  { area: "Frontend", items: ["Next.js 15 (App Router)", "TypeScript", "Tailwind CSS", "shadcn-style UI", "TanStack Query"] },
-  { area: "Backend", items: ["NestJS", "TypeScript", "Prisma ORM", "PostgreSQL", "Redis (placeholder)"] },
+  {
+    area: "Frontend",
+    items: [
+      "Next.js 15 (App Router)",
+      "TypeScript",
+      "Tailwind CSS",
+      "shadcn-style UI",
+      "TanStack Query",
+    ],
+  },
+  {
+    area: "Backend",
+    items: ["NestJS", "TypeScript", "Prisma ORM", "PostgreSQL", "Redis (placeholder)"],
+  },
   { area: "Shared", items: ["pnpm workspaces", "Zod schemas/types in @keepr/shared"] },
-  { area: "Dev tooling", items: ["ts-node-dev", "ES2020 target"] }
+  { area: "Dev tooling", items: ["ts-node-dev", "ES2020 target"] },
 ];
 
-const apiBase = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api").replace(/\/$/, "");
+const apiBase = (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api").replace(
+  /\/$/,
+  "",
+);
 
 export default function TechPage() {
   const [snapshot, setSnapshot] = useState<PerfSnapshot | null>(null);
@@ -201,7 +213,8 @@ export default function TechPage() {
             ) : snapshot ? (
               <div className="space-y-2">
                 <div className="text-xs text-slate-500">
-                  Updated {new Date(snapshot.timestamp).toLocaleTimeString()} • window {(snapshot.windowMs / 1000).toFixed(0)}s
+                  Updated {new Date(snapshot.timestamp).toLocaleTimeString()} • window{" "}
+                  {(snapshot.windowMs / 1000).toFixed(0)}s
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {renderMetric("p50", snapshot.latencyMs.p50, "ms")}
@@ -228,12 +241,16 @@ export default function TechPage() {
             ) : sloSnapshot ? (
               <div className="space-y-3">
                 <div className="text-xs text-slate-500">
-                  Samples {sloSnapshot.captured} • Targets: API p95 ≤ {sloSnapshot.targets.apiP95Ms}ms, error rate ≤{" "}
-                  {(sloSnapshot.targets.apiErrorRate * 100).toFixed(1)}%; job p95 ≤ {sloSnapshot.targets.jobP95Ms}ms
+                  Samples {sloSnapshot.captured} • Targets: API p95 ≤ {sloSnapshot.targets.apiP95Ms}
+                  ms, error rate ≤ {(sloSnapshot.targets.apiErrorRate * 100).toFixed(1)}%; job p95 ≤{" "}
+                  {sloSnapshot.targets.jobP95Ms}ms
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {renderMetric("API p95", `${sloSnapshot.api.p95} ms`)}
-                  {renderMetric("API error rate", `${((sloSnapshot.api.errors / Math.max(1, sloSnapshot.api.count)) * 100).toFixed(1)}%`)}
+                  {renderMetric(
+                    "API error rate",
+                    `${((sloSnapshot.api.errors / Math.max(1, sloSnapshot.api.count)) * 100).toFixed(1)}%`,
+                  )}
                   {renderMetric("API p99", `${sloSnapshot.api.p99} ms`)}
                   {renderMetric("Job p95", `${sloSnapshot.jobs.p95} ms`)}
                   {renderMetric("Job failures", `${sloSnapshot.jobs.errors}`)}

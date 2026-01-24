@@ -16,4 +16,3 @@ export class UpsertOtaMappingDto {
   @IsString()
   status?: string; // mapped | disabled
 }
-

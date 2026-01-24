@@ -146,7 +146,7 @@ export function generateCodeChallenge(verifier: string, method: "S256" | "plain"
 export function verifyCodeChallenge(
   verifier: string,
   challenge: string,
-  method: "S256" | "plain" = "S256"
+  method: "S256" | "plain" = "S256",
 ): boolean {
   const computedChallenge = generateCodeChallenge(verifier, method);
   return computedChallenge === challenge;
@@ -157,7 +157,10 @@ export function verifyCodeChallenge(
  */
 export function parseScopes(scopeString: string | undefined): string[] {
   if (!scopeString) return [];
-  return scopeString.split(" ").map(s => s.trim()).filter(Boolean);
+  return scopeString
+    .split(" ")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 export function scopesToString(scopes: string[]): string {
@@ -166,5 +169,5 @@ export function scopesToString(scopes: string[]): string {
 
 export function validateScopes(requested: string[], allowed: string[]): string[] {
   const allowedSet = new Set(allowed);
-  return requested.filter(scope => allowedSet.has(scope));
+  return requested.filter((scope) => allowedSet.has(scope));
 }

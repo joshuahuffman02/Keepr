@@ -2,14 +2,7 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import {
-  Mail,
-  Check,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  AlertCircle,
-} from "lucide-react";
+import { Mail, Check, Info, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -73,30 +66,18 @@ export function CommunicationSetup({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Form state
-  const [useCustomDomain, setUseCustomDomain] = useState(
-    initialData?.useCustomDomain || false
-  );
-  const [customDomain, setCustomDomain] = useState(
-    initialData?.customDomain || ""
-  );
-  const [sendConfirmation, setSendConfirmation] = useState(
-    initialData?.sendConfirmation ?? true
-  );
+  const [useCustomDomain, setUseCustomDomain] = useState(initialData?.useCustomDomain || false);
+  const [customDomain, setCustomDomain] = useState(initialData?.customDomain || "");
+  const [sendConfirmation, setSendConfirmation] = useState(initialData?.sendConfirmation ?? true);
   const [preArrivalReminders, setPreArrivalReminders] = useState<PreArrivalReminder[]>(
-    initialData?.preArrivalReminders || DEFAULT_PRE_ARRIVAL_REMINDERS
+    initialData?.preArrivalReminders || DEFAULT_PRE_ARRIVAL_REMINDERS,
   );
-  const [sendPostStay, setSendPostStay] = useState(
-    initialData?.sendPostStay ?? true
-  );
-  const [enableNpsSurvey, setEnableNpsSurvey] = useState(
-    initialData?.enableNpsSurvey ?? false
-  );
+  const [sendPostStay, setSendPostStay] = useState(initialData?.sendPostStay ?? true);
+  const [enableNpsSurvey, setEnableNpsSurvey] = useState(initialData?.enableNpsSurvey ?? false);
 
   const togglePreArrivalReminder = (days: number) => {
     setPreArrivalReminders((prev) =>
-      prev.map((r) =>
-        r.days === days ? { ...r, enabled: !r.enabled } : r
-      )
+      prev.map((r) => (r.days === days ? { ...r, enabled: !r.enabled } : r)),
     );
   };
 
@@ -141,9 +122,7 @@ export function CommunicationSetup({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 mb-4">
             <Mail className="w-8 h-8 text-blue-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Guest Communications
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Guest Communications</h2>
           <p className="text-slate-400">Stay connected with your guests</p>
         </motion.div>
 
@@ -174,17 +153,15 @@ export function CommunicationSetup({
           {showAdvanced && (
             <motion.div
               initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
-              animate={
-                prefersReducedMotion ? {} : { opacity: 1, height: "auto" }
-              }
+              animate={prefersReducedMotion ? {} : { opacity: 1, height: "auto" }}
               exit={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
               className="px-4 pb-4 space-y-4"
             >
               <div className="flex items-start gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                 <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-slate-300">
-                  Using your own domain (e.g., hello@keeprstay.com)
-                  improves email deliverability and builds trust with guests.
+                  Using your own domain (e.g., hello@keeprstay.com) improves email deliverability
+                  and builds trust with guests.
                 </p>
               </div>
 
@@ -194,9 +171,7 @@ export function CommunicationSetup({
                   onClick={() => setUseCustomDomain(!useCustomDomain)}
                   className={cn(
                     "w-5 h-5 rounded border-2 flex items-center justify-center transition-all flex-shrink-0",
-                    useCustomDomain
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-slate-600"
+                    useCustomDomain ? "border-blue-500 bg-blue-500" : "border-slate-600",
                   )}
                 >
                   {useCustomDomain && (
@@ -209,9 +184,7 @@ export function CommunicationSetup({
                     </motion.div>
                   )}
                 </button>
-                <span className="text-sm text-slate-300">
-                  Use custom domain for sending emails
-                </span>
+                <span className="text-sm text-slate-300">Use custom domain for sending emails</span>
               </label>
 
               {useCustomDomain && (
@@ -248,7 +221,7 @@ export function CommunicationSetup({
                 "p-4 rounded-xl border-2 transition-all",
                 sendConfirmation
                   ? "border-blue-500 bg-blue-500/10"
-                  : "border-slate-700 bg-slate-800/30"
+                  : "border-slate-700 bg-slate-800/30",
               )}
             >
               <div className="flex items-start justify-between">
@@ -256,7 +229,7 @@ export function CommunicationSetup({
                   <h4
                     className={cn(
                       "font-semibold",
-                      sendConfirmation ? "text-blue-400" : "text-white"
+                      sendConfirmation ? "text-blue-400" : "text-white",
                     )}
                   >
                     Booking Confirmation
@@ -273,7 +246,7 @@ export function CommunicationSetup({
                   onClick={() => setSendConfirmation(!sendConfirmation)}
                   className={cn(
                     "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4",
-                    sendConfirmation ? "bg-blue-500" : "bg-slate-600"
+                    sendConfirmation ? "bg-blue-500" : "bg-slate-600",
                   )}
                 >
                   <motion.span
@@ -281,7 +254,7 @@ export function CommunicationSetup({
                     transition={SPRING_CONFIG}
                     className={cn(
                       "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                      sendConfirmation ? "translate-x-6" : "translate-x-1"
+                      sendConfirmation ? "translate-x-6" : "translate-x-1",
                     )}
                   />
                 </button>
@@ -302,7 +275,7 @@ export function CommunicationSetup({
                     "p-4 rounded-xl border-2 transition-all",
                     reminder.enabled
                       ? "border-blue-500 bg-blue-500/10"
-                      : "border-slate-700 bg-slate-800/30"
+                      : "border-slate-700 bg-slate-800/30",
                   )}
                 >
                   <div className="flex items-start justify-between">
@@ -310,18 +283,16 @@ export function CommunicationSetup({
                       <h4
                         className={cn(
                           "font-semibold",
-                          reminder.enabled ? "text-blue-400" : "text-white"
+                          reminder.enabled ? "text-blue-400" : "text-white",
                         )}
                       >
                         {reminder.days === 30
                           ? "1 Month Before"
                           : reminder.days === 7
-                          ? "1 Week Before"
-                          : "Day Before"}
+                            ? "1 Week Before"
+                            : "Day Before"}
                       </h4>
-                      <p className="text-sm text-slate-400 mt-1">
-                        {reminder.description}
-                      </p>
+                      <p className="text-sm text-slate-400 mt-1">{reminder.description}</p>
                       <div className="mt-2 text-xs text-slate-500 bg-slate-900/50 rounded px-2 py-1 inline-block">
                         {reminder.days} {reminder.days === 1 ? "day" : "days"} before check-in
                       </div>
@@ -331,7 +302,7 @@ export function CommunicationSetup({
                       onClick={() => togglePreArrivalReminder(reminder.days)}
                       className={cn(
                         "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4",
-                        reminder.enabled ? "bg-blue-500" : "bg-slate-600"
+                        reminder.enabled ? "bg-blue-500" : "bg-slate-600",
                       )}
                     >
                       <motion.span
@@ -339,7 +310,7 @@ export function CommunicationSetup({
                         transition={SPRING_CONFIG}
                         className={cn(
                           "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                          reminder.enabled ? "translate-x-6" : "translate-x-1"
+                          reminder.enabled ? "translate-x-6" : "translate-x-1",
                         )}
                       />
                     </button>
@@ -354,16 +325,13 @@ export function CommunicationSetup({
                 "p-4 rounded-xl border-2 transition-all",
                 sendPostStay
                   ? "border-blue-500 bg-blue-500/10"
-                  : "border-slate-700 bg-slate-800/30"
+                  : "border-slate-700 bg-slate-800/30",
               )}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h4
-                    className={cn(
-                      "font-semibold",
-                      sendPostStay ? "text-blue-400" : "text-white"
-                    )}
+                    className={cn("font-semibold", sendPostStay ? "text-blue-400" : "text-white")}
                   >
                     Post-Stay Thank You
                   </h4>
@@ -379,7 +347,7 @@ export function CommunicationSetup({
                   onClick={() => setSendPostStay(!sendPostStay)}
                   className={cn(
                     "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4",
-                    sendPostStay ? "bg-blue-500" : "bg-slate-600"
+                    sendPostStay ? "bg-blue-500" : "bg-slate-600",
                   )}
                 >
                   <motion.span
@@ -387,7 +355,7 @@ export function CommunicationSetup({
                     transition={SPRING_CONFIG}
                     className={cn(
                       "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                      sendPostStay ? "translate-x-6" : "translate-x-1"
+                      sendPostStay ? "translate-x-6" : "translate-x-1",
                     )}
                   />
                 </button>
@@ -403,16 +371,14 @@ export function CommunicationSetup({
           transition={{ delay: 0.25 }}
           className="space-y-4"
         >
-          <h3 className="text-lg font-semibold text-white">
-            Guest Feedback Survey
-          </h3>
+          <h3 className="text-lg font-semibold text-white">Guest Feedback Survey</h3>
 
           <div
             className={cn(
               "p-4 rounded-xl border-2 transition-all",
               enableNpsSurvey
                 ? "border-purple-500 bg-purple-500/10"
-                : "border-slate-700 bg-slate-800/30"
+                : "border-slate-700 bg-slate-800/30",
             )}
           >
             <div className="flex items-start justify-between">
@@ -420,7 +386,7 @@ export function CommunicationSetup({
                 <h4
                   className={cn(
                     "font-semibold",
-                    enableNpsSurvey ? "text-purple-400" : "text-white"
+                    enableNpsSurvey ? "text-purple-400" : "text-white",
                   )}
                 >
                   Post-Stay NPS Survey
@@ -437,7 +403,7 @@ export function CommunicationSetup({
                 onClick={() => setEnableNpsSurvey(!enableNpsSurvey)}
                 className={cn(
                   "relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ml-4",
-                  enableNpsSurvey ? "bg-purple-500" : "bg-slate-600"
+                  enableNpsSurvey ? "bg-purple-500" : "bg-slate-600",
                 )}
               >
                 <motion.span
@@ -445,7 +411,7 @@ export function CommunicationSetup({
                   transition={SPRING_CONFIG}
                   className={cn(
                     "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
-                    enableNpsSurvey ? "translate-x-6" : "translate-x-1"
+                    enableNpsSurvey ? "translate-x-6" : "translate-x-1",
                   )}
                 />
               </button>
@@ -466,8 +432,7 @@ export function CommunicationSetup({
               <span className="text-slate-300 font-medium">
                 All emails can be customized in settings.
               </span>{" "}
-              You can edit templates, add your branding, and fine-tune timing
-              after onboarding.
+              You can edit templates, add your branding, and fine-tune timing after onboarding.
             </p>
           </div>
         </motion.div>
@@ -494,7 +459,7 @@ export function CommunicationSetup({
               "flex-1 py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-blue-500 to-indigo-500",
               "hover:from-blue-400 hover:to-indigo-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

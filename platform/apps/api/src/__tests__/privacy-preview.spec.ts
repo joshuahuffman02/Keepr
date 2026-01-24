@@ -17,35 +17,47 @@ describe("Privacy redaction preview", () => {
   }> = [];
   const prismaStub = {
     piiFieldTag: {
-      upsert: jest.fn(async ({ where, create, update }: {
-        where: { resource_field: { resource: string; field: string } };
-        create: { id?: string; resource: string; field: string; classification: PiiClassification; redactionMode?: RedactionMode | null };
-        update: { classification: PiiClassification; redactionMode?: RedactionMode | null };
-      }) => {
-        const index = piiTags.findIndex(
-          (tag) =>
-            tag.resource === where.resource_field.resource &&
-            tag.field === where.resource_field.field
-        );
-        if (index >= 0) {
-          const existing = piiTags[index];
-          const updated = {
-            ...existing,
-            classification: update.classification,
-            redactionMode: update.redactionMode ?? existing.redactionMode,
+      upsert: jest.fn(
+        async ({
+          where,
+          create,
+          update,
+        }: {
+          where: { resource_field: { resource: string; field: string } };
+          create: {
+            id?: string;
+            resource: string;
+            field: string;
+            classification: PiiClassification;
+            redactionMode?: RedactionMode | null;
           };
-          piiTags[index] = updated;
-          return updated;
-        }
-        const created = {
-          resource: create.resource,
-          field: create.field,
-          classification: create.classification,
-          redactionMode: create.redactionMode ?? null,
-        };
-        piiTags.push(created);
-        return created;
-      }),
+          update: { classification: PiiClassification; redactionMode?: RedactionMode | null };
+        }) => {
+          const index = piiTags.findIndex(
+            (tag) =>
+              tag.resource === where.resource_field.resource &&
+              tag.field === where.resource_field.field,
+          );
+          if (index >= 0) {
+            const existing = piiTags[index];
+            const updated = {
+              ...existing,
+              classification: update.classification,
+              redactionMode: update.redactionMode ?? existing.redactionMode,
+            };
+            piiTags[index] = updated;
+            return updated;
+          }
+          const created = {
+            resource: create.resource,
+            field: create.field,
+            classification: create.classification,
+            redactionMode: create.redactionMode ?? null,
+          };
+          piiTags.push(created);
+          return created;
+        },
+      ),
       findMany: jest.fn(async () => piiTags),
       deleteMany: jest.fn(async ({ where }: { where: { resource: string; field: string } }) => {
         let removed = 0;
@@ -71,7 +83,13 @@ describe("Privacy redaction preview", () => {
     await prismaStub.piiFieldTag.upsert({
       where: { resource_field: { resource: "guest", field: "ssn" } },
       update: { classification: PiiClassification.secret, redactionMode: RedactionMode.remove },
-      create: { id: "pii-ssn", resource: "guest", field: "ssn", classification: PiiClassification.secret, redactionMode: RedactionMode.remove },
+      create: {
+        id: "pii-ssn",
+        resource: "guest",
+        field: "ssn",
+        classification: PiiClassification.secret,
+        redactionMode: RedactionMode.remove,
+      },
     });
   });
 

@@ -7,7 +7,14 @@ import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
@@ -17,7 +24,7 @@ const statusColors: Record<string, string> = {
   in_transit: "bg-status-info-bg text-status-info-text",
   paid: "bg-status-success-bg text-status-success-text",
   failed: "bg-status-error-bg text-status-error-text",
-  canceled: "bg-muted text-muted-foreground"
+  canceled: "bg-muted text-muted-foreground",
 };
 
 function formatMoney(cents: number | null | undefined, currency = "USD") {
@@ -57,7 +64,7 @@ export default function PayoutsPage() {
       return apiClient.listPayouts(campgroundId, payoutStatus);
     },
     enabled: !!campgroundId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   const totalNet = useMemo(() => {
@@ -71,7 +78,9 @@ export default function PayoutsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Payouts</h1>
-            <p className="text-sm text-muted-foreground">Stripe Connect payouts with balance transaction lines.</p>
+            <p className="text-sm text-muted-foreground">
+              Stripe Connect payouts with balance transaction lines.
+            </p>
           </div>
           <div className="flex gap-2">
             {statusFilters.map((s) => (
@@ -134,12 +143,24 @@ export default function PayoutsPage() {
                     <TableCell colSpan={8} className="h-32 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                          <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          <svg
+                            className="w-5 h-5 text-muted-foreground"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
                           </svg>
                         </div>
                         <p className="text-sm font-medium text-foreground">No payouts yet</p>
-                        <p className="text-xs text-muted-foreground">Payouts will appear here once processed</p>
+                        <p className="text-xs text-muted-foreground">
+                          Payouts will appear here once processed
+                        </p>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -147,7 +168,10 @@ export default function PayoutsPage() {
                 {data?.map((payout) => (
                   <TableRow key={payout.id}>
                     <TableCell className="font-mono text-xs">
-                      <Link className="text-primary hover:underline" href={`/finance/payouts/${payout.id}`}>
+                      <Link
+                        className="text-primary hover:underline"
+                        href={`/finance/payouts/${payout.id}`}
+                      >
                         {payout.stripePayoutId}
                       </Link>
                     </TableCell>
@@ -156,17 +180,32 @@ export default function PayoutsPage() {
                         {payout.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell>{formatMoney(payout.amountCents, payout.currency.toUpperCase())}</TableCell>
-                    <TableCell>{formatMoney(payout.feeCents ?? 0, payout.currency.toUpperCase())}</TableCell>
-                    <TableCell>{formatMoney(payout.amountCents - (payout.feeCents ?? 0), payout.currency.toUpperCase())}</TableCell>
+                    <TableCell>
+                      {formatMoney(payout.amountCents, payout.currency.toUpperCase())}
+                    </TableCell>
+                    <TableCell>
+                      {formatMoney(payout.feeCents ?? 0, payout.currency.toUpperCase())}
+                    </TableCell>
+                    <TableCell>
+                      {formatMoney(
+                        payout.amountCents - (payout.feeCents ?? 0),
+                        payout.currency.toUpperCase(),
+                      )}
+                    </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {payout.arrivalDate ? format(new Date(payout.arrivalDate), "yyyy-MM-dd") : "—"}
+                      {payout.arrivalDate
+                        ? format(new Date(payout.arrivalDate), "yyyy-MM-dd")
+                        : "—"}
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground flex flex-col gap-1">
                       <span>{payout.lines?.length ?? 0}</span>
-                      {reconMap[payout.id] && Math.abs(reconMap[payout.id].driftVsLedgerCents) > DRIFT_THRESHOLD_CENTS && (
-                        <Badge className="bg-status-warning-bg text-status-warning-text w-fit">Drift: {formatMoney(reconMap[payout.id].driftVsLedgerCents)}</Badge>
-                      )}
+                      {reconMap[payout.id] &&
+                        Math.abs(reconMap[payout.id].driftVsLedgerCents) >
+                          DRIFT_THRESHOLD_CENTS && (
+                          <Badge className="bg-status-warning-bg text-status-warning-text w-fit">
+                            Drift: {formatMoney(reconMap[payout.id].driftVsLedgerCents)}
+                          </Badge>
+                        )}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button
@@ -183,10 +222,17 @@ export default function PayoutsPage() {
                           try {
                             const recon = await apiClient.getPayoutRecon(campgroundId, payout.id);
                             setReconMap((prev) => ({ ...prev, [payout.id]: recon }));
-                            toast({ title: "Recon ready", description: `Drift vs ledger: ${formatMoney(recon.driftVsLedgerCents)}` });
+                            toast({
+                              title: "Recon ready",
+                              description: `Drift vs ledger: ${formatMoney(recon.driftVsLedgerCents)}`,
+                            });
                           } catch (err: unknown) {
                             const message = err instanceof Error ? err.message : "Recon failed";
-                            toast({ title: "Recon failed", description: message, variant: "destructive" });
+                            toast({
+                              title: "Recon failed",
+                              description: message,
+                              variant: "destructive",
+                            });
                           }
                         }}
                       >
@@ -194,7 +240,8 @@ export default function PayoutsPage() {
                       </Button>
                       {reconMap[payout.id] && (
                         <div className="text-xs text-muted-foreground mt-1">
-                          Drift (lines): {formatMoney(reconMap[payout.id].driftVsLinesCents)} · Drift (ledger): {formatMoney(reconMap[payout.id].driftVsLedgerCents)}
+                          Drift (lines): {formatMoney(reconMap[payout.id].driftVsLinesCents)} ·
+                          Drift (ledger): {formatMoney(reconMap[payout.id].driftVsLedgerCents)}
                         </div>
                       )}
                     </TableCell>

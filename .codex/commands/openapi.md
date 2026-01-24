@@ -15,4 +15,5 @@ pnpm --dir platform/apps/api openapi:generate
 ```
 
 ## Output
+
 - `platform/apps/api/openapi.json`

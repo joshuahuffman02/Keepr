@@ -60,7 +60,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Leadership",
         title: "Conduct Emergency Service Review",
-        description: "With negative NPS, immediate intervention is required. Schedule on-site management review, mystery guest evaluation, and staff meeting to address core issues.",
+        description:
+          "With negative NPS, immediate intervention is required. Schedule on-site management review, mystery guest evaluation, and staff meeting to address core issues.",
         expectedImpact: "Foundation for all other improvements",
         estimatedEffort: "low",
       },
@@ -68,7 +69,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Operations",
         title: "Implement Daily Cleanliness Audits",
-        description: "Establish a daily inspection checklist for restrooms, common areas, and sites. Assign accountability to specific staff members.",
+        description:
+          "Establish a daily inspection checklist for restrooms, common areas, and sites. Assign accountability to specific staff members.",
         expectedImpact: "Can improve NPS by 10-15 points",
         estimatedEffort: "low",
       },
@@ -76,7 +78,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Maintenance",
         title: "Facilities Maintenance Program",
-        description: "Create a preventive maintenance schedule for all facilities. Address repair requests within 24 hours.",
+        description:
+          "Create a preventive maintenance schedule for all facilities. Address repair requests within 24 hours.",
         expectedImpact: "Can improve NPS by 6-10 points",
         estimatedEffort: "medium",
       },
@@ -84,7 +87,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Training",
         title: "Customer Service Training Program",
-        description: "Implement monthly customer service training sessions focusing on guest interactions, problem resolution, and proactive service.",
+        description:
+          "Implement monthly customer service training sessions focusing on guest interactions, problem resolution, and proactive service.",
         expectedImpact: "Can improve NPS by 8-12 points",
         estimatedEffort: "medium",
       },
@@ -107,7 +111,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Policies",
         title: "Enforce Quiet Hours",
-        description: "Clearly communicate quiet hours (10 PM - 8 AM) at check-in and via signage. Train staff on diplomatic enforcement procedures.",
+        description:
+          "Clearly communicate quiet hours (10 PM - 8 AM) at check-in and via signage. Train staff on diplomatic enforcement procedures.",
         expectedImpact: "Can improve NPS by 8-10 points",
         estimatedEffort: "low",
       },
@@ -115,7 +120,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "high",
         category: "Leadership",
         title: "Management Responsiveness Training",
-        description: "Ensure management is visible and accessible. Implement a system for escalating and resolving guest concerns within 2 hours.",
+        description:
+          "Ensure management is visible and accessible. Implement a system for escalating and resolving guest concerns within 2 hours.",
         expectedImpact: "Can improve NPS by 8-12 points",
         estimatedEffort: "low",
       },
@@ -123,7 +129,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "medium",
         category: "Infrastructure",
         title: "Upgrade WiFi Infrastructure",
-        description: "Assess current WiFi coverage and bandwidth. Consider mesh network systems or additional access points for better coverage.",
+        description:
+          "Assess current WiFi coverage and bandwidth. Consider mesh network systems or additional access points for better coverage.",
         expectedImpact: "Can improve NPS by 5-8 points",
         estimatedEffort: "medium",
       },
@@ -145,7 +152,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "medium",
         category: "Guest Experience",
         title: "Amenity Audit and Enhancement",
-        description: "Survey guests on desired amenities. Prioritize additions that have highest demand and ROI (e.g., dog park, playground equipment).",
+        description:
+          "Survey guests on desired amenities. Prioritize additions that have highest demand and ROI (e.g., dog park, playground equipment).",
         expectedImpact: "Can improve NPS by 5-10 points",
         estimatedEffort: "high",
       },
@@ -153,7 +161,8 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "medium",
         category: "Pricing",
         title: "Value Enhancement Strategy",
-        description: "Review pricing against local competitors. Consider adding value through complimentary amenities (coffee, firewood) rather than price cuts.",
+        description:
+          "Review pricing against local competitors. Consider adding value through complimentary amenities (coffee, firewood) rather than price cuts.",
         expectedImpact: "Can improve NPS by 5-8 points",
         estimatedEffort: "low",
       },
@@ -161,17 +170,14 @@ const mockSuggestions: CampgroundSuggestion[] = [
         priority: "medium",
         category: "Infrastructure",
         title: "Site Quality Improvements",
-        description: "Address drainage issues, level pads, and ensure adequate spacing between sites. Consider site-specific upgrades for premium pricing.",
+        description:
+          "Address drainage issues, level pads, and ensure adequate spacing between sites. Consider site-specific upgrades for premium pricing.",
         expectedImpact: "Can improve NPS by 5-10 points",
         estimatedEffort: "high",
       },
     ],
     detractorCount: 67,
-    topComplaints: [
-      "Not worth the price",
-      "Bare bones amenities",
-      "Sites were too close together",
-    ],
+    topComplaints: ["Not worth the price", "Bare bones amenities", "Sites were too close together"],
   },
 ];
 
@@ -284,7 +290,7 @@ export default function AiInsightsPage() {
   const totalSuggestions = suggestions.reduce((sum, s) => sum + s.suggestions.length, 0);
   const highPrioritySuggestions = suggestions.reduce(
     (sum, s) => sum + s.suggestions.filter((sg) => sg.priority === "high").length,
-    0
+    0,
   );
 
   return (
@@ -303,7 +309,9 @@ export default function AiInsightsPage() {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">AI-generated improvement recommendations and anomaly detection</p>
+          <p className="text-muted-foreground mt-1">
+            AI-generated improvement recommendations and anomaly detection
+          </p>
         </div>
         <DateRangePicker value={dateRange} onChange={setDateRange} />
       </div>
@@ -388,22 +396,36 @@ export default function AiInsightsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className={anomaly.severity === "critical" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"}>
+                        <Badge
+                          className={
+                            anomaly.severity === "critical"
+                              ? "bg-red-500/20 text-red-400"
+                              : "bg-amber-500/20 text-amber-400"
+                          }
+                        >
                           {anomaly.severity}
                         </Badge>
                         {anomaly.campgroundName && (
                           <span className="text-muted-foreground">{anomaly.campgroundName}</span>
                         )}
                       </div>
-                      <p className="font-medium text-foreground">{formatMessage(anomaly.message)}</p>
+                      <p className="font-medium text-foreground">
+                        {formatMessage(anomaly.message)}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-red-400">
-                        {typeof anomaly.currentValue === 'number' ? Math.round(anomaly.currentValue * 10) / 10 : anomaly.currentValue}
+                        {typeof anomaly.currentValue === "number"
+                          ? Math.round(anomaly.currentValue * 10) / 10
+                          : anomaly.currentValue}
                         {anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Expected: {typeof anomaly.expectedValue === 'number' ? Math.round(anomaly.expectedValue * 10) / 10 : anomaly.expectedValue}{anomaly.type === "cancellation_spike" ? "%" : ""}
+                        Expected:{" "}
+                        {typeof anomaly.expectedValue === "number"
+                          ? Math.round(anomaly.expectedValue * 10) / 10
+                          : anomaly.expectedValue}
+                        {anomaly.type === "cancellation_spike" ? "%" : ""}
                       </p>
                     </div>
                   </div>
@@ -411,7 +433,10 @@ export default function AiInsightsPage() {
                     <p className="text-xs text-muted-foreground mb-2">Recommendations:</p>
                     <ul className="space-y-1">
                       {anomaly.recommendations.map((rec, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                        >
                           <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 flex-shrink-0" />
                           {rec}
                         </li>
@@ -436,21 +461,29 @@ export default function AiInsightsPage() {
             <CardHeader
               className="cursor-pointer"
               onClick={() =>
-                setExpandedCampground(expandedCampground === cg.campgroundId ? null : cg.campgroundId)
+                setExpandedCampground(
+                  expandedCampground === cg.campgroundId ? null : cg.campgroundId,
+                )
               }
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="text-center">
-                    <p className={`text-3xl font-bold ${getNpsColor(cg.npsScore)}`}>{cg.npsScore}</p>
+                    <p className={`text-3xl font-bold ${getNpsColor(cg.npsScore)}`}>
+                      {cg.npsScore}
+                    </p>
                     <p className="text-xs text-muted-foreground">NPS</p>
                   </div>
                   <div>
                     <CardTitle className="text-foreground">{cg.campgroundName}</CardTitle>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-sm text-muted-foreground">{cg.detractorCount} detractors</span>
+                      <span className="text-sm text-muted-foreground">
+                        {cg.detractorCount} detractors
+                      </span>
                       <span className="text-muted-foreground">•</span>
-                      <span className="text-sm text-muted-foreground">{cg.suggestions.length} suggestions</span>
+                      <span className="text-sm text-muted-foreground">
+                        {cg.suggestions.length} suggestions
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -475,10 +508,15 @@ export default function AiInsightsPage() {
                 {/* Top Complaints */}
                 {cg.topComplaints.length > 0 && (
                   <div className="mb-6">
-                    <h4 className="text-sm font-medium text-muted-foreground mb-3">Recent Complaints</h4>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                      Recent Complaints
+                    </h4>
                     <div className="space-y-2">
                       {cg.topComplaints.map((complaint, idx) => (
-                        <p key={idx} className="text-sm text-muted-foreground italic pl-4 border-l-2 border-red-500/50">
+                        <p
+                          key={idx}
+                          className="text-sm text-muted-foreground italic pl-4 border-l-2 border-red-500/50"
+                        >
                           "{complaint}"
                         </p>
                       ))}
@@ -488,7 +526,9 @@ export default function AiInsightsPage() {
 
                 {/* Suggestions */}
                 <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Recommended Actions</h4>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                    Recommended Actions
+                  </h4>
                   <div className="space-y-3">
                     {cg.suggestions.map((suggestion, idx) => (
                       <div
@@ -507,7 +547,9 @@ export default function AiInsightsPage() {
                           {getEffortBadge(suggestion.estimatedEffort)}
                         </div>
                         <h5 className="font-medium text-foreground mb-1">{suggestion.title}</h5>
-                        <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {suggestion.description}
+                        </p>
                         <p className="text-xs text-green-400">
                           <Zap className="h-3 w-3 inline mr-1" />
                           Expected Impact: {suggestion.expectedImpact}

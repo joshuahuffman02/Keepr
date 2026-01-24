@@ -180,18 +180,15 @@ export function TourOverlay({
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[9998] pointer-events-none"
             style={{
-              background: targetRect && currentStep.spotlight !== false
-                ? `radial-gradient(ellipse ${targetRect.width + 40}px ${targetRect.height + 40}px at ${targetRect.left + targetRect.width / 2}px ${targetRect.top + targetRect.height / 2}px, transparent 0%, rgba(0, 0, 0, 0.75) 100%)`
-                : "rgba(0, 0, 0, 0.75)",
+              background:
+                targetRect && currentStep.spotlight !== false
+                  ? `radial-gradient(ellipse ${targetRect.width + 40}px ${targetRect.height + 40}px at ${targetRect.left + targetRect.width / 2}px ${targetRect.top + targetRect.height / 2}px, transparent 0%, rgba(0, 0, 0, 0.75) 100%)`
+                  : "rgba(0, 0, 0, 0.75)",
             }}
           />
 
           {/* Clickable overlay to skip */}
-          <div
-            className="fixed inset-0 z-[9998]"
-            onClick={onSkip}
-            aria-hidden="true"
-          />
+          <div className="fixed inset-0 z-[9998]" onClick={onSkip} aria-hidden="true" />
 
           {/* Spotlight ring around target */}
           {targetRect && currentStep.spotlight !== false && (
@@ -241,10 +238,14 @@ export function TourOverlay({
               <div
                 className={cn(
                   "absolute w-3 h-3 bg-card border-border rotate-45",
-                  tooltipPosition.arrowPosition === "top" && "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-t",
-                  tooltipPosition.arrowPosition === "bottom" && "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-r border-b",
-                  tooltipPosition.arrowPosition === "left" && "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-b",
-                  tooltipPosition.arrowPosition === "right" && "right-0 top-1/2 translate-x-1/2 -translate-y-1/2 border-r border-t"
+                  tooltipPosition.arrowPosition === "top" &&
+                    "top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-t",
+                  tooltipPosition.arrowPosition === "bottom" &&
+                    "bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-r border-b",
+                  tooltipPosition.arrowPosition === "left" &&
+                    "left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 border-l border-b",
+                  tooltipPosition.arrowPosition === "right" &&
+                    "right-0 top-1/2 translate-x-1/2 -translate-y-1/2 border-r border-t",
                 )}
               />
             )}
@@ -253,9 +254,7 @@ export function TourOverlay({
             <div className="flex items-start justify-between p-4 pb-2">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-emerald-500" />
-                <h3 className="font-semibold text-foreground">
-                  {currentStep.title}
-                </h3>
+                <h3 className="font-semibold text-foreground">{currentStep.title}</h3>
               </div>
               <Button
                 variant="ghost"
@@ -270,9 +269,7 @@ export function TourOverlay({
 
             {/* Content */}
             <div className="px-4 pb-4">
-              <p className="text-sm text-muted-foreground">
-                {currentStep.content}
-              </p>
+              <p className="text-sm text-muted-foreground">{currentStep.content}</p>
             </div>
 
             {/* Footer */}
@@ -287,8 +284,8 @@ export function TourOverlay({
                       i === currentStepIndex
                         ? "bg-emerald-500"
                         : i < currentStepIndex
-                        ? "bg-emerald-300"
-                        : "bg-muted"
+                          ? "bg-emerald-300"
+                          : "bg-muted",
                     )}
                   />
                 ))}

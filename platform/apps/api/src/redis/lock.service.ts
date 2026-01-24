@@ -14,7 +14,10 @@ export class LockService {
 
   constructor(private readonly redis: RedisService) {}
 
-  private async release(client: ReturnType<RedisService["getClient"]>, locks: { key: string; token: string }[]) {
+  private async release(
+    client: ReturnType<RedisService["getClient"]>,
+    locks: { key: string; token: string }[],
+  ) {
     if (!client || !locks.length) return;
     const lua = `
       if redis.call("get", KEYS[1]) == ARGV[1] then
@@ -29,8 +32,8 @@ export class LockService {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore lua script signature
           .eval(lua, 1, lock.key, lock.token)
-          .catch(() => null)
-      )
+          .catch(() => null),
+      ),
     );
   }
 
@@ -57,7 +60,10 @@ export class LockService {
       if (err instanceof ConflictException) {
         throw err;
       }
-      this.logger.warn(`Lock service unavailable; proceeding without locks`, err instanceof Error ? err.message : `${err}`);
+      this.logger.warn(
+        `Lock service unavailable; proceeding without locks`,
+        err instanceof Error ? err.message : `${err}`,
+      );
       return fn();
     }
 

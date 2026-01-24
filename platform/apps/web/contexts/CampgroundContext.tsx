@@ -13,7 +13,7 @@ type CampgroundContextValue = {
 const CampgroundContext = createContext<CampgroundContextValue>({
   selectedCampground: null,
   setSelectedCampground: () => {},
-  isHydrated: false
+  isHydrated: false,
 });
 
 export function CampgroundProvider({ children }: { children: React.ReactNode }) {
@@ -38,4 +38,3 @@ export function CampgroundProvider({ children }: { children: React.ReactNode }) 
 export function useCampground() {
   return useContext(CampgroundContext);
 }
-

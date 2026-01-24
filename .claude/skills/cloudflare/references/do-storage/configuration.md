@@ -3,18 +3,20 @@
 ## SQLite-backed (Recommended)
 
 **wrangler.jsonc:**
+
 ```jsonc
 {
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["Counter", "Session", "RateLimiter"]
-    }
-  ]
+      "new_sqlite_classes": ["Counter", "Session", "RateLimiter"],
+    },
+  ],
 }
 ```
 
 **wrangler.toml:**
+
 ```toml
 [[migrations]]
 tag = "v1"
@@ -24,14 +26,15 @@ new_sqlite_classes = ["Counter", "Session"]
 ## KV-backed (Legacy)
 
 **wrangler.jsonc:**
+
 ```jsonc
 {
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": ["OldCounter"]
-    }
-  ]
+      "new_classes": ["OldCounter"],
+    },
+  ],
 }
 ```
 
@@ -40,11 +43,11 @@ new_sqlite_classes = ["Counter", "Session"]
 ```typescript
 export class MyDurableObject extends DurableObject {
   sql: SqlStorage;
-  
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.sql = ctx.storage.sql;
-    
+
     // Initialize schema
     this.sql.exec(`
       CREATE TABLE IF NOT EXISTS users(
@@ -63,11 +66,11 @@ interface Env {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const id = env.MY_DO.idFromName('singleton');
+    const id = env.MY_DO.idFromName("singleton");
     const stub = env.MY_DO.get(id);
     return stub.fetch(request);
-  }
-}
+  },
+};
 ```
 
 ## CPU Limits
@@ -75,8 +78,8 @@ export default {
 ```jsonc
 {
   "limits": {
-    "cpu_ms": 300000  // 5 minutes (default 30s)
-  }
+    "cpu_ms": 300000, // 5 minutes (default 30s)
+  },
 }
 ```
 
@@ -103,10 +106,10 @@ const stub = env.MY_DO.get(id, { locationHint: "enam" });
 ```typescript
 export class Counter extends DurableObject {
   value: number;
-  
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    
+
     // Block concurrent requests during init
     ctx.blockConcurrencyWhile(async () => {
       this.value = (await ctx.storage.get("value")) || 0;

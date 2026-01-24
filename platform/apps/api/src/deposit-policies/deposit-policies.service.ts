@@ -37,13 +37,13 @@ export interface DepositCalculation {
 export class DepositPoliciesService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
+    private readonly audit: AuditService,
   ) {}
 
   list(campgroundId: string) {
     return this.prisma.depositPolicy.findMany({
       where: { campgroundId },
-      orderBy: [{ active: "desc" }, { createdAt: "desc" }]
+      orderBy: [{ active: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -55,8 +55,8 @@ export class DepositPoliciesService {
         campgroundId,
         siteClassId: dto.siteClassId ?? null,
         retryPlanId: dto.retryPlanId ?? null,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     await this.audit.record({
@@ -66,13 +66,18 @@ export class DepositPoliciesService {
       entity: "DepositPolicy",
       entityId: policy.id,
       before: null,
-      after: policy
+      after: policy,
     });
 
     return policy;
   }
 
-  async update(campgroundId: string, id: string, dto: UpdateDepositPolicyDto, actorId?: string | null) {
+  async update(
+    campgroundId: string,
+    id: string,
+    dto: UpdateDepositPolicyDto,
+    actorId?: string | null,
+  ) {
     const existing = await this.prisma.depositPolicy.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Deposit policy not found");
     const { siteClassId, retryPlanId, ...rest } = dto;
@@ -80,9 +85,9 @@ export class DepositPoliciesService {
       where: { id },
       data: {
         ...rest,
-        siteClassId: siteClassId === undefined ? undefined : siteClassId ?? null,
-        retryPlanId: retryPlanId === undefined ? undefined : retryPlanId ?? null
-      }
+        siteClassId: siteClassId === undefined ? undefined : (siteClassId ?? null),
+        retryPlanId: retryPlanId === undefined ? undefined : (retryPlanId ?? null),
+      },
     });
 
     await this.audit.record({
@@ -92,7 +97,7 @@ export class DepositPoliciesService {
       entity: "DepositPolicy",
       entityId: id,
       before: existing,
-      after: updated
+      after: updated,
     });
 
     return updated;
@@ -110,7 +115,7 @@ export class DepositPoliciesService {
       entity: "DepositPolicy",
       entityId: id,
       before: existing,
-      after: null
+      after: null,
     });
 
     return existing;
@@ -125,7 +130,7 @@ export class DepositPoliciesService {
     if (siteClassId) {
       const siteClassPolicy = await this.prisma.depositPolicy.findFirst({
         where: { campgroundId, siteClassId, active: true },
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
       });
       if (siteClassPolicy) return siteClassPolicy;
     }
@@ -133,12 +138,12 @@ export class DepositPoliciesService {
     // 2. Try campground default policy
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { defaultDepositPolicyId: true, depositRule: true, depositPercentage: true }
+      select: { defaultDepositPolicyId: true, depositRule: true, depositPercentage: true },
     });
 
     if (campground?.defaultDepositPolicyId) {
       const defaultPolicy = await this.prisma.depositPolicy.findUnique({
-        where: { id: campground.defaultDepositPolicyId }
+        where: { id: campground.defaultDepositPolicyId },
       });
       if (defaultPolicy?.active) return defaultPolicy;
     }
@@ -146,7 +151,7 @@ export class DepositPoliciesService {
     // 3. Fallback to any active campground-wide policy
     const campgroundPolicy = await this.prisma.depositPolicy.findFirst({
       where: { campgroundId, siteClassId: null, active: true },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
     if (campgroundPolicy) return campgroundPolicy;
 
@@ -162,15 +167,14 @@ export class DepositPoliciesService {
     siteClassId: string | null,
     totalAmountCents: number,
     lodgingOnlyCents: number,
-    nights: number
+    nights: number,
   ): Promise<DepositCalculation | null> {
     const policy = await this.resolve(campgroundId, siteClassId);
 
     if (!policy) return null;
 
-    const baseCents = policy.applyTo === DepositApplyTo.lodging_only
-      ? lodgingOnlyCents
-      : totalAmountCents;
+    const baseCents =
+      policy.applyTo === DepositApplyTo.lodging_only ? lodgingOnlyCents : totalAmountCents;
 
     let depositAmountCents = 0;
 
@@ -206,9 +210,9 @@ export class DepositPoliciesService {
         name: policy.name,
         strategy: policy.strategy,
         value: policy.value,
-        applyTo: policy.applyTo
+        applyTo: policy.applyTo,
       },
-      depositPolicyVersion
+      depositPolicyVersion,
     };
   }
 }

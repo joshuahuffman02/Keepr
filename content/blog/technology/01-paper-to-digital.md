@@ -17,6 +17,7 @@ Paper calendars, handwritten registrations, and filing cabinets full of records 
 ## The Problem with Paper
 
 ### Operational Challenges
+
 - Double-bookings from manual tracking errors
 - Lost or damaged records
 - Difficulty finding information quickly
@@ -24,12 +25,14 @@ Paper calendars, handwritten registrations, and filing cabinets full of records 
 - Handwriting legibility issues
 
 ### Guest Experience Issues
+
 - Phone-only booking inconvenient
 - No instant confirmation
 - Slower check-in process
 - No communication history
 
 ### Business Limitations
+
 - No reporting or analytics
 - Difficult to implement dynamic pricing
 - No automated marketing
@@ -40,21 +43,25 @@ Paper calendars, handwritten registrations, and filing cabinets full of records 
 ## What Digital Systems Provide
 
 ### Real-Time Availability
+
 - Instant updates across all channels
 - No double-booking risk
 - Staff sees same information
 
 ### Online Booking
+
 - 24/7 reservations
 - Guests book when convenient
 - Reduce phone call volume
 
 ### Automated Communications
+
 - Confirmation emails instantly
 - Reminder messages automatically
 - Post-stay follow-ups
 
 ### Business Intelligence
+
 - Occupancy reports
 - Revenue analytics
 - Guest data and history
@@ -93,4 +100,4 @@ The cost is typically offset by increased bookings, reduced errors, and time sav
 
 ---
 
-*Keepr helps campgrounds transition smoothly from paper to digital, with training and support every step of the way. [Make the switch at campreserv.com](https://campreserv.com)*
+_Keepr helps campgrounds transition smoothly from paper to digital, with training and support every step of the way. [Make the switch at campreserv.com](https://campreserv.com)_

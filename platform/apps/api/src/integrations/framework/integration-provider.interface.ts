@@ -91,7 +91,7 @@ export interface IntegrationProvider {
   initiateOAuth?(
     campgroundId: string,
     redirectUri: string,
-    state?: string
+    state?: string,
   ): Promise<OAuthUrlResult>;
 
   /**
@@ -100,7 +100,7 @@ export interface IntegrationProvider {
   handleOAuthCallback?(
     code: string,
     state: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<OAuthCallbackResult>;
 
   /**
@@ -119,7 +119,7 @@ export interface IntegrationProvider {
   connect(
     campgroundId: string,
     credentials: IntegrationCredentials,
-    config?: Record<string, unknown>
+    config?: Record<string, unknown>,
   ): Promise<{ success: boolean; error?: string }>;
 
   /**
@@ -138,7 +138,7 @@ export interface IntegrationProvider {
       direction: "inbound" | "outbound" | "bidirectional";
       entityTypes?: string[];
       since?: Date;
-    }
+    },
   ): Promise<SyncResult>;
 
   /**
@@ -146,7 +146,7 @@ export interface IntegrationProvider {
    */
   handleWebhook?(
     payload: WebhookPayload,
-    credentials: IntegrationCredentials
+    credentials: IntegrationCredentials,
   ): Promise<WebhookResult>;
 
   /**

@@ -107,7 +107,11 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
   const [provider, setProvider] = useState<Provider>("generic");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
-  const [preview, setPreview] = useState<{ rows: PreviewRow[]; totalHours: number; csv?: string } | null>(null);
+  const [preview, setPreview] = useState<{
+    rows: PreviewRow[];
+    totalHours: number;
+    csv?: string;
+  } | null>(null);
   const [exports, setExports] = useState<PayrollExport[]>([]);
   const [config, setConfig] = useState<PayrollConfig | null>(null);
   const [loading, setLoading] = useState(false);
@@ -174,7 +178,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
 
     try {
       const res = await fetch(
-        `/api/staff/payroll/preview?campgroundId=${params.campgroundId}&periodStart=${periodStart}&periodEnd=${periodEnd}&provider=${provider}`
+        `/api/staff/payroll/preview?campgroundId=${params.campgroundId}&periodStart=${periodStart}&periodEnd=${periodEnd}&provider=${provider}`,
       );
       if (!res.ok) throw new Error("Failed to load preview");
       const data = await res.json();
@@ -233,7 +237,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
 
       // Refresh exports list
       const exportsRes = await fetch(
-        `/api/staff/payroll/exports?campgroundId=${params.campgroundId}&limit=10`
+        `/api/staff/payroll/exports?campgroundId=${params.campgroundId}&limit=10`,
       );
       if (exportsRes.ok) {
         setExports(await exportsRes.json());
@@ -312,7 +316,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "export"
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted/60",
             )}
             aria-pressed={activeTab === "export"}
           >
@@ -325,7 +329,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "history"
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
-                : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted/60",
             )}
             aria-pressed={activeTab === "history"}
           >
@@ -344,7 +348,10 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
-            <button onClick={() => setError(null)} className="ml-auto text-red-800 underline text-xs font-medium">
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-800 underline text-xs font-medium"
+            >
               Dismiss
             </button>
           </motion.div>
@@ -373,7 +380,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                     </div>
                     <div>
                       <h2 className="text-lg font-semibold text-foreground">Payroll Provider</h2>
-                      <p className="text-sm text-muted-foreground">Select your payroll system for the correct export format</p>
+                      <p className="text-sm text-muted-foreground">
+                        Select your payroll system for the correct export format
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -389,7 +398,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         "text-left p-4 rounded-lg border-2 transition-all",
                         provider === p.id
                           ? "border-status-success/40 bg-status-success/10"
-                          : "border-border hover:border-border hover:bg-muted/60"
+                          : "border-border hover:border-border hover:bg-muted/60",
                       )}
                       aria-pressed={provider === p.id}
                     >
@@ -397,12 +406,16 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div
                           className={cn(
                             "w-8 h-8 rounded-lg flex items-center justify-center",
-                            provider === p.id ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"
+                            provider === p.id
+                              ? "bg-status-success/15 text-status-success"
+                              : "bg-muted text-muted-foreground",
                           )}
                         >
                           {p.icon}
                         </div>
-                        {provider === p.id && <CheckCircle2 className="w-4 h-4 text-status-success ml-auto" />}
+                        {provider === p.id && (
+                          <CheckCircle2 className="w-4 h-4 text-status-success ml-auto" />
+                        )}
                       </div>
                       <div className="font-semibold text-foreground">{p.name}</div>
                       <div className="text-xs text-muted-foreground mt-1">{p.description}</div>
@@ -425,7 +438,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                     </div>
                     <div>
                       <h2 className="text-lg font-semibold text-foreground">Pay Period</h2>
-                      <p className="text-sm text-muted-foreground">Select the date range for the export</p>
+                      <p className="text-sm text-muted-foreground">
+                        Select the date range for the export
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -445,7 +460,12 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="payroll-start-date" className="block text-sm font-medium text-foreground mb-2">Start Date</Label>
+                      <Label
+                        htmlFor="payroll-start-date"
+                        className="block text-sm font-medium text-foreground mb-2"
+                      >
+                        Start Date
+                      </Label>
                       <Input
                         id="payroll-start-date"
                         type="date"
@@ -455,7 +475,12 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                       />
                     </div>
                     <div>
-                      <Label htmlFor="payroll-end-date" className="block text-sm font-medium text-foreground mb-2">End Date</Label>
+                      <Label
+                        htmlFor="payroll-end-date"
+                        className="block text-sm font-medium text-foreground mb-2"
+                      >
+                        End Date
+                      </Label>
                       <Input
                         id="payroll-end-date"
                         type="date"
@@ -500,8 +525,8 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div>
                           <h2 className="text-lg font-semibold text-foreground">Preview</h2>
                           <p className="text-sm text-muted-foreground">
-                            {preview.rows.length} employee{preview.rows.length !== 1 ? "s" : ""} &middot;{" "}
-                            {totalHours.toFixed(1)} total hours
+                            {preview.rows.length} employee{preview.rows.length !== 1 ? "s" : ""}{" "}
+                            &middot; {totalHours.toFixed(1)} total hours
                           </p>
                         </div>
                       </div>
@@ -575,16 +600,22 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                                         : row.user?.email || row.userId.slice(0, 8)}
                                     </div>
                                     {row.user?.email && (
-                                      <div className="text-xs text-muted-foreground">{row.user.email}</div>
+                                      <div className="text-xs text-muted-foreground">
+                                        {row.user.email}
+                                      </div>
                                     )}
                                   </div>
                                 </div>
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-sm text-foreground">{row.roleCode || "—"}</span>
+                                <span className="text-sm text-foreground">
+                                  {row.roleCode || "—"}
+                                </span>
                               </td>
                               <td className="px-6 py-4 text-right">
-                                <span className="font-semibold text-foreground">{row.hours.toFixed(2)}</span>
+                                <span className="font-semibold text-foreground">
+                                  {row.hours.toFixed(2)}
+                                </span>
                               </td>
                               <td className="px-6 py-4">
                                 <span
@@ -592,7 +623,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                                     "inline-flex px-2 py-1 rounded-md text-xs font-medium",
                                     row.earningCode === "OT" || row.earningCode === "overtime"
                                       ? "bg-status-warning/15 text-status-warning"
-                                      : "bg-muted text-foreground"
+                                      : "bg-muted text-foreground",
                                   )}
                                 >
                                   {row.earningCode || "REG"}
@@ -608,7 +639,10 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         </tbody>
                         <tfoot>
                           <tr className="bg-muted/60 border-t border-border">
-                            <td colSpan={2} className="px-6 py-3 text-sm font-semibold text-foreground">
+                            <td
+                              colSpan={2}
+                              className="px-6 py-3 text-sm font-semibold text-foreground"
+                            >
                               Total
                             </td>
                             <td className="px-6 py-3 text-right font-bold text-foreground">
@@ -637,7 +671,10 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                 <ul className="text-xs text-muted-foreground space-y-1">
                   <li>&bull; Only approved and submitted timesheets are included in exports</li>
                   <li>&bull; Make sure all hours are approved before running payroll</li>
-                  <li>&bull; Each provider uses different column formats - select the right one for your payroll system</li>
+                  <li>
+                    &bull; Each provider uses different column formats - select the right one for
+                    your payroll system
+                  </li>
                 </ul>
               </motion.div>
             </motion.div>
@@ -690,7 +727,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div
                           className={cn(
                             "w-10 h-10 rounded-lg flex items-center justify-center",
-                            exp.status === "generated" ? "bg-status-success/15" : "bg-status-warning/15"
+                            exp.status === "generated"
+                              ? "bg-status-success/15"
+                              : "bg-status-warning/15",
                           )}
                         >
                           {exp.status === "generated" ? (
@@ -717,7 +756,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                         <div className="text-xs text-muted-foreground text-right">
                           {new Date(exp.createdAt).toLocaleDateString()}
                           <br />
-                          {exp.requestedBy?.firstName || exp.requestedBy?.email?.split("@")[0] || "Staff"}
+                          {exp.requestedBy?.firstName ||
+                            exp.requestedBy?.email?.split("@")[0] ||
+                            "Staff"}
                         </div>
                         {exp.status === "generated" && (
                           <motion.button

@@ -66,7 +66,10 @@ describe("ReservationsService refundPayment", () => {
         { provide: PrismaService, useValue: prisma },
         { provide: LockService, useValue: {} },
         { provide: PromotionsService, useValue: {} },
-        { provide: EmailService, useValue: { sendPaymentReceipt: jest.fn().mockResolvedValue(undefined) } },
+        {
+          provide: EmailService,
+          useValue: { sendPaymentReceipt: jest.fn().mockResolvedValue(undefined) },
+        },
         { provide: WaitlistService, useValue: {} },
         { provide: LoyaltyService, useValue: {} },
         { provide: TaxRulesService, useValue: {} },
@@ -127,7 +130,11 @@ describe("ReservationsService refundPayment", () => {
       },
     ]);
     tx.site.findUnique.mockResolvedValue({ siteClass: { glCode: "GL", clientAccount: "Revenue" } });
-    tx.guest.findUnique.mockResolvedValue({ email: "guest@example.com", primaryFirstName: "Test", primaryLastName: "Guest" });
+    tx.guest.findUnique.mockResolvedValue({
+      email: "guest@example.com",
+      primaryFirstName: "Test",
+      primaryLastName: "Guest",
+    });
     tx.campground.findUnique.mockResolvedValue({ name: "Campground" });
     tx.reservation.update.mockResolvedValue({ id: "res1", paidAmount: 3000 });
     tx.payment.findMany.mockResolvedValue([
@@ -145,7 +152,7 @@ describe("ReservationsService refundPayment", () => {
           balanceAmount: 2000,
           paymentStatus: "partial",
         }),
-      })
+      }),
     );
     expect(tx.payment.create).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -153,7 +160,7 @@ describe("ReservationsService refundPayment", () => {
           amountCents: 2000,
           direction: "refund",
         }),
-      })
+      }),
     );
     expect(postBalancedLedgerEntries).toHaveBeenCalled();
   });

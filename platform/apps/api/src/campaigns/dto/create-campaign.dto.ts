@@ -43,4 +43,3 @@ export class CreateCampaignDto {
   @IsOptional()
   variables?: Record<string, unknown>;
 }
-

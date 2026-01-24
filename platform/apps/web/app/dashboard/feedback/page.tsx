@@ -85,26 +85,26 @@ export default function FeedbackDashboard() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const selectedCampground = campgrounds[0];
 
   const metricsQuery = useQuery({
     queryKey: ["nps-metrics", selectedCampground?.id],
     queryFn: () => apiClient.getNpsMetrics(selectedCampground!.id),
-    enabled: !!selectedCampground?.id
+    enabled: !!selectedCampground?.id,
   });
 
   const surveysQuery = useQuery({
     queryKey: ["nps-surveys", selectedCampground?.id],
     queryFn: () => apiClient.listNpsSurveys(selectedCampground!.id),
-    enabled: !!selectedCampground?.id
+    enabled: !!selectedCampground?.id,
   });
 
   const reviewsQuery = useQuery({
     queryKey: ["reviews-admin", selectedCampground?.id],
     queryFn: () => apiClient.getAdminReviews(selectedCampground!.id),
-    enabled: !!selectedCampground?.id
+    enabled: !!selectedCampground?.id,
   });
 
   const [showRemoved, setShowRemoved] = useState(false);
@@ -124,18 +124,19 @@ export default function FeedbackDashboard() {
   }, [metricsQuery.data?.nps]);
 
   const createSurveyMutation = useMutation({
-    mutationFn: () => apiClient.createNpsSurvey({
-      campgroundId: selectedCampground!.id,
-      name: surveyName,
-      question: "How likely are you to recommend us to a friend?",
-      cooldownDays: 30,
-      samplingPercent: 100
-    }),
+    mutationFn: () =>
+      apiClient.createNpsSurvey({
+        campgroundId: selectedCampground!.id,
+        name: surveyName,
+        question: "How likely are you to recommend us to a friend?",
+        cooldownDays: 30,
+        samplingPercent: 100,
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["nps-surveys", selectedCampground?.id] });
       setSuccessMessage("Survey created! You're ready to start collecting feedback.");
       setTimeout(() => setSuccessMessage(null), 4000);
-    }
+    },
   });
 
   const inviteMutation = useMutation({
@@ -146,7 +147,7 @@ export default function FeedbackDashboard() {
         surveyId,
         campgroundId: selectedCampground!.id,
         channel: "email",
-        email: inviteEmail
+        email: inviteEmail,
       });
     },
     onSuccess: () => {
@@ -154,7 +155,7 @@ export default function FeedbackDashboard() {
       qc.invalidateQueries({ queryKey: ["nps-metrics", selectedCampground?.id] });
       setSuccessMessage("Invite sent! Your guest will receive it shortly.");
       setTimeout(() => setSuccessMessage(null), 4000);
-    }
+    },
   });
 
   const moderateMutation = useMutation({
@@ -169,7 +170,7 @@ export default function FeedbackDashboard() {
       };
       setSuccessMessage(messages[variables.status] || "Review updated!");
       setTimeout(() => setSuccessMessage(null), 4000);
-    }
+    },
   });
 
   const replyMutation = useMutation({
@@ -177,7 +178,7 @@ export default function FeedbackDashboard() {
       apiClient.replyReview({
         reviewId: payload.reviewId,
         authorType: "staff",
-        body: payload.body
+        body: payload.body,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reviews-admin", selectedCampground?.id] });
@@ -185,7 +186,7 @@ export default function FeedbackDashboard() {
       setReplyText("");
       setSuccessMessage("Reply posted! Guests will see your response.");
       setTimeout(() => setSuccessMessage(null), 4000);
-    }
+    },
   });
 
   if (!selectedCampground) {
@@ -201,7 +202,9 @@ export default function FeedbackDashboard() {
               <MessageSquareHeart className="w-8 h-8 text-muted-foreground" />
             </div>
             <h2 className="text-xl font-semibold text-foreground">No Campground Selected</h2>
-            <p className="text-muted-foreground mt-2">Select a campground to view guest feedback.</p>
+            <p className="text-muted-foreground mt-2">
+              Select a campground to view guest feedback.
+            </p>
           </motion.div>
         </div>
       </DashboardShell>
@@ -218,9 +221,29 @@ export default function FeedbackDashboard() {
 
   // NPS score color and sentiment
   const getNpsStyle = (score: number) => {
-    if (score >= 50) return { color: "text-status-success", bg: "bg-status-success/15", border: "border-emerald-200", label: "Excellent", icon: Sparkles };
-    if (score >= 0) return { color: "text-status-warning", bg: "bg-status-warning/15", border: "border-amber-200", label: "Good", icon: TrendingUp };
-    return { color: "text-status-error", bg: "bg-status-error/15", border: "border-red-200", label: "Needs Work", icon: TrendingDown };
+    if (score >= 50)
+      return {
+        color: "text-status-success",
+        bg: "bg-status-success/15",
+        border: "border-emerald-200",
+        label: "Excellent",
+        icon: Sparkles,
+      };
+    if (score >= 0)
+      return {
+        color: "text-status-warning",
+        bg: "bg-status-warning/15",
+        border: "border-amber-200",
+        label: "Good",
+        icon: TrendingUp,
+      };
+    return {
+      color: "text-status-error",
+      bg: "bg-status-error/15",
+      border: "border-red-200",
+      label: "Needs Work",
+      icon: TrendingDown,
+    };
   };
 
   const npsStyle = getNpsStyle(npsScore);
@@ -274,7 +297,9 @@ export default function FeedbackDashboard() {
                   <PartyPopper className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
                 </motion.div>
                 <h3 className="text-2xl font-bold text-foreground">Outstanding NPS!</h3>
-                <p className="text-muted-foreground mt-2">Your guests love you! Keep up the great work.</p>
+                <p className="text-muted-foreground mt-2">
+                  Your guests love you! Keep up the great work.
+                </p>
               </motion.div>
             </motion.div>
           )}
@@ -294,10 +319,7 @@ export default function FeedbackDashboard() {
         </motion.div>
 
         {/* Metrics Grid */}
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-1 md:grid-cols-4 gap-4"
-        >
+        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* NPS Score - Special styling */}
           <motion.div
             className={`relative overflow-hidden rounded-xl border-2 ${npsStyle.border} ${npsStyle.bg} p-5`}
@@ -307,8 +329,12 @@ export default function FeedbackDashboard() {
             <div className="flex items-start justify-between">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">NPS Score</span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${npsStyle.bg} ${npsStyle.color}`}>
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    NPS Score
+                  </span>
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${npsStyle.bg} ${npsStyle.color}`}
+                  >
                     {npsStyle.label}
                   </span>
                 </div>
@@ -326,7 +352,9 @@ export default function FeedbackDashboard() {
               </motion.div>
             </div>
             {!hasResponses && (
-              <p className="text-xs text-muted-foreground mt-2">Send your first survey to see your score</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Send your first survey to see your score
+              </p>
             )}
           </motion.div>
 
@@ -369,7 +397,9 @@ export default function FeedbackDashboard() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">NPS Benchmarks</h2>
-                  <p className="text-sm text-muted-foreground">See how you compare and what it takes to level up</p>
+                  <p className="text-sm text-muted-foreground">
+                    See how you compare and what it takes to level up
+                  </p>
                 </div>
               </div>
             </div>
@@ -415,11 +445,15 @@ export default function FeedbackDashboard() {
                         Keep delivering great experiences
                       </p>
                     </div>
-                  ) : metrics?.toReachAverage !== null && metrics?.toReachAverage !== undefined && metrics.toReachAverage > 0 ? (
+                  ) : metrics?.toReachAverage !== null &&
+                    metrics?.toReachAverage !== undefined &&
+                    metrics.toReachAverage > 0 ? (
                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-sm text-amber-700">Promoters needed</span>
-                        <span className="text-2xl font-bold text-amber-800">+{metrics.toReachAverage}</span>
+                        <span className="text-2xl font-bold text-amber-800">
+                          +{metrics.toReachAverage}
+                        </span>
                       </div>
                       <div className="space-y-2">
                         <div className="h-2 bg-amber-200 rounded-full overflow-hidden">
@@ -427,25 +461,25 @@ export default function FeedbackDashboard() {
                             className="h-full bg-amber-500 rounded-full"
                             initial={{ width: 0 }}
                             animate={{
-                              width: `${Math.min(100, (metrics.promoters / (metrics.promoters + metrics.toReachAverage)) * 100)}%`
+                              width: `${Math.min(100, (metrics.promoters / (metrics.promoters + metrics.toReachAverage)) * 100)}%`,
                             }}
                             transition={{ duration: 1, ease: "easeOut" }}
                           />
                         </div>
                         <p className="text-xs text-amber-600">
-                          {metrics.promoters} promoters → {metrics.promoters + metrics.toReachAverage} needed
+                          {metrics.promoters} promoters →{" "}
+                          {metrics.promoters + metrics.toReachAverage} needed
                         </p>
                       </div>
                       <p className="text-xs text-amber-700 mt-3 flex items-start gap-1">
                         <ChevronRight className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                        Turn {metrics.toReachAverage} more guests into fans (score 9-10) to beat the average
+                        Turn {metrics.toReachAverage} more guests into fans (score 9-10) to beat the
+                        average
                       </p>
                     </div>
                   ) : (
                     <div className="bg-muted border border-border rounded-xl p-4 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Need more data to calculate
-                      </p>
+                      <p className="text-sm text-muted-foreground">Need more data to calculate</p>
                     </div>
                   )}
                 </div>
@@ -470,11 +504,15 @@ export default function FeedbackDashboard() {
                         You're in elite company. NPS 70+ puts you among the best in hospitality.
                       </p>
                     </div>
-                  ) : metrics?.toReachWorldClass !== null && metrics?.toReachWorldClass !== undefined && metrics.toReachWorldClass > 0 ? (
+                  ) : metrics?.toReachWorldClass !== null &&
+                    metrics?.toReachWorldClass !== undefined &&
+                    metrics.toReachWorldClass > 0 ? (
                     <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-sm text-purple-700">Promoters needed</span>
-                        <span className="text-2xl font-bold text-purple-800">+{metrics.toReachWorldClass}</span>
+                        <span className="text-2xl font-bold text-purple-800">
+                          +{metrics.toReachWorldClass}
+                        </span>
                       </div>
                       <div className="space-y-2">
                         <div className="h-2 bg-purple-200 rounded-full overflow-hidden">
@@ -482,13 +520,14 @@ export default function FeedbackDashboard() {
                             className="h-full bg-purple-500 rounded-full"
                             initial={{ width: 0 }}
                             animate={{
-                              width: `${Math.min(100, (metrics.promoters / (metrics.promoters + metrics.toReachWorldClass)) * 100)}%`
+                              width: `${Math.min(100, (metrics.promoters / (metrics.promoters + metrics.toReachWorldClass)) * 100)}%`,
                             }}
                             transition={{ duration: 1, ease: "easeOut" }}
                           />
                         </div>
                         <p className="text-xs text-purple-600">
-                          {metrics.promoters} promoters → {metrics.promoters + metrics.toReachWorldClass} needed for 70+ NPS
+                          {metrics.promoters} promoters →{" "}
+                          {metrics.promoters + metrics.toReachWorldClass} needed for 70+ NPS
                         </p>
                       </div>
                       <p className="text-xs text-purple-700 mt-3 flex items-start gap-1">
@@ -500,15 +539,11 @@ export default function FeedbackDashboard() {
                     <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 text-center">
                       <Crown className="w-10 h-10 text-purple-500 mx-auto mb-2" />
                       <div className="font-bold text-purple-800 text-lg">World-Class!</div>
-                      <p className="text-sm text-purple-600 mt-1">
-                        You're in elite company.
-                      </p>
+                      <p className="text-sm text-purple-600 mt-1">You're in elite company.</p>
                     </div>
                   ) : (
                     <div className="bg-muted border border-border rounded-xl p-4 text-center">
-                      <p className="text-sm text-muted-foreground">
-                        Need more data to calculate
-                      </p>
+                      <p className="text-sm text-muted-foreground">Need more data to calculate</p>
                     </div>
                   )}
                 </div>
@@ -533,7 +568,10 @@ export default function FeedbackDashboard() {
                       </div>
                       <div>
                         <div className="font-medium text-foreground">Follow up with detractors</div>
-                        <p className="text-muted-foreground text-xs mt-1">Reach out personally to guests who scored 0-6. Often they just want to be heard.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          Reach out personally to guests who scored 0-6. Often they just want to be
+                          heard.
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
@@ -541,8 +579,13 @@ export default function FeedbackDashboard() {
                         <span className="text-emerald-600 text-xs font-bold">2</span>
                       </div>
                       <div>
-                        <div className="font-medium text-foreground">Convert passives to promoters</div>
-                        <p className="text-muted-foreground text-xs mt-1">Guests scoring 7-8 are almost fans. A small extra touch can push them over.</p>
+                        <div className="font-medium text-foreground">
+                          Convert passives to promoters
+                        </div>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          Guests scoring 7-8 are almost fans. A small extra touch can push them
+                          over.
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3 p-3 bg-muted rounded-lg">
@@ -551,7 +594,10 @@ export default function FeedbackDashboard() {
                       </div>
                       <div>
                         <div className="font-medium text-foreground">Celebrate your promoters</div>
-                        <p className="text-muted-foreground text-xs mt-1">Thank guests who scored 9-10 and ask for reviews. They're your best marketing.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
+                          Thank guests who scored 9-10 and ask for reviews. They're your best
+                          marketing.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -573,7 +619,9 @@ export default function FeedbackDashboard() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Collect Feedback</h2>
-                <p className="text-sm text-muted-foreground">Send NPS surveys to understand how guests feel</p>
+                <p className="text-sm text-muted-foreground">
+                  Send NPS surveys to understand how guests feel
+                </p>
               </div>
             </div>
           </div>
@@ -597,7 +645,9 @@ export default function FeedbackDashboard() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-3 mt-4">
                       <div className="flex-1">
-                        <label htmlFor="survey-name" className="sr-only">Survey name</label>
+                        <label htmlFor="survey-name" className="sr-only">
+                          Survey name
+                        </label>
                         <Input
                           id="survey-name"
                           value={surveyName}
@@ -606,7 +656,9 @@ export default function FeedbackDashboard() {
                           placeholder="Survey name (e.g., Post-Stay Survey)"
                           aria-describedby="survey-help"
                         />
-                        <p id="survey-help" className="sr-only">Enter a name for your NPS survey</p>
+                        <p id="survey-help" className="sr-only">
+                          Enter a name for your NPS survey
+                        </p>
                       </div>
                       <motion.button
                         whileHover={{ scale: 1.02 }}
@@ -643,13 +695,17 @@ export default function FeedbackDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 px-3 py-2 rounded-lg">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Survey active: <strong>{surveysQuery.data?.[0]?.name || "Guest NPS"}</strong></span>
+                  <span>
+                    Survey active: <strong>{surveysQuery.data?.[0]?.name || "Guest NPS"}</strong>
+                  </span>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <div className="flex-1 relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                    <label htmlFor="invite-email" className="sr-only">Guest email address</label>
+                    <label htmlFor="invite-email" className="sr-only">
+                      Guest email address
+                    </label>
                     <Input
                       id="invite-email"
                       type="email"
@@ -659,7 +715,9 @@ export default function FeedbackDashboard() {
                       className="w-full border border-border rounded-lg pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-shadow"
                       aria-describedby="email-help"
                     />
-                    <p id="email-help" className="sr-only">Enter the guest's email address to send an NPS survey</p>
+                    <p id="email-help" className="sr-only">
+                      Enter the guest's email address to send an NPS survey
+                    </p>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -727,7 +785,9 @@ export default function FeedbackDashboard() {
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-muted-foreground">Approve reviews to display them publicly</p>
+                  <p className="text-sm text-muted-foreground">
+                    Approve reviews to display them publicly
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -737,11 +797,16 @@ export default function FeedbackDashboard() {
                   onCheckedChange={(checked) => setShowRemoved(Boolean(checked))}
                   aria-describedby="show-removed-help"
                 />
-                <Label htmlFor="show-removed" className="flex items-center gap-1 cursor-pointer text-sm text-muted-foreground">
+                <Label
+                  htmlFor="show-removed"
+                  className="flex items-center gap-1 cursor-pointer text-sm text-muted-foreground"
+                >
                   {showRemoved ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   Show removed
                 </Label>
-                <span id="show-removed-help" className="sr-only">Toggle to show or hide removed reviews</span>
+                <span id="show-removed-help" className="sr-only">
+                  Toggle to show or hide removed reviews
+                </span>
               </div>
             </div>
           </div>
@@ -776,8 +841,8 @@ export default function FeedbackDashboard() {
                         review.status === "pending"
                           ? "border-amber-200 bg-amber-50/50"
                           : review.status === "approved"
-                          ? "border-emerald-200 bg-emerald-50/30"
-                          : "border-border bg-muted/50"
+                            ? "border-emerald-200 bg-emerald-50/30"
+                            : "border-border bg-muted/50"
                       }`}
                     >
                       <div className="space-y-4">
@@ -817,9 +882,14 @@ export default function FeedbackDashboard() {
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => moderateMutation.mutate({ reviewId: review.id, status: "approved" })}
+                                onClick={() =>
+                                  moderateMutation.mutate({
+                                    reviewId: review.id,
+                                    status: "approved",
+                                  })
+                                }
                                 className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg bg-emerald-600 text-white font-medium hover:bg-emerald-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-                                aria-label={`Approve review: ${review.title || 'Untitled'}`}
+                                aria-label={`Approve review: ${review.title || "Untitled"}`}
                               >
                                 <CheckCircle2 className="w-4 h-4" />
                                 Approve
@@ -829,9 +899,14 @@ export default function FeedbackDashboard() {
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                onClick={() => moderateMutation.mutate({ reviewId: review.id, status: "rejected" })}
+                                onClick={() =>
+                                  moderateMutation.mutate({
+                                    reviewId: review.id,
+                                    status: "rejected",
+                                  })
+                                }
                                 className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                                aria-label={`Reject review: ${review.title || 'Untitled'}`}
+                                aria-label={`Reject review: ${review.title || "Untitled"}`}
                               >
                                 <XCircle className="w-4 h-4" />
                                 Reject
@@ -840,9 +915,11 @@ export default function FeedbackDashboard() {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => moderateMutation.mutate({ reviewId: review.id, status: "rejected" })}
+                              onClick={() =>
+                                moderateMutation.mutate({ reviewId: review.id, status: "rejected" })
+                              }
                               className="flex items-center gap-1.5 text-sm px-3 py-2 rounded-lg border border-red-200 text-red-700 bg-red-50 font-medium hover:bg-red-100 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                              aria-label={`Remove review: ${review.title || 'Untitled'}`}
+                              aria-label={`Remove review: ${review.title || "Untitled"}`}
                             >
                               <Trash2 className="w-4 h-4" />
                               <span className="sr-only sm:not-sr-only">Remove</span>
@@ -887,7 +964,9 @@ export default function FeedbackDashboard() {
                                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                                   <Building2 className="w-4 h-4 text-blue-600" />
                                 </div>
-                                <span className="text-sm font-semibold text-blue-700">Your Public Response</span>
+                                <span className="text-sm font-semibold text-blue-700">
+                                  Your Public Response
+                                </span>
                               </div>
                               <Textarea
                                 value={replyText}
@@ -915,14 +994,23 @@ export default function FeedbackDashboard() {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     disabled={!replyText.trim() || replyMutation.isPending}
-                                    onClick={() => replyMutation.mutate({ reviewId: review.id, body: replyText.trim() })}
+                                    onClick={() =>
+                                      replyMutation.mutate({
+                                        reviewId: review.id,
+                                        body: replyText.trim(),
+                                      })
+                                    }
                                     className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                                   >
                                     {replyMutation.isPending ? (
                                       <>
                                         <motion.div
                                           animate={{ rotate: 360 }}
-                                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                          transition={{
+                                            duration: 1,
+                                            repeat: Infinity,
+                                            ease: "linear",
+                                          }}
                                           className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                                         />
                                         Posting...
@@ -947,11 +1035,14 @@ export default function FeedbackDashboard() {
                               className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                             >
                               <MessageCircle className="w-4 h-4" />
-                              {review.replies && review.replies.length > 0 ? "Add Another Reply" : "Reply Publicly"}
+                              {review.replies && review.replies.length > 0
+                                ? "Add Another Reply"
+                                : "Reply Publicly"}
                             </motion.button>
                             {review.replies && review.replies.length > 0 && (
                               <span className="text-xs text-muted-foreground">
-                                {review.replies.length} {review.replies.length === 1 ? "reply" : "replies"}
+                                {review.replies.length}{" "}
+                                {review.replies.length === 1 ? "reply" : "replies"}
                               </span>
                             )}
                           </div>
@@ -982,7 +1073,7 @@ function MetricCard({
   icon: Icon,
   iconBg,
   iconColor,
-  subtitle
+  subtitle,
 }: {
   label: string;
   value: number;
@@ -999,11 +1090,11 @@ function MetricCard({
     >
       <div className="flex items-start justify-between">
         <div>
-          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{label}</div>
+          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {label}
+          </div>
           <div className="text-3xl font-bold text-foreground mt-2">{value}</div>
-          {subtitle && (
-            <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>
-          )}
+          {subtitle && <div className="text-xs text-muted-foreground mt-1">{subtitle}</div>}
         </div>
         <div className={`w-10 h-10 rounded-lg ${iconBg} flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${iconColor}`} aria-hidden="true" />
@@ -1026,7 +1117,9 @@ function StatusBadge({ status }: { status: string }) {
   const Icon = style.icon;
 
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${style.bg} ${style.text}`}>
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${style.bg} ${style.text}`}
+    >
       <Icon className="w-3 h-3" aria-hidden="true" />
       <span className="capitalize">{status}</span>
     </span>

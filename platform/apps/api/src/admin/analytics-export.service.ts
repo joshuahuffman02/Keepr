@@ -44,19 +44,15 @@ export class AnalyticsExportService {
 
   constructor(
     private prisma: PrismaService,
-    private guestAnalyticsService: GuestAnalyticsService
+    private guestAnalyticsService: GuestAnalyticsService,
   ) {}
 
-  async createExport(
-    request: ExportRequest,
-    userId: string,
-    userEmail: string
-  ) {
+  async createExport(request: ExportRequest, userId: string, userEmail: string) {
     const scope = request.campgroundId
       ? SegmentScope.campground
       : request.organizationId
-      ? SegmentScope.organization
-      : SegmentScope.global;
+        ? SegmentScope.organization
+        : SegmentScope.global;
     const data: Prisma.AnalyticsExportUncheckedCreateInput = {
       id: randomUUID(),
       analyticsType: request.analyticsType,
@@ -108,7 +104,7 @@ export class AnalyticsExportService {
       // Fetch the analytics data
       const data = await this.fetchAnalyticsData(
         exportRecord.analyticsType,
-        exportRecord.dateRange || "last_30_days"
+        exportRecord.dateRange || "last_30_days",
       );
 
       // Convert to requested format
@@ -138,10 +134,7 @@ export class AnalyticsExportService {
       // In production, upload to S3 and store URL
       // For now, we'll store a data URL (small exports only)
       const base64Content = Buffer.from(content).toString("base64");
-      const mimeType =
-        exportRecord.format === ExportFormat.csv
-          ? "text/csv"
-          : "application/json";
+      const mimeType = exportRecord.format === ExportFormat.csv ? "text/csv" : "application/json";
       const dataUrl = `data:${mimeType};base64,${base64Content}`;
 
       await this.prisma.analyticsExport.update({
@@ -170,10 +163,7 @@ export class AnalyticsExportService {
     }
   }
 
-  private async fetchAnalyticsData(
-    analyticsType: AnalyticsType,
-    dateRange: string
-  ) {
+  private async fetchAnalyticsData(analyticsType: AnalyticsType, dateRange: string) {
     switch (analyticsType) {
       case AnalyticsType.overview:
         return this.guestAnalyticsService.getOverview(dateRange);
@@ -212,23 +202,33 @@ export class AnalyticsExportService {
       case AnalyticsType.geographic:
         rows.push("Region Type,Region,Guest Count,Percentage");
         toRecordArray(record.byCountry).forEach((item) => {
-          rows.push(`Country,${toStringValue(item.country)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `Country,${toStringValue(item.country)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         toRecordArray(record.byState).forEach((item) => {
-          rows.push(`State/Province,${toStringValue(item.state)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `State/Province,${toStringValue(item.state)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         toRecordArray(record.topCities).forEach((item) => {
-          rows.push(`City,${toStringValue(item.city)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `City,${toStringValue(item.city)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         break;
 
       case AnalyticsType.demographics:
         rows.push("Category,Segment,Count,Percentage");
         toRecordArray(record.partyComposition).forEach((item) => {
-          rows.push(`Party Composition,${toStringValue(item.type)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `Party Composition,${toStringValue(item.type)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         toRecordArray(record.rigTypes).forEach((item) => {
-          rows.push(`RV Type,${toStringValue(item.type)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `RV Type,${toStringValue(item.type)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         break;
 
@@ -236,7 +236,7 @@ export class AnalyticsExportService {
         rows.push("Month,Year,Reservations,Revenue,Avg Stay Length");
         toRecordArray(record.monthlyData).forEach((item) => {
           rows.push(
-            `${toStringValue(item.month)},${toNumberValue(item.year)},${toNumberValue(item.reservations)},${toNumberValue(item.revenue)},${toNumberValue(item.avgStayLength)}`
+            `${toStringValue(item.month)},${toNumberValue(item.year)},${toNumberValue(item.reservations)},${toNumberValue(item.revenue)},${toNumberValue(item.avgStayLength)}`,
           );
         });
         break;
@@ -244,10 +244,14 @@ export class AnalyticsExportService {
       case AnalyticsType.travel_behavior:
         rows.push("Category,Item,Count,Percentage");
         toRecordArray(record.stayReasons).forEach((item) => {
-          rows.push(`Stay Reason,${toStringValue(item.reason)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `Stay Reason,${toStringValue(item.reason)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         toRecordArray(record.bookingSources).forEach((item) => {
-          rows.push(`Booking Source,${toStringValue(item.source)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`);
+          rows.push(
+            `Booking Source,${toStringValue(item.source)},${toNumberValue(item.count)},${toNumberValue(item.percentage)}%`,
+          );
         });
         break;
 

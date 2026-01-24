@@ -72,9 +72,7 @@ test.describe("Chat widget scroll", () => {
     await expect(jumpButton).toBeVisible();
     await jumpButton.click();
 
-    await expect
-      .poll(() => list.evaluate((node) => node.scrollTop))
-      .toBeGreaterThan(0);
+    await expect.poll(() => list.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
   });
 
   test("keeps page scroll locked while wheeling inside chat list", async ({ page }) => {
@@ -351,14 +349,12 @@ test.describe("Chat widget scroll", () => {
     await internalInput.press("Enter");
 
     await expect(
-      page.getByTestId("chat-message-list").getByText("Internal note").first()
+      page.getByTestId("chat-message-list").getByText("Internal note").first(),
     ).toBeVisible();
     await expect(page.getByText("Internal note saved.")).toBeVisible();
     expect(requests[0]?.visibility).toBe("internal");
 
     await expect(internalToggle).toHaveAttribute("aria-pressed", "true");
-    await expect(
-      page.getByPlaceholder("Internal note for staff...")
-    ).toBeVisible();
+    await expect(page.getByPlaceholder("Internal note for staff...")).toBeVisible();
   });
 });

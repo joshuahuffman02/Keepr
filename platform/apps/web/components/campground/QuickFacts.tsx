@@ -76,7 +76,7 @@ export function QuickFacts({
     // Max occupancy (find highest across site classes)
     const maxOccupancy = Math.max(
       ...siteClasses.map((sc) => sc.maxOccupancy || 0).filter((o) => o > 0),
-      0
+      0,
     );
     if (maxOccupancy > 0) {
       factsList.push({
@@ -88,11 +88,9 @@ export function QuickFacts({
 
     // Hookups (check if any site has full hookups)
     const hasFullHookups = siteClasses.some(
-      (sc) => sc.hookupsPower && sc.hookupsWater && sc.hookupsSewer
+      (sc) => sc.hookupsPower && sc.hookupsWater && sc.hookupsSewer,
     );
-    const hasPartialHookups = siteClasses.some(
-      (sc) => sc.hookupsPower || sc.hookupsWater
-    );
+    const hasPartialHookups = siteClasses.some((sc) => sc.hookupsPower || sc.hookupsWater);
 
     if (hasFullHookups) {
       factsList.push({
@@ -189,10 +187,7 @@ export function QuickFacts({
 
   return (
     <div
-      className={cn(
-        "flex flex-wrap gap-3 md:gap-4",
-        className
-      )}
+      className={cn("flex flex-wrap gap-3 md:gap-4", className)}
       role="list"
       aria-label="Quick facts about this campground"
     >
@@ -233,7 +228,7 @@ export function QuickFactsCompact({
     // Max occupancy
     const maxOccupancy = Math.max(
       ...siteClasses.map((sc) => sc.maxOccupancy || 0).filter((o) => o > 0),
-      0
+      0,
     );
     if (maxOccupancy > 0) {
       items.push({
@@ -251,10 +246,7 @@ export function QuickFactsCompact({
     }
 
     // Pet friendly
-    if (
-      siteClasses.some((sc) => sc.petFriendly) ||
-      lowerAmenities.some((a) => a.includes("pet"))
-    ) {
+    if (siteClasses.some((sc) => sc.petFriendly) || lowerAmenities.some((a) => a.includes("pet"))) {
       items.push({
         icon: <Dog className="h-3.5 w-3.5" />,
         label: "",
@@ -267,11 +259,7 @@ export function QuickFactsCompact({
   if (facts.length === 0) return null;
 
   return (
-    <div
-      className={cn("flex items-center gap-3", className)}
-      role="list"
-      aria-label="Quick facts"
-    >
+    <div className={cn("flex items-center gap-3", className)} role="list" aria-label="Quick facts">
       {facts.map((fact, index) => (
         <div
           key={index}

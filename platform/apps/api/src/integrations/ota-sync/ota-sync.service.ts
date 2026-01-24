@@ -1,11 +1,11 @@
-import {
-  Injectable,
-  Logger,
-  BadRequestException,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable, Logger, BadRequestException, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { BaseOtaProvider, OtaBooking, OtaSyncResult, OtaProviderConfig } from "./providers/base-ota.provider";
+import {
+  BaseOtaProvider,
+  OtaBooking,
+  OtaSyncResult,
+  OtaProviderConfig,
+} from "./providers/base-ota.provider";
 import { ICalProvider } from "./providers/ical.provider";
 import { randomUUID } from "crypto";
 
@@ -149,7 +149,7 @@ export class OtaSyncService {
       sendEmailNotifications: boolean;
       ignoreSiteRestrictions: boolean;
       ignoreCategoryRestrictions: boolean;
-    }>
+    }>,
   ) {
     const channel = await this.prisma.otaChannel.findUnique({
       where: { id: channelId },
@@ -265,11 +265,7 @@ export class OtaSyncService {
         // Process each booking with deduplication
         // Pattern from remove_duplicate_apis.js - check unique constraint before insert
         for (const booking of bookings) {
-          const processResult = await this.processBooking(
-            channel,
-            mapping,
-            booking
-          );
+          const processResult = await this.processBooking(channel, mapping, booking);
 
           if (processResult === "new") {
             result.newBookings++;
@@ -300,7 +296,7 @@ export class OtaSyncService {
 
     result.success = result.errors.length === 0;
     this.logger.log(
-      `Sync complete: ${result.newBookings} new, ${result.updatedBookings} updated, ${result.duplicatesSkipped} duplicates`
+      `Sync complete: ${result.newBookings} new, ${result.updatedBookings} updated, ${result.duplicatesSkipped} duplicates`,
     );
 
     return result;
@@ -313,7 +309,7 @@ export class OtaSyncService {
   private async processBooking(
     channel: { id: string; campgroundId: string; defaultStatus: string },
     mapping: { id: string; siteId: string | null; siteClassId: string | null },
-    booking: OtaBooking
+    booking: OtaBooking,
   ): Promise<"new" | "updated" | "duplicate" | "error"> {
     // Check if we've already imported this booking
     // This is the deduplication check (from remove_duplicate_apis.js pattern)
@@ -332,10 +328,7 @@ export class OtaSyncService {
     if (existingImport) {
       // Already imported - check if we need to update
       if (existingImport.Reservation) {
-        const needsUpdate = this.bookingNeedsUpdate(
-          existingImport.Reservation,
-          booking
-        );
+        const needsUpdate = this.bookingNeedsUpdate(existingImport.Reservation, booking);
 
         if (needsUpdate) {
           await this.updateReservation(existingImport.Reservation.id, booking);
@@ -362,14 +355,12 @@ export class OtaSyncService {
    */
   private bookingNeedsUpdate(
     reservation: { arrivalDate: Date; departureDate: Date; status: string },
-    booking: OtaBooking
+    booking: OtaBooking,
   ): boolean {
-    const arrivalChanged =
-      reservation.arrivalDate.getTime() !== booking.arrivalDate.getTime();
+    const arrivalChanged = reservation.arrivalDate.getTime() !== booking.arrivalDate.getTime();
     const departureChanged =
       reservation.departureDate.getTime() !== booking.departureDate.getTime();
-    const statusChanged =
-      booking.status === "cancelled" && reservation.status !== "cancelled";
+    const statusChanged = booking.status === "cancelled" && reservation.status !== "cancelled";
 
     return arrivalChanged || departureChanged || statusChanged;
   }
@@ -377,10 +368,7 @@ export class OtaSyncService {
   /**
    * Update an existing reservation from OTA data
    */
-  private async updateReservation(
-    reservationId: string,
-    booking: OtaBooking
-  ): Promise<void> {
+  private async updateReservation(reservationId: string, booking: OtaBooking): Promise<void> {
     const updateData: Record<string, unknown> = {};
 
     if (booking.status === "cancelled") {
@@ -402,13 +390,10 @@ export class OtaSyncService {
   private async createReservationFromBooking(
     channel: { id: string; campgroundId: string; defaultStatus: string },
     mapping: { id: string; siteId: string | null; siteClassId: string | null },
-    booking: OtaBooking
+    booking: OtaBooking,
   ): Promise<void> {
     // Find or create guest
-    const guest = await this.findOrCreateGuest(
-      channel.campgroundId,
-      booking
-    );
+    const guest = await this.findOrCreateGuest(channel.campgroundId, booking);
 
     // Determine site to use
     let siteId = mapping.siteId;
@@ -461,20 +446,18 @@ export class OtaSyncService {
    */
   private async findOrCreateGuest(
     campgroundId: string,
-    booking: OtaBooking
+    booking: OtaBooking,
   ): Promise<{ id: string }> {
     const { firstName, lastName } = this.parseGuestName(booking.guestName);
-    const email = booking.guestEmail?.toLowerCase().trim() || `guest-${booking.externalId}@ota.campreserv.com`;
+    const email =
+      booking.guestEmail?.toLowerCase().trim() || `guest-${booking.externalId}@ota.campreserv.com`;
     const campgroundTag = `campground:${campgroundId}`;
 
     // Try to find existing guest by email
     const existing = await this.prisma.guest.findFirst({
       where: {
         emailNormalized: email.toLowerCase(),
-        OR: [
-          { Reservation: { some: { campgroundId } } },
-          { tags: { has: campgroundTag } },
-        ],
+        OR: [{ Reservation: { some: { campgroundId } } }, { tags: { has: campgroundTag } }],
       },
     });
 

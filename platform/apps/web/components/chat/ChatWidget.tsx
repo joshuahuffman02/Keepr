@@ -1,7 +1,21 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { Send, MessageCircle, Wifi, WifiOff, History, Paperclip, X, Loader2, AlertTriangle, FileText, Sparkles, ArrowDown, Lock } from "lucide-react";
+import {
+  Send,
+  MessageCircle,
+  Wifi,
+  WifiOff,
+  History,
+  Paperclip,
+  X,
+  Loader2,
+  AlertTriangle,
+  FileText,
+  Sparkles,
+  ArrowDown,
+  Lock,
+} from "lucide-react";
 import { API_BASE } from "@/lib/api-config";
 import { cn } from "@/lib/utils";
 import { ChatShell } from "./ChatShell";
@@ -43,8 +57,7 @@ const CHAT_ATTACHMENT_EXTENSION_MAP: Record<string, string> = {
 };
 const CHAT_SCROLL_BOTTOM_THRESHOLD = 120;
 
-const generateSessionId = () =>
-  `chat_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+const generateSessionId = () => `chat_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
 type AttachmentStatus = "uploading" | "ready" | "error";
 
@@ -214,7 +227,7 @@ export function ChatWidget({
         }
         return [item.attachment];
       }),
-    [attachmentItems]
+    [attachmentItems],
   );
   const hasUploadingAttachments = attachmentItems.some((item) => item.status === "uploading");
   const trimmedInput = input.trim();
@@ -235,9 +248,9 @@ export function ChatWidget({
               isRecord(data.occupancy) ||
               hasJsonRenderPayload(data))
           );
-        })
+        }),
       ),
-    [messages]
+    [messages],
   );
 
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
@@ -415,15 +428,15 @@ export function ChatWidget({
         prev.map((entry) =>
           entry.id === item.id
             ? { ...entry, status: "ready", attachment, error: undefined }
-            : entry
-        )
+            : entry,
+        ),
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed";
       setAttachmentItems((prev) =>
         prev.map((entry) =>
-          entry.id === item.id ? { ...entry, status: "error", error: message } : entry
-        )
+          entry.id === item.id ? { ...entry, status: "error", error: message } : entry,
+        ),
       );
     }
   };
@@ -477,48 +490,76 @@ export function ChatWidget({
     });
     setInput("");
     clearAttachments();
-  }, [canSend, clearAttachments, readyAttachments, sendMessage, showVisibilityToggle, trimmedInput]);
+  }, [
+    canSend,
+    clearAttachments,
+    readyAttachments,
+    sendMessage,
+    showVisibilityToggle,
+    trimmedInput,
+  ]);
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  }, [handleSend]);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSend();
+      }
+    },
+    [handleSend],
+  );
 
-  const handleQuickAction = useCallback((action: string) => {
-    visibilityRef.current = "public";
-    setMessageVisibility("public");
-    sendMessage(action, { visibility: "public" });
-  }, [sendMessage, setMessageVisibility]);
+  const handleQuickAction = useCallback(
+    (action: string) => {
+      visibilityRef.current = "public";
+      setMessageVisibility("public");
+      sendMessage(action, { visibility: "public" });
+    },
+    [sendMessage, setMessageVisibility],
+  );
 
-  const handleQuickReply = useCallback((question: string) => {
-    visibilityRef.current = "public";
-    setMessageVisibility("public");
-    setInput(question);
-    inputRef.current?.focus();
-  }, [setInput, setMessageVisibility]);
+  const handleQuickReply = useCallback(
+    (question: string) => {
+      visibilityRef.current = "public";
+      setMessageVisibility("public");
+      setInput(question);
+      inputRef.current?.focus();
+    },
+    [setInput, setMessageVisibility],
+  );
 
-  const handleEditMessage = useCallback((_messageId: string, content: string) => {
-    setInput(content);
-    inputRef.current?.focus();
-  }, [setInput]);
+  const handleEditMessage = useCallback(
+    (_messageId: string, content: string) => {
+      setInput(content);
+      inputRef.current?.focus();
+    },
+    [setInput],
+  );
 
-  const handleRegenerate = useCallback((messageId: string) => {
-    regenerateMessage(messageId);
-  }, [regenerateMessage]);
+  const handleRegenerate = useCallback(
+    (messageId: string) => {
+      regenerateMessage(messageId);
+    },
+    [regenerateMessage],
+  );
 
-  const handleFeedback = useCallback((messageId: string, value: "up" | "down") => {
-    setFeedbackById((prev) => ({
-      ...prev,
-      [messageId]: value,
-    }));
-    submitFeedback(messageId, value);
-  }, [submitFeedback]);
+  const handleFeedback = useCallback(
+    (messageId: string, value: "up" | "down") => {
+      setFeedbackById((prev) => ({
+        ...prev,
+        [messageId]: value,
+      }));
+      submitFeedback(messageId, value);
+    },
+    [submitFeedback],
+  );
 
-  const handleActionSelect = useCallback((actionId: string, optionId: string) => {
-    executeAction(actionId, optionId);
-  }, [executeAction]);
+  const handleActionSelect = useCallback(
+    (actionId: string, optionId: string) => {
+      executeAction(actionId, optionId);
+    },
+    [executeAction],
+  );
 
   const handleToggleHistory = useCallback(() => {
     setShowHistory((prev) => {
@@ -557,16 +598,22 @@ export function ChatWidget({
     return null;
   }, [messages]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setConversationQuery(value);
-    if (historyView !== "list") {
-      setHistoryView("list");
-    }
-  }, [historyView]);
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setConversationQuery(value);
+      if (historyView !== "list") {
+        setHistoryView("list");
+      }
+    },
+    [historyView],
+  );
 
-  const handleFilterChange = useCallback((id: string) => {
-    setConversationFilterId(id);
-  }, [setConversationFilterId]);
+  const handleFilterChange = useCallback(
+    (id: string) => {
+      setConversationFilterId(id);
+    },
+    [setConversationFilterId],
+  );
 
   const accent: ChatAccent = isGuest ? "guest" : "staff";
   const quickActions = isGuest ? PROMPTS.guest : PROMPTS.staff;
@@ -586,36 +633,39 @@ export function ChatWidget({
       { id: "30d", label: "30d" },
       { id: "90d", label: "90d" },
     ],
-    []
+    [],
   );
   const conversationSince = useMemo(() => {
     if (conversationFilterId === "all") return undefined;
-    const days =
-      conversationFilterId === "7d"
-        ? 7
-        : conversationFilterId === "30d"
-          ? 30
-          : 90;
+    const days = conversationFilterId === "7d" ? 7 : conversationFilterId === "30d" ? 30 : 90;
     const date = new Date();
     date.setDate(date.getDate() - days);
     return date.toISOString();
   }, [conversationFilterId]);
 
-  const emptyIconClasses = isGuest ? "bg-emerald-100 text-emerald-600" : "bg-blue-100 text-blue-600";
+  const emptyIconClasses = isGuest
+    ? "bg-emerald-100 text-emerald-600"
+    : "bg-blue-100 text-blue-600";
   const shellWidthClassName = showArtifacts
     ? "w-[calc(100vw-2rem)] sm:w-[44rem] xl:w-[52rem] 2xl:w-[60rem]"
     : undefined;
   const shellHeightClassName = showArtifacts
     ? "h-[calc(100vh-4rem)] sm:h-[680px] 2xl:h-[760px]"
     : undefined;
-  const artifactPanelWidthClassName = "sm:w-[22rem] md:w-[24rem] lg:w-[26rem] xl:w-[28rem] 2xl:w-[30rem]";
+  const artifactPanelWidthClassName =
+    "sm:w-[22rem] md:w-[24rem] lg:w-[26rem] xl:w-[28rem] 2xl:w-[30rem]";
   const artifactPanelPaddingClassName = showArtifacts
     ? "sm:pr-[22rem] md:pr-[24rem] lg:pr-[26rem] xl:pr-[28rem] 2xl:pr-[30rem]"
     : undefined;
 
   const emptyState = (
     <div className="text-center py-8">
-      <div className={cn("w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4", emptyIconClasses)}>
+      <div
+        className={cn(
+          "w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4",
+          emptyIconClasses,
+        )}
+      >
         <MessageCircle className="w-8 h-8" />
       </div>
       <h3 className="font-semibold text-foreground mb-1">
@@ -626,11 +676,7 @@ export function ChatWidget({
           ? "Share dates, guests, rig size, and must-have amenities."
           : "Ask for arrivals, occupancy, tasks, or draft actions."}
       </p>
-      <SuggestedPrompts
-        prompts={quickActions}
-        onSelect={handleQuickAction}
-        accent={accent}
-      />
+      <SuggestedPrompts prompts={quickActions} onSelect={handleQuickAction} accent={accent} />
     </div>
   );
 
@@ -746,7 +792,7 @@ export function ChatWidget({
     (tool: string, args: Record<string, unknown>) => {
       executeTool?.(tool, args);
     },
-    [executeTool]
+    [executeTool],
   );
 
   return (
@@ -830,7 +876,7 @@ export function ChatWidget({
               onClick={handleJumpToLatest}
               className={cn(
                 "pointer-events-auto inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs shadow-sm transition hover:bg-muted",
-                accent === "guest" ? "text-emerald-700" : "text-blue-700"
+                accent === "guest" ? "text-emerald-700" : "text-blue-700",
               )}
               data-testid="chat-jump-to-latest"
               aria-label="Jump to latest message"
@@ -888,7 +934,7 @@ export function ChatWidget({
                     "rounded-full px-2.5 py-1 font-medium transition",
                     !isInternalNote
                       ? "bg-white text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                   aria-pressed={!isInternalNote}
                 >
@@ -904,7 +950,7 @@ export function ChatWidget({
                     "rounded-full px-2.5 py-1 font-medium transition",
                     isInternalNote
                       ? "bg-amber-100 text-amber-900 shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                   aria-pressed={isInternalNote}
                 >
@@ -914,7 +960,7 @@ export function ChatWidget({
               <div
                 className={cn(
                   "flex items-center gap-1",
-                  isInternalNote ? "text-amber-700" : "text-muted-foreground"
+                  isInternalNote ? "text-amber-700" : "text-muted-foreground",
                 )}
               >
                 <Lock className="h-3 w-3" />
@@ -929,7 +975,7 @@ export function ChatWidget({
                   key={item.id}
                   className={cn(
                     "flex items-center gap-3 rounded-lg border border-border p-2 text-xs",
-                    item.status === "error" ? "bg-red-50/60" : "bg-muted/40"
+                    item.status === "error" ? "bg-red-50/60" : "bg-muted/40",
                   )}
                 >
                   {item.previewUrl ? (
@@ -962,9 +1008,7 @@ export function ChatWidget({
                       </div>
                     )}
                     {item.status === "ready" && (
-                      <div className="mt-1 text-[11px] text-muted-foreground">
-                        Ready to send
-                      </div>
+                      <div className="mt-1 text-[11px] text-muted-foreground">Ready to send</div>
                     )}
                   </div>
                   <button
@@ -1013,7 +1057,7 @@ export function ChatWidget({
                 "flex-1 px-4 py-2.5 border border-border rounded-xl focus:outline-none focus:ring-2 text-sm",
                 isGuest
                   ? "focus:ring-emerald-500/20 focus:border-emerald-500"
-                  : "focus:ring-blue-500/20 focus:border-blue-500"
+                  : "focus:ring-blue-500/20 focus:border-blue-500",
               )}
               disabled={isSending}
             />
@@ -1023,9 +1067,7 @@ export function ChatWidget({
               disabled={!canSend}
               className={cn(
                 "p-2.5 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
-                isGuest
-                  ? "bg-emerald-600 hover:bg-emerald-700"
-                  : "bg-blue-600 hover:bg-blue-700"
+                isGuest ? "bg-emerald-600 hover:bg-emerald-700" : "bg-blue-600 hover:bg-blue-700",
               )}
             >
               <Send className="w-5 h-5" />

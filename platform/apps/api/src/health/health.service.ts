@@ -14,13 +14,15 @@ type CheckResult = {
 export class HealthService {
   private readonly logger = new Logger(HealthService.name);
   private readonly readyChecksEnabled =
-    (process.env.ENABLE_READY_PROBE ?? process.env.ready_checks_enabled ?? "true").toString().toLowerCase() === "true";
+    (process.env.ENABLE_READY_PROBE ?? process.env.ready_checks_enabled ?? "true")
+      .toString()
+      .toLowerCase() === "true";
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly redis: RedisService,
-    private readonly observability: ObservabilityService
-  ) { }
+    private readonly observability: ObservabilityService,
+  ) {}
 
   liveness() {
     return {

@@ -16,10 +16,7 @@ interface ThirdPartyAnalyticsProps {
  * Only loads scripts when the corresponding ID is provided.
  * Uses afterInteractive strategy to avoid blocking page render.
  */
-export function ThirdPartyAnalytics({
-  gaMeasurementId,
-  metaPixelId,
-}: ThirdPartyAnalyticsProps) {
+export function ThirdPartyAnalytics({ gaMeasurementId, metaPixelId }: ThirdPartyAnalyticsProps) {
   return (
     <>
       {/* Google Analytics 4 */}

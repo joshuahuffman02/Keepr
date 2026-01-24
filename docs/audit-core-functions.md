@@ -1,14 +1,17 @@
 ## Agent Guardrails (Prisma 7)
+
 - Prisma 7 is in place. Do NOT switch generator to prisma-client or refactor @prisma/client imports.
 - Any new PrismaClient() must use PrismaPg adapter (see existing patterns).
 - Don’t touch GitHub/deploy; update docs/audit-core-functions.md and audit-findings-dev.md as you close items.
 
 ## Check-in Compliance & Overrides
+
 - Self/kiosk check-in now blocks until waiver + ID verification are signed unless an explicit override is provided; overrides are audited with unmet prerequisites and noted on the reservation request.
 - Signed waiver/IDV artifacts auto-attach to the reservation/guest (signature request, artifact, digital waiver, ID verification) so subsequent compliance checks recognize completion.
 - Kiosk check-in writes pending check-in status codes on compliance failures, marks check-in completed on success, auto-grants access control on check-in, and cancellations/checkout paths already auto-revoke access.
 
 ## Working Notes & Next Steps (Dec 11 2025)
+
 - Sequencing: Fix-Reports + Fix-Payments-POS + Fix-StaffBooking first; run Fix-Comms-Observability and Fix-Compliance-Ops in parallel; Fix-Accounting last because GL/rev-rec depend on reports and payments/POS.
 - Guardrails: Prisma 7 stays; do not switch generator or `@prisma/client` imports; any new `PrismaClient()` must use the PrismaPg adapter; no GitHub/deploy changes.
 - Accounting scope: Use the Accounting & FinOps section in this file as the checklist; it is the largest surface and should start only after the upstream fixes above land. Update this file and `audit-findings-dev.md` as items close.
@@ -17,6 +20,7 @@
 - Deployment/build follow-ups: confirm Vercel stays green on `main`; add a small ledger unit test to lock in `postEntries`/`ensureAccount`; keep reports module removed until implementation lands.
 
 ## Reporting & Exports
+
 - Export queue enforces a capacity guard with 503 + `retryAfter`, emits observability and alerts, and caps rows via `REPORT_EXPORT_MAX_ROWS` with resumable tokens; job run telemetry is recorded when exports finish or fail.
 - Export processor generates CSV/XLSX, uploads and persists the download URL plus recordCount/summary on the job, emails `emailTo` recipients, and writes an audit trail; queued and recurring jobs flow through cron/job queue instead of stubbed status flips.
 - Export summaries pull ADR/RevPAR/occupancy/revenue/liability, channel mix, and attach rate using period-aware `getDashboardMetrics` + booking sources derived from the same filters used in the analytics UI.
@@ -24,12 +28,14 @@
 - Analytics page surfaces the export trigger (CSV/XLSX + optional email) and polls job status so exports are reachable from the dashboard.
 
 ### Next steps
+
 - Seed report/reservation data to exercise CSV/XLSX export end-to-end (download URL + email + summary) from the analytics dashboard.
 - Resolve TypeScript lints in `reports.service.ts` (implicit any parameters, ServiceUnavailableException import).
 - Run the reports export smoke tests once data and prisma/queue deps are available.
 - Re-test dashboard export UX to confirm download link and emailed summary render correctly.
 
 ## Fix‑StaffBooking add‑on (notes)
+
 - UI now surfaces per-reservation conflicts (overlaps, holds, maintenance, blackouts) and blocks save when present; deposit shortfalls and missing override approvals are also blocked client-side.
 - UI pipes rig/ADA/amenity/occupancy validation via availability + conflict checks and shows ranked site recommendations using match scorer for the open reservation.
 - Payments UI collects tender type and enforces collecting at least the required deposit before saving.
@@ -37,22 +43,26 @@
 - Approvals/Audit modules are invoked (config_change) when overrides occur; pricing delta and discounts captured in audit payload.
 
 ## Fix‑GuestBooking (notes)
+
 - Public booking now advances through Site → Details → Payment with quote fetching inside the review step (promo/tax state-safe) and loading/error guards to prevent script crashes on site/CTA clicks.
 - Public availability/quote Zod schemas coerce Decimal/string fields to numbers to avoid client-side parse failures on Prisma decimals (similar to meteredMultiplier fix).
 - Arrival/departure, guest counts, and site type persist in the URL to keep defaults/shareability and survive refresh.
 
 ## Fix‑Payments-POS (notes)
+
 - Public payment intents require `Idempotency-Key`, return retry/backoff hints, and pass explicit 3DS policy/idempotency metadata to Stripe; failover remains stubbed.
 - Staff/public capture/refund/POS flows issue itemized receipts (line items/tax/fees/tenders) via `EmailService`; webhook refunds reuse the same receipt lines.
 - POS offline replay persists payload/tender/items, flags carts `needsReview` on mismatches, and stores records in `PosOfflineReplay` (Prisma migration required).
 - Stored-value taxable_load issue/reload enforces an active tax rule and liability roll-forward drift checks via `liabilitySnapshot({ enforce: true })`.
 
 ## Fix‑Compliance‑Ops (notes)
+
 - Self/kiosk check-in blocks until waiver + ID verification are signed; overrides must be explicitly requested and are audited with unmet prerequisites and reason/actor, while pending statuses are recorded when blocked.
 - Signed waiver artifacts, digital waivers, and ID verifications auto-attach to the reservation/guest so subsequent compliance checks recognize completion; kiosk paths mark check-in completed and auto-grant access, with revoke on cancel/checkout already in place.
 - Kiosk override payloads now accept actor/reason to log approvals and still issue access grants on success.
 
 ## Next steps
+
 - Payments/POS: run Prisma migrate/generate for `PosOfflineReplay`; add tests for capture/refund/webhook receipts, POS offline replay persistence, and taxable_load liability enforcement; re-test public guest payment + abandoned-cart flows with required idempotency keys; verify kiosk overrides and access-control grants.
 - Add automated tests for override-required paths (create/update) and conflict reasons returned by overlapCheck.
 - Wire match-score recommendations into booking flow (public) and enforce server-side selection from ranked list where required.
@@ -64,6 +74,7 @@
 - Add audit/reporting view for check-in overrides (who/why, unmet prerequisites, grants executed).
 
 ### Evidence
+
 ```343:375:platform/apps/api/src/reports/reports.service.ts
   private async enforceCapacityGuard() {
     const depth = await this.prisma.integrationExportJob.count({
@@ -284,17 +295,21 @@
     this.activeRuns += 1;
   }
 ```
+
 # Core Function Audit
 
 ## Comms & Observability
+
 - Consent, quiet hours, approvals: Email/SMS send flow enforces server-side consent using `privacySetting` + `consentLog`, ignores client-provided `consentGranted/consentSource`, blocks during campground quiet hours unless `quietHoursOverride` is set, and now always requires approved templates (raw body sends rejected); playbook jobs reschedule to quietHoursEnd when needed (platform/apps/api/src/communications/communications.controller.ts).
 - Deliverability handling: Postmark status webhook updates records and dispatches alerts for bounce/complaint events; Twilio status webhook only records metrics. Email sending retries Postmark once, then falls back to SMTP/log; SMS now retries with backoff and emits Slack/PagerDuty alerts on final failure or missing config but still has single-provider failover. Playbook jobs retry up to 3 times with incremental delay before failing (platform/apps/api/src/communications/communications.controller.ts, platform/apps/api/src/email/email.service.ts, platform/apps/api/src/sms/sms.service.ts).
 - Alerts and monitoring: Observability aggregates domain signals (redeem, offline backlog, offer lag, report failures, comms delivery/bounce/complaint, readiness, OTA backlog placeholder) with a new `emit` path for domain producers; queue state normalization captures DLQ-style names (including dead-letter variants), and JobQueueService now records saturation failures and passes queue capacity metadata. AlertMonitor emits Slack/PagerDuty alerts for breaches plus DLQ/queue lag detection and OTA adapter alerts; failed synthetics recorded every 5m (env-gated) are also surfaced. Readiness endpoint checks DB/Redis, records readiness status, and returns 503 on failure (platform/apps/api/src/observability/observability.service.ts, platform/apps/api/src/observability/alert-monitor.service.ts, platform/apps/api/src/observability/synthetics.service.ts, platform/apps/api/src/observability/job-queue.service.ts, platform/apps/api/src/health/health.service.ts).
 - Gaps/Risks: SMS still lacks a secondary provider; Postmark alerting is bounce/complaint-only. Observability emit path is in-memory (no durable sink), so alerts still depend on process memory. Queue telemetry assumes callers route through JobQueueService; external queues are not surfaced. Synthetics/comms/ready/OTA alerts remain env-flagged and can be disabled unintentionally.
 - Follow-ups (proposed): Add SMS provider failover or circuit-breaker, extend alerting thresholds for deliverability complaints, persist observability emit stream (or forward to metrics bus), and surface admin visibility for alert flags.
+
 # Core Function Audit
 
 ## Staff Booking & Assignment
+
 - Speed of entry: Staff console booking screen `platform/apps/web/app/campgrounds/[campgroundId]/reservations/page.tsx` requires manual site and guest selection plus manual dollar inputs; no quick-create defaults or keyboard-friendly shortcuts. Availability/overlap flags are computed (`overlapCheckQuery`, `selectedSiteUnavailable`) but never surfaced in the form, so conflicts are only caught after submit.
 - Conflict checks: API asserts overlap and blackouts via `assertSiteAvailable` in `platform/apps/api/src/reservations/reservations.service.ts` (used by `POST /reservations` and `PATCH /reservations/:id`). Holds and maintenance are skipped—holds are only validated when a `holdId` is passed, and maintenance tickets are not considered. UI auto-creates a hold before submit but ignores failures (`createReservation` in the same page), so staff can book over holds without warning.
 - Rig-fit / ADA / amenities: Rig compatibility is only applied to availability search (`searchAvailability` → `isRigCompatible` in `reservations.service.ts`); the create/update paths do not re-check rig type/length or any ADA/amenity constraints, allowing mismatched assignments. No ADA/amenity filters exist in the staff UI.
@@ -304,9 +319,11 @@
 - Folio / tender mix: Payments recorded through `POST /reservations/:id/payments` ignore payment method (controller passes only amount to `recordPayment`), defaulting to “card” and hard-coding ledger lines. No support for split tenders, cash/check, or folio-level adjustments on creation.
 - Offline queue handling: Staff booking calls are synchronous fetches (e.g., `createReservation` in `reservations/page.tsx`) with no retry/queue/offline capture; failures during network drop simply lose the transaction.
 - Follow-ups (proposed: staff booking): Enforce `maxOccupancy` server-side on create/update; require approvals/audit when `totalAmount` is manually supplied; capture `createdBy/updatedBy` and audit all staff bookings and site moves; re-check maintenance/ADA/access-control when reassigning sites and auto-sync access grants; validate payments/tender mix against quoted totals (including discounts/deposits) instead of defaulting to card.
+
 # Core Functions Audit
 
 ## Accounting & FinOps
+
 - Double-entry / ledger: Ledger exposed at `GET campgrounds/:campgroundId/ledger*` (`platform/apps/api/src/ledger/ledger.controller.ts`, `ledger.service.ts`). Reservation payments create debit Cash / credit revenue entries (`platform/apps/api/src/reservations/reservations.service.ts`). Long-stay billing posts AR debit / revenue credit per line (`platform/apps/api/src/billing/billing.service.ts#createLedgerPair`). Gaps: no global balancing or enforcement of paired entries; GL codes often null (OTA imports, refunds, fees). Ledger entries deduped by description/amount in reconciliation, risking missed duplicates. No period close or lock.
 - Payouts + reconciliation: Hourly job reconciles Stripe accounts (`payments.scheduler.ts#reconcilePayouts`) using balance transactions to seed payout lines and ledger adjustments for Stripe fees, platform fees, and chargebacks (`payments/reconciliation.service.ts`). Payout recon summary exposed at `GET campgrounds/:campgroundId/payouts/:payoutId/recon` and CSV export routes in `payments.controller.ts`. Gaps: Stripe-only; no bank feed tie-out or status tracking; drift alerts only via webhook URL env; no persisted recon state or approval workflow; ledger not updated with payout net cash movement.
 - Fee handling (platform/provider/FX, absorb vs pass-through): Payment intent creation computes pass-through vs absorb for platform and gateway fees (`payments.controller.ts#computeChargeAmounts`) and applies Stripe application_fee, but ledger posts only gross amount to revenue with no split of platform vs gateway fees. OTA imports optionally record channel fees but without GL codes (`ota.service.ts`). FX/tax config is stubbed with static rates (`currency-tax/currency-tax.service.ts`); no real FX revaluation or settlement handling.
@@ -318,10 +335,13 @@
 - Exports to QBO/Xero: Integrations service has sandbox QBO account pull stub and export job metadata (`integrations.service.ts`), but no mapping from ledger/invoices/payments to QBO/Xero objects, no file/package generation, and Xero not implemented. Exports landing page mentioned in tests but no actual accounting export payloads.
 - Audit logs: Chain-hashed audit log service (`audit.service.ts`) with CSV/JSON export endpoints; some calls from POS provider payments (`pos.service.ts#audit.record`). Gaps: payments/ledger/tax configuration changes not audited; no coverage over reconciliation actions or exports; audit logs stored in primary DB without tamper-evident storage/retention policy enforcement beyond defaults.
 - Follow-ups (proposed: payments): Build provider-agnostic capture/refund/void adapters with per-campground gateway selection + credentials/webhook config UI; route `payments.controller.ts` through adapters instead of Stripe-only guard; surface fee/payout drift per provider; add admin UI to choose gateway and manage keys/webhooks by environment; document failover/backoff and receipt issuance across providers.
+
 # Audit Core Functions
 
 ## Payments/POS/Stored Value
-- Gateway selection and fee preset enforcement exist before creating intents; production credentials are validated and only Stripe is permitted today. Pass-through/platform fee math is computed with both platform and gateway fee modes.  
+
+- Gateway selection and fee preset enforcement exist before creating intents; production credentials are validated and only Stripe is permitted today. Pass-through/platform fee math is computed with both platform and gateway fee modes.
+
 ```133:244:platform/apps/api/src/payments/payments.controller.ts
   private async getPaymentContext(reservationId: string) {
     const gatewayConfig = await this.gatewayConfigService.getConfig(reservation.campgroundId);
@@ -345,8 +365,10 @@
       requestedAmountCents: body.amountCents
     });
 ```
+
 - Public guest booking quote fetch now runs inside the review step (sharing promo/tax state) and public API schemas coerce Decimal/string values to numbers, preventing client-side parse errors; date/guest/siteType defaults persist in the URL for refresh/share resilience.
-- Idempotency and replay guardrails are applied on staff payment POSTs, POS checkout, and stored-value actions; completions mark snapshots and conflicts block duplicates.  
+- Idempotency and replay guardrails are applied on staff payment POSTs, POS checkout, and stored-value actions; completions mark snapshots and conflicts block duplicates.
+
 ```257:356:platform/apps/api/src/payments/payments.controller.ts
   async createIntent(
     ...
@@ -367,6 +389,7 @@
       await this.idempotency.complete(idempotencyKey, response);
     }
 ```
+
 ```83:129:platform/apps/api/src/pos/pos.service.ts
   async checkout(cartId: string, dto: CheckoutCartDto, idempotencyKey?: string, actor?: any) {
     const existing = await this.guardIdempotency(idempotencyKey, { cartId, dto }, actor, "pos/checkout");
@@ -376,6 +399,7 @@
       throw new BadRequestException("No open till session for this terminal");
     }
 ```
+
 ```592:623:platform/apps/api/src/stored-value/stored-value.service.ts
   async liabilitySnapshot(campgroundId: string) {
     const accounts = await this.prisma.storedValueAccount.findMany({
@@ -386,7 +410,9 @@
     return { campgroundId, taxableCents, nonTaxableCents, totalCents: taxableCents + nonTaxableCents };
   }
 ```
-- POS split tender accuracy: carts are repriced server-side and any tender-total mismatch (>1¢) forces `needs_review`; cash requires an open till and cash movements are written.  
+
+- POS split tender accuracy: carts are repriced server-side and any tender-total mismatch (>1¢) forces `needs_review`; cash requires an open till and cash movements are written.
+
 ```90:129:platform/apps/api/src/pos/pos.service.ts
     const expected = this.reprice(cart);
     const expectedTotal = expected.totalCents;
@@ -409,7 +435,9 @@
       throw new BadRequestException("No open till session for this terminal");
     }
 ```
-- Till sessions enforce open/close flows, over/short calculation, duplicate-movement protection, and daily rollups; anomalies trigger audit events.  
+
+- Till sessions enforce open/close flows, over/short calculation, duplicate-movement protection, and daily rollups; anomalies trigger audit events.
+
 ```31:144:platform/apps/api/src/pos/till.service.ts
   async open(dto: OpenTillDto, actor: Actor) {
     ...
@@ -442,7 +470,9 @@
       }
     });
 ```
-- Offline POS replay dedupes by clientTxId + totals hash; mismatches land in review and success is recorded in observability metrics.  
+
+- Offline POS replay dedupes by clientTxId + totals hash; mismatches land in review and success is recorded in observability metrics.
+
 ```299:387:platform/apps/api/src/pos/pos.service.ts
   async replayOffline(dto: OfflineReplayDto, idempotencyKey?: string, actor?: any) {
     if (dto.clientTxId) {
@@ -460,7 +490,9 @@
       ? { clientTxId: dto.clientTxId, status: "accepted", cartId, expectedBreakdown: expected }
       : { clientTxId: dto.clientTxId, status: "needs_review", reason: "totals_mismatch", cartId, expectedBreakdown: expected, expectedHash, recordedTotalsHash: dto.recordedTotalsHash };
 ```
-- Stored value enforces taxable/non-taxable load consistency, idempotent issue/reload/redeem, PIN checks, and liability snapshotting by taxability bucket.  
+
+- Stored value enforces taxable/non-taxable load consistency, idempotent issue/reload/redeem, PIN checks, and liability snapshotting by taxability bucket.
+
 ```31:158:platform/apps/api/src/stored-value/stored-value.service.ts
   async issue(dto: IssueStoredValueDto, idempotencyKey?: string, actor?: any) {
     ...
@@ -482,7 +514,9 @@
 ```
 
 ### Gaps / Risks
-- Public payment intents do not use the idempotency service; retries could double-create PaymentIntents or double-apply pass-through fees.  
+
+- Public payment intents do not use the idempotency service; retries could double-create PaymentIntents or double-apply pass-through fees.
+
 ```406:477:platform/apps/api/src/payments/payments.controller.ts
   @Post("public/payments/intents")
   async createPublicIntent(@Body() body: CreatePublicPaymentIntentDto) {
@@ -497,7 +531,9 @@
       this.getPaymentMethodTypes(capabilities)
     );
 ```
-- SCA/3DS is not explicitly required; Stripe PaymentIntents rely on `automatic_payment_methods` defaults with no `request_three_d_secure` or regional policy controls, and there is no gateway failover beyond Stripe-only support.  
+
+- SCA/3DS is not explicitly required; Stripe PaymentIntents rely on `automatic_payment_methods` defaults with no `request_three_d_secure` or regional policy controls, and there is no gateway failover beyond Stripe-only support.
+
 ```31:59:platform/apps/api/src/payments/stripe.service.ts
     async createPaymentIntent(
         amountCents: number,
@@ -529,8 +565,10 @@
             }
         }, requestOptions);
 ```
-- Public payment intents now require `Idempotency-Key` and return retry-after hints on inflight/conflict; gateway failover is still stubbed and capture/refund/POS card payments continue to rely on caller retries for transient failures.  
-- Capture, refund, and POS flows now auto-issue itemized receipts (line items/tax/fees) via `EmailService.sendPaymentReceipt`; GL splitting of platform/gateway fees remains absent.  
+
+- Public payment intents now require `Idempotency-Key` and return retry-after hints on inflight/conflict; gateway failover is still stubbed and capture/refund/POS card payments continue to rely on caller retries for transient failures.
+- Capture, refund, and POS flows now auto-issue itemized receipts (line items/tax/fees) via `EmailService.sendPaymentReceipt`; GL splitting of platform/gateway fees remains absent.
+
 ```338:352:platform/apps/api/src/payments/payments.controller.ts
       const response = {
         id: intent.id,
@@ -542,11 +580,14 @@
         fees: feeBreakdown
       };
 ```
-- POS offline replay now stores payload/tender/items snapshots and flags carts `needsReview` when totals mismatch, improving reconciliation of offline POS batches.  
-- Taxable-load issuance/reload now requires an active tax rule and enforces liability roll-forward consistency; still lacks jurisdictional taxability matrices and GL/liability posting for stored value.  
+
+- POS offline replay now stores payload/tender/items snapshots and flags carts `needsReview` when totals mismatch, improving reconciliation of offline POS batches.
+- Taxable-load issuance/reload now requires an active tax rule and enforces liability roll-forward consistency; still lacks jurisdictional taxability matrices and GL/liability posting for stored value.
 
 ## Compliance & Ops
-- E-sign / waivers / COI: Signatures module issues and audits signature requests (types include waiver/coi), stores signed artifacts, and auto-reminds expiring COIs; waivers module can generate inline PDFs when enabled. Gaps: self-check-in only flags `waiverRequired` but never verifies a signed waiver or ID verification completion.  
+
+- E-sign / waivers / COI: Signatures module issues and audits signature requests (types include waiver/coi), stores signed artifacts, and auto-reminds expiring COIs; waivers module can generate inline PDFs when enabled. Gaps: self-check-in only flags `waiverRequired` but never verifies a signed waiver or ID verification completion.
+
 ```131:181:platform/apps/api/src/signatures/signatures.service.ts
   async createAndSend(dto: CreateSignatureRequestDto, actorId: string | null) {
     ...
@@ -561,6 +602,7 @@
     return { request: created, signingUrl: this.signingUrl(token) };
   }
 ```
+
 ```289:520:platform/apps/api/src/signatures/signatures.service.ts
     let artifact = await this.prisma.signatureArtifact.findUnique({ where: { requestId: request.id } });
     if (dto.status === "signed") {
@@ -593,6 +635,7 @@
     ...
   }
 ```
+
 ```48:51:platform/apps/api/src/self-checkin/self-checkin.service.ts
     // Check waiver if required
     if (reservation.waiverRequired) {
@@ -600,7 +643,9 @@
       // For now, assume it's handled elsewhere or skip
     }
 ```
-- Check-in enforcement + overrides: Self-checkin enforces prerequisites unless `override` is passed; it does not verify signed waivers/IDV, and override bypass leaves no audit trail or reporting hook. Policy gap: “cannot check in unless waivers signed unless staff override; overrides must appear in a report.” Current state: overrides are generic (`overrideRequest`) but not tied to check-in nor exported/reported.  
+
+- Check-in enforcement + overrides: Self-checkin enforces prerequisites unless `override` is passed; it does not verify signed waivers/IDV, and override bypass leaves no audit trail or reporting hook. Policy gap: “cannot check in unless waivers signed unless staff override; overrides must appear in a report.” Current state: overrides are generic (`overrideRequest`) but not tied to check-in nor exported/reported.
+
 ```78:145:platform/apps/api/src/self-checkin/self-checkin.service.ts
   async selfCheckin(
     reservationId: string,
@@ -628,6 +673,7 @@
     ...
   }
 ```
+
 ```24:52:platform/apps/api/src/self-checkin/self-checkin.service.ts
     // Check ID verification if required
     if (reservation.idVerificationRequired) {
@@ -640,6 +686,7 @@
       // For now, assume it's handled elsewhere or skip
     }
 ```
+
 ```288:352:platform/apps/api/src/staff/staff.service.ts
   async requestOverride(dto: OverrideRequestDto) {
     const record = await (this.prisma as any).overrideRequest.create({
@@ -680,7 +727,9 @@
     });
   }
 ```
-- Kiosk check-in: Kiosk flow marks reservations checked_in without validating waivers or ID verification and has no override recording or audit linkage; only pending forms block the check-in. Requires adding waiver/ID enforcement and logging any staff override to a report.  
+
+- Kiosk check-in: Kiosk flow marks reservations checked_in without validating waivers or ID verification and has no override recording or audit linkage; only pending forms block the check-in. Requires adding waiver/ID enforcement and logging any staff override to a report.
+
 ```1654:1720:platform/apps/api/src/reservations/reservations.service.ts
   async kioskCheckIn(id: string, upsellTotalCents: number) {
     ...
@@ -703,7 +752,9 @@
     ...
   }
 ```
-- Kiosk waiver capture: Kiosk flow never surfaces or collects required waivers/signatures; guests cannot sign on-device before status flips to `checked_in`. Needs embedded signature request (or redirect to `/sign/:token`) and a block until signed.  
+
+- Kiosk waiver capture: Kiosk flow never surfaces or collects required waivers/signatures; guests cannot sign on-device before status flips to `checked_in`. Needs embedded signature request (or redirect to `/sign/:token`) and a block until signed.
+
 ```1654:1720:platform/apps/api/src/reservations/reservations.service.ts
   async kioskCheckIn(id: string, upsellTotalCents: number) {
     ...
@@ -723,7 +774,9 @@
     ...
   }
 ```
-- Access control on check-in/out: Grant/revoke flows exist with idempotency and provider adapters, but reservation status changes only block access on cancel/checkout—no automatic grant or un-block on check-in, so door/lock provisioning depends on separate manual calls.  
+
+- Access control on check-in/out: Grant/revoke flows exist with idempotency and provider adapters, but reservation status changes only block access on cancel/checkout—no automatic grant or un-block on check-in, so door/lock provisioning depends on separate manual calls.
+
 ```161:304:platform/apps/api/src/access-control/access-control.service.ts
   async grantAccess(reservationId: string, dto: GrantAccessDto) {
     ...
@@ -760,6 +813,7 @@
     ...
   }
 ```
+
 ```1190:1235:platform/apps/api/src/reservations/reservations.service.ts
         if (data.status === 'cancelled' && existing.status !== 'cancelled') {
           ...
@@ -771,7 +825,9 @@
           await this.accessControl.blockAccessForReservation(id, "checked_out");
         }
 ```
-- Incident log / evidence / exports: Incidents support creation, status updates/close, evidence uploads, COI attachment, tasks with reminders, claim linkage, and CSV/JSON summary exports with per-status/type breakdown.  
+
+- Incident log / evidence / exports: Incidents support creation, status updates/close, evidence uploads, COI attachment, tasks with reminders, claim linkage, and CSV/JSON summary exports with per-status/type breakdown.
+
 ```24:214:platform/apps/api/src/incidents/incidents.service.ts
   async list(campgroundId: string) {
     return this.prisma.incident.findMany({
@@ -812,7 +868,9 @@
     return summary;
   }
 ```
-- Referrals + reason-for-stay capture/reporting: Reservation creation accepts referral code/program + stayReason preset/other, stores incentive amounts and sources, and reporting surfaces performance and reason breakdowns.  
+
+- Referrals + reason-for-stay capture/reporting: Reservation creation accepts referral code/program + stayReason preset/other, stores incentive amounts and sources, and reporting surfaces performance and reason breakdowns.
+
 ```883:1018:platform/apps/api/src/reservations/reservations.service.ts
         if (data.referralProgramId || data.referralCode) {
           referralProgram = await (this.prisma as any).referralProgram.findFirst({
@@ -843,6 +901,7 @@
             ...
           },
 ```
+
 ```232:340:platform/apps/api/src/reports/reports.service.ts
     async getReferralPerformance(campgroundId: string, startDate?: string, endDate?: string) {
       ...
@@ -864,4 +923,5 @@
       };
     }
 ```
+
 - Staff UI loading: Add a “fun” blocking loading/processing screen on staff payments while waiting for processor responses (e.g., `platform/apps/web/app/campgrounds/[campgroundId]/reservations/page.tsx` and POS checkout). Should show animation/progress, timeout/fallback messaging, and stay idempotent-friendly during retry.

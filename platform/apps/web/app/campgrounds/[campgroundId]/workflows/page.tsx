@@ -80,13 +80,17 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
         <div className="rounded-lg border p-4" data-testid="workflow-create-card">
           <h2 className="text-lg font-medium mb-2">Create Workflow</h2>
           <div className="space-y-2">
-            <Label htmlFor="workflow-name" className="block text-sm font-medium">Name</Label>
+            <Label htmlFor="workflow-name" className="block text-sm font-medium">
+              Name
+            </Label>
             <Input
               id="workflow-name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
-            <Label htmlFor="workflow-trigger" className="block text-sm font-medium">Trigger</Label>
+            <Label htmlFor="workflow-trigger" className="block text-sm font-medium">
+              Trigger
+            </Label>
             <Select
               value={form.trigger}
               onValueChange={(value) => setForm({ ...form, trigger: value })}
@@ -103,7 +107,9 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
                 <SelectItem value="review_received">Review Received</SelectItem>
               </SelectContent>
             </Select>
-            <Label htmlFor="workflow-priority" className="block text-sm font-medium">Priority</Label>
+            <Label htmlFor="workflow-priority" className="block text-sm font-medium">
+              Priority
+            </Label>
             <Input
               id="workflow-priority"
               type="number"
@@ -111,11 +117,7 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
               value={form.priority}
               onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })}
             />
-            <Button
-              className="mt-2"
-              onClick={create}
-              data-testid="workflow-trigger-button"
-            >
+            <Button className="mt-2" onClick={create} data-testid="workflow-trigger-button">
               Save Workflow
             </Button>
           </div>
@@ -124,10 +126,18 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
         <div className="rounded-lg border p-4" data-testid="workflow-list-card">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-medium">Workflows</h2>
-            {loading && <span className="text-sm text-muted-foreground" data-testid="workflow-loading">Loading…</span>}
+            {loading && (
+              <span className="text-sm text-muted-foreground" data-testid="workflow-loading">
+                Loading…
+              </span>
+            )}
           </div>
           {error && (
-            <div className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700" role="alert" aria-live="polite">
+            <div
+              className="rounded border border-red-200 bg-red-50 p-2 text-sm text-red-700"
+              role="alert"
+              aria-live="polite"
+            >
               {error}
             </div>
           )}
@@ -141,17 +151,27 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
             )}
             {!loading &&
               workflows.map((wf) => (
-                <div key={wf.id} className="rounded border px-3 py-2 flex justify-between" data-testid="workflow-step-row">
+                <div
+                  key={wf.id}
+                  className="rounded border px-3 py-2 flex justify-between"
+                  data-testid="workflow-step-row"
+                >
                   <div>
                     <div className="font-semibold">{wf.name}</div>
                     <div className="text-xs text-muted-foreground">
                       {wf.trigger} · priority {wf.priority}
                     </div>
                   </div>
-                  <div className="text-xs text-emerald-700" data-testid="workflow-run-status">{wf.status}</div>
+                  <div className="text-xs text-emerald-700" data-testid="workflow-run-status">
+                    {wf.status}
+                  </div>
                 </div>
               ))}
-            {!loading && !workflows.length && <div className="text-sm text-muted-foreground" data-testid="workflow-empty">No workflows yet.</div>}
+            {!loading && !workflows.length && (
+              <div className="text-sm text-muted-foreground" data-testid="workflow-empty">
+                No workflows yet.
+              </div>
+            )}
           </div>
         </div>
       </div>

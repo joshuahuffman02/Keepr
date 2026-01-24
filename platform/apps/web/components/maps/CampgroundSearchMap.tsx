@@ -134,11 +134,12 @@ function getClusterColor(count: number): string {
 
 // HTML escape function to prevent XSS in map popups
 const escapeHtml = (str: string): string =>
-  str.replace(/&/g, "&amp;")
-     .replace(/</g, "&lt;")
-     .replace(/>/g, "&gt;")
-     .replace(/"/g, "&quot;")
-     .replace(/'/g, "&#039;");
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 export function CampgroundSearchMap({
   campgrounds,
@@ -177,13 +178,15 @@ export function CampgroundSearchMap({
         (c) =>
           c.name.toLowerCase().includes(query) ||
           c.city?.toLowerCase().includes(query) ||
-          c.state?.toLowerCase().includes(query)
+          c.state?.toLowerCase().includes(query),
       );
     }
 
     if (activeFilters.length > 0) {
       result = result.filter((c) =>
-        activeFilters.some((filter) => c.amenities?.includes(filter) || c.siteTypes?.includes(filter))
+        activeFilters.some(
+          (filter) => c.amenities?.includes(filter) || c.siteTypes?.includes(filter),
+        ),
       );
     }
 
@@ -239,7 +242,7 @@ export function CampgroundSearchMap({
               c.latitude >= bounds.getSouth() &&
               c.latitude <= bounds.getNorth() &&
               c.longitude >= bounds.getWest() &&
-              c.longitude <= bounds.getEast()
+              c.longitude <= bounds.getEast(),
           );
           setVisibleCampgrounds(visible);
         });
@@ -275,7 +278,10 @@ export function CampgroundSearchMap({
     if (shouldCluster) {
       // Simple grid clustering
       const gridSize = 2; // degrees
-      const clusters = new Map<string, { lat: number; lng: number; campgrounds: SearchableCampground[] }>();
+      const clusters = new Map<
+        string,
+        { lat: number; lng: number; campgrounds: SearchableCampground[] }
+      >();
 
       filteredCampgrounds.forEach((c) => {
         const gridX = Math.floor(c.longitude / gridSize);
@@ -297,7 +303,8 @@ export function CampgroundSearchMap({
         const avgLng = cluster.lng / count;
 
         const el = document.createElement("div");
-        el.className = "flex items-center justify-center rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110";
+        el.className =
+          "flex items-center justify-center rounded-full shadow-lg cursor-pointer transition-transform hover:scale-110";
         el.style.width = count > 50 ? "48px" : count > 10 ? "40px" : "32px";
         el.style.height = count > 50 ? "48px" : count > 10 ? "40px" : "32px";
         el.style.backgroundColor = getClusterColor(count);
@@ -328,7 +335,7 @@ export function CampgroundSearchMap({
 
         el.className = cn(
           "flex items-center justify-center rounded-full shadow-lg transition-all cursor-pointer",
-          "hover:scale-125 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+          "hover:scale-125 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
         );
         el.style.width = isSelected ? "40px" : "32px";
         el.style.height = isSelected ? "40px" : "32px";
@@ -337,7 +344,7 @@ export function CampgroundSearchMap({
         el.style.zIndex = isSelected ? "10" : "1";
 
         const iconHtml = renderToStaticMarkup(
-          <Tent size={isSelected ? 20 : 16} color="white" strokeWidth={2.5} />
+          <Tent size={isSelected ? 20 : 16} color="white" strokeWidth={2.5} />,
         );
         el.innerHTML = iconHtml;
 
@@ -381,7 +388,7 @@ export function CampgroundSearchMap({
           c.latitude >= bounds.getSouth() &&
           c.latitude <= bounds.getNorth() &&
           c.longitude >= bounds.getWest() &&
-          c.longitude <= bounds.getEast()
+          c.longitude <= bounds.getEast(),
       );
       setVisibleCampgrounds(visible);
     }
@@ -406,11 +413,10 @@ export function CampgroundSearchMap({
           }
           const MarkerClass = Marker;
           const el = document.createElement("div");
-          el.className = "w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse";
+          el.className =
+            "w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg animate-pulse";
 
-          new MarkerClass({ element: el })
-            .setLngLat([longitude, latitude])
-            .addTo(mapRef.current);
+          new MarkerClass({ element: el }).setLngLat([longitude, latitude]).addTo(mapRef.current);
 
           mapRef.current.flyTo({
             center: [longitude, latitude],
@@ -421,7 +427,7 @@ export function CampgroundSearchMap({
       (error) => {
         console.error("Geolocation error:", error);
         setIsLocating(false);
-      }
+      },
     );
   }, []);
 
@@ -432,7 +438,7 @@ export function CampgroundSearchMap({
     // Use Nominatim (free OSM geocoder)
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`,
       );
       const results = await response.json();
 
@@ -450,7 +456,7 @@ export function CampgroundSearchMap({
 
   const toggleFilter = (filter: string) => {
     setActiveFilters((prev) =>
-      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter]
+      prev.includes(filter) ? prev.filter((f) => f !== filter) : [...prev, filter],
     );
   };
 
@@ -520,7 +526,7 @@ export function CampgroundSearchMap({
                   "cursor-pointer capitalize transition-colors",
                   activeFilters.includes(filter)
                     ? "bg-emerald-500 hover:bg-emerald-600"
-                    : "hover:bg-muted"
+                    : "hover:bg-muted",
                 )}
                 onClick={() => toggleFilter(filter)}
               >
@@ -546,7 +552,8 @@ export function CampgroundSearchMap({
       <div className="absolute bottom-4 left-4 z-10">
         <div className="bg-card/90 backdrop-blur-sm rounded-lg shadow-lg px-4 py-2">
           <p className="text-sm font-medium text-foreground">
-            <span className="text-emerald-600">{visibleCampgrounds.length}</span> campgrounds in view
+            <span className="text-emerald-600">{visibleCampgrounds.length}</span> campgrounds in
+            view
           </p>
         </div>
       </div>

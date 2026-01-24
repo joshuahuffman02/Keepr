@@ -27,4 +27,3 @@ export class ApplyRecommendationDto {
   @IsOptional()
   payload?: Record<string, unknown>;
 }
-

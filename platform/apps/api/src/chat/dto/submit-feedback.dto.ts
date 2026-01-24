@@ -1,9 +1,9 @@
-import { IsString, IsUUID, IsEnum, IsOptional, MaxLength } from 'class-validator';
-import { z } from 'zod';
+import { IsString, IsUUID, IsEnum, IsOptional, MaxLength } from "class-validator";
+import { z } from "zod";
 
 export enum ChatFeedbackValue {
-  up = 'up',
-  down = 'down',
+  up = "up",
+  down = "down",
 }
 
 export const submitFeedbackSchema = z.object({

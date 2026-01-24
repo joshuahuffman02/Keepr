@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from "@nestjs/common";
 import { randomUUID } from "crypto";
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, WorkflowTrigger, WorkflowStatus, WorkflowExecutionStatus } from '@prisma/client';
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../prisma/prisma.service";
+import { Prisma, WorkflowTrigger, WorkflowStatus, WorkflowExecutionStatus } from "@prisma/client";
 
 export interface CreateWorkflowDto {
   campgroundId: string;
@@ -17,7 +17,7 @@ export interface CreateWorkflowDto {
 
 export interface WorkflowStepDto {
   stepOrder: number;
-  actionType: 'send_email' | 'send_sms' | 'wait' | 'condition' | 'webhook';
+  actionType: "send_email" | "send_sms" | "wait" | "condition" | "webhook";
   config: Record<string, unknown>;
   isActive?: boolean;
 }
@@ -37,7 +37,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
@@ -67,7 +68,7 @@ export class WorkflowsService {
         trigger: dto.trigger,
         triggerValue: dto.triggerValue,
         conditions,
-        status: dto.status ?? 'draft',
+        status: dto.status ?? "draft",
         priority: dto.priority ?? 100,
         updatedAt: new Date(),
       },
@@ -81,10 +82,10 @@ export class WorkflowsService {
         ...(status ? { status } : {}),
       },
       include: {
-        WorkflowStep: { orderBy: { stepOrder: 'asc' } },
+        WorkflowStep: { orderBy: { stepOrder: "asc" } },
         _count: { select: { WorkflowExecution: true } },
       },
-      orderBy: { priority: 'asc' },
+      orderBy: { priority: "asc" },
     });
 
     return workflows.map(({ WorkflowStep, _count, ...workflow }) => ({
@@ -98,11 +99,11 @@ export class WorkflowsService {
     const workflow = await this.prisma.communicationWorkflow.findUnique({
       where: { id },
       include: {
-        WorkflowStep: { orderBy: { stepOrder: 'asc' } },
-        WorkflowExecution: { take: 10, orderBy: { createdAt: 'desc' } },
+        WorkflowStep: { orderBy: { stepOrder: "asc" } },
+        WorkflowExecution: { take: 10, orderBy: { createdAt: "desc" } },
       },
     });
-    if (!workflow) throw new NotFoundException('Workflow not found');
+    if (!workflow) throw new NotFoundException("Workflow not found");
     const { WorkflowStep, WorkflowExecution, ...rest } = workflow;
     return {
       ...rest,
@@ -186,11 +187,11 @@ export class WorkflowsService {
    */
   async triggerWorkflow(
     workflowId: string,
-    context: { reservationId?: string; guestId?: string; data?: Record<string, unknown> }
+    context: { reservationId?: string; guestId?: string; data?: Record<string, unknown> },
   ) {
     const workflow = await this.getWorkflow(workflowId);
-    if (workflow.status !== 'active') {
-      throw new BadRequestException('Workflow is not active');
+    if (workflow.status !== "active") {
+      throw new BadRequestException("Workflow is not active");
     }
 
     const contextData = context.data ? toJsonInput(context.data) : undefined;
@@ -204,7 +205,7 @@ export class WorkflowsService {
         workflowId,
         reservationId: context.reservationId,
         guestId: context.guestId,
-        status: 'pending',
+        status: "pending",
         currentStep: 0,
         context: contextData,
       },
@@ -217,10 +218,10 @@ export class WorkflowsService {
   @Cron(CronExpression.EVERY_MINUTE)
   async processPendingExecutions() {
     const pending = await this.prisma.workflowExecution.findMany({
-      where: { status: { in: ['pending', 'running'] } },
+      where: { status: { in: ["pending", "running"] } },
       include: {
         CommunicationWorkflow: {
-          include: { WorkflowStep: { orderBy: { stepOrder: 'asc' } } },
+          include: { WorkflowStep: { orderBy: { stepOrder: "asc" } } },
         },
       },
       take: 100,
@@ -236,8 +237,8 @@ export class WorkflowsService {
         await this.prisma.workflowExecution.update({
           where: { id: execution.id },
           data: {
-            status: 'failed',
-            error: error instanceof Error ? error.message : 'Unknown error',
+            status: "failed",
+            error: error instanceof Error ? error.message : "Unknown error",
           },
         });
       }
@@ -255,7 +256,7 @@ export class WorkflowsService {
       return this.prisma.workflowExecution.update({
         where: { id: execution.id },
         data: {
-          status: 'completed',
+          status: "completed",
           completedAt: new Date(),
         },
       });
@@ -266,7 +267,7 @@ export class WorkflowsService {
     // Mark as running
     await this.prisma.workflowExecution.update({
       where: { id: execution.id },
-      data: { status: 'running', startedAt: execution.startedAt ?? new Date() },
+      data: { status: "running", startedAt: execution.startedAt ?? new Date() },
     });
 
     // Execute the step
@@ -283,33 +284,32 @@ export class WorkflowsService {
     const config = isRecord(step.config) ? step.config : {};
 
     switch (step.actionType) {
-      case 'send_email':
+      case "send_email":
         // Queue email (integrate with email service)
         this.logger.log(`Would send email: ${config.templateId} to ${execution.guestId}`);
         break;
 
-      case 'send_sms':
+      case "send_sms":
         // Queue SMS
         this.logger.log(`Would send SMS to ${execution.guestId}`);
         break;
 
-      case 'wait':
+      case "wait":
         // Schedule next execution after delay
-        const delayMinutes =
-          typeof config.delayMinutes === "number" ? config.delayMinutes : 60;
+        const delayMinutes = typeof config.delayMinutes === "number" ? config.delayMinutes : 60;
         const delayMs = delayMinutes * 60 * 1000;
         // In production, use a job queue with delay
         this.logger.log(`Would wait ${delayMinutes} minutes`);
         break;
 
-      case 'webhook':
+      case "webhook":
         // Call external webhook
         const url = typeof config.url === "string" ? config.url : "";
         if (url) {
           try {
             await fetch(url, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 executionId: execution.id,
                 reservationId: execution.reservationId,
@@ -318,14 +318,14 @@ export class WorkflowsService {
               }),
             });
           } catch (e) {
-            this.logger.error('Webhook failed:', e instanceof Error ? e.stack : e);
+            this.logger.error("Webhook failed:", e instanceof Error ? e.stack : e);
           }
         }
         break;
 
-      case 'condition':
+      case "condition":
         // Evaluate condition and potentially skip steps
-        this.logger.log('Would evaluate condition');
+        this.logger.log("Would evaluate condition");
         break;
     }
   }
@@ -336,13 +336,13 @@ export class WorkflowsService {
   async checkTriggers(
     campgroundId: string,
     trigger: WorkflowTrigger,
-    context: { reservationId?: string; guestId?: string }
+    context: { reservationId?: string; guestId?: string },
   ) {
     const workflows = await this.prisma.communicationWorkflow.findMany({
       where: {
         campgroundId,
         trigger,
-        status: 'active',
+        status: "active",
       },
     });
 

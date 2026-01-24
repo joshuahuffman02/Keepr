@@ -30,9 +30,7 @@ type SupportReportRaw = Prisma.SupportReportGetPayload<{
 
 type SupportReportView = Omit<
   SupportReportRaw,
-  | "User_SupportReport_authorIdToUser"
-  | "User_SupportReport_assigneeIdToUser"
-  | "Campground"
+  "User_SupportReport_authorIdToUser" | "User_SupportReport_assigneeIdToUser" | "Campground"
 > & {
   author: SupportUserSummary | null;
   assignee: SupportUserSummary | null;
@@ -82,8 +80,8 @@ export class SupportService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly email: EmailService
-  ) { }
+    private readonly email: EmailService,
+  ) {}
 
   create(dto: CreateSupportReportDto, authorId?: string) {
     const {
@@ -102,44 +100,46 @@ export class SupportService {
       rawContext,
       campgroundId,
       region,
-      ownershipRole
+      ownershipRole,
     } = dto;
 
     const rawContextRecord = isRecord(rawContext) ? rawContext : {};
-    return this.prisma.supportReport.create({
-      data: {
-        id: randomUUID(),
-        description,
-        steps,
-        contactEmail,
-        path,
-        userAgent,
-        language,
-        timezone,
-        viewportWidth: viewportWidth ?? null,
-        viewportHeight: viewportHeight ?? null,
-        roleFilter,
-        pinnedIds: pinnedIds ?? [],
-        recentIds: recentIds ?? [],
-        rawContext: { ...rawContextRecord, region, ownershipRole },
-        campgroundId,
-        authorId: authorId ?? null,
-        updatedAt: new Date(),
-      },
-      include: {
-        Campground: { select: { id: true, name: true } },
-        User_SupportReport_assigneeIdToUser: {
-          select: { id: true, email: true, firstName: true, lastName: true },
+    return this.prisma.supportReport
+      .create({
+        data: {
+          id: randomUUID(),
+          description,
+          steps,
+          contactEmail,
+          path,
+          userAgent,
+          language,
+          timezone,
+          viewportWidth: viewportWidth ?? null,
+          viewportHeight: viewportHeight ?? null,
+          roleFilter,
+          pinnedIds: pinnedIds ?? [],
+          recentIds: recentIds ?? [],
+          rawContext: { ...rawContextRecord, region, ownershipRole },
+          campgroundId,
+          authorId: authorId ?? null,
+          updatedAt: new Date(),
         },
-        User_SupportReport_authorIdToUser: {
-          select: { id: true, email: true, firstName: true, lastName: true },
+        include: {
+          Campground: { select: { id: true, name: true } },
+          User_SupportReport_assigneeIdToUser: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
+          User_SupportReport_authorIdToUser: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
         },
-      },
-    }).then((report) => {
-      const view = toSupportReportView(report);
-      void this.notifyNew(view);
-      return view;
-    });
+      })
+      .then((report) => {
+        const view = toSupportReportView(report);
+        void this.notifyNew(view);
+        return view;
+      });
   }
 
   async findAll(args: { region?: string | null; campgroundId?: string | null }) {
@@ -173,7 +173,7 @@ export class SupportService {
     // If strict campground scoping is on, we might want to skip tickets or check their metadata.
     // Assuming Tickets are "Global Feedback" and should be visible to support staff.
     const tickets = await this.prisma.ticket.findMany({
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     // 3. Map Tickets to SupportReport shape
@@ -190,7 +190,12 @@ export class SupportService {
       const submitterName = submitter ? toStringValue(submitter.name) : null;
       const submitterId = submitter ? toStringValue(submitter.id) : null;
       const author = submitterEmail
-        ? { id: submitterId ?? "guest", email: submitterEmail, firstName: submitterName ?? null, lastName: null }
+        ? {
+            id: submitterId ?? "guest",
+            email: submitterEmail,
+            firstName: submitterName ?? null,
+            lastName: null,
+          }
         : null;
       const client = isRecord(t.client) ? t.client : null;
       const userAgent = client ? toStringValue(client.userAgent) : null;
@@ -219,7 +224,7 @@ export class SupportService {
         authorId: author?.id || null,
         author,
         campgroundId: null,
-        campground: { id: "global", name: "Global / Feedback" }
+        campground: { id: "global", name: "Global / Feedback" },
       };
     });
 
@@ -234,23 +239,27 @@ export class SupportService {
     actorId?: string,
     actorRegion?: string | null,
     actorCampgrounds?: string[],
-    platformScoped = false
+    platformScoped = false,
   ) {
     const { status, assigneeId } = dto;
 
     const before = await this.prisma.supportReport.findUnique({
       where: { id },
-      select: { assigneeId: true, rawContext: true, campgroundId: true }
+      select: { assigneeId: true, rawContext: true, campgroundId: true },
     });
 
-    const beforeRegion = before && isRecord(before.rawContext)
-      ? toStringValue(before.rawContext.region)
-      : null;
+    const beforeRegion =
+      before && isRecord(before.rawContext) ? toStringValue(before.rawContext.region) : null;
     if (beforeRegion && actorRegion && beforeRegion !== actorRegion) {
       throw new ForbiddenException("Forbidden by region scope");
     }
 
-    if (before?.campgroundId && actorCampgrounds && !actorCampgrounds.includes(before.campgroundId) && !platformScoped) {
+    if (
+      before?.campgroundId &&
+      actorCampgrounds &&
+      !actorCampgrounds.includes(before.campgroundId) &&
+      !platformScoped
+    ) {
       throw new ForbiddenException("Forbidden by campground scope");
     }
 
@@ -261,8 +270,8 @@ export class SupportService {
           id: true,
           region: true,
           CampgroundMembership: { select: { campgroundId: true } },
-          ownershipRoles: true
-        }
+          ownershipRoles: true,
+        },
       });
       if (!assignee) {
         throw new ForbiddenException("Assignee not found");
@@ -318,7 +327,7 @@ export class SupportService {
       where: {
         isActive: true,
         platformActive: { not: false },
-        ...(whereOr.length > 0 ? { OR: whereOr } : {})
+        ...(whereOr.length > 0 ? { OR: whereOr } : {}),
       },
       take: 200,
       select: {
@@ -331,8 +340,8 @@ export class SupportService {
         platformRegion: true,
         platformActive: true,
         ownershipRoles: true,
-        CampgroundMembership: { select: { campgroundId: true, role: true } }
-      }
+        CampgroundMembership: { select: { campgroundId: true, role: true } },
+      },
     });
 
     return users.map((u) => ({
@@ -340,7 +349,7 @@ export class SupportService {
       platformRole: u.platformRole ?? null,
       platformRegion: u.platformRegion ?? null,
       platformActive: u.platformActive ?? true,
-      notifyChannels: ["email"]
+      notifyChannels: ["email"],
     }));
   }
 
@@ -354,11 +363,9 @@ export class SupportService {
         platformRegion: dto.platformRegion ?? undefined,
         platformRole: platformRole ?? undefined,
         platformActive:
-          typeof dto.platformActive === "string"
-            ? dto.platformActive === "true"
-            : undefined,
+          typeof dto.platformActive === "string" ? dto.platformActive === "true" : undefined,
         ownershipRoles: ownershipRoles ?? undefined,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       select: {
         id: true,
@@ -370,8 +377,8 @@ export class SupportService {
         platformRegion: true,
         platformActive: true,
         ownershipRoles: true,
-        CampgroundMembership: { select: { campgroundId: true, role: true } }
-      }
+        CampgroundMembership: { select: { campgroundId: true, role: true } },
+      },
     });
   }
 
@@ -383,7 +390,7 @@ export class SupportService {
       `Desc: ${report.description}`,
       report.steps ? `Steps: ${report.steps}` : null,
       report.contactEmail ? `Contact: ${report.contactEmail}` : null,
-      report.id ? `Id: ${report.id}` : null
+      report.id ? `Id: ${report.id}` : null,
     ]
       .filter(Boolean)
       .join("\n");
@@ -404,7 +411,7 @@ export class SupportService {
         await fetch(slackWebhook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
+          body: JSON.stringify({ text }),
         });
       } catch (err) {
         this.logger.warn(`Failed to send support Slack notification: ${String(err)}`);
@@ -423,16 +430,20 @@ export class SupportService {
           ${report.contactEmail ? `<p style="margin: 4px 0; color: #334155;"><strong>Contact:</strong> ${report.contactEmail}</p>` : ""}
           <p style="margin: 12px 0 4px 0; color: #0f172a;"><strong>Description</strong></p>
           <p style="margin: 0 0 12px 0; color: #334155; white-space: pre-wrap;">${report.description}</p>
-          ${report.steps ? `
+          ${
+            report.steps
+              ? `
             <p style="margin: 12px 0 4px 0; color: #0f172a;"><strong>Steps</strong></p>
             <p style="margin: 0 0 12px 0; color: #334155; white-space: pre-wrap;">${report.steps}</p>
-          ` : ""}
+          `
+              : ""
+          }
           <p style="margin: 12px 0 4px 0; color: #0f172a;"><strong>Context</strong></p>
           <ul style="margin: 0; padding-left: 18px; color: #334155; line-height: 1.5;">
             ${report.timezone ? `<li>Timezone: ${report.timezone}</li>` : ""}
             ${report.language ? `<li>Language: ${report.language}</li>` : ""}
             ${report.userAgent ? `<li>Browser: ${report.userAgent}</li>` : ""}
-            ${(report.viewportWidth && report.viewportHeight) ? `<li>Viewport: ${report.viewportWidth} x ${report.viewportHeight}</li>` : ""}
+            ${report.viewportWidth && report.viewportHeight ? `<li>Viewport: ${report.viewportWidth} x ${report.viewportHeight}</li>` : ""}
             ${report.roleFilter ? `<li>Role filter: ${report.roleFilter}</li>` : ""}
             ${report.pinnedIds?.length ? `<li>Pinned: ${report.pinnedIds.join(", ")}</li>` : ""}
             ${report.recentIds?.length ? `<li>Recent: ${report.recentIds.join(", ")}</li>` : ""}
@@ -446,9 +457,9 @@ export class SupportService {
           this.email.sendEmail({
             to,
             subject,
-            html
-          })
-        )
+            html,
+          }),
+        ),
       );
     }
   }
@@ -464,12 +475,14 @@ export class SupportService {
           report.campground?.name ? `Campground: ${report.campground.name}` : null,
           report.path ? `Path: ${report.path}` : null,
           `Desc: ${report.description}`,
-          `Id: ${report.id}`
-        ].filter(Boolean).join("\n");
+          `Id: ${report.id}`,
+        ]
+          .filter(Boolean)
+          .join("\n");
         await fetch(slackWebhook, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text })
+          body: JSON.stringify({ text }),
         });
       } catch (err) {
         this.logger.warn(`Failed to send assignment Slack notification: ${String(err)}`);
@@ -479,7 +492,8 @@ export class SupportService {
     // Email notification to the assignee (optional)
     const assigneeEmail = report.assignee?.email;
     if (assigneeEmail) {
-      const subject = `Assigned: Support report (${report.status || "open"}) ${report.path || ""}`.trim();
+      const subject =
+        `Assigned: Support report (${report.status || "open"}) ${report.path || ""}`.trim();
       const html = `
         <div style="font-family: Arial, sans-serif; color: #0f172a; max-width: 640px;">
           <h2 style="margin: 0 0 12px 0;">You were assigned a support report</h2>
@@ -488,10 +502,14 @@ export class SupportService {
           <p style="margin: 4px 0; color: #334155;"><strong>Status:</strong> ${report.status}</p>
           <p style="margin: 12px 0 4px 0; color: #0f172a;"><strong>Description</strong></p>
           <p style="margin: 0 0 12px 0; color: #334155; white-space: pre-wrap;">${report.description}</p>
-          ${report.steps ? `
+          ${
+            report.steps
+              ? `
             <p style="margin: 12px 0 4px 0; color: #0f172a;"><strong>Steps</strong></p>
             <p style="margin: 0 0 12px 0; color: #334155; white-space: pre-wrap;">${report.steps}</p>
-          ` : ""}
+          `
+              : ""
+          }
           <p style="margin: 12px 0 0 0; color: #64748b; font-size: 12px;">Report ID: ${report.id}</p>
         </div>
       `;
@@ -500,7 +518,7 @@ export class SupportService {
         await this.email.sendEmail({
           to: assigneeEmail,
           subject,
-          html
+          html,
         });
       } catch (err) {
         this.logger.warn(`Failed to send assignment email: ${String(err)}`);

@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { getRequestContext, getTraceFields } from "../common/request-context";
 
-const redactEmail = (value: string) => value.replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, "[redacted_email]");
+const redactEmail = (value: string) =>
+  value.replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, "[redacted_email]");
 const redactPhone = (value: string) => value.replace(/\+?\d[\d\s().-]{7,}\b/g, "[redacted_phone]");
 const redactCardLast4 = (value: string) =>
   value.replace(/last4["']?\s*:\s*["']?\d{4}["']?/gi, 'last4:"[redacted_last4]"');

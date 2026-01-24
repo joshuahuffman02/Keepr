@@ -6,7 +6,13 @@ import { useState, useEffect, useMemo, useCallback, type FormEvent } from "react
 import { useToast } from "../../../../hooks/use-toast";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
 import { Checkbox } from "../../../../components/ui/checkbox";
@@ -22,7 +28,14 @@ import {
   SelectValue,
 } from "../../../../components/ui/select";
 import { Switch } from "../../../../components/ui/switch";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../../components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../../../components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -253,10 +266,7 @@ const isSeasonalStatus = (value: string): value is SeasonalStatus =>
   value === "waitlist";
 
 const isRenewalIntent = (value: string): value is RenewalIntent =>
-  value === "committed" ||
-  value === "likely" ||
-  value === "undecided" ||
-  value === "not_renewing";
+  value === "committed" || value === "likely" || value === "undecided" || value === "not_renewing";
 
 const isSeasonalPayment = (value: unknown): value is SeasonalGuest["payments"][number] =>
   isRecord(value) &&
@@ -345,21 +355,23 @@ const isDashboardStats = (value: unknown): value is DashboardStats => {
 
   if (!hasNumbers) return false;
 
-  const churnOk = churnRiskGuests.every((guest) =>
-    isRecord(guest) &&
-    isString(guest.guestId) &&
-    isString(guest.guestName) &&
-    isNumber(guest.tenure) &&
-    isString(guest.riskLevel) &&
-    isString(guest.renewalIntent)
+  const churnOk = churnRiskGuests.every(
+    (guest) =>
+      isRecord(guest) &&
+      isString(guest.guestId) &&
+      isString(guest.guestName) &&
+      isNumber(guest.tenure) &&
+      isString(guest.riskLevel) &&
+      isString(guest.renewalIntent),
   );
 
-  const milestonesOk = milestones.every((milestone) =>
-    isRecord(milestone) &&
-    isString(milestone.guestId) &&
-    isString(milestone.guestName) &&
-    isNumber(milestone.years) &&
-    isString(milestone.type)
+  const milestonesOk = milestones.every(
+    (milestone) =>
+      isRecord(milestone) &&
+      isString(milestone.guestId) &&
+      isString(milestone.guestName) &&
+      isNumber(milestone.years) &&
+      isString(milestone.type),
   );
 
   return churnOk && milestonesOk;
@@ -374,11 +386,23 @@ const getFormValue = (formData: FormData, key: string): string | null => {
 
 function StatusBadge({ status }: { status: SeasonalStatus }) {
   const config: Record<SeasonalStatus, { class: string; label: string }> = {
-    active: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Active" },
-    pending_renewal: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Pending Renewal" },
-    not_renewing: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Not Renewing" },
+    active: {
+      class: "bg-status-success/15 text-status-success border-status-success/20",
+      label: "Active",
+    },
+    pending_renewal: {
+      class: "bg-status-warning/15 text-status-warning border-status-warning/20",
+      label: "Pending Renewal",
+    },
+    not_renewing: {
+      class: "bg-status-error/15 text-status-error border-status-error/20",
+      label: "Not Renewing",
+    },
     departed: { class: "bg-muted text-foreground border-border", label: "Departed" },
-    waitlist: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Waitlist" },
+    waitlist: {
+      class: "bg-status-info/15 text-status-info border-status-info/20",
+      label: "Waitlist",
+    },
   };
   return (
     <Badge variant="outline" className={config[status].class}>
@@ -388,12 +412,33 @@ function StatusBadge({ status }: { status: SeasonalStatus }) {
 }
 
 function RenewalIntentBadge({ intent }: { intent?: RenewalIntent }) {
-  if (!intent) return <Badge variant="outline" className="bg-muted/60 text-muted-foreground">Unknown</Badge>;
+  if (!intent)
+    return (
+      <Badge variant="outline" className="bg-muted/60 text-muted-foreground">
+        Unknown
+      </Badge>
+    );
   const config: Record<RenewalIntent, { class: string; label: string; icon: LucideIcon }> = {
-    committed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Committed", icon: CheckCircle },
-    likely: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Likely", icon: TrendingUp },
-    undecided: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Undecided", icon: Clock },
-    not_renewing: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Not Returning", icon: X },
+    committed: {
+      class: "bg-status-success/15 text-status-success border-status-success/20",
+      label: "Committed",
+      icon: CheckCircle,
+    },
+    likely: {
+      class: "bg-status-success/15 text-status-success border-status-success/20",
+      label: "Likely",
+      icon: TrendingUp,
+    },
+    undecided: {
+      class: "bg-status-warning/15 text-status-warning border-status-warning/20",
+      label: "Undecided",
+      icon: Clock,
+    },
+    not_renewing: {
+      class: "bg-status-error/15 text-status-error border-status-error/20",
+      label: "Not Returning",
+      icon: X,
+    },
   };
   const Icon = config[intent].icon;
   return (
@@ -410,7 +455,10 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
 
   if (hasPastDue) {
     return (
-      <Badge variant="outline" className="bg-status-error/15 text-status-error border-status-error/20">
+      <Badge
+        variant="outline"
+        className="bg-status-error/15 text-status-error border-status-error/20"
+      >
         <AlertCircle className="h-3 w-3 mr-1" />
         Past Due
       </Badge>
@@ -425,18 +473,30 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
     );
   }
   return (
-    <Badge variant="outline" className="bg-status-success/15 text-status-success border-status-success/20">
+    <Badge
+      variant="outline"
+      className="bg-status-success/15 text-status-success border-status-success/20"
+    >
       <CheckCircle className="h-3 w-3 mr-1" />
       Current
     </Badge>
   );
 }
 
-function TenureBadge({ years, showCelebration = false }: { years: number; showCelebration?: boolean }) {
+function TenureBadge({
+  years,
+  showCelebration = false,
+}: {
+  years: number;
+  showCelebration?: boolean;
+}) {
   // Legendary: 20+ years
   if (years >= 20) {
     return (
-      <Badge variant="outline" className="bg-status-info/15 text-status-info border-status-info/30 shadow-sm cursor-default">
+      <Badge
+        variant="outline"
+        className="bg-status-info/15 text-status-info border-status-info/30 shadow-sm cursor-default"
+      >
         <Crown className="h-3 w-3 mr-1" />
         {years} Years - Legend!
         {showCelebration && <PartyPopper className="h-3 w-3 ml-1 animate-bounce" />}
@@ -447,7 +507,10 @@ function TenureBadge({ years, showCelebration = false }: { years: number; showCe
   // Gold Elite: 15+ years
   if (years >= 15) {
     return (
-      <Badge variant="outline" className="bg-status-warning/15 text-status-warning border-status-warning/30 shadow-sm cursor-default">
+      <Badge
+        variant="outline"
+        className="bg-status-warning/15 text-status-warning border-status-warning/30 shadow-sm cursor-default"
+      >
         <Crown className="h-3 w-3 mr-1" />
         {years} Years
         {showCelebration && <Sparkles className="h-3 w-3 ml-1" />}
@@ -458,7 +521,10 @@ function TenureBadge({ years, showCelebration = false }: { years: number; showCe
   // Gold: 10+ years
   if (years >= 10) {
     return (
-      <Badge variant="outline" className="bg-status-warning/10 text-status-warning border-status-warning/20 shadow-sm cursor-default">
+      <Badge
+        variant="outline"
+        className="bg-status-warning/10 text-status-warning border-status-warning/20 shadow-sm cursor-default"
+      >
         <Award className="h-3 w-3 mr-1" />
         {years} Years
       </Badge>
@@ -468,7 +534,10 @@ function TenureBadge({ years, showCelebration = false }: { years: number; showCe
   // Silver: 5+ years
   if (years >= 5) {
     return (
-      <Badge variant="outline" className="bg-muted text-foreground border-border shadow-sm cursor-default">
+      <Badge
+        variant="outline"
+        className="bg-muted text-foreground border-border shadow-sm cursor-default"
+      >
         <Star className="h-3 w-3 mr-1" />
         {years} Years
       </Badge>
@@ -486,9 +555,9 @@ function TenureBadge({ years, showCelebration = false }: { years: number; showCe
 // Shimmer animation component - renders styles safely for SSR
 function ShimmerStyles() {
   useEffect(() => {
-    if (!document.getElementById('tenure-shimmer-styles')) {
-      const style = document.createElement('style');
-      style.id = 'tenure-shimmer-styles';
+    if (!document.getElementById("tenure-shimmer-styles")) {
+      const style = document.createElement("style");
+      style.id = "tenure-shimmer-styles";
       style.textContent = `
         @keyframes shimmer {
           0% { background-position: -200% 0; }
@@ -507,12 +576,33 @@ function ShimmerStyles() {
 }
 
 function ContractStatusBadge({ status }: { status?: ContractStatus }) {
-  if (!status) return <Badge variant="outline" className="bg-muted/60 text-muted-foreground">Not Sent</Badge>;
+  if (!status)
+    return (
+      <Badge variant="outline" className="bg-muted/60 text-muted-foreground">
+        Not Sent
+      </Badge>
+    );
   const config: Record<ContractStatus, { class: string; label: string; icon: LucideIcon }> = {
-    signed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Signed", icon: CheckCircle },
-    sent: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Sent", icon: Send },
-    not_sent: { class: "bg-muted text-muted-foreground border-border", label: "Not Sent", icon: FileText },
-    expired: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Expired", icon: AlertCircle },
+    signed: {
+      class: "bg-status-success/15 text-status-success border-status-success/20",
+      label: "Signed",
+      icon: CheckCircle,
+    },
+    sent: {
+      class: "bg-status-info/15 text-status-info border-status-info/20",
+      label: "Sent",
+      icon: Send,
+    },
+    not_sent: {
+      class: "bg-muted text-muted-foreground border-border",
+      label: "Not Sent",
+      icon: FileText,
+    },
+    expired: {
+      class: "bg-status-error/15 text-status-error border-status-error/20",
+      label: "Expired",
+      icon: AlertCircle,
+    },
   };
   const Icon = config[status].icon;
   return (
@@ -561,13 +651,20 @@ function HeroStatCard({
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{title}</p>
-            <p className={`text-2xl font-bold mt-1 ${colorClasses[color].split(" ")[0]}`}>{value}</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              {title}
+            </p>
+            <p className={`text-2xl font-bold mt-1 ${colorClasses[color].split(" ")[0]}`}>
+              {value}
+            </p>
             {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
             {trend && (
-              <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-status-error"}`}>
+              <p
+                className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-status-error"}`}
+              >
                 <TrendingUp className={`h-3 w-3 ${trend.value < 0 ? "rotate-180" : ""}`} />
-                {trend.value > 0 ? "+" : ""}{trend.value}% {trend.label}
+                {trend.value > 0 ? "+" : ""}
+                {trend.value}% {trend.label}
               </p>
             )}
           </div>
@@ -584,18 +681,53 @@ function HeroStatCard({
 
 function CriticalAlertsBanner({
   stats,
-  onAlertClick
+  onAlertClick,
 }: {
   stats: DashboardStats["needsAttention"];
   onAlertClick: (tab: string) => void;
 }) {
   const alerts = [
-    { key: "pastDuePayments", count: stats.pastDuePayments, label: "Past Due", icon: DollarSign, color: "rose", tab: "payments" },
-    { key: "expiringContracts", count: stats.expiringContracts, label: "Expiring", icon: FileText, color: "amber", tab: "contracts" },
-    { key: "unsignedContracts", count: stats.unsignedContracts, label: "Unsigned", icon: FileSignature, color: "orange", tab: "contracts" },
-    { key: "pendingRenewals", count: stats.pendingRenewals, label: "Undecided", icon: RefreshCw, color: "blue", tab: "renewals" },
-    { key: "expiredInsurance", count: stats.expiredInsurance, label: "COI Expired", icon: Shield, color: "purple", tab: "contracts" },
-  ].filter(a => a.count > 0);
+    {
+      key: "pastDuePayments",
+      count: stats.pastDuePayments,
+      label: "Past Due",
+      icon: DollarSign,
+      color: "rose",
+      tab: "payments",
+    },
+    {
+      key: "expiringContracts",
+      count: stats.expiringContracts,
+      label: "Expiring",
+      icon: FileText,
+      color: "amber",
+      tab: "contracts",
+    },
+    {
+      key: "unsignedContracts",
+      count: stats.unsignedContracts,
+      label: "Unsigned",
+      icon: FileSignature,
+      color: "orange",
+      tab: "contracts",
+    },
+    {
+      key: "pendingRenewals",
+      count: stats.pendingRenewals,
+      label: "Undecided",
+      icon: RefreshCw,
+      color: "blue",
+      tab: "renewals",
+    },
+    {
+      key: "expiredInsurance",
+      count: stats.expiredInsurance,
+      label: "COI Expired",
+      icon: Shield,
+      color: "purple",
+      tab: "contracts",
+    },
+  ].filter((a) => a.count > 0);
 
   if (alerts.length === 0) {
     return (
@@ -614,8 +746,10 @@ function CriticalAlertsBanner({
 
   const colorMap: Record<string, string> = {
     rose: "bg-status-error/15 text-status-error border-status-error/20 hover:bg-status-error/25",
-    amber: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
-    orange: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
+    amber:
+      "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
+    orange:
+      "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
     blue: "bg-status-info/15 text-status-info border-status-info/20 hover:bg-status-info/25",
     purple: "bg-status-error/15 text-status-error border-status-error/20 hover:bg-status-error/25",
   };
@@ -656,39 +790,56 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "20year": return Crown;
-      case "15year": return Crown;
-      case "10year": return Award;
-      case "5year": return Star;
-      default: return Star;
+      case "20year":
+        return Crown;
+      case "15year":
+        return Crown;
+      case "10year":
+        return Award;
+      case "5year":
+        return Star;
+      default:
+        return Star;
     }
   };
 
   const getColor = (type: string) => {
     switch (type) {
-      case "20year": return "bg-status-info/15 text-status-info border border-status-info/30";
-      case "15year": return "bg-status-warning/15 text-status-warning border border-status-warning/30";
-      case "10year": return "bg-status-warning/10 text-status-warning border border-status-warning/20";
-      case "5year": return "bg-muted text-foreground border border-border";
-      default: return "bg-muted/60 text-muted-foreground border border-border";
+      case "20year":
+        return "bg-status-info/15 text-status-info border border-status-info/30";
+      case "15year":
+        return "bg-status-warning/15 text-status-warning border border-status-warning/30";
+      case "10year":
+        return "bg-status-warning/10 text-status-warning border border-status-warning/20";
+      case "5year":
+        return "bg-muted text-foreground border border-border";
+      default:
+        return "bg-muted/60 text-muted-foreground border border-border";
     }
   };
 
   const getAnimation = (type: string, index: number) => {
     const baseDelay = index * 0.1;
     switch (type) {
-      case "20year": return { animationDelay: `${baseDelay}s`, animation: "pulse 2s infinite" };
-      case "15year": return { animationDelay: `${baseDelay}s` };
-      default: return { animationDelay: `${baseDelay}s` };
+      case "20year":
+        return { animationDelay: `${baseDelay}s`, animation: "pulse 2s infinite" };
+      case "15year":
+        return { animationDelay: `${baseDelay}s` };
+      default:
+        return { animationDelay: `${baseDelay}s` };
     }
   };
 
   const getShadow = (type: string) => {
     switch (type) {
-      case "20year": return "shadow-lg shadow-status-info/20";
-      case "15year": return "shadow-md shadow-status-warning/20";
-      case "10year": return "shadow-sm shadow-status-warning/10";
-      default: return "shadow-sm";
+      case "20year":
+        return "shadow-lg shadow-status-info/20";
+      case "15year":
+        return "shadow-md shadow-status-warning/20";
+      case "10year":
+        return "shadow-sm shadow-status-warning/10";
+      default:
+        return "shadow-sm";
     }
   };
 
@@ -699,7 +850,10 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
         <Sparkles className="h-5 w-5 text-status-warning animate-pulse" />
       </div>
       <div className="absolute bottom-2 left-2 opacity-30">
-        <Star className="h-4 w-4 text-status-warning animate-pulse" style={{ animationDelay: "0.5s" }} />
+        <Star
+          className="h-4 w-4 text-status-warning animate-pulse"
+          style={{ animationDelay: "0.5s" }}
+        />
       </div>
 
       <CardHeader className="pb-2">
@@ -723,15 +877,17 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
                 style={animStyle}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span>{m.guestName} - {m.years} yrs</span>
+                <span>
+                  {m.guestName} - {m.years} yrs
+                </span>
               </div>
             );
           })}
         </div>
         {milestones.length > 5 && (
           <p className="text-xs text-status-warning mt-2 flex items-center gap-1">
-            <Gift className="h-3 w-3" />
-            +{milestones.length - 5} more milestone{milestones.length - 5 !== 1 ? "s" : ""} to celebrate!
+            <Gift className="h-3 w-3" />+{milestones.length - 5} more milestone
+            {milestones.length - 5 !== 1 ? "s" : ""} to celebrate!
           </p>
         )}
       </CardContent>
@@ -749,7 +905,12 @@ function RenewalProgressCard({ stats }: { stats: DashboardStats["renewalsByInten
     { key: "committed", value: stats.committed, color: "bg-status-success", label: "Committed" },
     { key: "likely", value: stats.likely, color: "bg-status-success/70", label: "Likely" },
     { key: "undecided", value: stats.undecided, color: "bg-status-warning", label: "Undecided" },
-    { key: "not_renewing", value: stats.not_renewing, color: "bg-status-error", label: "Not Returning" },
+    {
+      key: "not_renewing",
+      value: stats.not_renewing,
+      color: "bg-status-error",
+      label: "Not Returning",
+    },
   ];
 
   return (
@@ -861,9 +1022,7 @@ function CommunityStatsCard({ stats }: { stats: DashboardStats }) {
       </CardHeader>
       <CardContent>
         <div className="text-center py-2">
-          <div className="text-4xl font-bold text-foreground mb-1">
-            {stats.combinedTenureYears}
-          </div>
+          <div className="text-4xl font-bold text-foreground mb-1">{stats.combinedTenureYears}</div>
           <div className="text-sm text-muted-foreground">combined years of loyalty</div>
         </div>
         <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border">
@@ -892,10 +1051,34 @@ function PaymentAgingCard({ aging }: { aging: DashboardStats["paymentAging"] }) 
   if (total === 0) return null;
 
   const segments = [
-    { key: "current", value: aging.current, color: "bg-status-success", label: "< 30 days", textColor: "text-status-success" },
-    { key: "days30", value: aging.days30, color: "bg-status-warning/70", label: "30-59 days", textColor: "text-status-warning" },
-    { key: "days60", value: aging.days60, color: "bg-status-warning", label: "60-89 days", textColor: "text-status-warning" },
-    { key: "days90Plus", value: aging.days90Plus, color: "bg-status-error", label: "90+ days", textColor: "text-status-error" },
+    {
+      key: "current",
+      value: aging.current,
+      color: "bg-status-success",
+      label: "< 30 days",
+      textColor: "text-status-success",
+    },
+    {
+      key: "days30",
+      value: aging.days30,
+      color: "bg-status-warning/70",
+      label: "30-59 days",
+      textColor: "text-status-warning",
+    },
+    {
+      key: "days60",
+      value: aging.days60,
+      color: "bg-status-warning",
+      label: "60-89 days",
+      textColor: "text-status-warning",
+    },
+    {
+      key: "days90Plus",
+      value: aging.days90Plus,
+      color: "bg-status-error",
+      label: "90+ days",
+      textColor: "text-status-error",
+    },
   ];
 
   return (
@@ -919,13 +1102,15 @@ function PaymentAgingCard({ aging }: { aging: DashboardStats["paymentAging"] }) 
         </div>
         {/* Legend */}
         <div className="grid grid-cols-2 gap-2">
-          {segments.filter(s => s.value > 0).map((seg) => (
-            <div key={seg.key} className="flex items-center gap-2 text-sm">
-              <div className={`w-3 h-3 rounded-full ${seg.color}`} />
-              <span className={seg.textColor}>{seg.label}</span>
-              <span className="font-semibold ml-auto">{seg.value}</span>
-            </div>
-          ))}
+          {segments
+            .filter((s) => s.value > 0)
+            .map((seg) => (
+              <div key={seg.key} className="flex items-center gap-2 text-sm">
+                <div className={`w-3 h-3 rounded-full ${seg.color}`} />
+                <span className={seg.textColor}>{seg.label}</span>
+                <span className="font-semibold ml-auto">{seg.value}</span>
+              </div>
+            ))}
         </div>
       </CardContent>
     </Card>
@@ -942,15 +1127,23 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
   const isSoon = daysUntil <= 30;
 
   return (
-    <Card className={`${isUrgent ? 'border-status-error/30 bg-status-error/10' : isSoon ? 'border-status-warning/30 bg-status-warning/15' : 'border-status-info/30 bg-status-info/15'}`}>
+    <Card
+      className={`${isUrgent ? "border-status-error/30 bg-status-error/10" : isSoon ? "border-status-warning/30 bg-status-warning/15" : "border-status-info/30 bg-status-info/15"}`}
+    >
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isUrgent ? 'bg-status-error/15' : isSoon ? 'bg-status-warning/15' : 'bg-status-info/15'}`}>
-              <Timer className={`h-5 w-5 ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`} />
+            <div
+              className={`p-2 rounded-full ${isUrgent ? "bg-status-error/15" : isSoon ? "bg-status-warning/15" : "bg-status-info/15"}`}
+            >
+              <Timer
+                className={`h-5 w-5 ${isUrgent ? "text-status-error" : isSoon ? "text-status-warning" : "text-status-info"}`}
+              />
             </div>
             <div>
-              <p className={`text-sm font-medium ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
+              <p
+                className={`text-sm font-medium ${isUrgent ? "text-status-error" : isSoon ? "text-status-warning" : "text-status-info"}`}
+              >
                 Renewal Deadline
               </p>
               <p className="text-xs text-muted-foreground">
@@ -959,7 +1152,9 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
+            <div
+              className={`text-2xl font-bold ${isUrgent ? "text-status-error" : isSoon ? "text-status-warning" : "text-status-info"}`}
+            >
               {daysUntil}
             </div>
             <div className="text-xs text-muted-foreground">days left</div>
@@ -995,9 +1190,7 @@ function FloatingActionPanel({
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-bottom-4 duration-300">
       <Card className="shadow-2xl border-border bg-card/95 backdrop-blur">
         <CardContent className="p-3 flex flex-wrap items-center gap-2 md:gap-3">
-          <Badge className="bg-status-info text-white px-3 py-1">
-            {selectedCount} selected
-          </Badge>
+          <Badge className="bg-status-info text-white px-3 py-1">{selectedCount} selected</Badge>
           <div className="h-6 w-px bg-border hidden md:block" />
 
           {/* Message */}
@@ -1029,7 +1222,10 @@ function FloatingActionPanel({
                 Mark Undecided
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onBulkUpdate("not_renewing")} className="text-status-error">
+              <DropdownMenuItem
+                onClick={() => onBulkUpdate("not_renewing")}
+                className="text-status-error"
+              >
                 <X className="h-4 w-4 mr-2" />
                 Mark Not Returning
               </DropdownMenuItem>
@@ -1080,10 +1276,14 @@ function SeasonalRow({
   onViewDetails: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const currentContract = seasonal.contracts?.find(c => c.seasonYear === new Date().getFullYear());
+  const currentContract = seasonal.contracts?.find(
+    (c) => c.seasonYear === new Date().getFullYear(),
+  );
 
   return (
-    <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-primary/40 bg-primary/5" : "hover:shadow-md bg-card"}`}>
+    <div
+      className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-primary/40 bg-primary/5" : "hover:shadow-md bg-card"}`}
+    >
       {/* Mobile Card View */}
       <div className="md:hidden p-4 space-y-3">
         <div className="flex items-start justify-between">
@@ -1097,14 +1297,17 @@ function SeasonalRow({
             />
             {/* Avatar with tenure indicator */}
             <div className="relative">
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center font-medium text-lg ${
-                seasonal.totalSeasons >= 10
-                  ? "bg-status-warning/15 text-status-warning"
-                  : seasonal.totalSeasons >= 5
-                    ? "bg-muted text-foreground"
-                    : "bg-status-info/15 text-status-info"
-              }`}>
-                {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+              <div
+                className={`w-12 h-12 rounded-full flex items-center justify-center font-medium text-lg ${
+                  seasonal.totalSeasons >= 10
+                    ? "bg-status-warning/15 text-status-warning"
+                    : seasonal.totalSeasons >= 5
+                      ? "bg-muted text-foreground"
+                      : "bg-status-info/15 text-status-info"
+                }`}
+              >
+                {seasonal.guest.primaryFirstName[0]}
+                {seasonal.guest.primaryLastName[0]}
               </div>
               {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
                 <div className="absolute -top-1 -right-1 w-5 h-5 bg-status-warning rounded-full flex items-center justify-center text-status-warning-foreground text-xs font-bold shadow">
@@ -1135,7 +1338,9 @@ function SeasonalRow({
             aria-expanded={expanded}
             aria-controls={`seasonal-details-mobile-${seasonal.id}`}
           >
-            <ChevronDown className={`h-5 w-5 transition-transform ${expanded ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`h-5 w-5 transition-transform ${expanded ? "rotate-180" : ""}`}
+            />
           </Button>
         </div>
 
@@ -1161,7 +1366,9 @@ function SeasonalRow({
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">Rate</p>
-                <p className="font-medium">${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo</p>
+                <p className="font-medium">
+                  ${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo
+                </p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase">Since</p>
@@ -1173,13 +1380,23 @@ function SeasonalRow({
                 <Mail className="h-4 w-4 mr-1" />
                 Message
               </Button>
-              <Button size="sm" variant="outline" className="flex-1" onClick={() => onQuickAction("payment")}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1"
+                onClick={() => onQuickAction("payment")}
+              >
                 <CreditCard className="h-4 w-4 mr-1" />
                 Payment
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" className="flex-1" onClick={() => onQuickAction("contract")}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex-1"
+                onClick={() => onQuickAction("contract")}
+              >
                 <FileSignature className="h-4 w-4 mr-1" />
                 Contract
               </Button>
@@ -1211,14 +1428,17 @@ function SeasonalRow({
 
           {/* Avatar with tenure indicator */}
           <div className="relative">
-            <div className={`w-11 h-11 rounded-full flex items-center justify-center font-medium ${
-              seasonal.totalSeasons >= 10
-                ? "bg-status-warning/15 text-status-warning"
-                : seasonal.totalSeasons >= 5
-                  ? "bg-muted text-foreground"
-                  : "bg-status-info/15 text-status-info"
-            }`}>
-              {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+            <div
+              className={`w-11 h-11 rounded-full flex items-center justify-center font-medium ${
+                seasonal.totalSeasons >= 10
+                  ? "bg-status-warning/15 text-status-warning"
+                  : seasonal.totalSeasons >= 5
+                    ? "bg-muted text-foreground"
+                    : "bg-status-info/15 text-status-info"
+              }`}
+            >
+              {seasonal.guest.primaryFirstName[0]}
+              {seasonal.guest.primaryLastName[0]}
             </div>
             {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
               <div className="absolute -top-1 -right-1 w-5 h-5 bg-status-warning rounded-full flex items-center justify-center text-status-warning-foreground text-xs font-bold shadow">
@@ -1267,9 +1487,16 @@ function SeasonalRow({
               aria-expanded={expanded}
               aria-controls={`seasonal-details-${seasonal.id}`}
             >
-              <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`}
+              />
             </Button>
-            <Button size="sm" variant="ghost" onClick={onViewDetails} aria-label="View guest details">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onViewDetails}
+              aria-label="View guest details"
+            >
               <Eye className="h-4 w-4" />
             </Button>
           </div>
@@ -1277,14 +1504,19 @@ function SeasonalRow({
 
         {/* Desktop Expanded Details */}
         {expanded && (
-          <div id={`seasonal-details-${seasonal.id}`} className="px-4 pb-4 pt-0 border-t bg-muted/60/50">
+          <div
+            id={`seasonal-details-${seasonal.id}`}
+            className="px-4 pb-4 pt-0 border-t bg-muted/60/50"
+          >
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Phone</p>
                 <p className="text-sm font-medium">{seasonal.guest.phone || "—"}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Current Rate</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Current Rate
+                </p>
                 <p className="text-sm font-medium">
                   ${seasonal.pricing?.[0]?.finalRate?.toLocaleString() || "—"}/mo
                 </p>
@@ -1292,11 +1524,14 @@ function SeasonalRow({
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Billing</p>
                 <p className="text-sm font-medium">
-                  {seasonal.paysInFull ? "Paid in Full" : "Monthly"} • {seasonal.isMetered ? "Metered" : "Flat Rate"}
+                  {seasonal.paysInFull ? "Paid in Full" : "Monthly"} •{" "}
+                  {seasonal.isMetered ? "Metered" : "Flat Rate"}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wide">Member Since</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                  Member Since
+                </p>
                 <p className="text-sm font-medium">{seasonal.firstSeasonYear}</p>
               </div>
             </div>
@@ -1354,10 +1589,13 @@ function WaitlistRow({
           #{entry.priority}
         </div>
         <div className="w-10 h-10 rounded-full bg-status-info/15 flex items-center justify-center text-status-info font-medium">
-          {entry.guest.primaryFirstName[0]}{entry.guest.primaryLastName[0]}
+          {entry.guest.primaryFirstName[0]}
+          {entry.guest.primaryLastName[0]}
         </div>
         <div className="flex-1">
-          <p className="font-medium">{entry.guest.primaryFirstName} {entry.guest.primaryLastName}</p>
+          <p className="font-medium">
+            {entry.guest.primaryFirstName} {entry.guest.primaryLastName}
+          </p>
           <p className="text-sm text-muted-foreground">
             Added {formatDistanceToNow(new Date(entry.addedAt), { addSuffix: true })}
             {entry.preferredSites?.length ? ` • Prefers: ${entry.preferredSites.join(", ")}` : ""}
@@ -1370,7 +1608,12 @@ function WaitlistRow({
               Deposit Paid
             </Badge>
           )}
-          <Button size="sm" variant="outline" onClick={onContact} aria-label="Contact waitlist guest">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onContact}
+            aria-label="Contact waitlist guest"
+          >
             <Mail className="h-4 w-4" />
           </Button>
           <Button size="sm" variant="outline" onClick={onConvert}>
@@ -1417,7 +1660,12 @@ function RateCardDisplay({
             <Button size="sm" variant="ghost" onClick={onEdit} aria-label="Edit rate card">
               <Edit className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="ghost" onClick={onDuplicate} aria-label="Duplicate rate card">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onDuplicate}
+              aria-label="Duplicate rate card"
+            >
               <Copy className="h-4 w-4" />
             </Button>
           </div>
@@ -1427,7 +1675,9 @@ function RateCardDisplay({
       <CardContent>
         <div className="space-y-3">
           <div className="flex items-baseline gap-1">
-            <span className="text-3xl font-bold text-foreground">${rateCard.baseRate.toLocaleString()}</span>
+            <span className="text-3xl font-bold text-foreground">
+              ${rateCard.baseRate.toLocaleString()}
+            </span>
             <span className="text-muted-foreground">/{rateCard.billingFrequency}</span>
           </div>
 
@@ -1436,7 +1686,9 @@ function RateCardDisplay({
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Included</p>
               <div className="flex flex-wrap gap-1">
                 {rateCard.includedUtilities?.map((u) => (
-                  <Badge key={u} variant="secondary" className="text-xs">{u}</Badge>
+                  <Badge key={u} variant="secondary" className="text-xs">
+                    {u}
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -1444,7 +1696,9 @@ function RateCardDisplay({
 
           {(rateCard.discounts?.length ?? 0) > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Discounts</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                Discounts
+              </p>
               <div className="space-y-1">
                 {rateCard.discounts?.map((d, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
@@ -1461,14 +1715,18 @@ function RateCardDisplay({
 
           {(rateCard.incentives?.length ?? 0) > 0 && (
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Incentives</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                Incentives
+              </p>
               <div className="space-y-1">
                 {rateCard.incentives?.map((inc, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
                     <Zap className="h-3 w-3 text-status-warning" />
                     <span>{inc.name}</span>
                     {inc.deadline && (
-                      <span className="text-xs text-muted-foreground">by {format(new Date(inc.deadline), "MMM d")}</span>
+                      <span className="text-xs text-muted-foreground">
+                        by {format(new Date(inc.deadline), "MMM d")}
+                      </span>
                     )}
                   </div>
                 ))}
@@ -1506,7 +1764,10 @@ function MessageTemplateCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <p className="font-medium">{template.name}</p>
-            <Badge variant="secondary" className={categoryColors[template.category] || categoryColors.general}>
+            <Badge
+              variant="secondary"
+              className={categoryColors[template.category] || categoryColors.general}
+            >
               {template.category}
             </Badge>
             <Badge variant="outline" className="text-xs">
@@ -1585,7 +1846,7 @@ export default function SeasonalsPage() {
     queryFn: async () => {
       const response = await fetch(
         `/api/seasonals/campground/${campgroundId}/stats?seasonYear=${seasonYear}`,
-        { credentials: "include", headers: getAuthHeaders() }
+        { credentials: "include", headers: getAuthHeaders() },
       );
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1602,7 +1863,14 @@ export default function SeasonalsPage() {
   });
 
   const seasonalsQuery = useQuery({
-    queryKey: ["seasonals", campgroundId, statusFilter, renewalFilter, paymentFilter, debouncedSearch],
+    queryKey: [
+      "seasonals",
+      campgroundId,
+      statusFilter,
+      renewalFilter,
+      paymentFilter,
+      debouncedSearch,
+    ],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (statusFilter !== "all") params.set("status", statusFilter);
@@ -1612,7 +1880,7 @@ export default function SeasonalsPage() {
 
       const response = await fetch(
         `/api/seasonals/campground/${campgroundId}?${params.toString()}`,
-        { credentials: "include", headers: getAuthHeaders() }
+        { credentials: "include", headers: getAuthHeaders() },
       );
       if (!response.ok) {
         return { data: [], total: 0 };
@@ -1641,7 +1909,7 @@ export default function SeasonalsPage() {
     queryFn: async () => {
       const response = await fetch(
         `/api/seasonals/campground/${campgroundId}/rate-cards?seasonYear=${seasonYear}`,
-        { credentials: "include", headers: getAuthHeaders() }
+        { credentials: "include", headers: getAuthHeaders() },
       );
       if (!response.ok) return [];
       const data = await response.json();
@@ -1656,9 +1924,30 @@ export default function SeasonalsPage() {
     queryFn: async () => {
       // Mock data - replace with actual API
       const templates: MessageTemplate[] = [
-        { id: "1", name: "Renewal Reminder", subject: "It's time to renew for {{year}}!", body: "Hi {{first_name}}, we're excited to invite you back...", channel: "email", category: "renewal" },
-        { id: "2", name: "Payment Due", subject: "Payment reminder", body: "Hi {{first_name}}, just a friendly reminder that your payment of {{amount}} is due...", channel: "email", category: "payment" },
-        { id: "3", name: "Welcome Back", subject: "Welcome back to the park!", body: "Hi {{first_name}}, we're thrilled to have you back for another season...", channel: "email", category: "welcome" },
+        {
+          id: "1",
+          name: "Renewal Reminder",
+          subject: "It's time to renew for {{year}}!",
+          body: "Hi {{first_name}}, we're excited to invite you back...",
+          channel: "email",
+          category: "renewal",
+        },
+        {
+          id: "2",
+          name: "Payment Due",
+          subject: "Payment reminder",
+          body: "Hi {{first_name}}, just a friendly reminder that your payment of {{amount}} is due...",
+          channel: "email",
+          category: "payment",
+        },
+        {
+          id: "3",
+          name: "Welcome Back",
+          subject: "Welcome back to the park!",
+          body: "Hi {{first_name}}, we're thrilled to have you back for another season...",
+          channel: "email",
+          category: "welcome",
+        },
       ];
       return templates;
     },
@@ -1667,7 +1956,15 @@ export default function SeasonalsPage() {
 
   // Mutations
   const updateRenewalMutation = useMutation({
-    mutationFn: async ({ id, intent, notes }: { id: string; intent: RenewalIntent; notes?: string }) => {
+    mutationFn: async ({
+      id,
+      intent,
+      notes,
+    }: {
+      id: string;
+      intent: RenewalIntent;
+      notes?: string;
+    }) => {
       const response = await fetch(`/api/seasonals/${id}/renewal-intent`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
@@ -1760,7 +2057,13 @@ export default function SeasonalsPage() {
     renewalsByIntent: { committed: 0, likely: 0, undecided: 0, not_renewing: 0 },
     churnRiskGuests: [],
     paymentAging: { current: 0, days30: 0, days60: 0, days90Plus: 0 },
-    needsAttention: { pastDuePayments: 0, expiringContracts: 0, expiredInsurance: 0, pendingRenewals: 0, unsignedContracts: 0 },
+    needsAttention: {
+      pastDuePayments: 0,
+      expiringContracts: 0,
+      expiredInsurance: 0,
+      pendingRenewals: 0,
+      unsignedContracts: 0,
+    },
     milestones: [],
   };
   const stats = statsQuery.data || emptyStats;
@@ -1768,13 +2071,14 @@ export default function SeasonalsPage() {
   const waitlist = waitlistQuery.data || [];
   const rateCards = rateCardsQuery.data || [];
   const templates = templatesQuery.data || [];
-  const bulkSelectState = seasonals.length === 0
-    ? false
-    : selectedIds.length === seasonals.length
-      ? true
-      : selectedIds.length > 0
-        ? "indeterminate"
-        : false;
+  const bulkSelectState =
+    seasonals.length === 0
+      ? false
+      : selectedIds.length === seasonals.length
+        ? true
+        : selectedIds.length > 0
+          ? "indeterminate"
+          : false;
 
   // Selection handlers
   const toggleSelectAll = () => {
@@ -1786,9 +2090,7 @@ export default function SeasonalsPage() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const handleQuickAction = (seasonal: SeasonalGuest, action: string, value?: string) => {
@@ -1834,9 +2136,13 @@ export default function SeasonalsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               Seasonal Guests
-              <Badge variant="secondary" className="text-lg">{stats?.totalSeasonals || 0}</Badge>
+              <Badge variant="secondary" className="text-lg">
+                {stats?.totalSeasonals || 0}
+              </Badge>
             </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">Long-term campers with seasonal agreements (not individual reservations)</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Long-term campers with seasonal agreements (not individual reservations)
+            </p>
             <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
               <Calendar className="h-4 w-4" />
               <Select
@@ -1851,7 +2157,9 @@ export default function SeasonalsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {[currentYear - 1, currentYear, currentYear + 1].map((y) => (
-                    <SelectItem key={y} value={String(y)}>{y} Season</SelectItem>
+                    <SelectItem key={y} value={String(y)}>
+                      {y} Season
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -1898,7 +2206,10 @@ export default function SeasonalsPage() {
               value={stats.activeSeasonals}
               icon={Users}
               color="blue"
-              onClick={() => { setStatusFilter("active"); setActiveTab("all"); }}
+              onClick={() => {
+                setStatusFilter("active");
+                setActiveTab("all");
+              }}
             />
             <HeroStatCard
               title="Renewal Rate"
@@ -1920,7 +2231,10 @@ export default function SeasonalsPage() {
               icon={AlertCircle}
               color="rose"
               highlight={stats.paymentsPastDue > 0}
-              onClick={() => { setPaymentFilter("past_due"); setActiveTab("payments"); }}
+              onClick={() => {
+                setPaymentFilter("past_due");
+                setActiveTab("payments");
+              }}
             />
             <HeroStatCard
               title="Avg Tenure"
@@ -1948,12 +2262,8 @@ export default function SeasonalsPage() {
             <MilestonesCelebration milestones={stats.milestones} />
             <RenewalProgressCard stats={stats.renewalsByIntent} />
             <CommunityStatsCard stats={stats} />
-            {stats.churnRiskGuests?.length > 0 && (
-              <ChurnRiskCard guests={stats.churnRiskGuests} />
-            )}
-            {stats.paymentAging && (
-              <PaymentAgingCard aging={stats.paymentAging} />
-            )}
+            {stats.churnRiskGuests?.length > 0 && <ChurnRiskCard guests={stats.churnRiskGuests} />}
+            {stats.paymentAging && <PaymentAgingCard aging={stats.paymentAging} />}
           </div>
         )}
 
@@ -1969,14 +2279,18 @@ export default function SeasonalsPage() {
                 <RefreshCw className="h-4 w-4" />
                 Renewals
                 {(stats?.needsAttention?.pendingRenewals ?? 0) > 0 && (
-                  <Badge className="ml-1 bg-status-warning text-status-warning-foreground text-xs px-1.5">{stats?.needsAttention?.pendingRenewals}</Badge>
+                  <Badge className="ml-1 bg-status-warning text-status-warning-foreground text-xs px-1.5">
+                    {stats?.needsAttention?.pendingRenewals}
+                  </Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="payments" className="flex items-center gap-1.5">
                 <DollarSign className="h-4 w-4" />
                 Payments
                 {(stats?.needsAttention?.pastDuePayments ?? 0) > 0 && (
-                  <Badge className="ml-1 bg-status-error text-status-error-foreground text-xs px-1.5">{stats?.needsAttention?.pastDuePayments}</Badge>
+                  <Badge className="ml-1 bg-status-error text-status-error-foreground text-xs px-1.5">
+                    {stats?.needsAttention?.pastDuePayments}
+                  </Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="contracts" className="flex items-center gap-1.5">
@@ -1987,7 +2301,9 @@ export default function SeasonalsPage() {
                 <Clock className="h-4 w-4" />
                 Waitlist
                 {(stats?.waitlistCount ?? 0) > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs px-1.5">{stats?.waitlistCount}</Badge>
+                  <Badge variant="secondary" className="ml-1 text-xs px-1.5">
+                    {stats?.waitlistCount}
+                  </Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="config" className="flex items-center gap-1.5">
@@ -2041,7 +2357,10 @@ export default function SeasonalsPage() {
                       }
                     }}
                   >
-                    <SelectTrigger className="h-9 w-[160px] text-sm" aria-label="Filter by renewal intent">
+                    <SelectTrigger
+                      className="h-9 w-[160px] text-sm"
+                      aria-label="Filter by renewal intent"
+                    >
                       <SelectValue placeholder="All Renewal" />
                     </SelectTrigger>
                     <SelectContent>
@@ -2067,7 +2386,9 @@ export default function SeasonalsPage() {
                 aria-label="Select all seasonal guests"
               />
               <span className="text-muted-foreground">
-                {selectedIds.length > 0 ? `${selectedIds.length} selected` : `${seasonals.length} seasonal guests`}
+                {selectedIds.length > 0
+                  ? `${selectedIds.length} selected`
+                  : `${seasonals.length} seasonal guests`}
               </span>
             </div>
 
@@ -2105,26 +2426,46 @@ export default function SeasonalsPage() {
           {/* TAB: RENEWALS */}
           <TabsContent value="renewals" className="space-y-4">
             <div className="grid md:grid-cols-4 gap-4">
-              <Card className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("committed")}>
-                <div className="text-3xl font-bold text-status-success">{stats?.renewalsByIntent.committed || 0}</div>
+              <Card
+                className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all"
+                onClick={() => setRenewalFilter("committed")}
+              >
+                <div className="text-3xl font-bold text-status-success">
+                  {stats?.renewalsByIntent.committed || 0}
+                </div>
                 <div className="text-sm text-status-success flex items-center gap-1">
                   <CheckCircle className="h-4 w-4" /> Committed
                 </div>
               </Card>
-              <Card className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("likely")}>
-                <div className="text-3xl font-bold text-status-success">{stats?.renewalsByIntent.likely || 0}</div>
+              <Card
+                className="p-4 bg-status-success/15 border-status-success/20 cursor-pointer hover:shadow-md transition-all"
+                onClick={() => setRenewalFilter("likely")}
+              >
+                <div className="text-3xl font-bold text-status-success">
+                  {stats?.renewalsByIntent.likely || 0}
+                </div>
                 <div className="text-sm text-status-success flex items-center gap-1">
                   <TrendingUp className="h-4 w-4" /> Likely
                 </div>
               </Card>
-              <Card className="p-4 bg-status-warning/15 border-status-warning/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("undecided")}>
-                <div className="text-3xl font-bold text-status-warning">{stats?.renewalsByIntent.undecided || 0}</div>
+              <Card
+                className="p-4 bg-status-warning/15 border-status-warning/20 cursor-pointer hover:shadow-md transition-all"
+                onClick={() => setRenewalFilter("undecided")}
+              >
+                <div className="text-3xl font-bold text-status-warning">
+                  {stats?.renewalsByIntent.undecided || 0}
+                </div>
                 <div className="text-sm text-status-warning flex items-center gap-1">
                   <Clock className="h-4 w-4" /> Undecided
                 </div>
               </Card>
-              <Card className="p-4 bg-status-error/10 border-status-error/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("not_renewing")}>
-                <div className="text-3xl font-bold text-status-error">{stats?.renewalsByIntent.not_renewing || 0}</div>
+              <Card
+                className="p-4 bg-status-error/10 border-status-error/20 cursor-pointer hover:shadow-md transition-all"
+                onClick={() => setRenewalFilter("not_renewing")}
+              >
+                <div className="text-3xl font-bold text-status-error">
+                  {stats?.renewalsByIntent.not_renewing || 0}
+                </div>
                 <div className="text-sm text-status-error flex items-center gap-1">
                   <X className="h-4 w-4" /> Not Returning
                 </div>
@@ -2151,10 +2492,13 @@ export default function SeasonalsPage() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-status-warning/15 flex items-center justify-center text-status-warning font-medium text-sm">
-                          {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+                          {seasonal.guest.primaryFirstName[0]}
+                          {seasonal.guest.primaryLastName[0]}
                         </div>
                         <div>
-                          <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
+                          <p className="font-medium">
+                            {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
+                          </p>
                           <p className="text-sm text-muted-foreground">
                             {seasonal.totalSeasons} years at {seasonal.currentSite?.name || "TBD"}
                           </p>
@@ -2176,7 +2520,9 @@ export default function SeasonalsPage() {
                           size="sm"
                           variant="outline"
                           className="text-status-success hover:bg-status-success/10"
-                          onClick={() => updateRenewalMutation.mutate({ id: seasonal.id, intent: "committed" })}
+                          onClick={() =>
+                            updateRenewalMutation.mutate({ id: seasonal.id, intent: "committed" })
+                          }
                         >
                           <CheckCircle className="h-4 w-4 mr-1" />
                           Committed
@@ -2185,7 +2531,12 @@ export default function SeasonalsPage() {
                           size="sm"
                           variant="outline"
                           className="text-status-error hover:bg-status-error/10"
-                          onClick={() => updateRenewalMutation.mutate({ id: seasonal.id, intent: "not_renewing" })}
+                          onClick={() =>
+                            updateRenewalMutation.mutate({
+                              id: seasonal.id,
+                              intent: "not_renewing",
+                            })
+                          }
                         >
                           <X className="h-4 w-4 mr-1" />
                           Not Returning
@@ -2193,7 +2544,8 @@ export default function SeasonalsPage() {
                       </div>
                     </div>
                   ))}
-                {seasonals.filter((s) => !s.renewalIntent || s.renewalIntent === "undecided").length === 0 && (
+                {seasonals.filter((s) => !s.renewalIntent || s.renewalIntent === "undecided")
+                  .length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle className="h-8 w-8 text-status-success mx-auto mb-2" />
                     All guests have responded!
@@ -2207,19 +2559,25 @@ export default function SeasonalsPage() {
           <TabsContent value="payments" className="space-y-4">
             <div className="grid md:grid-cols-3 gap-4">
               <Card className="p-4 bg-status-success/15 border-status-success/20">
-                <div className="text-3xl font-bold text-status-success">{stats?.paymentsCurrent || 0}</div>
+                <div className="text-3xl font-bold text-status-success">
+                  {stats?.paymentsCurrent || 0}
+                </div>
                 <div className="text-sm text-status-success flex items-center gap-1">
                   <CheckCircle className="h-4 w-4" /> Current
                 </div>
               </Card>
               <Card className="p-4 bg-status-error/10 border-status-error/20">
-                <div className="text-3xl font-bold text-status-error">{stats?.paymentsPastDue || 0}</div>
+                <div className="text-3xl font-bold text-status-error">
+                  {stats?.paymentsPastDue || 0}
+                </div>
                 <div className="text-sm text-status-error flex items-center gap-1">
                   <AlertCircle className="h-4 w-4" /> Past Due
                 </div>
               </Card>
               <Card className="p-4 bg-status-info/10 border-status-info/20">
-                <div className="text-3xl font-bold text-status-info">{stats?.paymentsPaidAhead || 0}</div>
+                <div className="text-3xl font-bold text-status-info">
+                  {stats?.paymentsPaidAhead || 0}
+                </div>
                 <div className="text-sm text-status-info flex items-center gap-1">
                   <Sparkles className="h-4 w-4" /> Paid Ahead
                 </div>
@@ -2239,7 +2597,9 @@ export default function SeasonalsPage() {
                   .filter((s) => s.payments?.some((p) => p.status === "past_due"))
                   .map((seasonal) => {
                     const pastDue = seasonal.payments.find((p) => p.status === "past_due");
-                    const daysOverdue = pastDue ? differenceInDays(new Date(), new Date(pastDue.dueDate)) : 0;
+                    const daysOverdue = pastDue
+                      ? differenceInDays(new Date(), new Date(pastDue.dueDate))
+                      : 0;
                     return (
                       <div
                         key={seasonal.id}
@@ -2247,22 +2607,32 @@ export default function SeasonalsPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-status-error/15 flex items-center justify-center text-status-error font-medium text-sm">
-                            {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+                            {seasonal.guest.primaryFirstName[0]}
+                            {seasonal.guest.primaryLastName[0]}
                           </div>
                           <div>
-                            <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
+                            <p className="font-medium">
+                              {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
+                            </p>
                             <p className="text-sm text-muted-foreground">
-                              ${pastDue?.amount.toLocaleString()} due {pastDue?.dueDate && format(new Date(pastDue.dueDate), "MMM d")}
-                              <span className="text-status-error ml-2">({daysOverdue} days overdue)</span>
+                              ${pastDue?.amount.toLocaleString()} due{" "}
+                              {pastDue?.dueDate && format(new Date(pastDue.dueDate), "MMM d")}
+                              <span className="text-status-error ml-2">
+                                ({daysOverdue} days overdue)
+                              </span>
                             </p>
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => {
-                            setSelectedIds([seasonal.id]);
-                            setShowMessageModal(true);
-                            setMessageSubject("Payment Reminder");
-                          }}>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedIds([seasonal.id]);
+                              setShowMessageModal(true);
+                              setMessageSubject("Payment Reminder");
+                            }}
+                          >
                             <Mail className="h-4 w-4 mr-1" />
                             Remind
                           </Button>
@@ -2297,7 +2667,9 @@ export default function SeasonalsPage() {
                       <div className="h-3 rounded-full bg-muted overflow-hidden">
                         <div
                           className="h-full bg-status-success transition-all"
-                          style={{ width: `${stats ? (stats.contractsSigned / stats.contractsTotal) * 100 : 0}%` }}
+                          style={{
+                            width: `${stats ? (stats.contractsSigned / stats.contractsTotal) * 100 : 0}%`,
+                          }}
                         />
                       </div>
                     </div>
@@ -2316,7 +2688,10 @@ export default function SeasonalsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <div className="h-3 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full bg-status-info transition-all" style={{ width: "25%" }} />
+                        <div
+                          className="h-full bg-status-info transition-all"
+                          style={{ width: "25%" }}
+                        />
                       </div>
                     </div>
                     <span className="text-lg font-bold">22/88</span>
@@ -2337,12 +2712,12 @@ export default function SeasonalsPage() {
               <CardContent className="space-y-2">
                 {seasonals
                   .filter((s) => {
-                    const contract = s.contracts?.find(c => c.seasonYear === currentYear);
+                    const contract = s.contracts?.find((c) => c.seasonYear === currentYear);
                     return !contract || contract.status !== "signed";
                   })
                   .slice(0, 10)
                   .map((seasonal) => {
-                    const contract = seasonal.contracts?.find(c => c.seasonYear === currentYear);
+                    const contract = seasonal.contracts?.find((c) => c.seasonYear === currentYear);
                     return (
                       <div
                         key={seasonal.id}
@@ -2350,10 +2725,13 @@ export default function SeasonalsPage() {
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-foreground font-medium text-sm">
-                            {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
+                            {seasonal.guest.primaryFirstName[0]}
+                            {seasonal.guest.primaryLastName[0]}
                           </div>
                           <div>
-                            <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
+                            <p className="font-medium">
+                              {seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}
+                            </p>
                             <p className="text-sm text-muted-foreground">
                               {contract?.status === "sent"
                                 ? `Sent ${contract.sentAt && formatDistanceToNow(new Date(contract.sentAt), { addSuffix: true })}`
@@ -2443,7 +2821,12 @@ export default function SeasonalsPage() {
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <Label htmlFor="season-start">Season Start</Label>
-                    <Input id="season-start" type="date" defaultValue="2025-04-15" className="mt-1" />
+                    <Input
+                      id="season-start"
+                      type="date"
+                      defaultValue="2025-04-15"
+                      className="mt-1"
+                    />
                   </div>
                   <div>
                     <Label htmlFor="season-end">Season End</Label>
@@ -2451,7 +2834,12 @@ export default function SeasonalsPage() {
                   </div>
                   <div>
                     <Label htmlFor="renewal-deadline">Renewal Deadline</Label>
-                    <Input id="renewal-deadline" type="date" defaultValue="2025-03-01" className="mt-1" />
+                    <Input
+                      id="renewal-deadline"
+                      type="date"
+                      defaultValue="2025-03-01"
+                      className="mt-1"
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -2529,7 +2917,12 @@ export default function SeasonalsPage() {
                   <div>
                     <Label htmlFor="late-fee-amount">Late Fee</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input id="late-fee-amount" type="number" defaultValue="25" className="w-20" />
+                      <Input
+                        id="late-fee-amount"
+                        type="number"
+                        defaultValue="25"
+                        className="w-20"
+                      />
                       <Select defaultValue="flat">
                         <SelectTrigger className="flex-1" aria-label="Late fee type">
                           <SelectValue />
@@ -2565,17 +2958,29 @@ export default function SeasonalsPage() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">All Seasonals ({stats?.totalSeasonals || 0})</SelectItem>
-                        <SelectItem value="committed">Committed ({stats?.renewalsByIntent.committed || 0})</SelectItem>
-                        <SelectItem value="undecided">Undecided ({stats?.renewalsByIntent.undecided || 0})</SelectItem>
-                        <SelectItem value="past_due">Past Due Payments ({stats?.paymentsPastDue || 0})</SelectItem>
+                        <SelectItem value="all">
+                          All Seasonals ({stats?.totalSeasonals || 0})
+                        </SelectItem>
+                        <SelectItem value="committed">
+                          Committed ({stats?.renewalsByIntent.committed || 0})
+                        </SelectItem>
+                        <SelectItem value="undecided">
+                          Undecided ({stats?.renewalsByIntent.undecided || 0})
+                        </SelectItem>
+                        <SelectItem value="past_due">
+                          Past Due Payments ({stats?.paymentsPastDue || 0})
+                        </SelectItem>
                         <SelectItem value="selected">Selected ({selectedIds.length})</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
                     <Label id="comms-channel-label">Channel</Label>
-                    <div className="flex gap-2 mt-1" role="group" aria-labelledby="comms-channel-label">
+                    <div
+                      className="flex gap-2 mt-1"
+                      role="group"
+                      aria-labelledby="comms-channel-label"
+                    >
                       <Button
                         variant={messageChannel === "email" ? "default" : "outline"}
                         size="sm"
@@ -2619,7 +3024,8 @@ export default function SeasonalsPage() {
                       className="mt-1"
                     />
                     <p className="text-xs text-muted-foreground mt-1">
-                      Tokens: {"{{first_name}}"}, {"{{last_name}}"}, {"{{site}}"}, {"{{tenure_years}}"}, {"{{amount_due}}"}
+                      Tokens: {"{{first_name}}"}, {"{{last_name}}"}, {"{{site}}"},{" "}
+                      {"{{tenure_years}}"}, {"{{amount_due}}"}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -2701,7 +3107,11 @@ export default function SeasonalsPage() {
             });
             setSelectedIds([]);
           } catch (err: unknown) {
-            toast({ title: "Error", description: getErrorMessage(err, "Failed to send contracts"), variant: "destructive" });
+            toast({
+              title: "Error",
+              description: getErrorMessage(err, "Failed to send contracts"),
+              variant: "destructive",
+            });
           }
         }}
         onRecordPayment={() => {
@@ -2710,10 +3120,13 @@ export default function SeasonalsPage() {
         onExport={async () => {
           try {
             const params = new URLSearchParams({ ids: selectedIds.join(",") });
-            const response = await fetch(`/api/seasonals/campground/${campgroundId}/export?${params}`, {
-              credentials: "include",
-              headers: getAuthHeaders()
-            });
+            const response = await fetch(
+              `/api/seasonals/campground/${campgroundId}/export?${params}`,
+              {
+                credentials: "include",
+                headers: getAuthHeaders(),
+              },
+            );
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || "Failed to export");
 
@@ -2733,7 +3146,11 @@ export default function SeasonalsPage() {
               description: `Exported ${result.count} seasonal guest${result.count !== 1 ? "s" : ""} to CSV`,
             });
           } catch (err: unknown) {
-            toast({ title: "Error", description: getErrorMessage(err, "Failed to export"), variant: "destructive" });
+            toast({
+              title: "Error",
+              description: getErrorMessage(err, "Failed to export"),
+              variant: "destructive",
+            });
           }
         }}
         onClear={() => setSelectedIds([])}
@@ -2743,51 +3160,53 @@ export default function SeasonalsPage() {
       <Dialog open={showMessageModal} onOpenChange={setShowMessageModal}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Send Message to {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}</DialogTitle>
+            <DialogTitle>
+              Send Message to {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}
+            </DialogTitle>
           </DialogHeader>
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Button
-                  variant={messageChannel === "email" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setMessageChannel("email")}
-                  aria-pressed={messageChannel === "email"}
-                >
-                  <Mail className="h-4 w-4 mr-1" />
-                  Email
-                </Button>
-                <Button
-                  variant={messageChannel === "sms" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setMessageChannel("sms")}
-                  aria-pressed={messageChannel === "sms"}
-                >
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  SMS
-                </Button>
-              </div>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Button
+                variant={messageChannel === "email" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMessageChannel("email")}
+                aria-pressed={messageChannel === "email"}
+              >
+                <Mail className="h-4 w-4 mr-1" />
+                Email
+              </Button>
+              <Button
+                variant={messageChannel === "sms" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMessageChannel("sms")}
+                aria-pressed={messageChannel === "sms"}
+              >
+                <MessageSquare className="h-4 w-4 mr-1" />
+                SMS
+              </Button>
+            </div>
 
-              {messageChannel === "email" && (
-                <div>
-                  <Label htmlFor="bulk-message-subject">Subject</Label>
-                  <Input
-                    id="bulk-message-subject"
-                    value={messageSubject}
-                    onChange={(e) => setMessageSubject(e.target.value)}
-                    placeholder="Message subject..."
-                    className="mt-1"
-                  />
-                </div>
-              )}
-
+            {messageChannel === "email" && (
               <div>
-                <Label htmlFor="bulk-message-body">Message</Label>
-                <Textarea
-                  id="bulk-message-body"
-                  value={messageBody}
-                  onChange={(e) => setMessageBody(e.target.value)}
-                  placeholder="Hi {{first_name}}, ..."
-                  rows={5}
+                <Label htmlFor="bulk-message-subject">Subject</Label>
+                <Input
+                  id="bulk-message-subject"
+                  value={messageSubject}
+                  onChange={(e) => setMessageSubject(e.target.value)}
+                  placeholder="Message subject..."
+                  className="mt-1"
+                />
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="bulk-message-body">Message</Label>
+              <Textarea
+                id="bulk-message-body"
+                value={messageBody}
+                onChange={(e) => setMessageBody(e.target.value)}
+                placeholder="Hi {{first_name}}, ..."
+                rows={5}
                 className="mt-1"
               />
               <p className="text-xs text-muted-foreground mt-1">
@@ -2804,9 +3223,13 @@ export default function SeasonalsPage() {
               onClick={() => sendMessageMutation.mutate()}
             >
               {sendMessageMutation.isPending ? (
-                <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Sending...</>
+                <>
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Sending...
+                </>
               ) : (
-                <><Send className="h-4 w-4 mr-1" /> Send Message</>
+                <>
+                  <Send className="h-4 w-4 mr-1" /> Send Message
+                </>
               )}
             </Button>
           </DialogFooter>
@@ -2817,7 +3240,9 @@ export default function SeasonalsPage() {
       <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Record Payment for {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}</DialogTitle>
+            <DialogTitle>
+              Record Payment for {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}
+            </DialogTitle>
             <DialogDescription>
               Enter payment details to record for all selected guests.
             </DialogDescription>
@@ -2828,12 +3253,20 @@ export default function SeasonalsPage() {
               const formData = new FormData(e.currentTarget);
               const amountValue = getFormValue(formData, "amount");
               if (!amountValue) {
-                toast({ title: "Error", description: "Amount is required", variant: "destructive" });
+                toast({
+                  title: "Error",
+                  description: "Amount is required",
+                  variant: "destructive",
+                });
                 return;
               }
               const amount = Number.parseFloat(amountValue);
               if (Number.isNaN(amount)) {
-                toast({ title: "Error", description: "Amount must be a number", variant: "destructive" });
+                toast({
+                  title: "Error",
+                  description: "Amount must be a number",
+                  variant: "destructive",
+                });
                 return;
               }
               const amountCents = Math.round(amount * 100);
@@ -2862,7 +3295,11 @@ export default function SeasonalsPage() {
                 setSelectedIds([]);
                 queryClient.invalidateQueries({ queryKey: ["seasonals"] });
               } catch (err: unknown) {
-                toast({ title: "Error", description: getErrorMessage(err, "Failed to record payments"), variant: "destructive" });
+                toast({
+                  title: "Error",
+                  description: getErrorMessage(err, "Failed to record payments"),
+                  variant: "destructive",
+                });
               }
             }}
             className="space-y-4"
@@ -2898,12 +3335,7 @@ export default function SeasonalsPage() {
             </div>
             <div>
               <Label htmlFor="note">Note (optional)</Label>
-              <Input
-                id="note"
-                name="note"
-                placeholder="e.g., Check #1234"
-                className="mt-1"
-              />
+              <Input id="note" name="note" placeholder="e.g., Check #1234" className="mt-1" />
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowPaymentModal(false)}>

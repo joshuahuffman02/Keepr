@@ -39,42 +39,46 @@ export const FEATURE_TOURS: FeatureTour[] = [
       {
         id: "welcome",
         title: "Welcome to Your Dashboard!",
-        content: "This is your command center for managing reservations, guests, and your campground. Let's take a quick tour.",
-        placement: "center"
+        content:
+          "This is your command center for managing reservations, guests, and your campground. Let's take a quick tour.",
+        placement: "center",
       },
       {
         id: "nav-calendar",
         title: "Calendar View",
-        content: "See all your reservations at a glance. Drag to create new bookings, click to edit existing ones.",
+        content:
+          "See all your reservations at a glance. Drag to create new bookings, click to edit existing ones.",
         target: "[data-tour='nav-calendar']",
         placement: "right",
         action: {
           label: "Open Calendar",
-          href: "/calendar"
-        }
+          href: "/calendar",
+        },
       },
       {
         id: "nav-reservations",
         title: "Reservations",
-        content: "Manage all your bookings here. Search, filter, and handle check-ins and check-outs.",
+        content:
+          "Manage all your bookings here. Search, filter, and handle check-ins and check-outs.",
         target: "[data-tour='nav-reservations']",
-        placement: "right"
+        placement: "right",
       },
       {
         id: "quick-actions",
         title: "Quick Actions",
         content: "Use these shortcuts to create new bookings, add guests, or run reports quickly.",
         target: "[data-tour='quick-actions']",
-        placement: "bottom"
+        placement: "bottom",
       },
       {
         id: "help-support",
         title: "Need Help?",
-        content: "Click the support button anytime to chat with our AI assistant or access the Help Center.",
+        content:
+          "Click the support button anytime to chat with our AI assistant or access the Help Center.",
         target: "[data-tour='help-button']",
-        placement: "left"
-      }
-    ]
+        placement: "left",
+      },
+    ],
   },
   {
     id: "booking-flow",
@@ -87,37 +91,38 @@ export const FEATURE_TOURS: FeatureTour[] = [
         id: "start",
         title: "Creating a Booking",
         content: "Let's walk through creating a reservation step by step.",
-        placement: "center"
+        placement: "center",
       },
       {
         id: "select-dates",
         title: "Select Dates",
-        content: "Choose arrival and departure dates. The calendar shows availability in real-time.",
+        content:
+          "Choose arrival and departure dates. The calendar shows availability in real-time.",
         target: "[data-tour='date-picker']",
-        placement: "bottom"
+        placement: "bottom",
       },
       {
         id: "choose-site",
         title: "Choose a Site",
         content: "Pick from available sites. You'll see pricing and amenities for each option.",
         target: "[data-tour='site-selector']",
-        placement: "right"
+        placement: "right",
       },
       {
         id: "guest-info",
         title: "Guest Information",
         content: "Enter guest details or search for returning guests. Their info will auto-fill.",
         target: "[data-tour='guest-form']",
-        placement: "top"
+        placement: "top",
       },
       {
         id: "payment",
         title: "Collect Payment",
         content: "Collect deposit or full payment. Stripe handles card processing securely.",
         target: "[data-tour='payment-section']",
-        placement: "top"
-      }
-    ]
+        placement: "top",
+      },
+    ],
   },
   {
     id: "pricing-setup",
@@ -130,30 +135,31 @@ export const FEATURE_TOURS: FeatureTour[] = [
         id: "intro",
         title: "Pricing Made Easy",
         content: "Set up base rates and let the system handle seasonal adjustments automatically.",
-        placement: "center"
+        placement: "center",
       },
       {
         id: "base-rate",
         title: "Base Rates",
         content: "Start with your standard nightly rate. This is your foundation for all pricing.",
         target: "[data-tour='base-rate']",
-        placement: "right"
+        placement: "right",
       },
       {
         id: "seasonal",
         title: "Seasonal Rules",
-        content: "Add rules for peak season, holidays, or slow periods. Stack multiple rules for complex pricing.",
+        content:
+          "Add rules for peak season, holidays, or slow periods. Stack multiple rules for complex pricing.",
         target: "[data-tour='seasonal-rules']",
-        placement: "right"
+        placement: "right",
       },
       {
         id: "preview",
         title: "Preview Prices",
         content: "Always preview the final price before saving. See exactly what guests will pay.",
         target: "[data-tour='price-preview']",
-        placement: "left"
-      }
-    ]
+        placement: "left",
+      },
+    ],
   },
   {
     id: "referral-program",
@@ -165,25 +171,26 @@ export const FEATURE_TOURS: FeatureTour[] = [
       {
         id: "intro",
         title: "Refer & Earn $50",
-        content: "Know other campground owners? Refer them to Keepr and you both get $50 in credits!",
-        placement: "center"
+        content:
+          "Know other campground owners? Refer them to Keepr and you both get $50 in credits!",
+        placement: "center",
       },
       {
         id: "share-link",
         title: "Your Unique Link",
         content: "Copy your referral link and share it with fellow campground owners.",
         target: "[data-tour='referral-link']",
-        placement: "bottom"
+        placement: "bottom",
       },
       {
         id: "track-progress",
         title: "Track Your Referrals",
         content: "See who clicked, signed up, and when you've earned credits.",
         target: "[data-tour='referral-stats']",
-        placement: "bottom"
-      }
-    ]
-  }
+        placement: "bottom",
+      },
+    ],
+  },
 ];
 
 /**

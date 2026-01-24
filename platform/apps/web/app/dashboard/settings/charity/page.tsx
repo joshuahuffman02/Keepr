@@ -10,7 +10,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
@@ -27,7 +33,7 @@ import {
   Gift,
   BookOpen,
   ArrowRight,
-  PartyPopper
+  PartyPopper,
 } from "lucide-react";
 
 // Sybil's Kids as a virtual "suggested" charity when no charities exist
@@ -41,12 +47,30 @@ const SYBILS_KIDS = {
 };
 
 // Milestone messages based on donation totals
-function getMilestoneMessage(totalCents: number): { milestone: string; next: string; progress: number } | null {
+function getMilestoneMessage(
+  totalCents: number,
+): { milestone: string; next: string; progress: number } | null {
   const dollars = totalCents / 100;
-  if (dollars >= 1000) return { milestone: "Over $1,000 raised!", next: "Keep the momentum going!", progress: 100 };
-  if (dollars >= 500) return { milestone: "$500 milestone reached!", next: `$${(1000 - dollars).toFixed(0)} to reach $1,000`, progress: 50 };
-  if (dollars >= 100) return { milestone: "First $100 raised!", next: `$${(500 - dollars).toFixed(0)} to reach $500`, progress: 20 };
-  if (dollars > 0) return { milestone: "First donations received!", next: `$${(100 - dollars).toFixed(0)} to reach $100`, progress: Math.min(dollars, 10) };
+  if (dollars >= 1000)
+    return { milestone: "Over $1,000 raised!", next: "Keep the momentum going!", progress: 100 };
+  if (dollars >= 500)
+    return {
+      milestone: "$500 milestone reached!",
+      next: `$${(1000 - dollars).toFixed(0)} to reach $1,000`,
+      progress: 50,
+    };
+  if (dollars >= 100)
+    return {
+      milestone: "First $100 raised!",
+      next: `$${(500 - dollars).toFixed(0)} to reach $500`,
+      progress: 20,
+    };
+  if (dollars > 0)
+    return {
+      milestone: "First donations received!",
+      next: `$${(100 - dollars).toFixed(0)} to reach $100`,
+      progress: Math.min(dollars, 10),
+    };
   return null;
 }
 
@@ -72,7 +96,12 @@ export default function CharitySettingsPage() {
   const [isEnabled, setIsEnabled] = useState(true);
   const [charityMode, setCharityMode] = useState<CharityMode>("existing");
   const [selectedCharityId, setSelectedCharityId] = useState<string>("");
-  const [customCharity, setCustomCharity] = useState({ name: "", description: "", taxId: "", website: "" });
+  const [customCharity, setCustomCharity] = useState({
+    name: "",
+    description: "",
+    taxId: "",
+    website: "",
+  });
   const [customMessage, setCustomMessage] = useState("");
   const [roundUpType, setRoundUpType] = useState("nearest_dollar");
   const [defaultOptIn, setDefaultOptIn] = useState(false);
@@ -192,7 +221,10 @@ export default function CharitySettingsPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campground-charity", campgroundId] });
-      toast({ title: "Settings saved!", description: "Your charity round-up is ready to make a difference." });
+      toast({
+        title: "Settings saved!",
+        description: "Your charity round-up is ready to make a difference.",
+      });
     },
     onError: (err) => {
       toast({ title: "Couldn't save settings", description: String(err), variant: "destructive" });
@@ -220,14 +252,13 @@ export default function CharitySettingsPage() {
 
   if (!campgroundId) {
     return (
-      <div className="p-6 text-center text-muted-foreground">
-        Please select a campground first.
-      </div>
+      <div className="p-6 text-center text-muted-foreground">Please select a campground first.</div>
     );
   }
 
   // Only show full loading spinner on initial load when we have no cached data
-  const isInitialLoading = (loadingSettings && !currentSettings) || (loadingCharities && charities.length === 0);
+  const isInitialLoading =
+    (loadingSettings && !currentSettings) || (loadingCharities && charities.length === 0);
   if (isInitialLoading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -259,12 +290,8 @@ export default function CharitySettingsPage() {
               <Heart className="h-6 w-6 text-status-warning" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
-                Charity Round-Up
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Turn spare change into real change
-              </p>
+              <h1 className="text-2xl font-bold text-foreground">Charity Round-Up</h1>
+              <p className="text-sm text-muted-foreground">Turn spare change into real change</p>
             </div>
           </div>
 
@@ -329,9 +356,7 @@ export default function CharitySettingsPage() {
                 <Heart className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {stats?.totalDonations || 0}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{stats?.totalDonations || 0}</p>
                 <p className="text-xs text-muted-foreground">Donations</p>
               </div>
             </div>
@@ -346,9 +371,7 @@ export default function CharitySettingsPage() {
                 <Users className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {stats?.donorCount || 0}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{stats?.donorCount || 0}</p>
                 <p className="text-xs text-muted-foreground">Generous Guests</p>
               </div>
             </div>
@@ -379,11 +402,15 @@ export default function CharitySettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
       >
-        <Card className={`transition-all duration-300 ${isEnabled ? 'ring-2 ring-emerald-500/20 border-emerald-200' : ''}`}>
+        <Card
+          className={`transition-all duration-300 ${isEnabled ? "ring-2 ring-emerald-500/20 border-emerald-200" : ""}`}
+        >
           <CardContent className="py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full transition-colors ${isEnabled ? 'bg-emerald-100' : 'bg-muted'}`}>
+                <div
+                  className={`p-2 rounded-full transition-colors ${isEnabled ? "bg-emerald-100" : "bg-muted"}`}
+                >
                   {isEnabled ? (
                     <CheckCircle className="h-5 w-5 text-emerald-600" />
                   ) : (
@@ -392,12 +419,12 @@ export default function CharitySettingsPage() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground">
-                    {isEnabled ? 'Round-Up is Active' : 'Round-Up is Paused'}
+                    {isEnabled ? "Round-Up is Active" : "Round-Up is Paused"}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {isEnabled
                       ? `Guests can donate to ${charityName}`
-                      : 'Enable to let guests round up for charity'}
+                      : "Enable to let guests round up for charity"}
                   </p>
                 </div>
               </div>
@@ -464,16 +491,24 @@ export default function CharitySettingsPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-foreground">{SYBILS_KIDS.name}</span>
-                          <Badge variant="secondary" className="text-xs bg-status-warning/15 text-status-warning">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-status-warning/15 text-status-warning"
+                          >
                             <Sparkles className="h-3 w-3 mr-1" />
                             Recommended
                           </Badge>
-                          <Badge variant="secondary" className="text-xs bg-status-success/15 text-status-success">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-status-success/15 text-status-success"
+                          >
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Verified
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">{SYBILS_KIDS.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {SYBILS_KIDS.description}
+                        </p>
                       </div>
                       {selectedCharityId === SYBILS_KIDS.id && (
                         <CheckCircle className="h-5 w-5 text-rose-500 flex-shrink-0" />
@@ -498,14 +533,19 @@ export default function CharitySettingsPage() {
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-foreground">{charity.name}</span>
                             {charity.isVerified && (
-                              <Badge variant="secondary" className="text-xs bg-status-success/15 text-status-success">
+                              <Badge
+                                variant="secondary"
+                                className="text-xs bg-status-success/15 text-status-success"
+                              >
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Verified
                               </Badge>
                             )}
                           </div>
                           {charity.description && (
-                            <p className="text-sm text-muted-foreground mt-1">{charity.description}</p>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {charity.description}
+                            </p>
                           )}
                         </div>
                         {selectedCharityId === charity.id && (
@@ -529,7 +569,12 @@ export default function CharitySettingsPage() {
                         Add any 501(c)(3) organization. You'll manage the donations.
                       </p>
                     </div>
-                    <Button variant="outline" size="sm" onClick={handleUseSybilsKids} className="gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleUseSybilsKids}
+                      className="gap-1.5"
+                    >
                       <Sparkles className="h-3.5 w-3.5" />
                       Use Sybil's Kids
                     </Button>
@@ -542,7 +587,9 @@ export default function CharitySettingsPage() {
                         id="charity-name"
                         placeholder="e.g., Local Veterans Foundation"
                         value={customCharity.name}
-                        onChange={(e) => setCustomCharity({ ...customCharity, name: e.target.value })}
+                        onChange={(e) =>
+                          setCustomCharity({ ...customCharity, name: e.target.value })
+                        }
                         className="bg-card"
                       />
                     </div>
@@ -552,7 +599,9 @@ export default function CharitySettingsPage() {
                         id="charity-description"
                         placeholder="Brief description of what the charity does..."
                         value={customCharity.description}
-                        onChange={(e) => setCustomCharity({ ...customCharity, description: e.target.value })}
+                        onChange={(e) =>
+                          setCustomCharity({ ...customCharity, description: e.target.value })
+                        }
                         rows={2}
                         className="bg-card"
                       />
@@ -564,7 +613,9 @@ export default function CharitySettingsPage() {
                           id="charity-taxid"
                           placeholder="XX-XXXXXXX"
                           value={customCharity.taxId}
-                          onChange={(e) => setCustomCharity({ ...customCharity, taxId: e.target.value })}
+                          onChange={(e) =>
+                            setCustomCharity({ ...customCharity, taxId: e.target.value })
+                          }
                           className="bg-card"
                         />
                       </div>
@@ -574,7 +625,9 @@ export default function CharitySettingsPage() {
                           id="charity-website"
                           placeholder="https://..."
                           value={customCharity.website}
-                          onChange={(e) => setCustomCharity({ ...customCharity, website: e.target.value })}
+                          onChange={(e) =>
+                            setCustomCharity({ ...customCharity, website: e.target.value })
+                          }
                           className="bg-card"
                         />
                       </div>
@@ -637,16 +690,14 @@ export default function CharitySettingsPage() {
             {/* Default Opt-In */}
             <div className="flex items-center justify-between p-4 rounded-xl border bg-muted/60">
               <div>
-                <Label htmlFor="default-optin" className="font-medium">Pre-check the donation box</Label>
+                <Label htmlFor="default-optin" className="font-medium">
+                  Pre-check the donation box
+                </Label>
                 <p className="text-xs text-muted-foreground mt-1">
                   Guest can still uncheck if they prefer not to donate
                 </p>
               </div>
-              <Switch
-                id="default-optin"
-                checked={defaultOptIn}
-                onCheckedChange={setDefaultOptIn}
-              />
+              <Switch id="default-optin" checked={defaultOptIn} onCheckedChange={setDefaultOptIn} />
             </div>
 
             {/* GL Code */}
@@ -657,7 +708,9 @@ export default function CharitySettingsPage() {
                 </div>
                 <div className="flex-1 space-y-3">
                   <div>
-                    <Label htmlFor="gl-code" className="font-medium">GL Code for Accounting</Label>
+                    <Label htmlFor="gl-code" className="font-medium">
+                      GL Code for Accounting
+                    </Label>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Donations are recorded under this code in your ledger for QuickBooks export
                     </p>

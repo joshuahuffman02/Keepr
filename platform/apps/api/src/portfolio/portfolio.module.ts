@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { PortfolioService } from './portfolio.service';
-import { PortfolioController } from './portfolio.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from "@nestjs/common";
+import { PortfolioService } from "./portfolio.service";
+import { PortfolioController } from "./portfolio.controller";
+import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
   imports: [PrismaModule],
@@ -10,4 +10,3 @@ import { PrismaModule } from '../prisma/prisma.module';
   exports: [PortfolioService],
 })
 export class PortfolioModule {}
-

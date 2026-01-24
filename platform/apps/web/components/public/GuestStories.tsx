@@ -45,7 +45,7 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
           } catch {
             return { campground: cg, reviews: [] };
           }
-        })
+        }),
       );
 
       const stories: Array<{
@@ -143,10 +143,7 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
       };
 
   return (
-    <section
-      ref={ref}
-      className={cn("py-20 overflow-hidden", styles.bg, className)}
-    >
+    <section ref={ref} className={cn("py-20 overflow-hidden", styles.bg, className)}>
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
         <motion.div
@@ -164,8 +161,8 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
           </h2>
 
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            These aren't just reviews - they're the beginning of family traditions,
-            new friendships, and stories told around campfires for years to come.
+            These aren't just reviews - they're the beginning of family traditions, new friendships,
+            and stories told around campfires for years to come.
           </p>
         </motion.div>
 
@@ -177,16 +174,13 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
           {guestStories.map((story) => (
-            <motion.div
-              key={story.id}
-              variants={itemVariants}
-            >
+            <motion.div key={story.id} variants={itemVariants}>
               <Link
                 href={`/park/${story.campgroundSlug}`}
                 className={cn(
                   "relative block rounded-2xl p-6 border shadow-lg shadow-slate-900/5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2",
                   styles.cardBg,
-                  styles.border
+                  styles.border,
                 )}
               >
                 {/* Quote Icon */}
@@ -199,14 +193,9 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
                 {/* Rating */}
                 <div className="flex items-center gap-1 mb-4 pt-2">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-4 h-4 text-amber-400 fill-amber-400"
-                    />
+                    <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
                   ))}
-                  <span className="ml-2 text-xs text-slate-500 font-medium">
-                    {story.stayType}
-                  </span>
+                  <span className="ml-2 text-xs text-slate-500 font-medium">{story.stayType}</span>
                 </div>
 
                 {/* Quote */}
@@ -221,11 +210,10 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
                     KG
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 text-sm">
-                      Keepr Guest
-                    </p>
+                    <p className="font-semibold text-slate-900 text-sm">Keepr Guest</p>
                     <p className="text-xs text-slate-500">
-                      {story.campgroundLocation ? `${story.campgroundLocation} · ` : ""}{story.campgroundName}
+                      {story.campgroundLocation ? `${story.campgroundLocation} · ` : ""}
+                      {story.campgroundName}
                     </p>
                   </div>
                 </div>

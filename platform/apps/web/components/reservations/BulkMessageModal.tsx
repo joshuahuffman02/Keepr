@@ -28,7 +28,8 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
   if (!open) return null;
 
   const recipientsWithEmail = reservations.filter((r) => r.guest?.email);
-  const recipientsCount = messageType === "email" ? recipientsWithEmail.length : reservations.length;
+  const recipientsCount =
+    messageType === "email" ? recipientsWithEmail.length : reservations.length;
 
   const handleSend = async () => {
     if (!body.trim()) return;
@@ -53,7 +54,7 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
             direction: "outbound",
             subject: subject || "Message from your campground",
             body,
-            toAddress: res.guest?.email
+            toAddress: res.guest?.email,
           });
         } else {
           await apiClient.createCommunication({
@@ -63,7 +64,7 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
             type: "note",
             direction: "outbound",
             subject: subject || undefined,
-            body
+            body,
           });
         }
         sent++;
@@ -92,7 +93,10 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={handleClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={handleClose}
+    >
       <div
         className="w-full max-w-lg rounded-lg bg-card p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
@@ -107,7 +111,12 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
             disabled={sending}
           >
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -141,14 +150,16 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
 
         {messageType === "email" && recipientsWithEmail.length < reservations.length && (
           <div className="mb-4 rounded-md border border-status-warning/30 bg-status-warning/10 p-3 text-sm text-status-warning">
-            {reservations.length - recipientsWithEmail.length} guest{reservations.length - recipientsWithEmail.length !== 1 ? "s" : ""} without
-            email address will be skipped.
+            {reservations.length - recipientsWithEmail.length} guest
+            {reservations.length - recipientsWithEmail.length !== 1 ? "s" : ""} without email
+            address will be skipped.
           </div>
         )}
 
         {recipientsCount === 0 ? (
           <div className="mb-4 rounded-md border border-status-error/30 bg-status-error/10 p-3 text-sm text-status-error">
-            No valid recipients for {messageType === "email" ? "email" : "notes"}. Please check your selection.
+            No valid recipients for {messageType === "email" ? "email" : "notes"}. Please check your
+            selection.
           </div>
         ) : (
           <>
@@ -188,7 +199,9 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
                 <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className="h-full bg-action-primary transition-all"
-                    style={{ width: `${((progress.sent + progress.failed) / progress.total) * 100}%` }}
+                    style={{
+                      width: `${((progress.sent + progress.failed) / progress.total) * 100}%`,
+                    }}
                   />
                 </div>
                 {progress.failed > 0 && (
@@ -201,7 +214,10 @@ export function BulkMessageModal({ open, onClose, campgroundId, reservations, on
               <Button variant="outline" onClick={handleClose} disabled={sending}>
                 Cancel
               </Button>
-              <Button onClick={handleSend} disabled={sending || !body.trim() || recipientsCount === 0}>
+              <Button
+                onClick={handleSend}
+                disabled={sending || !body.trim() || recipientsCount === 0}
+              >
                 {sending
                   ? "Sending..."
                   : `Send to ${recipientsCount} guest${recipientsCount !== 1 ? "s" : ""}`}

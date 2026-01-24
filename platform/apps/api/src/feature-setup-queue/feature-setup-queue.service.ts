@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  ConflictException,
-} from "@nestjs/common";
+import { Injectable, Logger, NotFoundException, ConflictException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { randomUUID } from "crypto";
 import {
@@ -53,16 +48,16 @@ export class FeatureSetupQueueService {
     });
 
     const setupNowCount = items.filter(
-      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.setup_now
+      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.setup_now,
     ).length;
     const setupLaterCount = items.filter(
-      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.setup_later
+      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.setup_later,
     ).length;
     const completedCount = items.filter(
-      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.completed
+      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.completed,
     ).length;
     const skippedCount = items.filter(
-      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.skipped
+      (i: FeatureSetupQueue) => i.status === FeatureSetupStatus.skipped,
     ).length;
 
     return {
@@ -123,9 +118,7 @@ export class FeatureSetupQueueService {
       });
     } catch (error: unknown) {
       if (isRecord(error) && error.code === "P2002") {
-        throw new ConflictException(
-          `Feature "${dto.featureKey}" is already in the queue`
-        );
+        throw new ConflictException(`Feature "${dto.featureKey}" is already in the queue`);
       }
       throw error;
     }
@@ -155,7 +148,7 @@ export class FeatureSetupQueueService {
           status: feature.status,
           priority: feature.priority ?? index,
         },
-      })
+      }),
     );
 
     return this.prisma.$transaction(operations);
@@ -224,11 +217,7 @@ export class FeatureSetupQueueService {
   /**
    * Update a queue item
    */
-  async updateQueueItem(
-    campgroundId: string,
-    featureKey: string,
-    dto: UpdateFeatureQueueDto
-  ) {
+  async updateQueueItem(campgroundId: string, featureKey: string, dto: UpdateFeatureQueueDto) {
     const item = await this.getQueueItem(campgroundId, featureKey);
 
     const updateData: FeatureSetupQueueUpdateData = {};

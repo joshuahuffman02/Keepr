@@ -25,4 +25,3 @@ export class SubmitReviewDto {
   @IsArray()
   tags?: string[];
 }
-

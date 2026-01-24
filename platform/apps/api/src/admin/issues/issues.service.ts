@@ -213,14 +213,46 @@ export class IssuesService implements OnModuleInit {
    */
   private async seedInitialIssues(): Promise<void> {
     const sampleIssues = [
-      { title: "Account lockout uses Map<> instead of Redis", category: IssueCategory.database, priority: IssuePriority.high },
-      { title: "Scope cache uses in-memory Map with 5000 entry limit", category: IssueCategory.database, priority: IssuePriority.medium },
-      { title: "Gift card API integration stubbed in PaymentCollectionModal", category: IssueCategory.frontend, priority: IssuePriority.medium },
-      { title: "Wallet debit API not fully implemented", category: IssueCategory.frontend, priority: IssuePriority.medium },
-      { title: "Reminder email shows alert('TODO')", category: IssueCategory.frontend, priority: IssuePriority.low },
-      { title: "OTA providers need API credentials", category: IssueCategory.api, priority: IssuePriority.high },
-      { title: "Currency/FX rates need OpenExchangeRates integration", category: IssueCategory.api, priority: IssuePriority.medium },
-      { title: "SMS failover (single Twilio provider only)", category: IssueCategory.api, priority: IssuePriority.medium },
+      {
+        title: "Account lockout uses Map<> instead of Redis",
+        category: IssueCategory.database,
+        priority: IssuePriority.high,
+      },
+      {
+        title: "Scope cache uses in-memory Map with 5000 entry limit",
+        category: IssueCategory.database,
+        priority: IssuePriority.medium,
+      },
+      {
+        title: "Gift card API integration stubbed in PaymentCollectionModal",
+        category: IssueCategory.frontend,
+        priority: IssuePriority.medium,
+      },
+      {
+        title: "Wallet debit API not fully implemented",
+        category: IssueCategory.frontend,
+        priority: IssuePriority.medium,
+      },
+      {
+        title: "Reminder email shows alert('TODO')",
+        category: IssueCategory.frontend,
+        priority: IssuePriority.low,
+      },
+      {
+        title: "OTA providers need API credentials",
+        category: IssueCategory.api,
+        priority: IssuePriority.high,
+      },
+      {
+        title: "Currency/FX rates need OpenExchangeRates integration",
+        category: IssueCategory.api,
+        priority: IssuePriority.medium,
+      },
+      {
+        title: "SMS failover (single Twilio provider only)",
+        category: IssueCategory.api,
+        priority: IssuePriority.medium,
+      },
     ];
 
     const now = new Date();

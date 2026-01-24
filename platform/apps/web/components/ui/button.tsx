@@ -8,24 +8,28 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover focus-visible:ring-ring",
-        secondary: "bg-action-secondary text-action-secondary-foreground hover:bg-action-secondary-hover focus-visible:ring-ring/60",
+        default:
+          "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover focus-visible:ring-ring",
+        secondary:
+          "bg-action-secondary text-action-secondary-foreground hover:bg-action-secondary-hover focus-visible:ring-ring/60",
         ghost: "text-foreground hover:bg-muted focus-visible:ring-ring/50",
-        outline: "border border-border bg-background hover:bg-muted text-foreground focus-visible:ring-ring/50",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/50"
+        outline:
+          "border border-border bg-background hover:bg-muted text-foreground focus-visible:ring-ring/50",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-destructive/50",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 px-3 rounded-md",
         lg: "h-11 px-8 rounded-md",
-        icon: "h-10 w-10"
-      }
+        icon: "h-10 w-10",
+      },
     },
     defaultVariants: {
       variant: "default",
-      size: "default"
-    }
-  }
+      size: "default",
+    },
+  },
 );
 
 type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
@@ -44,10 +48,14 @@ type StandardButtonProps = BaseButtonProps & {
 
 export type ButtonProps = IconButtonProps | StandardButtonProps;
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, ...props }, ref) => {
-  const Comp = asChild ? Slot : "button";
-  return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
-});
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+    );
+  },
+);
 Button.displayName = "Button";
 
 export { Button, buttonVariants };

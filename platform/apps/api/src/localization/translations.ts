@@ -3,7 +3,7 @@
  * Organized by namespace for easy maintenance
  */
 
-export type TranslationKey = keyof typeof translations["en-US"];
+export type TranslationKey = keyof (typeof translations)["en-US"];
 export type SupportedLocale = keyof typeof translations;
 
 export const translations: Record<string, Record<string, string>> = {

@@ -15,7 +15,7 @@ import {
   Search,
   Tag,
   Users,
-  UserCheck
+  UserCheck,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
@@ -23,10 +23,23 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -49,8 +62,7 @@ type Reservation = {
 
 type TabKey = "arrivals" | "departures";
 
-const isTabKey = (value: string): value is TabKey =>
-  value === "arrivals" || value === "departures";
+const isTabKey = (value: string): value is TabKey => value === "arrivals" || value === "departures";
 
 const getGuestName = (guest: Reservation["guest"]) =>
   guest ? `${guest.primaryFirstName} ${guest.primaryLastName}`.trim() : "Guest";
@@ -86,7 +98,7 @@ export default function CheckInOutV2() {
   const reservationsQuery = useQuery<Reservation[]>({
     queryKey: ["reservations", campgroundId],
     queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const checkInMutation = useMutation({
@@ -95,14 +107,17 @@ export default function CheckInOutV2() {
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
       toast({ title: "Guest checked in" });
     },
-    onError: () => toast({ title: "Failed to check in", description: "Please try again", variant: "destructive" })
+    onError: () =>
+      toast({
+        title: "Failed to check in",
+        description: "Please try again",
+        variant: "destructive",
+      }),
   });
 
   const bulkCheckInMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const results = await Promise.allSettled(
-        ids.map((id) => apiClient.checkInReservation(id))
-      );
+      const results = await Promise.allSettled(ids.map((id) => apiClient.checkInReservation(id)));
       return results;
     },
     onSuccess: (results) => {
@@ -116,14 +131,18 @@ export default function CheckInOutV2() {
         toast({
           title: `${successCount} checked in, ${failCount} failed`,
           description: "Some check-ins could not be completed",
-          variant: "destructive"
+          variant: "destructive",
         });
       }
       setSelectedIds(new Set());
     },
     onError: () => {
-      toast({ title: "Bulk check-in failed", description: "Please try again", variant: "destructive" });
-    }
+      toast({
+        title: "Bulk check-in failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    },
   });
 
   const checkOutMutation = useMutation({
@@ -133,33 +152,41 @@ export default function CheckInOutV2() {
       toast({ title: "Guest checked out" });
       setIsPaymentOpen(false);
     },
-    onError: () => toast({ title: "Failed to check out", description: "Please try again", variant: "destructive" })
+    onError: () =>
+      toast({
+        title: "Failed to check out",
+        description: "Please try again",
+        variant: "destructive",
+      }),
   });
 
   const paymentMutation = useMutation({
-    mutationFn: (data: { id: string; amount: number }) => apiClient.recordReservationPayment(data.id, data.amount),
+    mutationFn: (data: { id: string; amount: number }) =>
+      apiClient.recordReservationPayment(data.id, data.amount),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
       toast({ title: "Payment recorded" });
       setIsPaymentOpen(false);
     },
-    onError: () => toast({ title: "Payment failed", variant: "destructive" })
+    onError: () => toast({ title: "Payment failed", variant: "destructive" }),
   });
 
   const reservations = reservationsQuery.data ?? [];
 
   // Arrivals: exclude cancelled, checked_in, and checked_out (only show pending arrivals)
-  const arrivals = reservations.filter((r) =>
-    r.status !== "cancelled" &&
-    r.status !== "checked_in" &&
-    r.status !== "checked_out" &&
-    r.arrivalDate.split("T")[0] === date
+  const arrivals = reservations.filter(
+    (r) =>
+      r.status !== "cancelled" &&
+      r.status !== "checked_in" &&
+      r.status !== "checked_out" &&
+      r.arrivalDate.split("T")[0] === date,
   );
   // Departures: exclude cancelled and checked_out (only show pending departures)
-  const departures = reservations.filter((r) =>
-    r.status !== "cancelled" &&
-    r.status !== "checked_out" &&
-    r.departureDate.split("T")[0] === date
+  const departures = reservations.filter(
+    (r) =>
+      r.status !== "cancelled" &&
+      r.status !== "checked_out" &&
+      r.departureDate.split("T")[0] === date,
   );
 
   const filteredList = useMemo(() => {
@@ -191,8 +218,8 @@ export default function CheckInOutV2() {
   }, [filteredList, tab]);
 
   const selectedCount = selectedIds.size;
-  const isAllSelected = eligibleForBulkCheckIn.length > 0 &&
-    eligibleForBulkCheckIn.every((r) => selectedIds.has(r.id));
+  const isAllSelected =
+    eligibleForBulkCheckIn.length > 0 && eligibleForBulkCheckIn.every((r) => selectedIds.has(r.id));
 
   const toggleSelectAll = () => {
     if (isAllSelected) {
@@ -226,7 +253,9 @@ export default function CheckInOutV2() {
   }, [arrivals, departures, tab]);
 
   const formatMoney = (cents?: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((cents ?? 0) / 100);
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+      (cents ?? 0) / 100,
+    );
 
   const openPayment = (res: Reservation) => {
     setSelectedReservation(res);
@@ -248,7 +277,9 @@ export default function CheckInOutV2() {
         {/* Header */}
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Operations · {date}</div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Operations · {date}
+            </div>
             <h1 className="text-3xl font-bold text-foreground">Arrivals & Departures</h1>
             <p className="text-sm text-muted-foreground">
               Move guests smoothly with balances, site status, and quick actions.
@@ -264,10 +295,15 @@ export default function CheckInOutV2() {
                 className="pl-9 pr-4 py-2 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
-            <Button variant="outline" onClick={() => {
-              const d = new Date();
-              setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
-            }}>
+            <Button
+              variant="outline"
+              onClick={() => {
+                const d = new Date();
+                setDate(
+                  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`,
+                );
+              }}
+            >
               Today
             </Button>
           </div>
@@ -289,7 +325,9 @@ export default function CheckInOutV2() {
           />
           <SummaryCard
             label="Outstanding balance"
-            value={formatMoney(arrivals.concat(departures).reduce((sum, r) => sum + (r.balanceAmount ?? 0), 0))}
+            value={formatMoney(
+              arrivals.concat(departures).reduce((sum, r) => sum + (r.balanceAmount ?? 0), 0),
+            )}
             icon={<CreditCard className="h-4 w-4" />}
             href="/billing/repeat-charges"
           />
@@ -314,7 +352,10 @@ export default function CheckInOutV2() {
             />
           </div>
           <div className="flex items-center gap-2">
-            <Select value={statusFilter} onValueChange={(v: typeof statusFilter) => setStatusFilter(v)}>
+            <Select
+              value={statusFilter}
+              onValueChange={(v: typeof statusFilter) => setStatusFilter(v)}
+            >
               <SelectTrigger className="w-[170px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
@@ -355,11 +396,7 @@ export default function CheckInOutV2() {
         {tab === "arrivals" && eligibleForBulkCheckIn.length > 0 && (
           <div className="flex items-center justify-between p-4 bg-card border border-border rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
-              <Checkbox
-                checked={isAllSelected}
-                onCheckedChange={toggleSelectAll}
-                id="select-all"
-              />
+              <Checkbox checked={isAllSelected} onCheckedChange={toggleSelectAll} id="select-all" />
               <Label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
                 Select all ({eligibleForBulkCheckIn.length})
               </Label>
@@ -390,140 +427,166 @@ export default function CheckInOutV2() {
               const isSelected = selectedIds.has(res.id);
 
               return (
-              <Card
-                key={res.id}
-                className={`overflow-hidden border ${
-                  isSelected
-                    ? "border-emerald-300 bg-emerald-50/40"
-                    : (res.balanceAmount ?? 0) > 0
-                    ? "border-amber-200 bg-amber-50/40"
-                    : "border-border"
-                } shadow-sm`}
-              >
-                <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    {isEligible && (
-                      <div className="pt-1">
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleSelect(res.id)}
-                          disabled={bulkCheckInMutation.isPending}
-                        />
-                      </div>
-                    )}
-                    <div
-                      className={`p-3 rounded-full ${
-                        tab === "arrivals"
-                          ? res.status === "checked_in"
-                            ? "bg-status-success/15 text-status-success"
-                            : "bg-status-info/15 text-status-info"
-                          : res.status === "checked_out"
-                          ? "bg-muted text-muted-foreground"
-                          : "bg-status-warning/15 text-status-warning"
-                      }`}
-                    >
-                      {tab === "arrivals" ? (
-                        res.status === "checked_in" ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />
-                      ) : (
-                        <LogOut className="h-5 w-5" />
+                <Card
+                  key={res.id}
+                  className={`overflow-hidden border ${
+                    isSelected
+                      ? "border-emerald-300 bg-emerald-50/40"
+                      : (res.balanceAmount ?? 0) > 0
+                        ? "border-amber-200 bg-amber-50/40"
+                        : "border-border"
+                  } shadow-sm`}
+                >
+                  <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      {isEligible && (
+                        <div className="pt-1">
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleSelect(res.id)}
+                            disabled={bulkCheckInMutation.isPending}
+                          />
+                        </div>
                       )}
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-lg text-foreground">
-                          {getGuestName(res.guest)}
-                        </h3>
-                        {(res.balanceAmount ?? 0) > 0 && (
-                          <Badge variant="destructive" className="h-5 px-1.5 text-[10px] uppercase tracking-wider">
-                            Balance Due
-                          </Badge>
+                      <div
+                        className={`p-3 rounded-full ${
+                          tab === "arrivals"
+                            ? res.status === "checked_in"
+                              ? "bg-status-success/15 text-status-success"
+                              : "bg-status-info/15 text-status-info"
+                            : res.status === "checked_out"
+                              ? "bg-muted text-muted-foreground"
+                              : "bg-status-warning/15 text-status-warning"
+                        }`}
+                      >
+                        {tab === "arrivals" ? (
+                          res.status === "checked_in" ? (
+                            <CheckCircle className="h-5 w-5" />
+                          ) : (
+                            <Clock className="h-5 w-5" />
+                          )
+                        ) : (
+                          <LogOut className="h-5 w-5" />
                         )}
-                        {!res.siteId && (
-                          <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase tracking-wider text-status-warning border-status-warning">
-                            Assign site
-                          </Badge>
-                        )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
-                        <span>•</span>
-                        <span>
-                          {res.adults ?? 0} adults{typeof res.children === "number" ? `, ${res.children} children` : ""}
-                        </span>
-                        {res.nights ? (
-                          <>
-                            <span>•</span>
-                            <span>{res.nights} nights</span>
-                          </>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold text-lg text-foreground">
+                            {getGuestName(res.guest)}
+                          </h3>
+                          {(res.balanceAmount ?? 0) > 0 && (
+                            <Badge
+                              variant="destructive"
+                              className="h-5 px-1.5 text-[10px] uppercase tracking-wider"
+                            >
+                              Balance Due
+                            </Badge>
+                          )}
+                          {!res.siteId && (
+                            <Badge
+                              variant="outline"
+                              className="h-5 px-1.5 text-[10px] uppercase tracking-wider text-status-warning border-status-warning"
+                            >
+                              Assign site
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+                          <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
+                          <span>•</span>
+                          <span>
+                            {res.adults ?? 0} adults
+                            {typeof res.children === "number" ? `, ${res.children} children` : ""}
+                          </span>
+                          {res.nights ? (
+                            <>
+                              <span>•</span>
+                              <span>{res.nights} nights</span>
+                            </>
+                          ) : null}
+                          {tab === "departures" ? (
+                            <>
+                              <span>•</span>
+                              <span>Arrived {new Date(res.arrivalDate).toLocaleDateString()}</span>
+                            </>
+                          ) : null}
+                        </div>
+                        {res.notes ? (
+                          <p className="text-sm text-status-warning mt-2 bg-status-warning/15 p-2 rounded border border-status-warning inline-block">
+                            Note: {res.notes}
+                          </p>
                         ) : null}
-                        {tab === "departures" ? (
-                          <>
-                            <span>•</span>
-                            <span>Arrived {new Date(res.arrivalDate).toLocaleDateString()}</span>
-                          </>
-                        ) : null}
-                      </div>
-                      {res.notes ? (
-                        <p className="text-sm text-status-warning mt-2 bg-status-warning/15 p-2 rounded border border-status-warning inline-block">
-                          Note: {res.notes}
-                        </p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                    <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Balance</div>
-                      <div className={`font-bold ${(res.balanceAmount ?? 0) > 0 ? "text-status-warning" : "text-status-success"}`}>
-                        {formatMoney(res.balanceAmount)}
                       </div>
                     </div>
 
-                    {tab === "arrivals" ? (
-                      res.status === "checked_in" ? (
-                        <Button disabled variant="outline" className="text-status-success border-status-success bg-status-success/15">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Checked In
+                    <div className="flex flex-col items-end gap-3 min-w-[200px]">
+                      <div className="text-right">
+                        <div className="text-xs text-muted-foreground">Balance</div>
+                        <div
+                          className={`font-bold ${(res.balanceAmount ?? 0) > 0 ? "text-status-warning" : "text-status-success"}`}
+                        >
+                          {formatMoney(res.balanceAmount)}
+                        </div>
+                      </div>
+
+                      {tab === "arrivals" ? (
+                        res.status === "checked_in" ? (
+                          <Button
+                            disabled
+                            variant="outline"
+                            className="text-status-success border-status-success bg-status-success/15"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Checked In
+                          </Button>
+                        ) : (
+                          <div className="flex flex-wrap gap-2 justify-end">
+                            {!res.siteId && (
+                              <Button
+                                variant="outline"
+                                className="text-status-warning border-status-warning hover:bg-status-warning/15"
+                              >
+                                Assign Site
+                              </Button>
+                            )}
+                            <Button
+                              onClick={() => checkInMutation.mutate(res.id)}
+                              disabled={checkInMutation.isPending}
+                              className="bg-emerald-600 hover:bg-emerald-700"
+                            >
+                              {checkInMutation.isPending ? "Checking..." : "Check In"}
+                            </Button>
+                          </div>
+                        )
+                      ) : res.status === "checked_out" ? (
+                        <Button disabled variant="outline" className="bg-muted">
+                          Checked Out
                         </Button>
                       ) : (
                         <div className="flex flex-wrap gap-2 justify-end">
-                          {!res.siteId && (
-                            <Button variant="outline" className="text-status-warning border-status-warning hover:bg-status-warning/15">
-                              Assign Site
+                          {(res.balanceAmount ?? 0) > 0 && (
+                            <Button
+                              variant="outline"
+                              className="text-status-warning border-status-warning hover:bg-status-warning/15"
+                              onClick={() => openPayment(res)}
+                            >
+                              Settle Balance
                             </Button>
                           )}
                           <Button
-                            onClick={() => checkInMutation.mutate(res.id)}
-                            disabled={checkInMutation.isPending}
-                            className="bg-emerald-600 hover:bg-emerald-700"
+                            onClick={() => handlePayAndCheckout(res)}
+                            disabled={checkOutMutation.isPending}
+                            className={
+                              (res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""
+                            }
                           >
-                            {checkInMutation.isPending ? "Checking..." : "Check In"}
+                            {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
                           </Button>
                         </div>
-                      )
-                    ) : res.status === "checked_out" ? (
-                      <Button disabled variant="outline" className="bg-muted">
-                        Checked Out
-                      </Button>
-                    ) : (
-                      <div className="flex flex-wrap gap-2 justify-end">
-                        {(res.balanceAmount ?? 0) > 0 && (
-                          <Button variant="outline" className="text-status-warning border-status-warning hover:bg-status-warning/15" onClick={() => openPayment(res)}>
-                            Settle Balance
-                          </Button>
-                        )}
-                        <Button
-                          onClick={() => handlePayAndCheckout(res)}
-                          disabled={checkOutMutation.isPending}
-                          className={(res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""}
-                        >
-                          {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
-                        </Button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
               );
             })
           )}
@@ -558,7 +621,8 @@ export default function CheckInOutV2() {
           <DialogHeader>
             <DialogTitle>Collect Outstanding Balance</DialogTitle>
             <DialogDescription>
-              Guest owes {formatMoney(selectedReservation?.balanceAmount)}. Record payment to proceed with checkout.
+              Guest owes {formatMoney(selectedReservation?.balanceAmount)}. Record payment to
+              proceed with checkout.
             </DialogDescription>
           </DialogHeader>
 
@@ -566,11 +630,15 @@ export default function CheckInOutV2() {
             <div className="grid gap-2">
               <Label>Payment Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
                 <Input
                   type="number"
                   value={(paymentAmount ?? 0) / 100}
-                  onChange={(e) => setPaymentAmount(Math.round(parseFloat(e.target.value || "0") * 100))}
+                  onChange={(e) =>
+                    setPaymentAmount(Math.round(parseFloat(e.target.value || "0") * 100))
+                  }
                   className="pl-7"
                 />
               </div>
@@ -595,7 +663,13 @@ export default function CheckInOutV2() {
             <Button variant="outline" onClick={() => setIsPaymentOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => selectedReservation && paymentMutation.mutate({ id: selectedReservation.id, amount: paymentAmount })} disabled={paymentMutation.isPending}>
+            <Button
+              onClick={() =>
+                selectedReservation &&
+                paymentMutation.mutate({ id: selectedReservation.id, amount: paymentAmount })
+              }
+              disabled={paymentMutation.isPending}
+            >
               {paymentMutation.isPending ? "Processing..." : "Record Payment"}
             </Button>
           </DialogFooter>
@@ -609,7 +683,7 @@ function SummaryCard({
   label,
   value,
   icon,
-  href
+  href,
 }: {
   label: string;
   value: string | number;
@@ -621,7 +695,9 @@ function SummaryCard({
       <div className="flex items-center gap-3">
         <span className="rounded-md bg-muted p-2 text-muted-foreground">{icon}</span>
         <div>
-          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</div>
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {label}
+          </div>
           <div className="text-xl font-bold text-foreground">{value}</div>
         </div>
       </div>
@@ -642,7 +718,7 @@ function HintCard({
   title,
   description,
   icon,
-  href
+  href,
 }: {
   title: string;
   description: string;

@@ -118,11 +118,7 @@ function formatAttractionType(type: string): string {
     .join(" ");
 }
 
-export default async function AttractionPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function AttractionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const attraction = await getAttraction(slug);
 
@@ -193,9 +189,7 @@ export default async function AttractionPage({
             {attraction.avgCampgroundRating && (
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <span className="font-semibold">
-                  {attraction.avgCampgroundRating.toFixed(1)}
-                </span>
+                <span className="font-semibold">{attraction.avgCampgroundRating.toFixed(1)}</span>
                 <span className="text-white/70">Avg Rating</span>
               </div>
             )}
@@ -212,12 +206,8 @@ export default async function AttractionPage({
               {/* About */}
               {attraction.description && (
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-3">
-                    About {attraction.name}
-                  </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    {attraction.description}
-                  </p>
+                  <h3 className="text-lg font-bold text-slate-900 mb-3">About {attraction.name}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{attraction.description}</p>
                 </div>
               )}
 
@@ -252,9 +242,7 @@ export default async function AttractionPage({
               {/* Related Attractions */}
               {attraction.relatedAttractions.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-3">
-                    Nearby Attractions
-                  </h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-3">Nearby Attractions</h3>
                   <div className="space-y-2">
                     {attraction.relatedAttractions.slice(0, 5).map((related) => (
                       <Link
@@ -262,13 +250,9 @@ export default async function AttractionPage({
                         href={`/near/${related.slug}`}
                         className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
                       >
-                        <span className="text-blue-600">
-                          {getAttractionIcon(related.type)}
-                        </span>
+                        <span className="text-blue-600">{getAttractionIcon(related.type)}</span>
                         <div className="flex-1 min-w-0">
-                          <div className="text-slate-700 truncate text-sm">
-                            {related.name}
-                          </div>
+                          <div className="text-slate-700 truncate text-sm">{related.name}</div>
                           <div className="text-xs text-slate-500">
                             {related.nearbyCampgroundCount} campgrounds
                           </div>
@@ -321,9 +305,7 @@ export default async function AttractionPage({
                           {(campground.city || campground.state) && (
                             <p className="flex items-center gap-1 text-sm text-slate-500 mt-1">
                               <MapPin className="h-4 w-4" />
-                              {[campground.city, campground.state]
-                                .filter(Boolean)
-                                .join(", ")}
+                              {[campground.city, campground.state].filter(Boolean).join(", ")}
                             </p>
                           )}
                         </div>
@@ -395,7 +377,8 @@ export default async function AttractionPage({
               {/* Pagination Info */}
               {attraction.campgrounds.length < attraction.nearbyCampgroundCount && (
                 <div className="mt-8 text-center text-slate-500">
-                  Showing {attraction.campgrounds.length} of {attraction.nearbyCampgroundCount} campgrounds
+                  Showing {attraction.campgrounds.length} of {attraction.nearbyCampgroundCount}{" "}
+                  campgrounds
                 </div>
               )}
             </div>
@@ -413,9 +396,9 @@ export default async function AttractionPage({
             <p>
               Planning a camping trip near {attraction.name}? This{" "}
               {formatAttractionType(attraction.type).toLowerCase()} in{" "}
-              {attraction.state || "the United States"} offers visitors a chance to
-              experience nature at its finest, with {attraction.nearbyCampgroundCount}{" "}
-              campgrounds and RV parks located nearby.
+              {attraction.state || "the United States"} offers visitors a chance to experience
+              nature at its finest, with {attraction.nearbyCampgroundCount} campgrounds and RV parks
+              located nearby.
             </p>
 
             {attraction.activities.length > 0 && (
@@ -423,28 +406,27 @@ export default async function AttractionPage({
                 <h3>Popular Activities</h3>
                 <p>
                   Visitors to {attraction.name} enjoy activities including{" "}
-                  {attraction.activities.join(", ")}. The area offers something for
-                  every outdoor enthusiast, from casual day hikers to experienced
-                  adventurers.
+                  {attraction.activities.join(", ")}. The area offers something for every outdoor
+                  enthusiast, from casual day hikers to experienced adventurers.
                 </p>
               </>
             )}
 
             <h3>Camping Options</h3>
             <p>
-              Campgrounds near {attraction.name} range from primitive backcountry sites
-              to full-service RV parks with all modern amenities. Whether you prefer
-              tent camping under the stars or the comfort of a fully-equipped RV site,
-              you'll find options to suit your camping style.
+              Campgrounds near {attraction.name} range from primitive backcountry sites to
+              full-service RV parks with all modern amenities. Whether you prefer tent camping under
+              the stars or the comfort of a fully-equipped RV site, you'll find options to suit your
+              camping style.
             </p>
 
             {attraction.bestSeason && (
               <>
                 <h3>When to Visit</h3>
                 <p>
-                  The best time to camp near {attraction.name} is {attraction.bestSeason}
-                  . During this period, you'll experience optimal weather conditions and
-                  the best access to trails and facilities.
+                  The best time to camp near {attraction.name} is {attraction.bestSeason}. During
+                  this period, you'll experience optimal weather conditions and the best access to
+                  trails and facilities.
                 </p>
               </>
             )}

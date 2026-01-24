@@ -13,12 +13,7 @@ interface TrackedPageProps {
 /**
  * Wrapper component that tracks page views and time on page
  */
-export function TrackedPage({
-  children,
-  pageName,
-  featureArea,
-  pageTitle,
-}: TrackedPageProps) {
+export function TrackedPage({ children, pageName, featureArea, pageTitle }: TrackedPageProps) {
   const analytics = useAnalyticsContext();
   const hasTrackedRef = useRef(false);
 
@@ -69,7 +64,7 @@ export function TrackedButton({
       });
       onClick?.(e);
     },
-    [analytics, actionType, actionTarget, metadata, onClick]
+    [analytics, actionType, actionTarget, metadata, onClick],
   );
 
   return (
@@ -106,7 +101,7 @@ export function TrackedLink({
       });
       onClick?.(e);
     },
-    [analytics, actionType, actionTarget, href, onClick]
+    [analytics, actionType, actionTarget, href, onClick],
   );
 
   return (
@@ -173,7 +168,7 @@ export function TrackedForm({
       hasInteractedRef.current = false; // Prevent abandonment tracking after successful submit
       onSubmit?.(e);
     },
-    [analytics, formName, featureArea, onSubmit]
+    [analytics, formName, featureArea, onSubmit],
   );
 
   return (
@@ -224,7 +219,7 @@ export function TrackedSearch({
         }
       }, debounceMs);
     },
-    [analytics, onSearch, debounceMs]
+    [analytics, onSearch, debounceMs],
   );
 
   useEffect(() => {
@@ -236,12 +231,7 @@ export function TrackedSearch({
   }, []);
 
   return (
-    <input
-      type="search"
-      placeholder={placeholder}
-      className={className}
-      onChange={handleChange}
-    />
+    <input type="search" placeholder={placeholder} className={className} onChange={handleChange} />
   );
 }
 
@@ -276,7 +266,7 @@ export function TrackedTabs({
       });
       onTabChange(tabId);
     },
-    [analytics, activeTab, onTabChange]
+    [analytics, activeTab, onTabChange],
   );
 
   return (
@@ -304,12 +294,7 @@ interface TrackedModalProps {
 /**
  * Modal wrapper that tracks opens and closes
  */
-export function TrackedModal({
-  isOpen,
-  modalName,
-  onClose,
-  children,
-}: TrackedModalProps) {
+export function TrackedModal({ isOpen, modalName, onClose, children }: TrackedModalProps) {
   const analytics = useAnalyticsContext();
   const openTimeRef = useRef<number | null>(null);
 
@@ -362,7 +347,7 @@ export function useRenderTracking(componentName: string) {
 export function useTrackedClick(
   actionType: string,
   actionTarget?: string,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ) {
   const analytics = useAnalyticsContext();
 
@@ -373,6 +358,6 @@ export function useTrackedClick(
         return handler?.(...args);
       };
     },
-    [analytics, actionType, actionTarget, metadata]
+    [analytics, actionType, actionTarget, metadata],
   );
 }

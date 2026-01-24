@@ -20,13 +20,7 @@ import type { z } from "zod";
 
 type DepositRule = z.infer<typeof CampgroundSchema>["depositRule"];
 
-const depositRuleSet = new Set<string>([
-  "none",
-  "full",
-  "half",
-  "first_night",
-  "first_night_fees",
-]);
+const depositRuleSet = new Set<string>(["none", "full", "half", "first_night", "first_night_fees"]);
 
 const isDepositRule = (value: string | null | undefined): value is DepositRule =>
   typeof value === "string" && depositRuleSet.has(value);
@@ -39,7 +33,7 @@ function CampgroundsPageContent() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const qc = useQueryClient();
 
@@ -53,7 +47,7 @@ function CampgroundsPageContent() {
   const depositMutation = useMutation({
     mutationFn: ({ id, rule }: { id: string; rule: DepositRule }) =>
       apiClient.updateCampgroundDeposit(id, rule),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["campgrounds"] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["campgrounds"] }),
   });
 
   return (
@@ -107,12 +101,13 @@ function CampgroundsPageContent() {
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-foreground">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">Deposit rule</div>
-                  <Select
-                    value={cg.depositRule || "none"}
-                    onValueChange={(value) =>
-                    isDepositRule(value) &&
-                    depositMutation.mutate({ id: cg.id, rule: value })
+                <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                  Deposit rule
+                </div>
+                <Select
+                  value={cg.depositRule || "none"}
+                  onValueChange={(value) =>
+                    isDepositRule(value) && depositMutation.mutate({ id: cg.id, rule: value })
                   }
                 >
                   <SelectTrigger
@@ -130,20 +125,36 @@ function CampgroundsPageContent() {
                     <SelectItem value="first_night_fees">First night + fees</SelectItem>
                   </SelectContent>
                 </Select>
-                {depositMutation.isPending && <span className="text-xs text-muted-foreground">Saving…</span>}
-                {depositMutation.isError && <span className="text-xs text-rose-600">Failed to save</span>}
+                {depositMutation.isPending && (
+                  <span className="text-xs text-muted-foreground">Saving…</span>
+                )}
+                {depositMutation.isError && (
+                  <span className="text-xs text-rose-600">Failed to save</span>
+                )}
               </div>
             </div>
           ))}
           {!isLoading && !data?.length && (
             <div className="rounded-lg border-2 border-dashed border-border bg-muted p-8 text-center">
               <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                <svg
+                  className="w-6 h-6 text-muted-foreground"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
                 </svg>
               </div>
               <p className="text-sm font-medium text-foreground mb-1">No campgrounds yet</p>
-              <p className="text-xs text-muted-foreground">Contact your administrator to set up your first campground</p>
+              <p className="text-xs text-muted-foreground">
+                Contact your administrator to set up your first campground
+              </p>
             </div>
           )}
         </div>
@@ -154,33 +165,35 @@ function CampgroundsPageContent() {
 
 export default function CampgroundsPage() {
   return (
-    <Suspense fallback={
-      <DashboardShell>
-        <div className="space-y-4">
-          <Breadcrumbs items={[{ label: "Campgrounds" }]} />
-          <div className="flex items-center justify-between">
-            <div className="h-7 w-40 bg-muted rounded animate-pulse" />
-          </div>
-          <div className="grid gap-3">
-            {[...Array(2)].map((_, i) => (
-              <div key={i} className="card p-4 animate-pulse">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 space-y-2">
-                    <div className="h-6 bg-muted rounded w-48" />
-                    <div className="h-4 bg-muted rounded w-32" />
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="h-9 w-16 bg-muted rounded" />
-                    <div className="h-9 w-20 bg-muted rounded" />
-                    <div className="h-9 w-24 bg-muted rounded" />
+    <Suspense
+      fallback={
+        <DashboardShell>
+          <div className="space-y-4">
+            <Breadcrumbs items={[{ label: "Campgrounds" }]} />
+            <div className="flex items-center justify-between">
+              <div className="h-7 w-40 bg-muted rounded animate-pulse" />
+            </div>
+            <div className="grid gap-3">
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="card p-4 animate-pulse">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 space-y-2">
+                      <div className="h-6 bg-muted rounded w-48" />
+                      <div className="h-4 bg-muted rounded w-32" />
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="h-9 w-16 bg-muted rounded" />
+                      <div className="h-9 w-20 bg-muted rounded" />
+                      <div className="h-9 w-24 bg-muted rounded" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </DashboardShell>
-    }>
+        </DashboardShell>
+      }
+    >
       <CampgroundsPageContent />
     </Suspense>
   );

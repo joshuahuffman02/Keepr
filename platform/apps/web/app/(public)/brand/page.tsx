@@ -139,7 +139,7 @@ export default function BrandPage() {
             <div className="rounded-xl border border-border bg-card/70 p-4">
               <p className="text-sm font-medium mb-2">Usage</p>
               <pre className="text-xs bg-background p-3 rounded border overflow-x-auto">
-{`import { Logo } from "@/components/brand";
+                {`import { Logo } from "@/components/brand";
 
 // Default - Evergreen on light backgrounds
 <Logo />
@@ -289,8 +289,8 @@ export default function BrandPage() {
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Body - 16-18px, Regular</p>
                     <p className="text-base leading-relaxed">
-                      Modern campground management software. Streamline reservations, payments,
-                      and guest experiences with Keepr.
+                      Modern campground management software. Streamline reservations, payments, and
+                      guest experiences with Keepr.
                     </p>
                   </div>
                   <div>
@@ -299,9 +299,7 @@ export default function BrandPage() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground mb-1">Caption - 12-14px, Regular</p>
-                    <p className="text-sm text-muted-foreground">
-                      Last updated 2 hours ago
-                    </p>
+                    <p className="text-sm text-muted-foreground">Last updated 2 hours ago</p>
                   </div>
                 </CardContent>
               </Card>
@@ -365,9 +363,7 @@ export default function BrandPage() {
                     <div className="space-y-2">
                       <Label htmlFor="focused">Focus state</Label>
                       <Input id="focused" placeholder="Click to see focus ring" />
-                      <p className="text-xs text-muted-foreground">
-                        Focus ring uses Trail Clay
-                      </p>
+                      <p className="text-xs text-muted-foreground">Focus ring uses Trail Clay</p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="disabled">Disabled</Label>
@@ -395,11 +391,17 @@ export default function BrandPage() {
                         Context
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        <Badge variant="outline" className="border-keepr-evergreen/30 text-keepr-evergreen">
+                        <Badge
+                          variant="outline"
+                          className="border-keepr-evergreen/30 text-keepr-evergreen"
+                        >
                           Direct booking
                         </Badge>
                         <Badge variant="secondary">Seasonal rate</Badge>
-                        <Badge variant="outline" className="border-keepr-evergreen/30 text-keepr-evergreen">
+                        <Badge
+                          variant="outline"
+                          className="border-keepr-evergreen/30 text-keepr-evergreen"
+                        >
                           Auto-pay on
                         </Badge>
                         <Badge variant="secondary">Waitlist open</Badge>
@@ -415,19 +417,28 @@ export default function BrandPage() {
                       <div className="flex flex-wrap gap-2">
                         <Badge variant="success">
                           <span className="inline-flex items-center gap-2">
-                            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-status-success" />
+                            <span
+                              aria-hidden
+                              className="h-1.5 w-1.5 rounded-full bg-status-success"
+                            />
                             Confirmed
                           </span>
                         </Badge>
                         <Badge variant="warning">
                           <span className="inline-flex items-center gap-2">
-                            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-status-warning" />
+                            <span
+                              aria-hidden
+                              className="h-1.5 w-1.5 rounded-full bg-status-warning"
+                            />
                             Needs attention
                           </span>
                         </Badge>
                         <Badge variant="error">
                           <span className="inline-flex items-center gap-2">
-                            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-status-error" />
+                            <span
+                              aria-hidden
+                              className="h-1.5 w-1.5 rounded-full bg-status-error"
+                            />
                             Blocked
                           </span>
                         </Badge>

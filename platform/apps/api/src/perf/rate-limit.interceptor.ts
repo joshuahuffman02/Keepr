@@ -18,7 +18,7 @@ type RateLimitRequest = Request & { organizationId?: string };
 export class RateLimitInterceptor implements NestInterceptor {
   constructor(
     private readonly rateLimitService: RateLimitService,
-    private readonly perfService: PerfService
+    private readonly perfService: PerfService,
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler<unknown>): Observable<unknown> {
@@ -28,7 +28,7 @@ export class RateLimitInterceptor implements NestInterceptor {
     // Extract and validate client IP to prevent spoofing via x-forwarded-for
     const ip = extractClientIpFromRequest(req);
     const orgHeader = req.organizationId ?? req.headers["x-organization-id"];
-    const orgId = Array.isArray(orgHeader) ? orgHeader[0] : orgHeader ?? null;
+    const orgId = Array.isArray(orgHeader) ? orgHeader[0] : (orgHeader ?? null);
 
     const result = this.rateLimitService.shouldAllow(ip, orgId);
     if (!result.allowed) {

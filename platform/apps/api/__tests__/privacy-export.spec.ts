@@ -51,10 +51,7 @@ describe("Privacy export API smoke", () => {
     ]);
 
     const moduleRef = await Test.createTestingModule({
-      providers: [
-        PrivacyService,
-        { provide: PrismaService, useValue: prisma },
-      ],
+      providers: [PrivacyService, { provide: PrismaService, useValue: prisma }],
     }).compile();
 
     privacy = moduleRef.get(PrivacyService);

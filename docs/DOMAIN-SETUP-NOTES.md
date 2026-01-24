@@ -36,14 +36,17 @@
 - [ ] SSL certificate verification
 
 ### Current Railway Domains (still work as fallback)
+
 - Web: `campreservweb-production.up.railway.app`
 - API: `camp-everydayapi-production.up.railway.app`
 
 ### Verification URLs (once live)
+
 - https://keeprstay.com - Main site
 - https://www.keeprstay.com - WWW redirect
 - https://api.keeprstay.com/health - API health check
 
 ### Cloudflare R2 Storage (existing)
+
 - Bucket: `camp-everyday-uploads`
 - CDN: `https://pub-b0e741601dad4c3b8f98d3a6991c858b.r2.dev`

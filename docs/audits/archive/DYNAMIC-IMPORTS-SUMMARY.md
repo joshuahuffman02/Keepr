@@ -1,6 +1,7 @@
 # Dynamic Imports Implementation Summary
 
 ## Overview
+
 Implemented code-splitting for heavy libraries (maplibre-gl and recharts) to reduce initial bundle size in the Next.js frontend.
 
 ## Changes Made
@@ -8,10 +9,12 @@ Implemented code-splitting for heavy libraries (maplibre-gl and recharts) to red
 ### 1. MapLibre GL (Map Library)
 
 **Files Updated:**
+
 - `/platform/apps/web/components/maps/BookingMap.tsx`
 - `/platform/apps/web/components/reports/HeatmapCard.tsx`
 
 **Implementation:**
+
 ```typescript
 // Dynamic import loader function
 let maplibregl: any = null;
@@ -45,12 +48,14 @@ if (!isMapLibreLoaded) {
 ### 2. Recharts (Chart Library)
 
 **Files Updated:**
+
 - `/platform/apps/web/components/analytics/TrendChart.tsx`
 - `/platform/apps/web/components/analytics/BreakdownPie.tsx`
 - `/platform/apps/web/components/reports/ReportChart.tsx`
 - `/platform/apps/web/app/gamification/page.tsx`
 
 **Implementation:**
+
 ```typescript
 // Dynamic import loader function
 let PieChart: any = null;
@@ -87,17 +92,20 @@ if (!isRechartsLoaded) {
 ## Benefits
 
 ### Bundle Size Reduction
+
 - **MapLibre GL**: ~500KB - Only loaded when map components are rendered
 - **Recharts**: ~200KB - Only loaded when chart components are rendered
 - **Total**: ~700KB removed from initial bundle
 
 ### Performance Improvements
+
 1. **Faster Initial Load**: Main bundle is smaller, loads faster
 2. **Better Time to Interactive (TTI)**: Less JavaScript to parse initially
 3. **On-Demand Loading**: Heavy libraries only load when needed
 4. **Better Caching**: Separate chunks can be cached independently
 
 ### User Experience
+
 - Loading indicators show while libraries are being fetched
 - Page remains interactive during library loading
 - Progressive enhancement - core functionality available immediately
@@ -139,6 +147,7 @@ The pattern used follows Next.js best practices for code-splitting:
 ## Future Optimizations
 
 Consider applying this pattern to other heavy libraries:
+
 - PDF rendering libraries
 - Rich text editors
 - Date range pickers with large locale files

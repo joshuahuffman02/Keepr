@@ -52,12 +52,24 @@ const actionTypeConfig = {
   payment: { icon: CreditCard, color: "text-emerald-600 bg-emerald-100" },
 };
 
-function mapActionToType(action: string): "create" | "update" | "delete" | "login" | "setting" | "payment" {
+function mapActionToType(
+  action: string,
+): "create" | "update" | "delete" | "login" | "setting" | "payment" {
   const lowerAction = action.toLowerCase();
   if (lowerAction.includes("create") || lowerAction.includes("add")) return "create";
-  if (lowerAction.includes("delete") || lowerAction.includes("remove") || lowerAction.includes("cancel")) return "delete";
+  if (
+    lowerAction.includes("delete") ||
+    lowerAction.includes("remove") ||
+    lowerAction.includes("cancel")
+  )
+    return "delete";
   if (lowerAction.includes("login") || lowerAction.includes("auth")) return "login";
-  if (lowerAction.includes("payment") || lowerAction.includes("charge") || lowerAction.includes("refund")) return "payment";
+  if (
+    lowerAction.includes("payment") ||
+    lowerAction.includes("charge") ||
+    lowerAction.includes("refund")
+  )
+    return "payment";
   if (lowerAction.includes("setting") || lowerAction.includes("config")) return "setting";
   return "update";
 }
@@ -78,13 +90,15 @@ export default function AuditLogPage() {
       return;
     }
 
-    apiClient.getAuditLogs(id, { limit: 100 })
+    apiClient
+      .getAuditLogs(id, { limit: 100 })
       .then((entries) => {
         const mapped: AuditEntry[] = entries.map((entry: AuditLogEntry) => ({
           id: entry.id,
           userId: entry.actorId,
           userName: entry.actor
-            ? `${entry.actor.firstName || ""} ${entry.actor.lastName || ""}`.trim() || entry.actor.email
+            ? `${entry.actor.firstName || ""} ${entry.actor.lastName || ""}`.trim() ||
+              entry.actor.email
             : "System",
           action: entry.action,
           actionType: mapActionToType(entry.action),
@@ -134,9 +148,7 @@ export default function AuditLogPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
-          <p className="text-muted-foreground mt-1">
-            Track all user actions and system changes
-          </p>
+          <p className="text-muted-foreground mt-1">Track all user actions and system changes</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -150,9 +162,7 @@ export default function AuditLogPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
-          <p className="text-muted-foreground mt-1">
-            Track all user actions and system changes
-          </p>
+          <p className="text-muted-foreground mt-1">Track all user actions and system changes</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -169,9 +179,7 @@ export default function AuditLogPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Audit Log</h2>
-          <p className="text-muted-foreground mt-1">
-            Track all user actions and system changes
-          </p>
+          <p className="text-muted-foreground mt-1">Track all user actions and system changes</p>
         </div>
         <Button variant="outline">
           <Download className="h-4 w-4 mr-2" />
@@ -227,9 +235,7 @@ export default function AuditLogPage() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-foreground">
-                        {entry.action}
-                      </span>
+                      <span className="font-medium text-foreground">{entry.action}</span>
                       <Badge variant="outline" className="text-xs">
                         {entry.resource}
                       </Badge>

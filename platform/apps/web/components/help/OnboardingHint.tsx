@@ -29,7 +29,7 @@ export function OnboardingHint({
   className = "",
   trigger = "immediate",
   delayMs = 1000,
-  actions = []
+  actions = [],
 }: OnboardingHintProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -75,7 +75,7 @@ export function OnboardingHint({
     top: "bottom-full mb-3",
     bottom: "top-full mt-3",
     left: "right-full mr-3",
-    right: "left-full ml-3"
+    right: "left-full ml-3",
   };
 
   return (
@@ -139,10 +139,10 @@ export function OnboardingHint({
             placement === "top"
               ? "bottom-[-9px] border-b-2 border-r-2 left-8"
               : placement === "bottom"
-              ? "top-[-9px] border-t-2 border-l-2 left-8"
-              : placement === "left"
-              ? "right-[-9px] border-t-2 border-r-2 top-6"
-              : "left-[-9px] border-b-2 border-l-2 top-6"
+                ? "top-[-9px] border-t-2 border-l-2 left-8"
+                : placement === "left"
+                  ? "right-[-9px] border-t-2 border-r-2 top-6"
+                  : "left-[-9px] border-b-2 border-l-2 top-6"
           }`}
         />
       </div>
@@ -154,7 +154,7 @@ export function PageOnboardingHint({
   id,
   title,
   content,
-  actions = []
+  actions = [],
 }: {
   id: string;
   title: string;

@@ -8,25 +8,28 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { useCampground } from "@/contexts/CampgroundContext";
 import { apiClient } from "@/lib/api-client";
 import { launchConfetti } from "@/lib/gamification/confetti";
-import {
-  Trophy,
-  Users,
-  Award,
-  Zap,
-  TrendingUp,
-  Shield,
-  Loader2,
-  Save,
-  Gift,
-} from "lucide-react";
+import { Trophy, Users, Award, Zap, TrendingUp, Shield, Loader2, Save, Gift } from "lucide-react";
 
-type RoleOptionValue = "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly";
+type RoleOptionValue =
+  | "owner"
+  | "manager"
+  | "front_desk"
+  | "maintenance"
+  | "finance"
+  | "marketing"
+  | "readonly";
 type CategoryValue =
   | "task"
   | "maintenance"
@@ -91,7 +94,10 @@ export default function GamificationSettingsPage() {
   // Local state for form
   const [enabled, setEnabled] = useState(false);
   const [enabledRoles, setEnabledRoles] = useState<RoleOptionValue[]>([
-    "owner", "manager", "front_desk", "maintenance"
+    "owner",
+    "manager",
+    "front_desk",
+    "maintenance",
   ]);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -102,7 +108,11 @@ export default function GamificationSettingsPage() {
   const [awardReason, setAwardReason] = useState<string>("Merit XP for outstanding work");
 
   // Fetch settings
-  const { data: settings, isLoading: settingsLoading, error: settingsError } = useQuery<GamificationSettings>({
+  const {
+    data: settings,
+    isLoading: settingsLoading,
+    error: settingsError,
+  } = useQuery<GamificationSettings>({
     queryKey: ["gamification-settings", campgroundId],
     queryFn: () => apiClient.getGamificationSettings(requireCampgroundId()),
     enabled: !!campgroundId,
@@ -196,9 +206,7 @@ export default function GamificationSettingsPage() {
 
   const handleToggleRole = (value: RoleOptionValue) => {
     setEnabledRoles((prev) => {
-      const newRoles = prev.includes(value)
-        ? prev.filter((r) => r !== value)
-        : [...prev, value];
+      const newRoles = prev.includes(value) ? prev.filter((r) => r !== value) : [...prev, value];
       setHasChanges(true);
       return newRoles;
     });
@@ -301,7 +309,9 @@ export default function GamificationSettingsPage() {
         </div>
         <Badge
           variant={enabled ? "default" : "outline"}
-          className={enabled ? "bg-status-success/15 text-status-success border-status-success/30" : ""}
+          className={
+            enabled ? "bg-status-success/15 text-status-success border-status-success/30" : ""
+          }
         >
           {enabled ? "Enabled" : "Disabled"}
         </Badge>
@@ -321,7 +331,9 @@ export default function GamificationSettingsPage() {
             <div className="rounded-lg border border-border bg-card/80 p-4">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp className="w-4 h-4 text-status-success" />
-                <span className="text-sm font-medium text-muted-foreground">Total XP (30 days)</span>
+                <span className="text-sm font-medium text-muted-foreground">
+                  Total XP (30 days)
+                </span>
               </div>
               <div className="text-2xl font-bold text-foreground">{totalXp.toLocaleString()}</div>
             </div>
@@ -408,9 +420,7 @@ export default function GamificationSettingsPage() {
               )}
               Save Settings
             </Button>
-            {hasChanges && (
-              <span className="text-sm text-amber-600">Unsaved changes</span>
-            )}
+            {hasChanges && <span className="text-sm text-amber-600">Unsaved changes</span>}
           </div>
         </CardContent>
       </Card>
@@ -441,7 +451,10 @@ export default function GamificationSettingsPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="bg-status-success/10 text-status-success border-status-success/20">
+                    <Badge
+                      variant="outline"
+                      className="bg-status-success/10 text-status-success border-status-success/20"
+                    >
                       Default: {rule.defaultXp} XP
                     </Badge>
                     <Badge variant={rule.isActive ? "default" : "secondary"}>
@@ -463,9 +476,7 @@ export default function GamificationSettingsPage() {
               <Gift className="w-5 h-5 text-purple-600" />
               Manual Merit XP
             </CardTitle>
-            <CardDescription>
-              Recognize above-and-beyond work with bonus XP
-            </CardDescription>
+            <CardDescription>Recognize above-and-beyond work with bonus XP</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -527,10 +538,7 @@ export default function GamificationSettingsPage() {
               />
             </div>
             <div className="flex justify-end">
-              <Button
-                onClick={handleAward}
-                disabled={awardMutation.isPending || !awardTarget}
-              >
+              <Button onClick={handleAward} disabled={awardMutation.isPending || !awardTarget}>
                 {awardMutation.isPending ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
@@ -566,10 +574,10 @@ export default function GamificationSettingsPage() {
                       row.rank === 1
                         ? "bg-status-warning/15 text-status-warning border-status-warning/30"
                         : row.rank === 2
-                        ? "bg-muted text-muted-foreground border-border"
-                        : row.rank === 3
-                        ? "bg-status-warning/10 text-status-warning border-status-warning/20"
-                        : ""
+                          ? "bg-muted text-muted-foreground border-border"
+                          : row.rank === 3
+                            ? "bg-status-warning/10 text-status-warning border-status-warning/20"
+                            : ""
                     }`}
                   >
                     {row.rank}

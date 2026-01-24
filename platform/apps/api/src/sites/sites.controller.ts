@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException, NotFoundException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  ForbiddenException,
+  NotFoundException,
+} from "@nestjs/common";
 import { SitesService } from "./sites.service";
 import { CreateSiteDto } from "./dto/create-site.dto";
 import { JwtAuthGuard, RolesGuard, ScopeGuard } from "../auth/guards";
@@ -8,19 +20,19 @@ import { UserRole } from "@prisma/client";
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class SitesController {
-  constructor(private readonly sites: SitesService) { }
+  constructor(private readonly sites: SitesService) {}
 
   @Get("campgrounds/:campgroundId/sites")
   list(
     @Param("campgroundId") campgroundId: string,
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
-    @Query("isActive") isActive?: string
+    @Query("isActive") isActive?: string,
   ) {
     return this.sites.listByCampground(campgroundId, {
       limit: limit ? parseInt(limit, 10) : undefined,
       offset: offset ? parseInt(offset, 10) : undefined,
-      isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined
+      isActive: isActive === "true" ? true : isActive === "false" ? false : undefined,
     });
   }
 
@@ -36,7 +48,10 @@ export class SitesController {
 
   @Post("campgrounds/:campgroundId/sites")
   @Roles(UserRole.owner, UserRole.manager)
-  create(@Param("campgroundId") campgroundId: string, @Body() body: Omit<CreateSiteDto, "campgroundId">) {
+  create(
+    @Param("campgroundId") campgroundId: string,
+    @Body() body: Omit<CreateSiteDto, "campgroundId">,
+  ) {
     return this.sites.create({ campgroundId, ...body });
   }
 
@@ -45,7 +60,7 @@ export class SitesController {
   async update(
     @Param("campgroundId") campgroundId: string,
     @Param("id") id: string,
-    @Body() body: Partial<CreateSiteDto>
+    @Body() body: Partial<CreateSiteDto>,
   ) {
     // SECURITY: Verify site belongs to campground before update
     const site = await this.sites.findOne(id);
@@ -60,10 +75,7 @@ export class SitesController {
 
   @Delete("campgrounds/:campgroundId/sites/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  async remove(
-    @Param("campgroundId") campgroundId: string,
-    @Param("id") id: string,
-  ) {
+  async remove(@Param("campgroundId") campgroundId: string, @Param("id") id: string) {
     // SECURITY: Verify site belongs to campground before delete
     const site = await this.sites.findOne(id);
     if (!site) {

@@ -2,7 +2,18 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { MapPin, Phone, Mail, Globe, Upload, Check, ChevronDown, ChevronUp, X, Loader2 } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Upload,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Loader2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,11 +33,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { US_TIMEZONES } from "@/lib/onboarding";
 import { cn } from "@/lib/utils";
 import { AmenityPicker } from "@/components/onboarding/AmenityPicker";
@@ -181,7 +188,7 @@ function ValidatedField({
             "bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 pr-10",
             "transition-all duration-200",
             "focus:bg-slate-800 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
-            showCheck && "border-emerald-500/50 focus:border-emerald-500"
+            showCheck && "border-emerald-500/50 focus:border-emerald-500",
           )}
         />
         {showCheck && (
@@ -220,7 +227,7 @@ function ToggleChip({
         "relative px-3 py-2 rounded-lg border text-sm transition-all",
         selected
           ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
-          : "border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-600 hover:bg-slate-800"
+          : "border-slate-700 bg-slate-800/50 text-slate-400 hover:border-slate-600 hover:bg-slate-800",
       )}
     >
       {selected && (
@@ -237,12 +244,7 @@ function ToggleChip({
   );
 }
 
-export function ParkProfile({
-  initialData,
-  onSave,
-  onNext,
-  isLoading = false,
-}: ParkProfileProps) {
+export function ParkProfile({ initialData, onSave, onNext, isLoading = false }: ParkProfileProps) {
   const prefersReducedMotion = useReducedMotion();
   const [saving, setSaving] = useState(false);
   const [stateOpen, setStateOpen] = useState(false);
@@ -336,9 +338,7 @@ export function ParkProfile({
       .filter((line) => line.length > 0);
 
     // Keep default selections and add custom ones
-    const defaultSelected = data.bookingSources.filter((s) =>
-      DEFAULT_BOOKING_SOURCES.includes(s)
-    );
+    const defaultSelected = data.bookingSources.filter((s) => DEFAULT_BOOKING_SOURCES.includes(s));
     setData((prev) => ({
       ...prev,
       bookingSources: [...defaultSelected, ...customLines],
@@ -354,9 +354,7 @@ export function ParkProfile({
       .filter((line) => line.length > 0);
 
     // Keep default selections and add custom ones
-    const defaultSelected = data.stayReasons.filter((r) =>
-      DEFAULT_STAY_REASONS.includes(r)
-    );
+    const defaultSelected = data.stayReasons.filter((r) => DEFAULT_STAY_REASONS.includes(r));
     setData((prev) => ({
       ...prev,
       stayReasons: [...defaultSelected, ...customLines],
@@ -454,18 +452,14 @@ export function ParkProfile({
               "relative w-20 h-20 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden cursor-pointer transition-all",
               data.logoUrl
                 ? "border-emerald-500/50 bg-slate-800"
-                : "border-slate-700 bg-slate-800 hover:border-emerald-500/50 group"
+                : "border-slate-700 bg-slate-800 hover:border-emerald-500/50 group",
             )}
           >
             {uploadingLogo ? (
               <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
             ) : data.logoUrl ? (
               <>
-                <img
-                  src={data.logoUrl}
-                  alt="Logo"
-                  className="w-full h-full object-cover"
-                />
+                <img src={data.logoUrl} alt="Logo" className="w-full h-full object-cover" />
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -559,9 +553,7 @@ export function ParkProfile({
               </Label>
               <Input
                 value={data.city}
-                onChange={(e) =>
-                  setData((prev) => ({ ...prev, city: e.target.value }))
-                }
+                onChange={(e) => setData((prev) => ({ ...prev, city: e.target.value }))}
                 placeholder="Springfield"
                 className="mt-2 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]"
               />
@@ -590,10 +582,7 @@ export function ParkProfile({
                   sideOffset={4}
                 >
                   <Command className="bg-slate-800">
-                    <CommandInput
-                      placeholder="Search state..."
-                      className="text-white"
-                    />
+                    <CommandInput placeholder="Search state..." className="text-white" />
                     <CommandList className="max-h-[200px]">
                       <CommandEmpty className="text-slate-400 py-2 text-center text-sm">
                         No state found.
@@ -614,7 +603,7 @@ export function ParkProfile({
                                 "mr-2 h-4 w-4",
                                 data.state === state.value
                                   ? "opacity-100 text-emerald-400"
-                                  : "opacity-0"
+                                  : "opacity-0",
                               )}
                             />
                             {state.label}
@@ -633,9 +622,7 @@ export function ParkProfile({
               </Label>
               <Input
                 value={data.postalCode}
-                onChange={(e) =>
-                  setData((prev) => ({ ...prev, postalCode: e.target.value }))
-                }
+                onChange={(e) => setData((prev) => ({ ...prev, postalCode: e.target.value }))}
                 placeholder="12345"
                 className="mt-2 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]"
               />
@@ -661,7 +648,11 @@ export function ParkProfile({
             </SelectTrigger>
             <SelectContent className="bg-slate-800 border-slate-700">
               {US_TIMEZONES.map((tz) => (
-                <SelectItem key={tz.value} value={tz.value} className="text-white hover:bg-slate-700">
+                <SelectItem
+                  key={tz.value}
+                  value={tz.value}
+                  className="text-white hover:bg-slate-700"
+                >
                   {tz.label}
                 </SelectItem>
               ))}
@@ -824,9 +815,7 @@ export function ParkProfile({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm text-slate-300">
-                  Custom stay reasons (one per line)
-                </Label>
+                <Label className="text-sm text-slate-300">Custom stay reasons (one per line)</Label>
                 <Textarea
                   value={customStayReasons}
                   onChange={(e) => handleCustomStayReasonsChange(e.target.value)}
@@ -852,7 +841,7 @@ export function ParkProfile({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50 disabled:cursor-not-allowed"
+              "disabled:opacity-50 disabled:cursor-not-allowed",
             )}
           >
             {saving ? (

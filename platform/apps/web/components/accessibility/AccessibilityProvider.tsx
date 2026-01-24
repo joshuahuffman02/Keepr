@@ -1,55 +1,58 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 /**
  * AccessibilityProvider - Global accessibility context
  * Manages accessibility preferences and provides utilities
  */
 interface AccessibilityContextValue {
-  prefersReducedMotion: boolean
-  announceMessage: (message: string, priority?: "polite" | "assertive") => void
+  prefersReducedMotion: boolean;
+  announceMessage: (message: string, priority?: "polite" | "assertive") => void;
 }
 
-const AccessibilityContext = React.createContext<AccessibilityContextValue | null>(null)
+const AccessibilityContext = React.createContext<AccessibilityContextValue | null>(null);
 
 export function AccessibilityProvider({ children }: { children: React.ReactNode }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false)
-  const announcerRef = React.useRef<HTMLDivElement>(null)
+  const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
+  const announcerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     // Detect reduced motion preference
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setPrefersReducedMotion(mediaQuery.matches)
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mediaQuery.matches);
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches)
-    }
+      setPrefersReducedMotion(e.matches);
+    };
 
-    mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
-  }, [])
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
+  }, []);
 
-  const announceMessage = React.useCallback((message: string, priority: "polite" | "assertive" = "polite") => {
-    if (announcerRef.current) {
-      announcerRef.current.textContent = ""
-      // Small delay to ensure screen readers pick up the change
-      setTimeout(() => {
-        if (announcerRef.current) {
-          announcerRef.current.setAttribute("aria-live", priority)
-          announcerRef.current.textContent = message
-        }
-      }, 100)
-    }
-  }, [])
+  const announceMessage = React.useCallback(
+    (message: string, priority: "polite" | "assertive" = "polite") => {
+      if (announcerRef.current) {
+        announcerRef.current.textContent = "";
+        // Small delay to ensure screen readers pick up the change
+        setTimeout(() => {
+          if (announcerRef.current) {
+            announcerRef.current.setAttribute("aria-live", priority);
+            announcerRef.current.textContent = message;
+          }
+        }, 100);
+      }
+    },
+    [],
+  );
 
   const value = React.useMemo(
     () => ({
       prefersReducedMotion,
       announceMessage,
     }),
-    [prefersReducedMotion, announceMessage]
-  )
+    [prefersReducedMotion, announceMessage],
+  );
 
   return (
     <AccessibilityContext.Provider value={value}>
@@ -63,13 +66,13 @@ export function AccessibilityProvider({ children }: { children: React.ReactNode 
         aria-atomic="true"
       />
     </AccessibilityContext.Provider>
-  )
+  );
 }
 
 export function useAccessibility() {
-  const context = React.useContext(AccessibilityContext)
+  const context = React.useContext(AccessibilityContext);
   if (!context) {
-    throw new Error("useAccessibility must be used within AccessibilityProvider")
+    throw new Error("useAccessibility must be used within AccessibilityProvider");
   }
-  return context
+  return context;
 }

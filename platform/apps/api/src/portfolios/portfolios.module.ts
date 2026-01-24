@@ -8,4 +8,3 @@ import { PortfoliosController } from "./portfolios.controller";
   exports: [PortfoliosService],
 })
 export class PortfoliosModule {}
-

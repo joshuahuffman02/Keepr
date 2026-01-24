@@ -72,9 +72,7 @@ interface ChatStreamToken {
   },
   namespace: "/chat",
 })
-export class ChatGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
 
@@ -83,7 +81,7 @@ export class ChatGateway
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   afterInit() {
@@ -181,9 +179,7 @@ export class ChatGateway
 
       this.connectedClients.set(client.id, authSocket);
 
-      this.logger.log(
-        `Chat client connected: ${client.id} (${participantType}: ${participantId})`
-      );
+      this.logger.log(`Chat client connected: ${client.id} (${participantType}: ${participantId})`);
 
       // Send connection confirmation
       client.emit("connected", {
@@ -210,7 +206,7 @@ export class ChatGateway
   @SubscribeMessage("conversation:join")
   async handleJoinConversation(
     @ConnectedSocket() client: AuthenticatedChatSocket,
-    @MessageBody() data: { conversationId: string }
+    @MessageBody() data: { conversationId: string },
   ) {
     // Verify the participant owns this conversation AND campground access
     const conversation = await this.prisma.chatConversation.findFirst({
@@ -225,7 +221,7 @@ export class ChatGateway
 
     if (!conversation) {
       this.logger.warn(
-        `Unauthorized conversation join attempt: ${client.data.participantId} -> ${data.conversationId}`
+        `Unauthorized conversation join attempt: ${client.data.participantId} -> ${data.conversationId}`,
       );
       return { error: "Conversation not found or not authorized" };
     }
@@ -242,7 +238,7 @@ export class ChatGateway
   @SubscribeMessage("conversation:leave")
   async handleLeaveConversation(
     @ConnectedSocket() client: AuthenticatedChatSocket,
-    @MessageBody() data: { conversationId: string }
+    @MessageBody() data: { conversationId: string },
   ) {
     await client.leave(`conversation:${data.conversationId}`);
     if (client.data.conversationId === data.conversationId) {
@@ -296,7 +292,7 @@ export class ChatGateway
       actionRequired?: ChatActionRequired;
       parts?: ChatMessagePart[];
       visibility?: ChatMessageVisibility;
-    }
+    },
   ) {
     this.server.to(`conversation:${conversationId}`).emit("chat:complete", {
       ...data,
@@ -321,14 +317,12 @@ export class ChatGateway
     campgroundId: string,
     participantId: string,
     event: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
   ) {
-    this.server
-      .to(`chat:${campgroundId}:${participantId}`)
-      .emit(event, {
-        ...data,
-        timestamp: new Date().toISOString(),
-      });
+    this.server.to(`chat:${campgroundId}:${participantId}`).emit(event, {
+      ...data,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   /**

@@ -57,10 +57,8 @@ const getSiteTypeIcon = (siteType?: string | null) => {
 // Get gradient for site type
 const getSiteTypeGradient = (siteType?: string | null) => {
   const type = (siteType || "").toLowerCase();
-  if (type.includes("rv") || type.includes("trailer"))
-    return "from-blue-600 to-cyan-600";
-  if (type.includes("cabin") || type.includes("lodge"))
-    return "from-amber-600 to-orange-600";
+  if (type.includes("rv") || type.includes("trailer")) return "from-blue-600 to-cyan-600";
+  if (type.includes("cabin") || type.includes("lodge")) return "from-amber-600 to-orange-600";
   if (type.includes("tent")) return "from-emerald-600 to-teal-600";
   if (type.includes("glamp")) return "from-purple-600 to-pink-600";
   return "from-slate-600 to-slate-700";
@@ -91,8 +89,7 @@ export function SiteClassCard({
   const pricePerNight = siteClass.defaultRate || 0;
   const totalPrice = pricePerNight * nights;
 
-  const hasFullHookups =
-    siteClass.hookupsPower && siteClass.hookupsWater && siteClass.hookupsSewer;
+  const hasFullHookups = siteClass.hookupsPower && siteClass.hookupsWater && siteClass.hookupsSewer;
 
   const features: { icon: typeof Plug; label: string }[] = [];
 
@@ -118,7 +115,7 @@ export function SiteClassCard({
         isSelected
           ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-lg"
           : "border-border hover:border-border hover:shadow-md",
-        className
+        className,
       )}
       onClick={onSelect}
       whileHover={prefersReducedMotion ? {} : { y: -2 }}
@@ -145,7 +142,7 @@ export function SiteClassCard({
           <div
             className={cn(
               "w-full h-full bg-gradient-to-br flex items-center justify-center",
-              getSiteTypeGradient(siteClass.siteType)
+              getSiteTypeGradient(siteClass.siteType),
             )}
           >
             <Icon className="h-12 w-12 text-white/60" />
@@ -157,7 +154,7 @@ export function SiteClassCard({
           <Badge
             className={cn(
               "text-white border-0 bg-gradient-to-r shadow-md",
-              getSiteTypeGradient(siteClass.siteType)
+              getSiteTypeGradient(siteClass.siteType),
             )}
           >
             <Icon className="h-3 w-3 mr-1" />
@@ -171,9 +168,7 @@ export function SiteClassCard({
             variant="secondary"
             className={cn(
               "shadow-md",
-              availableCount <= 2
-                ? "bg-amber-100 text-amber-800"
-                : "bg-card/90 text-foreground"
+              availableCount <= 2 ? "bg-amber-100 text-amber-800" : "bg-card/90 text-foreground",
             )}
           >
             {availableCount} available
@@ -219,22 +214,15 @@ export function SiteClassCard({
         {/* Total price */}
         {nights > 1 && (
           <div className="flex items-center justify-between pt-2 border-t border-border">
-            <span className="text-sm text-muted-foreground">
-              {nights} nights total
-            </span>
-            <span className="font-semibold text-foreground">
-              {formatCurrency(totalPrice)}
-            </span>
+            <span className="text-sm text-muted-foreground">{nights} nights total</span>
+            <span className="font-semibold text-foreground">{formatCurrency(totalPrice)}</span>
           </div>
         )}
 
         {/* Select button (on mobile) */}
         <Button
           variant={isSelected ? "default" : "outline"}
-          className={cn(
-            "w-full md:hidden",
-            isSelected && "bg-emerald-600 hover:bg-emerald-700"
-          )}
+          className={cn("w-full md:hidden", isSelected && "bg-emerald-600 hover:bg-emerald-700")}
           onClick={(e) => {
             e.stopPropagation();
             onSelect();
@@ -265,14 +253,7 @@ export function SiteClassGrid({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "grid gap-4 md:grid-cols-2 lg:grid-cols-2",
-        className
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn("grid gap-4 md:grid-cols-2 lg:grid-cols-2", className)}>{children}</div>
   );
 }
 
@@ -290,9 +271,7 @@ export function SiteClassEmpty({
     <div className="text-center py-12 bg-muted rounded-xl border border-border border-dashed">
       <Tent className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
       <p className="text-muted-foreground font-medium">{message}</p>
-      <p className="text-sm text-muted-foreground mt-1">
-        Try different dates or check back later
-      </p>
+      <p className="text-sm text-muted-foreground mt-1">Try different dates or check back later</p>
       {onChangeDates && (
         <Button variant="outline" className="mt-4" onClick={onChangeDates}>
           Change Dates

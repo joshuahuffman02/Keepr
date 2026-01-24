@@ -7,13 +7,7 @@ import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,10 +65,7 @@ function formatDateTime(d?: string | Date | null) {
   return isNaN(date.getTime()) ? "—" : format(date, "MMM d, yyyy h:mma");
 }
 
-export function ReservationFormsCard({
-  campgroundId,
-  reservationId,
-}: ReservationFormsCardProps) {
+export function ReservationFormsCard({ campgroundId, reservationId }: ReservationFormsCardProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [attachModalOpen, setAttachModalOpen] = useState(false);
@@ -101,11 +92,9 @@ export function ReservationFormsCard({
 
   const submissions = submissionsQuery.data || [];
   const templates = templatesQuery.data || [];
-  const pendingCount = submissions.filter(
-    (s) => s.status === "pending"
-  ).length;
+  const pendingCount = submissions.filter((s) => s.status === "pending").length;
   const requiredPendingCount = submissions.filter(
-    (s) => s.status === "pending" && s.formTemplate?.isRequired !== false
+    (s) => s.status === "pending" && s.formTemplate?.isRequired !== false,
   ).length;
   const responseEntries =
     selectedSubmission && isRecord(selectedSubmission.responses)
@@ -161,7 +150,7 @@ export function ReservationFormsCard({
     (t) =>
       !attachedTemplateIds.has(t.id) &&
       t.isActive !== false &&
-      t.title.toLowerCase().includes(searchQuery.toLowerCase())
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleMarkComplete = (submission: FormSubmission) => {
@@ -170,7 +159,9 @@ export function ReservationFormsCard({
 
   const handleSkipWithNote = () => {
     if (!selectedSubmission) return;
-    const baseResponses = isRecord(selectedSubmission.responses) ? selectedSubmission.responses : {};
+    const baseResponses = isRecord(selectedSubmission.responses)
+      ? selectedSubmission.responses
+      : {};
     // Use void status with a skipNote in responses
     updateMutation.mutate({
       id: selectedSubmission.id,
@@ -215,11 +206,7 @@ export function ReservationFormsCard({
       );
     }
     if (status === "void") {
-      return (
-        <Badge className="bg-muted text-muted-foreground border-border">
-          Voided
-        </Badge>
-      );
+      return <Badge className="bg-muted text-muted-foreground border-border">Voided</Badge>;
     }
     if (status === "pending" && isRequired) {
       return (
@@ -260,21 +247,15 @@ export function ReservationFormsCard({
             {submissionsQuery.isLoading ? (
               <span className="text-xs text-muted-foreground">Loading…</span>
             ) : (
-              <Badge
-                variant={requiredPendingCount > 0 ? "destructive" : "secondary"}
-              >
+              <Badge variant={requiredPendingCount > 0 ? "destructive" : "secondary"}>
                 {requiredPendingCount > 0
                   ? `${requiredPendingCount} required pending`
                   : pendingCount > 0
-                  ? `${pendingCount} pending`
-                  : "All complete"}
+                    ? `${pendingCount} pending`
+                    : "All complete"}
               </Badge>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setAttachModalOpen(true)}
-            >
+            <Button size="sm" variant="outline" onClick={() => setAttachModalOpen(true)}>
               <Plus className="h-4 w-4 mr-1" />
               Attach
             </Button>
@@ -313,21 +294,15 @@ export function ReservationFormsCard({
                     </span>
                     {getStatusBadge(submission)}
                     {!submission.formTemplate?.isRequired && (
-                      <span className="text-[10px] text-muted-foreground uppercase">
-                        Optional
-                      </span>
+                      <span className="text-[10px] text-muted-foreground uppercase">Optional</span>
                     )}
                   </div>
                   <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                    <span className="capitalize">
-                      {submission.formTemplate?.type || "custom"}
-                    </span>
+                    <span className="capitalize">{submission.formTemplate?.type || "custom"}</span>
                     {getShowAtLabel(submission.formTemplate?.showAt) && (
                       <>
                         <span>•</span>
-                        <span>
-                          Show: {getShowAtLabel(submission.formTemplate?.showAt)}
-                        </span>
+                        <span>Show: {getShowAtLabel(submission.formTemplate?.showAt)}</span>
                       </>
                     )}
                     {submission.signedAt && (
@@ -357,14 +332,14 @@ export function ReservationFormsCard({
 
                   {submission.status === "pending" && (
                     <>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleMarkComplete(submission)}
-                          title="Mark as complete"
-                        >
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleMarkComplete(submission)}
+                        title="Mark as complete"
+                      >
                         <Check className="h-4 w-4 text-status-success" />
-                        </Button>
+                      </Button>
                       {submission.formTemplate?.allowSkipWithNote && (
                         <Button
                           size="sm"
@@ -411,9 +386,7 @@ export function ReservationFormsCard({
                         </DropdownMenuItem>
                       )}
                       {submission.status !== "completed" && (
-                        <DropdownMenuItem
-                          onClick={() => handleMarkComplete(submission)}
-                        >
+                        <DropdownMenuItem onClick={() => handleMarkComplete(submission)}>
                           <Check className="h-4 w-4 mr-2" />
                           Mark complete
                         </DropdownMenuItem>
@@ -449,16 +422,14 @@ export function ReservationFormsCard({
             />
 
             {templatesQuery.isLoading ? (
-              <div className="text-center py-4 text-muted-foreground text-sm">
-                Loading forms...
-              </div>
+              <div className="text-center py-4 text-muted-foreground text-sm">Loading forms...</div>
             ) : availableTemplates.length === 0 ? (
               <div className="text-center py-4 text-muted-foreground text-sm">
                 {templates.length === 0
                   ? "No forms created yet. Create forms in Settings → Forms."
                   : searchQuery
-                  ? "No matching forms found."
-                  : "All forms already attached."}
+                    ? "No matching forms found."
+                    : "All forms already attached."}
               </div>
             ) : (
               <div className="space-y-2 max-h-64 overflow-auto">
@@ -471,24 +442,16 @@ export function ReservationFormsCard({
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="font-medium text-sm">
-                          {template.title}
-                        </div>
+                        <div className="font-medium text-sm">{template.title}</div>
                         <div className="text-xs text-muted-foreground flex items-center gap-2">
                           <span className="capitalize">{template.type}</span>
                           {template.isRequired !== false && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] h-4"
-                            >
+                            <Badge variant="outline" className="text-[10px] h-4">
                               Required
                             </Badge>
                           )}
                           {template.autoAttachMode !== "manual" && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] h-4 bg-status-info/10"
-                            >
+                            <Badge variant="outline" className="text-[10px] h-4 bg-status-info/10">
                               Auto-attach
                             </Badge>
                           )}
@@ -529,44 +492,31 @@ export function ReservationFormsCard({
             {skipNoteValue && (
               <div className="p-3 bg-muted rounded-lg">
                 <div className="text-xs text-muted-foreground mb-1">Skip reason:</div>
-                <div className="text-sm">
-                  {skipNoteValue}
-                </div>
+                <div className="text-sm">{skipNoteValue}</div>
               </div>
             )}
 
             {responseEntries.length > 0 && (
-                <div className="space-y-3">
-                  <div className="text-xs font-medium text-muted-foreground uppercase">
-                    Responses
-                  </div>
-                  <div className="space-y-2">
-                    {responseEntries.map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="p-3 bg-muted rounded-lg"
-                        >
-                          <div className="text-xs text-muted-foreground mb-1">
-                            {key}
-                          </div>
-                          <div className="text-sm">
-                            {typeof value === "boolean"
-                              ? value
-                                ? "Yes"
-                                : "No"
-                              : String(value)}
-                          </div>
-                        </div>
-                    ))}
-                  </div>
+              <div className="space-y-3">
+                <div className="text-xs font-medium text-muted-foreground uppercase">Responses</div>
+                <div className="space-y-2">
+                  {responseEntries.map(([key, value]) => (
+                    <div key={key} className="p-3 bg-muted rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">{key}</div>
+                      <div className="text-sm">
+                        {typeof value === "boolean" ? (value ? "Yes" : "No") : String(value)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+            )}
 
             {responseEntries.length === 0 && !skipNoteValue && (
-                <div className="text-center py-6 text-muted-foreground text-sm">
-                  No responses recorded yet.
-                </div>
-              )}
+              <div className="text-center py-6 text-muted-foreground text-sm">
+                No responses recorded yet.
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -586,8 +536,8 @@ export function ReservationFormsCard({
 
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Skipping "{selectedSubmission?.formTemplate?.title}". Please
-              provide a reason for skipping this form.
+              Skipping "{selectedSubmission?.formTemplate?.title}". Please provide a reason for
+              skipping this form.
             </p>
 
             <Textarea
@@ -619,12 +569,16 @@ export function ReservationFormsCard({
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remove Form</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove this form from the reservation? This action cannot be undone.
+              Are you sure you want to remove this form from the reservation? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

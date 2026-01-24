@@ -38,7 +38,7 @@ type RawBodyRequest = Request & { rawBody?: Buffer | string };
 export class MarketplaceController {
   constructor(
     private readonly registry: IntegrationRegistryService,
-    private readonly framework: IntegrationFrameworkService
+    private readonly framework: IntegrationFrameworkService,
   ) {}
 
   // ========================================
@@ -59,7 +59,7 @@ export class MarketplaceController {
   @Get("marketplace")
   async listIntegrations(
     @Query("category") category?: string,
-    @Query("activeOnly") activeOnly?: string
+    @Query("activeOnly") activeOnly?: string,
   ) {
     return this.registry.listIntegrations({
       category,
@@ -99,7 +99,7 @@ export class MarketplaceController {
   @Get("campgrounds/:campgroundId/marketplace")
   async listIntegrationsWithStatus(
     @Param("campgroundId") campgroundId: string,
-    @Query("category") category?: string
+    @Query("category") category?: string,
   ) {
     return this.registry.listIntegrationsWithStatus(campgroundId, { category });
   }
@@ -123,7 +123,7 @@ export class MarketplaceController {
   async initiateOAuth(
     @Param("campgroundId") campgroundId: string,
     @Param("slug") slug: string,
-    @Query("redirectUri") redirectUri?: string
+    @Query("redirectUri") redirectUri?: string,
   ) {
     const integration = await this.registry.getIntegration(slug);
     if (!integration) {
@@ -134,16 +134,11 @@ export class MarketplaceController {
       throw new BadRequestException(`Integration ${slug} does not use OAuth`);
     }
 
-    const defaultRedirectUri =
-      process.env.API_BASE_URL
-        ? `${process.env.API_BASE_URL}/integrations/oauth/${slug}/callback`
-        : `http://localhost:4000/integrations/oauth/${slug}/callback`;
+    const defaultRedirectUri = process.env.API_BASE_URL
+      ? `${process.env.API_BASE_URL}/integrations/oauth/${slug}/callback`
+      : `http://localhost:4000/integrations/oauth/${slug}/callback`;
 
-    return this.framework.initiateOAuth(
-      campgroundId,
-      slug,
-      redirectUri || defaultRedirectUri
-    );
+    return this.framework.initiateOAuth(campgroundId, slug, redirectUri || defaultRedirectUri);
   }
 
   /**
@@ -156,26 +151,20 @@ export class MarketplaceController {
     @Query("state") state: string,
     @Query("error") error?: string,
     @Query("error_description") errorDescription?: string,
-    @Res() res?: Response
+    @Res() res?: Response,
   ) {
     if (error) {
       const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
       return res?.redirect(
-        `${frontendUrl}/dashboard/settings/integrations?error=${error}&provider=${slug}`
+        `${frontendUrl}/dashboard/settings/integrations?error=${error}&provider=${slug}`,
       );
     }
 
-    const defaultRedirectUri =
-      process.env.API_BASE_URL
-        ? `${process.env.API_BASE_URL}/integrations/oauth/${slug}/callback`
-        : `http://localhost:4000/integrations/oauth/${slug}/callback`;
+    const defaultRedirectUri = process.env.API_BASE_URL
+      ? `${process.env.API_BASE_URL}/integrations/oauth/${slug}/callback`
+      : `http://localhost:4000/integrations/oauth/${slug}/callback`;
 
-    const result = await this.framework.handleOAuthCallback(
-      slug,
-      code,
-      state,
-      defaultRedirectUri
-    );
+    const result = await this.framework.handleOAuthCallback(slug, code, state, defaultRedirectUri);
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
     const redirectUrl = new URL(`${frontendUrl}/dashboard/settings/integrations`);
@@ -202,7 +191,7 @@ export class MarketplaceController {
   async connect(
     @Param("campgroundId") campgroundId: string,
     @Param("slug") slug: string,
-    @Body() body: { apiKey?: string; apiSecret?: string; config?: Record<string, unknown> }
+    @Body() body: { apiKey?: string; apiSecret?: string; config?: Record<string, unknown> },
   ) {
     const integration = await this.registry.getIntegration(slug);
     if (!integration) {
@@ -211,7 +200,7 @@ export class MarketplaceController {
 
     if (integration.authType === "oauth2") {
       throw new BadRequestException(
-        `Integration ${slug} requires OAuth. Use the OAuth flow instead.`
+        `Integration ${slug} requires OAuth. Use the OAuth flow instead.`,
       );
     }
 
@@ -226,7 +215,7 @@ export class MarketplaceController {
         apiKey: body.apiKey,
         apiSecret: body.apiSecret,
       },
-      body.config
+      body.config,
     );
   }
 
@@ -236,10 +225,7 @@ export class MarketplaceController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Roles(UserRole.owner, UserRole.manager)
   @Delete("campgrounds/:campgroundId/disconnect/:slug")
-  async disconnect(
-    @Param("campgroundId") campgroundId: string,
-    @Param("slug") slug: string
-  ) {
+  async disconnect(@Param("campgroundId") campgroundId: string, @Param("slug") slug: string) {
     return this.framework.disconnect(campgroundId, slug);
   }
 
@@ -256,7 +242,7 @@ export class MarketplaceController {
       syncType?: "full" | "incremental";
       direction?: "inbound" | "outbound" | "bidirectional";
       entityTypes?: string[];
-    }
+    },
   ) {
     return this.framework.triggerSync(connectionId, body);
   }
@@ -280,7 +266,7 @@ export class MarketplaceController {
   async getSyncLogs(
     @Param("connectionId") connectionId: string,
     @Query("limit") limit?: string,
-    @Query("cursor") cursor?: string
+    @Query("cursor") cursor?: string,
   ) {
     return this.registry.getSyncLogs(connectionId, {
       limit: limit ? parseInt(limit, 10) : undefined,
@@ -296,7 +282,7 @@ export class MarketplaceController {
   @Get("campgrounds/:campgroundId/status/:slug")
   async getConnectionStatus(
     @Param("campgroundId") campgroundId: string,
-    @Param("slug") slug: string
+    @Param("slug") slug: string,
   ) {
     return this.framework.getConnectionStatus(campgroundId, slug);
   }
@@ -316,7 +302,7 @@ export class MarketplaceController {
     @Headers("x-signature") signature?: string,
     @Headers("x-hub-signature") hubSignature?: string,
     @Headers("x-hmac-signature") hmacSignature?: string,
-    @Headers("x-campground-id") campgroundId?: string
+    @Headers("x-campground-id") campgroundId?: string,
   ) {
     const rawBodyValue = req.rawBody;
     const rawBody =
@@ -326,15 +312,8 @@ export class MarketplaceController {
           ? rawBodyValue
           : rawBodyValue.toString();
 
-    const providedSignature =
-      signature || hubSignature || hmacSignature;
+    const providedSignature = signature || hubSignature || hmacSignature;
 
-    return this.framework.handleWebhook(
-      slug,
-      body,
-      rawBody,
-      providedSignature,
-      campgroundId
-    );
+    return this.framework.handleWebhook(slug, body, rawBody, providedSignature, campgroundId);
   }
 }

@@ -25,10 +25,6 @@ import { QuickBooksMarketplaceProvider } from "./providers/quickbooks-marketplac
     IntegrationRegistryService,
     QuickBooksMarketplaceProvider,
   ],
-  exports: [
-    IntegrationFrameworkService,
-    IntegrationRegistryService,
-    CredentialEncryptionService,
-  ],
+  exports: [IntegrationFrameworkService, IntegrationRegistryService, CredentialEncryptionService],
 })
 export class MarketplaceModule {}

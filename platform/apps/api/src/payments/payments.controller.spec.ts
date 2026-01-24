@@ -36,10 +36,10 @@ describe("PaymentsController - Fee Calculations", () => {
           provide: PermissionsService,
           useValue: {
             isPlatformStaff: () => false,
-            checkAccess: async () => ({ allowed: true })
-          }
-        }
-      ]
+            checkAccess: async () => ({ allowed: true }),
+          },
+        },
+      ],
     }).compile();
 
     controller = moduleRef.get(PaymentsController);
@@ -55,7 +55,7 @@ describe("PaymentsController - Fee Calculations", () => {
     const calculateGatewayFee = (
       amountCents: number,
       percentBasisPoints: number | null | undefined,
-      flatFeeCents: number | null | undefined
+      flatFeeCents: number | null | undefined,
     ) => {
       return callPrivate("calculateGatewayFee", amountCents, percentBasisPoints, flatFeeCents);
     };
@@ -116,7 +116,11 @@ describe("PaymentsController - Fee Calculations", () => {
 
   describe("computeChargeAmounts", () => {
     type ChargeOptions = {
-      reservation: { balanceAmount?: number | null; totalAmount?: number | null; paidAmount?: number | null };
+      reservation: {
+        balanceAmount?: number | null;
+        totalAmount?: number | null;
+        paidAmount?: number | null;
+      };
       platformFeeMode: string;
       applicationFeeCents: number;
       gatewayFeeMode: string;
@@ -270,7 +274,7 @@ describe("PaymentsController - Fee Calculations", () => {
     });
   });
 
-  describe('buildReceiptLinesFromIntent', () => {
+  describe("buildReceiptLinesFromIntent", () => {
     type IntentLike = {
       amount?: number | null;
       amount_received?: number | null;
@@ -280,28 +284,28 @@ describe("PaymentsController - Fee Calculations", () => {
       return callPrivate("buildReceiptLinesFromIntent", intent);
     };
 
-    it('should build receipt lines from basic payment intent', () => {
+    it("should build receipt lines from basic payment intent", () => {
       const intent = {
         amount: 10000,
         amount_received: 10000,
         metadata: {
-          baseAmountCents: '9400',
-          platformPassThroughFeeCents: '200',
-          gatewayPassThroughFeeCents: '400',
+          baseAmountCents: "9400",
+          platformPassThroughFeeCents: "200",
+          gatewayPassThroughFeeCents: "400",
         },
       };
 
       const result = buildReceiptLinesFromIntent(intent);
 
       expect(result.lineItems).toHaveLength(3);
-      expect(result.lineItems[0]).toEqual({ label: 'Reservation charge', amountCents: 9400 });
-      expect(result.lineItems[1]).toEqual({ label: 'Platform fee', amountCents: 200 });
-      expect(result.lineItems[2]).toEqual({ label: 'Gateway fee', amountCents: 400 });
+      expect(result.lineItems[0]).toEqual({ label: "Reservation charge", amountCents: 9400 });
+      expect(result.lineItems[1]).toEqual({ label: "Platform fee", amountCents: 200 });
+      expect(result.lineItems[2]).toEqual({ label: "Gateway fee", amountCents: 400 });
       expect(result.feeCents).toBe(600);
       expect(result.totalCents).toBe(10000);
     });
 
-    it('should handle intent with no pass-through fees', () => {
+    it("should handle intent with no pass-through fees", () => {
       const intent = {
         amount: 10000,
         amount_received: 10000,
@@ -311,18 +315,18 @@ describe("PaymentsController - Fee Calculations", () => {
       const result = buildReceiptLinesFromIntent(intent);
 
       expect(result.lineItems).toHaveLength(1);
-      expect(result.lineItems[0]).toEqual({ label: 'Reservation charge', amountCents: 10000 });
+      expect(result.lineItems[0]).toEqual({ label: "Reservation charge", amountCents: 10000 });
       expect(result.feeCents).toBeUndefined();
       expect(result.totalCents).toBe(10000);
     });
 
-    it('should include tax when present', () => {
+    it("should include tax when present", () => {
       const intent = {
         amount: 10800,
         amount_received: 10800,
         metadata: {
-          baseAmountCents: '10000',
-          taxCents: '800',
+          baseAmountCents: "10000",
+          taxCents: "800",
         },
       };
 
@@ -332,25 +336,25 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.totalCents).toBe(10800);
     });
 
-    it('should use applicationFeeCents as fallback for platform fee', () => {
+    it("should use applicationFeeCents as fallback for platform fee", () => {
       const intent = {
         amount: 10200,
         amount_received: 10200,
         metadata: {
-          applicationFeeCents: '200', // legacy field name
+          applicationFeeCents: "200", // legacy field name
         },
       };
 
       const result = buildReceiptLinesFromIntent(intent);
 
-      expect(result.lineItems).toContainEqual({ label: 'Platform fee', amountCents: 200 });
+      expect(result.lineItems).toContainEqual({ label: "Platform fee", amountCents: 200 });
     });
 
-    it('should handle zero amounts gracefully', () => {
+    it("should handle zero amounts gracefully", () => {
       const intent = {
         amount: 0,
         metadata: {
-          baseAmountCents: '0',
+          baseAmountCents: "0",
         },
       };
 
@@ -360,7 +364,7 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.totalCents).toBe(0);
     });
 
-    it('should handle missing metadata', () => {
+    it("should handle missing metadata", () => {
       const intent = {
         amount: 5000,
       };
@@ -371,13 +375,13 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.totalCents).toBe(5000);
     });
 
-    it('should parse string metadata values correctly', () => {
+    it("should parse string metadata values correctly", () => {
       const intent = {
         amount: 10000,
         amount_received: 10000,
         metadata: {
-          baseAmountCents: '9700',
-          platformPassThroughFeeCents: '300',
+          baseAmountCents: "9700",
+          platformPassThroughFeeCents: "300",
         },
       };
 
@@ -388,144 +392,141 @@ describe("PaymentsController - Fee Calculations", () => {
     });
   });
 
-  describe('getPaymentMethodTypes', () => {
+  describe("getPaymentMethodTypes", () => {
     const getPaymentMethodTypes = (capabilities?: Record<string, string> | null) => {
       return controller.getPaymentMethodTypes(capabilities);
     };
 
-    it('should return card when card_payments is active', () => {
-      const result = getPaymentMethodTypes({ card_payments: 'active' });
-      expect(result).toContain('card');
+    it("should return card when card_payments is active", () => {
+      const result = getPaymentMethodTypes({ card_payments: "active" });
+      expect(result).toContain("card");
     });
 
-    it('should return us_bank_account when ACH is active', () => {
-      const result = getPaymentMethodTypes({ us_bank_account_ach_payments: 'active' });
-      expect(result).toContain('us_bank_account');
+    it("should return us_bank_account when ACH is active", () => {
+      const result = getPaymentMethodTypes({ us_bank_account_ach_payments: "active" });
+      expect(result).toContain("us_bank_account");
     });
 
-    it('should return both when both are active', () => {
+    it("should return both when both are active", () => {
       const result = getPaymentMethodTypes({
-        card_payments: 'active',
-        us_bank_account_ach_payments: 'active',
+        card_payments: "active",
+        us_bank_account_ach_payments: "active",
       });
-      expect(result).toContain('card');
-      expect(result).toContain('us_bank_account');
+      expect(result).toContain("card");
+      expect(result).toContain("us_bank_account");
       expect(result).toHaveLength(2);
     });
 
-    it('should default to card when no capabilities', () => {
+    it("should default to card when no capabilities", () => {
       const result = getPaymentMethodTypes(undefined);
-      expect(result).toEqual(['card']);
+      expect(result).toEqual(["card"]);
     });
 
-    it('should default to card when null capabilities', () => {
+    it("should default to card when null capabilities", () => {
       const result = getPaymentMethodTypes(null);
-      expect(result).toEqual(['card']);
+      expect(result).toEqual(["card"]);
     });
 
-    it('should default to card when capabilities are empty', () => {
+    it("should default to card when capabilities are empty", () => {
       const result = getPaymentMethodTypes({});
-      expect(result).toEqual(['card']);
+      expect(result).toEqual(["card"]);
     });
 
-    it('should not include inactive capabilities', () => {
+    it("should not include inactive capabilities", () => {
       const result = getPaymentMethodTypes({
-        card_payments: 'inactive',
-        us_bank_account_ach_payments: 'pending',
+        card_payments: "inactive",
+        us_bank_account_ach_payments: "pending",
       });
-      expect(result).toEqual(['card']); // defaults to card
+      expect(result).toEqual(["card"]); // defaults to card
     });
   });
 
-  describe('buildThreeDsPolicy', () => {
+  describe("buildThreeDsPolicy", () => {
     type ThreeDsConfig = Parameters<PaymentsController["buildThreeDsPolicy"]>[1];
-    const buildThreeDsPolicy = (
-      currency?: string | null,
-      gatewayConfig?: ThreeDsConfig
-    ) => {
+    const buildThreeDsPolicy = (currency?: string | null, gatewayConfig?: ThreeDsConfig) => {
       return controller.buildThreeDsPolicy(currency, gatewayConfig);
     };
 
-    describe('EU/UK currencies', () => {
+    describe("EU/UK currencies", () => {
       it('should return "any" for EUR currency', () => {
-        expect(buildThreeDsPolicy('eur')).toBe('any');
-        expect(buildThreeDsPolicy('EUR')).toBe('any');
+        expect(buildThreeDsPolicy("eur")).toBe("any");
+        expect(buildThreeDsPolicy("EUR")).toBe("any");
       });
 
       it('should return "any" for GBP currency', () => {
-        expect(buildThreeDsPolicy('gbp')).toBe('any');
-        expect(buildThreeDsPolicy('GBP')).toBe('any');
+        expect(buildThreeDsPolicy("gbp")).toBe("any");
+        expect(buildThreeDsPolicy("GBP")).toBe("any");
       });
 
       it('should return "any" for CHF currency', () => {
-        expect(buildThreeDsPolicy('chf')).toBe('any');
+        expect(buildThreeDsPolicy("chf")).toBe("any");
       });
 
       it('should return "any" for SEK currency', () => {
-        expect(buildThreeDsPolicy('sek')).toBe('any');
+        expect(buildThreeDsPolicy("sek")).toBe("any");
       });
 
       it('should return "any" for NOK currency', () => {
-        expect(buildThreeDsPolicy('nok')).toBe('any');
+        expect(buildThreeDsPolicy("nok")).toBe("any");
       });
     });
 
-    describe('US/other currencies', () => {
+    describe("US/other currencies", () => {
       it('should return "automatic" for USD currency', () => {
-        expect(buildThreeDsPolicy('usd')).toBe('automatic');
-        expect(buildThreeDsPolicy('USD')).toBe('automatic');
+        expect(buildThreeDsPolicy("usd")).toBe("automatic");
+        expect(buildThreeDsPolicy("USD")).toBe("automatic");
       });
 
       it('should return "automatic" for CAD currency', () => {
-        expect(buildThreeDsPolicy('cad')).toBe('automatic');
+        expect(buildThreeDsPolicy("cad")).toBe("automatic");
       });
 
       it('should return "automatic" for AUD currency', () => {
-        expect(buildThreeDsPolicy('aud')).toBe('automatic');
+        expect(buildThreeDsPolicy("aud")).toBe("automatic");
       });
     });
 
-    describe('region-based override', () => {
+    describe("region-based override", () => {
       it('should return "any" when region is eu', () => {
-        expect(buildThreeDsPolicy('usd', { region: 'eu' })).toBe('any');
+        expect(buildThreeDsPolicy("usd", { region: "eu" })).toBe("any");
       });
 
       it('should return "any" when region is uk', () => {
-        expect(buildThreeDsPolicy('usd', { region: 'uk' })).toBe('any');
+        expect(buildThreeDsPolicy("usd", { region: "uk" })).toBe("any");
       });
 
-      it('should use additionalConfig.region if present', () => {
-        expect(buildThreeDsPolicy('usd', { additionalConfig: { region: 'eu' } })).toBe('any');
+      it("should use additionalConfig.region if present", () => {
+        expect(buildThreeDsPolicy("usd", { additionalConfig: { region: "eu" } })).toBe("any");
       });
 
       it('should return "automatic" for non-EU region', () => {
-        expect(buildThreeDsPolicy('usd', { region: 'us' })).toBe('automatic');
+        expect(buildThreeDsPolicy("usd", { region: "us" })).toBe("automatic");
       });
     });
 
-    describe('edge cases', () => {
-      it('should handle null currency', () => {
-        expect(buildThreeDsPolicy(null)).toBe('automatic');
+    describe("edge cases", () => {
+      it("should handle null currency", () => {
+        expect(buildThreeDsPolicy(null)).toBe("automatic");
       });
 
-      it('should handle undefined currency', () => {
-        expect(buildThreeDsPolicy(undefined)).toBe('automatic');
+      it("should handle undefined currency", () => {
+        expect(buildThreeDsPolicy(undefined)).toBe("automatic");
       });
 
-      it('should handle empty string currency', () => {
-        expect(buildThreeDsPolicy('')).toBe('automatic');
+      it("should handle empty string currency", () => {
+        expect(buildThreeDsPolicy("")).toBe("automatic");
       });
     });
   });
 
-  describe('fee calculation integration scenarios', () => {
-    it('should calculate correct total for standard US transaction', () => {
+  describe("fee calculation integration scenarios", () => {
+    it("should calculate correct total for standard US transaction", () => {
       // $100 reservation, absorb mode
       const result = controller.computeChargeAmounts({
         reservation: { balanceAmount: 10000 },
-        platformFeeMode: 'absorb',
+        platformFeeMode: "absorb",
         applicationFeeCents: 200, // $2 platform fee
-        gatewayFeeMode: 'absorb',
+        gatewayFeeMode: "absorb",
         gatewayFeePercentBasisPoints: 290, // 2.9%
         gatewayFeeFlatCents: 30, // $0.30
       });
@@ -536,13 +537,13 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.gatewayPassThroughFeeCents).toBe(0);
     });
 
-    it('should calculate correct total for pass-through transaction', () => {
+    it("should calculate correct total for pass-through transaction", () => {
       // $100 reservation, pass-through mode
       const result = controller.computeChargeAmounts({
         reservation: { balanceAmount: 10000 },
-        platformFeeMode: 'pass_through',
+        platformFeeMode: "pass_through",
         applicationFeeCents: 200, // $2 platform fee
-        gatewayFeeMode: 'pass_through',
+        gatewayFeeMode: "pass_through",
         gatewayFeePercentBasisPoints: 290, // 2.9%
         gatewayFeeFlatCents: 30, // $0.30
       });
@@ -553,13 +554,13 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.gatewayPassThroughFeeCents).toBe(320);
     });
 
-    it('should handle partial payment scenario', () => {
+    it("should handle partial payment scenario", () => {
       // $500 total, $200 already paid, balance $300
       const result = controller.computeChargeAmounts({
         reservation: { balanceAmount: 30000, totalAmount: 50000, paidAmount: 20000 },
-        platformFeeMode: 'pass_through',
+        platformFeeMode: "pass_through",
         applicationFeeCents: 200,
-        gatewayFeeMode: 'absorb',
+        gatewayFeeMode: "absorb",
         gatewayFeePercentBasisPoints: 290,
         gatewayFeeFlatCents: 30,
       });
@@ -570,13 +571,13 @@ describe("PaymentsController - Fee Calculations", () => {
       expect(result.platformPassThroughFeeCents).toBe(200);
     });
 
-    it('should handle deposit (partial charge) scenario', () => {
+    it("should handle deposit (partial charge) scenario", () => {
       // $500 balance, request only $100 deposit
       const result = controller.computeChargeAmounts({
         reservation: { balanceAmount: 50000 },
-        platformFeeMode: 'absorb',
+        platformFeeMode: "absorb",
         applicationFeeCents: 200,
-        gatewayFeeMode: 'absorb',
+        gatewayFeeMode: "absorb",
         gatewayFeePercentBasisPoints: 290,
         gatewayFeeFlatCents: 30,
         requestedAmountCents: 10000,

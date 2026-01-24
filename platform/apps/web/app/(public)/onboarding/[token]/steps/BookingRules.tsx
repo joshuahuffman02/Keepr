@@ -68,25 +68,23 @@ export function BookingRules({
 }: BookingRulesProps) {
   const prefersReducedMotion = useReducedMotion();
   const [advanceBookingDays, setAdvanceBookingDays] = useState<number | null>(
-    initialData?.advanceBookingDays ?? 365
+    initialData?.advanceBookingDays ?? 365,
   );
-  const [minNights, setMinNights] = useState<number>(
-    initialData?.minNights || 1
-  );
+  const [minNights, setMinNights] = useState<number>(initialData?.minNights || 1);
   const [longTermEnabled, setLongTermEnabled] = useState<boolean>(
-    initialData?.longTermEnabled || false
+    initialData?.longTermEnabled || false,
   );
   const [longTermMinNights, setLongTermMinNights] = useState<number>(
-    initialData?.longTermMinNights || 28
+    initialData?.longTermMinNights || 28,
   );
   const [longTermAutoApply, setLongTermAutoApply] = useState<boolean>(
-    initialData?.longTermAutoApply || false
+    initialData?.longTermAutoApply || false,
   );
   const [officeClosesAt, setOfficeClosesAt] = useState<string>(
-    initialData?.officeClosesAt || "17:00"
+    initialData?.officeClosesAt || "17:00",
   );
   const [sameDayCutoffEnabled, setSameDayCutoffEnabled] = useState<boolean>(
-    initialData?.sameDayCutoffEnabled ?? true // Default enabled
+    initialData?.sameDayCutoffEnabled ?? true, // Default enabled
   );
   const [saving, setSaving] = useState(false);
 
@@ -127,12 +125,8 @@ export function BookingRules({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 mb-4">
             <Calendar className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Booking Rules
-          </h2>
-          <p className="text-slate-400">
-            Control when and how guests can make reservations
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Booking Rules</h2>
+          <p className="text-slate-400">Control when and how guests can make reservations</p>
         </motion.div>
 
         {/* Advance Booking Window */}
@@ -163,7 +157,7 @@ export function BookingRules({
                     "relative w-full p-4 rounded-xl border-2 text-left transition-all",
                     isSelected
                       ? "border-emerald-500 bg-emerald-500/10"
-                      : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                      : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                   )}
                 >
                   {/* Recommended badge */}
@@ -179,24 +173,20 @@ export function BookingRules({
                         <h4
                           className={cn(
                             "font-semibold",
-                            isSelected ? "text-emerald-400" : "text-white"
+                            isSelected ? "text-emerald-400" : "text-white",
                           )}
                         >
                           {option.label}
                         </h4>
                       </div>
-                      <p className="text-sm text-slate-400 mt-0.5">
-                        {option.description}
-                      </p>
+                      <p className="text-sm text-slate-400 mt-0.5">{option.description}</p>
                     </div>
 
                     {/* Selection indicator */}
                     <div
                       className={cn(
                         "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ml-3",
-                        isSelected
-                          ? "border-emerald-500 bg-emerald-500"
-                          : "border-slate-600"
+                        isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-600",
                       )}
                     >
                       {isSelected && (
@@ -246,14 +236,14 @@ export function BookingRules({
                     "flex-1 p-4 rounded-xl border-2 transition-all",
                     isSelected
                       ? "border-emerald-500 bg-emerald-500/10"
-                      : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                      : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                   )}
                 >
                   <div className="text-center">
                     <div
                       className={cn(
                         "text-2xl font-bold",
-                        isSelected ? "text-emerald-400" : "text-white"
+                        isSelected ? "text-emerald-400" : "text-white",
                       )}
                     >
                       {nights}
@@ -281,7 +271,7 @@ export function BookingRules({
               "w-full p-4 rounded-xl border-2 text-left transition-all",
               longTermEnabled
                 ? "border-emerald-500 bg-emerald-500/10"
-                : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
             )}
           >
             <div className="flex items-center justify-between">
@@ -289,14 +279,12 @@ export function BookingRules({
                 <h3
                   className={cn(
                     "font-semibold",
-                    longTermEnabled ? "text-emerald-400" : "text-white"
+                    longTermEnabled ? "text-emerald-400" : "text-white",
                   )}
                 >
                   Enable Long-Term Stays
                 </h3>
-                <p className="text-sm text-slate-400 mt-0.5">
-                  Allow monthly and seasonal bookings
-                </p>
+                <p className="text-sm text-slate-400 mt-0.5">Allow monthly and seasonal bookings</p>
               </div>
 
               <div className="flex items-center gap-3">
@@ -304,7 +292,7 @@ export function BookingRules({
                 <div
                   className={cn(
                     "relative w-11 h-6 rounded-full transition-colors",
-                    longTermEnabled ? "bg-emerald-500" : "bg-slate-600"
+                    longTermEnabled ? "bg-emerald-500" : "bg-slate-600",
                   )}
                 >
                   <motion.div
@@ -330,9 +318,7 @@ export function BookingRules({
           {longTermEnabled && (
             <motion.div
               initial={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
-              animate={
-                prefersReducedMotion ? {} : { opacity: 1, height: "auto" }
-              }
+              animate={prefersReducedMotion ? {} : { opacity: 1, height: "auto" }}
               exit={prefersReducedMotion ? {} : { opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
               className="space-y-3 pl-4 border-l-2 border-emerald-500/30"
@@ -344,9 +330,7 @@ export function BookingRules({
                 </label>
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() =>
-                      setLongTermMinNights(Math.max(7, longTermMinNights - 7))
-                    }
+                    onClick={() => setLongTermMinNights(Math.max(7, longTermMinNights - 7))}
                     className="w-10 h-10 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors"
                   >
                     -
@@ -381,24 +365,18 @@ export function BookingRules({
                   "w-full p-3 rounded-lg border transition-all",
                   longTermAutoApply
                     ? "border-emerald-500/50 bg-emerald-500/5"
-                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-300">
-                    Auto-apply long-term rates
-                  </span>
+                  <span className="text-sm text-slate-300">Auto-apply long-term rates</span>
                   <div
                     className={cn(
                       "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
-                      longTermAutoApply
-                        ? "border-emerald-500 bg-emerald-500"
-                        : "border-slate-600"
+                      longTermAutoApply ? "border-emerald-500 bg-emerald-500" : "border-slate-600",
                     )}
                   >
-                    {longTermAutoApply && (
-                      <Check className="w-3 h-3 text-white" />
-                    )}
+                    {longTermAutoApply && <Check className="w-3 h-3 text-white" />}
                   </div>
                 </div>
               </button>
@@ -413,9 +391,7 @@ export function BookingRules({
           transition={{ delay: 0.55 }}
           className="space-y-4"
         >
-          <h3 className="text-sm font-medium text-slate-300">
-            Same-Day Booking Cutoff
-          </h3>
+          <h3 className="text-sm font-medium text-slate-300">Same-Day Booking Cutoff</h3>
 
           {/* Toggle for same-day cutoff */}
           <button
@@ -424,7 +400,7 @@ export function BookingRules({
               "w-full p-4 rounded-xl border-2 text-left transition-all",
               sameDayCutoffEnabled
                 ? "border-emerald-500 bg-emerald-500/10"
-                : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
             )}
           >
             <div className="flex items-center justify-between">
@@ -432,20 +408,21 @@ export function BookingRules({
                 <h4
                   className={cn(
                     "font-semibold",
-                    sameDayCutoffEnabled ? "text-emerald-400" : "text-white"
+                    sameDayCutoffEnabled ? "text-emerald-400" : "text-white",
                   )}
                 >
                   Require Prep Time for Cabins
                 </h4>
                 <p className="text-sm text-slate-400 mt-0.5">
-                  Cabins and lodging need 1 hour before office close for same-day bookings (for cleaning and key prep)
+                  Cabins and lodging need 1 hour before office close for same-day bookings (for
+                  cleaning and key prep)
                 </p>
               </div>
 
               <div
                 className={cn(
                   "relative w-11 h-6 rounded-full transition-colors ml-3",
-                  sameDayCutoffEnabled ? "bg-emerald-500" : "bg-slate-600"
+                  sameDayCutoffEnabled ? "bg-emerald-500" : "bg-slate-600",
                 )}
               >
                 <motion.div
@@ -462,9 +439,7 @@ export function BookingRules({
 
           {/* Office close time - always shown since it's useful info */}
           <div className="space-y-2">
-            <label className="text-sm text-slate-400">
-              Office closes at
-            </label>
+            <label className="text-sm text-slate-400">Office closes at</label>
             <input
               type="time"
               value={officeClosesAt}
@@ -480,10 +455,12 @@ export function BookingRules({
               className="text-xs text-slate-400 bg-slate-800/30 rounded-lg p-3 border border-slate-700"
             >
               <p className="mb-1">
-                <span className="text-emerald-400 font-medium">RV and tent sites:</span> Can be booked anytime
+                <span className="text-emerald-400 font-medium">RV and tent sites:</span> Can be
+                booked anytime
               </p>
               <p>
-                <span className="text-amber-400 font-medium">Cabins and lodging:</span> Must book at least 1 hour before office close for same-day stays
+                <span className="text-amber-400 font-medium">Cabins and lodging:</span> Must book at
+                least 1 hour before office close for same-day stays
               </p>
             </motion.div>
           )}
@@ -497,11 +474,9 @@ export function BookingRules({
           className="bg-slate-800/30 border border-slate-700 rounded-lg p-4"
         >
           <p className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              You can customize this later.
-            </span>{" "}
-            Set different booking rules per site type, add seasonal minimums,
-            and create custom booking windows in your dashboard settings.
+            <span className="text-slate-300 font-medium">You can customize this later.</span> Set
+            different booking rules per site type, add seasonal minimums, and create custom booking
+            windows in your dashboard settings.
           </p>
         </motion.div>
 
@@ -518,7 +493,7 @@ export function BookingRules({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

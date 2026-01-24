@@ -42,17 +42,15 @@ export default function SeasonalRatesPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/settings/central/pricing/rate-groups">
-            Manage Rate Groups
-          </Link>
+          <Link href="/dashboard/settings/central/pricing/rate-groups">Manage Rate Groups</Link>
         </Button>
       </div>
 
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Seasonal rates are now managed through Rate Groups, which provide more flexible
-          date-based pricing with color-coded calendar visualization.
+          Seasonal rates are now managed through Rate Groups, which provide more flexible date-based
+          pricing with color-coded calendar visualization.
         </AlertDescription>
       </Alert>
 
@@ -62,9 +60,7 @@ export default function SeasonalRatesPage() {
             <Calendar className="h-5 w-5 text-muted-foreground" />
             Current Season Overview
           </CardTitle>
-          <CardDescription>
-            These seasons are configured in your Rate Groups
-          </CardDescription>
+          <CardDescription>These seasons are configured in your Rate Groups</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {seasons.map((season) => {
@@ -92,7 +88,10 @@ export default function SeasonalRatesPage() {
 
       <div className="flex justify-center">
         <Button variant="outline" asChild>
-          <Link href="/dashboard/settings/central/pricing/rate-groups" className="flex items-center gap-2">
+          <Link
+            href="/dashboard/settings/central/pricing/rate-groups"
+            className="flex items-center gap-2"
+          >
             Go to Rate Groups
             <ArrowRight className="h-4 w-4" />
           </Link>

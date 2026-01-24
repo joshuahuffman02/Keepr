@@ -149,9 +149,7 @@ export default function WebhooksPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure webhook endpoints for integrations
-          </p>
+          <p className="text-muted-foreground mt-1">Configure webhook endpoints for integrations</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -165,9 +163,7 @@ export default function WebhooksPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure webhook endpoints for integrations
-          </p>
+          <p className="text-muted-foreground mt-1">Configure webhook endpoints for integrations</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -185,9 +181,7 @@ export default function WebhooksPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Webhooks</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure webhook endpoints for integrations
-          </p>
+          <p className="text-muted-foreground mt-1">Configure webhook endpoints for integrations</p>
         </div>
         <Button onClick={() => setIsModalOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
@@ -199,8 +193,8 @@ export default function WebhooksPage() {
       <Alert className="bg-orange-50 border-orange-200">
         <Webhook className="h-4 w-4 text-orange-500" />
         <AlertDescription className="text-orange-800">
-          Webhooks send real-time HTTP POST requests to your server when events occur.
-          Use them to integrate with external systems, automation tools, or custom applications.
+          Webhooks send real-time HTTP POST requests to your server when events occur. Use them to
+          integrate with external systems, automation tools, or custom applications.
         </AlertDescription>
       </Alert>
 
@@ -254,12 +248,10 @@ export default function WebhooksPage() {
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Webhook className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No webhooks configured
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No webhooks configured</h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Add webhook endpoints to receive real-time notifications when
-              events occur in your campground.
+              Add webhook endpoints to receive real-time notifications when events occur in your
+              campground.
             </p>
             <Button onClick={() => setIsModalOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
@@ -308,7 +300,12 @@ export default function WebhooksPage() {
                     </Badge>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="More options" className="h-8 w-8">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="More options"
+                          className="h-8 w-8"
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -380,11 +377,7 @@ export default function WebhooksPage() {
               </div>
             </div>
 
-            {error && (
-              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-md">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-md">{error}</div>}
 
             <div className="flex gap-3 pt-4">
               <Button variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>

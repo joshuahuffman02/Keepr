@@ -35,15 +35,15 @@ First principle: camping happens outdoors. Guests should expect:
 
 Situations that may warrant policy exceptions:
 
-| Condition | Severity Level |
-|-----------|---------------|
-| Rain | Normal — no exception |
-| Heavy rain/storms | Normal unless severe warning |
-| Heat advisory | Case-by-case |
-| Severe thunderstorm warning | May warrant flexibility |
-| Hurricane/tornado warning | Full accommodation |
-| Mandatory evacuation | Automatic full refund/credit |
-| flooding affecting sites | Full accommodation |
+| Condition                   | Severity Level               |
+| --------------------------- | ---------------------------- |
+| Rain                        | Normal — no exception        |
+| Heavy rain/storms           | Normal unless severe warning |
+| Heat advisory               | Case-by-case                 |
+| Severe thunderstorm warning | May warrant flexibility      |
+| Hurricane/tornado warning   | Full accommodation           |
+| Mandatory evacuation        | Automatic full refund/credit |
+| flooding affecting sites    | Full accommodation           |
 
 ---
 
@@ -54,6 +54,7 @@ Situations that may warrant policy exceptions:
 Define distinct situations with specific responses:
 
 **Category 1: Normal Weather (No Exceptions)**
+
 - Rain, drizzle, overcast
 - Temperatures within seasonal range (even uncomfortable)
 - Wind under 30 mph
@@ -62,6 +63,7 @@ Define distinct situations with specific responses:
 **Standard policy applies:** Guests cancel according to normal cancellation terms.
 
 **Category 2: Severe Weather Watches (Limited Flexibility)**
+
 - Severe thunderstorm watch
 - Flash flood watch
 - Heat advisory
@@ -69,6 +71,7 @@ Define distinct situations with specific responses:
 **Policy:** Offer date change or credit if guest has safety concerns. No automatic refunds.
 
 **Category 3: Severe Weather Warnings (Full Flexibility)**
+
 - Tornado/hurricane warning
 - Severe thunderstorm warning in immediate area
 - Dangerous flooding
@@ -77,6 +80,7 @@ Define distinct situations with specific responses:
 **Policy:** Full flexibility—refund, credit, or date change at guest preference.
 
 **Category 4: Campground Closure or Evacuation**
+
 - Mandatory evacuation order
 - Campground closure due to conditions
 - Sites uninhabitable or inaccessible
@@ -88,9 +92,11 @@ Define distinct situations with specific responses:
 Distinguish between:
 
 **Guest chooses not to come** (weather looks bad):
+
 > Standard cancellation policy applies plus any weather-related flexibility you offer
 
 **You close or evacuate**:
+
 > Automatic full accommodation
 
 This prevents gaming while ensuring fairness when conditions are genuinely dangerous.
@@ -143,12 +149,13 @@ Questions about current conditions? Call us: [Phone]
 When severe weather approaches:
 
 **24-48 hours before:**
+
 ```
 Subject: Weather Update for Your Reservation
 
 Hi [Name],
 
-We're monitoring [weather situation] expected to affect 
+We're monitoring [weather situation] expected to affect
 our area on [dates].
 
 Current status: [situation summary]
@@ -166,6 +173,7 @@ Stay safe,
 ```
 
 **During active weather:**
+
 - Text or call guests on-site with safety instructions
 - Post updates at office/common areas
 - Have emergency procedures ready
@@ -180,6 +188,7 @@ Front-desk staff should:
 - Never argue about safety concerns
 
 **Good response to weather cancellation request:**
+
 > "I understand the weather looks concerning. Let me see what I can do. [Apply policy]. Would a credit for a future visit work for you, or would you like to try rescheduling?"
 
 ---
@@ -195,6 +204,7 @@ Extreme heat is increasingly common. Consider:
 - Guests with health concerns (elderly, children)
 
 **Balanced approach:**
+
 > "During heat advisories, we offer date changes or credits to guests with health concerns. Our pool/lake/AC facilities remain available for those who choose to stay."
 
 ### Winter Weather
@@ -229,18 +239,22 @@ Being too flexible costs money. But the alternative—forcing guests to stay or 
 ### Mitigation Strategies
 
 **Waitlist management:**
+
 - Keep waitlists for popular dates
 - Fill cancelled slots when possible
 
 **Insurance:**
+
 - Some policies cover weather-related revenue loss
 - Review your coverage
 
 **Shoulder season opportunity:**
+
 - Weather cancellations create openings
 - Offer discounted rates to fill gaps
 
 **Credit vs. refund:**
+
 - Credits keep money in your ecosystem
 - Guests more likely to return
 - Offer credit as default, refund upon request
@@ -254,12 +268,14 @@ Being too flexible costs money. But the alternative—forcing guests to stay or 
 Some guests use weather as cover for changed plans:
 
 **Signs of possible misuse:**
+
 - Request comes before any watch/warning
 - Weather is normal for the season
 - Multiple "weather" cancellations from same guest
 - Request 3 days before for weather 5 days out
 
 **Response approach:**
+
 - Apply policy consistently
 - Don't accuse, but don't accommodate beyond policy
 - Note patterns in guest record
@@ -292,4 +308,4 @@ A clear, written policy applied consistently creates trust. Guests who know you'
 
 ---
 
-*Keepr allows you to configure weather-related booking rules and quickly process credits or refunds when conditions warrant. [Manage the unexpected at campreserv.com](https://campreserv.com)*
+_Keepr allows you to configure weather-related booking rules and quickly process credits or refunds when conditions warrant. [Manage the unexpected at campreserv.com](https://campreserv.com)_

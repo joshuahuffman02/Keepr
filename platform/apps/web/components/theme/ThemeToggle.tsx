@@ -27,18 +27,12 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), []);
 
   if (!mounted) {
-    return (
-      <div className="flex items-center gap-1 rounded-lg bg-muted p-1 h-9 w-[106px]" />
-    );
+    return <div className="flex items-center gap-1 rounded-lg bg-muted p-1 h-9 w-[106px]" />;
   }
 
   return (
     <div
-      className={cn(
-        "flex items-center gap-0.5 rounded-lg p-1",
-        "bg-muted",
-        "border border-border"
-      )}
+      className={cn("flex items-center gap-0.5 rounded-lg p-1", "bg-muted", "border border-border")}
     >
       {themes.map(({ value, icon: Icon, label }) => {
         const isActive = theme === value;
@@ -50,9 +44,7 @@ export function ThemeToggle() {
             className={cn(
               "relative flex items-center justify-center rounded-md p-1.5 transition-colors",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              isActive
-                ? "text-action-primary"
-                : "text-muted-foreground hover:text-foreground"
+              isActive ? "text-action-primary" : "text-muted-foreground hover:text-foreground",
             )}
             title={label}
             aria-label={`Switch to ${label} theme`}
@@ -60,11 +52,7 @@ export function ThemeToggle() {
             {isActive && (
               <motion.div
                 layoutId="theme-indicator"
-                className={cn(
-                  "absolute inset-0 rounded-md",
-                  "bg-card",
-                  "shadow-sm"
-                )}
+                className={cn("absolute inset-0 rounded-md", "bg-card", "shadow-sm")}
                 transition={prefersReducedMotion ? { duration: 0 } : SPRING_CONFIG}
               />
             )}
@@ -87,9 +75,7 @@ export function ThemeToggleDropdown() {
 
   return (
     <div className="space-y-1">
-      <div className="px-2 text-xs font-semibold text-muted-foreground">
-        Theme (locked)
-      </div>
+      <div className="px-2 text-xs font-semibold text-muted-foreground">Theme (locked)</div>
       {themes.map(({ value, icon: Icon, label }) => {
         const isActive = theme === value;
         return (
@@ -100,7 +86,7 @@ export function ThemeToggleDropdown() {
               "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors",
               isActive
                 ? "bg-status-success-bg text-status-success-text"
-                : "text-muted-foreground hover:bg-muted"
+                : "text-muted-foreground hover:bg-muted",
             )}
           >
             <Icon className="h-4 w-4" />

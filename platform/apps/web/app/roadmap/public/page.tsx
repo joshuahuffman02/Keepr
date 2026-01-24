@@ -10,15 +10,14 @@ import {
   statusLabels,
 } from "../../../lib/roadmap-data";
 
-const isLucideIconName = (value: string): value is keyof typeof icons =>
-  value in icons;
+const isLucideIconName = (value: string): value is keyof typeof icons => value in icons;
 
 // Helper to render a lucide icon from its name (kebab-case)
 function PhaseIcon({ name, className = "h-5 w-5" }: { name: string; className?: string }) {
   const iconName = name
-    .split('-')
+    .split("-")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join('');
+    .join("");
 
   if (!isLucideIconName(iconName)) {
     return <icons.Circle className={className} />;
@@ -36,7 +35,9 @@ export default function PublicRoadmapPage() {
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Product roadmap</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
+              Product roadmap
+            </p>
             <h1 className="text-2xl font-bold text-slate-900">Keepr</h1>
             <p className="text-sm text-slate-600">What we're building next</p>
           </div>
@@ -64,8 +65,16 @@ export default function PublicRoadmapPage() {
             const relatedUpdates = getUpdatesForPhase(phase.id);
             const colors = statusColors[phase.status];
             return (
-              <div key={phase.id} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${colors.bg.replace('bg-', '').replace('-', '')})` }} />
+              <div
+                key={phase.id}
+                className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
+              >
+                <div
+                  className="h-1.5"
+                  style={{
+                    background: `linear-gradient(90deg, ${colors.bg.replace("bg-", "").replace("-", "")})`,
+                  }}
+                />
                 <div className="p-5 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3">
@@ -76,7 +85,9 @@ export default function PublicRoadmapPage() {
                         <p className="text-sm text-slate-600">{phase.description}</p>
                       </div>
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text}`}>
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold ${colors.bg} ${colors.text}`}
+                    >
                       {statusLabels[phase.status]}
                     </span>
                   </div>
@@ -89,7 +100,10 @@ export default function PublicRoadmapPage() {
                       <span className="font-semibold text-slate-900">{percentage}%</span>
                     </div>
                     <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div className="h-full rounded-full bg-emerald-500" style={{ width: `${percentage}%` }} />
+                      <div
+                        className="h-full rounded-full bg-emerald-500"
+                        style={{ width: `${percentage}%` }}
+                      />
                     </div>
                   </div>
 
@@ -101,7 +115,9 @@ export default function PublicRoadmapPage() {
                       </div>
                     ))}
                     {phase.milestones.length > 4 && (
-                      <div className="text-xs text-slate-500">+ {phase.milestones.length - 4} more</div>
+                      <div className="text-xs text-slate-500">
+                        + {phase.milestones.length - 4} more
+                      </div>
                     )}
                   </div>
 
@@ -111,8 +127,18 @@ export default function PublicRoadmapPage() {
                       className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700"
                     >
                       View related updates
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </Link>
                   )}

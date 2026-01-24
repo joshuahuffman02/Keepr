@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Param, Query, Body, UseGuards } from "@nestjs/common";
 import { AccountingConfidenceService } from "./accounting-confidence.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ScopeGuard } from "../auth/guards/scope.guard";
@@ -23,7 +15,7 @@ export class AccountingConfidenceController {
   @Get("confidence")
   async getConfidenceScore(
     @Param("campgroundId") campgroundId: string,
-    @Query("month") month?: string
+    @Query("month") month?: string,
   ) {
     return this.confidenceService.getConfidenceScore(campgroundId, month);
   }
@@ -35,7 +27,7 @@ export class AccountingConfidenceController {
   @Get("reconciliation")
   async getReconciliation(
     @Param("campgroundId") campgroundId: string,
-    @Query("month") month?: string
+    @Query("month") month?: string,
   ) {
     return this.confidenceService.getPayoutReconciliation(campgroundId, month);
   }
@@ -47,7 +39,7 @@ export class AccountingConfidenceController {
   @Get("month-end/:month")
   async getMonthEndStatus(
     @Param("campgroundId") campgroundId: string,
-    @Param("month") month: string
+    @Param("month") month: string,
   ) {
     return this.confidenceService.getMonthEndCloseStatus(campgroundId, month);
   }
@@ -60,7 +52,7 @@ export class AccountingConfidenceController {
   async initiateMonthEndClose(
     @Param("campgroundId") campgroundId: string,
     @Param("month") month: string,
-    @Body() body: { userId: string }
+    @Body() body: { userId: string },
   ) {
     return this.confidenceService.initiateMonthEndClose(campgroundId, month, body.userId);
   }
@@ -73,7 +65,7 @@ export class AccountingConfidenceController {
   async approveMonthEndClose(
     @Param("campgroundId") campgroundId: string,
     @Param("month") month: string,
-    @Body() body: { userId: string }
+    @Body() body: { userId: string },
   ) {
     return this.confidenceService.approveMonthEndClose(campgroundId, month, body.userId);
   }

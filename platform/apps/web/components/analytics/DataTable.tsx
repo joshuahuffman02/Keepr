@@ -87,7 +87,10 @@ export function DataTable({
             <TableBody>
               {displayData.length === 0 ? (
                 <TableRow className="border-border">
-                  <TableCell colSpan={columns.length} className="text-center text-muted-foreground py-8">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="text-center text-muted-foreground py-8"
+                  >
                     No data available
                   </TableCell>
                 </TableRow>

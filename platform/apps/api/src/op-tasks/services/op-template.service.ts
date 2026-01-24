@@ -1,15 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { OpTaskTemplate, OpTaskCategory, Prisma } from '@prisma/client';
-import { randomUUID } from 'crypto';
-import {
-  CreateOpTaskTemplateDto,
-  UpdateOpTaskTemplateDto,
-} from '../dto/op-task.dto';
+import { Injectable, NotFoundException, ConflictException } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { OpTaskTemplate, OpTaskCategory, Prisma } from "@prisma/client";
+import { randomUUID } from "crypto";
+import { CreateOpTaskTemplateDto, UpdateOpTaskTemplateDto } from "../dto/op-task.dto";
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
   if (value === undefined || value === null) return undefined;
@@ -35,10 +28,7 @@ export class OpTemplateService {
   /**
    * Create a new task template
    */
-  async create(
-    campgroundId: string,
-    dto: CreateOpTaskTemplateDto,
-  ): Promise<OpTaskTemplate> {
+  async create(campgroundId: string, dto: CreateOpTaskTemplateDto): Promise<OpTaskTemplate> {
     return this.prisma.opTaskTemplate.create({
       data: {
         id: randomUUID(),
@@ -46,7 +36,7 @@ export class OpTemplateService {
         name: dto.name,
         description: dto.description,
         category: dto.category,
-        priority: dto.priority ?? 'medium',
+        priority: dto.priority ?? "medium",
         checklistTemplate: toNullableJsonInput(dto.checklistTemplate ?? []),
         suppliesNeeded: toNullableJsonInput(dto.suppliesNeeded ?? []),
         estimatedMinutes: dto.estimatedMinutes,
@@ -82,7 +72,7 @@ export class OpTemplateService {
         ...(options?.category && { category: options.category }),
         ...(options?.isActive !== undefined && { isActive: options.isActive }),
       },
-      orderBy: [{ category: 'asc' }, { name: 'asc' }],
+      orderBy: [{ category: "asc" }, { name: "asc" }],
       include: {
         OpTeam: true,
         User: { select: { id: true, firstName: true, lastName: true } },
@@ -107,7 +97,7 @@ export class OpTemplateService {
     });
 
     if (!template) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     return template;
@@ -116,15 +106,12 @@ export class OpTemplateService {
   /**
    * Update a template
    */
-  async update(
-    id: string,
-    dto: UpdateOpTaskTemplateDto,
-  ): Promise<OpTaskTemplate> {
+  async update(id: string, dto: UpdateOpTaskTemplateDto): Promise<OpTaskTemplate> {
     const existing = await this.prisma.opTaskTemplate.findUnique({
       where: { id },
     });
     if (!existing) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     return this.prisma.opTaskTemplate.update({
@@ -169,7 +156,7 @@ export class OpTemplateService {
     });
 
     if (!existing) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     // Check if template is in use
@@ -178,7 +165,7 @@ export class OpTemplateService {
 
     if (activeConnections > 0) {
       throw new ConflictException(
-        'Cannot delete template with active triggers or recurrence rules. Deactivate them first.',
+        "Cannot delete template with active triggers or recurrence rules. Deactivate them first.",
       );
     }
 
@@ -197,7 +184,7 @@ export class OpTemplateService {
     });
 
     if (!original) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     return this.prisma.opTaskTemplate.create({
@@ -229,123 +216,123 @@ export class OpTemplateService {
   getStarterTemplates(): CreateOpTaskTemplateDto[] {
     return [
       {
-        name: 'Cabin Turnover',
-        description: 'Full turnover cleaning after guest checkout',
-        category: 'turnover',
-        priority: 'high',
+        name: "Cabin Turnover",
+        description: "Full turnover cleaning after guest checkout",
+        category: "turnover",
+        priority: "high",
         slaMinutes: 120, // 2 hours
         estimatedMinutes: 45,
         xpValue: 25,
         checklistTemplate: [
-          { id: 'ct-1', text: 'Strip and remake beds with fresh linens', required: true },
-          { id: 'ct-2', text: 'Vacuum/sweep all floors', required: true },
-          { id: 'ct-3', text: 'Clean bathroom (toilet, sink, shower)', required: true },
-          { id: 'ct-4', text: 'Wipe down all surfaces', required: true },
-          { id: 'ct-5', text: 'Restock toiletries and supplies', required: true },
-          { id: 'ct-6', text: 'Empty trash and recycling', required: true },
-          { id: 'ct-7', text: 'Check for damages and report', required: true },
-          { id: 'ct-8', text: 'Check appliances are working', required: false },
-          { id: 'ct-9', text: 'Set thermostat to default', required: false },
+          { id: "ct-1", text: "Strip and remake beds with fresh linens", required: true },
+          { id: "ct-2", text: "Vacuum/sweep all floors", required: true },
+          { id: "ct-3", text: "Clean bathroom (toilet, sink, shower)", required: true },
+          { id: "ct-4", text: "Wipe down all surfaces", required: true },
+          { id: "ct-5", text: "Restock toiletries and supplies", required: true },
+          { id: "ct-6", text: "Empty trash and recycling", required: true },
+          { id: "ct-7", text: "Check for damages and report", required: true },
+          { id: "ct-8", text: "Check appliances are working", required: false },
+          { id: "ct-9", text: "Set thermostat to default", required: false },
         ],
       },
       {
-        name: 'RV Site Turnover',
-        description: 'Quick site cleanup after RV departure',
-        category: 'turnover',
-        priority: 'medium',
+        name: "RV Site Turnover",
+        description: "Quick site cleanup after RV departure",
+        category: "turnover",
+        priority: "medium",
         slaMinutes: 60, // 1 hour
         estimatedMinutes: 15,
         xpValue: 10,
         checklistTemplate: [
-          { id: 'rv-1', text: 'Rake and clean pad area', required: true },
-          { id: 'rv-2', text: 'Check and clean fire ring', required: true },
-          { id: 'rv-3', text: 'Verify hookups are capped and clean', required: true },
-          { id: 'rv-4', text: 'Check picnic table condition', required: true },
-          { id: 'rv-5', text: 'Report any damage or issues', required: true },
+          { id: "rv-1", text: "Rake and clean pad area", required: true },
+          { id: "rv-2", text: "Check and clean fire ring", required: true },
+          { id: "rv-3", text: "Verify hookups are capped and clean", required: true },
+          { id: "rv-4", text: "Check picnic table condition", required: true },
+          { id: "rv-5", text: "Report any damage or issues", required: true },
         ],
       },
       {
-        name: 'Daily Bathroom Cleaning',
-        description: 'Routine cleaning of public restroom facilities',
-        category: 'housekeeping',
-        priority: 'medium',
+        name: "Daily Bathroom Cleaning",
+        description: "Routine cleaning of public restroom facilities",
+        category: "housekeeping",
+        priority: "medium",
         slaMinutes: 30,
         estimatedMinutes: 20,
         xpValue: 15,
         checklistTemplate: [
-          { id: 'br-1', text: 'Clean and sanitize toilets', required: true },
-          { id: 'br-2', text: 'Clean sinks and mirrors', required: true },
-          { id: 'br-3', text: 'Mop floors', required: true },
-          { id: 'br-4', text: 'Restock paper products', required: true },
-          { id: 'br-5', text: 'Restock soap dispensers', required: true },
-          { id: 'br-6', text: 'Empty trash bins', required: true },
-          { id: 'br-7', text: 'Check for maintenance issues', required: false },
+          { id: "br-1", text: "Clean and sanitize toilets", required: true },
+          { id: "br-2", text: "Clean sinks and mirrors", required: true },
+          { id: "br-3", text: "Mop floors", required: true },
+          { id: "br-4", text: "Restock paper products", required: true },
+          { id: "br-5", text: "Restock soap dispensers", required: true },
+          { id: "br-6", text: "Empty trash bins", required: true },
+          { id: "br-7", text: "Check for maintenance issues", required: false },
         ],
       },
       {
-        name: 'Deep Bathroom Clean',
-        description: 'Weekly deep cleaning of restroom facilities',
-        category: 'housekeeping',
-        priority: 'low',
+        name: "Deep Bathroom Clean",
+        description: "Weekly deep cleaning of restroom facilities",
+        category: "housekeeping",
+        priority: "low",
         slaMinutes: 90,
         estimatedMinutes: 45,
         xpValue: 20,
         checklistTemplate: [
-          { id: 'dbc-1', text: 'Complete daily cleaning checklist first', required: true },
-          { id: 'dbc-2', text: 'Scrub shower walls and floors', required: true },
-          { id: 'dbc-3', text: 'Clean all vents and exhaust fans', required: true },
-          { id: 'dbc-4', text: 'Wash walls and partitions', required: true },
-          { id: 'dbc-5', text: 'Clean light fixtures', required: false },
-          { id: 'dbc-6', text: 'Check and replace any damaged fixtures', required: false },
+          { id: "dbc-1", text: "Complete daily cleaning checklist first", required: true },
+          { id: "dbc-2", text: "Scrub shower walls and floors", required: true },
+          { id: "dbc-3", text: "Clean all vents and exhaust fans", required: true },
+          { id: "dbc-4", text: "Wash walls and partitions", required: true },
+          { id: "dbc-5", text: "Clean light fixtures", required: false },
+          { id: "dbc-6", text: "Check and replace any damaged fixtures", required: false },
         ],
       },
       {
-        name: 'Pool Daily Maintenance',
-        description: 'Daily pool water testing and maintenance',
-        category: 'pool',
-        priority: 'high',
+        name: "Pool Daily Maintenance",
+        description: "Daily pool water testing and maintenance",
+        category: "pool",
+        priority: "high",
         slaMinutes: 60,
         estimatedMinutes: 30,
         xpValue: 15,
         checklistTemplate: [
-          { id: 'pool-1', text: 'Test water chemistry (pH, chlorine)', required: true },
-          { id: 'pool-2', text: 'Record readings in log', required: true },
-          { id: 'pool-3', text: 'Skim surface for debris', required: true },
-          { id: 'pool-4', text: 'Check pump and filter operation', required: true },
-          { id: 'pool-5', text: 'Inspect pool area for safety hazards', required: true },
-          { id: 'pool-6', text: 'Organize furniture and equipment', required: false },
+          { id: "pool-1", text: "Test water chemistry (pH, chlorine)", required: true },
+          { id: "pool-2", text: "Record readings in log", required: true },
+          { id: "pool-3", text: "Skim surface for debris", required: true },
+          { id: "pool-4", text: "Check pump and filter operation", required: true },
+          { id: "pool-5", text: "Inspect pool area for safety hazards", required: true },
+          { id: "pool-6", text: "Organize furniture and equipment", required: false },
         ],
       },
       {
-        name: 'Garbage Collection',
-        description: 'Daily garbage and recycling collection route',
-        category: 'grounds',
-        priority: 'medium',
+        name: "Garbage Collection",
+        description: "Daily garbage and recycling collection route",
+        category: "grounds",
+        priority: "medium",
         slaMinutes: 120,
         estimatedMinutes: 60,
         xpValue: 15,
         checklistTemplate: [
-          { id: 'gc-1', text: 'Collect all site garbage cans', required: true },
-          { id: 'gc-2', text: 'Collect recycling bins', required: true },
-          { id: 'gc-3', text: 'Empty common area bins', required: true },
-          { id: 'gc-4', text: 'Check dumpster levels', required: true },
-          { id: 'gc-5', text: 'Report any overflowing or damaged bins', required: false },
+          { id: "gc-1", text: "Collect all site garbage cans", required: true },
+          { id: "gc-2", text: "Collect recycling bins", required: true },
+          { id: "gc-3", text: "Empty common area bins", required: true },
+          { id: "gc-4", text: "Check dumpster levels", required: true },
+          { id: "gc-5", text: "Report any overflowing or damaged bins", required: false },
         ],
       },
       {
-        name: 'Check-in Prep',
-        description: 'Prepare for guest arrival',
-        category: 'front_desk',
-        priority: 'high',
+        name: "Check-in Prep",
+        description: "Prepare for guest arrival",
+        category: "front_desk",
+        priority: "high",
         slaMinutes: 30,
         estimatedMinutes: 10,
         xpValue: 10,
         checklistTemplate: [
-          { id: 'cip-1', text: 'Verify payment status', required: true },
-          { id: 'cip-2', text: 'Check site assignment is ready', required: true },
-          { id: 'cip-3', text: 'Prepare welcome packet', required: true },
-          { id: 'cip-4', text: 'Note any special requests', required: true },
-          { id: 'cip-5', text: 'Confirm gate code/key ready', required: false },
+          { id: "cip-1", text: "Verify payment status", required: true },
+          { id: "cip-2", text: "Check site assignment is ready", required: true },
+          { id: "cip-3", text: "Prepare welcome packet", required: true },
+          { id: "cip-4", text: "Note any special requests", required: true },
+          { id: "cip-5", text: "Confirm gate code/key ready", required: false },
         ],
       },
     ];

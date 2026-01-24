@@ -22,5 +22,3 @@ export class CreateHoldDto {
   @IsString()
   note?: string;
 }
-
-

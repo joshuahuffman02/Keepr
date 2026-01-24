@@ -59,7 +59,11 @@ interface CreateGoalForm {
   dueDate: string;
 }
 
-const metricOptions: Array<{ value: string; unit: CreateGoalForm["unit"]; category: CreateGoalForm["category"] }> = [
+const metricOptions: Array<{
+  value: string;
+  unit: CreateGoalForm["unit"];
+  category: CreateGoalForm["category"];
+}> = [
   { value: "Total Revenue", unit: "currency", category: "revenue" },
   { value: "Average Daily Rate", unit: "currency", category: "revenue" },
   { value: "NPS Score", unit: "score", category: "satisfaction" },
@@ -70,15 +74,7 @@ const metricOptions: Array<{ value: string; unit: CreateGoalForm["unit"]; catego
   { value: "RevPAN", unit: "currency", category: "revenue" },
 ];
 
-const periodOptions = [
-  "Q1 2025",
-  "Q2 2025",
-  "Q3 2025",
-  "Q4 2025",
-  "2025",
-  "H1 2025",
-  "H2 2025",
-];
+const periodOptions = ["Q1 2025", "Q2 2025", "Q3 2025", "Q4 2025", "2025", "H1 2025", "H2 2025"];
 
 function formatValue(value: number, unit: string): string {
   switch (unit) {
@@ -157,14 +153,22 @@ function getCategoryIcon(category: string) {
   }
 }
 
-function ProgressBar({ current, target, status }: { current: number; target: number; status: string }) {
+function ProgressBar({
+  current,
+  target,
+  status,
+}: {
+  current: number;
+  target: number;
+  status: string;
+}) {
   const percentage = Math.min((current / target) * 100, 100);
   const color =
     status === "achieved" || status === "on_track"
       ? "bg-green-500"
       : status === "at_risk"
-      ? "bg-amber-500"
-      : "bg-red-500";
+        ? "bg-amber-500"
+        : "bg-red-500";
 
   return (
     <div className="w-full bg-muted rounded-full h-2">
@@ -222,10 +226,7 @@ function CreateGoalModal({
       <div className="bg-muted rounded-lg p-6 w-full max-w-lg mx-4 border border-border">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-foreground">Create New Goal</h2>
-          <button
-            onClick={onClose}
-            className="p-1 hover:bg-muted rounded-lg transition-colors"
-          >
+          <button onClick={onClose} className="p-1 hover:bg-muted rounded-lg transition-colors">
             <X className="h-5 w-5 text-muted-foreground" />
           </button>
         </div>
@@ -260,9 +261,7 @@ function CreateGoalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Metric
-              </label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Metric</label>
               <select
                 value={form.metric}
                 onChange={(e) => handleMetricChange(e.target.value)}
@@ -293,9 +292,7 @@ function CreateGoalModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">
-                Period
-              </label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Period</label>
               <select
                 value={form.period}
                 onChange={(e) => setForm({ ...form, period: e.target.value })}
@@ -596,7 +593,7 @@ export default function GoalsPage() {
           filteredGoals.map((goal) => {
             const dueDate = new Date(goal.dueDate);
             const daysRemaining = Math.ceil(
-              (dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+              (dueDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24),
             );
 
             return (
@@ -616,7 +613,8 @@ export default function GoalsPage() {
                           <p className="text-sm text-muted-foreground">{goal.description}</p>
                         )}
                         <p className="text-xs text-muted-foreground mt-1">
-                          {goal.period} • Due {dueDate.toLocaleDateString()} ({daysRemaining} days remaining)
+                          {goal.period} • Due {dueDate.toLocaleDateString()} ({daysRemaining} days
+                          remaining)
                         </p>
                       </div>
                     </div>
@@ -637,7 +635,8 @@ export default function GoalsPage() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Progress</span>
                       <span className={`font-medium ${getStatusColor(goal.status)}`}>
-                        {formatValue(goal.current, goal.unit)} / {formatValue(goal.target, goal.unit)}
+                        {formatValue(goal.current, goal.unit)} /{" "}
+                        {formatValue(goal.target, goal.unit)}
                       </span>
                     </div>
                     <ProgressBar current={goal.current} target={goal.target} status={goal.status} />
@@ -647,10 +646,10 @@ export default function GoalsPage() {
                         {goal.unit === "percentage"
                           ? `${(goal.target - goal.current).toFixed(1)}% to go`
                           : goal.unit === "currency"
-                          ? `$${((goal.target - goal.current) / 1000).toFixed(0)}K to go`
-                          : goal.unit === "score"
-                          ? `${goal.target - goal.current} points to go`
-                          : `${(goal.target - goal.current).toLocaleString()} to go`}
+                            ? `$${((goal.target - goal.current) / 1000).toFixed(0)}K to go`
+                            : goal.unit === "score"
+                              ? `${goal.target - goal.current} points to go`
+                              : `${(goal.target - goal.current).toLocaleString()} to go`}
                       </span>
                     </div>
                   </div>
@@ -687,7 +686,9 @@ export default function GoalsPage() {
                 <Star className="h-4 w-4 text-amber-400" />
                 <span className="font-medium text-foreground">NPS Improvement</span>
               </div>
-              <p className="text-xs text-muted-foreground">Get 3 struggling campgrounds above NPS 30</p>
+              <p className="text-xs text-muted-foreground">
+                Get 3 struggling campgrounds above NPS 30
+              </p>
             </div>
             <div
               onClick={() => setIsModalOpen(true)}
@@ -697,7 +698,9 @@ export default function GoalsPage() {
                 <Users className="h-4 w-4 text-purple-400" />
                 <span className="font-medium text-foreground">Guest Retention</span>
               </div>
-              <p className="text-xs text-muted-foreground">Increase first-to-repeat conversion by 15%</p>
+              <p className="text-xs text-muted-foreground">
+                Increase first-to-repeat conversion by 15%
+              </p>
             </div>
           </div>
         </CardContent>
@@ -711,7 +714,10 @@ export default function GoalsPage() {
         isSubmitting={isSubmitting}
       />
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">Delete Goal</AlertDialogTitle>
@@ -720,11 +726,10 @@ export default function GoalsPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDeleteGoal}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteGoal} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

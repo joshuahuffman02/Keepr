@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, Injectable, NotFoundException, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  Logger,
+} from "@nestjs/common";
 import {
   CheckInStatus,
   DigitalWaiver,
@@ -12,7 +18,7 @@ import {
   ReservationStatus,
   SignatureArtifact,
   SignatureRequest,
-  SiteHold
+  SiteHold,
 } from "@prisma/client";
 import { randomUUID } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
@@ -22,10 +28,10 @@ import { LockService } from "../redis/lock.service";
 import { PromotionsService } from "../promotions/promotions.service";
 import { AccessControlService } from "../access-control/access-control.service";
 
-import { WaitlistService } from '../waitlist/waitlist.service';
-import { EmailService } from '../email/email.service';
-import { LoyaltyService } from '../loyalty/loyalty.service';
-import { TaxRulesService } from '../tax-rules/tax-rules.service';
+import { WaitlistService } from "../waitlist/waitlist.service";
+import { EmailService } from "../email/email.service";
+import { LoyaltyService } from "../loyalty/loyalty.service";
+import { TaxRulesService } from "../tax-rules/tax-rules.service";
 import { postBalancedLedgerEntries, LedgerEntryInput } from "../ledger/ledger-posting.util";
 import { AuditService } from "../audit/audit.service";
 
@@ -75,7 +81,7 @@ const isDefined = <T>(value: T | null | undefined): value is T =>
   value !== null && value !== undefined;
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -111,8 +117,8 @@ export class ReservationsService {
     private readonly policiesService: PoliciesService,
     private readonly guestWalletService: GuestWalletService,
     private readonly stripeService: StripeService,
-    private readonly realtime: RealtimeService
-  ) { }
+    private readonly realtime: RealtimeService,
+  ) {}
 
   async getMatchedSites(campgroundId: string, guestId: string) {
     // Fetch guest with only the fields needed for matching (not all reservations)
@@ -127,33 +133,31 @@ export class ReservationsService {
           where: { campgroundId },
           select: {
             siteId: true,
-            Site: { select: { siteClassId: true } }
+            Site: { select: { siteClassId: true } },
           },
-          distinct: ['siteId']
-        }
-      }
+          distinct: ["siteId"],
+        },
+      },
     });
     if (!guest) throw new NotFoundException("Guest not found");
 
     const sites: MatchScoreSite[] = await this.prisma.site.findMany({
       where: { campgroundId, isActive: true },
-      include: { SiteClass: true }
+      include: { SiteClass: true },
     });
 
-    const matches = sites.map(site => {
+    const matches = sites.map((site) => {
       const { score, reasons } = this.matchScoreService.calculateMatchScore(guest, site);
       return {
         site,
         score,
-        reasons
+        reasons,
       };
     });
 
     // Sort by score descending
     return matches.sort((a, b) => b.score - a.score);
   }
-
-
 
   private computeNights(arrival: Date, departure: Date) {
     const ms = departure.getTime() - arrival.getTime();
@@ -164,7 +168,7 @@ export class ReservationsService {
   private async attachWaiverArtifacts(
     reservationId: string,
     guestId: string,
-    evidence: WaiverEvidence
+    evidence: WaiverEvidence,
   ) {
     const ops: Array<Promise<unknown>> = [];
 
@@ -174,9 +178,9 @@ export class ReservationsService {
           where: { id: evidence.request.id },
           data: {
             reservationId: evidence.request.reservationId ?? reservationId,
-            guestId: evidence.request.guestId ?? guestId
-          }
-        })
+            guestId: evidence.request.guestId ?? guestId,
+          },
+        }),
       );
     }
 
@@ -186,9 +190,9 @@ export class ReservationsService {
           where: { id: evidence.artifact.id },
           data: {
             reservationId: evidence.artifact.reservationId ?? reservationId,
-            guestId: evidence.artifact.guestId ?? guestId
-          }
-        })
+            guestId: evidence.artifact.guestId ?? guestId,
+          },
+        }),
       );
     }
 
@@ -198,9 +202,9 @@ export class ReservationsService {
           where: { id: evidence.digital.id },
           data: {
             reservationId: evidence.digital.reservationId ?? reservationId,
-            guestId: evidence.digital.guestId ?? guestId
-          }
-        })
+            guestId: evidence.digital.guestId ?? guestId,
+          },
+        }),
       );
     }
 
@@ -219,18 +223,18 @@ export class ReservationsService {
         where: {
           documentType: "waiver",
           status: "signed",
-          OR: [{ reservationId }, { reservationId: null, guestId }]
+          OR: [{ reservationId }, { reservationId: null, guestId }],
         },
         include: { SignatureArtifact: true },
-        orderBy: { signedAt: "desc" }
+        orderBy: { signedAt: "desc" },
       }),
       this.prisma.digitalWaiver.findFirst?.({
         where: {
           OR: [{ reservationId }, { reservationId: null, guestId }],
-          status: "signed"
+          status: "signed",
         },
-        orderBy: { signedAt: "desc" }
-      })
+        orderBy: { signedAt: "desc" },
+      }),
     ]);
 
     const signedArtifact =
@@ -238,8 +242,8 @@ export class ReservationsService {
       (await this.prisma.signatureArtifact?.findFirst?.({
         where: {
           pdfUrl: { not: "" },
-          OR: [{ reservationId }, { reservationId: null, guestId }]
-        }
+          OR: [{ reservationId }, { reservationId: null, guestId }],
+        },
       }));
 
     const hasEvidence = Boolean(signedRequest || signedArtifact || digitalWaiver);
@@ -248,22 +252,26 @@ export class ReservationsService {
       await this.attachWaiverArtifacts(reservationId, guestId, {
         request: signedRequest ?? undefined,
         artifact: signedArtifact ?? undefined,
-        digital: digitalWaiver ?? undefined
+        digital: digitalWaiver ?? undefined,
       });
     }
 
     return hasEvidence;
   }
 
-  private async attachIdVerification(reservationId: string, guestId: string, match: IdVerification | null) {
+  private async attachIdVerification(
+    reservationId: string,
+    guestId: string,
+    match: IdVerification | null,
+  ) {
     if (!match || (match.reservationId && match.guestId)) return;
     try {
       await this.prisma.idVerification?.update?.({
         where: { id: match.id },
         data: {
           reservationId: match.reservationId ?? reservationId,
-          guestId: match.guestId ?? guestId
-        }
+          guestId: match.guestId ?? guestId,
+        },
       });
     } catch (err) {
       this.logger.warn("Failed to attach ID verification to reservation", err);
@@ -279,11 +287,11 @@ export class ReservationsService {
           { reservationId },
           {
             guestId,
-            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
-          }
-        ]
+            OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
+          },
+        ],
       },
-      orderBy: { verifiedAt: "desc" }
+      orderBy: { verifiedAt: "desc" },
     });
 
     if (match) {
@@ -311,7 +319,11 @@ export class ReservationsService {
         reasons.push("waiver_required");
         try {
           const signatureResult = await this.signaturesService.autoSendForReservation(reservation);
-          if (signatureResult && typeof signatureResult === "object" && "signingUrl" in signatureResult) {
+          if (
+            signatureResult &&
+            typeof signatureResult === "object" &&
+            "signingUrl" in signatureResult
+          ) {
             const maybeUrl = signatureResult.signingUrl;
             if (typeof maybeUrl === "string") {
               signingUrl = maybeUrl;
@@ -341,7 +353,7 @@ export class ReservationsService {
 
   private async enqueuePlaybooksForReservation(
     type: "arrival" | "unpaid" | "upsell" | "post_departure",
-    reservationId: string
+    reservationId: string,
   ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
@@ -352,19 +364,24 @@ export class ReservationsService {
         departureDate: true,
         guestId: true,
         totalAmount: true,
-        paidAmount: true
-      }
+        paidAmount: true,
+      },
     });
     if (!reservation) return;
 
     const playbooks = await this.prisma.communicationPlaybook.findMany({
-      where: { campgroundId: reservation.campgroundId, type, enabled: true, templateId: { not: null } }
+      where: {
+        campgroundId: reservation.campgroundId,
+        type,
+        enabled: true,
+        templateId: { not: null },
+      },
     });
 
     for (const pb of playbooks) {
       if (!pb.templateId) continue;
       const template = await this.prisma.communicationTemplate.findFirst({
-        where: { id: pb.templateId, status: "approved" }
+        where: { id: pb.templateId, status: "approved" },
       });
       if (!template) continue;
 
@@ -373,8 +390,8 @@ export class ReservationsService {
         where: {
           playbookId: pb.id,
           reservationId: reservation.id,
-          status: { in: ["pending", "sent"] }
-        }
+          status: { in: ["pending", "sent"] },
+        },
       });
       if (existingJob) continue; // Skip if already queued or sent
 
@@ -383,7 +400,7 @@ export class ReservationsService {
           ? reservation.arrivalDate
           : type === "post_departure"
             ? reservation.departureDate
-            : new Date()
+            : new Date(),
       );
       if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
         scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
@@ -397,8 +414,8 @@ export class ReservationsService {
           guestId: reservation.guestId,
           status: "pending",
           scheduledAt,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
     }
   }
@@ -406,7 +423,9 @@ export class ReservationsService {
   @Cron("0 */12 * * *") // every 12 hours
   async enqueueUnpaidSweep() {
     // Use raw SQL to filter unpaid reservations in the database instead of fetching all
-    const due = await this.prisma.$queryRaw<{ id: string; campgroundId: string; guestId: string }[]>`
+    const due = await this.prisma.$queryRaw<
+      { id: string; campgroundId: string; guestId: string }[]
+    >`
       SELECT id, "campgroundId", "guestId"
       FROM "Reservation"
       WHERE status != 'cancelled'
@@ -420,15 +439,17 @@ export class ReservationsService {
       where: {
         type: "unpaid",
         enabled: true,
-        templateId: { not: null }
+        templateId: { not: null },
       },
       include: {
-        CommunicationTemplate: { select: { id: true, status: true } }
-      }
+        CommunicationTemplate: { select: { id: true, status: true } },
+      },
     });
 
     // Filter to only playbooks with approved templates
-    const validPlaybooks = playbooks.filter(pb => pb.CommunicationTemplate?.status === "approved");
+    const validPlaybooks = playbooks.filter(
+      (pb) => pb.CommunicationTemplate?.status === "approved",
+    );
     if (!validPlaybooks.length) return;
 
     // Group due reservations by campgroundId for O(1) lookup
@@ -467,7 +488,7 @@ export class ReservationsService {
           guestId: r.guestId,
           status: "pending",
           scheduledAt,
-          updatedAt: new Date()
+          updatedAt: new Date(),
         });
       }
     }
@@ -476,13 +497,16 @@ export class ReservationsService {
     if (jobsToCreate.length > 0) {
       await this.prisma.communicationPlaybookJob.createMany({
         data: jobsToCreate,
-        skipDuplicates: true
+        skipDuplicates: true,
       });
     }
   }
 
   private isOverlapError(err: unknown) {
-    return err instanceof Prisma.PrismaClientKnownRequestError && err.message.includes("Reservation_no_overlap");
+    return (
+      err instanceof Prisma.PrismaClientKnownRequestError &&
+      err.message.includes("Reservation_no_overlap")
+    );
   }
 
   /**
@@ -503,7 +527,7 @@ export class ReservationsService {
       adults?: number;
       children?: number;
       holdId?: string | null;
-    }
+    },
   ): Promise<string | null> {
     const now = new Date();
     const ignoreHoldId = options?.holdId ?? null;
@@ -553,12 +577,12 @@ export class ReservationsService {
       return null;
     }
 
-    const availableIds = availableSiteIds.map(s => s.id);
+    const availableIds = availableSiteIds.map((s) => s.id);
 
     // Fetch full site details only for available sites
     const sites: MatchScoreSite[] = await this.prisma.site.findMany({
       where: { id: { in: availableIds } },
-      include: { SiteClass: true }
+      include: { SiteClass: true },
     });
 
     if (!sites.length) {
@@ -576,9 +600,9 @@ export class ReservationsService {
             Reservation: {
               where: { campgroundId },
               select: { siteId: true, Site: { select: { siteClassId: true } } },
-              distinct: ['siteId']
-            }
-          }
+              distinct: ["siteId"],
+            },
+          },
         })
       : null;
 
@@ -593,7 +617,7 @@ export class ReservationsService {
             siteClassRigMaxLength: site.SiteClass?.rigMaxLength ?? null,
             accessible: site.accessible,
             amenityTags: site.amenityTags,
-            maxOccupancy: site.maxOccupancy
+            maxOccupancy: site.maxOccupancy,
           },
           {
             rigType: options?.rigType,
@@ -601,10 +625,12 @@ export class ReservationsService {
             requiresAccessible: options?.requiresAccessible ?? null,
             requiredAmenities: options?.requiredAmenities ?? null,
             adults: options?.adults ?? null,
-            children: options?.children ?? null
-          }
+            children: options?.children ?? null,
+          },
         );
-        const match = guest ? this.matchScoreService.calculateMatchScore(guest, site) : { score: 0 };
+        const match = guest
+          ? this.matchScoreService.calculateMatchScore(guest, site)
+          : { score: 0 };
         candidates.push({ site, score: match.score });
       } catch {
         // Skip sites that don't meet constraints
@@ -628,11 +654,16 @@ export class ReservationsService {
     arrival: Date,
     departure: Date,
     ignoreReservationId?: string,
-    ignoreHoldId?: string
+    ignoreHoldId?: string,
   ) {
     const range = Prisma.sql`tstzrange(${arrival}, ${departure}, '[)'::text)`;
-    const ignore = ignoreReservationId ? Prisma.sql`AND r."id" <> ${ignoreReservationId}` : Prisma.sql``;
-    const site = await this.prisma.site.findUnique({ where: { id: siteId }, select: { campgroundId: true } });
+    const ignore = ignoreReservationId
+      ? Prisma.sql`AND r."id" <> ${ignoreReservationId}`
+      : Prisma.sql``;
+    const site = await this.prisma.site.findUnique({
+      where: { id: siteId },
+      select: { campgroundId: true },
+    });
     if (!site) {
       throw new NotFoundException("Site not found");
     }
@@ -658,8 +689,8 @@ export class ReservationsService {
         ...(ignoreHoldId ? { id: { not: ignoreHoldId } } : {}),
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
         arrivalDate: { lt: departure },
-        departureDate: { gt: arrival }
-      }
+        departureDate: { gt: arrival },
+      },
     });
     if (holdCount > 0) {
       throw new ConflictException("Site is currently on hold for these dates.");
@@ -670,12 +701,8 @@ export class ReservationsService {
       where: {
         siteId,
         status: { in: [MaintenanceStatus.open, MaintenanceStatus.in_progress] },
-        OR: [
-          { isBlocking: true },
-          { outOfOrder: true },
-          { outOfOrderUntil: { gt: arrival } }
-        ]
-      }
+        OR: [{ isBlocking: true }, { outOfOrder: true }, { outOfOrderUntil: { gt: arrival } }],
+      },
     });
     if (maintenanceCount > 0) {
       throw new ConflictException("Site is unavailable due to maintenance.");
@@ -685,13 +712,10 @@ export class ReservationsService {
     const blackoutCount = await this.prisma.blackoutDate.count({
       where: {
         campgroundId: site.campgroundId,
-        OR: [
-          { siteId: siteId },
-          { siteId: null }
-        ],
+        OR: [{ siteId: siteId }, { siteId: null }],
         startDate: { lt: departure },
-        endDate: { gt: arrival }
-      }
+        endDate: { gt: arrival },
+      },
     });
 
     if (blackoutCount > 0) {
@@ -702,7 +726,7 @@ export class ReservationsService {
   async calculateDeposit(id: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { Site: { select: { siteClassId: true } } }
+      include: { Site: { select: { siteClassId: true } } },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
 
@@ -712,7 +736,7 @@ export class ReservationsService {
       siteClassId: reservation.Site?.siteClassId ?? null,
       totalAmountCents: reservation.totalAmount,
       lodgingOnlyCents: reservation.baseSubtotal,
-      nights
+      nights,
     });
 
     const remainingBalance = Math.max(0, reservation.totalAmount - (reservation.paidAmount || 0));
@@ -720,7 +744,7 @@ export class ReservationsService {
     return {
       depositAmount: depositCalc.depositAmount,
       depositPolicyVersion: depositCalc.depositPolicyVersion,
-      remainingBalance
+      remainingBalance,
     };
   }
 
@@ -733,7 +757,7 @@ export class ReservationsService {
   private isRigCompatible(
     site: { siteType: string; rigMaxLength?: number | null; siteClassRigMaxLength?: number | null },
     rigType?: string | null,
-    rigLength?: number | null
+    rigLength?: number | null,
   ) {
     if (!rigType && !rigLength) return true;
     const normalizedType = (rigType || "").toLowerCase();
@@ -766,7 +790,7 @@ export class ReservationsService {
       requiredAmenities?: string[] | null;
       adults?: number | null;
       children?: number | null;
-    }
+    },
   ) {
     const occupancy = (opts.adults ?? 0) + (opts.children ?? 0);
     if (site.maxOccupancy && occupancy > site.maxOccupancy) {
@@ -783,20 +807,33 @@ export class ReservationsService {
 
     if (opts.requiredAmenities && opts.requiredAmenities.length > 0) {
       const siteAmenities = (site.amenityTags ?? []).map((a) => a.toLowerCase());
-      const missing = opts.requiredAmenities.filter((a) => !siteAmenities.includes((a || "").toLowerCase()));
+      const missing = opts.requiredAmenities.filter(
+        (a) => !siteAmenities.includes((a || "").toLowerCase()),
+      );
       if (missing.length > 0) {
         throw new BadRequestException(`Site is missing required amenities: ${missing.join(", ")}`);
       }
     }
   }
 
-  async searchAvailability(campgroundId: string, arrivalDate: string, departureDate: string, rigType?: string, rigLength?: string) {
+  async searchAvailability(
+    campgroundId: string,
+    arrivalDate: string,
+    departureDate: string,
+    rigType?: string,
+    rigLength?: string,
+  ) {
     if (!arrivalDate || !departureDate) {
       throw new BadRequestException("arrivalDate and departureDate are required");
     }
     const arrival = new Date(arrivalDate);
     const departure = new Date(departureDate);
-    if (!(arrival instanceof Date) || isNaN(arrival.valueOf()) || !(departure instanceof Date) || isNaN(departure.valueOf())) {
+    if (
+      !(arrival instanceof Date) ||
+      isNaN(arrival.valueOf()) ||
+      !(departure instanceof Date) ||
+      isNaN(departure.valueOf())
+    ) {
       throw new BadRequestException("Invalid dates");
     }
     if (departure <= arrival) {
@@ -807,7 +844,7 @@ export class ReservationsService {
     const allSites = await this.prisma.site.findMany({
       where: {
         campgroundId,
-        isActive: true
+        isActive: true,
       },
       select: {
         id: true,
@@ -824,13 +861,13 @@ export class ReservationsService {
             rigMaxLength: true,
             defaultRate: true,
             name: true,
-            siteType: true
-          }
-        }
+            siteType: true,
+          },
+        },
       },
       orderBy: {
-        name: 'asc'
-      }
+        name: "asc",
+      },
     });
 
     // Get all conflicting reservations
@@ -839,14 +876,14 @@ export class ReservationsService {
         campgroundId,
         status: { not: ReservationStatus.cancelled },
         departureDate: { gt: arrival },
-        arrivalDate: { lt: departure }
+        arrivalDate: { lt: departure },
       },
       select: {
-        siteId: true
-      }
+        siteId: true,
+      },
     });
 
-    const conflictingSiteIds = new Set(conflictingReservations.map(r => r.siteId));
+    const conflictingSiteIds = new Set(conflictingReservations.map((r) => r.siteId));
 
     // Get active holds overlapping the range
     const now = new Date();
@@ -856,9 +893,9 @@ export class ReservationsService {
         status: "active",
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
         arrivalDate: { lt: departure },
-        departureDate: { gt: arrival }
+        departureDate: { gt: arrival },
       },
-      select: { siteId: true }
+      select: { siteId: true },
     });
     const holdSiteIds = new Set(holds.map((h: { siteId: string }) => h.siteId));
 
@@ -867,11 +904,11 @@ export class ReservationsService {
       where: {
         campgroundId,
         startDate: { lt: departure },
-        endDate: { gt: arrival }
+        endDate: { gt: arrival },
       },
       select: {
-        siteId: true
-      }
+        siteId: true,
+      },
     });
 
     const blackedOutSiteIds = new Set<string>();
@@ -891,19 +928,20 @@ export class ReservationsService {
 
     // Filter out sites with conflicts
     const rigLengthNum = rigLength ? Number(rigLength) : null;
-    const availableSites = allSites.filter(site =>
-      !conflictingSiteIds.has(site.id) &&
-      !blackedOutSiteIds.has(site.id) &&
-      !holdSiteIds.has(site.id) &&
-      this.isRigCompatible(
-        {
-          siteType: site.siteType || site.SiteClass?.siteType || "rv",
-          rigMaxLength: site.rigMaxLength,
-          siteClassRigMaxLength: site.SiteClass?.rigMaxLength ?? null
-        },
-        rigType,
-        Number.isFinite(rigLengthNum) ? rigLengthNum : null
-      )
+    const availableSites = allSites.filter(
+      (site) =>
+        !conflictingSiteIds.has(site.id) &&
+        !blackedOutSiteIds.has(site.id) &&
+        !holdSiteIds.has(site.id) &&
+        this.isRigCompatible(
+          {
+            siteType: site.siteType || site.SiteClass?.siteType || "rv",
+            rigMaxLength: site.rigMaxLength,
+            siteClassRigMaxLength: site.SiteClass?.rigMaxLength ?? null,
+          },
+          rigType,
+          Number.isFinite(rigLengthNum) ? rigLengthNum : null,
+        ),
     );
 
     return availableSites;
@@ -916,11 +954,13 @@ export class ReservationsService {
   async getSitesWithStatus(campgroundId: string, arrivalDate?: string, departureDate?: string) {
     const now = new Date();
     const arrival = arrivalDate ? new Date(arrivalDate) : now;
-    const departure = departureDate ? new Date(departureDate) : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const departure = departureDate
+      ? new Date(departureDate)
+      : new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { latitude: true, longitude: true }
+      select: { latitude: true, longitude: true },
     });
     const campgroundLat = campground?.latitude ? Number(campground.latitude) : null;
     const campgroundLng = campground?.longitude ? Number(campground.longitude) : null;
@@ -929,14 +969,14 @@ export class ReservationsService {
     const allSites = await this.prisma.site.findMany({
       where: {
         campgroundId,
-        isActive: true
+        isActive: true,
       },
       include: {
         SiteClass: {
-          select: { name: true, defaultRate: true }
-        }
+          select: { name: true, defaultRate: true },
+        },
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
     // Get conflicting reservations with guest info
@@ -945,24 +985,27 @@ export class ReservationsService {
         campgroundId,
         status: { not: ReservationStatus.cancelled },
         departureDate: { gt: arrival },
-        arrivalDate: { lt: departure }
+        arrivalDate: { lt: departure },
       },
       select: {
         siteId: true,
         arrivalDate: true,
         departureDate: true,
         Guest: {
-          select: { primaryFirstName: true, primaryLastName: true }
-        }
-      }
+          select: { primaryFirstName: true, primaryLastName: true },
+        },
+      },
     });
 
-    const occupiedSiteMap = new Map<string, { guestName: string; arrivalDate: Date; departureDate: Date }>();
+    const occupiedSiteMap = new Map<
+      string,
+      { guestName: string; arrivalDate: Date; departureDate: Date }
+    >();
     for (const r of conflictingReservations) {
       occupiedSiteMap.set(r.siteId, {
         guestName: `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`,
         arrivalDate: r.arrivalDate,
-        departureDate: r.departureDate
+        departureDate: r.departureDate,
       });
     }
 
@@ -971,9 +1014,9 @@ export class ReservationsService {
       where: {
         campgroundId,
         status: { in: [MaintenanceStatus.open, MaintenanceStatus.in_progress] },
-        siteId: { not: null }
+        siteId: { not: null },
       },
-      select: { siteId: true, title: true }
+      select: { siteId: true, title: true },
     });
 
     const maintenanceSiteMap = new Map<string, string>();
@@ -986,16 +1029,16 @@ export class ReservationsService {
       where: {
         campgroundId,
         startDate: { lt: departure },
-        endDate: { gt: arrival }
+        endDate: { gt: arrival },
       },
-      select: { siteId: true, reason: true }
+      select: { siteId: true, reason: true },
     });
 
     const blackoutSiteMap = new Map<string, string>();
     let campgroundBlackedOut = false;
     for (const b of blackouts) {
       if (b.siteId) {
-        blackoutSiteMap.set(b.siteId, b.reason || 'Blacked out');
+        blackoutSiteMap.set(b.siteId, b.reason || "Blacked out");
       } else {
         campgroundBlackedOut = true;
       }
@@ -1003,27 +1046,33 @@ export class ReservationsService {
 
     // Build result with status for each site
     return allSites.map((site, idx) => {
-      let status: 'available' | 'occupied' | 'maintenance' = 'available';
+      let status: "available" | "occupied" | "maintenance" = "available";
       let statusDetail: string | null = null;
 
       if (campgroundBlackedOut || blackoutSiteMap.has(site.id)) {
-        status = 'maintenance';
-        statusDetail = blackoutSiteMap.get(site.id) || 'Campground closed';
+        status = "maintenance";
+        statusDetail = blackoutSiteMap.get(site.id) || "Campground closed";
       } else if (maintenanceSiteMap.has(site.id)) {
-        status = 'maintenance';
-        statusDetail = maintenanceSiteMap.get(site.id) || 'Under maintenance';
+        status = "maintenance";
+        statusDetail = maintenanceSiteMap.get(site.id) || "Under maintenance";
       } else if (occupiedSiteMap.has(site.id)) {
-        status = 'occupied';
+        status = "occupied";
         const occ = occupiedSiteMap.get(site.id)!;
         statusDetail = occ.guestName;
       }
 
-      const derivedLat = site.latitude !== null && site.latitude !== undefined
-        ? Number(site.latitude)
-        : (campgroundLat !== null ? campgroundLat + 0.0005 * Math.sin(idx) : null);
-      const derivedLng = site.longitude !== null && site.longitude !== undefined
-        ? Number(site.longitude)
-        : (campgroundLng !== null ? campgroundLng + 0.0005 * Math.cos(idx) : null);
+      const derivedLat =
+        site.latitude !== null && site.latitude !== undefined
+          ? Number(site.latitude)
+          : campgroundLat !== null
+            ? campgroundLat + 0.0005 * Math.sin(idx)
+            : null;
+      const derivedLng =
+        site.longitude !== null && site.longitude !== undefined
+          ? Number(site.longitude)
+          : campgroundLng !== null
+            ? campgroundLng + 0.0005 * Math.cos(idx)
+            : null;
 
       return {
         id: site.id,
@@ -1038,7 +1087,7 @@ export class ReservationsService {
         longitude: derivedLng,
         defaultRate: site.SiteClass?.defaultRate ?? null,
         status,
-        statusDetail
+        statusDetail,
       };
     });
   }
@@ -1051,26 +1100,24 @@ export class ReservationsService {
       status?: string;
       fromDate?: Date;
       toDate?: Date;
-    }
+    },
   ) {
     const limit = Math.min(options?.limit ?? 1000, 2000); // Increased default for calendar view
     const offset = options?.offset ?? 0;
     const statusFilter =
-      options?.status && isReservationStatus(options.status)
-        ? { status: options.status }
-        : {};
+      options?.status && isReservationStatus(options.status) ? { status: options.status } : {};
 
     return this.prisma.reservation.findMany({
       where: {
         campgroundId,
         ...statusFilter,
         ...(options?.fromDate && { arrivalDate: { gte: options.fromDate } }),
-        ...(options?.toDate && { departureDate: { lte: options.toDate } })
+        ...(options?.toDate && { departureDate: { lte: options.toDate } }),
       },
       include: { Guest: true, Site: true },
-      orderBy: { arrivalDate: 'asc' }, // Changed to ASC so current/near-term reservations come first
+      orderBy: { arrivalDate: "asc" }, // Changed to ASC so current/near-term reservations come first
       take: limit,
-      skip: offset
+      skip: offset,
     });
   }
 
@@ -1092,18 +1139,18 @@ export class ReservationsService {
         campgroundId,
         // Only active reservations (confirmed or checked_in) if activeOnly
         ...(activeOnly && {
-          status: { in: ['confirmed', 'checked_in'] },
+          status: { in: ["confirmed", "checked_in"] },
           departureDate: { gte: today }, // Not yet departed
         }),
         OR: [
           // Search by site number/name
-          { Site: { siteNumber: { contains: searchTerm, mode: 'insensitive' } } },
-          { Site: { name: { contains: searchTerm, mode: 'insensitive' } } },
+          { Site: { siteNumber: { contains: searchTerm, mode: "insensitive" } } },
+          { Site: { name: { contains: searchTerm, mode: "insensitive" } } },
           // Search by guest name
-          { Guest: { primaryFirstName: { contains: searchTerm, mode: 'insensitive' } } },
-          { Guest: { primaryLastName: { contains: searchTerm, mode: 'insensitive' } } },
+          { Guest: { primaryFirstName: { contains: searchTerm, mode: "insensitive" } } },
+          { Guest: { primaryLastName: { contains: searchTerm, mode: "insensitive" } } },
           // Search by reservation id (used as confirmation code)
-          { id: { contains: searchTerm, mode: 'insensitive' } },
+          { id: { contains: searchTerm, mode: "insensitive" } },
         ],
       },
       include: {
@@ -1131,8 +1178,8 @@ export class ReservationsService {
         },
       },
       orderBy: [
-        { status: 'asc' }, // checked_in first
-        { arrivalDate: 'asc' },
+        { status: "asc" }, // checked_in first
+        { arrivalDate: "asc" },
       ],
       take: 10, // Limit results for typeahead
     });
@@ -1149,7 +1196,8 @@ export class ReservationsService {
       balanceAmount: Math.max(0, res.totalAmount - (res.paidAmount ?? 0)),
       guest: res.Guest,
       site: res.Site,
-      displayLabel: `${res.Site?.siteNumber || res.Site?.name || 'No Site'} - ${res.Guest?.primaryFirstName || ''} ${res.Guest?.primaryLastName || ''}`.trim(),
+      displayLabel:
+        `${res.Site?.siteNumber || res.Site?.name || "No Site"} - ${res.Guest?.primaryFirstName || ""} ${res.Guest?.primaryLastName || ""}`.trim(),
     }));
   }
 
@@ -1160,18 +1208,21 @@ export class ReservationsService {
         Guest: true,
         Site: { include: { SiteClass: true } },
         Campground: true,
-        Payment: true
-      }
+        Payment: true,
+      },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
 
-    const paymentStatus = this.computePaymentStatus(reservation.totalAmount, reservation.paidAmount ?? 0);
+    const paymentStatus = this.computePaymentStatus(
+      reservation.totalAmount,
+      reservation.paidAmount ?? 0,
+    );
     const balanceAmount = Math.max(0, reservation.totalAmount - (reservation.paidAmount ?? 0));
 
     return {
       ...reservation,
       paymentStatus,
-      balanceAmount
+      balanceAmount,
     };
   }
 
@@ -1184,18 +1235,26 @@ export class ReservationsService {
     // If siteClassId is provided instead of siteId, find an available site in that class
     let siteId: string | null | undefined = data.siteId;
     if (!siteId && data.siteClassId) {
-      siteId = await this.findAvailableSiteInClass(data.campgroundId, data.siteClassId, arrival, departure, {
-        guestId: data.guestId,
-        rigType: data.rigType ?? data.rvType ?? null,
-        rigLength: data.rigLength ?? null,
-        requiresAccessible: data.requiresAccessible ?? null,
-        requiredAmenities: data.requiredAmenities ?? null,
-        adults: data.adults,
-        children: data.children ?? 0,
-        holdId: data.holdId ?? null
-      });
+      siteId = await this.findAvailableSiteInClass(
+        data.campgroundId,
+        data.siteClassId,
+        arrival,
+        departure,
+        {
+          guestId: data.guestId,
+          rigType: data.rigType ?? data.rvType ?? null,
+          rigLength: data.rigLength ?? null,
+          requiresAccessible: data.requiresAccessible ?? null,
+          requiredAmenities: data.requiredAmenities ?? null,
+          adults: data.adults,
+          children: data.children ?? 0,
+          holdId: data.holdId ?? null,
+        },
+      );
       if (!siteId) {
-        throw new ConflictException("No available sites found in the selected class for the given dates.");
+        throw new ConflictException(
+          "No available sites found in the selected class for the given dates.",
+        );
       }
     }
 
@@ -1236,9 +1295,9 @@ export class ReservationsService {
             amenityTags: true,
             maxOccupancy: true,
             SiteClass: {
-              select: { rigMaxLength: true, siteType: true, name: true }
-            }
-          }
+              select: { rigMaxLength: true, siteType: true, name: true },
+            },
+          },
         });
 
         if (!siteInfo) {
@@ -1252,7 +1311,7 @@ export class ReservationsService {
             siteClassRigMaxLength: siteInfo.SiteClass?.rigMaxLength ?? null,
             accessible: siteInfo.accessible,
             amenityTags: siteInfo.amenityTags,
-            maxOccupancy: siteInfo.maxOccupancy
+            maxOccupancy: siteInfo.maxOccupancy,
           },
           {
             rigType: data.rigType ?? data.rvType ?? null,
@@ -1260,8 +1319,8 @@ export class ReservationsService {
             requiresAccessible: data.requiresAccessible ?? null,
             requiredAmenities: data.requiredAmenities ?? null,
             adults: data.adults,
-            children: data.children ?? 0
-          }
+            children: data.children ?? 0,
+          },
         );
 
         const baselinePrice = await evaluatePricingV2(
@@ -1270,7 +1329,7 @@ export class ReservationsService {
           data.campgroundId,
           siteId,
           arrival,
-          departure
+          departure,
         );
 
         // Get campground pricing control settings
@@ -1280,26 +1339,32 @@ export class ReservationsService {
             maxDiscountFraction: true,
             managerApprovalThreshold: true,
             minOverrideRateCents: true,
-            maxOverrideRateCents: true
-          }
+            maxOverrideRateCents: true,
+          },
         });
-        const manualPriceProvided = data.totalAmount !== undefined && data.totalAmount !== null && data.totalAmount > 0;
+        const manualPriceProvided =
+          data.totalAmount !== undefined && data.totalAmount !== null && data.totalAmount > 0;
         const price = manualPriceProvided
           ? {
-            totalCents: data.totalAmount,
-            baseSubtotalCents: baselinePrice.baseSubtotalCents,
-            rulesDeltaCents: baselinePrice.rulesDeltaCents,
-            nights: this.computeNights(arrival, departure),
-            pricingRuleVersion: "manual"
-          }
+              totalCents: data.totalAmount,
+              baseSubtotalCents: baselinePrice.baseSubtotalCents,
+              rulesDeltaCents: baselinePrice.rulesDeltaCents,
+              nights: this.computeNights(arrival, departure),
+              pricingRuleVersion: "manual",
+            }
           : baselinePrice;
         const manualDiscountProvided = (data.discountsAmount ?? 0) > 0;
-        const manualOverrideDelta = manualPriceProvided ? data.totalAmount - baselinePrice.totalCents : 0;
+        const manualOverrideDelta = manualPriceProvided
+          ? data.totalAmount - baselinePrice.totalCents
+          : 0;
         const overrideReason = data.overrideReason;
         const overrideApprovedBy = data.overrideApprovedBy;
-        const needsOverrideApproval = (manualPriceProvided && manualOverrideDelta !== 0) || manualDiscountProvided;
+        const needsOverrideApproval =
+          (manualPriceProvided && manualOverrideDelta !== 0) || manualDiscountProvided;
         if (needsOverrideApproval && (!overrideReason || !overrideApprovedBy)) {
-          throw new BadRequestException("Manual pricing overrides require overrideReason and overrideApprovedBy.");
+          throw new BadRequestException(
+            "Manual pricing overrides require overrideReason and overrideApprovedBy.",
+          );
         }
 
         // Validate override against campground pricing controls
@@ -1319,7 +1384,7 @@ export class ReservationsService {
             if (discountPct > maxDiscountFraction) {
               throw new BadRequestException(
                 `Override discount of ${Math.round(discountPct * 100)}% exceeds maximum allowed (${Math.round(maxDiscountFraction * 100)}%). ` +
-                `Minimum allowed price: $${((baselinePrice.totalCents * (1 - maxDiscountFraction)) / 100).toFixed(2)}`
+                  `Minimum allowed price: $${((baselinePrice.totalCents * (1 - maxDiscountFraction)) / 100).toFixed(2)}`,
               );
             }
 
@@ -1327,7 +1392,7 @@ export class ReservationsService {
             if (discountPct > managerThreshold && !overrideApprovedBy) {
               throw new BadRequestException(
                 `Discounts above ${Math.round(managerThreshold * 100)}% require manager approval. ` +
-                `Please provide overrideApprovedBy with a manager's user ID.`
+                  `Please provide overrideApprovedBy with a manager's user ID.`,
               );
             }
           }
@@ -1336,15 +1401,21 @@ export class ReservationsService {
           const nights = this.computeNights(arrival, departure);
           const perNightRate = data.totalAmount / nights;
 
-          if (pricingControls.minOverrideRateCents !== null && perNightRate < pricingControls.minOverrideRateCents) {
+          if (
+            pricingControls.minOverrideRateCents !== null &&
+            perNightRate < pricingControls.minOverrideRateCents
+          ) {
             throw new BadRequestException(
-              `Per-night rate of $${(perNightRate / 100).toFixed(2)} is below minimum allowed ($${(pricingControls.minOverrideRateCents / 100).toFixed(2)}/night).`
+              `Per-night rate of $${(perNightRate / 100).toFixed(2)} is below minimum allowed ($${(pricingControls.minOverrideRateCents / 100).toFixed(2)}/night).`,
             );
           }
 
-          if (pricingControls.maxOverrideRateCents !== null && perNightRate > pricingControls.maxOverrideRateCents) {
+          if (
+            pricingControls.maxOverrideRateCents !== null &&
+            perNightRate > pricingControls.maxOverrideRateCents
+          ) {
             throw new BadRequestException(
-              `Per-night rate of $${(perNightRate / 100).toFixed(2)} exceeds maximum allowed ($${(pricingControls.maxOverrideRateCents / 100).toFixed(2)}/night).`
+              `Per-night rate of $${(perNightRate / 100).toFixed(2)} exceeds maximum allowed ($${(pricingControls.maxOverrideRateCents / 100).toFixed(2)}/night).`,
             );
           }
         }
@@ -1366,7 +1437,7 @@ export class ReservationsService {
             const validation = await this.promotionsService.validate({
               campgroundId: data.campgroundId,
               code: promoCode,
-              subtotal: subtotal
+              subtotal: subtotal,
             });
             discountCents = validation.discountCents;
             promotionId = validation.promotionId;
@@ -1380,15 +1451,15 @@ export class ReservationsService {
           const referralConditions: Array<Prisma.ReferralProgramWhereInput | undefined> = [
             data.referralProgramId ? { id: data.referralProgramId } : undefined,
             data.referralCode ? { code: data.referralCode } : undefined,
-            data.referralCode ? { linkSlug: data.referralCode } : undefined
+            data.referralCode ? { linkSlug: data.referralCode } : undefined,
           ];
 
           referralProgram = await this.prisma.referralProgram.findFirst({
             where: {
               campgroundId: data.campgroundId,
               isActive: true,
-              OR: referralConditions.filter(isDefined)
-            }
+              OR: referralConditions.filter(isDefined),
+            },
           });
           if (!referralProgram) {
             throw new BadRequestException("Invalid or inactive referral code");
@@ -1401,7 +1472,10 @@ export class ReservationsService {
           referralChannel = referralProgram.channel ?? referralChannel;
 
           if (referralIncentiveType === ReferralIncentiveType.percent_discount) {
-            referralDiscountCents = Math.min(basis, Math.floor(basis * (referralIncentiveValue / 100)));
+            referralDiscountCents = Math.min(
+              basis,
+              Math.floor(basis * (referralIncentiveValue / 100)),
+            );
           } else {
             referralDiscountCents = Math.min(basis, Math.max(0, referralIncentiveValue));
           }
@@ -1412,9 +1486,7 @@ export class ReservationsService {
         const paidAmount = data.paidAmount ?? 0;
         const status = data.status ?? ReservationStatus.pending;
         const allowPendingCardWithoutDeposit =
-          data.paymentMethod === "card" &&
-          status === ReservationStatus.pending &&
-          paidAmount <= 0;
+          data.paymentMethod === "card" && status === ReservationStatus.pending && paidAmount <= 0;
 
         const depositCalc = allowPendingCardWithoutDeposit
           ? await calculateReservationDepositV2(this.depositPoliciesService, {
@@ -1422,7 +1494,7 @@ export class ReservationsService {
               siteClassId: siteInfo?.siteClassId ?? null,
               totalAmountCents: totalAmount,
               lodgingOnlyCents: price.baseSubtotalCents,
-              nights: price.nights
+              nights: price.nights,
             })
           : await assertReservationDepositV2(this.depositPoliciesService, {
               campgroundId: data.campgroundId,
@@ -1430,7 +1502,7 @@ export class ReservationsService {
               totalAmountCents: totalAmount,
               lodgingOnlyCents: price.baseSubtotalCents,
               paidAmountCents: paidAmount,
-              nights: price.nights
+              nights: price.nights,
             });
         const paymentFields = this.buildPaymentFields(totalAmount, paidAmount);
 
@@ -1473,7 +1545,10 @@ export class ReservationsService {
             feesAmount: data.feesAmount ?? 0,
             taxesAmount: data.taxesAmount ?? 0,
             discountsAmount:
-              (discountCents > 0 ? discountCents : (data.discountsAmount ?? (price.rulesDeltaCents < 0 ? -price.rulesDeltaCents : 0))) +
+              (discountCents > 0
+                ? discountCents
+                : (data.discountsAmount ??
+                  (price.rulesDeltaCents < 0 ? -price.rulesDeltaCents : 0))) +
               referralDiscountCents,
             promoCode: promoCode,
             referralProgramId: referralProgram?.id ?? data.referralProgramId ?? null,
@@ -1491,17 +1566,17 @@ export class ReservationsService {
             ...paymentFields,
             checkInAt: data.checkInAt ? new Date(data.checkInAt) : null,
             checkOutAt: data.checkOutAt ? new Date(data.checkOutAt) : null,
-            notes: data.notes ?? null
+            notes: data.notes ?? null,
           },
           include: {
             Site: {
               include: {
-                SiteClass: true
-              }
+                SiteClass: true,
+              },
             },
             Guest: true,
-            Campground: { select: { name: true } }
-          }
+            Campground: { select: { name: true } },
+          },
         } satisfies Prisma.ReservationCreateArgs;
         const reservation = await this.prisma.reservation.create(reservationArgs);
 
@@ -1523,24 +1598,30 @@ export class ReservationsService {
             departureDate: reservation.departureDate,
             status: reservation.status,
             totalAmount: reservation.totalAmount,
-            source: reservation.source
-          }
+            source: reservation.source,
+          },
         });
 
         await this.enqueuePlaybooksForReservation("arrival", reservation.id);
 
         if (reservation.seasonalRateId) {
           try {
-            await this.repeatChargesService.generateCharges(reservation.campgroundId, reservation.id);
+            await this.repeatChargesService.generateCharges(
+              reservation.campgroundId,
+              reservation.id,
+            );
           } catch (err) {
-            this.logger.error(`Failed to generate repeat charges for reservation ${reservation.id}:`, err instanceof Error ? err.stack : err);
+            this.logger.error(
+              `Failed to generate repeat charges for reservation ${reservation.id}:`,
+              err instanceof Error ? err.stack : err,
+            );
           }
         }
 
         if (hold?.id) {
           await this.prisma.siteHold.update({
             where: { id: hold.id },
-            data: { status: "released", expiresAt: hold.expiresAt ?? new Date() }
+            data: { status: "released", expiresAt: hold.expiresAt ?? new Date() },
           });
         }
 
@@ -1554,8 +1635,10 @@ export class ReservationsService {
               amountCents: paidAmount,
               method: paymentMethod || "card", // Default to card if not specified
               direction: "charge",
-              note: paymentNotes || (transactionId ? `Transaction ID: ${transactionId}` : "Initial payment")
-            }
+              note:
+                paymentNotes ||
+                (transactionId ? `Transaction ID: ${transactionId}` : "Initial payment"),
+            },
           });
 
           const revenueGl = reservation.Site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
@@ -1570,7 +1653,9 @@ export class ReservationsService {
               amountCents: paidAmount,
               direction: "debit",
               externalRef: transactionId ?? undefined,
-              dedupeKey: transactionId ? `res:${reservation.id}:init:${transactionId}:debit` : `res:${reservation.id}:init:debit`
+              dedupeKey: transactionId
+                ? `res:${reservation.id}:init:${transactionId}:debit`
+                : `res:${reservation.id}:init:debit`,
             },
             {
               campgroundId: data.campgroundId,
@@ -1581,8 +1666,10 @@ export class ReservationsService {
               amountCents: paidAmount,
               direction: "credit",
               externalRef: transactionId ?? undefined,
-              dedupeKey: transactionId ? `res:${reservation.id}:init:${transactionId}:credit` : `res:${reservation.id}:init:credit`
-            }
+              dedupeKey: transactionId
+                ? `res:${reservation.id}:init:${transactionId}:credit`
+                : `res:${reservation.id}:init:credit`,
+            },
           ]);
 
           // Send payment receipt email
@@ -1590,7 +1677,8 @@ export class ReservationsService {
             const guestEmail = reservation.Guest.email ?? undefined;
             if (guestEmail) {
               const guestName =
-                `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`.trim() || "Guest";
+                `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`.trim() ||
+                "Guest";
               await this.emailService.sendPaymentReceipt({
                 guestEmail,
                 guestName,
@@ -1604,11 +1692,14 @@ export class ReservationsService {
                 departureDate: reservation.departureDate,
                 source: reservation.source || "admin",
                 totalCents: paidAmount,
-                kind: "payment"
+                kind: "payment",
               });
             }
           } catch (emailError) {
-            this.logger.error("Failed to send payment receipt email:", emailError instanceof Error ? emailError.stack : emailError);
+            this.logger.error(
+              "Failed to send payment receipt email:",
+              emailError instanceof Error ? emailError.stack : emailError,
+            );
           }
         }
 
@@ -1629,8 +1720,8 @@ export class ReservationsService {
               totalAmount,
               baselineTotalCents: baselinePrice.totalCents,
               deltaCents: manualOverrideDelta,
-              discountsAmount: reservation.discountsAmount ?? 0
-            }
+              discountsAmount: reservation.discountsAmount ?? 0,
+            },
           });
           await this.approvals.create({
             type: "config_change",
@@ -1643,8 +1734,8 @@ export class ReservationsService {
               reservationId: reservation.id,
               guestId: reservation.guestId,
               siteId: reservation.siteId,
-              baselineTotalCents: baselinePrice.totalCents
-            }
+              baselineTotalCents: baselinePrice.totalCents,
+            },
           });
         }
 
@@ -1655,7 +1746,7 @@ export class ReservationsService {
             site: reservation.Site,
             siteClass: reservation.Site?.SiteClass,
             channel: reservation.source || "admin",
-            acceptances: policyAcceptances
+            acceptances: policyAcceptances,
           });
         } catch (err) {
           this.logger.warn(`Policies auto-apply failed for reservation ${reservation.id}:`, err);
@@ -1679,7 +1770,7 @@ export class ReservationsService {
           departureDate: reservation.departureDate.toISOString(),
           status: reservation.status,
           totalCents: reservation.totalAmount,
-          balanceCents: reservation.balanceAmount
+          balanceCents: reservation.balanceAmount,
         });
 
         return reservation;
@@ -1692,11 +1783,10 @@ export class ReservationsService {
     }
   }
 
-
   async update(id: string, data: Partial<CreateReservationDto>) {
     const existing = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { Guest: true, Campground: true, Site: true }
+      include: { Guest: true, Campground: true, Site: true },
     });
     if (!existing) throw new NotFoundException("Reservation not found");
 
@@ -1719,8 +1809,8 @@ export class ReservationsService {
             accessible: true,
             amenityTags: true,
             maxOccupancy: true,
-            SiteClass: { select: { rigMaxLength: true, siteType: true, name: true } }
-          }
+            SiteClass: { select: { rigMaxLength: true, siteType: true, name: true } },
+          },
         });
 
         if (!siteInfo) {
@@ -1734,7 +1824,7 @@ export class ReservationsService {
             siteClassRigMaxLength: siteInfo.SiteClass?.rigMaxLength ?? null,
             accessible: siteInfo.accessible,
             amenityTags: siteInfo.amenityTags,
-            maxOccupancy: siteInfo.maxOccupancy
+            maxOccupancy: siteInfo.maxOccupancy,
           },
           {
             rigType: data.rigType ?? data.rvType ?? existing.rigType ?? null,
@@ -1742,8 +1832,8 @@ export class ReservationsService {
             requiresAccessible: data.requiresAccessible ?? null,
             requiredAmenities: data.requiredAmenities ?? null,
             adults: data.adults ?? existing.adults ?? 0,
-            children: data.children ?? existing.children ?? 0
-          }
+            children: data.children ?? existing.children ?? 0,
+          },
         );
 
         const baselinePrice = await evaluatePricingV2(
@@ -1752,7 +1842,7 @@ export class ReservationsService {
           existing.campgroundId,
           targetSiteId,
           arrival,
-          departure
+          departure,
         );
 
         // Get campground pricing control settings
@@ -1762,21 +1852,27 @@ export class ReservationsService {
             maxDiscountFraction: true,
             managerApprovalThreshold: true,
             minOverrideRateCents: true,
-            maxOverrideRateCents: true
-          }
+            maxOverrideRateCents: true,
+          },
         });
 
         const shouldReprice = data.totalAmount === undefined || data.totalAmount === null;
         const price = shouldReprice ? baselinePrice : null;
-        const totalAmount = shouldReprice ? baselinePrice.totalCents : data.totalAmount ?? existing.totalAmount;
+        const totalAmount = shouldReprice
+          ? baselinePrice.totalCents
+          : (data.totalAmount ?? existing.totalAmount);
         const paidAmount = data.paidAmount ?? existing.paidAmount ?? 0;
-        const manualDiscountProvided = data.discountsAmount !== undefined && data.discountsAmount !== null;
+        const manualDiscountProvided =
+          data.discountsAmount !== undefined && data.discountsAmount !== null;
         const manualOverrideDelta = shouldReprice ? 0 : totalAmount - baselinePrice.totalCents;
         const overrideReason = data.overrideReason;
         const overrideApprovedBy = data.overrideApprovedBy;
-        const needsOverrideApproval = !shouldReprice && (manualOverrideDelta !== 0 || manualDiscountProvided);
+        const needsOverrideApproval =
+          !shouldReprice && (manualOverrideDelta !== 0 || manualDiscountProvided);
         if (needsOverrideApproval && (!overrideReason || !overrideApprovedBy)) {
-          throw new BadRequestException("Manual pricing overrides require overrideReason and overrideApprovedBy.");
+          throw new BadRequestException(
+            "Manual pricing overrides require overrideReason and overrideApprovedBy.",
+          );
         }
 
         // Validate override against campground pricing controls
@@ -1796,7 +1892,7 @@ export class ReservationsService {
             if (discountPct > maxDiscountFraction) {
               throw new BadRequestException(
                 `Override discount of ${Math.round(discountPct * 100)}% exceeds maximum allowed (${Math.round(maxDiscountFraction * 100)}%). ` +
-                `Minimum allowed price: $${((baselinePrice.totalCents * (1 - maxDiscountFraction)) / 100).toFixed(2)}`
+                  `Minimum allowed price: $${((baselinePrice.totalCents * (1 - maxDiscountFraction)) / 100).toFixed(2)}`,
               );
             }
 
@@ -1804,7 +1900,7 @@ export class ReservationsService {
             if (discountPct > managerThreshold && !overrideApprovedBy) {
               throw new BadRequestException(
                 `Discounts above ${Math.round(managerThreshold * 100)}% require manager approval. ` +
-                `Please provide overrideApprovedBy with a manager's user ID.`
+                  `Please provide overrideApprovedBy with a manager's user ID.`,
               );
             }
           }
@@ -1813,15 +1909,21 @@ export class ReservationsService {
           const nights = baselinePrice.nights;
           const perNightRate = totalAmount / nights;
 
-          if (pricingControls.minOverrideRateCents !== null && perNightRate < pricingControls.minOverrideRateCents) {
+          if (
+            pricingControls.minOverrideRateCents !== null &&
+            perNightRate < pricingControls.minOverrideRateCents
+          ) {
             throw new BadRequestException(
-              `Per-night rate of $${(perNightRate / 100).toFixed(2)} is below minimum allowed ($${(pricingControls.minOverrideRateCents / 100).toFixed(2)}/night).`
+              `Per-night rate of $${(perNightRate / 100).toFixed(2)} is below minimum allowed ($${(pricingControls.minOverrideRateCents / 100).toFixed(2)}/night).`,
             );
           }
 
-          if (pricingControls.maxOverrideRateCents !== null && perNightRate > pricingControls.maxOverrideRateCents) {
+          if (
+            pricingControls.maxOverrideRateCents !== null &&
+            perNightRate > pricingControls.maxOverrideRateCents
+          ) {
             throw new BadRequestException(
-              `Per-night rate of $${(perNightRate / 100).toFixed(2)} exceeds maximum allowed ($${(pricingControls.maxOverrideRateCents / 100).toFixed(2)}/night).`
+              `Per-night rate of $${(perNightRate / 100).toFixed(2)} exceeds maximum allowed ($${(pricingControls.maxOverrideRateCents / 100).toFixed(2)}/night).`,
             );
           }
         }
@@ -1830,9 +1932,13 @@ export class ReservationsService {
           campgroundId: existing.campgroundId,
           siteClassId: siteInfo?.siteClassId ?? null,
           totalAmountCents: totalAmount,
-          lodgingOnlyCents: price?.baseSubtotalCents ?? data.baseSubtotal ?? existing.baseSubtotal ?? baselinePrice.baseSubtotalCents,
+          lodgingOnlyCents:
+            price?.baseSubtotalCents ??
+            data.baseSubtotal ??
+            existing.baseSubtotal ??
+            baselinePrice.baseSubtotalCents,
           paidAmountCents: paidAmount,
-          nights: baselinePrice.nights
+          nights: baselinePrice.nights,
         });
         const paymentFields = this.buildPaymentFields(totalAmount, paidAmount);
 
@@ -1854,9 +1960,10 @@ export class ReservationsService {
 
         // If attempting to check in, ensure required forms are completed
         if (reservationData.status === ReservationStatus.checked_in) {
-          const pendingForms = await this.prisma.formSubmission?.count?.({
-            where: { reservationId: id, status: "pending" }
-          }) ?? 0;
+          const pendingForms =
+            (await this.prisma.formSubmission?.count?.({
+              where: { reservationId: id, status: "pending" },
+            })) ?? 0;
           if (pendingForms > 0) {
             throw new ConflictException("Forms must be completed before check-in");
           }
@@ -1866,13 +1973,13 @@ export class ReservationsService {
             paymentStatus: reservationData.paymentStatus ?? existing.paymentStatus,
             paymentRequired: existing.paymentRequired,
             waiverRequired: existing.waiverRequired,
-            idVerificationRequired: existing.idVerificationRequired
+            idVerificationRequired: existing.idVerificationRequired,
           };
           const compliance = await this.checkCompliance(mergedForCompliance);
           if (!compliance.ok) {
             throw new ConflictException({
               reason: compliance.reason,
-              signingUrl: compliance.signingUrl
+              signingUrl: compliance.signingUrl,
             });
           }
         }
@@ -1887,7 +1994,11 @@ export class ReservationsService {
             paidAmount,
             petCount: _pets !== undefined ? _pets : existing.petCount,
             petTypes: toNullableJsonInput(_petTypes !== undefined ? _petTypes : existing.petTypes),
-            baseSubtotal: data.baseSubtotal ?? (price ? price.baseSubtotalCents : baselinePrice.baseSubtotalCents ?? existing.baseSubtotal),
+            baseSubtotal:
+              data.baseSubtotal ??
+              (price
+                ? price.baseSubtotalCents
+                : (baselinePrice.baseSubtotalCents ?? existing.baseSubtotal)),
             feesAmount: data.feesAmount ?? existing.feesAmount,
             taxesAmount: data.taxesAmount ?? existing.taxesAmount,
             discountsAmount:
@@ -1905,12 +2016,12 @@ export class ReservationsService {
             checkInAt: data.checkInAt ? new Date(data.checkInAt) : undefined,
             checkOutAt: data.checkOutAt ? new Date(data.checkOutAt) : undefined,
             notes: data.notes ?? undefined,
-            siteId: data.siteId ?? undefined
+            siteId: data.siteId ?? undefined,
           },
           include: {
             Guest: true,
-            Site: true
-          }
+            Site: true,
+          },
         });
         const updatedReservation = await this.prisma.reservation.update(updateArgs);
 
@@ -1939,7 +2050,7 @@ export class ReservationsService {
             totalAmount: existing.totalAmount,
             adults: existing.adults,
             children: existing.children,
-            notes: existing.notes
+            notes: existing.notes,
           },
           after: {
             status: updatedReservation.status,
@@ -1949,8 +2060,8 @@ export class ReservationsService {
             totalAmount: updatedReservation.totalAmount,
             adults: updatedReservation.adults,
             children: updatedReservation.children,
-            notes: updatedReservation.notes
-          }
+            notes: updatedReservation.notes,
+          },
         });
 
         if (needsOverrideApproval) {
@@ -1963,14 +2074,14 @@ export class ReservationsService {
             before: {
               totalAmount: existing.totalAmount,
               discountsAmount: existing.discountsAmount,
-              baselineTotalCents: baselinePrice.totalCents
+              baselineTotalCents: baselinePrice.totalCents,
             },
             after: {
               totalAmount: updatedReservation.totalAmount,
               discountsAmount: updatedReservation.discountsAmount,
               baselineTotalCents: baselinePrice.totalCents,
-              deltaCents: manualOverrideDelta
-            }
+              deltaCents: manualOverrideDelta,
+            },
           });
           await this.approvals.create({
             type: "config_change",
@@ -1983,13 +2094,13 @@ export class ReservationsService {
               reservationId: id,
               guestId: updatedReservation.guestId,
               siteId: updatedReservation.siteId,
-              baselineTotalCents: baselinePrice.totalCents
-            }
+              baselineTotalCents: baselinePrice.totalCents,
+            },
           });
         }
 
         // Send cancellation email if status changed to cancelled
-        if (data.status === 'cancelled' && existing.status !== 'cancelled') {
+        if (data.status === "cancelled" && existing.status !== "cancelled") {
           await this.emailService.sendEmail({
             to: existing.Guest.email,
             subject: `Reservation Cancelled: ${existing.Campground.name}`,
@@ -1999,7 +2110,7 @@ export class ReservationsService {
                   <p>Your reservation at ${existing.Campground.name} has been cancelled.</p>
                   <p><strong>Site:</strong> ${existing.Site.siteNumber}</p>
                   <p>If you did not request this cancellation, please contact us immediately.</p>
-                `
+                `,
           });
 
           // Check waitlist for matches
@@ -2009,7 +2120,7 @@ export class ReservationsService {
             existing.arrivalDate,
             existing.departureDate,
             existing.siteId,
-            existing.Site.siteClassId ?? undefined
+            existing.Site.siteClassId ?? undefined,
           );
 
           await this.accessControl.blockAccessForReservation(id, "reservation_cancelled");
@@ -2017,13 +2128,16 @@ export class ReservationsService {
         }
 
         // Award loyalty points if status changed to checked_out
-        if (data.status === ReservationStatus.checked_out && existing.status !== ReservationStatus.checked_out) {
+        if (
+          data.status === ReservationStatus.checked_out &&
+          existing.status !== ReservationStatus.checked_out
+        ) {
           const points = Math.floor(updatedReservation.totalAmount / 100);
           if (points > 0) {
             await this.loyaltyService.awardPoints(
               existing.guestId,
               points,
-              `Reservation #${existing.id}`
+              `Reservation #${existing.id}`,
             );
           }
 
@@ -2033,20 +2147,23 @@ export class ReservationsService {
               data: {
                 id: randomUUID(),
                 tenantId: existing.campgroundId,
-                type: 'turnover',
-                state: 'pending',
+                type: "turnover",
+                state: "pending",
                 siteId: existing.siteId,
                 reservationId: existing.id,
-                slaStatus: 'on_track',
+                slaStatus: "on_track",
                 slaDueAt: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
-                source: 'auto_turnover',
-                createdBy: 'system',
+                source: "auto_turnover",
+                createdBy: "system",
                 updatedAt: new Date(),
               },
             });
           } catch (taskErr) {
             // Log but don't fail the checkout
-            this.logger.error('Failed to create turnover task:', taskErr instanceof Error ? taskErr.stack : taskErr);
+            this.logger.error(
+              "Failed to create turnover task:",
+              taskErr instanceof Error ? taskErr.stack : taskErr,
+            );
           }
 
           await this.accessControl.blockAccessForReservation(id, "checked_out");
@@ -2054,18 +2171,28 @@ export class ReservationsService {
         }
 
         // Playbook triggers on status change
-        if (data.status === ReservationStatus.confirmed && existing.status !== ReservationStatus.confirmed) {
+        if (
+          data.status === ReservationStatus.confirmed &&
+          existing.status !== ReservationStatus.confirmed
+        ) {
           await this.enqueuePlaybooksForReservation("arrival", updatedReservation.id);
         }
-        if (data.status === ReservationStatus.checked_in && existing.status !== ReservationStatus.checked_in) {
+        if (
+          data.status === ReservationStatus.checked_in &&
+          existing.status !== ReservationStatus.checked_in
+        ) {
           await this.enqueuePlaybooksForReservation("upsell", updatedReservation.id);
           await this.accessControl.autoGrantForReservation(id);
         }
 
         // Gamification: smooth check-in via standard update
-        if (data.status === ReservationStatus.checked_in && existing.status !== ReservationStatus.checked_in && existing.createdBy) {
+        if (
+          data.status === ReservationStatus.checked_in &&
+          existing.status !== ReservationStatus.checked_in &&
+          existing.createdBy
+        ) {
           const membership = await this.prisma.campgroundMembership.findFirst({
-            where: { userId: existing.createdBy, campgroundId: existing.campgroundId }
+            where: { userId: existing.createdBy, campgroundId: existing.campgroundId },
           });
           await this.gamification.recordEvent({
             campgroundId: existing.campgroundId,
@@ -2075,7 +2202,7 @@ export class ReservationsService {
             reason: "Smooth check-in",
             sourceType: "reservation",
             sourceId: existing.id,
-            eventKey: `reservation:${existing.id}:checkin`
+            eventKey: `reservation:${existing.id}:checkin`,
           });
         }
 
@@ -2090,7 +2217,7 @@ export class ReservationsService {
           departureDate: updatedReservation.departureDate.toISOString(),
           status: updatedReservation.status,
           totalCents: updatedReservation.totalAmount,
-          balanceCents: updatedReservation.balanceAmount
+          balanceCents: updatedReservation.balanceAmount,
         };
 
         // Reuse statusChanged from earlier in this transaction
@@ -2121,21 +2248,23 @@ export class ReservationsService {
 
   async updateGroupAssignment(
     id: string,
-    payload: { groupId: string | null; role?: "primary" | "member" | null }
+    payload: { groupId: string | null; role?: "primary" | "member" | null },
   ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      select: { campgroundId: true, groupId: true }
+      select: { campgroundId: true, groupId: true },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
 
     const targetGroupId = payload.groupId ?? null;
-    const targetRole: "primary" | "member" | null = targetGroupId ? (payload.role ?? "member") : null;
+    const targetRole: "primary" | "member" | null = targetGroupId
+      ? (payload.role ?? "member")
+      : null;
 
     if (targetGroupId) {
       const group = await this.prisma.group.findUnique({
         where: { id: targetGroupId },
-        select: { tenantId: true }
+        select: { tenantId: true },
       });
       if (!group) throw new NotFoundException("Group not found");
       if (group.tenantId !== reservation.campgroundId) {
@@ -2148,7 +2277,7 @@ export class ReservationsService {
       if (!targetGroupId || targetRole !== "primary") {
         await tx.group.updateMany({
           where: { primaryReservationId: id },
-          data: { primaryReservationId: null }
+          data: { primaryReservationId: null },
         });
       }
 
@@ -2156,17 +2285,17 @@ export class ReservationsService {
         // Ensure this reservation is the sole primary for the group
         await tx.reservation.updateMany({
           where: { groupId: targetGroupId, id: { not: id }, groupRole: "primary" },
-          data: { groupRole: "member" }
+          data: { groupRole: "member" },
         });
         await tx.group.update({
           where: { id: targetGroupId },
-          data: { primaryReservationId: id }
+          data: { primaryReservationId: id },
         });
       }
 
       await tx.reservation.update({
         where: { id },
-        data: { groupId: targetGroupId, groupRole: targetRole }
+        data: { groupId: targetGroupId, groupRole: targetRole },
       });
     });
 
@@ -2177,7 +2306,7 @@ export class ReservationsService {
     // Get reservation before deletion for audit
     const before = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { Guest: true, Site: true }
+      include: { Guest: true, Site: true },
     });
 
     const deleted = await this.prisma.reservation.delete({ where: { id } });
@@ -2199,9 +2328,9 @@ export class ReservationsService {
           arrivalDate: before.arrivalDate,
           departureDate: before.departureDate,
           status: before.status,
-          totalAmount: before.totalAmount
+          totalAmount: before.totalAmount,
         },
-        after: null
+        after: null,
       });
     }
 
@@ -2230,34 +2359,47 @@ export class ReservationsService {
       receiptKind?: "payment" | "refund" | "pos";
       tenders?: { method: string; amountCents: number; note?: string }[];
       recordedBy?: string; // User ID of staff who recorded the payment (for gamification)
-    }
+    },
   ) {
     const tenderList =
       options?.tenders && options.tenders.length > 0
         ? options.tenders
         : amountCents
-          ? [{ method: options?.paymentMethod || "card", amountCents, note: options?.receiptKind ? `${options.receiptKind} payment` : undefined }]
+          ? [
+              {
+                method: options?.paymentMethod || "card",
+                amountCents,
+                note: options?.receiptKind ? `${options.receiptKind} payment` : undefined,
+              },
+            ]
           : [];
     const totalTenderCents = tenderList.reduce((sum, t) => sum + (t.amountCents || 0), 0);
     if (totalTenderCents <= 0) throw new BadRequestException("Payment amount must be positive");
 
-    const externalRef = options?.stripeBalanceTransactionId ?? options?.stripeChargeId ?? options?.stripePaymentIntentId ?? options?.transactionId ?? null;
+    const externalRef =
+      options?.stripeBalanceTransactionId ??
+      options?.stripeChargeId ??
+      options?.stripePaymentIntentId ??
+      options?.transactionId ??
+      null;
 
     // Wrap entire operation in transaction with row-level locking to prevent race conditions
     // This ensures concurrent payments don't overwrite each other's paidAmount updates
     const { updated, reservation } = await this.prisma.$transaction(async (tx) => {
       // Lock the reservation row using SELECT FOR UPDATE to prevent concurrent modifications
-      const [lockedReservation] = await tx.$queryRaw<Array<{
-        id: string;
-        campgroundId: string;
-        guestId: string;
-        siteId: string;
-        paidAmount: number | null;
-        totalAmount: number;
-        arrivalDate: Date;
-        departureDate: Date;
-        source: string | null;
-      }>>`
+      const [lockedReservation] = await tx.$queryRaw<
+        Array<{
+          id: string;
+          campgroundId: string;
+          guestId: string;
+          siteId: string;
+          paidAmount: number | null;
+          totalAmount: number;
+          arrivalDate: Date;
+          departureDate: Date;
+          source: string | null;
+        }>
+      >`
         SELECT id, "campgroundId", "guestId", "siteId", "paidAmount", "totalAmount", "arrivalDate", "departureDate", source
         FROM "Reservation"
         WHERE id = ${id}
@@ -2272,12 +2414,12 @@ export class ReservationsService {
       // Get related data for ledger entries (these don't need locking)
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { SiteClass: true }
+        include: { SiteClass: true },
       });
       const guest = await tx.guest.findUnique({ where: { id: lockedReservation.guestId } });
       const campground = await tx.campground.findUnique({
         where: { id: lockedReservation.campgroundId },
-        select: { name: true }
+        select: { name: true },
       });
 
       const revenueGl = site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
@@ -2287,8 +2429,8 @@ export class ReservationsService {
         where: { id },
         data: {
           paidAmount: newPaid,
-          ...paymentFields
-        }
+          ...paymentFields,
+        },
       });
 
       // Combine locked data with related data for return
@@ -2296,13 +2438,16 @@ export class ReservationsService {
         ...lockedReservation,
         Site: site,
         Guest: guest,
-        Campground: campground
+        Campground: campground,
       };
 
       for (const tender of tenderList) {
         // Create unique payment ref for deduplication
         // Use tender.note if provided (e.g., "CASH-1234567890"), otherwise generate one
-        const paymentRef = externalRef ?? tender.note ?? `${tender.method}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const paymentRef =
+          externalRef ??
+          tender.note ??
+          `${tender.method}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
         await tx.payment.create({
           data: {
@@ -2320,8 +2465,8 @@ export class ReservationsService {
             applicationFeeCents: options?.applicationFeeCents,
             stripeFeeCents: options?.stripeFeeCents,
             methodType: options?.methodType,
-            capturedAt: options?.capturedAt
-          }
+            capturedAt: options?.capturedAt,
+          },
         });
         // Build ledger entries with tax/fee split when available
         // ACCT-HIGH-005: Split payment into revenue, tax liability, and fee revenue
@@ -2335,12 +2480,14 @@ export class ReservationsService {
             reservationId: fullReservation.id,
             glCode: "CASH",
             account: "Cash",
-            description: options?.transactionId ? `Payment ${options.transactionId}` : `Reservation payment (${tender.method})`,
+            description: options?.transactionId
+              ? `Payment ${options.transactionId}`
+              : `Reservation payment (${tender.method})`,
             amountCents: tender.amountCents,
             direction: "debit",
             externalRef: externalRef ?? paymentRef,
-            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:debit`
-          }
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:debit`,
+          },
         ];
 
         // Credit site revenue for the net amount (after tax and fees)
@@ -2354,7 +2501,7 @@ export class ReservationsService {
             amountCents: revenueAmount,
             direction: "credit",
             externalRef: externalRef ?? paymentRef,
-            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:revenue`
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:revenue`,
           });
         }
 
@@ -2369,7 +2516,7 @@ export class ReservationsService {
             amountCents: taxCents,
             direction: "credit",
             externalRef: externalRef ?? paymentRef,
-            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:tax`
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:tax`,
           });
         }
 
@@ -2384,7 +2531,7 @@ export class ReservationsService {
             amountCents: feeCents,
             direction: "credit",
             externalRef: externalRef ?? paymentRef,
-            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:fees`
+            dedupeKey: `res:${fullReservation.id}:payment:${paymentRef}:${tender.method}:credit:fees`,
           });
         }
 
@@ -2394,7 +2541,7 @@ export class ReservationsService {
       return {
         updated: updatedReservation,
         reservation: fullReservation,
-        previousPaidAmount: lockedReservation.paidAmount ?? 0
+        previousPaidAmount: lockedReservation.paidAmount ?? 0,
       };
     });
 
@@ -2407,16 +2554,19 @@ export class ReservationsService {
         entity: "reservation",
         entityId: id,
         before: {
-          paidAmount: updated.paidAmount ? updated.paidAmount - totalTenderCents : 0
+          paidAmount: updated.paidAmount ? updated.paidAmount - totalTenderCents : 0,
         },
         after: {
           paidAmount: updated.paidAmount,
-          paymentMethod: tenderList.map(t => t.method).join(", "),
-          paymentAmount: totalTenderCents
-        }
+          paymentMethod: tenderList.map((t) => t.method).join(", "),
+          paymentAmount: totalTenderCents,
+        },
       });
     } catch (auditError) {
-      this.logger.error("Failed to audit payment:", auditError instanceof Error ? auditError.stack : auditError);
+      this.logger.error(
+        "Failed to audit payment:",
+        auditError instanceof Error ? auditError.stack : auditError,
+      );
     }
 
     // Send payment receipt email
@@ -2433,30 +2583,34 @@ export class ReservationsService {
           campgroundId: reservation.campgroundId,
           guestId: reservation.guestId,
           amountCents: totalTenderCents,
-          paymentMethod: options?.paymentMethod || (tenderList.length === 1 ? tenderList[0].method : 'Mixed'),
+          paymentMethod:
+            options?.paymentMethod || (tenderList.length === 1 ? tenderList[0].method : "Mixed"),
           transactionId: options?.transactionId,
           reservationId: reservation.id,
           siteNumber: reservation.Site?.siteNumber,
           arrivalDate: reservation.arrivalDate,
           departureDate: reservation.departureDate,
-          source: options?.source || reservation.source || 'admin',
+          source: options?.source || reservation.source || "admin",
           lineItems: options?.lineItems,
           taxCents: options?.taxCents,
           feeCents: options?.feeCents,
           totalCents: options?.totalCents ?? totalTenderCents,
-          kind: options?.receiptKind ?? "payment"
+          kind: options?.receiptKind ?? "payment",
         });
       }
     } catch (emailError) {
       // Log but don't fail the payment if email fails
-      this.logger.error('Failed to send payment receipt email:', emailError instanceof Error ? emailError.stack : emailError);
+      this.logger.error(
+        "Failed to send payment receipt email:",
+        emailError instanceof Error ? emailError.stack : emailError,
+      );
     }
 
     // Gamification: Award XP for collecting payment (only if staff member is known)
     if (options?.recordedBy) {
       try {
         const membership = await this.prisma.campgroundMembership.findFirst({
-          where: { userId: options.recordedBy, campgroundId: reservation.campgroundId }
+          where: { userId: options.recordedBy, campgroundId: reservation.campgroundId },
         });
         if (membership) {
           const isFullPayment = (updated.paidAmount ?? 0) >= updated.totalAmount;
@@ -2472,11 +2626,14 @@ export class ReservationsService {
             sourceId: reservation.id,
             eventKey: `reservation:${id}:payment:${Date.now()}`,
             // Award bonus XP for collecting full balance
-            xpOverride: isFullPayment ? 20 : undefined
+            xpOverride: isFullPayment ? 20 : undefined,
           });
         }
       } catch (gamificationError) {
-        this.logger.error('Failed to record gamification event:', gamificationError instanceof Error ? gamificationError.stack : gamificationError);
+        this.logger.error(
+          "Failed to record gamification event:",
+          gamificationError instanceof Error ? gamificationError.stack : gamificationError,
+        );
       }
     }
 
@@ -2487,7 +2644,7 @@ export class ReservationsService {
     tx: Prisma.TransactionClient,
     reservationId: string,
     amountCents: number,
-    hints?: { stripePaymentIntentId?: string; stripeChargeId?: string }
+    hints?: { stripePaymentIntentId?: string; stripeChargeId?: string },
   ): Promise<Array<{ id: string; appliedAmountCents: number }>> {
     if (amountCents <= 0) return [];
     const now = new Date();
@@ -2498,11 +2655,13 @@ export class ReservationsService {
           reservationId,
           direction: "charge",
           OR: [
-            ...(hints.stripePaymentIntentId ? [{ stripePaymentIntentId: hints.stripePaymentIntentId }] : []),
-            ...(hints.stripeChargeId ? [{ stripeChargeId: hints.stripeChargeId }] : [])
-          ]
+            ...(hints.stripePaymentIntentId
+              ? [{ stripePaymentIntentId: hints.stripePaymentIntentId }]
+              : []),
+            ...(hints.stripeChargeId ? [{ stripeChargeId: hints.stripeChargeId }] : []),
+          ],
         },
-        orderBy: { createdAt: "desc" }
+        orderBy: { createdAt: "desc" },
       });
       if (payment) {
         const refunded = payment.refundedAmountCents ?? 0;
@@ -2511,7 +2670,7 @@ export class ReservationsService {
         if (apply > 0) {
           await tx.payment.update({
             where: { id: payment.id },
-            data: { refundedAmountCents: refunded + apply, refundedAt: now }
+            data: { refundedAmountCents: refunded + apply, refundedAt: now },
           });
           return [{ id: payment.id, appliedAmountCents: apply }];
         }
@@ -2521,7 +2680,7 @@ export class ReservationsService {
     let remaining = amountCents;
     const payments = await tx.payment.findMany({
       where: { reservationId, direction: "charge" },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     const applied: Array<{ id: string; appliedAmountCents: number }> = [];
@@ -2533,7 +2692,7 @@ export class ReservationsService {
       const apply = Math.min(remaining, available);
       await tx.payment.update({
         where: { id: payment.id },
-        data: { refundedAmountCents: refunded + apply, refundedAt: now }
+        data: { refundedAmountCents: refunded + apply, refundedAt: now },
       });
       applied.push({ id: payment.id, appliedAmountCents: apply });
       remaining -= apply;
@@ -2545,7 +2704,7 @@ export class ReservationsService {
   async refundPayment(
     id: string,
     amountCents: number,
-    options?: { destination?: "card" | "wallet"; reason?: string }
+    options?: { destination?: "card" | "wallet"; reason?: string },
   ) {
     if (amountCents <= 0) throw new BadRequestException("Refund amount must be positive");
 
@@ -2555,17 +2714,19 @@ export class ReservationsService {
     // Wrap entire operation in transaction with row-level locking to prevent race conditions
     const { updated, reservation } = await this.prisma.$transaction(async (tx) => {
       // Lock the reservation row using SELECT FOR UPDATE to prevent concurrent modifications
-      const [lockedReservation] = await tx.$queryRaw<Array<{
-        id: string;
-        campgroundId: string;
-        guestId: string;
-        siteId: string;
-        paidAmount: number | null;
-        totalAmount: number;
-        arrivalDate: Date;
-        departureDate: Date;
-        source: string | null;
-      }>>`
+      const [lockedReservation] = await tx.$queryRaw<
+        Array<{
+          id: string;
+          campgroundId: string;
+          guestId: string;
+          siteId: string;
+          paidAmount: number | null;
+          totalAmount: number;
+          arrivalDate: Date;
+          departureDate: Date;
+          source: string | null;
+        }>
+      >`
         SELECT id, "campgroundId", "guestId", "siteId", "paidAmount", "totalAmount", "arrivalDate", "departureDate", source
         FROM "Reservation"
         WHERE id = ${id}
@@ -2585,12 +2746,12 @@ export class ReservationsService {
       // Get related data for ledger entries
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { SiteClass: true }
+        include: { SiteClass: true },
       });
       const guest = await tx.guest.findUnique({ where: { id: lockedReservation.guestId } });
       const campground = await tx.campground.findUnique({
         where: { id: lockedReservation.campgroundId },
-        select: { name: true }
+        select: { name: true },
       });
 
       const revenueGl = site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
@@ -2600,15 +2761,15 @@ export class ReservationsService {
         where: { id },
         data: {
           paidAmount: newPaid,
-          ...paymentFields
-        }
+          ...paymentFields,
+        },
       });
 
       const fullReservation = {
         ...lockedReservation,
         Site: site,
         Guest: guest,
-        Campground: campground
+        Campground: campground,
       };
 
       const appliedRefunds = await this.allocateRefundToPayments(tx, id, amountCents);
@@ -2621,7 +2782,7 @@ export class ReservationsService {
           fullReservation.id,
           fullReservation.guestId,
           amountCents,
-          options?.reason ?? "Reservation refund"
+          options?.reason ?? "Reservation refund",
         );
 
         await tx.payment.create({
@@ -2633,8 +2794,8 @@ export class ReservationsService {
             method: "wallet_credit",
             direction: "refund",
             note: options?.reason ?? "Reservation refund - credited to wallet",
-            originalPaymentId
-          }
+            originalPaymentId,
+          },
         });
       } else {
         // Standard card refund
@@ -2647,8 +2808,8 @@ export class ReservationsService {
             method: "card",
             direction: "refund",
             note: options?.reason ?? "Reservation refund",
-            originalPaymentId
-          }
+            originalPaymentId,
+          },
         });
       }
 
@@ -2661,7 +2822,7 @@ export class ReservationsService {
           description: options?.reason ?? "Reservation refund",
           amountCents,
           direction: "credit",
-          dedupeKey: `res:${fullReservation.id}:refund:${amountCents}:credit:${refundTimestamp}`
+          dedupeKey: `res:${fullReservation.id}:refund:${amountCents}:credit:${refundTimestamp}`,
         },
         {
           campgroundId: fullReservation.campgroundId,
@@ -2671,8 +2832,8 @@ export class ReservationsService {
           description: options?.reason ?? "Reservation refund",
           amountCents,
           direction: "debit",
-          dedupeKey: `res:${fullReservation.id}:refund:${amountCents}:debit:${refundTimestamp}`
-        }
+          dedupeKey: `res:${fullReservation.id}:refund:${amountCents}:debit:${refundTimestamp}`,
+        },
       ]);
 
       return { updated: updatedReservation, reservation: fullReservation };
@@ -2687,24 +2848,28 @@ export class ReservationsService {
         entity: "reservation",
         entityId: id,
         before: {
-          paidAmount: updated.paidAmount + amountCents
+          paidAmount: updated.paidAmount + amountCents,
         },
         after: {
           paidAmount: updated.paidAmount,
           refundAmount: amountCents,
           destination,
-          reason: options?.reason
-        }
+          reason: options?.reason,
+        },
       });
     } catch (auditError) {
-      this.logger.error("Failed to audit refund:", auditError instanceof Error ? auditError.stack : auditError);
+      this.logger.error(
+        "Failed to audit refund:",
+        auditError instanceof Error ? auditError.stack : auditError,
+      );
     }
 
     // Send refund receipt
     try {
       await this.emailService.sendPaymentReceipt({
         guestEmail: reservation.Guest?.email ?? "",
-        guestName: `${reservation.Guest?.primaryFirstName ?? ""} ${reservation.Guest?.primaryLastName ?? ""}`.trim(),
+        guestName:
+          `${reservation.Guest?.primaryFirstName ?? ""} ${reservation.Guest?.primaryLastName ?? ""}`.trim(),
         campgroundName: reservation.Campground?.name ?? "Campground",
         amountCents,
         paymentMethod: destination === "wallet" ? "Guest Wallet Credit" : "Card",
@@ -2715,7 +2880,7 @@ export class ReservationsService {
         departureDate: reservation.departureDate,
         source: reservation.source ?? "admin",
         kind: "refund",
-        totalCents: amountCents
+        totalCents: amountCents,
       });
     } catch (err) {
       this.logger.warn("Failed to send refund receipt email", err);
@@ -2744,7 +2909,7 @@ export class ReservationsService {
       receiptKind?: "refund" | "payment" | "pos";
       stripePaymentIntentId?: string;
       stripeChargeId?: string;
-    }
+    },
   ) {
     if (amountCents <= 0) return; // Skip zero or negative refunds
 
@@ -2754,8 +2919,8 @@ export class ReservationsService {
         include: {
           Site: { include: { SiteClass: true } },
           Guest: true,
-          Campground: { select: { name: true } }
-        }
+          Campground: { select: { name: true } },
+        },
       });
       if (!reservation) {
         this.logger.error(`Stripe Refund - Reservation ${id} not found for refund recording`);
@@ -2769,13 +2934,13 @@ export class ReservationsService {
         where: { id },
         data: {
           paidAmount: newPaid,
-          ...paymentFields
-        }
+          ...paymentFields,
+        },
       });
 
       const appliedRefunds = await this.allocateRefundToPayments(tx, reservation.id, amountCents, {
         stripePaymentIntentId: options?.stripePaymentIntentId,
-        stripeChargeId: options?.stripeChargeId
+        stripeChargeId: options?.stripeChargeId,
       });
       const originalPaymentId = appliedRefunds[0]?.id ?? null;
 
@@ -2790,13 +2955,15 @@ export class ReservationsService {
           note: stripeRefundId ? `Stripe refund: ${stripeRefundId}` : "Stripe refund",
           originalPaymentId,
           stripePaymentIntentId: stripeRefundId ? `refund_${stripeRefundId}` : undefined,
-          stripeChargeId: options?.stripeChargeId ?? undefined
-        }
+          stripeChargeId: options?.stripeChargeId ?? undefined,
+        },
       });
 
       const revenueGl = reservation.Site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
       const revenueAccount = reservation.Site?.SiteClass?.clientAccount ?? "Revenue";
-      const dedupeKeyBase = stripeRefundId ? `res:${reservation.id}:refund:${stripeRefundId}` : `res:${reservation.id}:refund:${amountCents}`;
+      const dedupeKeyBase = stripeRefundId
+        ? `res:${reservation.id}:refund:${stripeRefundId}`
+        : `res:${reservation.id}:refund:${amountCents}`;
       await postBalancedLedgerEntries(tx, [
         {
           campgroundId: reservation.campgroundId,
@@ -2807,7 +2974,7 @@ export class ReservationsService {
           amountCents: amountCents,
           direction: "credit",
           externalRef: stripeRefundId ?? null,
-          dedupeKey: `${dedupeKeyBase}:credit`
+          dedupeKey: `${dedupeKeyBase}:credit`,
         },
         {
           campgroundId: reservation.campgroundId,
@@ -2818,8 +2985,8 @@ export class ReservationsService {
           amountCents: amountCents,
           direction: "debit",
           externalRef: stripeRefundId ?? null,
-          dedupeKey: `${dedupeKeyBase}:debit`
-        }
+          dedupeKey: `${dedupeKeyBase}:debit`,
+        },
       ]);
 
       return { reservation, updated };
@@ -2834,7 +3001,8 @@ export class ReservationsService {
     try {
       await this.emailService.sendPaymentReceipt({
         guestEmail: reservation.Guest?.email ?? "",
-        guestName: `${reservation.Guest?.primaryFirstName ?? ""} ${reservation.Guest?.primaryLastName ?? ""}`.trim(),
+        guestName:
+          `${reservation.Guest?.primaryFirstName ?? ""} ${reservation.Guest?.primaryLastName ?? ""}`.trim(),
         campgroundName: reservation.Campground?.name ?? "Campground",
         amountCents,
         paymentMethod: options?.paymentMethod ?? "Card",
@@ -2848,7 +3016,7 @@ export class ReservationsService {
         lineItems: options?.lineItems,
         taxCents: options?.taxCents,
         feeCents: options?.feeCents,
-        totalCents: options?.totalCents ?? amountCents
+        totalCents: options?.totalCents ?? amountCents,
       });
     } catch (err) {
       this.logger.warn("Failed to send refund receipt email", err);
@@ -2864,16 +3032,20 @@ export class ReservationsService {
       campgroundId,
       siteId,
       new Date(arrival),
-      new Date(departure)
+      new Date(departure),
     );
-    const taxExemption = await this.taxRulesService.evaluateExemption(campgroundId, pricing.nights, false);
+    const taxExemption = await this.taxRulesService.evaluateExemption(
+      campgroundId,
+      pricing.nights,
+      false,
+    );
     const taxExemptionReason = "reason" in taxExemption ? taxExemption.reason : null;
     const exemptionPayload = {
       eligible: taxExemption.eligible,
       applied: taxExemption.applied,
       requiresWaiver: taxExemption.rule?.requiresWaiver ?? false,
       waiverText: taxExemption.rule?.waiverText ?? null,
-      reason: taxExemptionReason
+      reason: taxExemptionReason,
     };
 
     return {
@@ -2882,7 +3054,7 @@ export class ReservationsService {
       taxExemption: exemptionPayload,
       taxExemptionEligible: exemptionPayload.eligible,
       requiresWaiver: exemptionPayload.requiresWaiver,
-      waiverText: exemptionPayload.waiverText
+      waiverText: exemptionPayload.waiverText,
     };
   }
 
@@ -2892,20 +3064,22 @@ export class ReservationsService {
       where: {
         campgroundId,
         balanceAmount: { gt: 0 },
-        NOT: { status: ReservationStatus.cancelled }
+        NOT: { status: ReservationStatus.cancelled },
       },
-      select: { id: true, departureDate: true, balanceAmount: true }
+      select: { id: true, departureDate: true, balanceAmount: true },
     });
 
     const buckets = {
       current: 0,
       "31_60": 0,
       "61_90": 0,
-      "90_plus": 0
+      "90_plus": 0,
     };
 
     for (const r of reservations) {
-      const daysPast = Math.floor((now.getTime() - r.departureDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysPast = Math.floor(
+        (now.getTime() - r.departureDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
       if (daysPast <= 30) buckets.current += r.balanceAmount;
       else if (daysPast <= 60) buckets["31_60"] += r.balanceAmount;
       else if (daysPast <= 90) buckets["61_90"] += r.balanceAmount;
@@ -2947,18 +3121,33 @@ export class ReservationsService {
     `;
   }
 
-  async overlapCheck(campgroundId: string, siteId: string, arrivalDate: string, departureDate: string, ignoreId?: string) {
+  async overlapCheck(
+    campgroundId: string,
+    siteId: string,
+    arrivalDate: string,
+    departureDate: string,
+    ignoreId?: string,
+  ) {
     if (!siteId || !arrivalDate || !departureDate) {
       throw new BadRequestException("siteId, arrivalDate, and departureDate are required");
     }
-    const site = await this.prisma.site.findUnique({ where: { id: siteId }, select: { campgroundId: true } });
+    const site = await this.prisma.site.findUnique({
+      where: { id: siteId },
+      select: { campgroundId: true },
+    });
     if (!site) throw new NotFoundException("Site not found");
     const arrival = new Date(arrivalDate);
     const departure = new Date(departureDate);
-    if (!(arrival instanceof Date) || isNaN(arrival.valueOf()) || !(departure instanceof Date) || isNaN(departure.valueOf())) {
+    if (
+      !(arrival instanceof Date) ||
+      isNaN(arrival.valueOf()) ||
+      !(departure instanceof Date) ||
+      isNaN(departure.valueOf())
+    ) {
       throw new BadRequestException("Invalid dates");
     }
-    if (departure <= arrival) throw new BadRequestException("departureDate must be after arrivalDate");
+    if (departure <= arrival)
+      throw new BadRequestException("departureDate must be after arrivalDate");
 
     const reasons: string[] = [];
 
@@ -2969,8 +3158,8 @@ export class ReservationsService {
         status: { not: ReservationStatus.cancelled },
         departureDate: { gt: arrival },
         arrivalDate: { lt: departure },
-        ...(ignoreId ? { id: { not: ignoreId } } : {})
-      }
+        ...(ignoreId ? { id: { not: ignoreId } } : {}),
+      },
     });
     if (conflictCount > 0) reasons.push("reservation");
 
@@ -2981,8 +3170,8 @@ export class ReservationsService {
         status: "active",
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }],
         arrivalDate: { lt: departure },
-        departureDate: { gt: arrival }
-      }
+        departureDate: { gt: arrival },
+      },
     });
     if (holdCount > 0) reasons.push("hold");
 
@@ -2990,12 +3179,8 @@ export class ReservationsService {
       where: {
         siteId,
         status: { in: [MaintenanceStatus.open, MaintenanceStatus.in_progress] },
-        OR: [
-          { isBlocking: true },
-          { outOfOrder: true },
-          { outOfOrderUntil: { gt: arrival } }
-        ]
-      }
+        OR: [{ isBlocking: true }, { outOfOrder: true }, { outOfOrderUntil: { gt: arrival } }],
+      },
     });
     if (maintenanceCount > 0) reasons.push("maintenance");
 
@@ -3004,8 +3189,8 @@ export class ReservationsService {
         campgroundId: site.campgroundId,
         OR: [{ siteId }, { siteId: null }],
         startDate: { lt: departure },
-        endDate: { gt: arrival }
-      }
+        endDate: { gt: arrival },
+      },
     });
     if (blackoutCount > 0) reasons.push("blackout");
 
@@ -3015,7 +3200,7 @@ export class ReservationsService {
   async kioskCheckIn(
     id: string,
     upsellTotalCents: number,
-    options?: { override?: boolean; overrideReason?: string; actorId?: string | null }
+    options?: { override?: boolean; overrideReason?: string; actorId?: string | null },
   ) {
     this.logger.log(`Kiosk - Check-in request for ${id}, upsell: ${upsellTotalCents}`);
     const reservation = await this.prisma.reservation.findUnique({
@@ -3023,15 +3208,17 @@ export class ReservationsService {
       include: {
         Guest: true,
         Campground: true,
-        Site: true
-      }
+        Site: true,
+      },
     });
     if (!reservation) {
       this.logger.error(`Kiosk - Reservation ${id} not found`);
       throw new NotFoundException("Reservation not found");
     }
 
-    this.logger.log(`Kiosk - Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount}`);
+    this.logger.log(
+      `Kiosk - Found reservation: ${reservation.status}, Total: ${reservation.totalAmount}, Paid: ${reservation.paidAmount}`,
+    );
 
     if (reservation.status === ReservationStatus.checked_in) {
       this.logger.warn(`Kiosk - Reservation ${id} already checked in`);
@@ -3039,9 +3226,10 @@ export class ReservationsService {
     }
 
     // Require forms to be completed before check-in
-    const pendingForms = await this.prisma.formSubmission?.count?.({
-      where: { reservationId: id, status: "pending" }
-    }) ?? 0;
+    const pendingForms =
+      (await this.prisma.formSubmission?.count?.({
+        where: { reservationId: id, status: "pending" },
+      })) ?? 0;
     if (pendingForms > 0) {
       throw new ConflictException("Forms must be completed before check-in");
     }
@@ -3060,12 +3248,12 @@ export class ReservationsService {
 
       await this.prisma.reservation.update({
         where: { id },
-        data: { checkInStatus }
+        data: { checkInStatus },
       });
 
       throw new ConflictException({
         reason: compliance.reason,
-        signingUrl: compliance.signingUrl
+        signingUrl: compliance.signingUrl,
       });
     }
 
@@ -3078,10 +3266,13 @@ export class ReservationsService {
           entity: "Reservation",
           entityId: id,
           before: { unmet: compliance.reasons ?? [] },
-          after: { override: true, reason: options?.overrideReason ?? null }
+          after: { override: true, reason: options?.overrideReason ?? null },
         });
       } catch (err) {
-        this.logger.error("Kiosk - Failed to audit check-in override", err instanceof Error ? err.stack : err);
+        this.logger.error(
+          "Kiosk - Failed to audit check-in override",
+          err instanceof Error ? err.stack : err,
+        );
       }
     }
 
@@ -3098,37 +3289,45 @@ export class ReservationsService {
         const lastPayment = await this.prisma.payment.findFirst({
           where: {
             reservationId: id,
-            stripePaymentIntentId: { not: null }
+            stripePaymentIntentId: { not: null },
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: "desc" },
         });
 
         if (!lastPayment?.stripePaymentIntentId) {
-          throw new BadRequestException('No payment method on file. Please provide payment details.');
+          throw new BadRequestException(
+            "No payment method on file. Please provide payment details.",
+          );
         }
 
         // Retrieve the original payment intent to get customer and payment method
-        const originalIntent = await this.stripeService.retrievePaymentIntent(lastPayment.stripePaymentIntentId);
+        const originalIntent = await this.stripeService.retrievePaymentIntent(
+          lastPayment.stripePaymentIntentId,
+        );
 
         if (!originalIntent.customer || !originalIntent.payment_method) {
-          throw new BadRequestException('Payment method information not available. Please provide payment details.');
+          throw new BadRequestException(
+            "Payment method information not available. Please provide payment details.",
+          );
         }
 
-        const customerId = typeof originalIntent.customer === 'string'
-          ? originalIntent.customer
-          : originalIntent.customer.id;
-        const paymentMethodId = typeof originalIntent.payment_method === 'string'
-          ? originalIntent.payment_method
-          : originalIntent.payment_method.id;
+        const customerId =
+          typeof originalIntent.customer === "string"
+            ? originalIntent.customer
+            : originalIntent.customer.id;
+        const paymentMethodId =
+          typeof originalIntent.payment_method === "string"
+            ? originalIntent.payment_method
+            : originalIntent.payment_method.id;
 
         // Get campground's Stripe account
         const campground = await this.prisma.campground.findUnique({
           where: { id: reservation.campgroundId },
-          select: { stripeAccountId: true, perBookingFeeCents: true }
+          select: { stripeAccountId: true, perBookingFeeCents: true },
         });
 
         if (!campground?.stripeAccountId) {
-          throw new BadRequestException('Payment processing not configured for this campground.');
+          throw new BadRequestException("Payment processing not configured for this campground.");
         }
 
         const applicationFeeCents = campground.perBookingFeeCents || 0;
@@ -3136,24 +3335,26 @@ export class ReservationsService {
         // Charge the saved payment method
         const paymentIntent = await this.stripeService.chargeOffSession(
           balanceDue,
-          'usd',
+          "usd",
           customerId,
           paymentMethodId,
           campground.stripeAccountId,
           {
             reservationId: id,
             campgroundId: reservation.campgroundId,
-            source: 'kiosk_checkin',
-            type: 'balance_due',
+            source: "kiosk_checkin",
+            type: "balance_due",
             upsellAmount: String(upsellTotalCents),
-            override: String(isOverride)
+            override: String(isOverride),
           },
           applicationFeeCents,
-          `kiosk-checkin-${id}-${Date.now()}`
+          `kiosk-checkin-${id}-${Date.now()}`,
         );
 
-        if (paymentIntent.status !== 'succeeded') {
-          throw new BadRequestException(`Payment failed: ${paymentIntent.status}. Please contact staff for assistance.`);
+        if (paymentIntent.status !== "succeeded") {
+          throw new BadRequestException(
+            `Payment failed: ${paymentIntent.status}. Please contact staff for assistance.`,
+          );
         }
 
         paymentIntentId = paymentIntent.id;
@@ -3169,14 +3370,14 @@ export class ReservationsService {
             campgroundId: reservation.campgroundId,
             reservationId: id,
             amountCents: balanceDue,
-            method: 'card',
-            direction: 'charge',
-            note: `Kiosk check-in balance charge. Upsell: $${(upsellTotalCents / 100).toFixed(2)}${isOverride ? ' (override)' : ''}`,
+            method: "card",
+            direction: "charge",
+            note: `Kiosk check-in balance charge. Upsell: $${(upsellTotalCents / 100).toFixed(2)}${isOverride ? " (override)" : ""}`,
             stripePaymentIntentId: paymentIntent.id,
             stripeChargeId: latestChargeId,
             applicationFeeCents,
-            capturedAt: new Date()
-          }
+            capturedAt: new Date(),
+          },
         });
 
         this.logger.log(`Kiosk - Payment successful: ${paymentIntent.id}`);
@@ -3184,7 +3385,7 @@ export class ReservationsService {
         const message = error instanceof Error ? error.message : "Unknown error";
         this.logger.error(`Kiosk - Payment failed for ${id}:`, error);
         throw new BadRequestException(
-          `Payment processing failed: ${message}. Please contact staff for assistance.`
+          `Payment processing failed: ${message}. Please contact staff for assistance.`,
         );
       }
     }
@@ -3194,7 +3395,7 @@ export class ReservationsService {
       const overrideNote = isOverride
         ? `[Override ${now.toISOString()}] ${options?.overrideReason ?? "No reason provided"}`
         : null;
-      const kioskNote = `[Kiosk] Checked in${isOverride ? " (override)" : ""}. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. ${balanceDue > 0 ? `Charged card on file (${paymentIntentId}).` : 'No balance due.'}`;
+      const kioskNote = `[Kiosk] Checked in${isOverride ? " (override)" : ""}. Upsell: $${(upsellTotalCents / 100).toFixed(2)}. ${balanceDue > 0 ? `Charged card on file (${paymentIntentId}).` : "No balance due."}`;
       const notes = [reservation.notes, overrideNote, kioskNote].filter(Boolean).join("\n");
 
       const updated = await this.prisma.reservation.update({
@@ -3207,8 +3408,8 @@ export class ReservationsService {
           totalAmount: newTotal,
           paidAmount: newTotal,
           // Add a note about the upsell/kiosk check-in
-          notes
-        }
+          notes,
+        },
       });
       this.logger.log(`Kiosk - Check-in successful for ${id}`);
 
@@ -3221,26 +3422,29 @@ export class ReservationsService {
         entityId: id,
         before: {
           status: reservation.status,
-          checkInStatus: reservation.checkInStatus
+          checkInStatus: reservation.checkInStatus,
         },
         after: {
           status: ReservationStatus.checked_in,
           checkInStatus: CheckInStatus.completed,
           checkInAt: updated.checkInAt,
           upsellAmount: upsellTotalCents,
-          source: "kiosk"
-        }
+          source: "kiosk",
+        },
       });
 
       try {
         await this.accessControl.autoGrantForReservation(id, options?.actorId ?? null);
       } catch (err) {
-        this.logger.error(`Kiosk - Access grant failed for ${id}:`, err instanceof Error ? err.stack : err);
+        this.logger.error(
+          `Kiosk - Access grant failed for ${id}:`,
+          err instanceof Error ? err.stack : err,
+        );
       }
 
       if (reservation.createdBy) {
         const membership = await this.prisma.campgroundMembership.findFirst({
-          where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+          where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId },
         });
         await this.gamification.recordEvent({
           campgroundId: reservation.campgroundId,
@@ -3250,7 +3454,7 @@ export class ReservationsService {
           reason: "Smooth check-in (kiosk)",
           sourceType: "reservation",
           sourceId: reservation.id,
-          eventKey: `reservation:${reservation.id}:checkin`
+          eventKey: `reservation:${reservation.id}:checkin`,
         });
       }
 
@@ -3263,7 +3467,7 @@ export class ReservationsService {
         siteName: reservation.Site?.siteNumber ?? undefined,
         arrivalDate: reservation.arrivalDate.toISOString(),
         departureDate: reservation.departureDate.toISOString(),
-        status: updated.status
+        status: updated.status,
       });
 
       return updated;
@@ -3279,11 +3483,11 @@ export class ReservationsService {
    */
   async staffCheckIn(
     id: string,
-    options?: { force?: boolean; actorId?: string | null }
+    options?: { force?: boolean; actorId?: string | null },
   ): Promise<{ reservation: Reservation; warning?: string }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { Guest: true, Site: true, Campground: true }
+      include: { Guest: true, Site: true, Campground: true },
     });
 
     if (!reservation) {
@@ -3299,13 +3503,14 @@ export class ReservationsService {
     }
 
     // Check for pending forms
-    const pendingForms = await this.prisma.formSubmission?.count?.({
-      where: { reservationId: id, status: "pending" }
-    }) ?? 0;
+    const pendingForms =
+      (await this.prisma.formSubmission?.count?.({
+        where: { reservationId: id, status: "pending" },
+      })) ?? 0;
 
     if (pendingForms > 0 && !options?.force) {
       throw new ConflictException(
-        "Forms must be completed before check-in. Use force=true to override."
+        "Forms must be completed before check-in. Use force=true to override.",
       );
     }
 
@@ -3323,9 +3528,9 @@ export class ReservationsService {
       data: {
         status: ReservationStatus.checked_in,
         checkInStatus: CheckInStatus.completed,
-        checkInAt: now
+        checkInAt: now,
       },
-      include: { Guest: true, Site: true, Campground: true }
+      include: { Guest: true, Site: true, Campground: true },
     });
 
     // Audit
@@ -3336,7 +3541,7 @@ export class ReservationsService {
       entity: "reservation",
       entityId: id,
       before: { status: reservation.status },
-      after: { status: updated.status, checkInAt: now, source: "staff" }
+      after: { status: updated.status, checkInAt: now, source: "staff" },
     });
 
     // Trigger playbooks and access control
@@ -3346,7 +3551,7 @@ export class ReservationsService {
     // Gamification
     if (reservation.createdBy) {
       const membership = await this.prisma.campgroundMembership.findFirst({
-        where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+        where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId },
       });
       await this.gamification.recordEvent({
         campgroundId: reservation.campgroundId,
@@ -3357,7 +3562,7 @@ export class ReservationsService {
         reason: "Smooth check-in (staff)",
         sourceType: "reservation",
         sourceId: reservation.id,
-        eventKey: `reservation:${reservation.id}:checkin`
+        eventKey: `reservation:${reservation.id}:checkin`,
       });
     }
 
@@ -3370,7 +3575,7 @@ export class ReservationsService {
       siteName: updated.Site?.siteNumber ?? undefined,
       arrivalDate: updated.arrivalDate.toISOString(),
       departureDate: updated.departureDate.toISOString(),
-      status: updated.status
+      status: updated.status,
     });
 
     return { reservation: updated, warning };
@@ -3381,11 +3586,11 @@ export class ReservationsService {
    */
   async staffCheckOut(
     id: string,
-    options?: { force?: boolean; actorId?: string | null }
+    options?: { force?: boolean; actorId?: string | null },
   ): Promise<{ reservation: Reservation; warning?: string }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { Guest: true, Site: true, Campground: true }
+      include: { Guest: true, Site: true, Campground: true },
     });
 
     if (!reservation) {
@@ -3407,7 +3612,7 @@ export class ReservationsService {
     if (balance > 0 && !options?.force) {
       throw new BadRequestException(
         `Cannot check out with outstanding balance of $${(balance / 100).toFixed(2)}. ` +
-        `Collect payment first or use force=true to override.`
+          `Collect payment first or use force=true to override.`,
       );
     } else if (balance > 0) {
       warning = `Guest checked out with outstanding balance of $${(balance / 100).toFixed(2)}`;
@@ -3418,9 +3623,9 @@ export class ReservationsService {
       where: { id },
       data: {
         status: ReservationStatus.checked_out,
-        checkOutAt: now
+        checkOutAt: now,
       },
-      include: { Guest: true, Site: true, Campground: true }
+      include: { Guest: true, Site: true, Campground: true },
     });
 
     // Audit
@@ -3431,7 +3636,7 @@ export class ReservationsService {
       entity: "reservation",
       entityId: id,
       before: { status: reservation.status },
-      after: { status: updated.status, checkOutAt: now, source: "staff" }
+      after: { status: updated.status, checkOutAt: now, source: "staff" },
     });
 
     // Trigger departure playbook
@@ -3446,7 +3651,7 @@ export class ReservationsService {
       siteName: updated.Site?.siteNumber ?? undefined,
       arrivalDate: updated.arrivalDate.toISOString(),
       departureDate: updated.departureDate.toISOString(),
-      status: updated.status
+      status: updated.status,
     });
 
     return { reservation: updated, warning };
@@ -3464,11 +3669,11 @@ export class ReservationsService {
       startDate: string | Date;
       endDate: string | Date;
     }>,
-    options?: { actorId?: string | null; sendNotification?: boolean }
+    options?: { actorId?: string | null; sendNotification?: boolean },
   ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { Campground: true, Guest: true, Site: true }
+      include: { Campground: true, Guest: true, Site: true },
     });
 
     if (!reservation) {
@@ -3477,7 +3682,7 @@ export class ReservationsService {
 
     // Validate segments are contiguous and cover the full reservation
     const sortedSegments = [...segments].sort(
-      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
     );
 
     const resStart = new Date(reservation.arrivalDate);
@@ -3490,7 +3695,7 @@ export class ReservationsService {
     firstStart.setHours(0, 0, 0, 0);
     if (firstStart.getTime() !== resStart.getTime()) {
       throw new BadRequestException(
-        `First segment must start on ${resStart.toISOString().slice(0, 10)}`
+        `First segment must start on ${resStart.toISOString().slice(0, 10)}`,
       );
     }
 
@@ -3499,7 +3704,7 @@ export class ReservationsService {
     lastEnd.setHours(0, 0, 0, 0);
     if (lastEnd.getTime() !== resEnd.getTime()) {
       throw new BadRequestException(
-        `Last segment must end on ${resEnd.toISOString().slice(0, 10)}`
+        `Last segment must end on ${resEnd.toISOString().slice(0, 10)}`,
       );
     }
 
@@ -3511,7 +3716,7 @@ export class ReservationsService {
       currStart.setHours(0, 0, 0, 0);
       if (currStart.getTime() !== prevEnd.getTime()) {
         throw new BadRequestException(
-          `Segments must be contiguous. Gap found between segment ${i} and ${i + 1}.`
+          `Segments must be contiguous. Gap found between segment ${i} and ${i + 1}.`,
         );
       }
     }
@@ -3531,7 +3736,7 @@ export class ReservationsService {
         seg.siteId,
         new Date(seg.startDate),
         new Date(seg.endDate),
-        reservationId
+        reservationId,
       );
     }
 
@@ -3544,7 +3749,7 @@ export class ReservationsService {
         reservation.campgroundId,
         seg.siteId,
         new Date(seg.startDate),
-        new Date(seg.endDate)
+        new Date(seg.endDate),
       );
       segmentPrices.push(priceResult.totalCents);
     }
@@ -3553,7 +3758,7 @@ export class ReservationsService {
 
     // Delete any existing segments and create new ones
     await this.prisma.reservationSegment.deleteMany({
-      where: { reservationId }
+      where: { reservationId },
     });
 
     // Create new segments in a transaction
@@ -3569,8 +3774,8 @@ export class ReservationsService {
             startDate: new Date(seg.startDate),
             endDate: new Date(seg.endDate),
             subtotalCents: segmentPrices[i],
-            sortOrder: i
-          }
+            sortOrder: i,
+          },
         });
       }
 
@@ -3583,13 +3788,13 @@ export class ReservationsService {
           balanceAmount: Math.max(0, newTotalAmount - reservation.paidAmount),
           notes: reservation.notes
             ? `${reservation.notes}\n[Split Stay] ${sortedSegments.length} segments across sites.`
-            : `[Split Stay] ${sortedSegments.length} segments across sites.`
+            : `[Split Stay] ${sortedSegments.length} segments across sites.`,
         },
         include: {
           ReservationSegment: { include: { Site: true }, orderBy: { sortOrder: "asc" } },
           Guest: true,
-          Campground: true
-        }
+          Campground: true,
+        },
       });
 
       const { ReservationSegment, ...updatedRest } = updated;
@@ -3607,8 +3812,8 @@ export class ReservationsService {
       after: {
         segmentCount: sortedSegments.length,
         siteIds: sortedSegments.map((s) => s.siteId),
-        totalAmount: newTotalAmount
-      }
+        totalAmount: newTotalAmount,
+      },
     });
 
     // Send notification to guest about site change if requested
@@ -3618,10 +3823,10 @@ export class ReservationsService {
           sortedSegments.map(async (s) => {
             const site = await this.prisma.site.findUnique({
               where: { id: s.siteId },
-              select: { name: true }
+              select: { name: true },
             });
             return site?.name ?? s.siteId;
-          })
+          }),
         );
 
         const subject = "Reservation update";
@@ -3644,7 +3849,7 @@ export class ReservationsService {
           html,
           campgroundId: reservation.campgroundId,
           guestId: reservation.guestId ?? undefined,
-          reservationId: reservation.id
+          reservationId: reservation.id,
         });
       } catch (err) {
         this.logger.warn("Failed to send split booking notification:", err);
@@ -3661,7 +3866,7 @@ export class ReservationsService {
     return this.prisma.reservationSegment.findMany({
       where: { reservationId },
       include: { Site: true },
-      orderBy: { sortOrder: "asc" }
+      orderBy: { sortOrder: "asc" },
     });
   }
 }

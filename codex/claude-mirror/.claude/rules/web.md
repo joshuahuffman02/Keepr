@@ -10,11 +10,13 @@ When working in the Next.js frontend:
 ## Components
 
 1. **Client components need "use client"**
+
    ```typescript
    "use client";
    ```
 
 2. **Initialize state from props**
+
    ```typescript
    const [form, setForm] = useState({
      name: props.data?.name || "",
@@ -22,6 +24,7 @@ When working in the Next.js frontend:
    ```
 
 3. **Use TanStack Query for data fetching**
+
    ```typescript
    const { data, isLoading } = useQuery({
      queryKey: ["resource", id],
@@ -35,12 +38,13 @@ When working in the Next.js frontend:
    const qc = useQueryClient();
    onSuccess: () => {
      qc.invalidateQueries({ queryKey: ["resource"] });
-   }
+   };
    ```
 
 ## Hydration Safety
 
 1. **Check for browser before localStorage**
+
    ```typescript
    const isBrowser = typeof window !== "undefined";
    const value = isBrowser ? localStorage.getItem("key") : null;
@@ -48,7 +52,7 @@ When working in the Next.js frontend:
 
 2. **Use enabled flag in queries**
    ```typescript
-   enabled: typeof window !== "undefined" && !!token
+   enabled: typeof window !== "undefined" && !!token;
    ```
 
 ## API Calls
@@ -60,11 +64,13 @@ When working in the Next.js frontend:
 ## Forms
 
 1. **Prevent default on submit**
+
    ```typescript
    <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(); }}>
    ```
 
 2. **Disable button during mutation**
+
    ```typescript
    <Button disabled={mutation.isPending}>Save</Button>
    ```

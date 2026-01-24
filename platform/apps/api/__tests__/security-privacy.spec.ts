@@ -6,19 +6,19 @@ describe("Security/Privacy audit API smoke", () => {
   let audit: AuditService;
   const prisma = {
     auditLog: {
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     privacySetting: {
       findUnique: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
     },
     auditExport: {
-      create: jest.fn()
+      create: jest.fn(),
     },
     piiFieldTag: {
       count: jest.fn(),
-      findMany: jest.fn()
-    }
+      findMany: jest.fn(),
+    },
   };
 
   const sampleRows = [
@@ -36,7 +36,7 @@ describe("Security/Privacy audit API smoke", () => {
       prevHash: "hash-0",
       before: null,
       after: null,
-      User: { id: "u1", email: "user@example.com", firstName: "Test", lastName: "User" }
+      User: { id: "u1", email: "user@example.com", firstName: "Test", lastName: "User" },
     },
     {
       id: "a2",
@@ -52,8 +52,8 @@ describe("Security/Privacy audit API smoke", () => {
       prevHash: "hash-1",
       before: null,
       after: null,
-      User: null
-    }
+      User: null,
+    },
   ];
 
   beforeAll(async () => {
@@ -63,22 +63,18 @@ describe("Security/Privacy audit API smoke", () => {
       redactPII: false,
       consentRequired: true,
       backupRetentionDays: 30,
-      keyRotationDays: 90
+      keyRotationDays: 90,
     });
     prisma.auditExport.create.mockResolvedValue({});
     prisma.piiFieldTag.count.mockResolvedValue(3);
     prisma.piiFieldTag.findMany.mockResolvedValue([
       { resource: "guests", field: "email", classification: "pii", redactionMode: null },
-      { resource: "guests", field: "phone", classification: "pii", redactionMode: "mask" }
+      { resource: "guests", field: "phone", classification: "pii", redactionMode: "mask" },
     ]);
 
     const moduleRef = await Test.createTestingModule({
-      providers: [
-        AuditService,
-        { provide: PrismaService, useValue: prisma }
-      ]
-    })
-      .compile();
+      providers: [AuditService, { provide: PrismaService, useValue: prisma }],
+    }).compile();
 
     audit = moduleRef.get(AuditService);
   });
@@ -91,8 +87,8 @@ describe("Security/Privacy audit API smoke", () => {
     expect(rows[0]).toEqual(
       expect.objectContaining({
         action: expect.any(String),
-        entity: expect.any(String)
-      })
+        entity: expect.any(String),
+      }),
     );
   });
 
@@ -102,7 +98,7 @@ describe("Security/Privacy audit API smoke", () => {
       setHeader: (key: string, value: string) => {
         headers[key] = value;
       },
-      send: jest.fn((payload: string) => payload)
+      send: jest.fn((payload: string) => payload),
     };
 
     const csv = await audit.exportCsv({ campgroundId: "cg1" }, res);
@@ -111,7 +107,9 @@ describe("Security/Privacy audit API smoke", () => {
     expect(headers["Content-Disposition"]).toContain("attachment; filename=audit.csv");
 
     const lines = csv.split("\n").filter(Boolean);
-    expect(lines[0]).toContain("id,campgroundId,actorId,action,entity,entityId,createdAt,ip,userAgent,chainHash,prevHash,before,after");
+    expect(lines[0]).toContain(
+      "id,campgroundId,actorId,action,entity,entityId,createdAt,ip,userAgent,chainHash,prevHash,before,after",
+    );
     expect(lines[1]).toContain("a1");
   });
 
@@ -124,8 +122,8 @@ describe("Security/Privacy audit API smoke", () => {
       expect.objectContaining({
         id: expect.any(String),
         action: expect.any(String),
-        createdAt: expect.anything()
-      })
+        createdAt: expect.anything(),
+      }),
     );
   });
 
@@ -136,11 +134,11 @@ describe("Security/Privacy audit API smoke", () => {
       expect.objectContaining({
         privacyDefaults: expect.objectContaining({
           redactPII: expect.any(Boolean),
-          consentRequired: expect.any(Boolean)
+          consentRequired: expect.any(Boolean),
         }),
         piiTagCount: expect.any(Number),
-        auditEvents: expect.any(Array)
-      })
+        auditEvents: expect.any(Array),
+      }),
     );
     expect(summary.auditEvents.length).toBeGreaterThan(0);
   });

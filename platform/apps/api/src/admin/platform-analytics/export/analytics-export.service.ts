@@ -33,7 +33,7 @@ export class AnalyticsExportService {
 
   constructor(
     private prisma: PrismaService,
-    private analyticsService: PlatformAnalyticsService
+    private analyticsService: PlatformAnalyticsService,
   ) {}
 
   /**
@@ -78,7 +78,8 @@ export class AnalyticsExportService {
       status: exp.status,
       format: exp.format,
       createdAt: exp.createdAt,
-      downloadUrl: exp.status === "completed" ? `/admin/platform-analytics/export/${id}/download` : undefined,
+      downloadUrl:
+        exp.status === "completed" ? `/admin/platform-analytics/export/${id}/download` : undefined,
     };
   }
 
@@ -124,7 +125,7 @@ export class AnalyticsExportService {
    */
   private generateJsonExport(
     data: Awaited<ReturnType<PlatformAnalyticsService["getFullAnalytics"]>>,
-    options: ExportOptions
+    options: ExportOptions,
   ): string {
     const {
       exportedAt: _ignoredExportedAt,
@@ -152,7 +153,7 @@ export class AnalyticsExportService {
    */
   private generateMarkdownExport(
     data: Awaited<ReturnType<PlatformAnalyticsService["getFullAnalytics"]>>,
-    options: ExportOptions
+    options: ExportOptions,
   ): string {
     const lines: string[] = [];
 
@@ -160,7 +161,9 @@ export class AnalyticsExportService {
     lines.push("# Campreserv Platform Analytics Report");
     lines.push("");
     lines.push(`**Generated:** ${new Date().toISOString()}`);
-    lines.push(`**Date Range:** ${data.metadata?.dateRange?.start} to ${data.metadata?.dateRange?.end}`);
+    lines.push(
+      `**Date Range:** ${data.metadata?.dateRange?.start} to ${data.metadata?.dateRange?.end}`,
+    );
     lines.push("");
 
     // Executive Summary
@@ -170,7 +173,9 @@ export class AnalyticsExportService {
     lines.push(`- **Total Revenue:** $${summary.totalRevenue.toLocaleString()}`);
     lines.push(`- **Total Reservations:** ${summary.totalReservations.toLocaleString()}`);
     lines.push(`- **Average Order Value:** $${summary.averageOrderValue.toFixed(2)}`);
-    lines.push(`- **YoY Growth:** ${summary.yoyGrowth !== null ? `${summary.yoyGrowth.toFixed(1)}%` : "N/A"}`);
+    lines.push(
+      `- **YoY Growth:** ${summary.yoyGrowth !== null ? `${summary.yoyGrowth.toFixed(1)}%` : "N/A"}`,
+    );
     lines.push("");
 
     // Revenue Intelligence
@@ -184,7 +189,7 @@ export class AnalyticsExportService {
 
       for (const item of data.modules.revenue.byAccommodationType || []) {
         lines.push(
-          `| ${item.type} | $${item.revenue.toLocaleString()} | ${item.reservations} | ${item.percentage.toFixed(1)}% | $${item.adr.toFixed(2)} |`
+          `| ${item.type} | $${item.revenue.toLocaleString()} | ${item.reservations} | ${item.percentage.toFixed(1)}% | $${item.adr.toFixed(2)} |`,
         );
       }
       lines.push("");
@@ -206,8 +211,12 @@ export class AnalyticsExportService {
       if (data.modules.guestJourney.accommodationProgression) {
         lines.push("### Accommodation Progression");
         lines.push("");
-        lines.push(`- **Upgrade Rate:** ${data.modules.guestJourney.accommodationProgression.upgradeRate.toFixed(1)}%`);
-        lines.push(`- **Downgrade Rate:** ${data.modules.guestJourney.accommodationProgression.downgradeRate.toFixed(1)}%`);
+        lines.push(
+          `- **Upgrade Rate:** ${data.modules.guestJourney.accommodationProgression.upgradeRate.toFixed(1)}%`,
+        );
+        lines.push(
+          `- **Downgrade Rate:** ${data.modules.guestJourney.accommodationProgression.downgradeRate.toFixed(1)}%`,
+        );
         lines.push("");
       }
     }
@@ -223,7 +232,7 @@ export class AnalyticsExportService {
 
       for (const item of data.modules.accommodations.typeDistribution || []) {
         lines.push(
-          `| ${item.type} | ${item.siteCount} | ${item.reservations} | $${item.revenue.toLocaleString()} | ${item.occupancyRate.toFixed(1)}% | ${item.revenueShare.toFixed(1)}% |`
+          `| ${item.type} | ${item.siteCount} | ${item.reservations} | $${item.revenue.toLocaleString()} | ${item.occupancyRate.toFixed(1)}% | ${item.revenueShare.toFixed(1)}% |`,
         );
       }
       lines.push("");
@@ -284,7 +293,7 @@ export class AnalyticsExportService {
    * Generate summary from analytics data
    */
   private generateSummary(
-    data: Awaited<ReturnType<PlatformAnalyticsService["getFullAnalytics"]>>
+    data: Awaited<ReturnType<PlatformAnalyticsService["getFullAnalytics"]>>,
   ): {
     totalRevenue: number;
     totalReservations: number;

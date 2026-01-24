@@ -91,7 +91,12 @@ function formatDuration(minutes: number): string {
 
 function getInitials(name: string | null, email: string | null): string {
   if (name) {
-    return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   }
   if (email) {
     return email.slice(0, 2).toUpperCase();
@@ -99,7 +104,11 @@ function getInitials(name: string | null, email: string | null): string {
   return "??";
 }
 
-type SortField = "totalSessionMinutes" | "actionsCount" | "reservationsCreated" | "errorsEncountered";
+type SortField =
+  | "totalSessionMinutes"
+  | "actionsCount"
+  | "reservationsCreated"
+  | "errorsEncountered";
 type SortOrder = "asc" | "desc";
 
 export default function StaffEfficiencyDashboard() {
@@ -162,9 +171,13 @@ export default function StaffEfficiencyDashboard() {
   const avgEfficiency = totalErrors > 0 ? totalActions / totalErrors : totalActions;
 
   // Find top performer
-  const topPerformer = aggregatedList.length > 0
-    ? aggregatedList.reduce((top, s) => (s.actionsCount > (top?.actionsCount || 0) ? s : top), aggregatedList[0])
-    : null;
+  const topPerformer =
+    aggregatedList.length > 0
+      ? aggregatedList.reduce(
+          (top, s) => (s.actionsCount > (top?.actionsCount || 0) ? s : top),
+          aggregatedList[0],
+        )
+      : null;
 
   // Find staff needing support (high error rate)
   const needsSupport = aggregatedList.filter((s) => {
@@ -253,7 +266,9 @@ export default function StaffEfficiencyDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Error Rate</CardTitle>
-            <AlertTriangle className={`h-4 w-4 ${totalErrors > totalActions * 0.05 ? "text-red-500" : "text-green-500"}`} />
+            <AlertTriangle
+              className={`h-4 w-4 ${totalErrors > totalActions * 0.05 ? "text-red-500" : "text-green-500"}`}
+            />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -340,10 +355,7 @@ export default function StaffEfficiencyDashboard() {
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("actionsCount")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("actionsCount")}>
                     <div className="flex items-center gap-1">
                       Actions
                       <ArrowUpDown className="h-4 w-4" />
@@ -374,7 +386,8 @@ export default function StaffEfficiencyDashboard() {
               <TableBody>
                 {sortedStats.map((stat) => {
                   const productivity = maxActions > 0 ? (stat.actionsCount / maxActions) * 100 : 0;
-                  const errorRate = stat.actionsCount > 0 ? stat.errorsEncountered / stat.actionsCount : 0;
+                  const errorRate =
+                    stat.actionsCount > 0 ? stat.errorsEncountered / stat.actionsCount : 0;
 
                   return (
                     <TableRow key={stat.userId}>
@@ -476,7 +489,8 @@ export default function StaffEfficiencyDashboard() {
           <CardContent>
             <div className="space-y-3">
               {needsSupport.map((stat) => {
-                const errorRate = stat.actionsCount > 0 ? (stat.errorsEncountered / stat.actionsCount) * 100 : 0;
+                const errorRate =
+                  stat.actionsCount > 0 ? (stat.errorsEncountered / stat.actionsCount) * 100 : 0;
                 return (
                   <div key={stat.userId} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

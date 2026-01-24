@@ -16,14 +16,14 @@ Campground directories are where travelers discover new places to stay. Ranking 
 
 ## Key Directories
 
-| Directory | Focus | Fee Model |
-|-----------|-------|-----------|
-| Hipcamp | Unique outdoor stays | Commission |
-| Good Sam | RV parks | Membership referrals |
-| Campendium | User reviews | Free listings |
-| The Dyrt | Reviews and discovery | Free/paid |
-| Recreation.gov | Public lands | Varies |
-| Harvest Hosts | Unique locations | Membership |
+| Directory      | Focus                 | Fee Model            |
+| -------------- | --------------------- | -------------------- |
+| Hipcamp        | Unique outdoor stays  | Commission           |
+| Good Sam       | RV parks              | Membership referrals |
+| Campendium     | User reviews          | Free listings        |
+| The Dyrt       | Reviews and discovery | Free/paid            |
+| Recreation.gov | Public lands          | Varies               |
+| Harvest Hosts  | Unique locations      | Membership           |
 
 ---
 
@@ -79,4 +79,4 @@ Campground directories are where travelers discover new places to stay. Ranking 
 
 ---
 
-*Keepr can sync availability with directory listings, ensuring accurate information everywhere. [Expand your reach at campreserv.com](https://campreserv.com)*
+_Keepr can sync availability with directory listings, ensuring accurate information everywhere. [Expand your reach at campreserv.com](https://campreserv.com)_

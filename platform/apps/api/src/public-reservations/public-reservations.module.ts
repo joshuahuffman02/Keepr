@@ -17,24 +17,24 @@ import { EmailModule } from "../email/email.module";
 import { AiModule } from "../ai/ai.module";
 
 @Module({
-    imports: [
-        PrismaModule,
-        RedisModule,
-        PromotionsModule,
-        AbandonedCartModule,
-        MembershipsModule,
-        SignaturesModule,
-        PoliciesModule,
-        AccessControlModule,
-        PricingV2Module,
-        DepositPoliciesModule,
-        FormsModule,
-        forwardRef(() => PaymentsModule),
-        EmailModule,
-        forwardRef(() => AiModule),
-    ],
-    controllers: [PublicReservationsController],
-    providers: [PublicReservationsService],
-    exports: [PublicReservationsService]
+  imports: [
+    PrismaModule,
+    RedisModule,
+    PromotionsModule,
+    AbandonedCartModule,
+    MembershipsModule,
+    SignaturesModule,
+    PoliciesModule,
+    AccessControlModule,
+    PricingV2Module,
+    DepositPoliciesModule,
+    FormsModule,
+    forwardRef(() => PaymentsModule),
+    EmailModule,
+    forwardRef(() => AiModule),
+  ],
+  controllers: [PublicReservationsController],
+  providers: [PublicReservationsService],
+  exports: [PublicReservationsService],
 })
-export class PublicReservationsModule { }
+export class PublicReservationsModule {}

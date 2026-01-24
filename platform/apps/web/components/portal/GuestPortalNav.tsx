@@ -60,9 +60,7 @@ export function GuestPortalTopNav({ guestName }: GuestPortalNavProps) {
               <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
                 <Home className="h-5 w-5 text-white" />
               </div>
-              <span className="font-semibold text-lg text-foreground">
-                Guest Portal
-              </span>
+              <span className="font-semibold text-lg text-foreground">Guest Portal</span>
             </div>
 
             {/* Nav Links */}
@@ -78,9 +76,7 @@ export function GuestPortalTopNav({ guestName }: GuestPortalNavProps) {
                     className={cn(
                       "relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                       "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                      isActive
-                        ? "text-primary"
-                        : "text-muted-foreground"
+                      isActive ? "text-primary" : "text-muted-foreground",
                     )}
                   >
                     <span className="flex items-center gap-2">
@@ -102,9 +98,7 @@ export function GuestPortalTopNav({ guestName }: GuestPortalNavProps) {
             {/* User Menu */}
             <div className="flex items-center gap-3">
               {guestName && (
-                <span className="text-sm text-muted-foreground">
-                  Welcome, {guestName}
-                </span>
+                <span className="text-sm text-muted-foreground">Welcome, {guestName}</span>
               )}
               <button
                 onClick={handleLogout}
@@ -126,9 +120,7 @@ export function GuestPortalTopNav({ guestName }: GuestPortalNavProps) {
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
               <Home className="h-4 w-4 text-white" />
             </div>
-            <span className="font-semibold text-foreground">
-              Guest Portal
-            </span>
+            <span className="font-semibold text-foreground">Guest Portal</span>
           </div>
 
           <button
@@ -170,7 +162,7 @@ export function GuestPortalTopNav({ guestName }: GuestPortalNavProps) {
                         "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors",
                         isActive
                           ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted"
+                          : "text-muted-foreground hover:bg-muted",
                       )}
                     >
                       <Icon className="h-5 w-5" />
@@ -220,9 +212,7 @@ export function GuestPortalBottomNav() {
                 "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all",
                 "min-w-[60px] min-h-[44px]", // 44px touch target
                 "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-                isActive
-                  ? "text-primary"
-                  : "text-muted-foreground"
+                isActive ? "text-primary" : "text-muted-foreground",
               )}
             >
               <div className="relative">

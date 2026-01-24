@@ -172,7 +172,8 @@ export default function NotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          Looks like you've wandered off the marked trail. But that's okay - sometimes the best discoveries happen when we get a little lost.
+          Looks like you've wandered off the marked trail. But that's okay - sometimes the best
+          discoveries happen when we get a little lost.
         </motion.p>
 
         {/* Tip card */}

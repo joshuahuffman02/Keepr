@@ -45,12 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Types
 export type SiteType = "rv" | "tent" | "cabin" | "glamping" | "group";
@@ -167,7 +162,12 @@ export function SiteLayoutEditor({
   const [gridSize, setGridSize] = useState(initialData?.gridSize || 20);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [draggedItem, setDraggedItem] = useState<{ id: string; type: "site" | "element"; startX: number; startY: number } | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{
+    id: string;
+    type: "site" | "element";
+    startX: number;
+    startY: number;
+  } | null>(null);
   const [history, setHistory] = useState<{ sites: LayoutSite[]; elements: LayoutElement[] }[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [showLayers, setShowLayers] = useState(true);
@@ -218,7 +218,7 @@ export function SiteLayoutEditor({
         y: (screenY - rect.top - pan.y) / zoom,
       };
     },
-    [zoom, pan]
+    [zoom, pan],
   );
 
   // Snap to grid
@@ -227,7 +227,7 @@ export function SiteLayoutEditor({
       if (!showGrid) return value;
       return Math.round(value / gridSize) * gridSize;
     },
-    [showGrid, gridSize]
+    [showGrid, gridSize],
   );
 
   // Find item at position
@@ -237,12 +237,7 @@ export function SiteLayoutEditor({
       for (let i = sites.length - 1; i >= 0; i--) {
         const site = sites[i];
         if (site.isHidden) continue;
-        if (
-          x >= site.x &&
-          x <= site.x + site.width &&
-          y >= site.y &&
-          y <= site.y + site.height
-        ) {
+        if (x >= site.x && x <= site.x + site.width && y >= site.y && y <= site.y + site.height) {
           return { id: site.id, type: "site" };
         }
       }
@@ -250,18 +245,13 @@ export function SiteLayoutEditor({
       for (let i = elements.length - 1; i >= 0; i--) {
         const el = elements[i];
         if (el.isHidden) continue;
-        if (
-          x >= el.x &&
-          x <= el.x + el.width &&
-          y >= el.y &&
-          y <= el.y + el.height
-        ) {
+        if (x >= el.x && x <= el.x + el.width && y >= el.y && y <= el.y + el.height) {
           return { id: el.id, type: "element" };
         }
       }
       return null;
     },
-    [sites, elements]
+    [sites, elements],
   );
 
   // Add new site
@@ -283,7 +273,7 @@ export function SiteLayoutEditor({
       setSelectedIds([newSite.id]);
       saveToHistory();
     },
-    [snapToGrid, selectedSiteType, nextSiteNumber, saveToHistory]
+    [snapToGrid, selectedSiteType, nextSiteNumber, saveToHistory],
   );
 
   // Delete selected items
@@ -354,7 +344,7 @@ export function SiteLayoutEditor({
           const isSelected = selectedIds.includes(item.id);
           if (e.shiftKey) {
             setSelectedIds((prev) =>
-              isSelected ? prev.filter((id) => id !== item.id) : [...prev, item.id]
+              isSelected ? prev.filter((id) => id !== item.id) : [...prev, item.id],
             );
           } else if (!isSelected) {
             setSelectedIds([item.id]);
@@ -374,7 +364,17 @@ export function SiteLayoutEditor({
         }
       }
     },
-    [readOnly, screenToCanvas, activeTool, pan, addSite, findItemAtPosition, selectedIds, sites, elements]
+    [
+      readOnly,
+      screenToCanvas,
+      activeTool,
+      pan,
+      addSite,
+      findItemAtPosition,
+      selectedIds,
+      sites,
+      elements,
+    ],
   );
 
   const handleMouseMove = useCallback(
@@ -398,22 +398,45 @@ export function SiteLayoutEditor({
           setSites((prev) =>
             prev.map((s) =>
               selectedIds.includes(s.id) && !s.isLocked
-                ? { ...s, x: s.id === draggedItem.id ? newX : s.x + (newX - (sites.find((ss) => ss.id === draggedItem.id)?.x || 0)), y: s.id === draggedItem.id ? newY : s.y + (newY - (sites.find((ss) => ss.id === draggedItem.id)?.y || 0)) }
-                : s
-            )
+                ? {
+                    ...s,
+                    x:
+                      s.id === draggedItem.id
+                        ? newX
+                        : s.x + (newX - (sites.find((ss) => ss.id === draggedItem.id)?.x || 0)),
+                    y:
+                      s.id === draggedItem.id
+                        ? newY
+                        : s.y + (newY - (sites.find((ss) => ss.id === draggedItem.id)?.y || 0)),
+                  }
+                : s,
+            ),
           );
         } else {
           setElements((prev) =>
             prev.map((el) =>
               selectedIds.includes(el.id) && !el.isLocked
-                ? { ...el, x: el.id === draggedItem.id ? newX : el.x, y: el.id === draggedItem.id ? newY : el.y }
-                : el
-            )
+                ? {
+                    ...el,
+                    x: el.id === draggedItem.id ? newX : el.x,
+                    y: el.id === draggedItem.id ? newY : el.y,
+                  }
+                : el,
+            ),
           );
         }
       }
     },
-    [isDragging, activeTool, dragStart, draggedItem, screenToCanvas, snapToGrid, selectedIds, sites]
+    [
+      isDragging,
+      activeTool,
+      dragStart,
+      draggedItem,
+      screenToCanvas,
+      snapToGrid,
+      selectedIds,
+      sites,
+    ],
   );
 
   const handleMouseUp = useCallback(() => {
@@ -425,19 +448,16 @@ export function SiteLayoutEditor({
   }, [isDragging, draggedItem, saveToHistory]);
 
   // Wheel zoom - only zoom if Ctrl/Cmd is held, otherwise let page scroll
-  const handleWheel = useCallback(
-    (e: React.WheelEvent<HTMLCanvasElement>) => {
-      // Only zoom if Ctrl (Windows/Linux) or Cmd (Mac) is held
-      if (!e.ctrlKey && !e.metaKey) {
-        // Let the page scroll normally
-        return;
-      }
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 0.9 : 1.1;
-      setZoom((prev) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev * delta)));
-    },
-    []
-  );
+  const handleWheel = useCallback((e: React.WheelEvent<HTMLCanvasElement>) => {
+    // Only zoom if Ctrl (Windows/Linux) or Cmd (Mac) is held
+    if (!e.ctrlKey && !e.metaKey) {
+      // Let the page scroll normally
+      return;
+    }
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom((prev) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev * delta)));
+  }, []);
 
   // Load background image
   useEffect(() => {
@@ -620,7 +640,22 @@ export function SiteLayoutEditor({
     });
 
     ctx.restore();
-  }, [sites, elements, selectedIds, zoom, pan, showGrid, gridSize, canvasWidth, canvasHeight, showBackgroundImage, backgroundOpacity, backgroundScale, backgroundOffset, backgroundImageUrl]);
+  }, [
+    sites,
+    elements,
+    selectedIds,
+    zoom,
+    pan,
+    showGrid,
+    gridSize,
+    canvasWidth,
+    canvasHeight,
+    showBackgroundImage,
+    backgroundOpacity,
+    backgroundScale,
+    backgroundOffset,
+    backgroundImageUrl,
+  ]);
 
   // Handle save
   const handleSave = () => {
@@ -677,7 +712,10 @@ export function SiteLayoutEditor({
 
   return (
     <TooltipProvider>
-      <div className={cn("flex flex-col bg-muted rounded-xl overflow-hidden border", className)} style={{ height: heightStyle }}>
+      <div
+        className={cn("flex flex-col bg-muted rounded-xl overflow-hidden border", className)}
+        style={{ height: heightStyle }}
+      >
         {/* Toolbar */}
         {!readOnly && (
           <div className="flex items-center gap-2 p-2 bg-card border-b">
@@ -742,7 +780,8 @@ export function SiteLayoutEditor({
                             aria-label={`Select ${type} site type`}
                             onClick={() => setSelectedSiteType(type)}
                             style={{
-                              backgroundColor: selectedSiteType === type ? SITE_TYPE_COLORS[type] : undefined,
+                              backgroundColor:
+                                selectedSiteType === type ? SITE_TYPE_COLORS[type] : undefined,
                             }}
                           >
                             <Icon className="h-4 w-4" />
@@ -759,7 +798,13 @@ export function SiteLayoutEditor({
             <div className="flex items-center gap-1 border-r pr-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Undo" onClick={undo} disabled={historyIndex <= 0}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Undo"
+                    onClick={undo}
+                    disabled={historyIndex <= 0}
+                  >
                     <Undo className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -768,7 +813,13 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Redo" onClick={redo} disabled={historyIndex >= history.length - 1}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Redo"
+                    onClick={redo}
+                    disabled={historyIndex >= history.length - 1}
+                  >
                     <Redo className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -777,7 +828,13 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Duplicate" onClick={duplicateSelected} disabled={selectedIds.length === 0}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Duplicate"
+                    onClick={duplicateSelected}
+                    disabled={selectedIds.length === 0}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -786,7 +843,13 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Delete" onClick={deleteSelected} disabled={selectedIds.length === 0}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Delete"
+                    onClick={deleteSelected}
+                    disabled={selectedIds.length === 0}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -798,18 +861,30 @@ export function SiteLayoutEditor({
             <div className="flex items-center gap-1 border-r pr-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.2))}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Zoom in"
+                    onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.2))}
+                  >
                     <ZoomIn className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>Zoom In</TooltipContent>
               </Tooltip>
 
-              <span className="text-xs text-muted-foreground w-12 text-center">{Math.round(zoom * 100)}%</span>
+              <span className="text-xs text-muted-foreground w-12 text-center">
+                {Math.round(zoom * 100)}%
+              </span>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.2))}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Zoom out"
+                    onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.2))}
+                  >
                     <ZoomOut className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -835,7 +910,12 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant={showGrid ? "default" : "ghost"} size="icon" aria-label="Toggle grid" onClick={() => setShowGrid(!showGrid)}>
+                  <Button
+                    variant={showGrid ? "default" : "ghost"}
+                    size="icon"
+                    aria-label="Toggle grid"
+                    onClick={() => setShowGrid(!showGrid)}
+                  >
                     <Grid3X3 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -865,10 +945,16 @@ export function SiteLayoutEditor({
                         aria-label={showBackgroundImage ? "Hide background" : "Show background"}
                         onClick={() => setShowBackgroundImage(!showBackgroundImage)}
                       >
-                        {showBackgroundImage ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                        {showBackgroundImage ? (
+                          <Eye className="h-4 w-4" />
+                        ) : (
+                          <EyeOff className="h-4 w-4" />
+                        )}
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>{showBackgroundImage ? "Hide" : "Show"} Background</TooltipContent>
+                    <TooltipContent>
+                      {showBackgroundImage ? "Hide" : "Show"} Background
+                    </TooltipContent>
                   </Tooltip>
 
                   <div className="flex items-center gap-1 ml-1">
@@ -882,7 +968,9 @@ export function SiteLayoutEditor({
                       onChange={(e) => setBackgroundScale(parseFloat(e.target.value))}
                       className="w-16 h-1 accent-emerald-600"
                     />
-                    <span className="text-xs text-muted-foreground w-8">{Math.round(backgroundScale * 100)}%</span>
+                    <span className="text-xs text-muted-foreground w-8">
+                      {Math.round(backgroundScale * 100)}%
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1 ml-1">
@@ -896,7 +984,9 @@ export function SiteLayoutEditor({
                       onChange={(e) => setBackgroundOpacity(parseFloat(e.target.value))}
                       className="w-16 h-1 accent-emerald-600"
                     />
-                    <span className="text-xs text-muted-foreground w-8">{Math.round(backgroundOpacity * 100)}%</span>
+                    <span className="text-xs text-muted-foreground w-8">
+                      {Math.round(backgroundOpacity * 100)}%
+                    </span>
                   </div>
 
                   <Tooltip>
@@ -946,7 +1036,7 @@ export function SiteLayoutEditor({
               className={cn(
                 "cursor-crosshair",
                 activeTool === "select" && "cursor-default",
-                activeTool === "pan" && (isDragging ? "cursor-grabbing" : "cursor-grab")
+                activeTool === "pan" && (isDragging ? "cursor-grabbing" : "cursor-grab"),
               )}
               style={{
                 width: canvasWidth * zoom,
@@ -975,8 +1065,8 @@ export function SiteLayoutEditor({
                     onChange={(e) => {
                       setSites((prev) =>
                         prev.map((s) =>
-                          s.id === selectedSite.id ? { ...s, siteNumber: e.target.value } : s
-                        )
+                          s.id === selectedSite.id ? { ...s, siteNumber: e.target.value } : s,
+                        ),
                       );
                     }}
                     className="w-full mt-1 px-3 py-2 border rounded-md"
@@ -992,8 +1082,8 @@ export function SiteLayoutEditor({
                         prev.map((s) =>
                           s.id === selectedSite.id
                             ? { ...s, siteType: value, color: SITE_TYPE_COLORS[value] }
-                            : s
-                        )
+                            : s,
+                        ),
                       );
                     }}
                   >
@@ -1004,10 +1094,10 @@ export function SiteLayoutEditor({
                       {Object.keys(SITE_TYPE_ICONS)
                         .filter((type): type is SiteType => type in SITE_TYPE_ICONS)
                         .map((type) => (
-                        <SelectItem key={type} value={type} className="capitalize">
-                          {type}
-                        </SelectItem>
-                      ))}
+                          <SelectItem key={type} value={type} className="capitalize">
+                            {type}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -1021,8 +1111,10 @@ export function SiteLayoutEditor({
                       onChange={(e) => {
                         setSites((prev) =>
                           prev.map((s) =>
-                            s.id === selectedSite.id ? { ...s, width: parseInt(e.target.value) || 60 } : s
-                          )
+                            s.id === selectedSite.id
+                              ? { ...s, width: parseInt(e.target.value) || 60 }
+                              : s,
+                          ),
                         );
                       }}
                       className="w-full mt-1 px-3 py-2 border rounded-md"
@@ -1036,8 +1128,10 @@ export function SiteLayoutEditor({
                       onChange={(e) => {
                         setSites((prev) =>
                           prev.map((s) =>
-                            s.id === selectedSite.id ? { ...s, height: parseInt(e.target.value) || 40 } : s
-                          )
+                            s.id === selectedSite.id
+                              ? { ...s, height: parseInt(e.target.value) || 40 }
+                              : s,
+                          ),
                         );
                       }}
                       className="w-full mt-1 px-3 py-2 border rounded-md"
@@ -1055,13 +1149,17 @@ export function SiteLayoutEditor({
                     onChange={(e) => {
                       setSites((prev) =>
                         prev.map((s) =>
-                          s.id === selectedSite.id ? { ...s, rotation: parseInt(e.target.value) } : s
-                        )
+                          s.id === selectedSite.id
+                            ? { ...s, rotation: parseInt(e.target.value) }
+                            : s,
+                        ),
                       );
                     }}
                     className="w-full mt-1"
                   />
-                  <span className="text-xs text-muted-foreground">{selectedSite.rotation} degrees</span>
+                  <span className="text-xs text-muted-foreground">
+                    {selectedSite.rotation} degrees
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -1071,12 +1169,16 @@ export function SiteLayoutEditor({
                     onClick={() => {
                       setSites((prev) =>
                         prev.map((s) =>
-                          s.id === selectedSite.id ? { ...s, isLocked: !s.isLocked } : s
-                        )
+                          s.id === selectedSite.id ? { ...s, isLocked: !s.isLocked } : s,
+                        ),
                       );
                     }}
                   >
-                    {selectedSite.isLocked ? <Lock className="h-4 w-4 mr-1" /> : <Unlock className="h-4 w-4 mr-1" />}
+                    {selectedSite.isLocked ? (
+                      <Lock className="h-4 w-4 mr-1" />
+                    ) : (
+                      <Unlock className="h-4 w-4 mr-1" />
+                    )}
                     {selectedSite.isLocked ? "Locked" : "Unlocked"}
                   </Button>
                 </div>
@@ -1094,7 +1196,9 @@ export function SiteLayoutEditor({
           </div>
           <div className="flex items-center gap-4">
             <span>Grid: {gridSize}px</span>
-            <span>Canvas: {canvasWidth} x {canvasHeight}</span>
+            <span>
+              Canvas: {canvasWidth} x {canvasHeight}
+            </span>
           </div>
         </div>
       </div>

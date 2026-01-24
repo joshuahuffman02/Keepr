@@ -141,11 +141,23 @@ function getEventLabel(eventType: string): string {
 function getActorBadge(actorType: string) {
   switch (actorType) {
     case "staff":
-      return <Badge variant="default" className="text-xs">Staff</Badge>;
+      return (
+        <Badge variant="default" className="text-xs">
+          Staff
+        </Badge>
+      );
     case "guest":
-      return <Badge variant="secondary" className="text-xs">Guest</Badge>;
+      return (
+        <Badge variant="secondary" className="text-xs">
+          Guest
+        </Badge>
+      );
     case "system":
-      return <Badge variant="outline" className="text-xs">System</Badge>;
+      return (
+        <Badge variant="outline" className="text-xs">
+          System
+        </Badge>
+      );
     default:
       return null;
   }
@@ -179,7 +191,11 @@ export default function LiveActivityFeed() {
   const [filterType, setFilterType] = useState("all");
   const [filterActor, setFilterActor] = useState("all");
 
-  const { data: liveEvents, isLoading: eventsLoading, refetch: refetchEvents } = useQuery<LiveEvent[]>({
+  const {
+    data: liveEvents,
+    isLoading: eventsLoading,
+    refetch: refetchEvents,
+  } = useQuery<LiveEvent[]>({
     queryKey: ["analytics-live-events", campgroundId],
     queryFn: async () => {
       const response = await apiClient.get<LiveEvent[]>(`/analytics/enhanced/live`, {
@@ -206,11 +222,12 @@ export default function LiveActivityFeed() {
   });
 
   // Filter events
-  const filteredEvents = liveEvents?.filter((event) => {
-    if (filterType !== "all" && event.eventType !== filterType) return false;
-    if (filterActor !== "all" && event.actorType !== filterActor) return false;
-    return true;
-  }) || [];
+  const filteredEvents =
+    liveEvents?.filter((event) => {
+      if (filterType !== "all" && event.eventType !== filterType) return false;
+      if (filterActor !== "all" && event.actorType !== filterActor) return false;
+      return true;
+    }) || [];
 
   // Get unique event types for filter
   const eventTypes = [...new Set(liveEvents?.map((e) => e.eventType) || [])];
@@ -242,28 +259,17 @@ export default function LiveActivityFeed() {
                 </span>
               )}
             </h1>
-            <p className="text-muted-foreground">
-              Real-time view of all activity
-            </p>
+            <p className="text-muted-foreground">Real-time view of all activity</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Switch
-              id="live-mode"
-              checked={isLive}
-              onCheckedChange={setIsLive}
-            />
+            <Switch id="live-mode" checked={isLive} onCheckedChange={setIsLive} />
             <Label htmlFor="live-mode" className="text-sm">
               {isLive ? "Live" : "Paused"}
             </Label>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetchEvents()}
-            disabled={isLive}
-          >
+          <Button variant="outline" size="sm" onClick={() => refetchEvents()} disabled={isLive}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -465,9 +471,7 @@ export default function LiveActivityFeed() {
                 ))}
               </div>
             ) : filteredEvents.length === 0 ? (
-              <div className="p-6 text-center text-muted-foreground">
-                No events found
-              </div>
+              <div className="p-6 text-center text-muted-foreground">No events found</div>
             ) : (
               <ScrollArea className="h-[500px]">
                 <div className="divide-y">
@@ -476,9 +480,7 @@ export default function LiveActivityFeed() {
                       key={event.id}
                       className="flex items-start gap-3 p-4 hover:bg-muted/50 transition-colors"
                     >
-                      <div className="mt-0.5">
-                        {getEventIcon(event.eventType)}
-                      </div>
+                      <div className="mt-0.5">{getEventIcon(event.eventType)}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium text-sm">
@@ -496,11 +498,13 @@ export default function LiveActivityFeed() {
                         )}
                         {event.eventData && Object.keys(event.eventData).length > 0 && (
                           <div className="mt-1 flex flex-wrap gap-1">
-                            {Object.entries(event.eventData).slice(0, 3).map(([key, value]) => (
-                              <Badge key={key} variant="outline" className="text-xs">
-                                {key}: {String(value).slice(0, 20)}
-                              </Badge>
-                            ))}
+                            {Object.entries(event.eventData)
+                              .slice(0, 3)
+                              .map(([key, value]) => (
+                                <Badge key={key} variant="outline" className="text-xs">
+                                  {key}: {String(value).slice(0, 20)}
+                                </Badge>
+                              ))}
                           </div>
                         )}
                       </div>

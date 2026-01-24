@@ -11,28 +11,28 @@ import {
   UseGuards,
   Req,
   Headers,
-} from '@nestjs/common';
-import { ValueStackService } from './value-stack.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { ScopeGuard } from '../auth/guards/scope.guard';
-import { GuaranteeType } from '@prisma/client';
-import { extractClientIp } from '../common/ip-utils';
+} from "@nestjs/common";
+import { ValueStackService } from "./value-stack.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { ScopeGuard } from "../auth/guards/scope.guard";
+import { GuaranteeType } from "@prisma/client";
+import { extractClientIp } from "../common/ip-utils";
 
-@Controller('campgrounds/:campgroundId/value-stack')
+@Controller("campgrounds/:campgroundId/value-stack")
 @UseGuards(JwtAuthGuard, ScopeGuard)
 export class ValueStackController {
   constructor(private readonly valueStackService: ValueStackService) {}
 
   // ==================== GUARANTEES ====================
 
-  @Get('guarantees')
-  async getGuarantees(@Param('campgroundId') campgroundId: string) {
+  @Get("guarantees")
+  async getGuarantees(@Param("campgroundId") campgroundId: string) {
     return this.valueStackService.getGuarantees(campgroundId);
   }
 
-  @Post('guarantees')
+  @Post("guarantees")
   async createGuarantee(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body()
     body: {
       type: GuaranteeType;
@@ -45,10 +45,10 @@ export class ValueStackController {
     return this.valueStackService.createGuarantee({ campgroundId, ...body });
   }
 
-  @Put('guarantees/:id')
+  @Put("guarantees/:id")
   async updateGuarantee(
-    @Param('campgroundId') campgroundId: string,
-    @Param('id') id: string,
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
     @Body()
     body: Partial<{
       type: GuaranteeType;
@@ -62,24 +62,21 @@ export class ValueStackController {
     return this.valueStackService.updateGuarantee(id, campgroundId, body);
   }
 
-  @Delete('guarantees/:id')
-  async deleteGuarantee(
-    @Param('campgroundId') campgroundId: string,
-    @Param('id') id: string
-  ) {
+  @Delete("guarantees/:id")
+  async deleteGuarantee(@Param("campgroundId") campgroundId: string, @Param("id") id: string) {
     return this.valueStackService.deleteGuarantee(id, campgroundId);
   }
 
   // ==================== BONUSES ====================
 
-  @Get('bonuses')
-  async getBonuses(@Param('campgroundId') campgroundId: string) {
+  @Get("bonuses")
+  async getBonuses(@Param("campgroundId") campgroundId: string) {
     return this.valueStackService.getBonuses(campgroundId);
   }
 
-  @Post('bonuses')
+  @Post("bonuses")
   async createBonus(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body()
     body: {
       name: string;
@@ -94,10 +91,10 @@ export class ValueStackController {
     return this.valueStackService.createBonus({ campgroundId, ...body });
   }
 
-  @Put('bonuses/:id')
+  @Put("bonuses/:id")
   async updateBonus(
-    @Param('campgroundId') campgroundId: string,
-    @Param('id') id: string,
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
     @Body()
     body: Partial<{
       name: string;
@@ -113,24 +110,21 @@ export class ValueStackController {
     return this.valueStackService.updateBonus(id, campgroundId, body);
   }
 
-  @Delete('bonuses/:id')
-  async deleteBonus(
-    @Param('campgroundId') campgroundId: string,
-    @Param('id') id: string
-  ) {
+  @Delete("bonuses/:id")
+  async deleteBonus(@Param("campgroundId") campgroundId: string, @Param("id") id: string) {
     return this.valueStackService.deleteBonus(id, campgroundId);
   }
 
   // ==================== LEAD CAPTURE CONFIG ====================
 
-  @Get('lead-capture')
-  async getLeadCaptureConfig(@Param('campgroundId') campgroundId: string) {
+  @Get("lead-capture")
+  async getLeadCaptureConfig(@Param("campgroundId") campgroundId: string) {
     return this.valueStackService.getLeadCaptureConfig(campgroundId);
   }
 
-  @Put('lead-capture')
+  @Put("lead-capture")
   async updateLeadCaptureConfig(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body()
     body: Partial<{
       eventsEnabled: boolean;
@@ -151,14 +145,14 @@ export class ValueStackController {
 
   // ==================== BOOKING PAGE CONFIG ====================
 
-  @Get('booking-page')
-  async getBookingPageConfig(@Param('campgroundId') campgroundId: string) {
+  @Get("booking-page")
+  async getBookingPageConfig(@Param("campgroundId") campgroundId: string) {
     return this.valueStackService.getBookingPageConfig(campgroundId);
   }
 
-  @Put('booking-page')
+  @Put("booking-page")
   async updateBookingPageConfig(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body()
     body: Partial<{
       heroHeadline: string;
@@ -178,31 +172,28 @@ export class ValueStackController {
 
   // ==================== LEADS ====================
 
-  @Get('leads')
-  async getLeads(
-    @Param('campgroundId') campgroundId: string,
-    @Query('source') source?: string,
-  ) {
+  @Get("leads")
+  async getLeads(@Param("campgroundId") campgroundId: string, @Query("source") source?: string) {
     return this.valueStackService.getLeads(campgroundId, source);
   }
 }
 
 // Public controller for lead capture (no auth required)
-@Controller('public/campgrounds/:campgroundId')
+@Controller("public/campgrounds/:campgroundId")
 export class PublicValueStackController {
   constructor(private readonly valueStackService: ValueStackService) {}
 
-  @Get('value-stack')
-  async getPublicValueStack(@Param('campgroundId') campgroundId: string) {
+  @Get("value-stack")
+  async getPublicValueStack(@Param("campgroundId") campgroundId: string) {
     return this.valueStackService.getPublicValueStack(campgroundId);
   }
 
-  @Post('leads')
+  @Post("leads")
   async captureLead(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: { email: string; source: string; marketingOptIn?: boolean },
-    @Headers('x-forwarded-for') forwardedFor?: string,
-    @Headers('user-agent') userAgent?: string,
+    @Headers("x-forwarded-for") forwardedFor?: string,
+    @Headers("user-agent") userAgent?: string,
     @Req() req?: Request,
   ) {
     // Extract and validate client IP to prevent spoofing via x-forwarded-for

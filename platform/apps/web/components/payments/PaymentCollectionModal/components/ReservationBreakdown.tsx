@@ -1,7 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, Tag, TrendingUp, Clock, Percent, Info, Heart, CreditCard, Building2 } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Tag,
+  TrendingUp,
+  Clock,
+  Percent,
+  Info,
+  Heart,
+  CreditCard,
+  Building2,
+} from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../../../ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../ui/tooltip";
 import { usePaymentContext } from "../context/PaymentContext";
@@ -31,11 +42,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
   };
 
   // Get reservationId from subject
-  const reservationId = props.subject.type === "reservation"
-    ? props.subject.reservationId
-    : props.subject.type === "balance"
+  const reservationId =
+    props.subject.type === "reservation"
       ? props.subject.reservationId
-      : null;
+      : props.subject.type === "balance"
+        ? props.subject.reservationId
+        : null;
 
   // Fetch reservation and quote data
   useEffect(() => {
@@ -52,17 +64,19 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
 
         // Fetch quote for pricing rules
         if (res.campgroundId && res.siteId) {
-          const arrivalDate = typeof res.arrivalDate === 'string'
-            ? res.arrivalDate.split('T')[0]
-            : new Date(res.arrivalDate).toISOString().split('T')[0];
-          const departureDate = typeof res.departureDate === 'string'
-            ? res.departureDate.split('T')[0]
-            : new Date(res.departureDate).toISOString().split('T')[0];
+          const arrivalDate =
+            typeof res.arrivalDate === "string"
+              ? res.arrivalDate.split("T")[0]
+              : new Date(res.arrivalDate).toISOString().split("T")[0];
+          const departureDate =
+            typeof res.departureDate === "string"
+              ? res.departureDate.split("T")[0]
+              : new Date(res.departureDate).toISOString().split("T")[0];
 
           const quoteData = await apiClient.getQuote(res.campgroundId, {
             siteId: res.siteId,
             arrivalDate,
-            departureDate
+            departureDate,
           });
           setQuote(quoteData);
         }
@@ -79,12 +93,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
   // Rule type helpers
   const getRuleIcon = (type: string) => {
     switch (type) {
-      case 'seasonal':
-      case 'dow':
+      case "seasonal":
+      case "dow":
         return <Tag className="w-3 h-3" />;
-      case 'demand':
+      case "demand":
         return <TrendingUp className="w-3 h-3" />;
-      case 'length_of_stay':
+      case "length_of_stay":
         return <Clock className="w-3 h-3" />;
       default:
         return <Percent className="w-3 h-3" />;
@@ -93,12 +107,18 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
 
   const getRuleTypeLabel = (type: string) => {
     switch (type) {
-      case 'seasonal': return 'Seasonal Rate';
-      case 'dow': return 'Day of Week';
-      case 'demand': return 'Dynamic Pricing';
-      case 'length_of_stay': return 'Length of Stay';
-      case 'override': return 'Rate Override';
-      default: return type;
+      case "seasonal":
+        return "Seasonal Rate";
+      case "dow":
+        return "Day of Week";
+      case "demand":
+        return "Dynamic Pricing";
+      case "length_of_stay":
+        return "Length of Stay";
+      case "override":
+        return "Rate Override";
+      default:
+        return type;
     }
   };
 
@@ -128,37 +148,45 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
 
   // Only show CC fees for card-based payment methods
   const selectedMethod = state.selectedMethod;
-  const isCardPayment = !selectedMethod || ["card", "saved_card", "terminal", "apple_pay", "google_pay", "link"].includes(selectedMethod);
+  const isCardPayment =
+    !selectedMethod ||
+    ["card", "saved_card", "terminal", "apple_pay", "google_pay", "link"].includes(selectedMethod);
 
   // Platform fee (Campreserv's per-booking fee)
   // Default based on billing plan: Enterprise=$1, Standard=$2, OTA=$3
   const billingPlan = config?.billingPlan ?? "ota_only";
-  const defaultPlatformFee = billingPlan === "enterprise" ? 100 : billingPlan === "standard" ? 200 : 300;
+  const defaultPlatformFee =
+    billingPlan === "enterprise" ? 100 : billingPlan === "standard" ? 200 : 300;
   const platformFeeCents = config?.perBookingFeeCents ?? defaultPlatformFee;
   const platformFeeMode = config?.platformFeeMode ?? "pass_through";
-  const billingPlanLabel = billingPlan === "enterprise" ? "Enterprise"
-    : billingPlan === "standard" ? "Standard" : "OTA";
+  const billingPlanLabel =
+    billingPlan === "enterprise" ? "Enterprise" : billingPlan === "standard" ? "Standard" : "OTA";
 
   // CC fee estimate - calculated on grand total for pass_through mode
-  const estimatedCCFeeCents = Math.round((grandTotalCents * ccFeePercent / 100) + ccFeeFlatCents);
+  const estimatedCCFeeCents = Math.round((grandTotalCents * ccFeePercent) / 100 + ccFeeFlatCents);
 
   // CC fee on charity donation specifically (for accounting info)
-  const charityDonationCCFeeCents = donationCents > 0
-    ? Math.round((donationCents * ccFeePercent / 100) + (donationCents > 0 ? ccFeeFlatCents * (donationCents / grandTotalCents) : 0))
-    : 0;
+  const charityDonationCCFeeCents =
+    donationCents > 0
+      ? Math.round(
+          (donationCents * ccFeePercent) / 100 +
+            (donationCents > 0 ? ccFeeFlatCents * (donationCents / grandTotalCents) : 0),
+        )
+      : 0;
 
   if (compact) {
     return (
       <div className="text-xs text-muted-foreground space-y-1 py-2">
         <div className="flex justify-between">
-          <span>Base ({quote?.nights ?? '?'} nights)</span>
+          <span>Base ({quote?.nights ?? "?"} nights)</span>
           <span>{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
         </div>
         {quote?.rulesDeltaCents !== undefined && quote.rulesDeltaCents !== 0 && (
           <div className="flex justify-between">
             <span>Pricing adjustments</span>
             <span className={quote.rulesDeltaCents >= 0 ? "text-amber-600" : "text-emerald-600"}>
-              {quote.rulesDeltaCents >= 0 ? '+' : ''}{formatCurrency(quote.rulesDeltaCents)}
+              {quote.rulesDeltaCents >= 0 ? "+" : ""}
+              {formatCurrency(quote.rulesDeltaCents)}
             </span>
           </div>
         )}
@@ -200,8 +228,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           {/* Base Rate */}
           <div className="space-y-1">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Base Lodging ({quote?.nights ?? '?'} nights)</span>
-              <span className="text-foreground">{formatCurrency(quote?.baseSubtotalCents ?? baseCents)}</span>
+              <span className="text-muted-foreground">
+                Base Lodging ({quote?.nights ?? "?"} nights)
+              </span>
+              <span className="text-foreground">
+                {formatCurrency(quote?.baseSubtotalCents ?? baseCents)}
+              </span>
             </div>
             {quote?.perNightCents && (
               <div className="flex justify-between text-xs text-muted-foreground pl-3">
@@ -232,8 +264,11 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                       </Tooltip>
                     </TooltipProvider>
                   </span>
-                  <span className={`text-xs ${rule.adjustmentCents >= 0 ? "text-amber-600" : "text-emerald-600"}`}>
-                    {rule.adjustmentCents >= 0 ? '+' : ''}{formatCurrency(rule.adjustmentCents)}
+                  <span
+                    className={`text-xs ${rule.adjustmentCents >= 0 ? "text-amber-600" : "text-emerald-600"}`}
+                  >
+                    {rule.adjustmentCents >= 0 ? "+" : ""}
+                    {formatCurrency(rule.adjustmentCents)}
                   </span>
                 </div>
               ))}
@@ -241,17 +276,22 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
           )}
 
           {/* Dynamic pricing (if no detailed rules) */}
-          {quote?.rulesDeltaCents !== undefined && quote.rulesDeltaCents !== 0 && !quote.appliedRules?.length && (
-            <div className="flex justify-between">
-              <span className="flex items-center gap-1.5 text-muted-foreground">
-                <TrendingUp className="w-3 h-3" />
-                Dynamic Pricing
-              </span>
-              <span className={quote.rulesDeltaCents >= 0 ? "text-amber-600" : "text-emerald-600"}>
-                {quote.rulesDeltaCents >= 0 ? '+' : ''}{formatCurrency(quote.rulesDeltaCents)}
-              </span>
-            </div>
-          )}
+          {quote?.rulesDeltaCents !== undefined &&
+            quote.rulesDeltaCents !== 0 &&
+            !quote.appliedRules?.length && (
+              <div className="flex justify-between">
+                <span className="flex items-center gap-1.5 text-muted-foreground">
+                  <TrendingUp className="w-3 h-3" />
+                  Dynamic Pricing
+                </span>
+                <span
+                  className={quote.rulesDeltaCents >= 0 ? "text-amber-600" : "text-emerald-600"}
+                >
+                  {quote.rulesDeltaCents >= 0 ? "+" : ""}
+                  {formatCurrency(quote.rulesDeltaCents)}
+                </span>
+              </div>
+            )}
 
           {/* Early check-in / Late checkout */}
           {earlyCheckInCharge > 0 && (
@@ -298,7 +338,13 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                     </TooltipProvider>
                   </span>
                   <span className="flex items-center gap-1 text-xs">
-                    <span className={platformFeeMode === "absorb" ? "line-through text-muted-foreground" : "text-foreground"}>
+                    <span
+                      className={
+                        platformFeeMode === "absorb"
+                          ? "line-through text-muted-foreground"
+                          : "text-foreground"
+                      }
+                    >
                       {formatCurrency(platformFeeCents)}
                     </span>
                     {platformFeeMode === "absorb" && (
@@ -319,8 +365,12 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                           <span className="cursor-help text-xs">CC Processing</span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p className="text-xs">{ccFeePercent}% + ${(ccFeeFlatCents / 100).toFixed(2)} per transaction</p>
-                          <p className="text-xs text-muted-foreground">Goes to Stripe (card payments only)</p>
+                          <p className="text-xs">
+                            {ccFeePercent}% + ${(ccFeeFlatCents / 100).toFixed(2)} per transaction
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Goes to Stripe (card payments only)
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -379,7 +429,10 @@ export function ReservationBreakdown({ compact = false }: ReservationBreakdownPr
                       </TooltipTrigger>
                       <TooltipContent>
                         <p className="text-xs">100% goes to charity</p>
-                        <p className="text-xs text-muted-foreground">CC fee (~{formatCurrency(charityDonationCCFeeCents)}) absorbed by campground</p>
+                        <p className="text-xs text-muted-foreground">
+                          CC fee (~{formatCurrency(charityDonationCCFeeCents)}) absorbed by
+                          campground
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

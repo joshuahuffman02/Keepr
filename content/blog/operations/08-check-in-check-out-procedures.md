@@ -50,12 +50,14 @@ Common check-in frustrations:
 Reduce check-in friction before guests even show up:
 
 **Send pre-arrival information (24-48 hours before):**
+
 - Arrival instructions and office hours
 - What to have ready (ID, confirmation, payment)
 - Site number and basic directions
 - Any important rules or policies
 
 **Prepare the day's arrivals:**
+
 - Print arrival list each morning
 - Review any special requests or notes
 - Pre-assign sites for reservations without assignments
@@ -64,28 +66,34 @@ Reduce check-in friction before guests even show up:
 ### Step 2: The Arrival Interaction (3-5 Minutes Target)
 
 **Quick welcome:**
+
 > "Welcome to [Campground Name]! Can I have the name on your reservation?"
 
 **Efficient verification:**
+
 - Pull up reservation
 - Confirm dates and site type
 - Verify guest count and vehicle info
 
 **Payment handling:**
+
 - Collect balance if applicable
 - Process quickly with card on file or tap payment
 
 **Site information:**
+
 - Provide site number and quick directions
 - Hand over campground map
 - Highlight key amenities (restrooms, dump station, etc.)
 
 **Quick rules reminder:**
+
 - Quiet hours
 - Pet policy (if applicable)
 - Check-out time
 
 **Send-off:**
+
 > "You're in Site 24, straight down this road, third right. Enjoy your stay, and let us know if you need anything!"
 
 ### Step 3: Self-Service Options
@@ -93,17 +101,20 @@ Reduce check-in friction before guests even show up:
 For campgrounds with limited staff or high-volume arrivals:
 
 **Self-check-in kiosk:**
+
 - Guest confirms reservation on touchscreen
 - Pays any balance
 - Receives site assignment and access codes
 - Prints receipt and directions
 
 **Mobile check-in:**
+
 - Guest checks in via smartphone before arrival
 - Receives site info digitally
 - Drives directly to site, skipping office entirely
 
 **After-hours check-in:**
+
 - Instructions posted at entrance
 - Registration envelopes with site assignments
 - Access code to late-arrival sites
@@ -174,11 +185,13 @@ At check-out, guests want:
 **Best practice: Don't require office check-out**
 
 If there are no additional charges, guests can simply leave:
+
 - Site is marked as checked-out automatically at checkout time
 - Staff clears and inspects site afterward
 - Guests receive thank-you email regardless
 
 **Save office check-out for:**
+
 - Guests with balances due
 - Those wanting to extend stays
 - Extended stay or long-term guests
@@ -217,41 +230,46 @@ At many campgrounds, 60-70% of arrivals happen in a 4-hour Friday window. This c
 ### Solutions for Peak Arrivals
 
 **Stagger check-in times:**
+
 - Assign arrival windows (3-5 PM, 5-7 PM)
 - Early arrivers wait in overflow area
 - Reduces concentrated demand
 
 **Add temporary staff:**
+
 - Cross-train maintenance or other staff
 - Hire weekend-only check-in help
 - Use volunteers in exchange for camping
 
 **Expand check-in locations:**
+
 - Use outdoor check-in stations on busy days
 - Mobile tablets for roaming check-in
 - Pre-staged golf carts for escorting guests
 
 **Pre-check-in options:**
+
 - Send site assignments morning-of
 - Allow guests to check in online
 - Reduce what must happen at arrival
 
 **Communicate wait times:**
+
 > "We're experiencing high arrival volume right now. Expected wait is about 15 minutes. Thanks for your patience!"
 
 ---
 
 ## Common Check-In Problems and Solutions
 
-| Problem | Solution |
-|---------|----------|
-| Guest can't find reservation | Search by email, phone, or confirmation # |
-| Site not ready | Apologize, offer alternative or wait area |
-| Balance dispute | Review history calmly, get manager if needed |
-| Guest wants different site | Accommodate if possible, explain if not |
-| Late arrival (after office closes) | Have clear after-hours process |
-| Large group arrival | Pre-coordinate, dedicated staff member |
-| Language barrier | Use translation app, have multilingual materials |
+| Problem                            | Solution                                         |
+| ---------------------------------- | ------------------------------------------------ |
+| Guest can't find reservation       | Search by email, phone, or confirmation #        |
+| Site not ready                     | Apologize, offer alternative or wait area        |
+| Balance dispute                    | Review history calmly, get manager if needed     |
+| Guest wants different site         | Accommodate if possible, explain if not          |
+| Late arrival (after office closes) | Have clear after-hours process                   |
+| Large group arrival                | Pre-coordinate, dedicated staff member           |
+| Language barrier                   | Use translation app, have multilingual materials |
 
 ---
 
@@ -260,16 +278,19 @@ At many campgrounds, 60-70% of arrivals happen in a 4-hour Friday window. This c
 Track these metrics to improve over time:
 
 **Efficiency metrics:**
+
 - Average check-in time (target: under 5 minutes)
 - Average check-out time (target: under 2 minutes)
 - Peak wait times on busy days
 
 **Experience metrics:**
+
 - Guest feedback on arrival experience
 - Reviews mentioning check-in (positive or negative)
 - Staff feedback on pain points
 
 **Operational metrics:**
+
 - No-shows discovered at check-in time
 - Early arrivals requiring accommodation
 - After-hours check-ins
@@ -296,4 +317,4 @@ The key is preparation: know who's coming, have their information ready, and get
 
 ---
 
-*Keepr streamlines check-in with pre-populated guest information, quick site assignment, and integrated payments—getting guests to their sites faster. [See it in action at campreserv.com](https://campreserv.com)*
+_Keepr streamlines check-in with pre-populated guest information, quick site assignment, and integrated payments—getting guests to their sites faster. [See it in action at campreserv.com](https://campreserv.com)_

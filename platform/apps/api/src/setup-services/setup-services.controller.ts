@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Body, UseGuards } from "@nestjs/common";
 import { SetupServicesService } from "./setup-services.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { PurchaseSetupServiceDto } from "./dto/purchase-setup-service.dto";
@@ -50,7 +42,7 @@ export class SetupServicesController {
   @UseGuards(JwtAuthGuard)
   async purchase(
     @Param("organizationId") organizationId: string,
-    @Body() dto: PurchaseSetupServiceDto
+    @Body() dto: PurchaseSetupServiceDto,
   ) {
     return this.setupServicesService.purchase({
       organizationId,
@@ -68,8 +60,7 @@ export class SetupServicesController {
   @Get("organizations/:organizationId/setup-services/surcharge")
   @UseGuards(JwtAuthGuard)
   async calculateSurcharge(@Param("organizationId") organizationId: string) {
-    const surcharge =
-      await this.setupServicesService.calculateBookingSurcharge(organizationId);
+    const surcharge = await this.setupServicesService.calculateBookingSurcharge(organizationId);
     return {
       hasSurcharge: surcharge > 0,
       surchargeAmountCents: surcharge,
@@ -83,13 +74,9 @@ export class SetupServicesController {
   @UseGuards(JwtAuthGuard)
   async updateStatus(
     @Param("serviceId") serviceId: string,
-    @Body() body: { status: SetupServiceStatus; completedBy?: string }
+    @Body() body: { status: SetupServiceStatus; completedBy?: string },
   ) {
-    return this.setupServicesService.updateStatus(
-      serviceId,
-      body.status,
-      body.completedBy
-    );
+    return this.setupServicesService.updateStatus(serviceId, body.status, body.completedBy);
   }
 
   /**
@@ -97,10 +84,7 @@ export class SetupServicesController {
    */
   @Patch("organizations/:organizationId/setup-services/:serviceId/notes")
   @UseGuards(JwtAuthGuard)
-  async addNotes(
-    @Param("serviceId") serviceId: string,
-    @Body() body: { notes: string }
-  ) {
+  async addNotes(@Param("serviceId") serviceId: string, @Body() body: { notes: string }) {
     return this.setupServicesService.addNotes(serviceId, body.notes);
   }
 
@@ -109,10 +93,7 @@ export class SetupServicesController {
    */
   @Patch("organizations/:organizationId/setup-services/:serviceId/import-file")
   @UseGuards(JwtAuthGuard)
-  async setImportFile(
-    @Param("serviceId") serviceId: string,
-    @Body() body: { fileUrl: string }
-  ) {
+  async setImportFile(@Param("serviceId") serviceId: string, @Body() body: { fileUrl: string }) {
     return this.setupServicesService.setImportFile(serviceId, body.fileUrl);
   }
 }

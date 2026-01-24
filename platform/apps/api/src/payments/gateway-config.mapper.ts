@@ -1,7 +1,9 @@
 import { CampgroundPaymentGatewayConfig, GatewayFeePreset } from "@prisma/client";
 import { isRecord } from "../utils/type-guards";
 
-type ConfigRecord = (CampgroundPaymentGatewayConfig & { GatewayFeePreset?: GatewayFeePreset | null }) | null;
+type ConfigRecord =
+  | (CampgroundPaymentGatewayConfig & { GatewayFeePreset?: GatewayFeePreset | null })
+  | null;
 
 export interface GatewayConfigView {
   id: string;
@@ -30,7 +32,8 @@ export interface GatewayConfigView {
 export const GatewayConfigMapper = {
   toView(record: ConfigRecord): GatewayConfigView | null {
     if (!record) return null;
-    const percentBasisPoints = record.feePercentBasisPoints ?? record.GatewayFeePreset?.percentBasisPoints ?? 0;
+    const percentBasisPoints =
+      record.feePercentBasisPoints ?? record.GatewayFeePreset?.percentBasisPoints ?? 0;
     const flatFeeCents = record.feeFlatCents ?? record.GatewayFeePreset?.flatFeeCents ?? 0;
 
     return {
@@ -45,16 +48,18 @@ export const GatewayConfigMapper = {
       feePresetLabel: record.GatewayFeePreset?.label ?? null,
       effectiveFee: {
         percentBasisPoints,
-        flatFeeCents
+        flatFeeCents,
       },
       credentials: {
         publishableKeySecretId: record.publishableKeySecretId ?? null,
         secretKeySecretId: record.secretKeySecretId ?? null,
         merchantAccountIdSecretId: record.merchantAccountIdSecretId ?? null,
-        webhookSecretId: record.webhookSecretId ?? null
+        webhookSecretId: record.webhookSecretId ?? null,
       },
-      hasProductionCredentials: Boolean(record.secretKeySecretId || record.merchantAccountIdSecretId),
-      additionalConfig: isRecord(record.additionalConfig) ? record.additionalConfig : null
+      hasProductionCredentials: Boolean(
+        record.secretKeySecretId || record.merchantAccountIdSecretId,
+      ),
+      additionalConfig: isRecord(record.additionalConfig) ? record.additionalConfig : null,
     };
-  }
+  },
 };

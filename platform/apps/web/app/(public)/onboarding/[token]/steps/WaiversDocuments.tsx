@@ -53,27 +53,21 @@ export function WaiversDocuments({
 }: WaiversDocumentsProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  const [requireWaiver, setRequireWaiver] = useState(
-    initialData?.requireWaiver ?? false
+  const [requireWaiver, setRequireWaiver] = useState(initialData?.requireWaiver ?? false);
+  const [waiverTiming, setWaiverTiming] = useState<"before_arrival" | "at_checkin">(
+    initialData?.waiverTiming || "before_arrival",
   );
-  const [waiverTiming, setWaiverTiming] = useState<
-    "before_arrival" | "at_checkin"
-  >(initialData?.waiverTiming || "before_arrival");
-  const [useDefaultWaiver, setUseDefaultWaiver] = useState(
-    initialData?.useDefaultWaiver ?? true
-  );
+  const [useDefaultWaiver, setUseDefaultWaiver] = useState(initialData?.useDefaultWaiver ?? true);
   const [waiverContent, setWaiverContent] = useState(
-    initialData?.waiverContent || DEFAULT_WAIVER_TEMPLATE
+    initialData?.waiverContent || DEFAULT_WAIVER_TEMPLATE,
   );
   const [requireParkRulesAck, setRequireParkRulesAck] = useState(
-    initialData?.requireParkRulesAck ?? false
+    initialData?.requireParkRulesAck ?? false,
   );
   const [requireVehicleForm, setRequireVehicleForm] = useState(
-    initialData?.requireVehicleForm ?? false
+    initialData?.requireVehicleForm ?? false,
   );
-  const [requirePetPolicy, setRequirePetPolicy] = useState(
-    initialData?.requirePetPolicy ?? false
-  );
+  const [requirePetPolicy, setRequirePetPolicy] = useState(initialData?.requirePetPolicy ?? false);
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
@@ -117,12 +111,8 @@ export function WaiversDocuments({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 mb-4">
             <FileCheck className="w-8 h-8 text-blue-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Guest Agreements
-          </h2>
-          <p className="text-slate-400">
-            Protect your business with waivers and documents
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Guest Agreements</h2>
+          <p className="text-slate-400">Protect your business with waivers and documents</p>
         </motion.div>
 
         {/* Liability Waiver Toggle */}
@@ -138,7 +128,7 @@ export function WaiversDocuments({
               "w-full p-5 rounded-xl border-2 text-left transition-all",
               requireWaiver
                 ? "border-blue-500 bg-blue-500/10"
-                : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
             )}
           >
             <div className="flex items-start justify-between">
@@ -146,7 +136,7 @@ export function WaiversDocuments({
                 <h3
                   className={cn(
                     "font-semibold text-lg",
-                    requireWaiver ? "text-blue-400" : "text-white"
+                    requireWaiver ? "text-blue-400" : "text-white",
                   )}
                 >
                   Require Liability Waiver
@@ -160,16 +150,12 @@ export function WaiversDocuments({
               <div
                 className={cn(
                   "w-12 h-7 rounded-full transition-all flex-shrink-0 ml-4",
-                  requireWaiver ? "bg-blue-500" : "bg-slate-600"
+                  requireWaiver ? "bg-blue-500" : "bg-slate-600",
                 )}
               >
                 <motion.div
                   className="w-5 h-5 bg-white rounded-full mt-1 mx-1"
-                  animate={
-                    prefersReducedMotion
-                      ? {}
-                      : { x: requireWaiver ? 20 : 0 }
-                  }
+                  animate={prefersReducedMotion ? {} : { x: requireWaiver ? 20 : 0 }}
                   transition={SPRING_CONFIG}
                 />
               </div>
@@ -186,9 +172,7 @@ export function WaiversDocuments({
             >
               {/* When to collect */}
               <div className="space-y-3">
-                <label className="text-sm font-medium text-slate-300">
-                  When to collect waiver
-                </label>
+                <label className="text-sm font-medium text-slate-300">When to collect waiver</label>
                 <div className="space-y-2">
                   <button
                     onClick={() => setWaiverTiming("before_arrival")}
@@ -196,7 +180,7 @@ export function WaiversDocuments({
                       "w-full p-4 rounded-lg border-2 text-left transition-all",
                       waiverTiming === "before_arrival"
                         ? "border-blue-500 bg-blue-500/10"
-                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -204,23 +188,19 @@ export function WaiversDocuments({
                         <div
                           className={cn(
                             "font-medium",
-                            waiverTiming === "before_arrival"
-                              ? "text-blue-400"
-                              : "text-white"
+                            waiverTiming === "before_arrival" ? "text-blue-400" : "text-white",
                           )}
                         >
                           Before arrival
                         </div>
-                        <div className="text-sm text-slate-400">
-                          Guests sign when booking
-                        </div>
+                        <div className="text-sm text-slate-400">Guests sign when booking</div>
                       </div>
                       <div
                         className={cn(
                           "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0",
                           waiverTiming === "before_arrival"
                             ? "border-blue-500 bg-blue-500"
-                            : "border-slate-600"
+                            : "border-slate-600",
                         )}
                       >
                         {waiverTiming === "before_arrival" && (
@@ -236,7 +216,7 @@ export function WaiversDocuments({
                       "w-full p-4 rounded-lg border-2 text-left transition-all",
                       waiverTiming === "at_checkin"
                         ? "border-blue-500 bg-blue-500/10"
-                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                        : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                     )}
                   >
                     <div className="flex items-center justify-between">
@@ -244,28 +224,22 @@ export function WaiversDocuments({
                         <div
                           className={cn(
                             "font-medium",
-                            waiverTiming === "at_checkin"
-                              ? "text-blue-400"
-                              : "text-white"
+                            waiverTiming === "at_checkin" ? "text-blue-400" : "text-white",
                           )}
                         >
                           At check-in
                         </div>
-                        <div className="text-sm text-slate-400">
-                          Guests sign when they arrive
-                        </div>
+                        <div className="text-sm text-slate-400">Guests sign when they arrive</div>
                       </div>
                       <div
                         className={cn(
                           "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0",
                           waiverTiming === "at_checkin"
                             ? "border-blue-500 bg-blue-500"
-                            : "border-slate-600"
+                            : "border-slate-600",
                         )}
                       >
-                        {waiverTiming === "at_checkin" && (
-                          <Check className="w-3 h-3 text-white" />
-                        )}
+                        {waiverTiming === "at_checkin" && <Check className="w-3 h-3 text-white" />}
                       </div>
                     </div>
                   </button>
@@ -279,7 +253,7 @@ export function WaiversDocuments({
                   "w-full p-4 rounded-lg border-2 text-left transition-all",
                   useDefaultWaiver
                     ? "border-blue-500 bg-blue-500/10"
-                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                 )}
               >
                 <div className="flex items-start justify-between">
@@ -287,7 +261,7 @@ export function WaiversDocuments({
                     <div
                       className={cn(
                         "font-medium",
-                        useDefaultWaiver ? "text-blue-400" : "text-white"
+                        useDefaultWaiver ? "text-blue-400" : "text-white",
                       )}
                     >
                       Use our standard liability waiver
@@ -301,16 +275,12 @@ export function WaiversDocuments({
                   <div
                     className={cn(
                       "w-12 h-7 rounded-full transition-all flex-shrink-0 ml-4",
-                      useDefaultWaiver ? "bg-blue-500" : "bg-slate-600"
+                      useDefaultWaiver ? "bg-blue-500" : "bg-slate-600",
                     )}
                   >
                     <motion.div
                       className="w-5 h-5 bg-white rounded-full mt-1 mx-1"
-                      animate={
-                        prefersReducedMotion
-                          ? {}
-                          : { x: useDefaultWaiver ? 20 : 0 }
-                      }
+                      animate={prefersReducedMotion ? {} : { x: useDefaultWaiver ? 20 : 0 }}
                       transition={SPRING_CONFIG}
                     />
                   </div>
@@ -362,7 +332,7 @@ export function WaiversDocuments({
                 "w-full p-4 rounded-lg border-2 text-left transition-all",
                 requireParkRulesAck
                   ? "border-blue-500 bg-blue-500/10"
-                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
               )}
             >
               <div className="flex items-start justify-between">
@@ -370,7 +340,7 @@ export function WaiversDocuments({
                   <div
                     className={cn(
                       "font-medium",
-                      requireParkRulesAck ? "text-blue-400" : "text-white"
+                      requireParkRulesAck ? "text-blue-400" : "text-white",
                     )}
                   >
                     Park rules signature
@@ -382,9 +352,7 @@ export function WaiversDocuments({
                 <div
                   className={cn(
                     "w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ml-4",
-                    requireParkRulesAck
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-slate-600"
+                    requireParkRulesAck ? "border-blue-500 bg-blue-500" : "border-slate-600",
                   )}
                 >
                   {requireParkRulesAck && (
@@ -407,7 +375,7 @@ export function WaiversDocuments({
                 "w-full p-4 rounded-lg border-2 text-left transition-all",
                 requireVehicleForm
                   ? "border-blue-500 bg-blue-500/10"
-                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
               )}
             >
               <div className="flex items-start justify-between">
@@ -415,7 +383,7 @@ export function WaiversDocuments({
                   <div
                     className={cn(
                       "font-medium",
-                      requireVehicleForm ? "text-blue-400" : "text-white"
+                      requireVehicleForm ? "text-blue-400" : "text-white",
                     )}
                   >
                     Vehicle registration form
@@ -427,9 +395,7 @@ export function WaiversDocuments({
                 <div
                   className={cn(
                     "w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ml-4",
-                    requireVehicleForm
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-slate-600"
+                    requireVehicleForm ? "border-blue-500 bg-blue-500" : "border-slate-600",
                   )}
                 >
                   {requireVehicleForm && (
@@ -452,16 +418,13 @@ export function WaiversDocuments({
                 "w-full p-4 rounded-lg border-2 text-left transition-all",
                 requirePetPolicy
                   ? "border-blue-500 bg-blue-500/10"
-                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                  : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
               )}
             >
               <div className="flex items-start justify-between">
                 <div>
                   <div
-                    className={cn(
-                      "font-medium",
-                      requirePetPolicy ? "text-blue-400" : "text-white"
-                    )}
+                    className={cn("font-medium", requirePetPolicy ? "text-blue-400" : "text-white")}
                   >
                     Pet policy agreement
                   </div>
@@ -472,9 +435,7 @@ export function WaiversDocuments({
                 <div
                   className={cn(
                     "w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ml-4",
-                    requirePetPolicy
-                      ? "border-blue-500 bg-blue-500"
-                      : "border-slate-600"
+                    requirePetPolicy ? "border-blue-500 bg-blue-500" : "border-slate-600",
                   )}
                 >
                   {requirePetPolicy && (
@@ -506,12 +467,9 @@ export function WaiversDocuments({
           <div className="flex gap-3">
             <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-slate-300">
-              <span className="font-medium text-blue-400">
-                Digital signatures made easy.
-              </span>{" "}
-              Guests will sign these documents electronically during the booking
-              or check-in process. All signatures are securely stored and
-              timestamped.
+              <span className="font-medium text-blue-400">Digital signatures made easy.</span>{" "}
+              Guests will sign these documents electronically during the booking or check-in
+              process. All signatures are securely stored and timestamped.
             </div>
           </div>
         </motion.div>
@@ -539,7 +497,7 @@ export function WaiversDocuments({
               "flex-1 py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-blue-500 to-cyan-500",
               "hover:from-blue-400 hover:to-cyan-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

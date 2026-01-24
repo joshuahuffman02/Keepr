@@ -7,6 +7,7 @@ Fixed "as any" type safety issues across three high-priority files, replacing un
 ## Results
 
 ### 1. platform/apps/web/app/guests/page.tsx
+
 - **Before:** 35 instances of "as any"
 - **After:** 0 instances (100% fixed!)
 - **Key improvements:**
@@ -16,6 +17,7 @@ Fixed "as any" type safety issues across three high-priority files, replacing un
   - Fixed select onChange event handlers
 
 ### 2. platform/apps/web/app/reports/page.tsx
+
 - **Before:** 56 instances of "as any"
 - **After:** 3 instances (95% fixed)
 - **Key improvements:**
@@ -26,6 +28,7 @@ Fixed "as any" type safety issues across three high-priority files, replacing un
   - Remaining 3 are complex object literals (low impact)
 
 ### 3. platform/apps/web/app/campgrounds/[campgroundId]/reservations/page.tsx
+
 - **Before:** 36 instances of "as any"
 - **After:** 3 instances (92% fixed)
 - **Key improvements:**
@@ -37,6 +40,7 @@ Fixed "as any" type safety issues across three high-priority files, replacing un
 ## Type Definitions Added
 
 ### GuestWithExtras (guests page)
+
 ```typescript
 type GuestWithExtras = {
   id: string;
@@ -54,6 +58,7 @@ type GuestWithExtras = {
 ```
 
 ### SiteWithClass (reports & reservations)
+
 ```typescript
 type SiteWithClass = {
   id: string;
@@ -66,6 +71,7 @@ type SiteWithClass = {
 ```
 
 ### ReservationWithGuest (reports & reservations)
+
 ```typescript
 type ReservationWithGuest = {
   id: string;
@@ -91,12 +97,14 @@ type ReservationWithGuest = {
 ## Patterns Used
 
 ### Before (unsafe):
+
 ```typescript
 const guest = (r as any).guest?.primaryFirstName;
 const vipGuests = data.filter((g) => (g as any).vip);
 ```
 
 ### After (type-safe):
+
 ```typescript
 const guest = (r as ReservationWithGuest).guest?.primaryFirstName;
 const vipGuests = data.filter((g) => (g as GuestWithExtras).vip);
@@ -105,6 +113,7 @@ const vipGuests = data.filter((g) => (g as GuestWithExtras).vip);
 ## Remaining Work
 
 The remaining 6 "as any" casts (3 in reports, 3 in reservations) are:
+
 - Complex object literal type assertions in data export functions
 - Input element value type conversions (toFixed returns string, input expects string)
 

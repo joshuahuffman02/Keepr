@@ -17,13 +17,7 @@ interface TerminalMethodProps {
   onCancel?: () => void;
 }
 
-type TerminalStatus =
-  | "idle"
-  | "creating"
-  | "waiting_for_card"
-  | "processing"
-  | "success"
-  | "error";
+type TerminalStatus = "idle" | "creating" | "waiting_for_card" | "processing" | "success" | "error";
 
 export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodProps) {
   const { state, actions, props } = usePaymentContext();
@@ -89,7 +83,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
       const result = await apiClient.processTerminalPayment(
         props.campgroundId,
         selectedReader.id,
-        terminalPayment.paymentIntentId
+        terminalPayment.paymentIntentId,
       );
 
       if (!result.success) {
@@ -192,7 +186,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                 isOnline ? "cursor-pointer" : "cursor-not-allowed opacity-60",
                 isSelected && isOnline
                   ? "border-status-success bg-status-success/15"
-                  : "border-border hover:border-border"
+                  : "border-border hover:border-border",
               )}
               onClick={() => isOnline && setSelectedReaderId(reader.id)}
             >
@@ -209,7 +203,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                 <div
                   className={cn(
                     "absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white",
-                    isOnline ? "bg-status-success" : "bg-muted"
+                    isOnline ? "bg-status-success" : "bg-muted",
                   )}
                 />
               </div>
@@ -223,7 +217,7 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
                       "text-xs px-2 py-0.5 rounded",
                       isOnline
                         ? "bg-status-success/15 text-status-success"
-                        : "bg-muted text-muted-foreground"
+                        : "bg-muted text-muted-foreground",
                     )}
                   >
                     {isOnline ? "Online" : "Offline"}
@@ -252,7 +246,10 @@ export function TerminalMethod({ onSuccess, onError, onCancel }: TerminalMethodP
             checked={saveCard}
             onCheckedChange={(checked) => setSaveCard(checked === true)}
           />
-          <Label htmlFor="save-card-terminal" className="text-sm text-muted-foreground cursor-pointer">
+          <Label
+            htmlFor="save-card-terminal"
+            className="text-sm text-muted-foreground cursor-pointer"
+          >
             Save card for future payments
           </Label>
         </div>

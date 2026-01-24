@@ -22,7 +22,7 @@ async function run() {
   });
   console.log(
     "Existing users:",
-    users.map((u) => u.email)
+    users.map((u) => u.email),
   );
 
   // Create or update an owner user

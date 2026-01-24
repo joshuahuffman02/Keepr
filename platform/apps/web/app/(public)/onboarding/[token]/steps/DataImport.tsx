@@ -266,7 +266,7 @@ export function DataImport({
   const [coverageLoading, setCoverageLoading] = useState(false);
   const [coverageError, setCoverageError] = useState<string | null>(null);
   const [systemKey, setSystemKey] = useState<string>(
-    initialSystemKey ?? DEFAULT_SYSTEM_OPTIONS[0]?.key ?? "campspot"
+    initialSystemKey ?? DEFAULT_SYSTEM_OPTIONS[0]?.key ?? "campspot",
   );
   const [overrideAccepted, setOverrideAccepted] = useState(initialOverrideAccepted);
   const [importTotals, setImportTotals] = useState(() => ({
@@ -327,7 +327,7 @@ export function DataImport({
           apiUrl(`/onboarding/session/${sessionId}/ai-gate/status?token=${token}`),
           {
             headers: { "x-onboarding-token": token },
-          }
+          },
         );
         if (response.ok) {
           const data = await response.json();
@@ -349,11 +349,11 @@ export function DataImport({
       try {
         const response = await fetch(
           apiUrl(
-            `/onboarding/session/${sessionId}/ai-import/coverage?system=${encodeURIComponent(selected)}`
+            `/onboarding/session/${sessionId}/ai-import/coverage?system=${encodeURIComponent(selected)}`,
           ),
           {
             headers: { "x-onboarding-token": token },
-          }
+          },
         );
         if (!response.ok) {
           const err = await response.json().catch(() => ({}));
@@ -367,32 +367,29 @@ export function DataImport({
         setCoverageLoading(false);
       }
     },
-    [sessionId, token, systemKey]
+    [sessionId, token, systemKey],
   );
 
   const saveDraft = useCallback(
     async (nextDraft: DataImportDraft, signature?: string) => {
       if (!sessionId || !token) return;
       try {
-        const response = await fetch(
-          apiUrl(`/onboarding/session/${sessionId}/data-import/draft`),
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              "x-onboarding-token": token,
+        const response = await fetch(apiUrl(`/onboarding/session/${sessionId}/data-import/draft`), {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-onboarding-token": token,
+          },
+          body: JSON.stringify({
+            token,
+            payload: {
+              importSystemKey: nextDraft.importSystemKey,
+              overrideAccepted: nextDraft.overrideAccepted,
+              requiredComplete: nextDraft.requiredComplete,
+              missingRequired: nextDraft.missingRequired,
             },
-            body: JSON.stringify({
-              token,
-              payload: {
-                importSystemKey: nextDraft.importSystemKey,
-                overrideAccepted: nextDraft.overrideAccepted,
-                requiredComplete: nextDraft.requiredComplete,
-                missingRequired: nextDraft.missingRequired,
-              },
-            }),
-          }
-        );
+          }),
+        });
         if (!response.ok) {
           const err = await response.json().catch(() => ({}));
           throw new Error(err.message || "Failed to save draft");
@@ -402,7 +399,7 @@ export function DataImport({
         console.warn("Failed to save data import draft:", err);
       }
     },
-    [sessionId, token]
+    [sessionId, token],
   );
 
   useEffect(() => {
@@ -439,21 +436,18 @@ export function DataImport({
     setError(null);
 
     try {
-      const response = await fetch(
-        apiUrl(`/onboarding/session/${sessionId}/ai-import/extract`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({
-            token,
-            documentId,
-            targetEntity: uploadResult?.classification.suggestedEntity || "sites",
-          }),
-        }
-      );
+      const response = await fetch(apiUrl(`/onboarding/session/${sessionId}/ai-import/extract`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({
+          token,
+          documentId,
+          targetEntity: uploadResult?.classification.suggestedEntity || "sites",
+        }),
+      });
 
       if (!response.ok) {
         const err = await response.json();
@@ -490,24 +484,21 @@ export function DataImport({
     setError(null);
 
     try {
-      const response = await fetch(
-        apiUrl(`/onboarding/session/${sessionId}/ai-import/confirm`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({
-            token,
-            documentId: uploadResult.documentId,
-            corrections: Object.entries(corrections).map(([rowNum, fields]) => ({
-              rowNumber: parseInt(rowNum),
-              ...fields,
-            })),
-          }),
-        }
-      );
+      const response = await fetch(apiUrl(`/onboarding/session/${sessionId}/ai-import/confirm`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({
+          token,
+          documentId: uploadResult.documentId,
+          corrections: Object.entries(corrections).map(([rowNum, fields]) => ({
+            rowNumber: parseInt(rowNum),
+            ...fields,
+          })),
+        }),
+      });
 
       if (!response.ok) {
         const err = await response.json();
@@ -564,45 +555,42 @@ export function DataImport({
     return headerLine.split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
   };
 
-  const handleManualFileUpload = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
+  const handleManualFileUpload = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-      setFileName(file.name);
-      setError(null);
+    setFileName(file.name);
+    setError(null);
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result;
-        if (typeof content !== "string") return;
-        setCsvContent(content);
-        const headers = parseCSVHeaders(content);
-        setSourceFields(headers);
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result;
+      if (typeof content !== "string") return;
+      setCsvContent(content);
+      const headers = parseCSVHeaders(content);
+      setSourceFields(headers);
 
-        const autoMappings: FieldMapping[] = [];
-        headers.forEach((header) => {
-          const normalizedHeader = header.toLowerCase().replace(/[_\s-]/g, "");
-          const match = SITE_TARGET_FIELDS.find((field) => {
-            const normalizedTarget = field.value.toLowerCase();
-            const normalizedLabel = field.label.toLowerCase().replace(/[_\s-]/g, "");
-            return (
-              normalizedHeader.includes(normalizedTarget) ||
-              normalizedTarget.includes(normalizedHeader) ||
-              normalizedHeader.includes(normalizedLabel) ||
-              normalizedLabel.includes(normalizedHeader)
-            );
-          });
-          if (match) {
-            autoMappings.push({ sourceField: header, targetField: match.value });
-          }
+      const autoMappings: FieldMapping[] = [];
+      headers.forEach((header) => {
+        const normalizedHeader = header.toLowerCase().replace(/[_\s-]/g, "");
+        const match = SITE_TARGET_FIELDS.find((field) => {
+          const normalizedTarget = field.value.toLowerCase();
+          const normalizedLabel = field.label.toLowerCase().replace(/[_\s-]/g, "");
+          return (
+            normalizedHeader.includes(normalizedTarget) ||
+            normalizedTarget.includes(normalizedHeader) ||
+            normalizedHeader.includes(normalizedLabel) ||
+            normalizedLabel.includes(normalizedHeader)
+          );
         });
-        setMappings(autoMappings);
-      };
-      reader.readAsText(file);
-    },
-    []
-  );
+        if (match) {
+          autoMappings.push({ sourceField: header, targetField: match.value });
+        }
+      });
+      setMappings(autoMappings);
+    };
+    reader.readAsText(file);
+  }, []);
 
   const updateMapping = (sourceField: string, targetField: string) => {
     setMappings((prev) => {
@@ -611,9 +599,7 @@ export function DataImport({
         if (targetField === "") {
           return prev.filter((m) => m.sourceField !== sourceField);
         }
-        return prev.map((m) =>
-          m.sourceField === sourceField ? { ...m, targetField } : m
-        );
+        return prev.map((m) => (m.sourceField === sourceField ? { ...m, targetField } : m));
       }
       if (targetField !== "") {
         return [...prev, { sourceField, targetField }];
@@ -627,21 +613,18 @@ export function DataImport({
     setError(null);
 
     try {
-      const response = await fetch(
-        apiUrl(`/campgrounds/${campgroundId}/import/preview`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Onboarding-Token": token,
-          },
-          body: JSON.stringify({
-            entityType: "sites",
-            csvContent,
-            mappings,
-          }),
-        }
-      );
+      const response = await fetch(apiUrl(`/campgrounds/${campgroundId}/import/preview`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Onboarding-Token": token,
+        },
+        body: JSON.stringify({
+          entityType: "sites",
+          csvContent,
+          mappings,
+        }),
+      });
 
       if (!response.ok) {
         const err = await response.json();
@@ -662,22 +645,19 @@ export function DataImport({
     setError(null);
 
     try {
-      const response = await fetch(
-        apiUrl(`/campgrounds/${campgroundId}/import/execute`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Onboarding-Token": token,
-          },
-          body: JSON.stringify({
-            entityType: "sites",
-            csvContent,
-            mappings,
-            updateExisting: false,
-          }),
-        }
-      );
+      const response = await fetch(apiUrl(`/campgrounds/${campgroundId}/import/execute`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Onboarding-Token": token,
+        },
+        body: JSON.stringify({
+          entityType: "sites",
+          csvContent,
+          mappings,
+          updateExisting: false,
+        }),
+      });
 
       if (!response.ok) {
         const err = await response.json();
@@ -704,22 +684,18 @@ export function DataImport({
     }
   };
 
-  const requiredFieldsMapped = SITE_TARGET_FIELDS.filter((f) => f.required).every(
-    (field) => mappings.some((m) => m.targetField === field.value)
+  const requiredFieldsMapped = SITE_TARGET_FIELDS.filter((f) => f.required).every((field) =>
+    mappings.some((m) => m.targetField === field.value),
   );
 
   // Determine if AI mode is available
   const aiAvailable = aiAccessLevel && aiAccessLevel.canMakeAiCall;
   const missingRequiredGroups = coverageSummary
-    ? coverageSummary.coverage.filter(
-        (group) => group.required && group.status !== "complete"
-      )
+    ? coverageSummary.coverage.filter((group) => group.required && group.status !== "complete")
     : [];
   const canContinue = coverageSummary?.requiredComplete ?? false;
   const requiredCompleteForSave = mode === "ai" ? canContinue : true;
-  const requiredCompleteForDraft = coverageSummary
-    ? coverageSummary.requiredComplete
-    : undefined;
+  const requiredCompleteForDraft = coverageSummary ? coverageSummary.requiredComplete : undefined;
   const missingRequiredForDraft = coverageSummary
     ? missingRequiredGroups.map((group) => ({
         key: group.key,
@@ -741,15 +717,14 @@ export function DataImport({
     : null;
   const sortedForms = coverageSummary
     ? [...coverageSummary.forms].sort(
-        (a, b) => getCoverageRank(a.status) - getCoverageRank(b.status)
+        (a, b) => getCoverageRank(a.status) - getCoverageRank(b.status),
       )
     : [];
   const missingRequiredKeys = new Set(missingRequiredGroups.map((group) => group.key));
   const nextForms = coverageSummary
     ? sortedForms.filter(
         (form) =>
-          form.status !== "complete" &&
-          form.covers.some((key) => missingRequiredKeys.has(key))
+          form.status !== "complete" && form.covers.some((key) => missingRequiredKeys.has(key)),
       )
     : [];
 
@@ -815,9 +790,7 @@ export function DataImport({
                 onClick={() => setMode("ai")}
                 className={cn(
                   "px-4 py-2 rounded-md text-sm font-medium transition-all",
-                  mode === "ai"
-                    ? "bg-emerald-600 text-white"
-                    : "text-slate-400 hover:text-white"
+                  mode === "ai" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-white",
                 )}
               >
                 <Sparkles className="w-4 h-4 inline mr-2" />
@@ -829,7 +802,7 @@ export function DataImport({
                   "px-4 py-2 rounded-md text-sm font-medium transition-all",
                   mode === "manual"
                     ? "bg-emerald-600 text-white"
-                    : "text-slate-400 hover:text-white"
+                    : "text-slate-400 hover:text-white",
                 )}
               >
                 <FileSpreadsheet className="w-4 h-4 inline mr-2" />
@@ -876,21 +849,16 @@ export function DataImport({
                       </div>
                       <div className="w-full md:w-64">
                         <Label className="text-xs text-slate-400">Current system</Label>
-                        <Select
-                          value={systemKey}
-                          onValueChange={(value) => setSystemKey(value)}
-                        >
+                        <Select value={systemKey} onValueChange={(value) => setSystemKey(value)}>
                           <SelectTrigger className="bg-slate-900/70 border-slate-700 text-white">
                             <SelectValue placeholder="Select system" />
                           </SelectTrigger>
                           <SelectContent>
-                            {(coverageSummary?.systems || DEFAULT_SYSTEM_OPTIONS).map(
-                              (option) => (
-                                <SelectItem key={option.key} value={option.key}>
-                                  {option.label}
-                                </SelectItem>
-                              )
-                            )}
+                            {(coverageSummary?.systems || DEFAULT_SYSTEM_OPTIONS).map((option) => (
+                              <SelectItem key={option.key} value={option.key}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -928,16 +896,17 @@ export function DataImport({
                                       <span className="font-medium">{group.label}</span>
                                     </div>
                                     <p className="text-xs text-slate-500">{group.description}</p>
-                                    {group.status !== "complete" && group.missingFields.length > 0 && (
-                                      <p className="text-xs text-amber-300">
-                                        Missing: {group.missingFields.join(", ")}
-                                      </p>
-                                    )}
+                                    {group.status !== "complete" &&
+                                      group.missingFields.length > 0 && (
+                                        <p className="text-xs text-amber-300">
+                                          Missing: {group.missingFields.join(", ")}
+                                        </p>
+                                      )}
                                   </div>
                                   <span
                                     className={cn(
                                       "text-xs font-semibold uppercase",
-                                      getCoverageTextColor(group.status)
+                                      getCoverageTextColor(group.status),
                                     )}
                                   >
                                     {getCoverageLabel(group.status)}
@@ -954,7 +923,7 @@ export function DataImport({
                               {sortedForms.map((form) => {
                                 const missingCoverageLabels = coverageLabelByKey
                                   ? form.missingCoverage.map(
-                                      (key) => coverageLabelByKey[key] ?? key
+                                      (key) => coverageLabelByKey[key] ?? key,
                                     )
                                   : form.missingCoverage;
                                 return (
@@ -968,11 +937,12 @@ export function DataImport({
                                         <span className="font-medium">{form.label}</span>
                                       </div>
                                       <p className="text-xs text-slate-500">{form.description}</p>
-                                      {form.status !== "complete" && missingCoverageLabels.length > 0 && (
-                                        <p className="text-xs text-amber-300">
-                                          Still needed for: {missingCoverageLabels.join(", ")}
-                                        </p>
-                                      )}
+                                      {form.status !== "complete" &&
+                                        missingCoverageLabels.length > 0 && (
+                                          <p className="text-xs text-amber-300">
+                                            Still needed for: {missingCoverageLabels.join(", ")}
+                                          </p>
+                                        )}
                                       <p className="text-xs text-slate-600">
                                         Files: {form.fileTypes.join(", ").toUpperCase()}
                                       </p>
@@ -980,7 +950,7 @@ export function DataImport({
                                     <span
                                       className={cn(
                                         "text-xs font-semibold uppercase",
-                                        getCoverageTextColor(form.status)
+                                        getCoverageTextColor(form.status),
                                       )}
                                     >
                                       {getCoverageLabel(form.status)}
@@ -1026,11 +996,10 @@ export function DataImport({
                             ) : (
                               <div className="divide-y divide-slate-800 max-h-48 overflow-y-auto">
                                 {coverageSummary.documents.map((doc) => {
-                                  const statusInfo =
-                                    DOCUMENT_STATUS_LABELS[doc.status] || {
-                                      label: doc.status.replace(/_/g, " "),
-                                      color: "text-slate-400",
-                                    };
+                                  const statusInfo = DOCUMENT_STATUS_LABELS[doc.status] || {
+                                    label: doc.status.replace(/_/g, " "),
+                                    color: "text-slate-400",
+                                  };
                                   const entityLabel =
                                     ENTITY_LABELS[doc.targetEntity] || doc.targetEntity;
                                   const uploadedAt = doc.createdAt
@@ -1067,9 +1036,7 @@ export function DataImport({
                         <div className="flex items-start gap-3">
                           <ClipboardList className="w-5 h-5 text-emerald-400 mt-0.5" />
                           <div className="space-y-1">
-                            <p className="text-sm font-medium text-white">
-                              Ready to continue?
-                            </p>
+                            <p className="text-sm font-medium text-white">Ready to continue?</p>
                             <p className="text-xs text-slate-400">
                               {canContinue
                                 ? "Required forms are covered. You can continue or import more."
@@ -1087,14 +1054,13 @@ export function DataImport({
                           <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-200 space-y-2">
                             <div className="flex items-center gap-2">
                               <AlertTriangle className="w-4 h-4" />
-                              <span className="font-semibold">
-                                Missing required data
-                              </span>
+                              <span className="font-semibold">Missing required data</span>
                             </div>
                             <ul className="space-y-1">
                               {missingRequiredGroups.map((group) => (
                                 <li key={group.key}>
-                                  {group.label}: {group.missingFields.join(", ") || "Missing export"}
+                                  {group.label}:{" "}
+                                  {group.missingFields.join(", ") || "Missing export"}
                                 </li>
                               ))}
                             </ul>
@@ -1122,7 +1088,7 @@ export function DataImport({
                             disabled={(!canContinue && !overrideAccepted) || isCompleting}
                             className={cn(
                               "sm:min-w-[200px]",
-                              !canContinue && "bg-amber-600 hover:bg-amber-500"
+                              !canContinue && "bg-amber-600 hover:bg-amber-500",
                             )}
                           >
                             {isCompleting ? (
@@ -1209,9 +1175,7 @@ export function DataImport({
                   className="text-center py-12"
                 >
                   <Loader2 className="w-12 h-12 text-emerald-400 mx-auto mb-4 animate-spin" />
-                  <h3 className="text-lg font-medium text-white mb-2">
-                    Extracting Data...
-                  </h3>
+                  <h3 className="text-lg font-medium text-white mb-2">Extracting Data...</h3>
                   <p className="text-slate-400">
                     AI is analyzing your document and extracting site information
                   </p>
@@ -1287,9 +1251,7 @@ export function DataImport({
                   {!csvContent ? (
                     <div className="border-2 border-dashed border-slate-700 rounded-xl p-12 text-center hover:border-slate-600 transition-colors">
                       <Upload className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-                      <p className="text-slate-300 mb-2">
-                        Drag and drop your CSV file here
-                      </p>
+                      <p className="text-slate-300 mb-2">Drag and drop your CSV file here</p>
                       <p className="text-slate-500 text-sm mb-4">or</p>
                       <label className="inline-block">
                         <input
@@ -1338,9 +1300,7 @@ export function DataImport({
                           </div>
                           <div className="divide-y divide-slate-700/50">
                             {sourceFields.map((field) => {
-                              const mapping = mappings.find(
-                                (m) => m.sourceField === field
-                              );
+                              const mapping = mappings.find((m) => m.sourceField === field);
                               return (
                                 <div
                                   key={field}
@@ -1362,13 +1322,11 @@ export function DataImport({
                                         <SelectItem
                                           key={target.value}
                                           value={target.value}
-                                          disabled={
-                                            mappings.some(
-                                              (m) =>
-                                                m.targetField === target.value &&
-                                                m.sourceField !== field
-                                            )
-                                          }
+                                          disabled={mappings.some(
+                                            (m) =>
+                                              m.targetField === target.value &&
+                                              m.sourceField !== field,
+                                          )}
                                         >
                                           {target.label}
                                           {target.required && " *"}
@@ -1411,13 +1369,13 @@ export function DataImport({
                                 "rounded-lg p-4 text-center border",
                                 preview.errorCount > 0
                                   ? "bg-red-500/10 border-red-500/30"
-                                  : "bg-slate-800/30 border-slate-700"
+                                  : "bg-slate-800/30 border-slate-700",
                               )}
                             >
                               <p
                                 className={cn(
                                   "text-2xl font-bold",
-                                  preview.errorCount > 0 ? "text-red-400" : "text-slate-500"
+                                  preview.errorCount > 0 ? "text-red-400" : "text-slate-500",
                                 )}
                               >
                                 {preview.errorCount}
@@ -1564,12 +1522,8 @@ C1,Cabin 1,cabin,Rustic Cabins,0,4,95.00,yes,no,no,no,One room cabin with queen 
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/20 mb-6">
                 <Check className="w-10 h-10 text-emerald-400" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                Import Complete!
-              </h3>
-              <p className="text-slate-400">
-                Your sites have been imported successfully.
-              </p>
+              <h3 className="text-2xl font-bold text-white mb-2">Import Complete!</h3>
+              <p className="text-slate-400">Your sites have been imported successfully.</p>
             </motion.div>
           )}
         </AnimatePresence>

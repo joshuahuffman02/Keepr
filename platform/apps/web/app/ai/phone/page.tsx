@@ -12,7 +12,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Loader2,
   Phone,
@@ -34,7 +40,7 @@ import {
   CheckCircle2,
   XCircle,
   Calendar,
-  DollarSign
+  DollarSign,
 } from "lucide-react";
 import { format, formatDistanceToNow, formatDuration, intervalToDuration } from "date-fns";
 import Link from "next/link";
@@ -114,14 +120,20 @@ export default function AIPhonePage() {
   const queryClient = useQueryClient();
 
   // Get campground
-  const { data: campgrounds = [] } = useQuery<Awaited<ReturnType<typeof apiClient.getCampgrounds>>>({
-    queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds(),
-  });
+  const { data: campgrounds = [] } = useQuery<Awaited<ReturnType<typeof apiClient.getCampgrounds>>>(
+    {
+      queryKey: ["campgrounds"],
+      queryFn: () => apiClient.getCampgrounds(),
+    },
+  );
   const campground = campgrounds[0];
 
   // Get phone sessions
-  const { data: sessions = [], isLoading: loadingSessions, refetch } = useQuery<PhoneSession[]>({
+  const {
+    data: sessions = [],
+    isLoading: loadingSessions,
+    refetch,
+  } = useQuery<PhoneSession[]>({
     queryKey: ["phone-sessions", campground?.id],
     queryFn: () => apiClient.getPhoneSessions(campground!.id),
     enabled: !!campground?.id,
@@ -142,12 +154,16 @@ export default function AIPhonePage() {
     enabled: !!campground?.id,
   });
 
-  const activeCalls = sessions.filter(s => s.status === "in_progress");
-  const completedCalls = sessions.filter(s => s.status !== "in_progress");
+  const activeCalls = sessions.filter((s) => s.status === "in_progress");
+  const completedCalls = sessions.filter((s) => s.status !== "in_progress");
   const totalCalls = sessions.length;
-  const avgDuration = completedCalls.length > 0
-    ? Math.round(completedCalls.reduce((acc, s) => acc + (s.durationSeconds || 0), 0) / completedCalls.length)
-    : 0;
+  const avgDuration =
+    completedCalls.length > 0
+      ? Math.round(
+          completedCalls.reduce((acc, s) => acc + (s.durationSeconds || 0), 0) /
+            completedCalls.length,
+        )
+      : 0;
 
   if (!campground) {
     return (
@@ -191,7 +207,10 @@ export default function AIPhonePage() {
           </div>
           <div className="flex items-center gap-2">
             {autopilotConfig?.phoneAgentEnabled ? (
-              <Badge variant="default" className="gap-1 bg-status-success text-status-success-foreground">
+              <Badge
+                variant="default"
+                className="gap-1 bg-status-success text-status-success-foreground"
+              >
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
@@ -239,12 +258,16 @@ export default function AIPhonePage() {
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span>
-                          {autopilotConfig.phoneAgentHoursStart} - {autopilotConfig.phoneAgentHoursEnd}
+                          {autopilotConfig.phoneAgentHoursStart} -{" "}
+                          {autopilotConfig.phoneAgentHoursEnd}
                         </span>
                       </div>
                     )}
                     {activeCalls.length > 0 && (
-                      <Badge variant="default" className="bg-status-success text-status-success-foreground animate-pulse">
+                      <Badge
+                        variant="default"
+                        className="bg-status-success text-status-success-foreground animate-pulse"
+                      >
                         {activeCalls.length} Active Call{activeCalls.length > 1 ? "s" : ""}
                       </Badge>
                     )}
@@ -266,10 +289,16 @@ export default function AIPhonePage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <PhoneCall className="h-5 w-5 text-primary" />
-                <Badge variant="outline" className="text-xs">Today</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Today
+                </Badge>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {loadingSummary ? <Loader2 className="h-5 w-5 animate-spin" /> : summary?.totalCalls || 0}
+                {loadingSummary ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  summary?.totalCalls || 0
+                )}
               </div>
               <p className="text-xs text-muted-foreground">Total Calls</p>
             </CardContent>
@@ -281,7 +310,11 @@ export default function AIPhonePage() {
                 <CheckCircle2 className="h-5 w-5 text-status-success-text" />
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {loadingSummary ? <Loader2 className="h-5 w-5 animate-spin" /> : summary?.callsHandled || 0}
+                {loadingSummary ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  summary?.callsHandled || 0
+                )}
               </div>
               <p className="text-xs text-muted-foreground">Resolved by AI</p>
             </CardContent>
@@ -293,7 +326,9 @@ export default function AIPhonePage() {
                 <Clock className="h-5 w-5 text-status-info-text" />
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {avgDuration > 0 ? `${Math.floor(avgDuration / 60)}:${(avgDuration % 60).toString().padStart(2, "0")}` : "0:00"}
+                {avgDuration > 0
+                  ? `${Math.floor(avgDuration / 60)}:${(avgDuration % 60).toString().padStart(2, "0")}`
+                  : "0:00"}
               </div>
               <p className="text-xs text-muted-foreground">Avg. Duration</p>
             </CardContent>
@@ -319,7 +354,10 @@ export default function AIPhonePage() {
               <PhoneCall className="h-4 w-4" />
               Call History
               {activeCalls.length > 0 && (
-                <Badge variant="secondary" className="ml-1 bg-status-success text-status-success-foreground">
+                <Badge
+                  variant="secondary"
+                  className="ml-1 bg-status-success text-status-success-foreground"
+                >
                   {activeCalls.length}
                 </Badge>
               )}
@@ -368,13 +406,19 @@ export default function AIPhonePage() {
                           className={cn(
                             "cursor-pointer transition-all hover:shadow-md",
                             selectedSession?.id === session.id && "ring-2 ring-primary",
-                            session.status === "in_progress" && "border-l-4 border-l-status-success"
+                            session.status === "in_progress" &&
+                              "border-l-4 border-l-status-success",
                           )}
                           onClick={() => setSelectedSession(session)}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-center gap-4">
-                              <div className={cn("flex h-10 w-10 items-center justify-center rounded-full", statusColor)}>
+                              <div
+                                className={cn(
+                                  "flex h-10 w-10 items-center justify-center rounded-full",
+                                  statusColor,
+                                )}
+                              >
                                 <StatusIcon className="h-5 w-5" />
                               </div>
 
@@ -410,10 +454,14 @@ export default function AIPhonePage() {
                                 <p className="text-sm font-medium text-foreground">
                                   {session.durationSeconds
                                     ? `${Math.floor(session.durationSeconds / 60)}:${(session.durationSeconds % 60).toString().padStart(2, "0")}`
-                                    : session.status === "in_progress" ? "Live" : "--:--"}
+                                    : session.status === "in_progress"
+                                      ? "Live"
+                                      : "--:--"}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {formatDistanceToNow(new Date(session.startedAt), { addSuffix: true })}
+                                  {formatDistanceToNow(new Date(session.startedAt), {
+                                    addSuffix: true,
+                                  })}
                                 </p>
                               </div>
                             </div>
@@ -437,12 +485,14 @@ export default function AIPhonePage() {
                 <CardContent>
                   <div className="space-y-3">
                     {summary?.topIntents && summary.topIntents.length > 0 ? (
-                      summary.topIntents.map((intent: { name: string; count: number }, i: number) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-sm text-foreground">{intent.name}</span>
-                          <Badge variant="secondary">{intent.count}</Badge>
-                        </div>
-                      ))
+                      summary.topIntents.map(
+                        (intent: { name: string; count: number }, i: number) => (
+                          <div key={i} className="flex items-center justify-between">
+                            <span className="text-sm text-foreground">{intent.name}</span>
+                            <Badge variant="secondary">{intent.count}</Badge>
+                          </div>
+                        ),
+                      )
                     ) : (
                       <p className="text-sm text-muted-foreground">No data yet</p>
                     )}
@@ -459,7 +509,9 @@ export default function AIPhonePage() {
                   <div className="flex items-center justify-center py-8">
                     <div className="text-center">
                       <div className="text-4xl font-bold text-foreground">
-                        {summary?.resolutionRate ? `${Math.round(summary.resolutionRate * 100)}%` : "N/A"}
+                        {summary?.resolutionRate
+                          ? `${Math.round(summary.resolutionRate * 100)}%`
+                          : "N/A"}
                       </div>
                       <p className="text-sm text-muted-foreground mt-2">
                         {summary?.callsHandled || 0} of {summary?.totalCalls || 0} calls
@@ -513,7 +565,9 @@ export default function AIPhonePage() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">AI Cost</p>
-                    <p className="font-medium">${((selectedSession.costCents || 0) / 100).toFixed(2)}</p>
+                    <p className="font-medium">
+                      ${((selectedSession.costCents || 0) / 100).toFixed(2)}
+                    </p>
                   </div>
                 </div>
 

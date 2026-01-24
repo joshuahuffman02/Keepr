@@ -12,17 +12,17 @@ describe("StoredValueService liability + taxable loads", () => {
       campgroundId: "camp-1",
       status: "active",
       currency: "usd",
-      metadata: { taxableLoad: true }
+      metadata: { taxableLoad: true },
     };
 
     const prisma = {
       storedValueAccount: { findUnique: jest.fn().mockResolvedValue(account) },
-      $transaction: jest.fn()
+      $transaction: jest.fn(),
     };
     const idempotency = {
       start: jest.fn().mockResolvedValue(null),
       complete: jest.fn(),
-      fail: jest.fn()
+      fail: jest.fn(),
     };
     const observability = { recordRedeemOutcome: jest.fn() };
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -30,8 +30,8 @@ describe("StoredValueService liability + taxable loads", () => {
         StoredValueService,
         { provide: PrismaService, useValue: prisma },
         { provide: IdempotencyService, useValue: idempotency },
-        { provide: ObservabilityService, useValue: observability }
-      ]
+        { provide: ObservabilityService, useValue: observability },
+      ],
     }).compile();
     const service = moduleRef.get(StoredValueService);
 
@@ -41,10 +41,10 @@ describe("StoredValueService liability + taxable loads", () => {
           accountId: account.id,
           amountCents: 5000,
           currency: "usd",
-          taxableLoad: false
+          taxableLoad: false,
         },
-        "reload-key"
-      )
+        "reload-key",
+      ),
     ).rejects.toBeInstanceOf(ConflictException);
 
     await moduleRef.close();
@@ -55,21 +55,21 @@ describe("StoredValueService liability + taxable loads", () => {
       storedValueAccount: {
         findMany: jest.fn().mockResolvedValue([
           { id: "a1", metadata: { taxableLoad: true } },
-          { id: "a2", metadata: { taxableLoad: false } }
-        ])
+          { id: "a2", metadata: { taxableLoad: false } },
+        ]),
       },
       storedValueLedger: {
         findMany: jest.fn().mockResolvedValue([
           { accountId: "a1", direction: "issue", amountCents: 1000 },
           { accountId: "a1", direction: "redeem", amountCents: 200 },
-          { accountId: "a2", direction: "issue", amountCents: 500 }
-        ])
-      }
+          { accountId: "a2", direction: "issue", amountCents: 500 },
+        ]),
+      },
     };
     const idempotency = {
       start: jest.fn().mockResolvedValue(null),
       complete: jest.fn(),
-      fail: jest.fn()
+      fail: jest.fn(),
     };
     const observability = { recordRedeemOutcome: jest.fn() };
     const moduleRef: TestingModule = await Test.createTestingModule({
@@ -77,8 +77,8 @@ describe("StoredValueService liability + taxable loads", () => {
         StoredValueService,
         { provide: PrismaService, useValue: prisma },
         { provide: IdempotencyService, useValue: idempotency },
-        { provide: ObservabilityService, useValue: observability }
-      ]
+        { provide: ObservabilityService, useValue: observability },
+      ],
     }).compile();
     const service = moduleRef.get(StoredValueService);
 

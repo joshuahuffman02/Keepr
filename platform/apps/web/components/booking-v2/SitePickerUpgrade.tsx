@@ -3,14 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  MapPin,
-  ChevronRight,
-  Check,
-  X,
-  Sparkles,
-  Map,
-} from "lucide-react";
+import { MapPin, ChevronRight, Check, X, Sparkles, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -70,7 +63,7 @@ export function SitePickerUpgrade({
     <div
       className={cn(
         "bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200 overflow-hidden",
-        className
+        className,
       )}
     >
       {/* Header / Toggle */}
@@ -84,9 +77,7 @@ export function SitePickerUpgrade({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-foreground">
-              Pick Your Exact Site
-            </h3>
+            <h3 className="font-semibold text-foreground">Pick Your Exact Site</h3>
             <Badge className="bg-amber-500 text-white border-0 text-xs">
               +{formatCurrency(upgradeFee)}
             </Badge>
@@ -107,7 +98,7 @@ export function SitePickerUpgrade({
             <ChevronRight
               className={cn(
                 "h-5 w-5 text-muted-foreground transition-transform",
-                isExpanded && "rotate-90"
+                isExpanded && "rotate-90",
               )}
             />
           )}
@@ -149,7 +140,7 @@ export function SitePickerUpgrade({
                         "relative p-3 rounded-lg border-2 text-left transition-all",
                         isSelected
                           ? "border-emerald-500 bg-emerald-50"
-                          : "border-border bg-card hover:border-border hover:shadow-sm"
+                          : "border-border bg-card hover:border-border hover:shadow-sm",
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -179,9 +170,7 @@ export function SitePickerUpgrade({
                           Site {site.siteNumber}
                         </div>
                         {site.name && site.name !== `Site ${site.siteNumber}` && (
-                          <div className="text-xs text-muted-foreground truncate">
-                            {site.name}
-                          </div>
+                          <div className="text-xs text-muted-foreground truncate">{site.name}</div>
                         )}
                       </div>
                     </motion.button>
@@ -221,14 +210,12 @@ export function SitePickerBanner({
       onClick={onClick}
       className={cn(
         "w-full flex items-center gap-3 p-3 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200 hover:border-amber-300 transition-colors text-left",
-        className
+        className,
       )}
     >
       <Sparkles className="h-5 w-5 text-amber-500 flex-shrink-0" />
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-foreground">
-          Want a specific site?
-        </span>
+        <span className="text-sm font-medium text-foreground">Want a specific site?</span>
         <span className="text-sm text-muted-foreground ml-1">
           Pick your spot for +{formatCurrency(upgradeFee)}
         </span>

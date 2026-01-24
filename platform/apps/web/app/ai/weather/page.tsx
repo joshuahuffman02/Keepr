@@ -24,7 +24,7 @@ import {
   Droplets,
   AlertTriangle,
   Bell,
-  Settings
+  Settings,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -173,9 +173,7 @@ export default function AIWeatherPage() {
                         <span className="font-semibold text-status-warning-text">
                           {alert.title}
                         </span>
-                        <Badge className={getSeverityColor(alert.severity)}>
-                          {alert.severity}
-                        </Badge>
+                        <Badge className={getSeverityColor(alert.severity)}>{alert.severity}</Badge>
                       </div>
                       <p className="text-sm text-status-warning-text">{alert.message}</p>
                       {alert.guestsNotified > 0 && (
@@ -241,7 +239,9 @@ export default function AIWeatherPage() {
                     </div>
                     <div className="text-center">
                       <Wind className="h-5 w-5 mx-auto text-muted-foreground mb-1" />
-                      <p className="text-sm font-medium">{Math.round(weather?.windSpeed ?? 0)} mph</p>
+                      <p className="text-sm font-medium">
+                        {Math.round(weather?.windSpeed ?? 0)} mph
+                      </p>
                       <p className="text-xs text-muted-foreground">Wind</p>
                     </div>
                   </div>
@@ -250,7 +250,9 @@ export default function AIWeatherPage() {
                 <div className="text-center py-8">
                   <CloudSun className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                   <p className="text-muted-foreground">Weather data unavailable</p>
-                  <p className="text-sm text-muted-foreground mt-1">Configure weather API in settings</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Configure weather API in settings
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -342,7 +344,8 @@ export default function AIWeatherPage() {
                           {alert.status}
                         </Badge>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {alert.startTime && formatDistanceToNow(new Date(alert.startTime), { addSuffix: true })}
+                          {alert.startTime &&
+                            formatDistanceToNow(new Date(alert.startTime), { addSuffix: true })}
                         </p>
                       </div>
                     </div>

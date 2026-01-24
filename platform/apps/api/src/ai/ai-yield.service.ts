@@ -51,7 +51,7 @@ export class AiYieldService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly realtime: RealtimeService
+    private readonly realtime: RealtimeService,
   ) {}
 
   // ==================== SNAPSHOT POPULATION ====================
@@ -73,9 +73,7 @@ export class AiYieldService {
       try {
         await this.recordSnapshot(campground.id, new Date());
       } catch (error) {
-        this.logger.error(
-          `Failed to record snapshot for campground ${campground.id}: ${error}`
-        );
+        this.logger.error(`Failed to record snapshot for campground ${campground.id}: ${error}`);
       }
     }
 
@@ -126,7 +124,10 @@ export class AiYieldService {
 
     // Calculate revenue for this date (pro-rata from reservations)
     const revenueCents = reservations.reduce((sum, r) => {
-      const nights = Math.max(1, Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)));
+      const nights = Math.max(
+        1,
+        Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)),
+      );
       const perNight = nights > 0 ? Math.round(r.totalAmount / nights) : 0;
       return sum + perNight;
     }, 0);
@@ -164,10 +165,7 @@ export class AiYieldService {
   /**
    * Backfill historical snapshots (useful for initial setup)
    */
-  async backfillSnapshots(
-    campgroundId: string,
-    days: number = 90
-  ): Promise<number> {
+  async backfillSnapshots(campgroundId: string, days: number = 90): Promise<number> {
     this.logger.log(`Backfilling ${days} days of snapshots for ${campgroundId}`);
     let recorded = 0;
 
@@ -197,7 +195,7 @@ export class AiYieldService {
     options: {
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ): Promise<YieldMetrics> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -236,10 +234,7 @@ export class AiYieldService {
       },
       select: { impactCents: true },
     });
-    const potentialRevenue = insights.reduce(
-      (sum, i) => sum + (i.impactCents || 0),
-      0
-    );
+    const potentialRevenue = insights.reduce((sum, i) => sum + (i.impactCents || 0), 0);
 
     return {
       todayOccupancy: todayMetrics.occupancyPct,
@@ -270,7 +265,7 @@ export class AiYieldService {
    */
   private async getDayMetrics(
     campgroundId: string,
-    date: Date
+    date: Date,
   ): Promise<{
     occupancyPct: number;
     revenueCents: number;
@@ -292,7 +287,8 @@ export class AiYieldService {
 
     if (snapshot) {
       const adr = snapshot.occupied > 0 ? Math.round(snapshot.revenueCents / snapshot.occupied) : 0;
-      const revPAN = snapshot.totalSites > 0 ? Math.round(snapshot.revenueCents / snapshot.totalSites) : 0;
+      const revPAN =
+        snapshot.totalSites > 0 ? Math.round(snapshot.revenueCents / snapshot.totalSites) : 0;
       return {
         occupancyPct: snapshot.occupancyPct,
         revenueCents: snapshot.revenueCents,
@@ -319,7 +315,10 @@ export class AiYieldService {
     const occupied = new Set(reservations.map((r) => r.siteId)).size;
     const occupancyPct = sites > 0 ? (occupied / sites) * 100 : 0;
     const revenueCents = reservations.reduce((sum, r) => {
-      const nights = Math.max(1, Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)));
+      const nights = Math.max(
+        1,
+        Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)),
+      );
       const perNight = nights > 0 ? Math.round(r.totalAmount / nights) : 0;
       return sum + perNight;
     }, 0);
@@ -335,7 +334,7 @@ export class AiYieldService {
   private async getPeriodMetrics(
     campgroundId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<{
     occupancyPct: number;
     revenueCents: number;
@@ -377,7 +376,7 @@ export class AiYieldService {
   private async getYoyComparison(
     campgroundId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<{
     occupancy: number;
     revenue: number;
@@ -418,7 +417,7 @@ export class AiYieldService {
    */
   async forecastOccupancy(
     campgroundId: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<{
     forecasts: OccupancyForecast[];
     avgOccupancy: number;
@@ -455,7 +454,10 @@ export class AiYieldService {
       const occupiedSites = new Set(reservations.map((r) => r.siteId)).size;
       const occupancyPct = (occupiedSites / sites) * 100;
       const projectedRevenue = reservations.reduce((sum, r) => {
-        const nights = Math.max(1, Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)));
+        const nights = Math.max(
+          1,
+          Math.ceil((r.departureDate.getTime() - r.arrivalDate.getTime()) / (24 * 60 * 60 * 1000)),
+        );
         const perNight = nights > 0 ? Math.round(r.totalAmount / nights) : 0;
         return sum + perNight;
       }, 0);
@@ -484,7 +486,7 @@ export class AiYieldService {
    */
   async getOccupancyTrend(
     campgroundId: string,
-    days: number = 30
+    days: number = 30,
   ): Promise<Array<{ date: string; occupancy: number; revenue: number }>> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -549,7 +551,7 @@ export class AiYieldService {
         const current = siteRes[i];
         const next = siteRes[i + 1];
         const gapDays = Math.floor(
-          (next.arrival.getTime() - current.departure.getTime()) / (24 * 60 * 60 * 1000)
+          (next.arrival.getTime() - current.departure.getTime()) / (24 * 60 * 60 * 1000),
         );
 
         if (gapDays === 1 || gapDays === 2) {
@@ -566,38 +568,35 @@ export class AiYieldService {
   /**
    * Get all data needed for yield dashboard in one call
    */
-  async getYieldDashboard(
-    campgroundId: string
-  ): Promise<{
+  async getYieldDashboard(campgroundId: string): Promise<{
     metrics: YieldMetrics;
     occupancyTrend: Array<{ date: string; occupancy: number; revenue: number }>;
     forecasts: OccupancyForecast[];
     topRecommendations: AiPricingRecommendation[];
     revenueInsights: AiRevenueInsight[];
   }> {
-    const [metrics, occupancyTrend, forecastData, recommendations, insights] =
-      await Promise.all([
-        this.getYieldMetrics(campgroundId),
-        this.getOccupancyTrend(campgroundId, 30),
-        this.forecastOccupancy(campgroundId, 30),
-        this.prisma.aiPricingRecommendation.findMany({
-          where: {
-            campgroundId,
-            status: "pending",
-            expiresAt: { gt: new Date() },
-          },
-          orderBy: { estimatedRevenueDelta: "desc" },
-          take: 5,
-        }),
-        this.prisma.aiRevenueInsight.findMany({
-          where: {
-            campgroundId,
-            status: { in: ["new", "in_progress"] },
-          },
-          orderBy: { priority: "desc" },
-          take: 5,
-        }),
-      ]);
+    const [metrics, occupancyTrend, forecastData, recommendations, insights] = await Promise.all([
+      this.getYieldMetrics(campgroundId),
+      this.getOccupancyTrend(campgroundId, 30),
+      this.forecastOccupancy(campgroundId, 30),
+      this.prisma.aiPricingRecommendation.findMany({
+        where: {
+          campgroundId,
+          status: "pending",
+          expiresAt: { gt: new Date() },
+        },
+        orderBy: { estimatedRevenueDelta: "desc" },
+        take: 5,
+      }),
+      this.prisma.aiRevenueInsight.findMany({
+        where: {
+          campgroundId,
+          status: { in: ["new", "in_progress"] },
+        },
+        orderBy: { priority: "desc" },
+        take: 5,
+      }),
+    ]);
 
     return {
       metrics,
@@ -616,7 +615,7 @@ export class AiYieldService {
    */
   async broadcastYieldMetricsUpdate(
     campgroundId: string,
-    triggeredBy: "reservation" | "payment" | "scheduled" | "manual" = "manual"
+    triggeredBy: "reservation" | "payment" | "scheduled" | "manual" = "manual",
   ): Promise<void> {
     try {
       const metrics = await this.getYieldMetrics(campgroundId);
@@ -637,12 +636,10 @@ export class AiYieldService {
       });
 
       this.logger.debug(
-        `Broadcast yield metrics update for campground ${campgroundId}, triggered by ${triggeredBy}`
+        `Broadcast yield metrics update for campground ${campgroundId}, triggered by ${triggeredBy}`,
       );
     } catch (error) {
-      this.logger.error(
-        `Failed to broadcast yield metrics for ${campgroundId}: ${error}`
-      );
+      this.logger.error(`Failed to broadcast yield metrics for ${campgroundId}: ${error}`);
     }
   }
 
@@ -662,7 +659,7 @@ export class AiYieldService {
       estimatedRevenueDelta: number;
       confidence: number;
       reason: string;
-    }
+    },
   ): Promise<void> {
     // Get site class name if available
     let siteClassName: string | undefined;
@@ -688,9 +685,7 @@ export class AiYieldService {
       reason: recommendation.reason,
     });
 
-    this.logger.debug(
-      `Broadcast new pricing recommendation for campground ${campgroundId}`
-    );
+    this.logger.debug(`Broadcast new pricing recommendation for campground ${campgroundId}`);
   }
 
   /**
@@ -710,9 +705,7 @@ export class AiYieldService {
 
       this.logger.debug(`Broadcast forecast update for campground ${campgroundId}`);
     } catch (error) {
-      this.logger.error(
-        `Failed to broadcast forecast for ${campgroundId}: ${error}`
-      );
+      this.logger.error(`Failed to broadcast forecast for ${campgroundId}: ${error}`);
     }
   }
 
@@ -722,10 +715,10 @@ export class AiYieldService {
    */
   async onReservationChange(
     campgroundId: string,
-    changeType: "created" | "updated" | "cancelled"
+    changeType: "created" | "updated" | "cancelled",
   ): Promise<void> {
     this.logger.log(
-      `Reservation ${changeType} detected for campground ${campgroundId}, updating yield metrics`
+      `Reservation ${changeType} detected for campground ${campgroundId}, updating yield metrics`,
     );
 
     // Broadcast updated metrics
@@ -740,9 +733,7 @@ export class AiYieldService {
    * Updates revenue-related metrics
    */
   async onPaymentReceived(campgroundId: string): Promise<void> {
-    this.logger.log(
-      `Payment received for campground ${campgroundId}, updating yield metrics`
-    );
+    this.logger.log(`Payment received for campground ${campgroundId}, updating yield metrics`);
 
     await this.broadcastYieldMetricsUpdate(campgroundId, "payment");
   }

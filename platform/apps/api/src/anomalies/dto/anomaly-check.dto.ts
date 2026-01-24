@@ -1,10 +1,10 @@
 import { IsOptional, IsString } from "class-validator";
 
 export class AnomalyCheckDto {
-    @IsString()
-    campgroundId!: string;
+  @IsString()
+  campgroundId!: string;
 
-    @IsOptional()
-    @IsString()
-    metric?: string; // e.g. "occupancy", "revenue"
+  @IsOptional()
+  @IsString()
+  metric?: string; // e.g. "occupancy", "revenue"
 }

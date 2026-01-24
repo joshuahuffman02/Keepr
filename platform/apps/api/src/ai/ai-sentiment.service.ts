@@ -8,7 +8,14 @@ export interface SentimentAnalysis {
   sentiment: "positive" | "neutral" | "negative";
   sentimentScore: number; // -1.0 to 1.0
   urgencyLevel: "low" | "normal" | "high" | "critical";
-  detectedIntent: "booking" | "complaint" | "question" | "praise" | "cancellation" | "payment" | "other";
+  detectedIntent:
+    | "booking"
+    | "complaint"
+    | "question"
+    | "praise"
+    | "cancellation"
+    | "payment"
+    | "other";
   confidence: number; // 0-1
   summary?: string;
 }
@@ -49,7 +56,7 @@ export class AiSentimentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly aiProvider: AiProviderService,
-    private readonly featureGate: AiFeatureGateService
+    private readonly featureGate: AiFeatureGateService,
   ) {}
 
   /**
@@ -63,12 +70,12 @@ export class AiSentimentService {
       guestName?: string;
       reservationStatus?: string;
       type?: "email" | "sms" | "message";
-    }
+    },
   ): Promise<SentimentAnalysis> {
     // Check if AI is enabled for this campground
     const isEnabled = await this.featureGate.isFeatureEnabled(
       campgroundId,
-      AiFeatureType.analytics
+      AiFeatureType.analytics,
     );
 
     if (!isEnabled.allowed) {
@@ -177,10 +184,7 @@ export class AiSentimentService {
   /**
    * Get sentiment statistics for a campground
    */
-  async getSentimentStats(
-    campgroundId: string,
-    options?: { startDate?: Date; endDate?: Date }
-  ) {
+  async getSentimentStats(campgroundId: string, options?: { startDate?: Date; endDate?: Date }) {
     const where: Prisma.CommunicationWhereInput = {
       campgroundId,
       direction: "inbound",
@@ -260,7 +264,7 @@ export class AiSentimentService {
       guestName?: string;
       reservationStatus?: string;
       type?: "email" | "sms" | "message";
-    }
+    },
   ): Promise<SentimentAnalysis> {
     const contextStr = context
       ? `
@@ -300,8 +304,7 @@ Guidelines:
     const response = await this.aiProvider.getCompletion({
       campgroundId,
       featureType: AiFeatureType.analytics,
-      systemPrompt:
-        "You analyze campground guest messages and respond with JSON only.",
+      systemPrompt: "You analyze campground guest messages and respond with JSON only.",
       userPrompt: prompt,
       maxTokens: 500,
       temperature: 0.3,
@@ -338,18 +341,45 @@ Guidelines:
 
     // Sentiment detection
     const negativeWords = [
-      "disappointed", "frustrat", "angry", "upset", "terrible", "worst",
-      "horrible", "awful", "unacceptable", "refund", "complaint", "problem",
-      "broken", "dirty", "rude", "disgusting", "never again", "warning"
+      "disappointed",
+      "frustrat",
+      "angry",
+      "upset",
+      "terrible",
+      "worst",
+      "horrible",
+      "awful",
+      "unacceptable",
+      "refund",
+      "complaint",
+      "problem",
+      "broken",
+      "dirty",
+      "rude",
+      "disgusting",
+      "never again",
+      "warning",
     ];
     const positiveWords = [
-      "thank", "great", "excellent", "wonderful", "amazing", "love",
-      "perfect", "fantastic", "awesome", "best", "happy", "appreciate",
-      "recommend", "enjoy", "beautiful"
+      "thank",
+      "great",
+      "excellent",
+      "wonderful",
+      "amazing",
+      "love",
+      "perfect",
+      "fantastic",
+      "awesome",
+      "best",
+      "happy",
+      "appreciate",
+      "recommend",
+      "enjoy",
+      "beautiful",
     ];
 
-    const negativeCount = negativeWords.filter(w => lowerContent.includes(w)).length;
-    const positiveCount = positiveWords.filter(w => lowerContent.includes(w)).length;
+    const negativeCount = negativeWords.filter((w) => lowerContent.includes(w)).length;
+    const positiveCount = positiveWords.filter((w) => lowerContent.includes(w)).length;
 
     let sentiment: "positive" | "neutral" | "negative" = "neutral";
     let sentimentScore = 0;
@@ -370,13 +400,21 @@ Guidelines:
 
     // Urgency detection
     const criticalWords = ["emergency", "urgent", "asap", "immediately", "safety", "help", "911"];
-    const highUrgencyWords = ["complaint", "refund", "today", "now", "right now", "manager", "lawyer"];
+    const highUrgencyWords = [
+      "complaint",
+      "refund",
+      "today",
+      "now",
+      "right now",
+      "manager",
+      "lawyer",
+    ];
 
     let urgencyLevel: "low" | "normal" | "high" | "critical" = "normal";
 
-    if (criticalWords.some(w => lowerContent.includes(w))) {
+    if (criticalWords.some((w) => lowerContent.includes(w))) {
       urgencyLevel = "critical";
-    } else if (highUrgencyWords.some(w => lowerContent.includes(w)) || sentiment === "negative") {
+    } else if (highUrgencyWords.some((w) => lowerContent.includes(w)) || sentiment === "negative") {
       urgencyLevel = "high";
     } else if (sentiment === "positive") {
       urgencyLevel = "low";
@@ -387,13 +425,31 @@ Guidelines:
 
     if (lowerContent.includes("cancel") || lowerContent.includes("cancellation")) {
       detectedIntent = "cancellation";
-    } else if (lowerContent.includes("book") || lowerContent.includes("reserv") || lowerContent.includes("availability")) {
+    } else if (
+      lowerContent.includes("book") ||
+      lowerContent.includes("reserv") ||
+      lowerContent.includes("availability")
+    ) {
       detectedIntent = "booking";
-    } else if (lowerContent.includes("pay") || lowerContent.includes("charge") || lowerContent.includes("refund") || lowerContent.includes("bill")) {
+    } else if (
+      lowerContent.includes("pay") ||
+      lowerContent.includes("charge") ||
+      lowerContent.includes("refund") ||
+      lowerContent.includes("bill")
+    ) {
       detectedIntent = "payment";
-    } else if (lowerContent.includes("complaint") || lowerContent.includes("problem") || lowerContent.includes("issue")) {
+    } else if (
+      lowerContent.includes("complaint") ||
+      lowerContent.includes("problem") ||
+      lowerContent.includes("issue")
+    ) {
       detectedIntent = "complaint";
-    } else if (lowerContent.includes("?") || lowerContent.includes("how") || lowerContent.includes("what") || lowerContent.includes("when")) {
+    } else if (
+      lowerContent.includes("?") ||
+      lowerContent.includes("how") ||
+      lowerContent.includes("what") ||
+      lowerContent.includes("when")
+    ) {
       detectedIntent = "question";
     } else if (sentiment === "positive") {
       detectedIntent = "praise";
@@ -420,9 +476,7 @@ Guidelines:
     return this.isIntent(i) ? i : "other";
   }
 
-  private normalizeMessageType(
-    type?: string | null
-  ): "email" | "sms" | "message" | undefined {
+  private normalizeMessageType(type?: string | null): "email" | "sms" | "message" | undefined {
     if (type === "email" || type === "sms" || type === "message") {
       return type;
     }

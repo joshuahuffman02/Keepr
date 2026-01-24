@@ -108,8 +108,7 @@ export class AiPhoneAgentService {
           },
           siteType: {
             type: "string",
-            description:
-              "Type of site requested (e.g., 'RV', 'tent', 'cabin'). Optional.",
+            description: "Type of site requested (e.g., 'RV', 'tent', 'cabin'). Optional.",
           },
           guests: {
             type: "number",
@@ -146,8 +145,7 @@ export class AiPhoneAgentService {
     {
       type: "function",
       name: "lookup_reservation",
-      description:
-        "Look up an existing reservation by confirmation number or phone number.",
+      description: "Look up an existing reservation by confirmation number or phone number.",
       parameters: {
         type: "object",
         properties: {
@@ -157,8 +155,7 @@ export class AiPhoneAgentService {
           },
           phoneNumber: {
             type: "string",
-            description:
-              "Phone number associated with the reservation (if no confirmation number)",
+            description: "Phone number associated with the reservation (if no confirmation number)",
           },
           lastName: {
             type: "string",
@@ -213,8 +210,7 @@ export class AiPhoneAgentService {
     {
       type: "function",
       name: "take_voicemail",
-      description:
-        "Offer to take a voicemail message when staff is unavailable or after hours.",
+      description: "Offer to take a voicemail message when staff is unavailable or after hours.",
       parameters: {
         type: "object",
         properties: {
@@ -231,7 +227,7 @@ export class AiPhoneAgentService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly configService: AiAutopilotConfigService,
-    private readonly autonomousAction: AiAutonomousActionService
+    private readonly autonomousAction: AiAutonomousActionService,
   ) {
     // Initialize OpenAI client if API key is available
     const apiKey = process.env.OPENAI_API_KEY;
@@ -248,11 +244,7 @@ export class AiPhoneAgentService {
    * Handle incoming voice call webhook from Twilio
    * Returns TwiML to connect the call to our WebSocket stream
    */
-  async handleIncomingCall(
-    callSid: string,
-    callerPhone: string,
-    toPhone: string
-  ): Promise<string> {
+  async handleIncomingCall(callSid: string, callerPhone: string, toPhone: string): Promise<string> {
     // Find campground by phone number
     const config = await this.prisma.aiAutopilotConfig.findFirst({
       where: {
@@ -368,7 +360,7 @@ export class AiPhoneAgentService {
   async handleWebSocketConnection(
     callSid: string,
     campgroundId: string,
-    campgroundName: string
+    campgroundName: string,
   ): Promise<CallSession | null> {
     if (!this.openai) {
       this.logger.error("OpenAI client not initialized");
@@ -429,7 +421,7 @@ export class AiPhoneAgentService {
   async handleToolCall(
     callSid: string,
     toolName: string,
-    toolArgs: Record<string, unknown>
+    toolArgs: Record<string, unknown>,
   ): Promise<Record<string, unknown>> {
     const session = this.activeSessions.get(callSid);
     if (!session) return { error: "Session not found" };
@@ -493,10 +485,7 @@ export class AiPhoneAgentService {
 
   // ==================== TOOL IMPLEMENTATIONS ====================
 
-  private async toolCheckAvailability(
-    campgroundId: string,
-    args: Record<string, unknown>
-  ) {
+  private async toolCheckAvailability(campgroundId: string, args: Record<string, unknown>) {
     try {
       const arrivalDate = getStringValue(args.arrivalDate);
       const departureDate = getStringValue(args.departureDate);
@@ -515,9 +504,7 @@ export class AiPhoneAgentService {
         where: {
           campgroundId,
           status: "available",
-          SiteClass: siteType
-            ? { name: { contains: siteType, mode: "insensitive" } }
-            : undefined,
+          SiteClass: siteType ? { name: { contains: siteType, mode: "insensitive" } } : undefined,
         },
         include: { SiteClass: true },
       });
@@ -536,11 +523,11 @@ export class AiPhoneAgentService {
         });
 
         if (!conflict) {
-        available.push({
-          siteName: site.name,
-          siteType: site.SiteClass?.name,
-          defaultRate: site.SiteClass?.defaultRate,
-        });
+          available.push({
+            siteName: site.name,
+            siteType: site.SiteClass?.name,
+            defaultRate: site.SiteClass?.defaultRate,
+          });
         }
       }
 
@@ -569,10 +556,7 @@ export class AiPhoneAgentService {
     }
   }
 
-  private async toolGetRates(
-    campgroundId: string,
-    args: Record<string, unknown>
-  ) {
+  private async toolGetRates(campgroundId: string, args: Record<string, unknown>) {
     try {
       const arrivalDate = getStringValue(args.arrivalDate);
       const departureDate = getStringValue(args.departureDate);
@@ -585,9 +569,7 @@ export class AiPhoneAgentService {
       const siteClasses = await this.prisma.siteClass.findMany({
         where: {
           campgroundId,
-          name: siteType
-            ? { contains: siteType, mode: "insensitive" }
-            : undefined,
+          name: siteType ? { contains: siteType, mode: "insensitive" } : undefined,
         },
         select: { name: true, defaultRate: true, maxOccupancy: true },
       });
@@ -598,9 +580,7 @@ export class AiPhoneAgentService {
 
       const arrival = new Date(arrivalDate);
       const departure = new Date(departureDate);
-      const nights = Math.ceil(
-        (departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)
-      );
+      const nights = Math.ceil((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24));
 
       return {
         rates: siteClasses.map((sc) => ({
@@ -620,10 +600,7 @@ export class AiPhoneAgentService {
     }
   }
 
-  private async toolLookupReservation(
-    campgroundId: string,
-    args: Record<string, unknown>
-  ) {
+  private async toolLookupReservation(campgroundId: string, args: Record<string, unknown>) {
     try {
       const confirmationNumber = getStringValue(args.confirmationNumber);
       const phoneNumber = getStringValue(args.phoneNumber);
@@ -668,27 +645,24 @@ export class AiPhoneAgentService {
         };
       }
 
-        return {
-          found: true,
-          confirmationNumber: reservation.id,
-          guestName: `${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName}`,
-          siteName: reservation.Site?.name,
-          arrivalDate: reservation.arrivalDate.toISOString().split("T")[0],
-          departureDate: reservation.departureDate.toISOString().split("T")[0],
-          status: reservation.status,
-          balance: reservation.balanceAmount || 0,
-          lastName,
-        };
+      return {
+        found: true,
+        confirmationNumber: reservation.id,
+        guestName: `${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName}`,
+        siteName: reservation.Site?.name,
+        arrivalDate: reservation.arrivalDate.toISOString().split("T")[0],
+        departureDate: reservation.departureDate.toISOString().split("T")[0],
+        status: reservation.status,
+        balance: reservation.balanceAmount || 0,
+        lastName,
+      };
     } catch (error) {
       this.logger.error(`Lookup reservation error: ${error}`);
       return { error: "Could not look up reservation" };
     }
   }
 
-  private async toolAnswerFaq(
-    campgroundId: string,
-    args: Record<string, unknown>
-  ) {
+  private async toolAnswerFaq(campgroundId: string, args: Record<string, unknown>) {
     try {
       const question = getStringValue(args.question);
       const category = getStringValue(args.category);
@@ -719,10 +693,8 @@ export class AiPhoneAgentService {
       const keywords = question.toLowerCase().split(/\s+/);
       const relevant = contexts.filter((c) =>
         keywords.some(
-          (kw) =>
-            c.question?.toLowerCase().includes(kw) ||
-            c.answer.toLowerCase().includes(kw)
-        )
+          (kw) => c.question?.toLowerCase().includes(kw) || c.answer.toLowerCase().includes(kw),
+        ),
       );
 
       if (relevant.length > 0) {
@@ -744,10 +716,7 @@ export class AiPhoneAgentService {
     }
   }
 
-  private async toolTransferToStaff(
-    session: CallSession,
-    args: Record<string, unknown>
-  ) {
+  private async toolTransferToStaff(session: CallSession, args: Record<string, unknown>) {
     const reason = getStringValue(args.reason) || "Caller requested transfer";
     const urgency = getStringValue(args.urgency);
     const config = await this.prisma.aiAutopilotConfig.findUnique({
@@ -782,10 +751,7 @@ export class AiPhoneAgentService {
     };
   }
 
-  private async toolTakeVoicemail(
-    session: CallSession,
-    args: Record<string, unknown>
-  ) {
+  private async toolTakeVoicemail(session: CallSession, args: Record<string, unknown>) {
     const reason = getStringValue(args.reason) || "Please leave a message";
     await this.prisma.aiPhoneSession.update({
       where: { twilioCallSid: session.callSid },
@@ -805,11 +771,9 @@ export class AiPhoneAgentService {
 
   private buildSystemPrompt(
     campgroundName: string,
-    context: { faqs: AiCampgroundContext[]; policies: AiCampgroundContext[] }
+    context: { faqs: AiCampgroundContext[]; policies: AiCampgroundContext[] },
   ): string {
-    const faqText = context.faqs
-      .map((f) => `Q: ${f.question}\nA: ${f.answer}`)
-      .join("\n\n");
+    const faqText = context.faqs.map((f) => `Q: ${f.question}\nA: ${f.answer}`).join("\n\n");
 
     const policyText = context.policies.map((p) => p.answer).join("\n");
 
@@ -918,7 +882,7 @@ Start by greeting the caller and asking how you can help today.`;
       startDate?: Date;
       endDate?: Date;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const { status, startDate, endDate, limit = 50 } = options;
 
@@ -972,9 +936,7 @@ Start by greeting the caller and asking how you can help today.`;
     const transferred = sessions.filter((s) => s.status === "transferred").length;
     const voicemails = sessions.filter((s) => s.status === "voicemail").length;
 
-    const durations = sessions
-      .filter((s) => s.durationSeconds)
-      .map((s) => s.durationSeconds!);
+    const durations = sessions.filter((s) => s.durationSeconds).map((s) => s.durationSeconds!);
 
     const avgDuration =
       durations.length > 0

@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Param, Query, UseGuards } from "@nestjs/common";
 import { BillingDashboardService } from "./billing-dashboard.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { ScopeGuard } from "../auth/guards/scope.guard";
@@ -22,7 +16,7 @@ export class BillingDashboardController {
   async getSummary(
     @Param("campgroundId") campgroundId: string,
     @Query("periodStart") periodStartStr?: string,
-    @Query("periodEnd") periodEndStr?: string
+    @Query("periodEnd") periodEndStr?: string,
   ) {
     const periodStart = periodStartStr ? new Date(periodStartStr) : undefined;
     const periodEnd = periodEndStr ? new Date(periodEndStr) : undefined;
@@ -37,7 +31,7 @@ export class BillingDashboardController {
   async getRevenueBreakdown(
     @Param("campgroundId") campgroundId: string,
     @Query("periodStart") periodStartStr?: string,
-    @Query("periodEnd") periodEndStr?: string
+    @Query("periodEnd") periodEndStr?: string,
   ) {
     const periodStart = periodStartStr ? new Date(periodStartStr) : undefined;
     const periodEnd = periodEndStr ? new Date(periodEndStr) : undefined;
@@ -51,7 +45,7 @@ export class BillingDashboardController {
   @Get("fee-invoices")
   async getFeeInvoices(
     @Param("campgroundId") campgroundId: string,
-    @Query("limit") limitStr?: string
+    @Query("limit") limitStr?: string,
   ) {
     const limit = limitStr ? parseInt(limitStr, 10) : 12;
     return this.dashboardService.getFeeInvoiceHistory(campgroundId, limit);
@@ -62,10 +56,7 @@ export class BillingDashboardController {
    * Shows bank deposits received
    */
   @Get("payouts")
-  async getPayouts(
-    @Param("campgroundId") campgroundId: string,
-    @Query("limit") limitStr?: string
-  ) {
+  async getPayouts(@Param("campgroundId") campgroundId: string, @Query("limit") limitStr?: string) {
     const limit = limitStr ? parseInt(limitStr, 10) : 20;
     return this.dashboardService.getPayoutHistory(campgroundId, limit);
   }
@@ -78,7 +69,7 @@ export class BillingDashboardController {
   async getFeeTransparency(
     @Param("campgroundId") campgroundId: string,
     @Query("periodStart") periodStartStr: string,
-    @Query("periodEnd") periodEndStr: string
+    @Query("periodEnd") periodEndStr: string,
   ) {
     const periodStart = new Date(periodStartStr);
     const periodEnd = new Date(periodEndStr);

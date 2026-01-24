@@ -5,7 +5,7 @@ import type { ReservationPayload, Scope, SdkConfig } from "./types";
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json" }
+    headers: { "content-type": "application/json" },
   });
 }
 
@@ -17,7 +17,7 @@ describe("DeveloperApiClient (mocked)", () => {
     clientId: "client-id",
     clientSecret: "client-secret",
     campgroundId: "camp-1",
-    scopes
+    scopes,
   };
 
   let fetchMock = vi.fn<typeof fetch>();
@@ -44,8 +44,8 @@ describe("DeveloperApiClient (mocked)", () => {
           access_token: "mock-access",
           refresh_token: "mock-refresh",
           expires_in: 3600,
-          scope: "reservations:read reservations:write"
-        })
+          scope: "reservations:read reservations:write",
+        }),
       )
       // list reservations
       .mockResolvedValueOnce(jsonResponse([{ id: "res-1" }]));
@@ -66,9 +66,9 @@ describe("DeveloperApiClient (mocked)", () => {
           grant_type: "client_credentials",
           client_id: "client-id",
           client_secret: "client-secret",
-          scope: "reservations:read reservations:write"
-        })
-      })
+          scope: "reservations:read reservations:write",
+        }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -77,9 +77,9 @@ describe("DeveloperApiClient (mocked)", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization: "Bearer mock-access"
-        })
-      })
+          Authorization: "Bearer mock-access",
+        }),
+      }),
     );
   });
 
@@ -89,7 +89,7 @@ describe("DeveloperApiClient (mocked)", () => {
       guestId: "guest-1",
       arrivalDate: "2024-06-01",
       departureDate: "2024-06-05",
-      adults: 2
+      adults: 2,
     };
 
     fetchMock
@@ -99,8 +99,8 @@ describe("DeveloperApiClient (mocked)", () => {
           access_token: "mock-access",
           refresh_token: "mock-refresh",
           expires_in: 3600,
-          scope: "reservations:read reservations:write"
-        })
+          scope: "reservations:read reservations:write",
+        }),
       )
       // create
       .mockResolvedValueOnce(jsonResponse({ ...payload, id: "res-1" }))
@@ -130,10 +130,10 @@ describe("DeveloperApiClient (mocked)", () => {
         method: "POST",
         headers: expect.objectContaining({
           Authorization: "Bearer mock-access",
-          "content-type": "application/json"
+          "content-type": "application/json",
         }),
-        body: JSON.stringify(payload)
-      })
+        body: JSON.stringify(payload),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -143,10 +143,10 @@ describe("DeveloperApiClient (mocked)", () => {
         method: "PATCH",
         headers: expect.objectContaining({
           Authorization: "Bearer mock-access",
-          "content-type": "application/json"
+          "content-type": "application/json",
         }),
-        body: JSON.stringify({ notes: "updated" })
-      })
+        body: JSON.stringify({ notes: "updated" }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -155,9 +155,9 @@ describe("DeveloperApiClient (mocked)", () => {
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
-          Authorization: "Bearer mock-access"
-        })
-      })
+          Authorization: "Bearer mock-access",
+        }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -166,9 +166,9 @@ describe("DeveloperApiClient (mocked)", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization: "Bearer mock-access"
-        })
-      })
+          Authorization: "Bearer mock-access",
+        }),
+      }),
     );
   });
 });

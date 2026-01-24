@@ -8,7 +8,7 @@ type ApiTokenRequest = Request & { apiPrincipal?: ApiPrincipal; campgroundId?: s
 
 @Injectable()
 export class ApiTokenGuard implements CanActivate {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private hashToken(token: string) {
     return createHash("sha256").update(token).digest("hex");
@@ -31,9 +31,9 @@ export class ApiTokenGuard implements CanActivate {
         accessTokenHash: hashed,
         revokedAt: null,
         expiresAt: { gt: new Date() },
-        ApiClient: { isActive: true }
+        ApiClient: { isActive: true },
       },
-      include: { ApiClient: true }
+      include: { ApiClient: true },
     });
 
     if (!record || !record.ApiClient) {
@@ -44,7 +44,7 @@ export class ApiTokenGuard implements CanActivate {
       apiClientId: record.apiClientId,
       tokenId: record.id,
       campgroundId: record.ApiClient.campgroundId,
-      scopes: record.scopes || []
+      scopes: record.scopes || [],
     };
 
     request.apiPrincipal = principal;

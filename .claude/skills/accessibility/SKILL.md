@@ -9,6 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ## WCAG 2.1 Level AA Compliance
 
 ### Core Principles (POUR)
+
 1. **Perceivable** - Users can perceive the content
 2. **Operable** - Users can navigate and interact
 3. **Understandable** - Content is clear and predictable
@@ -17,11 +18,13 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ## Color Contrast
 
 ### Minimum Ratios
+
 - **Normal text**: 4.5:1
 - **Large text (18px+ bold or 24px+)**: 3:1
 - **UI components**: 3:1
 
 ### Testing
+
 ```tsx
 // Tailwind classes with good contrast
 <p className="text-slate-900">High contrast text</p>  // Good
@@ -33,6 +36,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ```
 
 ### Never Rely on Color Alone
+
 ```tsx
 // BAD - Color only
 <span className="text-red-500">Error</span>
@@ -47,6 +51,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ## Keyboard Navigation
 
 ### Focus Management
+
 ```tsx
 // Always visible focus indicators
 <button className="focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
@@ -58,6 +63,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ```
 
 ### Tab Order
+
 ```tsx
 // Natural tab order (no tabIndex needed usually)
 <form>
@@ -71,6 +77,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ```
 
 ### Keyboard Shortcuts
+
 ```tsx
 // Escape to close modals
 useEffect(() => {
@@ -85,6 +92,7 @@ useEffect(() => {
 ## Screen Readers
 
 ### Semantic HTML
+
 ```tsx
 // Use proper elements
 <nav>...</nav>           // Navigation
@@ -96,6 +104,7 @@ useEffect(() => {
 ```
 
 ### ARIA Labels
+
 ```tsx
 // Label for icon-only buttons
 <button aria-label="Close dialog">
@@ -118,11 +127,14 @@ useEffect(() => {
 ```
 
 ### Form Accessibility
+
 ```tsx
 <div>
   <label htmlFor="email" id="email-label">
     Email address
-    <span className="text-red-500" aria-hidden="true">*</span>
+    <span className="text-red-500" aria-hidden="true">
+      *
+    </span>
   </label>
   <input
     id="email"
@@ -164,6 +176,7 @@ useEffect(() => {
 ## Interactive Components
 
 ### Buttons vs Links
+
 ```tsx
 // Button - performs action
 <button onClick={handleSubmit}>Submit</button>
@@ -176,6 +189,7 @@ useEffect(() => {
 ```
 
 ### Modal Dialogs
+
 ```tsx
 <div
   role="dialog"
@@ -184,9 +198,7 @@ useEffect(() => {
   aria-describedby="dialog-description"
 >
   <h2 id="dialog-title">Confirm Cancellation</h2>
-  <p id="dialog-description">
-    Are you sure you want to cancel this reservation?
-  </p>
+  <p id="dialog-description">Are you sure you want to cancel this reservation?</p>
   {/* Focus trap inside modal */}
 </div>
 ```

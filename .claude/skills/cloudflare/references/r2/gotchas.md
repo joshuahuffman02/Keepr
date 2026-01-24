@@ -19,10 +19,10 @@ while (listed.truncated) {
 
 ```typescript
 // ❌ WRONG: Using etag (unquoted) in headers
-headers.set('etag', object.etag); // Missing quotes
+headers.set("etag", object.etag); // Missing quotes
 
 // ✅ CORRECT: Use httpEtag (quoted)
-headers.set('etag', object.httpEtag);
+headers.set("etag", object.httpEtag);
 ```
 
 ## Checksum Limits
@@ -49,11 +49,11 @@ await env.MY_BUCKET.put(key, data, { sha256: hash });
 ```typescript
 // Precondition failure returns object WITHOUT body
 const object = await env.MY_BUCKET.get(key, {
-  onlyIf: { etagMatches: '"wrong"' }
+  onlyIf: { etagMatches: '"wrong"' },
 });
 
 // Check for body, not just null
-if (!object) return new Response('Not found', { status: 404 });
+if (!object) return new Response("Not found", { status: 404 });
 if (!object.body) return new Response(null, { status: 304 }); // Precondition failed
 ```
 
@@ -65,8 +65,8 @@ const key = url.pathname.slice(1); // Could be ../../../etc/passwd
 await env.MY_BUCKET.get(key);
 
 // ✅ SAFE: Validate keys
-if (!key || key.includes('..') || key.startsWith('/')) {
-  return new Response('Invalid key', { status: 400 });
+if (!key || key.includes("..") || key.startsWith("/")) {
+  return new Response("Invalid key", { status: 400 });
 }
 ```
 
@@ -78,14 +78,14 @@ if (!key || key.includes('..') || key.startsWith('/')) {
 
 ## Limits
 
-| Limit | Value |
-|-------|-------|
-| Object size | 5 TB |
-| Multipart part count | 10,000 |
-| Batch delete | 1,000 keys |
-| List limit | 1,000 per request |
-| Key size | 1024 bytes |
-| Custom metadata | 2 KB per object |
+| Limit                | Value             |
+| -------------------- | ----------------- |
+| Object size          | 5 TB              |
+| Multipart part count | 10,000            |
+| Batch delete         | 1,000 keys        |
+| List limit           | 1,000 per request |
+| Key size             | 1024 bytes        |
+| Custom metadata      | 2 KB per object   |
 
 ## Common Errors
 

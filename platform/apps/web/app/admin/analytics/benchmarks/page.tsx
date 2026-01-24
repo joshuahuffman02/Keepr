@@ -42,12 +42,12 @@ const mockBenchmarks = {
     },
   },
   adr: {
-    platformAverage: 58.50,
+    platformAverage: 58.5,
     byTypeAverage: {
-      rv: 68.50,
-      tent: 35.20,
-      cabin: 95.80,
-      glamping: 125.40,
+      rv: 68.5,
+      tent: 35.2,
+      cabin: 95.8,
+      glamping: 125.4,
     },
   },
   bookingWindow: {
@@ -61,11 +61,41 @@ const mockCampgroundComparison = {
     name: "Sample Campground",
   },
   metrics: [
-    { metric: "Total Revenue", campgroundValue: 68500, platformAverage: 56875, percentile: 72, status: "above" },
-    { metric: "Occupancy Rate (%)", campgroundValue: 75.2, platformAverage: 67.8, percentile: 68, status: "above" },
-    { metric: "Average Length of Stay", campgroundValue: 4.2, platformAverage: 3.8, percentile: 65, status: "above" },
-    { metric: "Average Daily Rate ($)", campgroundValue: 62.50, platformAverage: 58.50, percentile: 58, status: "average" },
-    { metric: "Average Booking Window (days)", campgroundValue: 18.5, platformAverage: 21.5, percentile: 42, status: "below" },
+    {
+      metric: "Total Revenue",
+      campgroundValue: 68500,
+      platformAverage: 56875,
+      percentile: 72,
+      status: "above",
+    },
+    {
+      metric: "Occupancy Rate (%)",
+      campgroundValue: 75.2,
+      platformAverage: 67.8,
+      percentile: 68,
+      status: "above",
+    },
+    {
+      metric: "Average Length of Stay",
+      campgroundValue: 4.2,
+      platformAverage: 3.8,
+      percentile: 65,
+      status: "above",
+    },
+    {
+      metric: "Average Daily Rate ($)",
+      campgroundValue: 62.5,
+      platformAverage: 58.5,
+      percentile: 58,
+      status: "average",
+    },
+    {
+      metric: "Average Booking Window (days)",
+      campgroundValue: 18.5,
+      platformAverage: 21.5,
+      percentile: 42,
+      status: "below",
+    },
   ],
   overallScore: 61,
 };
@@ -187,19 +217,27 @@ export default function BenchmarksPage() {
           <CardContent className="space-y-4">
             <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
               <span className="text-muted-foreground">Average per Campground</span>
-              <span className="text-foreground font-medium">{formatCurrency(benchmarks.revenue.averagePerCampground)}</span>
+              <span className="text-foreground font-medium">
+                {formatCurrency(benchmarks.revenue.averagePerCampground)}
+              </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
               <span className="text-muted-foreground">Median per Campground</span>
-              <span className="text-foreground font-medium">{formatCurrency(benchmarks.revenue.medianPerCampground)}</span>
+              <span className="text-foreground font-medium">
+                {formatCurrency(benchmarks.revenue.medianPerCampground)}
+              </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-green-50 border border-green-200 rounded-lg">
               <span className="text-green-700">Top 10% Threshold</span>
-              <span className="text-green-700 font-medium">{formatCurrency(benchmarks.revenue.top10Percentile)}</span>
+              <span className="text-green-700 font-medium">
+                {formatCurrency(benchmarks.revenue.top10Percentile)}
+              </span>
             </div>
             <div className="flex justify-between items-center p-3 bg-red-50 border border-red-200 rounded-lg">
               <span className="text-red-700">Bottom 10% Threshold</span>
-              <span className="text-red-700 font-medium">{formatCurrency(benchmarks.revenue.bottom10Percentile)}</span>
+              <span className="text-red-700 font-medium">
+                {formatCurrency(benchmarks.revenue.bottom10Percentile)}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -235,7 +273,10 @@ export default function BenchmarksPage() {
           <CardContent>
             <div className="space-y-3">
               {Object.entries(benchmarks.adr.byTypeAverage).map(([type, rate]) => (
-                <div key={type} className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                <div
+                  key={type}
+                  className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                >
                   <span className="text-foreground capitalize">{type}</span>
                   <span className="text-foreground font-medium">{formatCurrency(rate)}/night</span>
                 </div>
@@ -252,7 +293,10 @@ export default function BenchmarksPage() {
           <CardContent>
             <div className="space-y-3">
               {Object.entries(benchmarks.los.byTypeAverage).map(([type, los]) => (
-                <div key={type} className="flex justify-between items-center p-3 bg-muted rounded-lg">
+                <div
+                  key={type}
+                  className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                >
                   <span className="text-foreground capitalize">{type}</span>
                   <span className="text-foreground font-medium">{los.toFixed(1)} nights</span>
                 </div>
@@ -268,8 +312,8 @@ export default function BenchmarksPage() {
         <RadarChart
           title="Performance Spider Chart"
           description="Visual comparison across all metrics (percentile scores)"
-          data={comparison.metrics.map(m => ({
-            metric: m.metric.replace(/\s*\([^)]*\)/g, '').substring(0, 15),
+          data={comparison.metrics.map((m) => ({
+            metric: m.metric.replace(/\s*\([^)]*\)/g, "").substring(0, 15),
             value: m.percentile,
             benchmark: 50,
             fullMark: 100,

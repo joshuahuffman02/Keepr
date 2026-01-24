@@ -64,10 +64,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div
-            key={i}
-            className="h-20 bg-muted animate-pulse rounded-lg"
-          />
+          <div key={i} className="h-20 bg-muted animate-pulse rounded-lg" />
         ))}
       </div>
     );
@@ -75,9 +72,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
 
   if (sortedMethods.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        No payment methods available
-      </div>
+      <div className="text-center py-8 text-muted-foreground">No payment methods available</div>
     );
   }
 
@@ -90,7 +85,8 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
 
         // Special states
         const hasWallet = method === "guest_wallet" && state.walletBalanceCents > 0;
-        const hasTerminal = method === "terminal" && state.terminalReaders.some((r) => r.status === "online");
+        const hasTerminal =
+          method === "terminal" && state.terminalReaders.some((r) => r.status === "online");
         const hasSavedCards = method === "saved_card" && state.savedCards.length > 0;
 
         return (
@@ -105,7 +101,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
               isSelected
                 ? "border-emerald-600 bg-emerald-50 text-emerald-700"
                 : "border-border bg-card text-foreground",
-              disabled && "opacity-50 cursor-not-allowed hover:border-border hover:bg-card"
+              disabled && "opacity-50 cursor-not-allowed hover:border-border hover:bg-card",
             )}
           >
             <IconComponent className="w-6 h-6 mb-2" />
@@ -125,7 +121,7 @@ export function MethodSelector({ onSelect, disabled = false }: MethodSelectorPro
                   "absolute top-1 right-1 text-xs px-1.5 py-0.5 rounded-full",
                   hasTerminal
                     ? "bg-status-success-bg text-status-success-text"
-                    : "bg-muted text-muted-foreground"
+                    : "bg-muted text-muted-foreground",
                 )}
               >
                 {hasTerminal ? "Ready" : "Offline"}

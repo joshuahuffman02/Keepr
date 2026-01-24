@@ -15,7 +15,7 @@ import { IntegrationsClient } from "@keepr/integrations-sdk";
 
 const client = new IntegrationsClient({
   baseUrl: "https://api.example.com/api",
-  token: "YOUR_JWT_OR_TOKEN"
+  token: "YOUR_JWT_OR_TOKEN",
 });
 
 // Upsert a connection (sandbox QBO)
@@ -24,7 +24,7 @@ await client.upsertConnection({
   type: "accounting",
   provider: "qbo",
   credentials: { accessToken: "sandbox-token" },
-  settings: { realmId: "sandbox-realm-id" }
+  settings: { realmId: "sandbox-realm-id" },
 });
 
 // List connections
@@ -42,6 +42,6 @@ await client.queueExport({ type: "api", connectionId: connections[0].id, resourc
 ```
 
 ## Notes
+
 - Uses cross-fetch; set `token` or `apiKey` for auth headers.
 - Keep sandbox credentials only; production provider creds require approval.
-

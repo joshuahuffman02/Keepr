@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { DynamicPricingService } from '../src/dynamic-pricing/dynamic-pricing.service';
-import { WorkflowsService } from '../src/workflows/workflows.service';
-import { StaffService } from '../src/staff/staff.service';
-import { PortfolioService } from '../src/portfolio/portfolio.service';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { Test, TestingModule } from "@nestjs/testing";
+import { DynamicPricingService } from "../src/dynamic-pricing/dynamic-pricing.service";
+import { WorkflowsService } from "../src/workflows/workflows.service";
+import { StaffService } from "../src/staff/staff.service";
+import { PortfolioService } from "../src/portfolio/portfolio.service";
+import { PrismaService } from "../src/prisma/prisma.service";
 
 const mockPrisma = {
   dynamicPricingRule: {
@@ -88,7 +88,7 @@ const mockPrisma = {
   },
 };
 
-describe('Phase 3 modules', () => {
+describe("Phase 3 modules", () => {
   let pricing: DynamicPricingService;
   let workflows: WorkflowsService;
   let staff: StaffService;
@@ -115,39 +115,51 @@ describe('Phase 3 modules', () => {
     jest.clearAllMocks();
   });
 
-  it('calculates occupancy-based adjustments', async () => {
+  it("calculates occupancy-based adjustments", async () => {
     mockPrisma.occupancySnapshot.findUnique.mockResolvedValue({ occupancyPct: 80 });
     mockPrisma.dynamicPricingRule.findMany.mockResolvedValue([
-      { name: 'High Occ', siteClassIds: [], conditions: { occupancyMin: 70 }, adjustmentType: 'percent', adjustmentValue: 10 },
+      {
+        name: "High Occ",
+        siteClassIds: [],
+        conditions: { occupancyMin: 70 },
+        adjustmentType: "percent",
+        adjustmentValue: 10,
+      },
     ]);
-    const result = await pricing.calculateAdjustment('cg', null, new Date(), 10000);
+    const result = await pricing.calculateAdjustment("cg", null, new Date(), 10000);
     expect(result.adjustedPrice).toBeGreaterThan(10000);
   });
 
-  it('processes workflow executions (cron)', async () => {
+  it("processes workflow executions (cron)", async () => {
     mockPrisma.workflowExecution.findMany.mockResolvedValue([
-      { id: 'w1', status: 'pending', currentStep: 0, workflow: { steps: [{ isActive: true, actionType: 'condition', config: {} }] } },
+      {
+        id: "w1",
+        status: "pending",
+        currentStep: 0,
+        workflow: { steps: [{ isActive: true, actionType: "condition", config: {} }] },
+      },
     ]);
     mockPrisma.workflowExecution.update.mockResolvedValue({});
     const out = await workflows.processPendingExecutions();
     expect(out.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('records staff performance', async () => {
-    mockPrisma.task.findMany.mockResolvedValue([{ slaStatus: 'on_track' }]);
+  it("records staff performance", async () => {
+    mockPrisma.task.findMany.mockResolvedValue([{ slaStatus: "on_track" }]);
     mockPrisma.staffShift.findMany.mockResolvedValue([
       { clockedInAt: new Date(Date.now() - 2 * 3600 * 1000), clockedOutAt: new Date() },
     ]);
-    await staff.calculatePerformanceMetrics('cg', 'user', new Date(), new Date());
+    await staff.calculatePerformanceMetrics("cg", "user", new Date(), new Date());
     expect(mockPrisma.staffPerformance.upsert).toHaveBeenCalled();
   });
 
-  it('aggregates portfolio metrics', async () => {
-    mockPrisma.campground.findMany.mockResolvedValue([{ id: 'c1', name: 'Camp' }]);
+  it("aggregates portfolio metrics", async () => {
+    mockPrisma.campground.findMany.mockResolvedValue([{ id: "c1", name: "Camp" }]);
     mockPrisma.reservation.count.mockResolvedValue(10);
-    mockPrisma.reservation.aggregate = jest.fn().mockResolvedValue({ _sum: { totalAmount: 100000 } });
-    await portfolio.calculateDailyMetrics('org', new Date());
+    mockPrisma.reservation.aggregate = jest
+      .fn()
+      .mockResolvedValue({ _sum: { totalAmount: 100000 } });
+    await portfolio.calculateDailyMetrics("org", new Date());
     expect(mockPrisma.portfolioMetric.upsert).toHaveBeenCalled();
   });
 });
-

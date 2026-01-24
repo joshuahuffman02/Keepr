@@ -8,4 +8,3 @@ import { LocalizationController } from "./localization.controller";
   exports: [LocalizationService],
 })
 export class LocalizationModule {}
-

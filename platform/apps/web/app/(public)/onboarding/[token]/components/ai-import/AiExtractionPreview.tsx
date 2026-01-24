@@ -2,15 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-import {
-  Check,
-  AlertTriangle,
-  X,
-  Edit2,
-  ChevronDown,
-  ChevronUp,
-  Loader2,
-} from "lucide-react";
+import { Check, AlertTriangle, X, Edit2, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -21,11 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 type FieldValue = string | number | boolean | null;
@@ -101,9 +89,7 @@ export function AiExtractionPreview({
   isConfirming = false,
 }: AiExtractionPreviewProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
-  const [editingCell, setEditingCell] = useState<{ row: number; field: string } | null>(
-    null
-  );
+  const [editingCell, setEditingCell] = useState<{ row: number; field: string } | null>(null);
   const [editValue, setEditValue] = useState<string>("");
   const [showLowConfidence, setShowLowConfidence] = useState(true);
 
@@ -115,7 +101,7 @@ export function AiExtractionPreview({
     return Object.keys(firstRow.fields).filter((field) => {
       // Always show fields that have values or are required
       const hasValue = rows.some(
-        (r) => r.fields[field]?.value !== null && r.fields[field]?.value !== undefined
+        (r) => r.fields[field]?.value !== null && r.fields[field]?.value !== undefined,
       );
       return hasValue;
     });
@@ -197,9 +183,7 @@ export function AiExtractionPreview({
             <p className="text-sm text-muted-foreground">To Update</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-muted-foreground">
-              {summary.skipCount}
-            </p>
+            <p className="text-2xl font-bold text-muted-foreground">{summary.skipCount}</p>
             <p className="text-sm text-muted-foreground">Skipped</p>
           </div>
         </div>
@@ -249,12 +233,10 @@ export function AiExtractionPreview({
                   <TableRow
                     className={cn(
                       "cursor-pointer hover:bg-muted/50",
-                      row.action === "skip" && "opacity-50"
+                      row.action === "skip" && "opacity-50",
                     )}
                   >
-                    <TableCell className="font-mono text-sm">
-                      {row.rowNumber}
-                    </TableCell>
+                    <TableCell className="font-mono text-sm">{row.rowNumber}</TableCell>
                     <TableCell>
                       <div
                         className="flex items-center gap-1"
@@ -266,15 +248,14 @@ export function AiExtractionPreview({
                     {visibleFields.slice(0, 6).map((field) => {
                       const fieldData = row.fields[field];
                       const isEditing =
-                        editingCell?.row === row.rowNumber &&
-                        editingCell?.field === field;
+                        editingCell?.row === row.rowNumber && editingCell?.field === field;
 
                       return (
                         <TableCell
                           key={field}
                           className={cn(
                             "relative",
-                            fieldData?.requiresReview && getConfidenceBg(fieldData.confidence)
+                            fieldData?.requiresReview && getConfidenceBg(fieldData.confidence),
                           )}
                           onClick={() => {
                             if (!isEditing && fieldData) {
@@ -336,9 +317,7 @@ export function AiExtractionPreview({
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            setExpandedRow(
-                              expandedRow === row.rowNumber ? null : row.rowNumber
-                            )
+                            setExpandedRow(expandedRow === row.rowNumber ? null : row.rowNumber)
                           }
                         >
                           {expandedRow === row.rowNumber ? (
@@ -363,15 +342,13 @@ export function AiExtractionPreview({
                                   "p-2 rounded border text-sm",
                                   data.requiresReview
                                     ? getConfidenceBg(data.confidence)
-                                    : "bg-white"
+                                    : "bg-white",
                                 )}
                               >
                                 <p className="text-xs text-muted-foreground">
                                   {FIELD_LABELS[field] || field}
                                 </p>
-                                <p className="font-medium truncate">
-                                  {formatValue(data.value)}
-                                </p>
+                                <p className="font-medium truncate">{formatValue(data.value)}</p>
                                 <p className="text-xs text-muted-foreground mt-1">
                                   {Math.round(data.confidence * 100)}% • {data.source}
                                 </p>
@@ -407,10 +384,7 @@ export function AiExtractionPreview({
         <Button variant="outline" onClick={onCancel} disabled={isConfirming}>
           Cancel
         </Button>
-        <Button
-          onClick={onConfirm}
-          disabled={isConfirming || summary.validRows === 0}
-        >
+        <Button onClick={onConfirm} disabled={isConfirming || summary.validRows === 0}>
           {isConfirming ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

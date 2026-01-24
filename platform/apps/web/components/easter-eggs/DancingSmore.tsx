@@ -40,10 +40,7 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
               }}
             >
               {/* S'more SVG */}
-              <svg
-                viewBox="0 0 120 100"
-                className="w-32 h-28 drop-shadow-2xl"
-              >
+              <svg viewBox="0 0 120 100" className="w-32 h-28 drop-shadow-2xl">
                 {/* Bottom graham cracker */}
                 <rect
                   x="10"
@@ -56,9 +53,33 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
                   strokeWidth="2"
                 />
                 {/* Graham cracker texture lines */}
-                <line x1="30" y1="75" x2="30" y2="85" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
-                <line x1="60" y1="75" x2="60" y2="85" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
-                <line x1="90" y1="75" x2="90" y2="85" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
+                <line
+                  x1="30"
+                  y1="75"
+                  x2="30"
+                  y2="85"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                <line
+                  x1="60"
+                  y1="75"
+                  x2="60"
+                  y2="85"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                <line
+                  x1="90"
+                  y1="75"
+                  x2="90"
+                  y2="85"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
 
                 {/* Chocolate layer */}
                 <rect
@@ -72,8 +93,24 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
                   strokeWidth="1"
                 />
                 {/* Chocolate squares */}
-                <line x1="45" y1="55" x2="45" y2="73" stroke="#3D2817" strokeWidth="1" opacity="0.5" />
-                <line x1="75" y1="55" x2="75" y2="73" stroke="#3D2817" strokeWidth="1" opacity="0.5" />
+                <line
+                  x1="45"
+                  y1="55"
+                  x2="45"
+                  y2="73"
+                  stroke="#3D2817"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                <line
+                  x1="75"
+                  y1="55"
+                  x2="75"
+                  y2="73"
+                  stroke="#3D2817"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
 
                 {/* Marshmallow (toasted) */}
                 <ellipse
@@ -102,9 +139,33 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
                   strokeWidth="2"
                 />
                 {/* Graham cracker texture lines */}
-                <line x1="30" y1="20" x2="30" y2="30" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
-                <line x1="60" y1="20" x2="60" y2="30" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
-                <line x1="90" y1="20" x2="90" y2="30" stroke="#8B6914" strokeWidth="1" opacity="0.5" />
+                <line
+                  x1="30"
+                  y1="20"
+                  x2="30"
+                  y2="30"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                <line
+                  x1="60"
+                  y1="20"
+                  x2="60"
+                  y2="30"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
+                <line
+                  x1="90"
+                  y1="20"
+                  x2="90"
+                  y2="30"
+                  stroke="#8B6914"
+                  strokeWidth="1"
+                  opacity="0.5"
+                />
 
                 {/* Little arms */}
                 <motion.g
@@ -118,7 +179,15 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
                   }}
                   style={{ transformOrigin: "10px 50px" }}
                 >
-                  <line x1="10" y1="50" x2="-5" y2="35" stroke="#C4A574" strokeWidth="6" strokeLinecap="round" />
+                  <line
+                    x1="10"
+                    y1="50"
+                    x2="-5"
+                    y2="35"
+                    stroke="#C4A574"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
                 </motion.g>
                 <motion.g
                   animate={{
@@ -131,7 +200,15 @@ export function DancingSmore({ visible, onClose }: DancingSmoreProps) {
                   }}
                   style={{ transformOrigin: "110px 50px" }}
                 >
-                  <line x1="110" y1="50" x2="125" y2="35" stroke="#C4A574" strokeWidth="6" strokeLinecap="round" />
+                  <line
+                    x1="110"
+                    y1="50"
+                    x2="125"
+                    y2="35"
+                    stroke="#C4A574"
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                  />
                 </motion.g>
 
                 {/* Cute face on marshmallow */}

@@ -8,7 +8,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import * as bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -25,15 +25,15 @@ async function main() {
       passwordHash: password,
       isActive: true,
       firstName: "Linda",
-      lastName: "Thesing"
+      lastName: "Thesing",
     },
     create: {
       email: "lsthesing@gmail.com",
       passwordHash: password,
       firstName: "Linda",
       lastName: "Thesing",
-      isActive: true
-    }
+      isActive: true,
+    },
   });
   console.log(`Created/updated user: Linda Thesing (${linda.email})`);
 
@@ -44,15 +44,15 @@ async function main() {
       passwordHash: password,
       isActive: true,
       firstName: "John",
-      lastName: "Thesing"
+      lastName: "Thesing",
     },
     create: {
       email: "jthesing1@gmail.com",
       passwordHash: password,
       firstName: "John",
       lastName: "Thesing",
-      isActive: true
-    }
+      isActive: true,
+    },
   });
   console.log(`Created/updated user: John Thesing (${john.email})`);
 
@@ -63,10 +63,10 @@ async function main() {
         { slug: { startsWith: "keepr" } },
         { slug: "sunset-sands-resort" },
         { slug: "blueberry-hill-camp" },
-        { slug: "redwood-ridge-hideout" }
-      ]
+        { slug: "redwood-ridge-hideout" },
+      ],
     },
-    select: { id: true, name: true }
+    select: { id: true, name: true },
   });
 
   console.log(`\nAdding memberships to ${campgrounds.length} demo campgrounds...`);
@@ -75,27 +75,27 @@ async function main() {
     // Linda - front desk
     await prisma.campgroundMembership.upsert({
       where: {
-        userId_campgroundId: { userId: linda.id, campgroundId: cg.id }
+        userId_campgroundId: { userId: linda.id, campgroundId: cg.id },
       },
       update: { role: UserRole.front_desk },
       create: {
         campgroundId: cg.id,
         userId: linda.id,
-        role: UserRole.front_desk
-      }
+        role: UserRole.front_desk,
+      },
     });
 
     // John - maintenance
     await prisma.campgroundMembership.upsert({
       where: {
-        userId_campgroundId: { userId: john.id, campgroundId: cg.id }
+        userId_campgroundId: { userId: john.id, campgroundId: cg.id },
       },
       update: { role: UserRole.maintenance },
       create: {
         campgroundId: cg.id,
         userId: john.id,
-        role: UserRole.maintenance
-      }
+        role: UserRole.maintenance,
+      },
     });
 
     console.log(`  ${cg.name}: Linda (front_desk), John (maintenance)`);

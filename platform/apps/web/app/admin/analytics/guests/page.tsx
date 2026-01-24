@@ -66,7 +66,9 @@ export default function GuestJourneyPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/admin/platform-analytics/guests/journey?range=${dateRange}`);
+        const response = await fetch(
+          `/api/admin/platform-analytics/guests/journey?range=${dateRange}`,
+        );
         if (response.ok) {
           const result = await response.json();
           setData(result);
@@ -102,10 +104,11 @@ export default function GuestJourneyPage() {
   const upgradeRate = toNumber(data?.accommodationProgression?.upgradeRate) ?? 0;
   const downgradeRate = toNumber(data?.accommodationProgression?.downgradeRate) ?? 0;
 
-  const ltvPieData = data?.lifetimeValue?.tiers?.map((tier) => ({
-    name: tier.tier,
-    value: tier.guestCount,
-  })) || [];
+  const ltvPieData =
+    data?.lifetimeValue?.tiers?.map((tier) => ({
+      name: tier.tier,
+      value: tier.guestCount,
+    })) || [];
 
   const hasData = data && data.overview && data.overview.totalGuests > 0;
 
@@ -125,7 +128,8 @@ export default function GuestJourneyPage() {
           <Users className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No Guest Data Available</h3>
           <p className="text-muted-foreground max-w-md">
-            There is no guest data for the selected time period. Data will appear here once guests make reservations.
+            There is no guest data for the selected time period. Data will appear here once guests
+            make reservations.
           </p>
         </div>
       </div>
@@ -229,9 +233,7 @@ export default function GuestJourneyPage() {
               </div>
               <div>
                 <p className="text-sm text-green-600 font-medium">Upgrade Rate</p>
-                <p className="text-3xl font-bold text-foreground">
-                  {upgradeRate.toFixed(1)}%
-                </p>
+                <p className="text-3xl font-bold text-foreground">{upgradeRate.toFixed(1)}%</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Guests moving to higher-tier accommodations
                 </p>
@@ -247,9 +249,7 @@ export default function GuestJourneyPage() {
               </div>
               <div>
                 <p className="text-sm text-red-600 font-medium">Downgrade Rate</p>
-                <p className="text-3xl font-bold text-foreground">
-                  {downgradeRate.toFixed(1)}%
-                </p>
+                <p className="text-3xl font-bold text-foreground">{downgradeRate.toFixed(1)}%</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   Guests moving to lower-tier accommodations
                 </p>
@@ -268,9 +268,24 @@ export default function GuestJourneyPage() {
             columns={[
               { key: "tier", label: "LTV Tier" },
               { key: "guestCount", label: "Guests", align: "right", format: (v) => formatCount(v) },
-              { key: "totalRevenue", label: "Total Revenue", align: "right", format: (v) => formatMoney(v) },
-              { key: "averageLtv", label: "Avg LTV", align: "right", format: (v) => formatMoney(v) },
-              { key: "averageStays", label: "Avg Stays", align: "right", format: (v) => formatFixed(v) },
+              {
+                key: "totalRevenue",
+                label: "Total Revenue",
+                align: "right",
+                format: (v) => formatMoney(v),
+              },
+              {
+                key: "averageLtv",
+                label: "Avg LTV",
+                align: "right",
+                format: (v) => formatMoney(v),
+              },
+              {
+                key: "averageStays",
+                label: "Avg Stays",
+                align: "right",
+                format: (v) => formatFixed(v),
+              },
             ]}
             data={data?.lifetimeValue?.tiers || []}
             loading={loading}
@@ -309,7 +324,12 @@ export default function GuestJourneyPage() {
           { key: "totalGuests", label: "Guests", align: "right", format: (v) => formatCount(v) },
           { key: "retention30", label: "30-Day", align: "right", format: (v) => formatPercent(v) },
           { key: "retention90", label: "90-Day", align: "right", format: (v) => formatPercent(v) },
-          { key: "retention180", label: "180-Day", align: "right", format: (v) => formatPercent(v) },
+          {
+            key: "retention180",
+            label: "180-Day",
+            align: "right",
+            format: (v) => formatPercent(v),
+          },
         ]}
         data={data?.retentionCohorts || []}
         loading={loading}

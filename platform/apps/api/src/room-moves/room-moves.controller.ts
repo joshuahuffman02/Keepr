@@ -1,26 +1,18 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import { RoomMovesService } from './room-moves.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import type { AuthUser } from '../auth/auth.types';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from "@nestjs/common";
+import { RoomMovesService } from "./room-moves.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { CurrentUser } from "../auth/decorators/current-user.decorator";
+import type { AuthUser } from "../auth/auth.types";
 
-@Controller('room-moves')
+@Controller("room-moves")
 @UseGuards(JwtAuthGuard)
 export class RoomMovesController {
   constructor(private roomMovesService: RoomMovesService) {}
 
   @Post()
   createMoveRequest(
-    @Body() body: {
+    @Body()
+    body: {
       reservationId: string;
       toSiteId: string;
       moveDate: string;
@@ -37,44 +29,38 @@ export class RoomMovesController {
     });
   }
 
-  @Get(':id')
-  getMoveRequest(@Param('id') id: string) {
+  @Get(":id")
+  getMoveRequest(@Param("id") id: string) {
     return this.roomMovesService.getMoveRequest(id);
   }
 
-  @Get('reservation/:reservationId')
-  getMoveRequestsByReservation(@Param('reservationId') reservationId: string) {
+  @Get("reservation/:reservationId")
+  getMoveRequestsByReservation(@Param("reservationId") reservationId: string) {
     return this.roomMovesService.getMoveRequestsByReservation(reservationId);
   }
 
   @Get()
-  getPendingMoveRequests(@Query('campgroundId') campgroundId: string) {
+  getPendingMoveRequests(@Query("campgroundId") campgroundId: string) {
     return this.roomMovesService.getPendingMoveRequests(campgroundId);
   }
 
-  @Get('today')
-  getTodaysMoves(@Query('campgroundId') campgroundId: string) {
+  @Get("today")
+  getTodaysMoves(@Query("campgroundId") campgroundId: string) {
     return this.roomMovesService.getTodaysMoves(campgroundId);
   }
 
-  @Post(':id/approve')
-  approveMoveRequest(
-    @Param('id') id: string,
-    @CurrentUser() user: AuthUser,
-  ) {
+  @Post(":id/approve")
+  approveMoveRequest(@Param("id") id: string, @CurrentUser() user: AuthUser) {
     return this.roomMovesService.approveMoveRequest(id, user.id);
   }
 
-  @Post(':id/complete')
-  completeMoveRequest(
-    @Param('id') id: string,
-    @CurrentUser() user: AuthUser,
-  ) {
+  @Post(":id/complete")
+  completeMoveRequest(@Param("id") id: string, @CurrentUser() user: AuthUser) {
     return this.roomMovesService.completeMoveRequest(id, user.id);
   }
 
-  @Post(':id/cancel')
-  cancelMoveRequest(@Param('id') id: string) {
+  @Post(":id/cancel")
+  cancelMoveRequest(@Param("id") id: string) {
     return this.roomMovesService.cancelMoveRequest(id);
   }
 }

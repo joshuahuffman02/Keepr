@@ -10,4 +10,3 @@ export class UpdatePhotosDto {
   @IsString()
   heroImageUrl?: string | null;
 }
-

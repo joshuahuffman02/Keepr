@@ -6,15 +6,30 @@ import { buildAuthMembership, buildAuthUser } from "../test-helpers/auth";
 
 describe("PermissionsService", () => {
   type PrismaMock = {
-    permissionRule: { findMany: jest.Mock; findFirst: jest.Mock; create: jest.Mock; update: jest.Mock; delete: jest.Mock };
-    approvalRequest: { create: jest.Mock; findUnique: jest.Mock; update: jest.Mock; findMany: jest.Mock };
+    permissionRule: {
+      findMany: jest.Mock;
+      findFirst: jest.Mock;
+      create: jest.Mock;
+      update: jest.Mock;
+      delete: jest.Mock;
+    };
+    approvalRequest: {
+      create: jest.Mock;
+      findUnique: jest.Mock;
+      update: jest.Mock;
+      findMany: jest.Mock;
+    };
   };
 
   let service: PermissionsService;
   let prismaMock: PrismaMock;
   let moduleRef: TestingModule;
 
-  const buildUserForCampground = (campgroundId: string, role: UserRole, overrides: Parameters<typeof buildAuthUser>[0] = {}) =>
+  const buildUserForCampground = (
+    campgroundId: string,
+    role: UserRole,
+    overrides: Parameters<typeof buildAuthUser>[0] = {},
+  ) =>
     buildAuthUser({
       role,
       memberships: [buildAuthMembership({ campgroundId, role })],
@@ -28,18 +43,18 @@ describe("PermissionsService", () => {
         findFirst: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
-        delete: jest.fn()
+        delete: jest.fn(),
       },
       approvalRequest: {
         create: jest.fn(),
         findUnique: jest.fn(),
         update: jest.fn(),
-        findMany: jest.fn()
-      }
+        findMany: jest.fn(),
+      },
     };
 
     moduleRef = await Test.createTestingModule({
-      providers: [PermissionsService, { provide: PrismaService, useValue: prismaMock }]
+      providers: [PermissionsService, { provide: PrismaService, useValue: prismaMock }],
     }).compile();
 
     service = moduleRef.get(PermissionsService);
@@ -57,7 +72,7 @@ describe("PermissionsService", () => {
       campgroundId: "camp1",
       region: "r1",
       resource: "communications",
-      action: "read"
+      action: "read",
     });
     expect(res.allowed).toBe(false);
   });
@@ -69,8 +84,8 @@ describe("PermissionsService", () => {
         resource: "communications",
         action: "read",
         fields: ["__region:r1", "body"],
-        effect: PermissionEffect.allow
-      }
+        effect: PermissionEffect.allow,
+      },
     ]);
 
     const res = await service.checkAccess({
@@ -79,7 +94,7 @@ describe("PermissionsService", () => {
       region: "r1",
       resource: "communications",
       action: "read",
-      field: "body"
+      field: "body",
     });
     expect(res.allowed).toBe(true);
   });
@@ -91,8 +106,8 @@ describe("PermissionsService", () => {
         resource: "communications",
         action: "read",
         fields: [],
-        effect: PermissionEffect.deny
-      }
+        effect: PermissionEffect.deny,
+      },
     ]);
 
     const res = await service.checkAccess({
@@ -100,7 +115,7 @@ describe("PermissionsService", () => {
       campgroundId: "camp1",
       region: "r1",
       resource: "communications",
-      action: "read"
+      action: "read",
     });
     expect(res.allowed).toBe(false);
   });
@@ -115,14 +130,14 @@ describe("PermissionsService", () => {
       action: "read",
       fields: ["body"],
       regions: ["r1"],
-      effect: PermissionEffect.allow
+      effect: PermissionEffect.allow,
     });
     expect(prismaMock.permissionRule.create).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({
-          fields: expect.arrayContaining(["body", "__region:r1"])
-        })
-      })
+          fields: expect.arrayContaining(["body", "__region:r1"]),
+        }),
+      }),
     );
   });
 
@@ -132,7 +147,7 @@ describe("PermissionsService", () => {
       campgroundId: "campX",
       region: "r1",
       resource: "finance",
-      action: "write"
+      action: "write",
     });
     expect(resOwner.allowed).toBe(true);
 
@@ -141,7 +156,7 @@ describe("PermissionsService", () => {
       campgroundId: "campX",
       region: "r1",
       resource: "finance",
-      action: "write"
+      action: "write",
     });
     expect(resManager.allowed).toBe(true);
   });
@@ -154,7 +169,7 @@ describe("PermissionsService", () => {
         action: "read",
         fields: [],
         effect: PermissionEffect.allow,
-        campgroundId: "camp1"
+        campgroundId: "camp1",
       },
       {
         role: UserRole.front_desk,
@@ -162,8 +177,8 @@ describe("PermissionsService", () => {
         action: "read",
         fields: [],
         effect: PermissionEffect.deny,
-        campgroundId: null
-      }
+        campgroundId: null,
+      },
     ]);
 
     const res = await service.checkAccess({
@@ -171,7 +186,7 @@ describe("PermissionsService", () => {
       campgroundId: "camp1",
       region: null,
       resource: "communications",
-      action: "read"
+      action: "read",
     });
     expect(res.allowed).toBe(true);
   });
@@ -183,8 +198,8 @@ describe("PermissionsService", () => {
         resource: "communications",
         action: "read",
         fields: ["__region:r2"],
-        effect: PermissionEffect.allow
-      }
+        effect: PermissionEffect.allow,
+      },
     ]);
 
     const res = await service.checkAccess({
@@ -192,7 +207,7 @@ describe("PermissionsService", () => {
       campgroundId: "camp1",
       region: "r1",
       resource: "communications",
-      action: "read"
+      action: "read",
     });
     expect(res.allowed).toBe(false);
   });

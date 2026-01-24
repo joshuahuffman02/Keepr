@@ -79,10 +79,23 @@ export const IMPORT_SYSTEMS: ImportSystemDefinition[] = [
     key: "campspot",
     label: "Campspot",
     forms: [
-      { ...BASE_FORMS.sites, description: "Look for a Campspot export labeled Sites, Inventory, or Space Types (CSV/Excel)." },
-      { ...BASE_FORMS.reservations, description: "Campspot Reservations/Booking List export with totals, payments, and taxes." },
-      { ...BASE_FORMS.rates, description: "Campspot Rate Table or Seasonal Rates export (Pricing or Rates report)." },
-      { ...BASE_FORMS.taxes, description: "Campspot Taxes/Fees report or Transactions export with tax totals." },
+      {
+        ...BASE_FORMS.sites,
+        description:
+          "Look for a Campspot export labeled Sites, Inventory, or Space Types (CSV/Excel).",
+      },
+      {
+        ...BASE_FORMS.reservations,
+        description: "Campspot Reservations/Booking List export with totals, payments, and taxes.",
+      },
+      {
+        ...BASE_FORMS.rates,
+        description: "Campspot Rate Table or Seasonal Rates export (Pricing or Rates report).",
+      },
+      {
+        ...BASE_FORMS.taxes,
+        description: "Campspot Taxes/Fees report or Transactions export with tax totals.",
+      },
     ],
   },
   {
@@ -90,8 +103,14 @@ export const IMPORT_SYSTEMS: ImportSystemDefinition[] = [
     label: "Newbook",
     forms: [
       { ...BASE_FORMS.sites, description: "Newbook Sites or Units export (Inventory/Asset list)." },
-      { ...BASE_FORMS.reservations, description: "Newbook Reservations or Booking List report export with payments." },
-      { ...BASE_FORMS.rates, description: "Newbook Rates/Seasons export (Rate Plans or Pricing table)." },
+      {
+        ...BASE_FORMS.reservations,
+        description: "Newbook Reservations or Booking List report export with payments.",
+      },
+      {
+        ...BASE_FORMS.rates,
+        description: "Newbook Rates/Seasons export (Rate Plans or Pricing table).",
+      },
       { ...BASE_FORMS.taxes, description: "Newbook Charges/Taxes or Transaction ledger export." },
     ],
   },
@@ -99,8 +118,14 @@ export const IMPORT_SYSTEMS: ImportSystemDefinition[] = [
     key: "rms_cloud",
     label: "RMS Cloud",
     forms: [
-      { ...BASE_FORMS.sites, description: "RMS Areas/Rooms/Inventory export (often called Asset list)." },
-      { ...BASE_FORMS.reservations, description: "RMS Reservations/Booking List report export with charges." },
+      {
+        ...BASE_FORMS.sites,
+        description: "RMS Areas/Rooms/Inventory export (often called Asset list).",
+      },
+      {
+        ...BASE_FORMS.reservations,
+        description: "RMS Reservations/Booking List report export with charges.",
+      },
       { ...BASE_FORMS.rates, description: "RMS Rate Table or Rate Lookup export." },
       { ...BASE_FORMS.taxes, description: "RMS Tax/Charge ledger or Revenue summary export." },
     ],
@@ -110,9 +135,15 @@ export const IMPORT_SYSTEMS: ImportSystemDefinition[] = [
     label: "Campground Master",
     forms: [
       { ...BASE_FORMS.sites, description: "Campground Master Sites list export (Setup > Sites)." },
-      { ...BASE_FORMS.reservations, description: "Campground Master Reservation list or Arrivals/Departures report export." },
+      {
+        ...BASE_FORMS.reservations,
+        description: "Campground Master Reservation list or Arrivals/Departures report export.",
+      },
       { ...BASE_FORMS.rates, description: "Campground Master Rate Table or Seasonal Rate export." },
-      { ...BASE_FORMS.taxes, description: "Campground Master Tax/Charge report or Transaction summary export." },
+      {
+        ...BASE_FORMS.taxes,
+        description: "Campground Master Tax/Charge report or Transaction summary export.",
+      },
     ],
   },
   {
@@ -120,20 +151,21 @@ export const IMPORT_SYSTEMS: ImportSystemDefinition[] = [
     label: "ResNexus",
     forms: [
       { ...BASE_FORMS.sites, description: "ResNexus Units/Rooms export (Inventory list)." },
-      { ...BASE_FORMS.reservations, description: "ResNexus Reservations/Booking List report export with payments." },
+      {
+        ...BASE_FORMS.reservations,
+        description: "ResNexus Reservations/Booking List report export with payments.",
+      },
       { ...BASE_FORMS.rates, description: "ResNexus Rate/Season export or Pricing table." },
-      { ...BASE_FORMS.taxes, description: "ResNexus Taxes/Fees report or Payments/Transactions export." },
+      {
+        ...BASE_FORMS.taxes,
+        description: "ResNexus Taxes/Fees report or Payments/Transactions export.",
+      },
     ],
   },
   {
     key: "other",
     label: "Other / Not Sure",
-    forms: [
-      BASE_FORMS.sites,
-      BASE_FORMS.reservations,
-      BASE_FORMS.rates,
-      BASE_FORMS.taxes,
-    ],
+    forms: [BASE_FORMS.sites, BASE_FORMS.reservations, BASE_FORMS.rates, BASE_FORMS.taxes],
   },
 ];
 
@@ -238,7 +270,9 @@ export const resolveImportSystem = (key?: string): ImportSystemDefinition => {
     return IMPORT_SYSTEMS.find((system) => system.key === DEFAULT_SYSTEM_KEY) ?? IMPORT_SYSTEMS[0];
   }
   const normalized = key.toLowerCase();
-  return IMPORT_SYSTEMS.find((system) => system.key === normalized)
-    ?? IMPORT_SYSTEMS.find((system) => system.key === DEFAULT_SYSTEM_KEY)
-    ?? IMPORT_SYSTEMS[0];
+  return (
+    IMPORT_SYSTEMS.find((system) => system.key === normalized) ??
+    IMPORT_SYSTEMS.find((system) => system.key === DEFAULT_SYSTEM_KEY) ??
+    IMPORT_SYSTEMS[0]
+  );
 };

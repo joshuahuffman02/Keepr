@@ -94,16 +94,37 @@ const createEmptyItemsByCategory = (): Record<SecurityCategory, SecurityChecklis
 
 const securityCategoryList = Object.keys(SECURITY_CATEGORIES).filter(isSecurityCategory);
 
-const SECURITY_TONES: Record<SecurityCertificationLevel, { bg: string; text: string; border: string }> = {
+const SECURITY_TONES: Record<
+  SecurityCertificationLevel,
+  { bg: string; text: string; border: string }
+> = {
   none: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-  basic: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/30" },
+  basic: {
+    bg: "bg-status-warning/15",
+    text: "text-status-warning",
+    border: "border-status-warning/30",
+  },
   standard: { bg: "bg-muted", text: "text-foreground", border: "border-border" },
-  advanced: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/30" },
-  excellence: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/30" },
+  advanced: {
+    bg: "bg-status-success/15",
+    text: "text-status-success",
+    border: "border-status-success/30",
+  },
+  excellence: {
+    bg: "bg-status-info/15",
+    text: "text-status-info",
+    border: "border-status-info/30",
+  },
 };
 
 // SVG Shield Badge Component
-function ShieldBadge({ level, size = "md" }: { level: SecurityCertificationLevel; size?: "sm" | "md" | "lg" }) {
+function ShieldBadge({
+  level,
+  size = "md",
+}: {
+  level: SecurityCertificationLevel;
+  size?: "sm" | "md" | "lg";
+}) {
   const sizeClasses = {
     sm: "w-8 h-8",
     md: "w-16 h-16",
@@ -113,15 +134,33 @@ function ShieldBadge({ level, size = "md" }: { level: SecurityCertificationLevel
   const badgeInfo = getSecurityBadgeInfo(level);
   if (!badgeInfo) {
     return (
-      <div className={cn("rounded-full flex items-center justify-center bg-muted", sizeClasses[size])}>
-        <Shield className={cn("text-muted-foreground", size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
+      <div
+        className={cn("rounded-full flex items-center justify-center bg-muted", sizeClasses[size])}
+      >
+        <Shield
+          className={cn(
+            "text-muted-foreground",
+            size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4",
+          )}
+        />
       </div>
     );
   }
 
   return (
-    <div className={cn("rounded-full flex items-center justify-center", SECURITY_TONES[level].bg, sizeClasses[size])}>
-      <ShieldCheck className={cn(SECURITY_TONES[level].text, size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4")} />
+    <div
+      className={cn(
+        "rounded-full flex items-center justify-center",
+        SECURITY_TONES[level].bg,
+        sizeClasses[size],
+      )}
+    >
+      <ShieldCheck
+        className={cn(
+          SECURITY_TONES[level].text,
+          size === "lg" ? "w-12 h-12" : size === "md" ? "w-8 h-8" : "w-4 h-4",
+        )}
+      />
     </div>
   );
 }
@@ -140,7 +179,9 @@ export default function SecurityCertificationPage() {
   const [previousLevel, setPreviousLevel] = useState<string | null>(null);
   const [showTierUnlock, setShowTierUnlock] = useState<string | null>(null);
   // Fix: Use valid category names from SECURITY_CATEGORIES
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["access_management", "physical_security"]));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set(["access_management", "physical_security"]),
+  );
 
   // Auditor verification fields
   const [auditorName, setAuditorName] = useState("");
@@ -156,7 +197,8 @@ export default function SecurityCertificationPage() {
 
   // Load campground ID from localStorage
   useEffect(() => {
-    const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const cg =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     setCampgroundId(cg);
   }, []);
 
@@ -165,18 +207,18 @@ export default function SecurityCertificationPage() {
     if (!showTierUnlock) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setShowTierUnlock(null);
+      if (e.key === "Escape") setShowTierUnlock(null);
     };
 
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, [showTierUnlock]);
 
   // Fetch campground data
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Initialize form from campground data
@@ -202,7 +244,8 @@ export default function SecurityCertificationPage() {
     setAuditorOrg(getString(cgRecord ? cgRecord["securityAuditorOrg"] : undefined) ?? "");
 
     // Set previous level for comparison
-    const savedLevel = getString(cgRecord ? cgRecord["securityCertificationLevel"] : undefined) || "none";
+    const savedLevel =
+      getString(cgRecord ? cgRecord["securityCertificationLevel"] : undefined) || "none";
     setPreviousLevel(savedLevel);
   }, [campgroundQuery.data]);
 
@@ -231,7 +274,13 @@ export default function SecurityCertificationPage() {
   // Calculate next tier info
   const nextTierInfo = useMemo(() => {
     if (certificationLevel === "excellence") return null;
-    const tierOrder: SecurityCertificationLevel[] = ["none", "basic", "standard", "advanced", "excellence"];
+    const tierOrder: SecurityCertificationLevel[] = [
+      "none",
+      "basic",
+      "standard",
+      "advanced",
+      "excellence",
+    ];
     const currentIndex = tierOrder.indexOf(certificationLevel);
     const nextTierIndex = currentIndex + 1;
     if (nextTierIndex >= tierOrder.length) return null;
@@ -243,30 +292,34 @@ export default function SecurityCertificationPage() {
   }, [certificationLevel, stats.totalPoints]);
 
   // Toggle item completion with first-item celebration
-  const toggleItem = useCallback((itemId: string) => {
-    setCompletedItems(prev => {
-      const next = new Set(prev);
-      if (next.has(itemId)) {
-        next.delete(itemId);
-      } else {
-        next.add(itemId);
+  const toggleItem = useCallback(
+    (itemId: string) => {
+      setCompletedItems((prev) => {
+        const next = new Set(prev);
+        if (next.has(itemId)) {
+          next.delete(itemId);
+        } else {
+          next.add(itemId);
 
-        // First item celebration
-        if (prev.size === 0 && !hasCompletedFirstItem) {
-          setHasCompletedFirstItem(true);
-          toast({
-            title: "Great start!",
-            description: "You've taken your first step toward security certification. Keep going!",
-          });
+          // First item celebration
+          if (prev.size === 0 && !hasCompletedFirstItem) {
+            setHasCompletedFirstItem(true);
+            toast({
+              title: "Great start!",
+              description:
+                "You've taken your first step toward security certification. Keep going!",
+            });
+          }
         }
-      }
-      return next;
-    });
-  }, [hasCompletedFirstItem, toast]);
+        return next;
+      });
+    },
+    [hasCompletedFirstItem, toast],
+  );
 
   // Toggle category expansion
   const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => {
+    setExpandedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(category)) {
         next.delete(category);
@@ -320,9 +373,10 @@ export default function SecurityCertificationPage() {
       } else {
         toast({
           title: "Assessment saved",
-          description: certificationLevel !== "none"
-            ? `Your ${badgeInfo?.label} certification has been updated.`
-            : "Your progress has been saved. Keep going!",
+          description:
+            certificationLevel !== "none"
+              ? `Your ${badgeInfo?.label} certification has been updated.`
+              : "Your progress has been saved. Keep going!",
         });
       }
     },
@@ -332,7 +386,7 @@ export default function SecurityCertificationPage() {
         description: "There was an error saving your assessment. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 
   // Group checklist items by category
@@ -348,14 +402,20 @@ export default function SecurityCertificationPage() {
   if (!campgroundId) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Select a campground to configure security certification.</p>
+        <p className="text-muted-foreground">
+          Select a campground to configure security certification.
+        </p>
       </div>
     );
   }
 
   if (campgroundQuery.isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]" role="status" aria-label="Loading security certification data">
+      <div
+        className="flex items-center justify-center min-h-[400px]"
+        role="status"
+        aria-label="Loading security certification data"
+      >
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
         <span className="sr-only">Loading...</span>
       </div>
@@ -376,10 +436,10 @@ export default function SecurityCertificationPage() {
             certificationLevel === "excellence"
               ? ["#06b6d4", "#3b82f6", "#8b5cf6", "#0ea5e9"]
               : certificationLevel === "advanced"
-              ? ["#f59e0b", "#fbbf24", "#fcd34d", "#fef3c7"]
-              : certificationLevel === "standard"
-              ? ["#94a3b8", "#64748b", "#cbd5e1", "#e2e8f0"]
-              : ["#92400e", "#b45309", "#d97706", "#f59e0b"]
+                ? ["#f59e0b", "#fbbf24", "#fcd34d", "#fef3c7"]
+                : certificationLevel === "standard"
+                  ? ["#94a3b8", "#64748b", "#cbd5e1", "#e2e8f0"]
+                  : ["#92400e", "#b45309", "#d97706", "#f59e0b"]
           }
         />
       )}
@@ -439,10 +499,7 @@ export default function SecurityCertificationPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className={cn(
-                  "text-lg font-semibold mb-4",
-                  badgeTone.text
-                )}
+                className={cn("text-lg font-semibold mb-4", badgeTone.text)}
               >
                 {badgeInfo?.label} - {badgeInfo?.tier} Shield
               </motion.p>
@@ -482,7 +539,10 @@ export default function SecurityCertificationPage() {
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             {hasUnsavedChanges && (
-              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 justify-center">
+              <Badge
+                variant="outline"
+                className="bg-amber-50 text-amber-700 border-amber-200 justify-center"
+              >
                 Unsaved changes
               </Badge>
             )}
@@ -492,7 +552,7 @@ export default function SecurityCertificationPage() {
               className={cn(
                 "w-full sm:w-auto transition-all duration-200",
                 "motion-safe:hover:scale-105 motion-safe:active:scale-95",
-                justSaved && "bg-emerald-600 hover:bg-emerald-700"
+                justSaved && "bg-emerald-600 hover:bg-emerald-700",
               )}
             >
               {saveMutation.isPending && !prefersReducedMotion ? (
@@ -528,11 +588,16 @@ export default function SecurityCertificationPage() {
                   Welcome to Security Certification
                 </h3>
                 <p className="text-sm text-foreground mb-3">
-                  Don&apos;t worry—you&apos;re not expected to complete everything at once. This checklist helps you build security practices over time. Many items take just minutes to complete, and we provide templates for the rest.
+                  Don&apos;t worry—you&apos;re not expected to complete everything at once. This
+                  checklist helps you build security practices over time. Many items take just
+                  minutes to complete, and we provide templates for the rest.
                 </p>
                 <div className="flex items-center gap-2 text-sm text-status-info">
                   <Target className="w-4 h-4" />
-                  <span className="font-medium">Start with &quot;Quick Wins&quot; below to earn your first badge in under 30 minutes</span>
+                  <span className="font-medium">
+                    Start with &quot;Quick Wins&quot; below to earn your first badge in under 30
+                    minutes
+                  </span>
                 </div>
               </div>
             </div>
@@ -554,7 +619,8 @@ export default function SecurityCertificationPage() {
                 <Sparkles className="w-5 h-5 text-status-warning" />
               </motion.div>
               <p className="text-sm font-medium text-status-warning">
-                You&apos;re only {nextTierInfo.pointsNeeded} points away from {getSecurityBadgeInfo(nextTierInfo.tier)?.label}!
+                You&apos;re only {nextTierInfo.pointsNeeded} points away from{" "}
+                {getSecurityBadgeInfo(nextTierInfo.tier)?.label}!
                 <span className="block text-xs text-muted-foreground mt-0.5">
                   Complete {Math.ceil(nextTierInfo.pointsNeeded / 10)} more items to level up
                 </span>
@@ -591,17 +657,17 @@ export default function SecurityCertificationPage() {
                       "flex items-center justify-between p-3 rounded-lg border transition-all cursor-pointer",
                       "bg-card border-amber-200",
                       "hover:bg-amber-50 hover:shadow-md",
-                      "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                      "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2",
                     )}
                     onClick={() => {
                       toggleItem(item.id);
-                      setExpandedCategories(prev => new Set([...prev, item.category]));
+                      setExpandedCategories((prev) => new Set([...prev, item.category]));
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
+                      if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
                         toggleItem(item.id);
-                        setExpandedCategories(prev => new Set([...prev, item.category]));
+                        setExpandedCategories((prev) => new Set([...prev, item.category]));
                       }
                     }}
                   >
@@ -615,7 +681,10 @@ export default function SecurityCertificationPage() {
                       <div>
                         <span className="text-sm font-medium text-foreground">{item.label}</span>
                         {item.required && (
-                          <Badge variant="outline" className="ml-2 text-xs bg-blue-50 text-blue-700 border-blue-200">
+                          <Badge
+                            variant="outline"
+                            className="ml-2 text-xs bg-blue-50 text-blue-700 border-blue-200"
+                          >
                             Core Practice
                           </Badge>
                         )}
@@ -643,9 +712,7 @@ export default function SecurityCertificationPage() {
               <div className="flex flex-col items-center text-center p-4 rounded-xl bg-card border border-border">
                 {badgeInfo ? (
                   <>
-                    <motion.div
-                      whileHover={prefersReducedMotion ? {} : { scale: 1.1, rotate: 5 }}
-                    >
+                    <motion.div whileHover={prefersReducedMotion ? {} : { scale: 1.1, rotate: 5 }}>
                       <ShieldBadge level={certificationLevel} size="md" />
                     </motion.div>
                     <Badge className={cn("mb-2 mt-3", badgeTone.bg, badgeTone.text)}>
@@ -659,13 +726,14 @@ export default function SecurityCertificationPage() {
                     <div className="w-16 h-16 rounded-full bg-status-info/15 flex items-center justify-center mb-3">
                       <Shield className="w-8 h-8 text-status-info" />
                     </div>
-                    <h4 className="font-semibold text-foreground mb-1">
-                      Ready to Get Started?
-                    </h4>
+                    <h4 className="font-semibold text-foreground mb-1">Ready to Get Started?</h4>
                     <p className="text-xs text-muted-foreground mb-2">
                       Complete your first security practice to earn Bronze Shield
                     </p>
-                    <Badge variant="secondary" className="bg-status-info/10 text-status-info border-status-info/20">
+                    <Badge
+                      variant="secondary"
+                      className="bg-status-info/10 text-status-info border-status-info/20"
+                    >
                       Just getting started
                     </Badge>
                   </div>
@@ -677,7 +745,9 @@ export default function SecurityCertificationPage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground font-medium">Points Earned</span>
-                    <span className="font-medium text-foreground">{stats.totalPoints} / {stats.maxPoints}</span>
+                    <span className="font-medium text-foreground">
+                      {stats.totalPoints} / {stats.maxPoints}
+                    </span>
                   </div>
                   <div
                     className="h-2 bg-muted rounded-full overflow-hidden"
@@ -689,7 +759,7 @@ export default function SecurityCertificationPage() {
                     <motion.div
                       className={cn(
                         "h-full bg-status-info relative origin-left",
-                        (stats.totalPoints / stats.maxPoints) > 0.9 && "motion-safe:animate-pulse"
+                        stats.totalPoints / stats.maxPoints > 0.9 && "motion-safe:animate-pulse",
                       )}
                       initial={{ scaleX: 0 }}
                       animate={{ scaleX: stats.totalPoints / stats.maxPoints }}
@@ -700,7 +770,9 @@ export default function SecurityCertificationPage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Core Practices</span>
-                    <span className="font-medium text-foreground">{stats.requiredCompleted} / {stats.requiredTotal}</span>
+                    <span className="font-medium text-foreground">
+                      {stats.requiredCompleted} / {stats.requiredTotal}
+                    </span>
                   </div>
                   <div
                     className="h-2 bg-muted rounded-full overflow-hidden"
@@ -733,9 +805,7 @@ export default function SecurityCertificationPage() {
                   </span>
                 </div>
                 {isVerified && auditorOrg && (
-                  <p className="text-xs text-muted-foreground">
-                    Verified by {auditorOrg}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Verified by {auditorOrg}</p>
                 )}
               </div>
             </div>
@@ -774,15 +844,21 @@ export default function SecurityCertificationPage() {
                       isCurrent
                         ? `${tone.border} ${tone.bg}`
                         : isAchieved
-                        ? `${tone.border} ${tone.bg}`
-                        : "border-border bg-card"
+                          ? `${tone.border} ${tone.bg}`
+                          : "border-border bg-card",
                     )}
                   >
                     <div className="flex flex-col items-center text-center">
                       <ShieldBadge level={level} size="sm" />
-                      <h4 className="font-semibold text-foreground mt-2 text-sm sm:text-base">{info?.tier}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">{threshold.minPoints}+ pts</p>
-                      <p className="text-xs text-muted-foreground">{Math.round(threshold.requiredItemsRatio * 100)}% core</p>
+                      <h4 className="font-semibold text-foreground mt-2 text-sm sm:text-base">
+                        {info?.tier}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {threshold.minPoints}+ pts
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {Math.round(threshold.requiredItemsRatio * 100)}% core
+                      </p>
                       {isCurrent && (
                         <Badge className={cn("mt-2", tone.bg, tone.text)}>Current</Badge>
                       )}
@@ -790,7 +866,9 @@ export default function SecurityCertificationPage() {
                         <CheckCircle2 className={cn("w-5 h-5 mt-2", tone.text)} />
                       )}
                       {!isAchieved && pointsNeeded > 0 && (
-                        <p className="text-xs text-muted-foreground mt-2">{pointsNeeded} pts to go</p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {pointsNeeded} pts to go
+                        </p>
                       )}
                     </div>
                   </div>
@@ -808,7 +886,8 @@ export default function SecurityCertificationPage() {
               Protected by Campreserv
             </CardTitle>
             <CardDescription className="">
-              These security measures are automatically handled by the Campreserv platform - no action required
+              These security measures are automatically handled by the Campreserv platform - no
+              action required
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -833,10 +912,14 @@ export default function SecurityCertificationPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground">{protection.label}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {protection.label}
+                        </span>
                         <CheckCircle2 className="w-4 h-4 text-status-success flex-shrink-0" />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{protection.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {protection.description}
+                      </p>
                     </div>
                   </div>
                 );
@@ -862,10 +945,15 @@ export default function SecurityCertificationPage() {
               const items = itemsByCategory[category] || [];
               const categoryStats = stats.categoryProgress[category];
               const isExpanded = expandedCategories.has(category);
-              const isCategoryComplete = categoryStats?.completed === categoryStats?.total && categoryStats?.total > 0;
+              const isCategoryComplete =
+                categoryStats?.completed === categoryStats?.total && categoryStats?.total > 0;
 
               return (
-                <Collapsible key={category} open={isExpanded} onOpenChange={() => toggleCategory(category)}>
+                <Collapsible
+                  key={category}
+                  open={isExpanded}
+                  onOpenChange={() => toggleCategory(category)}
+                >
                   <div className="border border-border rounded-lg overflow-hidden">
                     <CollapsibleTrigger asChild>
                       <button
@@ -873,12 +961,12 @@ export default function SecurityCertificationPage() {
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
-                          <div className={cn(
-                            "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
-                            isCategoryComplete
-                              ? "bg-emerald-100"
-                              : "bg-blue-100"
-                          )}>
+                          <div
+                            className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
+                              isCategoryComplete ? "bg-emerald-100" : "bg-blue-100",
+                            )}
+                          >
                             {isCategoryComplete ? (
                               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                             ) : (
@@ -887,7 +975,9 @@ export default function SecurityCertificationPage() {
                           </div>
                           <div className="text-left">
                             <h4 className="font-semibold text-foreground">{categoryInfo.label}</h4>
-                            <p className="text-xs text-muted-foreground">{categoryInfo.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {categoryInfo.description}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -899,10 +989,12 @@ export default function SecurityCertificationPage() {
                               {categoryStats?.points || 0}/{categoryStats?.maxPoints || 0} pts
                             </p>
                           </div>
-                          <ChevronDown className={cn(
-                            "w-5 h-5 text-muted-foreground transition-transform",
-                            isExpanded && "rotate-180"
-                          )} />
+                          <ChevronDown
+                            className={cn(
+                              "w-5 h-5 text-muted-foreground transition-transform",
+                              isExpanded && "rotate-180",
+                            )}
+                          />
                         </div>
                       </button>
                     </CollapsibleTrigger>
@@ -920,7 +1012,7 @@ export default function SecurityCertificationPage() {
                           </div>
                         )}
 
-                        {items.map(item => (
+                        {items.map((item) => (
                           <div
                             key={item.id}
                             role="button"
@@ -931,11 +1023,11 @@ export default function SecurityCertificationPage() {
                               "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset",
                               completedItems.has(item.id)
                                 ? "bg-emerald-50 border border-emerald-200"
-                                : "bg-muted/60 border border-border hover:bg-muted"
+                                : "bg-muted/60 border border-border hover:bg-muted",
                             )}
                             onClick={() => toggleItem(item.id)}
                             onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
+                              if (e.key === "Enter" || e.key === " ") {
                                 e.preventDefault();
                                 toggleItem(item.id);
                               }
@@ -950,24 +1042,34 @@ export default function SecurityCertificationPage() {
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={cn(
-                                  "text-sm font-medium",
-                                  completedItems.has(item.id)
-                                    ? "text-emerald-900"
-                                    : "text-foreground"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "text-sm font-medium",
+                                    completedItems.has(item.id)
+                                      ? "text-emerald-900"
+                                      : "text-foreground",
+                                  )}
+                                >
                                   {item.label}
                                 </span>
                                 {item.required ? (
-                                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs bg-blue-50 text-blue-700 border-blue-200"
+                                  >
                                     Core Practice
                                   </Badge>
                                 ) : (
-                                  <Badge variant="outline" className="text-xs bg-muted/60 text-muted-foreground">
+                                  <Badge
+                                    variant="outline"
+                                    className="text-xs bg-muted/60 text-muted-foreground"
+                                  >
                                     Enhanced
                                   </Badge>
                                 )}
-                                <Badge variant="secondary" className="text-xs">{item.points} pts</Badge>
+                                <Badge variant="secondary" className="text-xs">
+                                  {item.points} pts
+                                </Badge>
                               </div>
                               <p className="text-xs text-muted-foreground mt-1">
                                 {item.description}
@@ -981,7 +1083,10 @@ export default function SecurityCertificationPage() {
                                       className="h-7 text-xs focus:ring-2 focus:ring-offset-1"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        window.open(`/security-templates/${SECURITY_TEMPLATES[item.templateId!].filename}`, "_blank");
+                                        window.open(
+                                          `/security-templates/${SECURITY_TEMPLATES[item.templateId!].filename}`,
+                                          "_blank",
+                                        );
                                       }}
                                     >
                                       <Download className="w-3 h-3 mr-1" />
@@ -1035,7 +1140,10 @@ export default function SecurityCertificationPage() {
                   checked={isVerified}
                   onCheckedChange={(checked) => setIsVerified(checked === true)}
                 />
-                <label htmlFor="verified" className="text-sm font-medium text-foreground cursor-pointer flex items-center gap-2">
+                <label
+                  htmlFor="verified"
+                  className="text-sm font-medium text-foreground cursor-pointer flex items-center gap-2"
+                >
                   <ShieldCheck className="w-4 h-4 text-emerald-500" />
                   This assessment has been verified by a third-party auditor
                 </label>
@@ -1050,7 +1158,10 @@ export default function SecurityCertificationPage() {
                     className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
                   >
                     <div className="space-y-2">
-                      <Label htmlFor="auditorName" className="flex items-center gap-2 text-foreground">
+                      <Label
+                        htmlFor="auditorName"
+                        className="flex items-center gap-2 text-foreground"
+                      >
                         <UserCheck className="w-4 h-4" />
                         Auditor Name
                       </Label>
@@ -1063,7 +1174,10 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorOrg" className="flex items-center gap-2 text-foreground">
+                      <Label
+                        htmlFor="auditorOrg"
+                        className="flex items-center gap-2 text-foreground"
+                      >
                         <Building2 className="w-4 h-4" />
                         Organization
                       </Label>
@@ -1076,7 +1190,10 @@ export default function SecurityCertificationPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="auditorEmail" className="flex items-center gap-2 text-foreground">
+                      <Label
+                        htmlFor="auditorEmail"
+                        className="flex items-center gap-2 text-foreground"
+                      >
                         <Mail className="w-4 h-4" />
                         Contact Email
                       </Label>

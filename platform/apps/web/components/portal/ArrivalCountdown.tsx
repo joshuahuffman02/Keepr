@@ -124,9 +124,7 @@ export function ArrivalCountdown({
                   <MapPin className="h-4 w-4" />
                   <span>Site {siteNumber}</span>
                 </div>
-                <p className="text-xs text-white/70">
-                  {format(arrival, "EEEE, MMMM d, yyyy")}
-                </p>
+                <p className="text-xs text-white/70">{format(arrival, "EEEE, MMMM d, yyyy")}</p>
               </div>
             </div>
 

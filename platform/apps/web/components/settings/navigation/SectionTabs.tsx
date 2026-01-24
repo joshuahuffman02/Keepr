@@ -49,10 +49,7 @@ export function SectionTabs({ sections, categoryId, className }: SectionTabsProp
   return (
     <div
       ref={containerRef}
-      className={cn(
-        "border-b bg-muted/80 overflow-x-auto scrollbar-hide",
-        className
-      )}
+      className={cn("border-b bg-muted/80 overflow-x-auto scrollbar-hide", className)}
     >
       <nav
         role="tablist"
@@ -77,7 +74,7 @@ export function SectionTabs({ sections, categoryId, className }: SectionTabsProp
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-inset",
                 isActive
                   ? "border-border text-foreground font-medium"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
               )}
             >
               {section.label}

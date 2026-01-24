@@ -111,10 +111,7 @@ export class FeatureProgressService {
   /**
    * Bulk update feature progress
    */
-  async bulkUpdate(
-    userId: string,
-    updates: Array<{ featureKey: string; completed: boolean }>
-  ) {
+  async bulkUpdate(userId: string, updates: Array<{ featureKey: string; completed: boolean }>) {
     const operations = updates.map((update) =>
       this.prisma.featureProgress.upsert({
         where: {
@@ -132,7 +129,7 @@ export class FeatureProgressService {
           completedAt: update.completed ? new Date() : null,
           updatedAt: new Date(),
         },
-      })
+      }),
     );
 
     return this.prisma.$transaction(operations);

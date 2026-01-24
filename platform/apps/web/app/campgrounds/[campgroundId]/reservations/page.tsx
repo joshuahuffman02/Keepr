@@ -13,7 +13,13 @@ import { DashboardShell } from "../../../../components/ui/layout/DashboardShell"
 import { PageHeader } from "../../../../components/ui/layout/PageHeader";
 import { Checkbox } from "../../../../components/ui/checkbox";
 import { Input } from "../../../../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { Textarea } from "../../../../components/ui/textarea";
 import { TableEmpty } from "../../../../components/ui/table";
@@ -23,7 +29,7 @@ import {
   LedgerEntrySchema,
   ReservationSchema,
   computeDepositDue,
-  CreateCommunicationSchema
+  CreateCommunicationSchema,
 } from "@keepr/shared";
 import type { z } from "zod";
 import { useGanttStore } from "../../../../lib/gantt-store";
@@ -106,26 +112,26 @@ export default function ReservationsPage() {
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const reservationsQuery = useQuery({
     queryKey: ["reservations", campgroundId],
     queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const sitesQuery = useQuery({
     queryKey: ["sites", campgroundId],
     queryFn: () => apiClient.getSites(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const siteClassesQuery = useQuery({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const guestsQuery = useQuery({
     queryKey: ["guests"],
-    queryFn: () => apiClient.getGuests()
+    queryFn: () => apiClient.getGuests(),
   });
 
   const [listTab, setListTab] = useState<ListTab>("all");
@@ -134,7 +140,7 @@ export default function ReservationsPage() {
     primaryLastName: "",
     email: "",
     phone: "",
-    notes: ""
+    notes: "",
   });
   const [formState, setFormState] = useState<FormState>({
     siteId: "",
@@ -157,7 +163,7 @@ export default function ReservationsPage() {
     rigLength: "",
     feesAmount: "",
     taxesAmount: "",
-    discountsAmount: ""
+    discountsAmount: "",
   });
   const [editing, setEditing] = useState<Record<string, ReservationUpdate | undefined>>({});
   const [paymentInputs, setPaymentInputs] = useState<Record<string, number>>({});
@@ -180,14 +186,18 @@ export default function ReservationsPage() {
     id: number;
     skippedIds: string[];
   } | null>(null);
-  const [sortBy, setSortBy] = useState<"arrival" | "guest" | "site" | "status" | "balance" | "created">("arrival");
+  const [sortBy, setSortBy] = useState<
+    "arrival" | "guest" | "site" | "status" | "balance" | "created"
+  >("arrival");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   useEffect(() => {
     if (!bulkFeedback) return;
     const timer = setTimeout(() => setBulkFeedback(null), 6000);
     return () => clearTimeout(timer);
   }, [bulkFeedback]);
-  const [guestEdits, setGuestEdits] = useState<Record<string, { email: string; phone: string }>>({});
+  const [guestEdits, setGuestEdits] = useState<Record<string, { email: string; phone: string }>>(
+    {},
+  );
   const [quoteTotal, setQuoteTotal] = useState<number | null>(null);
   const [quoteBreakdown, setQuoteBreakdown] = useState<{
     baseSubtotalCents: number;
@@ -204,72 +214,104 @@ export default function ReservationsPage() {
   const [commsErrors, setCommsErrors] = useState<Record<string, string>>({});
   const [newComm, setNewComm] = useState<Record<string, CommDraft>>({});
   const [resQuotes, setResQuotes] = useState<
-    Record<string, { baseSubtotalCents: number; rulesDeltaCents: number; totalCents: number; nights: number }>
+    Record<
+      string,
+      { baseSubtotalCents: number; rulesDeltaCents: number; totalCents: number; nights: number }
+    >
   >({});
   const [resQuoteLoading, setResQuoteLoading] = useState<Record<string, boolean>>({});
   const [resQuoteErrors, setResQuoteErrors] = useState<Record<string, string>>({});
-  const [flash, setFlash] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const [flash, setFlash] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
   const [showBookingSuccess, setShowBookingSuccess] = useState(false);
   const [bulkMessageOpen, setBulkMessageOpen] = useState(false);
   const { selection, setSelection, drag, setDrag, startDrag, resetDrag } = useGanttStore();
   const focusId = selection.openDetailsId;
   const highlighted = selection.highlightedId;
   const overlapCheckQuery = useQuery({
-    queryKey: ["overlap-check", campgroundId, formState.siteId, formState.arrivalDate, formState.departureDate],
+    queryKey: [
+      "overlap-check",
+      campgroundId,
+      formState.siteId,
+      formState.arrivalDate,
+      formState.departureDate,
+    ],
     queryFn: () =>
       apiClient.checkOverlap(campgroundId, {
         siteId: formState.siteId,
         arrivalDate: formState.arrivalDate,
-        departureDate: formState.departureDate
+        departureDate: formState.departureDate,
       }),
-    enabled: !!campgroundId && !!formState.siteId && !!formState.arrivalDate && !!formState.departureDate
+    enabled:
+      !!campgroundId && !!formState.siteId && !!formState.arrivalDate && !!formState.departureDate,
   });
   const overlapsListQuery = useQuery({
     queryKey: ["overlaps", campgroundId],
     queryFn: () => apiClient.listOverlaps(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const availabilityQuery = useQuery({
-    queryKey: ["availability", campgroundId, formState.arrivalDate, formState.departureDate, formState.rigType, formState.rigLength],
+    queryKey: [
+      "availability",
+      campgroundId,
+      formState.arrivalDate,
+      formState.departureDate,
+      formState.rigType,
+      formState.rigLength,
+    ],
     queryFn: () =>
       apiClient.getAvailability(campgroundId, {
         arrivalDate: formState.arrivalDate,
         departureDate: formState.departureDate,
         rigType: formState.rigType || undefined,
-        rigLength: formState.rigLength || undefined
+        rigLength: formState.rigLength || undefined,
       }),
-    enabled: !!campgroundId && !!formState.arrivalDate && !!formState.departureDate
+    enabled: !!campgroundId && !!formState.arrivalDate && !!formState.departureDate,
   });
   const siteCount = sitesQuery.data?.length ?? 0;
   const createGuest = useMutation({
-    mutationFn: (payload: { primaryFirstName: string; primaryLastName: string; email: string; phone: string; notes?: string }) =>
-      apiClient.createGuest(payload),
+    mutationFn: (payload: {
+      primaryFirstName: string;
+      primaryLastName: string;
+      email: string;
+      phone: string;
+      notes?: string;
+    }) => apiClient.createGuest(payload),
     onSuccess: (newGuest) => {
       queryClient.invalidateQueries({ queryKey: ["guests"] });
       setFormState((s) => ({ ...s, guestId: newGuest.id }));
       setFlash({ type: "success", message: "Guest saved and selected." });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to save guest." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to save guest.",
+      });
+    },
   });
 
   const createReservation = useMutation({
     mutationFn: async () => {
       const selectedSite = sitesQuery.data?.find((s) => s.id === formState.siteId);
-      const selectedClass = siteClassesQuery.data?.find((cls) => cls.id === selectedSite?.siteClassId) ?? null;
+      const selectedClass =
+        siteClassesQuery.data?.find((cls) => cls.id === selectedSite?.siteClassId) ?? null;
       const nights =
         formState.arrivalDate && formState.departureDate
           ? Math.max(
-            1,
-            Math.round(
-              (new Date(formState.departureDate).getTime() - new Date(formState.arrivalDate).getTime()) /
-              (1000 * 60 * 60 * 24)
+              1,
+              Math.round(
+                (new Date(formState.departureDate).getTime() -
+                  new Date(formState.arrivalDate).getTime()) /
+                  (1000 * 60 * 60 * 24),
+              ),
             )
-          )
           : 1;
       const autoTotal =
-        formState.totalAmount === 0 && selectedClass ? ((selectedClass.defaultRate ?? 0) * nights) / 100 : formState.totalAmount;
+        formState.totalAmount === 0 && selectedClass
+          ? ((selectedClass.defaultRate ?? 0) * nights) / 100
+          : formState.totalAmount;
       const paymentStatus =
         autoTotal === 0
           ? "unpaid"
@@ -286,7 +328,7 @@ export default function ReservationsPage() {
             campgroundId,
             siteId: formState.siteId,
             arrivalDate: formState.arrivalDate,
-            departureDate: formState.departureDate
+            departureDate: formState.departureDate,
           });
           if (isRecord(hold) && typeof hold.id === "string") {
             holdId = hold.id;
@@ -306,7 +348,10 @@ export default function ReservationsPage() {
         children: Number(formState.children),
         totalAmount: Math.round(effectiveTotal * 100),
         paidAmount: Math.round(Number(formState.paidAmount) * 100),
-        balanceAmount: Math.max(0, Math.round(effectiveTotal * 100) - Math.round(Number(formState.paidAmount) * 100)),
+        balanceAmount: Math.max(
+          0,
+          Math.round(effectiveTotal * 100) - Math.round(Number(formState.paidAmount) * 100),
+        ),
         paymentStatus,
         notes: formState.notes || undefined,
         status: "pending",
@@ -322,7 +367,7 @@ export default function ReservationsPage() {
         feesAmount: Math.round(feesVal * 100),
         taxesAmount: Math.round(taxesVal * 100),
         discountsAmount: Math.round(discountsVal * 100),
-        holdId
+        holdId,
       });
     },
     onSuccess: () => {
@@ -347,7 +392,7 @@ export default function ReservationsPage() {
         rigLength: "",
         feesAmount: "",
         taxesAmount: "",
-        discountsAmount: ""
+        discountsAmount: "",
       });
       // Show celebration overlay
       setShowBookingSuccess(true);
@@ -355,8 +400,11 @@ export default function ReservationsPage() {
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to save reservation." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to save reservation.",
+      });
+    },
   });
 
   const deleteReservation = useMutation({
@@ -366,13 +414,17 @@ export default function ReservationsPage() {
       setFlash({ type: "success", message: "Reservation deleted." });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to delete reservation." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to delete reservation.",
+      });
+    },
   });
 
   const reservationsKey = ["reservations", campgroundId];
   const updateReservation = useMutation({
-    mutationFn: (payload: { id: string; data: ReservationUpdate }) => apiClient.updateReservation(payload.id, payload.data),
+    mutationFn: (payload: { id: string; data: ReservationUpdate }) =>
+      apiClient.updateReservation(payload.id, payload.data),
     onMutate: async (payload) => {
       await queryClient.cancelQueries({ queryKey: reservationsKey });
       const previous = queryClient.getQueryData<Reservation[]>(reservationsKey);
@@ -380,13 +432,13 @@ export default function ReservationsPage() {
         const next = previous.map((res) =>
           res.id === payload.id
             ? {
-              ...res,
-              ...payload.data,
-              arrivalDate: payload.data.arrivalDate ?? res.arrivalDate,
-              departureDate: payload.data.departureDate ?? res.departureDate,
-              siteId: payload.data.siteId ?? res.siteId
-            }
-            : res
+                ...res,
+                ...payload.data,
+                arrivalDate: payload.data.arrivalDate ?? res.arrivalDate,
+                departureDate: payload.data.departureDate ?? res.departureDate,
+                siteId: payload.data.siteId ?? res.siteId,
+              }
+            : res,
         );
         queryClient.setQueryData(reservationsKey, next);
       }
@@ -405,14 +457,18 @@ export default function ReservationsPage() {
       setEditing({});
       resetDrag();
       queryClient.invalidateQueries({ queryKey: reservationsKey });
-    }
+    },
   });
 
   const createCommunication = useMutation({
-    mutationFn: (payload: z.infer<typeof CreateCommunicationSchema>) => apiClient.createCommunication(payload),
+    mutationFn: (payload: z.infer<typeof CreateCommunicationSchema>) =>
+      apiClient.createCommunication(payload),
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to save note." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to save note.",
+      });
+    },
   });
 
   const statusBadge = (status: ReservationStatus) =>
@@ -430,7 +486,10 @@ export default function ReservationsPage() {
     async (res: Reservation, forceOpen?: boolean) => {
       const nextOpen = forceOpen !== undefined ? forceOpen : !openDetails[res.id];
       setOpenDetails(nextOpen ? { [res.id]: true } : {});
-      setSelection({ openDetailsId: nextOpen ? res.id : null, highlightedId: nextOpen ? res.id : highlighted });
+      setSelection({
+        openDetailsId: nextOpen ? res.id : null,
+        highlightedId: nextOpen ? res.id : highlighted,
+      });
 
       if (nextOpen && !ledgerByRes[res.id]) {
         setLedgerLoading((prev) => ({ ...prev, [res.id]: true }));
@@ -457,7 +516,7 @@ export default function ReservationsPage() {
           const quote = await apiClient.getQuote(campgroundId, {
             siteId: res.siteId,
             arrivalDate: res.arrivalDate,
-            departureDate: res.departureDate
+            departureDate: res.departureDate,
           });
           setResQuotes((prev) => ({
             ...prev,
@@ -465,8 +524,8 @@ export default function ReservationsPage() {
               baseSubtotalCents: quote.baseSubtotalCents,
               rulesDeltaCents: quote.rulesDeltaCents,
               totalCents: quote.totalCents,
-              nights: quote.nights
-            }
+              nights: quote.nights,
+            },
           }));
         } catch {
           setResQuoteErrors((prev) => ({ ...prev, [res.id]: "Failed to load pricing breakdown." }));
@@ -487,7 +546,7 @@ export default function ReservationsPage() {
             campgroundId,
             reservationId: res.id,
             guestId: res.guestId || undefined,
-            limit: 50
+            limit: 50,
           });
           setCommsByRes((prev) => ({ ...prev, [res.id]: list.items }));
         } catch {
@@ -512,8 +571,8 @@ export default function ReservationsPage() {
       commsByRes,
       setCommsLoading,
       setCommsErrors,
-      campgroundId
-    ]
+      campgroundId,
+    ],
   );
 
   const beginDrag = useCallback(
@@ -522,38 +581,43 @@ export default function ReservationsPage() {
         reservationId: res.id,
         siteId: res.siteId,
         startDate: res.arrivalDate,
-        endDate: res.departureDate
+        endDate: res.departureDate,
       });
       setSelection({ highlightedId: res.id });
     },
-    [startDrag, setSelection]
+    [startDrag, setSelection],
   );
 
   const moveReservation = useCallback(
     (resId: string, nextSiteId: string, nextArrival: string, nextDeparture: string) => {
       updateReservation.mutate({
         id: resId,
-        data: { siteId: nextSiteId, arrivalDate: nextArrival, departureDate: nextDeparture }
+        data: { siteId: nextSiteId, arrivalDate: nextArrival, departureDate: nextDeparture },
       });
       resetDrag();
     },
-    [updateReservation, resetDrag]
+    [updateReservation, resetDrag],
   );
 
   const recordPayment = useMutation({
-    mutationFn: (payload: { id: string; amount: number; method?: "card" | "cash" | "check" | "folio"; note?: string }) =>
+    mutationFn: (payload: {
+      id: string;
+      amount: number;
+      method?: "card" | "cash" | "check" | "folio";
+      note?: string;
+    }) =>
       apiClient.recordReservationPayment(
         payload.id,
         Math.round(payload.amount * 100),
         payload.method
           ? [
-            {
-              method: payload.method,
-              amountCents: Math.round(payload.amount * 100),
-              note: payload.note
-            }
-          ]
-          : undefined
+              {
+                method: payload.method,
+                amountCents: Math.round(payload.amount * 100),
+                note: payload.note,
+              },
+            ]
+          : undefined,
       ),
     onSuccess: () => {
       setPaymentInputs({});
@@ -561,8 +625,11 @@ export default function ReservationsPage() {
       setFlash({ type: "success", message: "Payment recorded." });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to record payment." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to record payment.",
+      });
+    },
   });
 
   const refundPayment = useMutation({
@@ -574,15 +641,18 @@ export default function ReservationsPage() {
       setFlash({ type: "success", message: "Refund saved." });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to refund." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to refund.",
+      });
+    },
   });
 
   const updateGuestContact = useMutation({
     mutationFn: (payload: { guestId: string; email?: string; phone?: string }) =>
       apiClient.updateGuest(payload.guestId, {
         ...(payload.email ? { email: payload.email } : {}),
-        ...(payload.phone ? { phone: payload.phone } : {})
+        ...(payload.phone ? { phone: payload.phone } : {}),
       }),
     onSuccess: (updated) => {
       setGuestEdits((prev) => {
@@ -595,21 +665,26 @@ export default function ReservationsPage() {
       setFlash({ type: "success", message: "Guest contact updated." });
     },
     onError: (err) => {
-      setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to update guest contact." });
-    }
+      setFlash({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to update guest contact.",
+      });
+    },
   });
 
   const selectedSite = sitesQuery.data?.find((s) => s.id === formState.siteId);
-  const selectedClass = siteClassesQuery.data?.find((cls) => cls.id === selectedSite?.siteClassId) ?? null;
+  const selectedClass =
+    siteClassesQuery.data?.find((cls) => cls.id === selectedSite?.siteClassId) ?? null;
   const nights =
     formState.arrivalDate && formState.departureDate
       ? Math.max(
-        1,
-        Math.round(
-          (new Date(formState.departureDate).getTime() - new Date(formState.arrivalDate).getTime()) /
-          (1000 * 60 * 60 * 24)
+          1,
+          Math.round(
+            (new Date(formState.departureDate).getTime() -
+              new Date(formState.arrivalDate).getTime()) /
+              (1000 * 60 * 60 * 24),
+          ),
         )
-      )
       : 1;
   const autoTotal =
     quoteTotal !== null
@@ -636,13 +711,13 @@ export default function ReservationsPage() {
   const suggestedDeposit =
     campgroundQuery.data && effectiveTotal
       ? computeDepositDue({
-        total: effectiveTotal,
-        nights,
-        arrivalDate: formState.arrivalDate || undefined,
-        depositRule: campgroundQuery.data.depositRule,
-        depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-        depositConfig: campgroundQuery.data?.depositConfig ?? null
-      })
+          total: effectiveTotal,
+          nights,
+          arrivalDate: formState.arrivalDate || undefined,
+          depositRule: campgroundQuery.data.depositRule,
+          depositPercentage: campgroundQuery.data.depositPercentage ?? null,
+          depositConfig: campgroundQuery.data?.depositConfig ?? null,
+        })
       : null;
   const requiredDeposit = suggestedDeposit ?? 0;
   const invalidDates =
@@ -650,8 +725,13 @@ export default function ReservationsPage() {
       ? new Date(formState.departureDate) < new Date(formState.arrivalDate)
       : false;
   const missingRequired =
-    !formState.siteId || !formState.guestId || !formState.arrivalDate || !formState.departureDate || invalidDates;
-  const hasFilters = search.trim() !== "" || statusFilter !== "all" || startFilter !== "" || endFilter !== "";
+    !formState.siteId ||
+    !formState.guestId ||
+    !formState.arrivalDate ||
+    !formState.departureDate ||
+    invalidDates;
+  const hasFilters =
+    search.trim() !== "" || statusFilter !== "all" || startFilter !== "" || endFilter !== "";
   const activeFilterCount =
     (search.trim() ? 1 : 0) +
     (statusFilter !== "all" ? 1 : 0) +
@@ -663,9 +743,13 @@ export default function ReservationsPage() {
   const occupancyOver = maxOccupancy ? occupancy > maxOccupancy : false;
   const availableSiteIds = new Set((availabilityQuery.data || []).map((s) => s.id));
   const hasAvailabilityWindow = !!formState.arrivalDate && !!formState.departureDate;
-  const selectedSiteUnavailable = hasAvailabilityWindow && formState.siteId ? !availableSiteIds.has(formState.siteId) : false;
+  const selectedSiteUnavailable =
+    hasAvailabilityWindow && formState.siteId ? !availableSiteIds.has(formState.siteId) : false;
   const overlapConflict = overlapCheckQuery.data?.conflict ?? false;
-  const openDetailIds = useMemo(() => Object.keys(openDetails).filter((id) => openDetails[id]), [openDetails]);
+  const openDetailIds = useMemo(
+    () => Object.keys(openDetails).filter((id) => openDetails[id]),
+    [openDetails],
+  );
   const overlapChecks = useQueries({
     queries: openDetailIds.map((id) => {
       const res = reservationsQuery.data?.find((r) => r.id === id);
@@ -679,26 +763,29 @@ export default function ReservationsPage() {
             siteId: targetSiteId!,
             arrivalDate: arrival!,
             departureDate: departure!,
-            ignoreId: id
+            ignoreId: id,
           }),
-        enabled: !!campgroundId && !!targetSiteId && !!arrival && !!departure
+        enabled: !!campgroundId && !!targetSiteId && !!arrival && !!departure,
       };
-    })
+    }),
   });
   const conflictByReservation = useMemo(
     () =>
-      overlapChecks.reduce<Record<string, { conflict: boolean; reasons?: string[] }>>((acc, q, idx) => {
-        const resId = openDetailIds[idx];
-        if (resId) {
-          if (q.data) {
-            acc[resId] = q.data;
-          } else if (q.isError) {
-            acc[resId] = { conflict: false, reasons: ["error"] };
+      overlapChecks.reduce<Record<string, { conflict: boolean; reasons?: string[] }>>(
+        (acc, q, idx) => {
+          const resId = openDetailIds[idx];
+          if (resId) {
+            if (q.data) {
+              acc[resId] = q.data;
+            } else if (q.isError) {
+              acc[resId] = { conflict: false, reasons: ["error"] };
+            }
           }
-        }
-        return acc;
-      }, {}),
-    [overlapChecks, openDetailIds]
+          return acc;
+        },
+        {},
+      ),
+    [overlapChecks, openDetailIds],
   );
   useEffect(() => {
     if (!flash) return;
@@ -714,36 +801,57 @@ export default function ReservationsPage() {
       setTimeout(() => setSelection({ highlightedId: null }), 3000);
     }
   }, [searchParams, setSelection]);
-  const matchTargetId = useMemo(() => focusId || openDetailIds[0] || null, [focusId, openDetailIds]);
+  const matchTargetId = useMemo(
+    () => focusId || openDetailIds[0] || null,
+    [focusId, openDetailIds],
+  );
   const matchTargetReservation = useMemo(
-    () => (matchTargetId ? reservationsQuery.data?.find((r) => r.id === matchTargetId) ?? null : null),
-    [matchTargetId, reservationsQuery.data]
+    () =>
+      matchTargetId ? (reservationsQuery.data?.find((r) => r.id === matchTargetId) ?? null) : null,
+    [matchTargetId, reservationsQuery.data],
   );
   const matchScoresQuery = useQuery({
     queryKey: ["site-match-score", campgroundId, matchTargetReservation?.guestId],
     queryFn: () => apiClient.getMatchedSites(campgroundId, matchTargetReservation!.guestId),
-    enabled: !!campgroundId && !!matchTargetReservation?.guestId
+    enabled: !!campgroundId && !!matchTargetReservation?.guestId,
   });
-  const topMatches = useMemo(() => matchScoresQuery.data?.slice(0, 5) ?? [], [matchScoresQuery.data]);
+  const topMatches = useMemo(
+    () => matchScoresQuery.data?.slice(0, 5) ?? [],
+    [matchScoresQuery.data],
+  );
   const summaryText = useMemo(() => {
     const siteName = selectedSite?.name || "Site";
     const className = selectedClass?.name ? ` (${selectedClass.name})` : "";
-    const dates = formState.arrivalDate && formState.departureDate ? `${formState.arrivalDate} → ${formState.departureDate}` : "";
+    const dates =
+      formState.arrivalDate && formState.departureDate
+        ? `${formState.arrivalDate} → ${formState.departureDate}`
+        : "";
     const total = `$${effectiveTotal.toFixed(2)}`;
     const paid = `$${formState.paidAmount.toFixed(2)}`;
     const balance = `$${effectiveBalance.toFixed(2)}`;
     const depRule = campgroundQuery.data?.depositRule || formState.depositRule;
     return `${siteName}${className} • ${dates} • ${nights} night(s) • Total ${total} • Paid ${paid} • Balance ${balance} • Deposit rule ${depRule}`;
-  }, [selectedSite, selectedClass, formState, effectiveTotal, effectiveBalance, nights, campgroundQuery.data?.depositRule]);
+  }, [
+    selectedSite,
+    selectedClass,
+    formState,
+    effectiveTotal,
+    effectiveBalance,
+    nights,
+    campgroundQuery.data?.depositRule,
+  ]);
 
   const filteredReservations = useMemo(() => {
     if (!reservationsQuery.data) return [];
     return reservationsQuery.data.filter((res) => {
       const term = search.toLowerCase();
-      const guest = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.toLowerCase();
+      const guest =
+        `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.toLowerCase();
       const site = `${res.site?.name || res.site?.siteNumber || ""}`.toLowerCase();
       const status = res.status.toLowerCase();
-      const matchesTerm = term ? guest.includes(term) || site.includes(term) || status.includes(term) : true;
+      const matchesTerm = term
+        ? guest.includes(term) || site.includes(term) || status.includes(term)
+        : true;
       const matchesStatus = statusFilter === "all" ? true : res.status === statusFilter;
       const arrival = new Date(res.arrivalDate);
       const startOk = startFilter ? arrival >= new Date(startFilter) : true;
@@ -751,8 +859,9 @@ export default function ReservationsPage() {
       const nights = Math.max(
         1,
         Math.round(
-          (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) / (1000 * 60 * 60 * 24)
-        )
+          (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
+            (1000 * 60 * 60 * 24),
+        ),
       );
       const total = (res.totalAmount ?? 0) / 100;
       const paid = (res.paidAmount ?? 0) / 100;
@@ -764,14 +873,22 @@ export default function ReservationsPage() {
               arrivalDate: res.arrivalDate,
               depositRule: campgroundQuery.data.depositRule,
               depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-              depositConfig: campgroundQuery.data?.depositConfig ?? null
+              depositConfig: campgroundQuery.data?.depositConfig ?? null,
             })
           : 0;
       const depositDue = requiredDeposit > paid;
 
       return matchesTerm && matchesStatus && startOk && endOk && (!filterDepositsDue || depositDue);
     });
-  }, [reservationsQuery.data, search, statusFilter, startFilter, endFilter, filterDepositsDue, campgroundQuery.data]);
+  }, [
+    reservationsQuery.data,
+    search,
+    statusFilter,
+    startFilter,
+    endFilter,
+    filterDepositsDue,
+    campgroundQuery.data,
+  ]);
 
   const sortedReservations = useMemo(() => {
     const data = [...filteredReservations];
@@ -779,7 +896,8 @@ export default function ReservationsPage() {
       const dir = sortDir === "asc" ? 1 : -1;
       const getGuest = (r: Reservation) =>
         `${r.guest?.primaryLastName || ""} ${r.guest?.primaryFirstName || ""}`.trim().toLowerCase();
-      const getSite = (r: Reservation) => `${r.site?.name || r.site?.siteNumber || ""}`.toLowerCase();
+      const getSite = (r: Reservation) =>
+        `${r.site?.name || r.site?.siteNumber || ""}`.toLowerCase();
       const balanceA = Math.max(0, (a.totalAmount ?? 0) - (a.paidAmount ?? 0));
       const balanceB = Math.max(0, (b.totalAmount ?? 0) - (b.paidAmount ?? 0));
       switch (sortBy) {
@@ -792,7 +910,9 @@ export default function ReservationsPage() {
         case "balance":
           return dir * (balanceA - balanceB);
         case "created":
-          return dir * (new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
+          return (
+            dir * (new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime())
+          );
         case "arrival":
         default:
           return dir * (new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
@@ -802,17 +922,25 @@ export default function ReservationsPage() {
   }, [filteredReservations, sortBy, sortDir]);
 
   const tabFilteredReservations = useMemo(
-    () => (listTab === "inhouse" ? sortedReservations.filter((r) => r.status === "checked_in") : sortedReservations),
-    [sortedReservations, listTab]
+    () =>
+      listTab === "inhouse"
+        ? sortedReservations.filter((r) => r.status === "checked_in")
+        : sortedReservations,
+    [sortedReservations, listTab],
   );
 
-  const currentRowIds = useMemo(() => tabFilteredReservations.map((r) => r.id), [tabFilteredReservations]);
+  const currentRowIds = useMemo(
+    () => tabFilteredReservations.map((r) => r.id),
+    [tabFilteredReservations],
+  );
   const selectedInView = useMemo(
     () => tabFilteredReservations.filter((r) => selectedIds.includes(r.id)),
-    [tabFilteredReservations, selectedIds]
+    [tabFilteredReservations, selectedIds],
   );
-  const allInViewSelected = currentRowIds.length > 0 && currentRowIds.every((id) => selectedIds.includes(id));
-  const someInViewSelected = currentRowIds.some((id) => selectedIds.includes(id)) && !allInViewSelected;
+  const allInViewSelected =
+    currentRowIds.length > 0 && currentRowIds.every((id) => selectedIds.includes(id));
+  const someInViewSelected =
+    currentRowIds.some((id) => selectedIds.includes(id)) && !allInViewSelected;
   const selectAllState = allInViewSelected ? true : someInViewSelected ? "indeterminate" : false;
   useEffect(() => {
     setSelectedIds([]);
@@ -823,7 +951,10 @@ export default function ReservationsPage() {
     const nights = tabFilteredReservations.reduce((sum, r) => {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
-      const n = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
+      const n = Math.max(
+        1,
+        Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)),
+      );
       return sum + n;
     }, 0);
     const totalCents = tabFilteredReservations.reduce((sum, r) => sum + (r.totalAmount ?? 0), 0);
@@ -841,34 +972,43 @@ export default function ReservationsPage() {
   const isSameDay = useCallback((value: string | Date | undefined | null, compare: Date) => {
     if (!value) return false;
     const d = new Date(value);
-    return d.getFullYear() === compare.getFullYear() && d.getMonth() === compare.getMonth() && d.getDate() === compare.getDate();
+    return (
+      d.getFullYear() === compare.getFullYear() &&
+      d.getMonth() === compare.getMonth() &&
+      d.getDate() === compare.getDate()
+    );
   }, []);
 
   const today = useMemo(() => new Date(), []);
   // Arrivals: exclude already checked in/out (only pending arrivals)
   const arrivalsToday = useMemo(
-    () => (reservationsQuery.data || []).filter((res) =>
-      res.status !== "cancelled" &&
-      res.status !== "checked_in" &&
-      res.status !== "checked_out" &&
-      isSameDay(res.arrivalDate, today)
-    ),
-    [reservationsQuery.data, isSameDay, today]
+    () =>
+      (reservationsQuery.data || []).filter(
+        (res) =>
+          res.status !== "cancelled" &&
+          res.status !== "checked_in" &&
+          res.status !== "checked_out" &&
+          isSameDay(res.arrivalDate, today),
+      ),
+    [reservationsQuery.data, isSameDay, today],
   );
   // Departures: exclude already checked out (only pending departures)
   const departuresToday = useMemo(
-    () => (reservationsQuery.data || []).filter((res) =>
-      res.status !== "cancelled" &&
-      res.status !== "checked_out" &&
-      isSameDay(res.departureDate, today)
-    ),
-    [reservationsQuery.data, isSameDay, today]
+    () =>
+      (reservationsQuery.data || []).filter(
+        (res) =>
+          res.status !== "cancelled" &&
+          res.status !== "checked_out" &&
+          isSameDay(res.departureDate, today),
+      ),
+    [reservationsQuery.data, isSameDay, today],
   );
   const inHouse = useMemo(
     () => (reservationsQuery.data || []).filter((res) => res.status === "checked_in"),
-    [reservationsQuery.data]
+    [reservationsQuery.data],
   );
-  const occupancyRate = siteCount > 0 ? Math.min(100, Math.round((inHouse.length / siteCount) * 100)) : 0;
+  const occupancyRate =
+    siteCount > 0 ? Math.min(100, Math.round((inHouse.length / siteCount) * 100)) : 0;
   const balanceDueCents = useMemo(
     () =>
       (reservationsQuery.data || []).reduce((sum, res) => {
@@ -876,13 +1016,15 @@ export default function ReservationsPage() {
         const paidCents = res.paidAmount ?? 0;
         return sum + Math.max(0, totalCents - paidCents);
       }, 0),
-    [reservationsQuery.data]
+    [reservationsQuery.data],
   );
 
   const handleExport = (format: "csv" | "json") => {
     if (!filteredReservations.length) return;
     if (format === "json") {
-      const blob = new Blob([JSON.stringify(filteredReservations, null, 2)], { type: "application/json" });
+      const blob = new Blob([JSON.stringify(filteredReservations, null, 2)], {
+        type: "application/json",
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -891,17 +1033,42 @@ export default function ReservationsPage() {
       URL.revokeObjectURL(url);
       return;
     }
-    const headers = ["id", "status", "arrival", "departure", "nights", "site", "guest", "total", "paid", "balance"];
+    const headers = [
+      "id",
+      "status",
+      "arrival",
+      "departure",
+      "nights",
+      "site",
+      "guest",
+      "total",
+      "paid",
+      "balance",
+    ];
     const rows = filteredReservations.map((r) => {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
-      const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
+      const nights = Math.max(
+        1,
+        Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)),
+      );
       const guest = `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.trim();
       const site = r.site?.name || r.site?.siteNumber || "";
       const total = (r.totalAmount ?? 0) / 100;
       const paid = (r.paidAmount ?? 0) / 100;
       const balance = Math.max(0, total - paid);
-      return [r.id, r.status, arrival.toISOString(), departure.toISOString(), nights, site, guest, total, paid, balance];
+      return [
+        r.id,
+        r.status,
+        arrival.toISOString(),
+        departure.toISOString(),
+        nights,
+        site,
+        guest,
+        total,
+        paid,
+        balance,
+      ];
     });
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -926,17 +1093,42 @@ export default function ReservationsPage() {
       URL.revokeObjectURL(url);
       return;
     }
-    const headers = ["id", "status", "arrival", "departure", "nights", "site", "guest", "total", "paid", "balance"];
+    const headers = [
+      "id",
+      "status",
+      "arrival",
+      "departure",
+      "nights",
+      "site",
+      "guest",
+      "total",
+      "paid",
+      "balance",
+    ];
     const rows = selected.map((r) => {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
-      const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
+      const nights = Math.max(
+        1,
+        Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)),
+      );
       const guest = `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.trim();
       const site = r.site?.name || r.site?.siteNumber || "";
       const total = (r.totalAmount ?? 0) / 100;
       const paid = (r.paidAmount ?? 0) / 100;
       const balance = Math.max(0, total - paid);
-      return [r.id, r.status, arrival.toISOString(), departure.toISOString(), nights, site, guest, total, paid, balance];
+      return [
+        r.id,
+        r.status,
+        arrival.toISOString(),
+        departure.toISOString(),
+        nights,
+        site,
+        guest,
+        total,
+        paid,
+        balance,
+      ];
     });
     const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -950,10 +1142,10 @@ export default function ReservationsPage() {
 
   const bulkUpdateStatus = async (nextStatus: ReservationStatus, allowed: ReservationStatus[]) => {
     const eligible = (reservationsQuery.data || []).filter(
-      (r) => selectedIds.includes(r.id) && allowed.includes(r.status)
+      (r) => selectedIds.includes(r.id) && allowed.includes(r.status),
     );
     const skipped = (reservationsQuery.data || []).filter(
-      (r) => selectedIds.includes(r.id) && !allowed.includes(r.status)
+      (r) => selectedIds.includes(r.id) && !allowed.includes(r.status),
     );
     const actionId = Date.now();
     if (!eligible.length) {
@@ -962,12 +1154,24 @@ export default function ReservationsPage() {
     }
     setBulkPending(true);
     try {
-      const results = await Promise.allSettled(eligible.map((r) => apiClient.updateReservation(r.id, { status: nextStatus })));
+      const results = await Promise.allSettled(
+        eligible.map((r) => apiClient.updateReservation(r.id, { status: nextStatus })),
+      );
       const updated = results.filter((r) => r.status === "fulfilled").length;
       const failed = results.length - updated;
-      setBulkFeedback({ updated, skipped: skipped.length, failed, action: nextStatus, id: actionId, skippedIds: skipped.map((s) => s.id) });
+      setBulkFeedback({
+        updated,
+        skipped: skipped.length,
+        failed,
+        action: nextStatus,
+        id: actionId,
+        skippedIds: skipped.map((s) => s.id),
+      });
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
-      setFlash({ type: "success", message: `Updated ${updated} reservation(s).${failed ? ` ${failed} failed.` : ""}` });
+      setFlash({
+        type: "success",
+        message: `Updated ${updated} reservation(s).${failed ? ` ${failed} failed.` : ""}`,
+      });
     } catch (err) {
       setFlash({ type: "error", message: "Bulk update failed." });
     } finally {
@@ -998,7 +1202,8 @@ export default function ReservationsPage() {
 
   // Auto-quote when site + dates change
   useEffect(() => {
-    const shouldQuote = campgroundId && formState.siteId && formState.arrivalDate && formState.departureDate;
+    const shouldQuote =
+      campgroundId && formState.siteId && formState.arrivalDate && formState.departureDate;
     if (!shouldQuote) {
       setQuoteTotal(null);
       setQuoteBreakdown(null);
@@ -1012,14 +1217,14 @@ export default function ReservationsPage() {
       .getQuote(campgroundId, {
         siteId: formState.siteId,
         arrivalDate: formState.arrivalDate,
-        departureDate: formState.departureDate
+        departureDate: formState.departureDate,
       })
       .then((quote) => {
         setQuoteTotal((quote.totalCents ?? 0) / 100);
         setQuoteBreakdown({
           baseSubtotalCents: quote.baseSubtotalCents,
           rulesDeltaCents: quote.rulesDeltaCents,
-          nights: quote.nights
+          nights: quote.nights,
         });
       })
       .catch(() => {
@@ -1044,10 +1249,10 @@ export default function ReservationsPage() {
           ...s,
           siteId: sel.siteId || s.siteId,
           arrivalDate: sel.arrival || s.arrivalDate,
-          departureDate: sel.departure || s.departureDate
+          departureDate: sel.departure || s.departureDate,
         }));
       }
-    } catch { }
+    } catch {}
     localStorage.removeItem("campreserv:pendingSelection");
   }, [campgroundId]);
 
@@ -1058,40 +1263,44 @@ export default function ReservationsPage() {
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: campgroundQuery.data?.name || campgroundId },
-            { label: "Reservations" }
+            { label: "Reservations" },
           ]}
         />
         <PageHeader
           eyebrow="Reservations"
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
                 <CalendarDays className="h-5 w-5" />
               </span>
               <span>Reservations</span>
             </span>
-          )}
+          }
           subtitle="Track arrivals, departures, balances, and guest communications."
-          actions={(
+          actions={
             <>
-              <Button variant="outline" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
+              <Button
+                variant="outline"
+                onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}
+              >
                 Open calendar
               </Button>
               <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
                 Go to booking
               </Button>
             </>
-          )}
+          }
         />
         {flash && (
           <div
             role={flash.type === "error" ? "alert" : "status"}
-            className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
-              ? "border-status-success/30 bg-status-success/15 text-status-success"
-              : flash.type === "error"
-                ? "border-status-error/30 bg-status-error/10 text-status-error"
-                : "border-border bg-muted text-foreground"
-              }`}
+            className={`rounded-md border px-3 py-2 text-sm ${
+              flash.type === "success"
+                ? "border-status-success/30 bg-status-success/15 text-status-success"
+                : flash.type === "error"
+                  ? "border-status-error/30 bg-status-error/10 text-status-error"
+                  : "border-border bg-muted text-foreground"
+            }`}
           >
             {flash.message}
           </div>
@@ -1112,7 +1321,10 @@ export default function ReservationsPage() {
             </CardContent>
           </Card>
           <Link href="/check-in-out" className="block">
-            <Card data-testid="arrivals-card" className="border-border shadow-sm hover:shadow-md transition cursor-pointer">
+            <Card
+              data-testid="arrivals-card"
+              className="border-border shadow-sm hover:shadow-md transition cursor-pointer"
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
                   <LogIn className="h-4 w-4 text-muted-foreground" />
@@ -1120,7 +1332,10 @@ export default function ReservationsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-2">
-                <div className="text-2xl font-semibold text-foreground" data-testid="arrivals-today">
+                <div
+                  className="text-2xl font-semibold text-foreground"
+                  data-testid="arrivals-today"
+                >
                   {arrivalsToday.length}
                 </div>
                 <div className="text-xs text-muted-foreground">Open check-in board</div>
@@ -1128,7 +1343,10 @@ export default function ReservationsPage() {
             </Card>
           </Link>
           <Link href="/check-in-out" className="block">
-            <Card data-testid="departures-card" className="border-border shadow-sm hover:shadow-md transition cursor-pointer">
+            <Card
+              data-testid="departures-card"
+              className="border-border shadow-sm hover:shadow-md transition cursor-pointer"
+            >
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm text-muted-foreground flex items-center gap-2">
                   <LogOut className="h-4 w-4 text-muted-foreground" />
@@ -1136,7 +1354,10 @@ export default function ReservationsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0 space-y-2">
-                <div className="text-2xl font-semibold text-foreground" data-testid="departures-today">
+                <div
+                  className="text-2xl font-semibold text-foreground"
+                  data-testid="departures-today"
+                >
                   {departuresToday.length}
                 </div>
                 <div className="text-xs text-muted-foreground">Open check-out board</div>
@@ -1151,8 +1372,13 @@ export default function ReservationsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-2">
-              <div className="text-2xl font-semibold text-foreground" data-testid="balance-due-value">
-                {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(balanceDueCents / 100)}
+              <div
+                className="text-2xl font-semibold text-foreground"
+                data-testid="balance-due-value"
+              >
+                {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+                  balanceDueCents / 100,
+                )}
               </div>
               <div className="text-xs text-muted-foreground">Open receivables</div>
             </CardContent>
@@ -1163,8 +1389,8 @@ export default function ReservationsPage() {
           <CardContent className="flex items-start gap-3 p-4 text-sm text-muted-foreground">
             <Info className="mt-0.5 h-4 w-4 text-muted-foreground" />
             <span>
-              Creating new bookings now lives on the dedicated booking page. Use the dashboard below for arrivals,
-              departures, balances, and guest comms.
+              Creating new bookings now lives on the dedicated booking page. Use the dashboard below
+              for arrivals, departures, balances, and guest comms.
             </span>
           </CardContent>
         </Card>
@@ -1180,429 +1406,561 @@ export default function ReservationsPage() {
               <TabsTrigger value="inhouse">In house</TabsTrigger>
             </TabsList>
             <div className="text-xs text-muted-foreground">
-              Showing {tabFilteredReservations.length} of {filteredReservations.length} (filters applied)
+              Showing {tabFilteredReservations.length} of {filteredReservations.length} (filters
+              applied)
             </div>
           </div>
 
           {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            <div className="rounded-lg border border-border bg-card p-4">
-              <div className="text-xs text-muted-foreground">Reservations</div>
-              <div className="text-lg font-semibold text-foreground">{tabFilteredReservations.length}</div>
-              <div className="text-xs text-muted-foreground">{summary.nights} nights total</div>
-            </div>
-            <div className="rounded-lg border border-border bg-card p-4">
-              <div className="text-xs text-muted-foreground">Revenue</div>
-              <div className="text-lg font-semibold text-foreground">
-                ${(summary.totalCents / 100).toFixed(2)} / Paid ${(summary.paidCents / 100).toFixed(2)}
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground">Reservations</div>
+                <div className="text-lg font-semibold text-foreground">
+                  {tabFilteredReservations.length}
+                </div>
+                <div className="text-xs text-muted-foreground">{summary.nights} nights total</div>
               </div>
-              <div className="text-xs text-muted-foreground">Balance ${(summary.balanceCents / 100).toFixed(2)}</div>
-            </div>
-            <div className="rounded-lg border border-border bg-card p-4">
-              <div className="text-xs text-muted-foreground">ADR</div>
-              <div className="text-lg font-semibold text-foreground">${summary.adr.toFixed(2)}</div>
-              <div className="text-xs text-muted-foreground">Avg daily rate</div>
-            </div>
-            <div className="rounded-lg border border-border bg-card p-4">
-              <div className="text-xs text-muted-foreground">RevPAR</div>
-              <div className="text-lg font-semibold text-foreground">
-                {siteCount > 0 ? `$${summary.revpar.toFixed(2)}` : "n/a"}
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground">Revenue</div>
+                <div className="text-lg font-semibold text-foreground">
+                  ${(summary.totalCents / 100).toFixed(2)} / Paid $
+                  {(summary.paidCents / 100).toFixed(2)}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Balance ${(summary.balanceCents / 100).toFixed(2)}
+                </div>
               </div>
-              <div className="text-xs text-muted-foreground">Per available site</div>
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground">ADR</div>
+                <div className="text-lg font-semibold text-foreground">
+                  ${summary.adr.toFixed(2)}
+                </div>
+                <div className="text-xs text-muted-foreground">Avg daily rate</div>
+              </div>
+              <div className="rounded-lg border border-border bg-card p-4">
+                <div className="text-xs text-muted-foreground">RevPAR</div>
+                <div className="text-lg font-semibold text-foreground">
+                  {siteCount > 0 ? `$${summary.revpar.toFixed(2)}` : "n/a"}
+                </div>
+                <div className="text-xs text-muted-foreground">Per available site</div>
+              </div>
             </div>
-          </div>
           )}
 
-        <TabsContent value="all" className="space-y-4">
-          <div className="rounded-lg border border-border bg-card overflow-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2">
-                    <Checkbox
-                      checked={selectAllState}
-                      onCheckedChange={toggleAll}
-                      aria-label="Select all reservations"
-                    />
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy("arrival");
-                    setSortDir((prev) => sortBy === "arrival" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Dates
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "guest" ? "guest" : "guest");
-                    setSortDir((prev) => sortBy === "guest" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Guest
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "site" ? "site" : "site");
-                    setSortDir((prev) => sortBy === "site" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Site
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "status" ? "status" : "status");
-                    setSortDir((prev) => sortBy === "status" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Status
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "balance" ? "balance" : "balance");
-                    setSortDir((prev) => sortBy === "balance" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Balance
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {tabFilteredReservations.map((res) => {
-                  const arrival = new Date(res.arrivalDate);
-                  const departure = new Date(res.departureDate);
-                  const total = (res.totalAmount ?? 0) / 100;
-                  const paid = (res.paidAmount ?? 0) / 100;
-                  const balance = Math.max(0, total - paid);
-                  const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() || "Unassigned";
-                  const statusClass = statusBadge(res.status);
-                  const balanceClass =
-                    balance > 0
-                      ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
-                      : "border-status-success/30 bg-status-success/15 text-status-success";
-                  return (
-                    <tr key={res.id} className="hover:bg-muted">
-                      <td className="px-3 py-2">
-                        <Checkbox
-                          checked={selectedIds.includes(res.id)}
-                          onCheckedChange={() => toggleRow(res.id)}
-                          aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
-                        />
-                      </td>
-                      <td className="px-3 py-2 text-foreground">
-                        {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
-                      </td>
-                      <td className="px-3 py-2 text-foreground">{guestName}</td>
-                      <td className="px-3 py-2 text-foreground">{res.site?.name || res.site?.siteNumber || "—"}</td>
-                      <td className="px-3 py-2">
-                        <span className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}>
-                          {res.status.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 text-foreground">
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}>
-                          Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex flex-wrap gap-2">
-                          {res.status === "confirmed" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
-                              disabled={updateReservation.isPending}
-                            >
-                              Check in
-                            </Button>
-                          )}
-                          {res.status === "checked_in" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
-                              disabled={updateReservation.isPending}
-                            >
-                              Check out
-                            </Button>
-                          )}
-                          <Button size="sm" variant="outline" onClick={() => toggleDetails(res, true)}>
-                            Message
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleDetails(res)}
+          <TabsContent value="all" className="space-y-4">
+            <div className="rounded-lg border border-border bg-card overflow-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-muted text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2">
+                      <Checkbox
+                        checked={selectAllState}
+                        onCheckedChange={toggleAll}
+                        aria-label="Select all reservations"
+                      />
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy("arrival");
+                        setSortDir((prev) =>
+                          sortBy === "arrival" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Dates
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "guest" ? "guest" : "guest"));
+                        setSortDir((prev) =>
+                          sortBy === "guest" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Guest
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "site" ? "site" : "site"));
+                        setSortDir((prev) =>
+                          sortBy === "site" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Site
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "status" ? "status" : "status"));
+                        setSortDir((prev) =>
+                          sortBy === "status" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "balance" ? "balance" : "balance"));
+                        setSortDir((prev) =>
+                          sortBy === "balance" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Balance
+                    </th>
+                    <th className="px-3 py-2 text-left font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {tabFilteredReservations.map((res) => {
+                    const arrival = new Date(res.arrivalDate);
+                    const departure = new Date(res.departureDate);
+                    const total = (res.totalAmount ?? 0) / 100;
+                    const paid = (res.paidAmount ?? 0) / 100;
+                    const balance = Math.max(0, total - paid);
+                    const guestName =
+                      `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() ||
+                      "Unassigned";
+                    const statusClass = statusBadge(res.status);
+                    const balanceClass =
+                      balance > 0
+                        ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
+                        : "border-status-success/30 bg-status-success/15 text-status-success";
+                    return (
+                      <tr key={res.id} className="hover:bg-muted">
+                        <td className="px-3 py-2">
+                          <Checkbox
+                            checked={selectedIds.includes(res.id)}
+                            onCheckedChange={() => toggleRow(res.id)}
+                            aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
+                          />
+                        </td>
+                        <td className="px-3 py-2 text-foreground">
+                          {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
+                        </td>
+                        <td className="px-3 py-2 text-foreground">{guestName}</td>
+                        <td className="px-3 py-2 text-foreground">
+                          {res.site?.name || res.site?.siteNumber || "—"}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}
                           >
-                            {openDetails[res.id] ? "Hide" : "Expand"}
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)}>
-                            Details
-                          </Button>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          {activeFilterCount > 0 && (
-                            <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
-                              {activeFilterCount} filters
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {tabFilteredReservations.length === 0 && <TableEmpty colSpan={7}>No reservations match the current filters.</TableEmpty>}
-              </tbody>
-            </table>
-          </div>
-        </TabsContent>
+                            {res.status.replace("_", " ")}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-foreground">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}
+                          >
+                            Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-2">
+                            {res.status === "confirmed" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  updateReservation.mutate({
+                                    id: res.id,
+                                    data: { status: "checked_in" },
+                                  })
+                                }
+                                disabled={updateReservation.isPending}
+                              >
+                                Check in
+                              </Button>
+                            )}
+                            {res.status === "checked_in" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  updateReservation.mutate({
+                                    id: res.id,
+                                    data: { status: "checked_out" },
+                                  })
+                                }
+                                disabled={updateReservation.isPending}
+                              >
+                                Check out
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => toggleDetails(res, true)}
+                            >
+                              Message
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => toggleDetails(res)}>
+                              {openDetails[res.id] ? "Hide" : "Expand"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)
+                              }
+                            >
+                              Details
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            {activeFilterCount > 0 && (
+                              <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
+                                {activeFilterCount} filters
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {tabFilteredReservations.length === 0 && (
+                    <TableEmpty colSpan={7}>No reservations match the current filters.</TableEmpty>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
 
-        <TabsContent value="inhouse" className="space-y-4">
-          <div className="rounded-lg border border-border bg-card overflow-auto">
-            <table className="min-w-full text-sm">
-              <thead className="bg-muted text-muted-foreground">
-                <tr>
-                  <th className="px-3 py-2">
-                    <Checkbox
-                      checked={selectAllState}
-                      onCheckedChange={toggleAll}
-                      aria-label="Select all in-house reservations"
-                    />
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy("arrival");
-                    setSortDir((prev) => sortBy === "arrival" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Dates
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "guest" ? "guest" : "guest");
-                    setSortDir((prev) => sortBy === "guest" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Guest
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "site" ? "site" : "site");
-                    setSortDir((prev) => sortBy === "site" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Site
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "status" ? "status" : "status");
-                    setSortDir((prev) => sortBy === "status" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Status
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
-                    setSortBy((prev) => prev === "balance" ? "balance" : "balance");
-                    setSortDir((prev) => sortBy === "balance" ? (prev === "asc" ? "desc" : "asc") : "asc");
-                  }}>
-                    Balance
-                  </th>
-                  <th className="px-3 py-2 text-left font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {tabFilteredReservations.map((res) => {
-                  const arrival = new Date(res.arrivalDate);
-                  const departure = new Date(res.departureDate);
-                  const total = (res.totalAmount ?? 0) / 100;
-                  const paid = (res.paidAmount ?? 0) / 100;
-                  const balance = Math.max(0, total - paid);
-                  const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() || "Unassigned";
-                  const statusClass = statusBadge(res.status);
-                  const balanceClass =
-                    balance > 0
-                      ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
-                      : "border-status-success/30 bg-status-success/15 text-status-success";
-                  return (
-                    <tr key={res.id} className="hover:bg-muted">
-                      <td className="px-3 py-2">
-                        <Checkbox
-                          checked={selectedIds.includes(res.id)}
-                          onCheckedChange={() => toggleRow(res.id)}
-                          aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
-                        />
-                      </td>
-                      <td className="px-3 py-2 text-foreground">
-                        {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
-                      </td>
-                      <td className="px-3 py-2 text-foreground">{guestName}</td>
-                      <td className="px-3 py-2 text-foreground">{res.site?.name || res.site?.siteNumber || "—"}</td>
-                      <td className="px-3 py-2">
-                        <span className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}>
-                          {res.status.replace("_", " ")}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 text-foreground">
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}>
-                          Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2">
-                        <div className="flex flex-wrap gap-2">
-                          {res.status === "confirmed" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
-                              disabled={updateReservation.isPending}
-                            >
-                              Check in
-                            </Button>
-                          )}
-                          {res.status === "checked_in" && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
-                              disabled={updateReservation.isPending}
-                            >
-                              Check out
-                            </Button>
-                          )}
-                          <Button size="sm" variant="outline" onClick={() => toggleDetails(res, true)}>
-                            Message
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => toggleDetails(res)}
+          <TabsContent value="inhouse" className="space-y-4">
+            <div className="rounded-lg border border-border bg-card overflow-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-muted text-muted-foreground">
+                  <tr>
+                    <th className="px-3 py-2">
+                      <Checkbox
+                        checked={selectAllState}
+                        onCheckedChange={toggleAll}
+                        aria-label="Select all in-house reservations"
+                      />
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy("arrival");
+                        setSortDir((prev) =>
+                          sortBy === "arrival" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Dates
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "guest" ? "guest" : "guest"));
+                        setSortDir((prev) =>
+                          sortBy === "guest" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Guest
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "site" ? "site" : "site"));
+                        setSortDir((prev) =>
+                          sortBy === "site" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Site
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "status" ? "status" : "status"));
+                        setSortDir((prev) =>
+                          sortBy === "status" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Status
+                    </th>
+                    <th
+                      className="px-3 py-2 text-left font-semibold cursor-pointer select-none"
+                      onClick={() => {
+                        setSortBy((prev) => (prev === "balance" ? "balance" : "balance"));
+                        setSortDir((prev) =>
+                          sortBy === "balance" ? (prev === "asc" ? "desc" : "asc") : "asc",
+                        );
+                      }}
+                    >
+                      Balance
+                    </th>
+                    <th className="px-3 py-2 text-left font-semibold">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {tabFilteredReservations.map((res) => {
+                    const arrival = new Date(res.arrivalDate);
+                    const departure = new Date(res.departureDate);
+                    const total = (res.totalAmount ?? 0) / 100;
+                    const paid = (res.paidAmount ?? 0) / 100;
+                    const balance = Math.max(0, total - paid);
+                    const guestName =
+                      `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() ||
+                      "Unassigned";
+                    const statusClass = statusBadge(res.status);
+                    const balanceClass =
+                      balance > 0
+                        ? "border-status-warning/30 bg-status-warning/15 text-status-warning"
+                        : "border-status-success/30 bg-status-success/15 text-status-success";
+                    return (
+                      <tr key={res.id} className="hover:bg-muted">
+                        <td className="px-3 py-2">
+                          <Checkbox
+                            checked={selectedIds.includes(res.id)}
+                            onCheckedChange={() => toggleRow(res.id)}
+                            aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
+                          />
+                        </td>
+                        <td className="px-3 py-2 text-foreground">
+                          {arrival.toLocaleDateString()} → {departure.toLocaleDateString()}
+                        </td>
+                        <td className="px-3 py-2 text-foreground">{guestName}</td>
+                        <td className="px-3 py-2 text-foreground">
+                          {res.site?.name || res.site?.siteNumber || "—"}
+                        </td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`rounded-full border px-2 py-0.5 text-xs capitalize ${statusClass}`}
                           >
-                            {openDetails[res.id] ? "Hide" : "Expand"}
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)}>
-                            Details
-                          </Button>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                          {activeFilterCount > 0 && (
-                            <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
-                              {activeFilterCount} filters
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {tabFilteredReservations.length === 0 && <TableEmpty colSpan={7}>No in-house guests right now.</TableEmpty>}
-              </tbody>
-            </table>
-          </div>
-        </TabsContent>
+                            {res.status.replace("_", " ")}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-foreground">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${balanceClass}`}
+                          >
+                            Paid ${paid.toFixed(2)} • Bal ${balance.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="flex flex-wrap gap-2">
+                            {res.status === "confirmed" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  updateReservation.mutate({
+                                    id: res.id,
+                                    data: { status: "checked_in" },
+                                  })
+                                }
+                                disabled={updateReservation.isPending}
+                              >
+                                Check in
+                              </Button>
+                            )}
+                            {res.status === "checked_in" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  updateReservation.mutate({
+                                    id: res.id,
+                                    data: { status: "checked_out" },
+                                  })
+                                }
+                                disabled={updateReservation.isPending}
+                              >
+                                Check out
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => toggleDetails(res, true)}
+                            >
+                              Message
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => toggleDetails(res)}>
+                              {openDetails[res.id] ? "Hide" : "Expand"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)
+                              }
+                            >
+                              Details
+                            </Button>
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            {activeFilterCount > 0 && (
+                              <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
+                                {activeFilterCount} filters
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {tabFilteredReservations.length === 0 && (
+                    <TableEmpty colSpan={7}>No in-house guests right now.</TableEmpty>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </TabsContent>
         </Tabs>
 
         <div className="grid gap-3">
-            {overlapsListQuery.data && overlapsListQuery.data.length > 0 && (
-              <details className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-sm text-status-warning">
-                <summary className="p-3 cursor-pointer hover:bg-status-warning/25 rounded-lg flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold">Overlapping reservations detected</span>
-                    <span className="px-2 py-0.5 rounded-full bg-status-warning/25 text-xs font-medium">{overlapsListQuery.data.length}</span>
-                  </div>
-                  <span className="text-xs">Click to expand</span>
-                </summary>
-                <div className="px-3 pb-3 space-y-2 border-t border-status-warning/30">
-                  <div className="text-xs pt-2">These reservations have conflicting dates on the same site. Update arrival/departure dates or move to a different site.</div>
-                  <div className="space-y-1">
-                    {overlapsListQuery.data.map((row) => (
-                      <div key={`${row.reservationA}-${row.reservationB}`} className="flex flex-wrap items-center gap-2 text-xs p-2 bg-status-warning/25 rounded">
-                        <span className="font-semibold">{row.siteId}</span>
-                        <span>
-                          {row.arrivalA.slice(0, 10)} → {row.departureA.slice(0, 10)}
-                        </span>
-                        <span>overlaps</span>
-                        <span>
-                          {row.arrivalB.slice(0, 10)} → {row.departureB.slice(0, 10)}
-                        </span>
-                        <span className="flex gap-2 ml-auto">
-                          <a className="underline hover:opacity-80" href={`/campgrounds/${campgroundId}/reservations/${row.reservationA}`}>
-                            Fix A
-                          </a>
-                          <a className="underline hover:opacity-80" href={`/campgrounds/${campgroundId}/reservations/${row.reservationB}`}>
-                            Fix B
-                          </a>
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+          {overlapsListQuery.data && overlapsListQuery.data.length > 0 && (
+            <details className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-sm text-status-warning">
+              <summary className="p-3 cursor-pointer hover:bg-status-warning/25 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Overlapping reservations detected</span>
+                  <span className="px-2 py-0.5 rounded-full bg-status-warning/25 text-xs font-medium">
+                    {overlapsListQuery.data.length}
+                  </span>
                 </div>
-              </details>
-            )}
-            <Card className="border-border shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-semibold text-foreground flex items-center gap-2">
-                    Filters & exports
-                    {activeFilterCount > 0 && (
-                      <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
-                        {activeFilterCount} on
+                <span className="text-xs">Click to expand</span>
+              </summary>
+              <div className="px-3 pb-3 space-y-2 border-t border-status-warning/30">
+                <div className="text-xs pt-2">
+                  These reservations have conflicting dates on the same site. Update
+                  arrival/departure dates or move to a different site.
+                </div>
+                <div className="space-y-1">
+                  {overlapsListQuery.data.map((row) => (
+                    <div
+                      key={`${row.reservationA}-${row.reservationB}`}
+                      className="flex flex-wrap items-center gap-2 text-xs p-2 bg-status-warning/25 rounded"
+                    >
+                      <span className="font-semibold">{row.siteId}</span>
+                      <span>
+                        {row.arrivalA.slice(0, 10)} → {row.departureA.slice(0, 10)}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      disabled={!hasFilters && !filterDepositsDue}
-                      onClick={() => {
-                        setSearch("");
-                        setStatusFilter("all");
-                        setStartFilter("");
-                        setEndFilter("");
-                        setFilterDepositsDue(false);
-                      }}
-                    >
-                      Clear all filters
-                    </Button>
-                  </div>
+                      <span>overlaps</span>
+                      <span>
+                        {row.arrivalB.slice(0, 10)} → {row.departureB.slice(0, 10)}
+                      </span>
+                      <span className="flex gap-2 ml-auto">
+                        <a
+                          className="underline hover:opacity-80"
+                          href={`/campgrounds/${campgroundId}/reservations/${row.reservationA}`}
+                        >
+                          Fix A
+                        </a>
+                        <a
+                          className="underline hover:opacity-80"
+                          href={`/campgrounds/${campgroundId}/reservations/${row.reservationB}`}
+                        >
+                          Fix B
+                        </a>
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              </CardHeader>
-              <CardContent className="pt-0 space-y-3">
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="space-y-1">
-                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Search</div>
-                    <Input
-                      aria-label="Search reservations"
-                      placeholder="Search guest, site, status..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Start date</div>
-                    <Input
-                      type="date"
-                      aria-label="Start date filter"
-                      value={startFilter}
-                      onChange={(e) => setStartFilter(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">End date</div>
-                    <Input
-                      type="date"
-                      aria-label="End date filter"
-                      value={endFilter}
-                      onChange={(e) => setEndFilter(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
-                    <Select
-                      value={statusFilter}
-                      onValueChange={(value) => {
-                        if (value === "all" || isReservationStatus(value)) {
-                          setStatusFilter(value);
-                        }
-                      }}
-                    >
-                      <SelectTrigger aria-label="Status filter">
-                        <SelectValue placeholder="All statuses" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All statuses</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="confirmed">Confirmed</SelectItem>
-                        <SelectItem value="checked_in">Checked in</SelectItem>
-                        <SelectItem value="checked_out">Checked out</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+              </div>
+            </details>
+          )}
+          <Card className="border-border shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  Filters & exports
+                  {activeFilterCount > 0 && (
+                    <span className="rounded-full bg-status-success/15 text-status-success border border-status-success/30 px-2 py-0.5 text-[11px] font-semibold">
+                      {activeFilterCount} on
+                    </span>
+                  )}
                 </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled={!hasFilters && !filterDepositsDue}
+                    onClick={() => {
+                      setSearch("");
+                      setStatusFilter("all");
+                      setStartFilter("");
+                      setEndFilter("");
+                      setFilterDepositsDue(false);
+                    }}
+                  >
+                    Clear all filters
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0 space-y-3">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Search
+                  </div>
+                  <Input
+                    aria-label="Search reservations"
+                    placeholder="Search guest, site, status..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Start date
+                  </div>
+                  <Input
+                    type="date"
+                    aria-label="Start date filter"
+                    value={startFilter}
+                    onChange={(e) => setStartFilter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    End date
+                  </div>
+                  <Input
+                    type="date"
+                    aria-label="End date filter"
+                    value={endFilter}
+                    onChange={(e) => setEndFilter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    Status
+                  </div>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(value) => {
+                      if (value === "all" || isReservationStatus(value)) {
+                        setStatusFilter(value);
+                      }
+                    }}
+                  >
+                    <SelectTrigger aria-label="Status filter">
+                      <SelectValue placeholder="All statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All statuses</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                      <SelectItem value="checked_in">Checked in</SelectItem>
+                      <SelectItem value="checked_out">Checked out</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -1711,169 +2069,193 @@ export default function ReservationsPage() {
                 </Button>
               </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Exports</div>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
-                      Export CSV
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => handleExport("json")} disabled={!filteredReservations.length}>
-                      Export JSON
-                    </Button>
-                  </div>
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Exports
                 </div>
-                {/* Active filter pills */}
-                {activeFilterCount > 0 && (
-                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
-                    <span className="text-xs text-muted-foreground font-medium">Active:</span>
-                    {search.trim() && (
-                      <FilterChip
-                        label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
-                        selected
-                        removable
-                        onRemove={() => setSearch("")}
-                        variant="subtle"
-                      />
-                    )}
-                    {statusFilter !== "all" && (
-                      <FilterChip
-                        label={`Status: ${statusFilter.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
-                        selected
-                        removable
-                        onRemove={() => setStatusFilter("all")}
-                        variant="subtle"
-                      />
-                    )}
-                    {startFilter && endFilter && startFilter === endFilter ? (
-                      <FilterChip
-                        label={`Date: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
-                        selected
-                        removable
-                        onRemove={() => {
-                          setStartFilter("");
-                          setEndFilter("");
-                        }}
-                        variant="subtle"
-                      />
-                    ) : (
-                      <>
-                        {startFilter && (
-                          <FilterChip
-                            label={`From: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
-                            selected
-                            removable
-                            onRemove={() => setStartFilter("")}
-                            variant="subtle"
-                          />
-                        )}
-                        {endFilter && (
-                          <FilterChip
-                            label={`To: ${new Date(endFilter + "T00:00:00").toLocaleDateString()}`}
-                            selected
-                            removable
-                            onRemove={() => setEndFilter("")}
-                            variant="subtle"
-                          />
-                        )}
-                      </>
-                    )}
-                    {filterDepositsDue && (
-                      <FilterChip
-                        label="Deposits due"
-                        selected
-                        removable
-                        onRemove={() => setFilterDepositsDue(false)}
-                        variant="subtle"
-                      />
-                    )}
-                    {activeFilterCount > 1 && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs h-7 px-2"
-                        onClick={() => {
-                          setSearch("");
-                          setStatusFilter("all");
-                          setStartFilter("");
-                          setEndFilter("");
-                          setFilterDepositsDue(false);
-                        }}
-                      >
-                        Clear all
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            {reservationsQuery.isLoading && <p className="text-muted-foreground">Loading…</p>}
-            {reservationsQuery.error && <p className="text-status-error">Error loading reservations</p>}
-            {selectedInView.length > 0 && (
-              <div className="rounded-lg border border-status-info/30 bg-status-info/15 p-3 flex flex-wrap items-center gap-2 text-sm text-foreground">
-                <div className="font-semibold">{selectedInView.length} selected</div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2">
                   <Button
                     size="sm"
                     variant="outline"
-                    disabled={bulkPending}
-                    onClick={() => bulkUpdateStatus("checked_in", ["confirmed"])}
+                    onClick={() => handleExport("csv")}
+                    disabled={!filteredReservations.length}
                   >
-                    Check in selected
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={bulkPending}
-                    onClick={() => bulkUpdateStatus("checked_out", ["checked_in"])}
-                  >
-                    Check out selected
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={bulkPending}
-                    onClick={() => bulkUpdateStatus("cancelled", ["pending", "confirmed", "checked_in"])}
-                  >
-                    Cancel selected
-                  </Button>
-                  <Button size="sm" variant="outline" onClick={handleBulkMessage}>
-                    Message selected
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleExportSelected("csv")}>
                     Export CSV
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleExportSelected("json")}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleExport("json")}
+                    disabled={!filteredReservations.length}
+                  >
                     Export JSON
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
-                    Clear
-                  </Button>
                 </div>
-                {bulkFeedback && (
-                  <div className="flex items-center gap-2 text-xs text-foreground">
-                    <span>
-                      {bulkFeedback.action}: updated {bulkFeedback.updated}, skipped {bulkFeedback.skipped}
-                      {bulkFeedback.failed ? `, failed ${bulkFeedback.failed}` : ""}
-                    </span>
-                    <button
-                      className="text-status-success hover:opacity-80 font-semibold"
-                      onClick={() => setBulkFeedback(null)}
-                    >
-                      clear
-                    </button>
-                  </div>
-                )}
               </div>
-            )}
-            {tabFilteredReservations.filter((res) => openDetails[res.id] || focusId === res.id).map((res) => {
+              {/* Active filter pills */}
+              {activeFilterCount > 0 && (
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+                  <span className="text-xs text-muted-foreground font-medium">Active:</span>
+                  {search.trim() && (
+                    <FilterChip
+                      label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + "..." : search.trim()}"`}
+                      selected
+                      removable
+                      onRemove={() => setSearch("")}
+                      variant="subtle"
+                    />
+                  )}
+                  {statusFilter !== "all" && (
+                    <FilterChip
+                      label={`Status: ${statusFilter.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                      selected
+                      removable
+                      onRemove={() => setStatusFilter("all")}
+                      variant="subtle"
+                    />
+                  )}
+                  {startFilter && endFilter && startFilter === endFilter ? (
+                    <FilterChip
+                      label={`Date: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                      selected
+                      removable
+                      onRemove={() => {
+                        setStartFilter("");
+                        setEndFilter("");
+                      }}
+                      variant="subtle"
+                    />
+                  ) : (
+                    <>
+                      {startFilter && (
+                        <FilterChip
+                          label={`From: ${new Date(startFilter + "T00:00:00").toLocaleDateString()}`}
+                          selected
+                          removable
+                          onRemove={() => setStartFilter("")}
+                          variant="subtle"
+                        />
+                      )}
+                      {endFilter && (
+                        <FilterChip
+                          label={`To: ${new Date(endFilter + "T00:00:00").toLocaleDateString()}`}
+                          selected
+                          removable
+                          onRemove={() => setEndFilter("")}
+                          variant="subtle"
+                        />
+                      )}
+                    </>
+                  )}
+                  {filterDepositsDue && (
+                    <FilterChip
+                      label="Deposits due"
+                      selected
+                      removable
+                      onRemove={() => setFilterDepositsDue(false)}
+                      variant="subtle"
+                    />
+                  )}
+                  {activeFilterCount > 1 && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs h-7 px-2"
+                      onClick={() => {
+                        setSearch("");
+                        setStatusFilter("all");
+                        setStartFilter("");
+                        setEndFilter("");
+                        setFilterDepositsDue(false);
+                      }}
+                    >
+                      Clear all
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          {reservationsQuery.isLoading && <p className="text-muted-foreground">Loading…</p>}
+          {reservationsQuery.error && (
+            <p className="text-status-error">Error loading reservations</p>
+          )}
+          {selectedInView.length > 0 && (
+            <div className="rounded-lg border border-status-info/30 bg-status-info/15 p-3 flex flex-wrap items-center gap-2 text-sm text-foreground">
+              <div className="font-semibold">{selectedInView.length} selected</div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={bulkPending}
+                  onClick={() => bulkUpdateStatus("checked_in", ["confirmed"])}
+                >
+                  Check in selected
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={bulkPending}
+                  onClick={() => bulkUpdateStatus("checked_out", ["checked_in"])}
+                >
+                  Check out selected
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={bulkPending}
+                  onClick={() =>
+                    bulkUpdateStatus("cancelled", ["pending", "confirmed", "checked_in"])
+                  }
+                >
+                  Cancel selected
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleBulkMessage}>
+                  Message selected
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => handleExportSelected("csv")}>
+                  Export CSV
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => handleExportSelected("json")}>
+                  Export JSON
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setSelectedIds([])}>
+                  Clear
+                </Button>
+              </div>
+              {bulkFeedback && (
+                <div className="flex items-center gap-2 text-xs text-foreground">
+                  <span>
+                    {bulkFeedback.action}: updated {bulkFeedback.updated}, skipped{" "}
+                    {bulkFeedback.skipped}
+                    {bulkFeedback.failed ? `, failed ${bulkFeedback.failed}` : ""}
+                  </span>
+                  <button
+                    className="text-status-success hover:opacity-80 font-semibold"
+                    onClick={() => setBulkFeedback(null)}
+                  >
+                    clear
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {tabFilteredReservations
+            .filter((res) => openDetails[res.id] || focusId === res.id)
+            .map((res) => {
               const siteClassId = res.site?.siteClass?.id;
               const siteClassName = siteClassId
                 ? siteClassesQuery.data?.find((cls) => cls.id === siteClassId)?.name || ""
                 : "";
-              const siteClass = siteClassId ? siteClassesQuery.data?.find((cls) => cls.id === siteClassId) : undefined;
+              const siteClass = siteClassId
+                ? siteClassesQuery.data?.find((cls) => cls.id === siteClassId)
+                : undefined;
               const arrival = new Date(res.arrivalDate);
               const departure = new Date(res.departureDate);
-              const nights = Math.max(1, Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
+              const nights = Math.max(
+                1,
+                Math.round((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)),
+              );
               const total = (res.totalAmount ?? 0) / 100;
               const paid = (res.paidAmount ?? 0) / 100;
               const balance = Math.max(0, total - paid);
@@ -1896,26 +2278,26 @@ export default function ReservationsPage() {
               const suggestedDeposit =
                 campgroundQuery.data && total
                   ? computeDepositDue({
-                    total,
-                    nights,
-                    arrivalDate: res.arrivalDate,
-                    depositRule: campgroundQuery.data.depositRule,
-                    depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-                    depositConfig: campgroundQuery.data?.depositConfig ?? null
-                  })
+                      total,
+                      nights,
+                      arrivalDate: res.arrivalDate,
+                      depositRule: campgroundQuery.data.depositRule,
+                      depositPercentage: campgroundQuery.data.depositPercentage ?? null,
+                      depositConfig: campgroundQuery.data?.depositConfig ?? null,
+                    })
                   : 0;
               const editedTotalCents = editing[res.id]?.totalAmount ?? res.totalAmount ?? 0;
               const editedPaidCents = editing[res.id]?.paidAmount ?? res.paidAmount ?? 0;
               const editedDepositDue =
                 campgroundQuery.data && editedTotalCents
                   ? computeDepositDue({
-                    total: editedTotalCents / 100,
-                    nights,
-                    arrivalDate: res.arrivalDate,
-                    depositRule: campgroundQuery.data.depositRule,
-                    depositPercentage: campgroundQuery.data.depositPercentage ?? null,
-                    depositConfig: campgroundQuery.data?.depositConfig ?? null
-                  })
+                      total: editedTotalCents / 100,
+                      nights,
+                      arrivalDate: res.arrivalDate,
+                      depositRule: campgroundQuery.data.depositRule,
+                      depositPercentage: campgroundQuery.data.depositPercentage ?? null,
+                      depositConfig: campgroundQuery.data?.depositConfig ?? null,
+                    })
                   : suggestedDeposit;
               const depositShortfall = Math.max(0, editedDepositDue - editedPaidCents / 100);
               const paymentAmount = Number(paymentInputs[res.id] ?? balance);
@@ -1923,15 +2305,15 @@ export default function ReservationsPage() {
               const conflict = conflictByReservation[res.id];
               const manualOverride =
                 editedTotalCents !== (res.totalAmount ?? 0) ||
-                (editing[res.id]?.discountsAmount ?? (res.discountsAmount ?? 0)) !== (res.discountsAmount ?? 0);
+                (editing[res.id]?.discountsAmount ?? res.discountsAmount ?? 0) !==
+                  (res.discountsAmount ?? 0);
               const overrideMissing =
                 manualOverride &&
                 (!(editing[res.id]?.overrideReason || "").trim() ||
                   !(editing[res.id]?.overrideApprovedBy || "").trim());
-              const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim();
-              const wasSkipped =
-                !!bulkFeedback &&
-                bulkFeedback.skippedIds.includes(res.id);
+              const guestName =
+                `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim();
+              const wasSkipped = !!bulkFeedback && bulkFeedback.skippedIds.includes(res.id);
 
               return (
                 <div
@@ -1944,25 +2326,35 @@ export default function ReservationsPage() {
                     onClick={(event) => event.stopPropagation()}
                   >
                     <div className="flex items-center justify-between border-b border-border px-4 py-3">
-                      <div className="text-sm font-semibold text-foreground">Reservation details</div>
+                      <div className="text-sm font-semibold text-foreground">
+                        Reservation details
+                      </div>
                       <Button size="sm" variant="ghost" onClick={() => toggleDetails(res, false)}>
                         Close
                       </Button>
                     </div>
-                    <div className={`p-4 space-y-4 ${highlighted === res.id ? "ring-2 ring-status-success/40" : ""} ${wasSkipped ? "border-status-warning/30" : ""}`}>
+                    <div
+                      className={`p-4 space-y-4 ${highlighted === res.id ? "ring-2 ring-status-success/40" : ""} ${wasSkipped ? "border-status-warning/30" : ""}`}
+                    >
                       <div className="space-y-3">
                         <div className="flex flex-wrap items-center gap-3">
-                          <span className={`rounded-full border px-3 py-1 text-xs ${statusColor}`}>{res.status.replace("_", " ")}</span>
+                          <span className={`rounded-full border px-3 py-1 text-xs ${statusColor}`}>
+                            {res.status.replace("_", " ")}
+                          </span>
                           <div className="flex flex-col">
-                            <div className="text-base font-semibold text-foreground">{guestName || "Unassigned guest"}</div>
+                            <div className="text-base font-semibold text-foreground">
+                              {guestName || "Unassigned guest"}
+                            </div>
                             <div className="text-xs text-muted-foreground">
-                              {arrival.toLocaleDateString()} → {departure.toLocaleDateString()} • {nights} night(s)
+                              {arrival.toLocaleDateString()} → {departure.toLocaleDateString()} •{" "}
+                              {nights} night(s)
                             </div>
                           </div>
                         </div>
                         <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                           <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground">
-                            Site {res.site?.name || res.site?.siteNumber} {siteClassName ? `• ${siteClassName}` : ""}
+                            Site {res.site?.name || res.site?.siteNumber}{" "}
+                            {siteClassName ? `• ${siteClassName}` : ""}
                           </span>
                           <span className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground">
                             Payment {res.paymentStatus || "unpaid"}
@@ -1992,19 +2384,31 @@ export default function ReservationsPage() {
                         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                           <div className="rounded-xl border border-border bg-muted px-3 py-2">
                             <div className="text-[11px] text-muted-foreground">Total</div>
-                            <div className="text-sm font-semibold text-foreground">${total.toFixed(2)}</div>
+                            <div className="text-sm font-semibold text-foreground">
+                              ${total.toFixed(2)}
+                            </div>
                           </div>
                           <div className="rounded-xl border border-border bg-muted px-3 py-2">
                             <div className="text-[11px] text-muted-foreground">Paid</div>
-                            <div className="text-sm font-semibold text-foreground">${paid.toFixed(2)}</div>
+                            <div className="text-sm font-semibold text-foreground">
+                              ${paid.toFixed(2)}
+                            </div>
                           </div>
                           <div
                             className={`rounded-xl border px-3 py-2 ${
-                              balance > 0 ? "border-status-warning/40 bg-status-warning/10" : "border-border bg-muted"
+                              balance > 0
+                                ? "border-status-warning/40 bg-status-warning/10"
+                                : "border-border bg-muted"
                             }`}
                           >
-                            <div className={`text-[11px] ${balance > 0 ? "text-status-warning" : "text-muted-foreground"}`}>Balance</div>
-                            <div className={`text-sm font-semibold ${balance > 0 ? "text-status-warning" : "text-foreground"}`}>
+                            <div
+                              className={`text-[11px] ${balance > 0 ? "text-status-warning" : "text-muted-foreground"}`}
+                            >
+                              Balance
+                            </div>
+                            <div
+                              className={`text-sm font-semibold ${balance > 0 ? "text-status-warning" : "text-foreground"}`}
+                            >
                               ${balance.toFixed(2)}
                             </div>
                           </div>
@@ -2025,21 +2429,31 @@ export default function ReservationsPage() {
                           >
                             {paid >= suggestedDeposit
                               ? `Deposit covered (${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(suggestedDeposit)})`
-                              : `Deposit due ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
-                                Math.max(0, suggestedDeposit - paid)
-                              )} of ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(suggestedDeposit)}`}
+                              : `Deposit due ${new Intl.NumberFormat("en-US", {
+                                  style: "currency",
+                                  currency: "USD",
+                                }).format(
+                                  Math.max(0, suggestedDeposit - paid),
+                                )} of ${new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(suggestedDeposit)}`}
                           </div>
                         )}
                       </div>
 
                       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-muted/40 px-3 py-3">
-                        <div className="text-xs font-semibold text-muted-foreground">Quick actions</div>
+                        <div className="text-xs font-semibold text-muted-foreground">
+                          Quick actions
+                        </div>
                         <div className="flex flex-wrap gap-2">
                           {res.status === "confirmed" && (
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
+                              onClick={() =>
+                                updateReservation.mutate({
+                                  id: res.id,
+                                  data: { status: "checked_in" },
+                                })
+                              }
                               disabled={updateReservation.isPending}
                             >
                               Check in
@@ -2049,7 +2463,12 @@ export default function ReservationsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
+                              onClick={() =>
+                                updateReservation.mutate({
+                                  id: res.id,
+                                  data: { status: "checked_out" },
+                                })
+                              }
                               disabled={updateReservation.isPending}
                             >
                               Check out
@@ -2059,7 +2478,9 @@ export default function ReservationsPage() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)}
+                              onClick={() =>
+                                router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)
+                              }
                             >
                               Collect deposit
                             </Button>
@@ -2077,7 +2498,9 @@ export default function ReservationsPage() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)}
+                            onClick={() =>
+                              router.push(`/campgrounds/${campgroundId}/reservations/${res.id}`)
+                            }
                           >
                             View details
                           </Button>
@@ -2086,7 +2509,12 @@ export default function ReservationsPage() {
                               Ledger
                             </a>
                           </Button>
-                          <Button size="sm" variant="destructive" onClick={() => deleteReservation.mutate(res.id)} disabled={deleteReservation.isPending}>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => deleteReservation.mutate(res.id)}
+                            disabled={deleteReservation.isPending}
+                          >
                             Delete
                           </Button>
                         </div>
@@ -2095,30 +2523,44 @@ export default function ReservationsPage() {
                       <div className="space-y-3">
                         {conflict?.conflict && (
                           <div className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-xs text-status-error">
-                            <div className="text-sm font-semibold text-status-error">Conflict detected</div>
+                            <div className="text-sm font-semibold text-status-error">
+                              Conflict detected
+                            </div>
                             <div className="flex flex-wrap gap-2">
                               {(conflict.reasons || []).map((r) => (
-                                <span key={r} className="rounded-full border border-status-error/30 bg-card px-2 py-0.5">
+                                <span
+                                  key={r}
+                                  className="rounded-full border border-status-error/30 bg-card px-2 py-0.5"
+                                >
                                   {r}
                                 </span>
                               ))}
                             </div>
-                            <div className="text-[11px] text-status-error">Resolve conflicts before saving changes.</div>
+                            <div className="text-[11px] text-status-error">
+                              Resolve conflicts before saving changes.
+                            </div>
                           </div>
                         )}
 
                         <details open className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Overview & activity</span>
-                            <span className="text-xs font-normal text-muted-foreground">Stay + recent updates</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Stay + recent updates
+                            </span>
                           </summary>
                           <div className="px-4 pb-4">
                             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-1">
-                                <div className="text-sm font-semibold text-foreground">At a glance</div>
+                                <div className="text-sm font-semibold text-foreground">
+                                  At a glance
+                                </div>
                                 {(() => {
                                   const formatCurrency = (value: number) =>
-                                    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value);
+                                    new Intl.NumberFormat("en-US", {
+                                      style: "currency",
+                                      currency: "USD",
+                                    }).format(value);
                                   const depositRuleLabel = campgroundQuery.data?.depositRule
                                     ? campgroundQuery.data.depositRule.replace(/_/g, " ")
                                     : "none";
@@ -2131,9 +2573,12 @@ export default function ReservationsPage() {
                                   const alerts: string[] = [];
                                   if (conflict?.conflict) alerts.push("Conflict");
                                   if (resOccupancyOver) alerts.push("Over capacity");
-                                  if (balance > 0) alerts.push(`Balance due ${formatCurrency(balance)}`);
+                                  if (balance > 0)
+                                    alerts.push(`Balance due ${formatCurrency(balance)}`);
                                   if (suggestedDeposit > 0 && paid < suggestedDeposit) {
-                                    alerts.push(`Deposit due ${formatCurrency(Math.max(0, suggestedDeposit - paid))}`);
+                                    alerts.push(
+                                      `Deposit due ${formatCurrency(Math.max(0, suggestedDeposit - paid))}`,
+                                    );
                                   }
 
                                   return (
@@ -2153,7 +2598,9 @@ export default function ReservationsPage() {
                                       <div className="flex items-center justify-between gap-3">
                                         <span className="text-muted-foreground">Stay</span>
                                         <span>
-                                          {arrival.toLocaleDateString()} → {departure.toLocaleDateString()} ({nights} night{nights === 1 ? "" : "s"})
+                                          {arrival.toLocaleDateString()} →{" "}
+                                          {departure.toLocaleDateString()} ({nights} night
+                                          {nights === 1 ? "" : "s"})
                                         </span>
                                       </div>
                                       <div className="flex items-center justify-between gap-3">
@@ -2166,8 +2613,11 @@ export default function ReservationsPage() {
                                       <div className="flex items-center justify-between gap-3">
                                         <span className="text-muted-foreground">Guest</span>
                                         <span>
-                                          {guestName || "Unassigned"} • {res.adults} adult{res.adults === 1 ? "" : "s"}
-                                          {res.children ? `, ${res.children} child${res.children === 1 ? "" : "ren"}` : ""}
+                                          {guestName || "Unassigned"} • {res.adults} adult
+                                          {res.adults === 1 ? "" : "s"}
+                                          {res.children
+                                            ? `, ${res.children} child${res.children === 1 ? "" : "ren"}`
+                                            : ""}
                                         </span>
                                       </div>
                                       <div className="flex items-center justify-between gap-3">
@@ -2177,13 +2627,15 @@ export default function ReservationsPage() {
                                       <div className="flex items-center justify-between gap-3">
                                         <span className="text-muted-foreground">Payment</span>
                                         <span>
-                                          {res.paymentStatus || "unpaid"} • Balance {formatCurrency(balance)}
+                                          {res.paymentStatus || "unpaid"} • Balance{" "}
+                                          {formatCurrency(balance)}
                                         </span>
                                       </div>
                                       <div className="flex items-center justify-between gap-3">
                                         <span className="text-muted-foreground">Deposit</span>
                                         <span>
-                                          {depositRuleLabel === "none" ? "None" : depositRuleLabel} • {depositStatus}
+                                          {depositRuleLabel === "none" ? "None" : depositRuleLabel}{" "}
+                                          • {depositStatus}
                                         </span>
                                       </div>
                                     </div>
@@ -2191,41 +2643,57 @@ export default function ReservationsPage() {
                                 })()}
                               </div>
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
-                                <div className="text-sm font-semibold text-foreground">Recent activity</div>
+                                <div className="text-sm font-semibold text-foreground">
+                                  Recent activity
+                                </div>
                                 {(() => {
                                   const activity: { id: string; label: string; at: string }[] = [];
-                                  (ledgerByRes[res.id] || []).slice(0, 5).forEach((row: LedgerEntry, idx: number) => {
-                                    if (row.createdAt) {
-                                      activity.push({
-                                        id: `ledger-${res.id}-${idx}`,
-                                        label: `${row.description || "Ledger"} ${row.amountCents ? `$${(row.amountCents / 100).toFixed(2)}` : ""}`.trim(),
-                                        at: row.createdAt
-                                      });
-                                    }
-                                  });
-                                  (commsByRes[res.id] || []).slice(0, 5).forEach((c: Communication, idx: number) => {
-                                    if (c.createdAt) {
-                                      activity.push({
-                                        id: `comm-${res.id}-${idx}`,
-                                        label: c.subject || c.type || "Message",
-                                        at: c.createdAt
-                                      });
-                                    }
-                                  });
+                                  (ledgerByRes[res.id] || [])
+                                    .slice(0, 5)
+                                    .forEach((row: LedgerEntry, idx: number) => {
+                                      if (row.createdAt) {
+                                        activity.push({
+                                          id: `ledger-${res.id}-${idx}`,
+                                          label:
+                                            `${row.description || "Ledger"} ${row.amountCents ? `$${(row.amountCents / 100).toFixed(2)}` : ""}`.trim(),
+                                          at: row.createdAt,
+                                        });
+                                      }
+                                    });
+                                  (commsByRes[res.id] || [])
+                                    .slice(0, 5)
+                                    .forEach((c: Communication, idx: number) => {
+                                      if (c.createdAt) {
+                                        activity.push({
+                                          id: `comm-${res.id}-${idx}`,
+                                          label: c.subject || c.type || "Message",
+                                          at: c.createdAt,
+                                        });
+                                      }
+                                    });
                                   if (activity.length === 0) {
                                     activity.push({
                                       id: `fallback-${res.id}`,
                                       label: "No recent activity",
-                                      at: res.updatedAt || res.createdAt || ""
+                                      at: res.updatedAt || res.createdAt || "",
                                     });
                                   }
-                                  const sorted = activity.sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()).slice(0, 6);
+                                  const sorted = activity
+                                    .sort(
+                                      (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime(),
+                                    )
+                                    .slice(0, 6);
                                   return (
                                     <div className="space-y-1">
                                       {sorted.map((a) => (
-                                        <div key={a.id} className="flex items-center justify-between gap-2">
+                                        <div
+                                          key={a.id}
+                                          className="flex items-center justify-between gap-2"
+                                        >
                                           <span className="truncate">{a.label}</span>
-                                          <span className="text-[10px] text-muted-foreground">{a.at ? new Date(a.at).toLocaleString() : ""}</span>
+                                          <span className="text-[10px] text-muted-foreground">
+                                            {a.at ? new Date(a.at).toLocaleString() : ""}
+                                          </span>
                                         </div>
                                       ))}
                                     </div>
@@ -2239,23 +2707,30 @@ export default function ReservationsPage() {
                         <details open className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Payments & totals</span>
-                            <span className="text-xs font-normal text-muted-foreground">Money, balances, and edits</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Money, balances, and edits
+                            </span>
                           </summary>
                           <div className="px-4 pb-4 space-y-3">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-foreground">
                               <div className="rounded-lg border border-border bg-muted px-3 py-2">
                                 <div className="text-muted-foreground text-xs">Payment</div>
                                 <div className="font-semibold">${total.toFixed(2)}</div>
-                                <div className="text-xs text-muted-foreground">Paid ${paid.toFixed(2)} • Balance ${balance.toFixed(2)}</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Paid ${paid.toFixed(2)} • Balance ${balance.toFixed(2)}
+                                </div>
                                 {suggestedDeposit > 0 && (
                                   <div className="text-xs text-status-warning mt-1">
-                                    Deposit: ${suggestedDeposit.toFixed(2)} {paid >= suggestedDeposit ? "✔" : "← due"}
+                                    Deposit: ${suggestedDeposit.toFixed(2)}{" "}
+                                    {paid >= suggestedDeposit ? "✔" : "← due"}
                                   </div>
                                 )}
                               </div>
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 flex flex-col gap-1">
                                 <div className="text-muted-foreground text-xs">Guests</div>
-                                <div className="text-sm">Adults {res.adults} • Children {res.children}</div>
+                                <div className="text-sm">
+                                  Adults {res.adults} • Children {res.children}
+                                </div>
                                 <div className="flex flex-wrap gap-2 text-xs">
                                   <Button
                                     size="sm"
@@ -2263,7 +2738,7 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
-                                        [res.id]: { ...(prev[res.id] || {}), status: "confirmed" }
+                                        [res.id]: { ...(prev[res.id] || {}), status: "confirmed" },
                                       }))
                                     }
                                   >
@@ -2276,7 +2751,7 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
-                                        [res.id]: { ...(prev[res.id] || {}), status: "checked_in" }
+                                        [res.id]: { ...(prev[res.id] || {}), status: "checked_in" },
                                       }))
                                     }
                                   >
@@ -2288,7 +2763,10 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
-                                        [res.id]: { ...(prev[res.id] || {}), status: "checked_out" }
+                                        [res.id]: {
+                                          ...(prev[res.id] || {}),
+                                          status: "checked_out",
+                                        },
                                       }))
                                     }
                                   >
@@ -2300,7 +2778,7 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
-                                        [res.id]: { ...(prev[res.id] || {}), status: "cancelled" }
+                                        [res.id]: { ...(prev[res.id] || {}), status: "cancelled" },
                                       }))
                                     }
                                   >
@@ -2324,7 +2802,10 @@ export default function ReservationsPage() {
                                         : Math.max(0, balance).toFixed(2)
                                     }
                                     onChange={(e) =>
-                                      setPaymentInputs((prev) => ({ ...prev, [res.id]: Number(e.target.value || 0) }))
+                                      setPaymentInputs((prev) => ({
+                                        ...prev,
+                                        [res.id]: Number(e.target.value || 0),
+                                      }))
                                     }
                                   />
                                   <Select
@@ -2332,11 +2813,14 @@ export default function ReservationsPage() {
                                     onValueChange={(value) =>
                                       setPaymentTenders((prev) => ({
                                         ...prev,
-                                        [res.id]: isPaymentTender(value) ? value : "card"
+                                        [res.id]: isPaymentTender(value) ? value : "card",
                                       }))
                                     }
                                   >
-                                    <SelectTrigger className="h-8 w-[90px] px-2 text-xs" aria-label="Payment method">
+                                    <SelectTrigger
+                                      className="h-8 w-[90px] px-2 text-xs"
+                                      aria-label="Payment method"
+                                    >
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -2352,7 +2836,7 @@ export default function ReservationsPage() {
                                       recordPayment.mutate({
                                         id: res.id,
                                         amount: paymentAmount,
-                                        method: paymentTenders[res.id] ?? "card"
+                                        method: paymentTenders[res.id] ?? "card",
                                       })
                                     }
                                     disabled={recordPayment.isPending || depositPaymentTooLow}
@@ -2365,7 +2849,7 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       setPaymentInputs((prev) => ({
                                         ...prev,
-                                        [res.id]: Math.max(0, balance)
+                                        [res.id]: Math.max(0, balance),
                                       }))
                                     }
                                   >
@@ -2374,7 +2858,8 @@ export default function ReservationsPage() {
                                 </div>
                                 {depositPaymentTooLow && (
                                   <div className="text-[11px] text-status-warning">
-                                    Deposit shortfall ${depositShortfall.toFixed(2)} — collect at least this amount.
+                                    Deposit shortfall ${depositShortfall.toFixed(2)} — collect at
+                                    least this amount.
                                   </div>
                                 )}
                                 <div className="flex flex-wrap gap-2 mt-1">
@@ -2387,7 +2872,10 @@ export default function ReservationsPage() {
                                     aria-label="Refund amount"
                                     value={refundInputs[res.id] ?? ""}
                                     onChange={(e) =>
-                                      setRefundInputs((prev) => ({ ...prev, [res.id]: Number(e.target.value || 0) }))
+                                      setRefundInputs((prev) => ({
+                                        ...prev,
+                                        [res.id]: Number(e.target.value || 0),
+                                      }))
                                     }
                                   />
                                   <Button
@@ -2396,7 +2884,7 @@ export default function ReservationsPage() {
                                     onClick={() =>
                                       refundPayment.mutate({
                                         id: res.id,
-                                        amount: Number(refundInputs[res.id] ?? 0)
+                                        amount: Number(refundInputs[res.id] ?? 0),
                                       })
                                     }
                                     disabled={refundPayment.isPending}
@@ -2419,8 +2907,8 @@ export default function ReservationsPage() {
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        adults: Number(e.target.value)
-                                      }
+                                        adults: Number(e.target.value),
+                                      },
                                     }))
                                   }
                                 />
@@ -2436,8 +2924,8 @@ export default function ReservationsPage() {
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        children: Number(e.target.value)
-                                      }
+                                        children: Number(e.target.value),
+                                      },
                                     }))
                                   }
                                 />
@@ -2447,14 +2935,16 @@ export default function ReservationsPage() {
                                 <Input
                                   type="number"
                                   className="h-8 w-28 px-2 py-1 text-xs"
-                                  value={((editing[res.id]?.totalAmount ?? res.totalAmount) / 100).toFixed(2)}
+                                  value={(
+                                    (editing[res.id]?.totalAmount ?? res.totalAmount) / 100
+                                  ).toFixed(2)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        totalAmount: Math.round(Number(e.target.value) * 100)
-                                      }
+                                        totalAmount: Math.round(Number(e.target.value) * 100),
+                                      },
                                     }))
                                   }
                                 />
@@ -2464,14 +2954,16 @@ export default function ReservationsPage() {
                                 <Input
                                   type="number"
                                   className="h-8 w-28 px-2 py-1 text-xs"
-                                  value={((editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100).toFixed(2)}
+                                  value={(
+                                    (editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100
+                                  ).toFixed(2)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        paidAmount: Math.round(Number(e.target.value) * 100)
-                                      }
+                                        paidAmount: Math.round(Number(e.target.value) * 100),
+                                      },
                                     }))
                                   }
                                 />
@@ -2479,18 +2971,23 @@ export default function ReservationsPage() {
                               <label className="flex items-center gap-2">
                                 Payment
                                 <Select
-                                  value={editing[res.id]?.paymentStatus || res.paymentStatus || "unpaid"}
+                                  value={
+                                    editing[res.id]?.paymentStatus || res.paymentStatus || "unpaid"
+                                  }
                                   onValueChange={(value) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        paymentStatus: value
-                                      }
+                                        paymentStatus: value,
+                                      },
                                     }))
                                   }
                                 >
-                                  <SelectTrigger className="h-8 w-[110px] px-2 text-xs" aria-label="Payment status">
+                                  <SelectTrigger
+                                    className="h-8 w-[110px] px-2 text-xs"
+                                    aria-label="Payment status"
+                                  >
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -2507,12 +3004,16 @@ export default function ReservationsPage() {
                         <details className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Guest & site</span>
-                            <span className="text-xs font-normal text-muted-foreground">Assignment and contact</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Assignment and contact
+                            </span>
                           </summary>
                           <div className="px-4 pb-4 space-y-3">
                             <div className="grid gap-3 md:grid-cols-2">
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
-                                <div className="text-sm font-semibold text-foreground">Assignment</div>
+                                <div className="text-sm font-semibold text-foreground">
+                                  Assignment
+                                </div>
                                 <div className="flex flex-wrap items-center gap-2 text-xs text-foreground">
                                   <label className="flex items-center gap-2">
                                     Site
@@ -2521,11 +3022,14 @@ export default function ReservationsPage() {
                                       onValueChange={(value) =>
                                         setEditing((prev) => ({
                                           ...prev,
-                                          [res.id]: { ...(prev[res.id] || {}), siteId: value }
+                                          [res.id]: { ...(prev[res.id] || {}), siteId: value },
                                         }))
                                       }
                                     >
-                                      <SelectTrigger className="h-8 w-[180px] px-2 text-xs" aria-label="Assign site">
+                                      <SelectTrigger
+                                        className="h-8 w-[180px] px-2 text-xs"
+                                        aria-label="Assign site"
+                                      >
                                         <SelectValue placeholder="Select site" />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -2545,11 +3049,14 @@ export default function ReservationsPage() {
                                       onValueChange={(value) =>
                                         setEditing((prev) => ({
                                           ...prev,
-                                          [res.id]: { ...(prev[res.id] || {}), guestId: value }
+                                          [res.id]: { ...(prev[res.id] || {}), guestId: value },
                                         }))
                                       }
                                     >
-                                      <SelectTrigger className="h-8 w-[200px] px-2 text-xs" aria-label="Assign guest">
+                                      <SelectTrigger
+                                        className="h-8 w-[200px] px-2 text-xs"
+                                        aria-label="Assign guest"
+                                      >
                                         <SelectValue placeholder="Select guest" />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -2566,23 +3073,32 @@ export default function ReservationsPage() {
                               </div>
                               {res.guest && (
                                 <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
-                                  <div className="text-sm font-semibold text-foreground">Guest contact</div>
+                                  <div className="text-sm font-semibold text-foreground">
+                                    Guest contact
+                                  </div>
                                   <div className="font-semibold">
                                     {res.guest.primaryFirstName} {res.guest.primaryLastName}
                                   </div>
                                   <div className="text-[11px] text-muted-foreground">
-                                    Guest profile ID: {res.guest.id} {res.guest.email ? `• ${res.guest.email}` : ""}
+                                    Guest profile ID: {res.guest.id}{" "}
+                                    {res.guest.email ? `• ${res.guest.email}` : ""}
                                   </div>
                                   <div className="flex flex-wrap gap-2">
                                     <Input
                                       className="h-8 w-[180px] px-2 py-1 text-xs"
                                       placeholder="Email"
                                       aria-label="Guest email"
-                                      value={guestEdits[res.guest.id]?.email ?? res.guest.email ?? ""}
+                                      value={
+                                        guestEdits[res.guest.id]?.email ?? res.guest.email ?? ""
+                                      }
                                       onChange={(e) =>
                                         setGuestEdits((prev) => ({
                                           ...prev,
-                                          [res.guest!.id]: { email: e.target.value, phone: prev[res.guest!.id]?.phone ?? res.guest!.phone ?? "" }
+                                          [res.guest!.id]: {
+                                            email: e.target.value,
+                                            phone:
+                                              prev[res.guest!.id]?.phone ?? res.guest!.phone ?? "",
+                                          },
                                         }))
                                       }
                                     />
@@ -2590,11 +3106,17 @@ export default function ReservationsPage() {
                                       className="h-8 w-[140px] px-2 py-1 text-xs"
                                       placeholder="Phone"
                                       aria-label="Guest phone"
-                                      value={guestEdits[res.guest.id]?.phone ?? res.guest.phone ?? ""}
+                                      value={
+                                        guestEdits[res.guest.id]?.phone ?? res.guest.phone ?? ""
+                                      }
                                       onChange={(e) =>
                                         setGuestEdits((prev) => ({
                                           ...prev,
-                                          [res.guest!.id]: { phone: e.target.value, email: prev[res.guest!.id]?.email ?? res.guest!.email ?? "" }
+                                          [res.guest!.id]: {
+                                            phone: e.target.value,
+                                            email:
+                                              prev[res.guest!.id]?.email ?? res.guest!.email ?? "",
+                                          },
                                         }))
                                       }
                                     />
@@ -2603,8 +3125,10 @@ export default function ReservationsPage() {
                                       onClick={() =>
                                         updateGuestContact.mutate({
                                           guestId: res.guest!.id,
-                                          email: guestEdits[res.guest!.id]?.email ?? res.guest!.email,
-                                          phone: guestEdits[res.guest!.id]?.phone ?? res.guest!.phone
+                                          email:
+                                            guestEdits[res.guest!.id]?.email ?? res.guest!.email,
+                                          phone:
+                                            guestEdits[res.guest!.id]?.phone ?? res.guest!.phone,
                                         })
                                       }
                                       disabled={updateGuestContact.isPending}
@@ -2619,8 +3143,14 @@ export default function ReservationsPage() {
                             {matchTargetReservation?.id === res.id && (
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
                                 <div className="flex items-center justify-between">
-                                  <div className="text-sm font-semibold text-foreground">Recommended sites</div>
-                                  {matchScoresQuery.isLoading && <span className="text-[11px] text-muted-foreground">Checking matches…</span>}
+                                  <div className="text-sm font-semibold text-foreground">
+                                    Recommended sites
+                                  </div>
+                                  {matchScoresQuery.isLoading && (
+                                    <span className="text-[11px] text-muted-foreground">
+                                      Checking matches…
+                                    </span>
+                                  )}
                                   {matchScoresQuery.isError && (
                                     <span role="alert" className="text-[11px] text-status-error">
                                       Match scoring failed
@@ -2628,7 +3158,9 @@ export default function ReservationsPage() {
                                   )}
                                 </div>
                                 {topMatches.length === 0 && !matchScoresQuery.isLoading && (
-                                  <div className="text-muted-foreground">No ranked matches available for this guest.</div>
+                                  <div className="text-muted-foreground">
+                                    No ranked matches available for this guest.
+                                  </div>
                                 )}
                                 {topMatches.length > 0 && (
                                   <div className="flex flex-wrap gap-2">
@@ -2639,7 +3171,10 @@ export default function ReservationsPage() {
                                         onClick={() =>
                                           setEditing((prev) => ({
                                             ...prev,
-                                            [res.id]: { ...(prev[res.id] || {}), siteId: m.site.id }
+                                            [res.id]: {
+                                              ...(prev[res.id] || {}),
+                                              siteId: m.site.id,
+                                            },
                                           }))
                                         }
                                       >
@@ -2657,34 +3192,55 @@ export default function ReservationsPage() {
                         <details className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Stay details</span>
-                            <span className="text-xs font-normal text-muted-foreground">Dates, notes, and related stays</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Dates, notes, and related stays
+                            </span>
                           </summary>
                           <div className="px-4 pb-4 space-y-3">
                             <div className="rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground space-y-2">
-                              <div className="text-sm font-semibold text-foreground">Related reservations</div>
+                              <div className="text-sm font-semibold text-foreground">
+                                Related reservations
+                              </div>
                               {(() => {
                                 const related = (reservationsQuery.data || [])
                                   .filter((r) => r.id !== res.id && r.guestId === res.guestId)
-                                  .sort((a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime())
+                                  .sort(
+                                    (a, b) =>
+                                      new Date(a.arrivalDate).getTime() -
+                                      new Date(b.arrivalDate).getTime(),
+                                  )
                                   .slice(0, 3);
                                 if (related.length === 0) {
-                                  return <div className="text-muted-foreground">No other stays for this guest.</div>;
+                                  return (
+                                    <div className="text-muted-foreground">
+                                      No other stays for this guest.
+                                    </div>
+                                  );
                                 }
                                 return (
                                   <div className="space-y-1">
                                     {related.map((r) => (
                                       <div key={r.id} className="flex flex-wrap items-center gap-2">
                                         <span className="rounded-full border border-border bg-card px-2 py-0.5">
-                                          {new Date(r.arrivalDate).toLocaleDateString()} → {new Date(r.departureDate).toLocaleDateString()}
+                                          {new Date(r.arrivalDate).toLocaleDateString()} →{" "}
+                                          {new Date(r.departureDate).toLocaleDateString()}
                                         </span>
-                                        <span className="text-foreground">{r.site?.name || r.site?.siteNumber || r.siteId}</span>
-                                        <span className={`rounded-full border px-2 py-0.5 text-[11px] capitalize ${statusBadge(r.status)}`}>
+                                        <span className="text-foreground">
+                                          {r.site?.name || r.site?.siteNumber || r.siteId}
+                                        </span>
+                                        <span
+                                          className={`rounded-full border px-2 py-0.5 text-[11px] capitalize ${statusBadge(r.status)}`}
+                                        >
                                           {r.status.replace("_", " ")}
                                         </span>
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)}
+                                          onClick={() =>
+                                            router.push(
+                                              `/campgrounds/${campgroundId}/reservations/${r.id}`,
+                                            )
+                                          }
                                         >
                                           Open
                                         </Button>
@@ -2700,14 +3256,16 @@ export default function ReservationsPage() {
                                 <Input
                                   type="datetime-local"
                                   className="h-8 px-2 py-1 text-xs"
-                                  value={(editing[res.id]?.checkInAt || res.checkInAt || "").toString().slice(0, 16)}
+                                  value={(editing[res.id]?.checkInAt || res.checkInAt || "")
+                                    .toString()
+                                    .slice(0, 16)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        checkInAt: e.target.value
-                                      }
+                                        checkInAt: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
@@ -2717,14 +3275,16 @@ export default function ReservationsPage() {
                                 <Input
                                   type="datetime-local"
                                   className="h-8 px-2 py-1 text-xs"
-                                  value={(editing[res.id]?.checkOutAt || res.checkOutAt || "").toString().slice(0, 16)}
+                                  value={(editing[res.id]?.checkOutAt || res.checkOutAt || "")
+                                    .toString()
+                                    .slice(0, 16)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        checkOutAt: e.target.value
-                                      }
+                                        checkOutAt: e.target.value,
+                                      },
                                     }))
                                   }
                                 />
@@ -2741,8 +3301,8 @@ export default function ReservationsPage() {
                                     ...prev,
                                     [res.id]: {
                                       ...prev[res.id],
-                                      notes: e.target.value
-                                    }
+                                      notes: e.target.value,
+                                    },
                                   }))
                                 }
                               />
@@ -2753,12 +3313,16 @@ export default function ReservationsPage() {
                         <details className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Communications</span>
-                            <span className="text-xs font-normal text-muted-foreground">Messages and notes</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Messages and notes
+                            </span>
                           </summary>
                           <div className="px-4 pb-4">
                             <div className="rounded-lg border border-border bg-card p-3 space-y-2 text-sm">
                               <div className="flex items-center justify-between">
-                                <div className="text-xs font-semibold text-foreground">Communications</div>
+                                <div className="text-xs font-semibold text-foreground">
+                                  Communications
+                                </div>
                                 <div className="flex gap-2 items-center flex-wrap">
                                   <div className="flex gap-1">
                                     {commFilterOptions.map((f) => (
@@ -2768,7 +3332,11 @@ export default function ReservationsPage() {
                                         onClick={() => setCommsFilter(f)}
                                         aria-pressed={commsFilter === f}
                                       >
-                                        {f === "failed" ? "Failed" : f === "messages" ? "Messages" : f[0].toUpperCase() + f.slice(1)}
+                                        {f === "failed"
+                                          ? "Failed"
+                                          : f === "messages"
+                                            ? "Messages"
+                                            : f[0].toUpperCase() + f.slice(1)}
                                       </button>
                                     ))}
                                   </div>
@@ -2780,7 +3348,9 @@ export default function ReservationsPage() {
                                   >
                                     Failed only
                                   </Button>
-                                  {commsLoading[res.id] && <div className="text-xs text-muted-foreground">Loading…</div>}
+                                  {commsLoading[res.id] && (
+                                    <div className="text-xs text-muted-foreground">Loading…</div>
+                                  )}
                                   <Button
                                     size="sm"
                                     variant="ghost"
@@ -2821,11 +3391,17 @@ export default function ReservationsPage() {
                               )}
                               {(commsByRes[res.id] || [])
                                 .filter((c: Communication) => {
-                                  if (commsFilter === "notes") return (c.type || "").toLowerCase() === "note";
-                                  if (commsFilter === "messages") return (c.type || "").toLowerCase() !== "note";
+                                  if (commsFilter === "notes")
+                                    return (c.type || "").toLowerCase() === "note";
+                                  if (commsFilter === "messages")
+                                    return (c.type || "").toLowerCase() !== "note";
                                   if (commsFilter === "failed") {
                                     const s = (c.status || "").toLowerCase();
-                                    return s.includes("fail") || s.includes("bounce") || s.includes("error");
+                                    return (
+                                      s.includes("fail") ||
+                                      s.includes("bounce") ||
+                                      s.includes("error")
+                                    );
                                   }
                                   return true;
                                 })
@@ -2839,7 +3415,10 @@ export default function ReservationsPage() {
                                         ? "bg-status-error/15 text-status-error border border-status-error/30"
                                         : "bg-muted text-foreground border border-border";
                                   return (
-                                    <div key={c.id} className="rounded border border-border bg-muted px-2 py-1 text-xs text-foreground">
+                                    <div
+                                      key={c.id}
+                                      className="rounded border border-border bg-muted px-2 py-1 text-xs text-foreground"
+                                    >
                                       <div className="flex flex-wrap items-center gap-2">
                                         <span className="font-semibold uppercase">{c.type}</span>
                                         <span
@@ -2851,13 +3430,25 @@ export default function ReservationsPage() {
                                         >
                                           {c.direction}
                                         </span>
-                                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusClass}`}>
+                                        <span
+                                          className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${statusClass}`}
+                                        >
                                           {status}
                                         </span>
-                                        <span className="text-muted-foreground">{c.createdAt ? new Date(c.createdAt).toLocaleString() : ""}</span>
+                                        <span className="text-muted-foreground">
+                                          {c.createdAt
+                                            ? new Date(c.createdAt).toLocaleString()
+                                            : ""}
+                                        </span>
                                       </div>
-                                      {c.subject && <div className="text-foreground">{c.subject}</div>}
-                                      {c.body && <div className="text-foreground whitespace-pre-wrap">{c.body}</div>}
+                                      {c.subject && (
+                                        <div className="text-foreground">{c.subject}</div>
+                                      )}
+                                      {c.body && (
+                                        <div className="text-foreground whitespace-pre-wrap">
+                                          {c.body}
+                                        </div>
+                                      )}
                                       <div className="text-[11px] text-muted-foreground mt-1">
                                         {c.provider ? `Provider: ${c.provider}` : ""}
                                         {c.toAddress ? ` • To: ${c.toAddress}` : ""}
@@ -2882,15 +3473,23 @@ export default function ReservationsPage() {
                                         value={commDraft.type || "note"}
                                         onValueChange={(value) =>
                                           setNewComm((prev) => {
-                                            const nextType = isCommDraftType(value) ? value : "note";
+                                            const nextType = isCommDraftType(value)
+                                              ? value
+                                              : "note";
                                             return {
                                               ...prev,
-                                              [res.id]: { ...(prev[res.id] || { body: "" }), type: nextType }
+                                              [res.id]: {
+                                                ...(prev[res.id] || { body: "" }),
+                                                type: nextType,
+                                              },
                                             };
                                           })
                                         }
                                       >
-                                        <SelectTrigger className="h-8 w-[96px] px-2 text-xs" aria-label="Communication type">
+                                        <SelectTrigger
+                                          className="h-8 w-[96px] px-2 text-xs"
+                                          aria-label="Communication type"
+                                        >
                                           <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -2907,7 +3506,10 @@ export default function ReservationsPage() {
                                           onChange={(e) =>
                                             setNewComm((prev) => ({
                                               ...prev,
-                                              [res.id]: { ...(prev[res.id] || { body: "", type: "email" }), toAddress: e.target.value }
+                                              [res.id]: {
+                                                ...(prev[res.id] || { body: "", type: "email" }),
+                                                toAddress: e.target.value,
+                                              },
                                             }))
                                           }
                                         />
@@ -2918,14 +3520,30 @@ export default function ReservationsPage() {
                                       placeholder="Subject (optional)"
                                       aria-label="Communication subject"
                                       value={commDraft.subject ?? ""}
-                                      onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { body: "" }), subject: e.target.value } }))}
+                                      onChange={(e) =>
+                                        setNewComm((prev) => ({
+                                          ...prev,
+                                          [res.id]: {
+                                            ...(prev[res.id] || { body: "" }),
+                                            subject: e.target.value,
+                                          },
+                                        }))
+                                      }
                                     />
                                     <Textarea
                                       className="min-h-[70px] text-xs"
                                       placeholder="Add a note or email body"
                                       aria-label="Communication body"
                                       value={commDraft.body ?? ""}
-                                      onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { subject: "" }), body: e.target.value } }))}
+                                      onChange={(e) =>
+                                        setNewComm((prev) => ({
+                                          ...prev,
+                                          [res.id]: {
+                                            ...(prev[res.id] || { subject: "" }),
+                                            body: e.target.value,
+                                          },
+                                        }))
+                                      }
                                     />
                                     <div className="flex justify-end">
                                       <Button
@@ -2934,7 +3552,10 @@ export default function ReservationsPage() {
                                           const payloadType = commDraft.type || "note";
                                           if (payloadType === "email") {
                                             if (!commDraft.toAddress) {
-                                              setFlash({ type: "error", message: "Recipient email is required." });
+                                              setFlash({
+                                                type: "error",
+                                                message: "Recipient email is required.",
+                                              });
                                               return;
                                             }
                                             try {
@@ -2946,22 +3567,39 @@ export default function ReservationsPage() {
                                                 direction: "outbound",
                                                 subject: commDraft.subject || undefined,
                                                 body: commDraft.body || "",
-                                                toAddress: commDraft.toAddress
+                                                toAddress: commDraft.toAddress,
                                               });
                                               setCommsByRes((prev) => ({
                                                 ...prev,
-                                                [res.id]: [sent, ...(prev[res.id] || [])]
+                                                [res.id]: [sent, ...(prev[res.id] || [])],
                                               }));
-                                              setNewComm((prev) => ({ ...prev, [res.id]: { type: "note", subject: "", body: "", toAddress: "" } }));
+                                              setNewComm((prev) => ({
+                                                ...prev,
+                                                [res.id]: {
+                                                  type: "note",
+                                                  subject: "",
+                                                  body: "",
+                                                  toAddress: "",
+                                                },
+                                              }));
                                               setFlash({ type: "success", message: "Email sent." });
                                             } catch (err) {
-                                              setFlash({ type: "error", message: err instanceof Error ? err.message : "Failed to send email." });
+                                              setFlash({
+                                                type: "error",
+                                                message:
+                                                  err instanceof Error
+                                                    ? err.message
+                                                    : "Failed to send email.",
+                                              });
                                             }
                                             return;
                                           }
 
                                           if (!commDraft.body) {
-                                            setFlash({ type: "error", message: "Note body is required." });
+                                            setFlash({
+                                              type: "error",
+                                              message: "Note body is required.",
+                                            });
                                             return;
                                           }
                                           try {
@@ -2972,13 +3610,21 @@ export default function ReservationsPage() {
                                               type: "note",
                                               direction: "outbound",
                                               subject: commDraft.subject || undefined,
-                                              body: commDraft.body || ""
+                                              body: commDraft.body || "",
                                             });
                                             setCommsByRes((prev) => ({
                                               ...prev,
-                                              [res.id]: [created, ...(prev[res.id] || [])]
+                                              [res.id]: [created, ...(prev[res.id] || [])],
                                             }));
-                                            setNewComm((prev) => ({ ...prev, [res.id]: { type: "note", subject: "", body: "", toAddress: "" } }));
+                                            setNewComm((prev) => ({
+                                              ...prev,
+                                              [res.id]: {
+                                                type: "note",
+                                                subject: "",
+                                                body: "",
+                                                toAddress: "",
+                                              },
+                                            }));
                                             setFlash({ type: "success", message: "Note saved." });
                                           } catch {
                                             // handled by mutation onError
@@ -2986,7 +3632,11 @@ export default function ReservationsPage() {
                                         }}
                                         disabled={createCommunication.isPending}
                                       >
-                                        {createCommunication.isPending ? "Saving…" : commDraft.type === "email" ? "Send email" : "Add note"}
+                                        {createCommunication.isPending
+                                          ? "Saving…"
+                                          : commDraft.type === "email"
+                                            ? "Send email"
+                                            : "Add note"}
                                       </Button>
                                     </div>
                                   </div>
@@ -2999,24 +3649,37 @@ export default function ReservationsPage() {
                         <details className="rounded-xl border border-border bg-card">
                           <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-foreground">
                             <span>Ledger & pricing</span>
-                            <span className="text-xs font-normal text-muted-foreground">Fees, rules, and line items</span>
+                            <span className="text-xs font-normal text-muted-foreground">
+                              Fees, rules, and line items
+                            </span>
                           </summary>
                           <div className="px-4 pb-4">
                             <div className="rounded-lg border border-border bg-muted p-3 space-y-1 text-sm">
-                              <div className="text-xs font-semibold text-foreground">Payments / Ledger</div>
+                              <div className="text-xs font-semibold text-foreground">
+                                Payments / Ledger
+                              </div>
                               <div className="text-xs text-muted-foreground">
                                 Promo {res.promoCode || "n/a"} • Source {res.source || "n/a"}
                                 {res.checkInWindowStart || res.checkInWindowEnd
                                   ? ` • Check-in window ${res.checkInWindowStart || "n/a"} - ${res.checkInWindowEnd || "n/a"}`
                                   : ""}
                               </div>
-                              {(res.vehiclePlate || res.vehicleState || res.rigType || res.rigLength) && (
+                              {(res.vehiclePlate ||
+                                res.vehicleState ||
+                                res.rigType ||
+                                res.rigLength) && (
                                 <div className="text-xs text-muted-foreground">
-                                  Vehicle {res.vehiclePlate || "n/a"} {res.vehicleState ? `(${res.vehicleState})` : ""} • Rig{" "}
-                                  {res.rigType || "n/a"} {res.rigLength ? `• ${res.rigLength}ft` : ""}
+                                  Vehicle {res.vehiclePlate || "n/a"}{" "}
+                                  {res.vehicleState ? `(${res.vehicleState})` : ""} • Rig{" "}
+                                  {res.rigType || "n/a"}{" "}
+                                  {res.rigLength ? `• ${res.rigLength}ft` : ""}
                                 </div>
                               )}
-                              {resQuoteLoading[res.id] && <div className="text-xs text-muted-foreground">Loading pricing breakdown…</div>}
+                              {resQuoteLoading[res.id] && (
+                                <div className="text-xs text-muted-foreground">
+                                  Loading pricing breakdown…
+                                </div>
+                              )}
                               {resQuoteErrors[res.id] && (
                                 <div role="alert" className="text-xs text-status-warning">
                                   {resQuoteErrors[res.id]}
@@ -3024,39 +3687,57 @@ export default function ReservationsPage() {
                               )}
                               {resQuotes[res.id] && (
                                 <div className="text-xs text-muted-foreground">
-                                  Base ${(resQuotes[res.id].baseSubtotalCents / 100).toFixed(2)} • Rules{" "}
-                                  {resQuotes[res.id].rulesDeltaCents >= 0 ? "+" : "-"}$
-                                  {Math.abs(resQuotes[res.id].rulesDeltaCents / 100).toFixed(2)} • Total $
-                                  {(resQuotes[res.id].totalCents / 100).toFixed(2)} ({resQuotes[res.id].nights} nights)
+                                  Base ${(resQuotes[res.id].baseSubtotalCents / 100).toFixed(2)} •
+                                  Rules {resQuotes[res.id].rulesDeltaCents >= 0 ? "+" : "-"}$
+                                  {Math.abs(resQuotes[res.id].rulesDeltaCents / 100).toFixed(2)} •
+                                  Total ${(resQuotes[res.id].totalCents / 100).toFixed(2)} (
+                                  {resQuotes[res.id].nights} nights)
                                 </div>
                               )}
                               {(feesAmount || taxesAmount || discountsAmount) > 0 && (
                                 <div className="text-xs text-muted-foreground">
-                                  Fees ${feesAmount.toFixed(2)} • Taxes ${taxesAmount.toFixed(2)} • Discounts ${discountsAmount.toFixed(2)}
+                                  Fees ${feesAmount.toFixed(2)} • Taxes ${taxesAmount.toFixed(2)} •
+                                  Discounts ${discountsAmount.toFixed(2)}
                                 </div>
                               )}
-                              {ledgerLoading[res.id] && <div className="text-xs text-muted-foreground">Loading ledger…</div>}
+                              {ledgerLoading[res.id] && (
+                                <div className="text-xs text-muted-foreground">Loading ledger…</div>
+                              )}
                               {ledgerErrors[res.id] && (
                                 <div role="alert" className="text-xs text-status-warning">
                                   {ledgerErrors[res.id]}
                                 </div>
                               )}
-                              {!ledgerLoading[res.id] && ledgerByRes[res.id] && ledgerByRes[res.id].length === 0 && (
-                                <div className="overflow-hidden rounded border border-border bg-card">
-                                  <table className="w-full text-sm">
-                                    <tbody>
-                                      <TableEmpty>No ledger entries yet.</TableEmpty>
-                                    </tbody>
-                                  </table>
-                                </div>
-                              )}
+                              {!ledgerLoading[res.id] &&
+                                ledgerByRes[res.id] &&
+                                ledgerByRes[res.id].length === 0 && (
+                                  <div className="overflow-hidden rounded border border-border bg-card">
+                                    <table className="w-full text-sm">
+                                      <tbody>
+                                        <TableEmpty>No ledger entries yet.</TableEmpty>
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                )}
                               {!ledgerLoading[res.id] &&
                                 (ledgerByRes[res.id] || []).map((row) => (
-                                  <div key={row.id} className="flex flex-wrap items-center gap-2 text-xs text-foreground">
-                                    <span className="text-muted-foreground">{new Date(row.occurredAt).toLocaleDateString()}</span>
-                                    <span>{row.direction === "credit" ? "+" : "-"}${(row.amountCents / 100).toFixed(2)}</span>
-                                    <span className="text-muted-foreground">{row.glCode || "GL n/a"}</span>
-                                    <span className="text-muted-foreground">{row.description || "Ledger entry"}</span>
+                                  <div
+                                    key={row.id}
+                                    className="flex flex-wrap items-center gap-2 text-xs text-foreground"
+                                  >
+                                    <span className="text-muted-foreground">
+                                      {new Date(row.occurredAt).toLocaleDateString()}
+                                    </span>
+                                    <span>
+                                      {row.direction === "credit" ? "+" : "-"}$
+                                      {(row.amountCents / 100).toFixed(2)}
+                                    </span>
+                                    <span className="text-muted-foreground">
+                                      {row.glCode || "GL n/a"}
+                                    </span>
+                                    <span className="text-muted-foreground">
+                                      {row.description || "Ledger entry"}
+                                    </span>
                                   </div>
                                 ))}
                             </div>
@@ -3068,7 +3749,9 @@ export default function ReservationsPage() {
                         {manualOverride && (
                           <div className="rounded-md border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-xs text-status-warning space-y-2">
                             <div className="text-sm font-semibold">Manual pricing override</div>
-                            <div className="text-[11px]">Provide reason and approval to save discount/total changes.</div>
+                            <div className="text-[11px]">
+                              Provide reason and approval to save discount/total changes.
+                            </div>
                             <div className="grid md:grid-cols-2 gap-2">
                               <Input
                                 className="h-8 px-2 py-1 text-xs border-status-warning/30"
@@ -3078,7 +3761,10 @@ export default function ReservationsPage() {
                                 onChange={(e) =>
                                   setEditing((prev) => ({
                                     ...prev,
-                                    [res.id]: { ...(prev[res.id] || {}), overrideReason: e.target.value }
+                                    [res.id]: {
+                                      ...(prev[res.id] || {}),
+                                      overrideReason: e.target.value,
+                                    },
                                   }))
                                 }
                               />
@@ -3090,7 +3776,10 @@ export default function ReservationsPage() {
                                 onChange={(e) =>
                                   setEditing((prev) => ({
                                     ...prev,
-                                    [res.id]: { ...(prev[res.id] || {}), overrideApprovedBy: e.target.value }
+                                    [res.id]: {
+                                      ...(prev[res.id] || {}),
+                                      overrideApprovedBy: e.target.value,
+                                    },
                                   }))
                                 }
                               />
@@ -3110,40 +3799,57 @@ export default function ReservationsPage() {
                                   balanceAmount: Math.max(
                                     0,
                                     (editing[res.id]?.totalAmount ?? res.totalAmount) -
-                                    (editing[res.id]?.paidAmount ?? res.paidAmount ?? 0)
+                                      (editing[res.id]?.paidAmount ?? res.paidAmount ?? 0),
                                   ),
                                   paymentStatus:
                                     (editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) >=
-                                      (editing[res.id]?.totalAmount ?? res.totalAmount)
+                                    (editing[res.id]?.totalAmount ?? res.totalAmount)
                                       ? "paid"
                                       : (editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) > 0
                                         ? "partial"
                                         : "unpaid",
-                                  checkInAt: editing[res.id]?.checkInAt ?? res.checkInAt ?? undefined,
-                                  checkOutAt: editing[res.id]?.checkOutAt ?? res.checkOutAt ?? undefined,
+                                  checkInAt:
+                                    editing[res.id]?.checkInAt ?? res.checkInAt ?? undefined,
+                                  checkOutAt:
+                                    editing[res.id]?.checkOutAt ?? res.checkOutAt ?? undefined,
                                   notes: editing[res.id]?.notes ?? res.notes ?? undefined,
                                   status: editing[res.id]?.status ?? res.status,
                                   siteId: editing[res.id]?.siteId ?? res.siteId,
                                   guestId: editing[res.id]?.guestId ?? res.guestId,
-                                  promoCode: editing[res.id]?.promoCode ?? res.promoCode ?? undefined,
+                                  promoCode:
+                                    editing[res.id]?.promoCode ?? res.promoCode ?? undefined,
                                   source: editing[res.id]?.source ?? res.source ?? undefined,
                                   checkInWindowStart:
-                                    editing[res.id]?.checkInWindowStart ?? res.checkInWindowStart ?? undefined,
-                                  checkInWindowEnd: editing[res.id]?.checkInWindowEnd ?? res.checkInWindowEnd ?? undefined,
-                                  vehiclePlate: editing[res.id]?.vehiclePlate ?? res.vehiclePlate ?? undefined,
-                                  vehicleState: editing[res.id]?.vehicleState ?? res.vehicleState ?? undefined,
+                                    editing[res.id]?.checkInWindowStart ??
+                                    res.checkInWindowStart ??
+                                    undefined,
+                                  checkInWindowEnd:
+                                    editing[res.id]?.checkInWindowEnd ??
+                                    res.checkInWindowEnd ??
+                                    undefined,
+                                  vehiclePlate:
+                                    editing[res.id]?.vehiclePlate ?? res.vehiclePlate ?? undefined,
+                                  vehicleState:
+                                    editing[res.id]?.vehicleState ?? res.vehicleState ?? undefined,
                                   rigType: editing[res.id]?.rigType ?? res.rigType ?? undefined,
-                                  rigLength: editing[res.id]?.rigLength ?? res.rigLength ?? undefined,
+                                  rigLength:
+                                    editing[res.id]?.rigLength ?? res.rigLength ?? undefined,
                                   baseSubtotal: editing[res.id]?.totalAmount ?? res.totalAmount,
                                   feesAmount: res.feesAmount ?? 0,
                                   taxesAmount: res.taxesAmount ?? 0,
                                   discountsAmount: res.discountsAmount ?? 0,
                                   overrideReason: editing[res.id]?.overrideReason ?? undefined,
-                                  overrideApprovedBy: editing[res.id]?.overrideApprovedBy ?? undefined
-                                }
+                                  overrideApprovedBy:
+                                    editing[res.id]?.overrideApprovedBy ?? undefined,
+                                },
                               })
                             }
-                            disabled={updateReservation.isPending || conflict?.conflict || overrideMissing || depositShortfall > 0}
+                            disabled={
+                              updateReservation.isPending ||
+                              conflict?.conflict ||
+                              overrideMissing ||
+                              depositShortfall > 0
+                            }
                           >
                             {updateReservation.isPending ? "Saving…" : "Save"}
                           </Button>
@@ -3162,8 +3868,10 @@ export default function ReservationsPage() {
                         </div>
                         {(depositShortfall > 0 || overrideMissing || conflict?.conflict) && (
                           <div className="text-[11px] text-status-warning">
-                            {depositShortfall > 0 && `Deposit shortfall $${depositShortfall.toFixed(2)} — collect before saving. `}
-                            {overrideMissing && "Override reason + approver are required when editing totals. "}
+                            {depositShortfall > 0 &&
+                              `Deposit shortfall $${depositShortfall.toFixed(2)} — collect before saving. `}
+                            {overrideMissing &&
+                              "Override reason + approver are required when editing totals. "}
                             {conflict?.conflict && "Resolve site conflicts before saving."}
                           </div>
                         )}
@@ -3173,14 +3881,18 @@ export default function ReservationsPage() {
                 </div>
               );
             })}
-            {!reservationsQuery.isLoading && reservationsQuery.data?.length && !filteredReservations.length && (
+          {!reservationsQuery.isLoading &&
+            reservationsQuery.data?.length &&
+            !filteredReservations.length && (
               <div className="rounded-lg border border-border bg-card py-12 px-4 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
                     <CalendarDays className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <div className="space-y-2">
-                    <p className="text-lg font-semibold text-foreground">No reservations match your filters</p>
+                    <p className="text-lg font-semibold text-foreground">
+                      No reservations match your filters
+                    </p>
                     <p className="text-sm text-muted-foreground max-w-md mx-auto">
                       Try adjusting your filters or search criteria to find what you're looking for.
                     </p>
@@ -3200,38 +3912,36 @@ export default function ReservationsPage() {
                 </div>
               </div>
             )}
-            {!reservationsQuery.isLoading && !reservationsQuery.data?.length && (
-              <div className="rounded-lg border border-border bg-card py-16 px-4 text-center">
-                <div className="flex flex-col items-center gap-4">
-                  <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center">
-                    <CalendarDays className="h-10 w-10 text-status-info" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-lg font-semibold text-foreground">No reservations yet</p>
-                    <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                      Start taking bookings by creating your first reservation. You can also set up your site inventory and pricing first.
-                    </p>
-                  </div>
-                  <div className="flex gap-2 mt-2">
-                    <Button
-                      onClick={() => router.push("/booking")}
-                      className="gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Create First Reservation
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => router.push(`/campgrounds/${campgroundId}/sites`)}
-                      className="gap-2"
-                    >
-                      Set Up Sites
-                    </Button>
-                  </div>
+          {!reservationsQuery.isLoading && !reservationsQuery.data?.length && (
+            <div className="rounded-lg border border-border bg-card py-16 px-4 text-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center">
+                  <CalendarDays className="h-10 w-10 text-status-info" />
+                </div>
+                <div className="space-y-2">
+                  <p className="text-lg font-semibold text-foreground">No reservations yet</p>
+                  <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                    Start taking bookings by creating your first reservation. You can also set up
+                    your site inventory and pricing first.
+                  </p>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  <Button onClick={() => router.push("/booking")} className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create First Reservation
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push(`/campgrounds/${campgroundId}/sites`)}
+                    className="gap-2"
+                  >
+                    Set Up Sites
+                  </Button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+        </div>
       </div>
       <BulkMessageModal
         open={bulkMessageOpen}
@@ -3241,9 +3951,10 @@ export default function ReservationsPage() {
         onComplete={(results) => {
           setFlash({
             type: results.failed === 0 ? "success" : "info",
-            message: results.failed === 0
-              ? `Message sent to ${results.sent} guest${results.sent !== 1 ? "s" : ""}`
-              : `Sent to ${results.sent}, failed for ${results.failed}`
+            message:
+              results.failed === 0
+                ? `Message sent to ${results.sent} guest${results.sent !== 1 ? "s" : ""}`
+                : `Sent to ${results.sent}, failed for ${results.failed}`,
           });
           if (results.failed === 0) {
             setSelectedIds([]);

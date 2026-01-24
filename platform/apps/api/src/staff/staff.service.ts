@@ -1,6 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { PushNotificationType, ShiftStatus, TimeOffStatus, SwapStatus, OverrideStatus } from '@prisma/client';
+import { BadRequestException, Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  PushNotificationType,
+  ShiftStatus,
+  TimeOffStatus,
+  SwapStatus,
+  OverrideStatus,
+} from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import { AuditService } from "../audit/audit.service";
 import { EmailService } from "../email/email.service";
@@ -61,9 +67,15 @@ type UserSummary = {
 type ShiftSwapWithRelations = Prisma.ShiftSwapRequestGetPayload<{
   include: {
     StaffShift: true;
-    User_ShiftSwapRequest_requesterIdToUser: { select: { id: true; firstName: true; lastName: true; email: true } };
-    User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true; firstName: true; lastName: true; email: true } };
-    User_ShiftSwapRequest_managerIdToUser: { select: { id: true; firstName: true; lastName: true } };
+    User_ShiftSwapRequest_requesterIdToUser: {
+      select: { id: true; firstName: true; lastName: true; email: true };
+    };
+    User_ShiftSwapRequest_recipientUserIdToUser: {
+      select: { id: true; firstName: true; lastName: true; email: true };
+    };
+    User_ShiftSwapRequest_managerIdToUser: {
+      select: { id: true; firstName: true; lastName: true };
+    };
   };
 }>;
 
@@ -106,7 +118,7 @@ export class StaffService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
   private readonly logger = new Logger(StaffService.name);
 
@@ -143,7 +155,7 @@ export class StaffService {
     startDate: Date,
     endDate: Date,
     userId?: string,
-    status?: string
+    status?: string,
   ) {
     const statusFilter = status && isShiftStatus(status) ? status : undefined;
     return this.prisma.staffShift.findMany({
@@ -156,19 +168,23 @@ export class StaffService {
       include: {
         User: { select: { id: true, firstName: true, lastName: true, email: true } },
       },
-      orderBy: [{ shiftDate: 'asc' }, { startTime: 'asc' }],
+      orderBy: [{ shiftDate: "asc" }, { startTime: "asc" }],
     });
   }
 
   async updateShift(id: string, dto: Partial<CreateShiftDto>) {
     const existing = await this.prisma.staffShift.findUnique({ where: { id } });
-    if (!existing) throw new NotFoundException('Shift not found');
+    if (!existing) throw new NotFoundException("Shift not found");
 
     const newStart = dto.startTime
-      ? new Date(`${dto.shiftDate || existing.shiftDate.toISOString().split('T')[0]}T${dto.startTime}`)
+      ? new Date(
+          `${dto.shiftDate || existing.shiftDate.toISOString().split("T")[0]}T${dto.startTime}`,
+        )
       : undefined;
     const newEnd = dto.endTime
-      ? new Date(`${dto.shiftDate || existing.shiftDate.toISOString().split('T')[0]}T${dto.endTime}`)
+      ? new Date(
+          `${dto.shiftDate || existing.shiftDate.toISOString().split("T")[0]}T${dto.endTime}`,
+        )
       : undefined;
 
     return this.prisma.staffShift.update({
@@ -190,7 +206,11 @@ export class StaffService {
     return this.prisma.staffShift.delete({ where: { id } });
   }
 
-  async clockIn(shiftId: string, source: "kiosk" | "mobile" | "web" | "manual" = "web", note?: string) {
+  async clockIn(
+    shiftId: string,
+    source: "kiosk" | "mobile" | "web" | "manual" = "web",
+    note?: string,
+  ) {
     const shift = await this.prisma.staffShift.findUnique({ where: { id: shiftId } });
     if (!shift) throw new NotFoundException("Shift not found");
 
@@ -205,16 +225,16 @@ export class StaffService {
         source,
         note,
         status: "open",
-        updatedAt: now
-      }
+        updatedAt: now,
+      },
     });
 
     const updatedShift = await this.prisma.staffShift.update({
       where: { id: shiftId },
       data: {
         clockedInAt: shift.clockedInAt ?? now,
-        status: "in_progress"
-      }
+        status: "in_progress",
+      },
     });
 
     return { shift: updatedShift, entry };
@@ -226,19 +246,19 @@ export class StaffService {
 
     const openEntry = await this.prisma.staffTimeEntry.findFirst({
       where: { shiftId, status: { in: ["open", "submitted"] }, clockOutAt: null },
-      orderBy: { clockInAt: "desc" }
+      orderBy: { clockInAt: "desc" },
     });
     if (!openEntry) throw new BadRequestException("No open time entry for shift");
 
     const now = new Date();
     const updatedEntry = await this.prisma.staffTimeEntry.update({
       where: { id: openEntry.id },
-      data: { clockOutAt: now, status: "submitted", note: note ?? openEntry.note }
+      data: { clockOutAt: now, status: "submitted", note: note ?? openEntry.note },
     });
 
     const entries = await this.prisma.staffTimeEntry.findMany({
       where: { shiftId },
-      orderBy: { clockInAt: "asc" }
+      orderBy: { clockInAt: "asc" },
     });
 
     const actualMinutes = this.calculateTotalMinutes(entries);
@@ -248,8 +268,8 @@ export class StaffService {
       data: {
         clockedOutAt: now,
         actualMinutes,
-        status: "submitted"
-      }
+        status: "submitted",
+      },
     });
 
     return { shift: updatedShift, entry: updatedEntry, minutes: actualMinutes };
@@ -258,7 +278,7 @@ export class StaffService {
   async approveShift(shiftId: string, approverId: string, note?: string) {
     const shift = await this.prisma.staffShift.findUnique({
       where: { id: shiftId },
-      include: { StaffTimeEntry: true }
+      include: { StaffTimeEntry: true },
     });
     if (!shift) throw new NotFoundException("Shift not found");
 
@@ -273,8 +293,8 @@ export class StaffService {
         status: "approved",
         note,
         approvedAt,
-        updatedAt: approvedAt
-      }
+        updatedAt: approvedAt,
+      },
     });
 
     await this.prisma.staffShift.update({
@@ -284,13 +304,13 @@ export class StaffService {
         actualMinutes: minutes,
         approvedAt,
         approvedById: approverId,
-        approvalNote: note
-      }
+        approvalNote: note,
+      },
     });
 
     await this.prisma.staffTimeEntry.updateMany({
       where: { shiftId },
-      data: { status: "approved", approvedAt, approvedById: approverId }
+      data: { status: "approved", approvedAt, approvedById: approverId },
     });
 
     return { approval, minutes };
@@ -309,18 +329,23 @@ export class StaffService {
         status: "rejected",
         note,
         approvedAt: rejectedAt,
-        updatedAt: rejectedAt
-      }
+        updatedAt: rejectedAt,
+      },
     });
 
     await this.prisma.staffShift.update({
       where: { id: shiftId },
-      data: { status: "rejected", approvedAt: rejectedAt, approvedById: approverId, approvalNote: note }
+      data: {
+        status: "rejected",
+        approvedAt: rejectedAt,
+        approvedById: approverId,
+        approvalNote: note,
+      },
     });
 
     await this.prisma.staffTimeEntry.updateMany({
       where: { shiftId },
-      data: { status: "rejected", approvedAt: rejectedAt, approvedById: approverId }
+      data: { status: "rejected", approvedAt: rejectedAt, approvedById: approverId },
     });
 
     return { approval };
@@ -329,25 +354,32 @@ export class StaffService {
   async submitShift(shiftId: string) {
     return this.prisma.staffShift.update({
       where: { id: shiftId },
-      data: { status: "submitted" }
+      data: { status: "submitted" },
     });
   }
 
   // ---- Roles ----
 
-  async upsertRole(dto: { campgroundId: string; code: string; name: string; hourlyRate?: number; earningCode?: string; isActive?: boolean }) {
+  async upsertRole(dto: {
+    campgroundId: string;
+    code: string;
+    name: string;
+    hourlyRate?: number;
+    earningCode?: string;
+    isActive?: boolean;
+  }) {
     return this.prisma.staffRole.upsert({
       where: {
         campgroundId_code: {
           campgroundId: dto.campgroundId,
-          code: dto.code
-        }
+          code: dto.code,
+        },
       },
       update: {
         name: dto.name,
         hourlyRate: dto.hourlyRate ?? undefined,
         earningCode: dto.earningCode ?? undefined,
-        isActive: dto.isActive ?? true
+        isActive: dto.isActive ?? true,
       },
       create: {
         id: randomUUID(),
@@ -357,15 +389,15 @@ export class StaffService {
         hourlyRate: dto.hourlyRate ?? null,
         earningCode: dto.earningCode ?? null,
         isActive: dto.isActive ?? true,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
   async listRoles(campgroundId: string) {
     return this.prisma.staffRole.findMany({
       where: { campgroundId, isActive: true },
-      orderBy: { code: "asc" }
+      orderBy: { code: "asc" },
     });
   }
 
@@ -384,8 +416,8 @@ export class StaffService {
         deltaAmount: dto.deltaAmount ?? null,
         metadata: toJsonValue(dto.metadata),
         status: "pending",
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     await this.audit.record({
@@ -394,13 +426,18 @@ export class StaffService {
       action: "override.request",
       entity: dto.targetEntity ?? "override",
       entityId: record.id,
-      after: record
+      after: record,
     });
 
     return record;
   }
 
-  async decideOverride(id: string, approverId: string, status: "approved" | "rejected" | "cancelled", note?: string) {
+  async decideOverride(
+    id: string,
+    approverId: string,
+    status: "approved" | "rejected" | "cancelled",
+    note?: string,
+  ) {
     const existing = await this.prisma.overrideRequest.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException("Override not found");
 
@@ -412,8 +449,8 @@ export class StaffService {
         status,
         approvedAt: status === "approved" ? now : null,
         rejectedAt: status === "rejected" ? now : null,
-        reason: note ?? existing.reason
-      }
+        reason: note ?? existing.reason,
+      },
     });
 
     await this.audit.record({
@@ -423,7 +460,7 @@ export class StaffService {
       entity: existing.targetEntity ?? "override",
       entityId: existing.targetId ?? id,
       before: existing,
-      after: updated
+      after: updated,
     });
 
     return updated;
@@ -434,7 +471,7 @@ export class StaffService {
     return this.prisma.overrideRequest.findMany({
       where: { campgroundId, ...(statusFilter ? { status: statusFilter } : {}) },
       orderBy: { createdAt: "desc" },
-      take: 200
+      take: 200,
     });
   }
 
@@ -476,7 +513,7 @@ export class StaffService {
       include: {
         User: { select: { id: true, firstName: true, lastName: true } },
       },
-      orderBy: [{ userId: 'asc' }, { dayOfWeek: 'asc' }],
+      orderBy: [{ userId: "asc" }, { dayOfWeek: "asc" }],
     });
   }
 
@@ -488,9 +525,9 @@ export class StaffService {
     type: PushNotificationType,
     title: string,
     body: string,
-    data?: Record<string, unknown>
+    data?: Record<string, unknown>,
   ) {
-    const pushEnabled = process.env.PUSH_NOTIFICATIONS_ENABLED === 'true';
+    const pushEnabled = process.env.PUSH_NOTIFICATIONS_ENABLED === "true";
     const fcmKey = process.env.FCM_SERVER_KEY;
 
     const notification = await this.prisma.pushNotification.create({
@@ -512,22 +549,22 @@ export class StaffService {
         // Fetch push subscriptions for the user
         const subs = await this.prisma.pushSubscription.findMany({
           where: { userId },
-          select: { endpoint: true, keys: true }
+          select: { endpoint: true, keys: true },
         });
 
         // Minimal FCM-like payload; replace with real SDK as needed
         for (const sub of subs) {
-          await fetch('https://fcm.googleapis.com/fcm/send', {
-            method: 'POST',
+          await fetch("https://fcm.googleapis.com/fcm/send", {
+            method: "POST",
             headers: {
-              'Content-Type': 'application/json',
-              Authorization: `key=${fcmKey}`
+              "Content-Type": "application/json",
+              Authorization: `key=${fcmKey}`,
             },
             body: JSON.stringify({
               to: sub.endpoint,
               notification: { title, body },
-              data
-            })
+              data,
+            }),
           }).catch(() => {
             this.logger?.warn?.(`[Push] Failed to send to ${sub.endpoint}`);
           });
@@ -537,7 +574,7 @@ export class StaffService {
       }
     } else {
       // Environment or opt-in not present; log only
-      this.logger.log(`[Push] (noop) ${type}: ${title} to user ${userId ?? 'n/a'}`);
+      this.logger.log(`[Push] (noop) ${type}: ${title} to user ${userId ?? "n/a"}`);
     }
 
     return notification;
@@ -549,7 +586,7 @@ export class StaffService {
         userId,
         ...(unreadOnly ? { readAt: null } : {}),
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: limit,
     });
   }
@@ -582,7 +619,7 @@ export class StaffService {
       avgTaskMinutes?: number;
       hoursWorked?: number;
       notes?: string;
-    }
+    },
   ) {
     return this.prisma.staffPerformance.upsert({
       where: {
@@ -617,26 +654,31 @@ export class StaffService {
       include: {
         User: { select: { id: true, firstName: true, lastName: true } },
       },
-      orderBy: { periodStart: 'desc' },
+      orderBy: { periodStart: "desc" },
     });
   }
 
   /**
    * Calculate performance metrics for a staff member
    */
-  async calculatePerformanceMetrics(campgroundId: string, userId: string, periodStart: Date, periodEnd: Date) {
+  async calculatePerformanceMetrics(
+    campgroundId: string,
+    userId: string,
+    periodStart: Date,
+    periodEnd: Date,
+  ) {
     // Count completed tasks
     const tasks = await this.prisma.task.findMany({
       where: {
         tenantId: campgroundId,
         assignedToUserId: userId,
-        state: 'done',
+        state: "done",
         updatedAt: { gte: periodStart, lte: periodEnd },
       },
     });
 
     const tasksCompleted = tasks.length;
-    const tasksSlaOnTime = tasks.filter(t => t.slaStatus === 'on_track').length;
+    const tasksSlaOnTime = tasks.filter((t) => t.slaStatus === "on_track").length;
 
     // Get shifts and calculate hours worked
     const shifts = await this.prisma.staffShift.findMany({
@@ -654,7 +696,8 @@ export class StaffService {
       if (shift.actualMinutes != null) {
         hoursWorked += shift.actualMinutes / 60;
       } else if (shift.clockedInAt && shift.clockedOutAt) {
-        hoursWorked += minutesBetween({ clockInAt: shift.clockedInAt, clockOutAt: shift.clockedOutAt }) / 60;
+        hoursWorked +=
+          minutesBetween({ clockInAt: shift.clockedInAt, clockOutAt: shift.clockedOutAt }) / 60;
       }
     }
 
@@ -689,7 +732,9 @@ export class StaffService {
         updatedAt: new Date(),
       },
       include: {
-        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
       },
     });
   }
@@ -701,9 +746,10 @@ export class StaffService {
       status?: string;
       startDate?: Date;
       endDate?: Date;
-    }
+    },
   ) {
-    const statusFilter = options?.status && isTimeOffStatus(options.status) ? options.status : undefined;
+    const statusFilter =
+      options?.status && isTimeOffStatus(options.status) ? options.status : undefined;
     return this.prisma.timeOffRequest.findMany({
       where: {
         campgroundId,
@@ -713,10 +759,14 @@ export class StaffService {
         ...(options?.endDate ? { endDate: { lte: options.endDate } } : {}),
       },
       include: {
-        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
-        User_TimeOffRequest_reviewerIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
+        User_TimeOffRequest_reviewerIdToUser: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
       },
-      orderBy: { startDate: 'desc' },
+      orderBy: { startDate: "desc" },
     });
   }
 
@@ -724,10 +774,10 @@ export class StaffService {
     requestId: string,
     reviewerId: string,
     status: "approved" | "rejected",
-    note?: string
+    note?: string,
   ) {
     const request = await this.prisma.timeOffRequest.findUnique({ where: { id: requestId } });
-    if (!request) throw new NotFoundException('Time-off request not found');
+    if (!request) throw new NotFoundException("Time-off request not found");
 
     return this.prisma.timeOffRequest.update({
       where: { id: requestId },
@@ -738,21 +788,27 @@ export class StaffService {
         reviewedAt: new Date(),
       },
       include: {
-        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
-        User_TimeOffRequest_reviewerIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
+        User_TimeOffRequest_reviewerIdToUser: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
       },
     });
   }
 
   async cancelTimeOffRequest(requestId: string, userId: string) {
     const request = await this.prisma.timeOffRequest.findUnique({ where: { id: requestId } });
-    if (!request) throw new NotFoundException('Time-off request not found');
-    if (request.userId !== userId) throw new BadRequestException('Cannot cancel another user\'s request');
-    if (request.status !== 'pending') throw new BadRequestException('Can only cancel pending requests');
+    if (!request) throw new NotFoundException("Time-off request not found");
+    if (request.userId !== userId)
+      throw new BadRequestException("Cannot cancel another user's request");
+    if (request.status !== "pending")
+      throw new BadRequestException("Can only cancel pending requests");
 
     return this.prisma.timeOffRequest.update({
       where: { id: requestId },
-      data: { status: 'cancelled' },
+      data: { status: "cancelled" },
     });
   }
 
@@ -813,7 +869,7 @@ export class StaffService {
       userId?: string;
       startDate?: Date;
       endDate?: Date;
-    }
+    },
   ) {
     return this.prisma.availabilityOverride.findMany({
       where: {
@@ -826,7 +882,7 @@ export class StaffService {
       include: {
         User: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
     });
   }
 
@@ -838,9 +894,10 @@ export class StaffService {
       include: { StaffBreak: { where: { endedAt: null } } },
     });
 
-    if (!timeEntry) throw new NotFoundException('Time entry not found');
-    if (timeEntry.clockOutAt) throw new BadRequestException('Cannot start break on clocked-out entry');
-    if (timeEntry.StaffBreak.length > 0) throw new BadRequestException('Already on a break');
+    if (!timeEntry) throw new NotFoundException("Time entry not found");
+    if (timeEntry.clockOutAt)
+      throw new BadRequestException("Cannot start break on clocked-out entry");
+    if (timeEntry.StaffBreak.length > 0) throw new BadRequestException("Already on a break");
 
     return this.prisma.staffBreak.create({
       data: {
@@ -856,8 +913,8 @@ export class StaffService {
 
   async endBreak(breakId: string) {
     const brk = await this.prisma.staffBreak.findUnique({ where: { id: breakId } });
-    if (!brk) throw new NotFoundException('Break not found');
-    if (brk.endedAt) throw new BadRequestException('Break already ended');
+    if (!brk) throw new NotFoundException("Break not found");
+    if (brk.endedAt) throw new BadRequestException("Break already ended");
 
     const endedAt = new Date();
     const durationMins = Math.round((endedAt.getTime() - brk.startedAt.getTime()) / 60000);
@@ -877,7 +934,7 @@ export class StaffService {
   async getBreaksForEntry(timeEntryId: string) {
     return this.prisma.staffBreak.findMany({
       where: { timeEntryId },
-      orderBy: { startedAt: 'asc' },
+      orderBy: { startedAt: "asc" },
     });
   }
 
@@ -888,15 +945,17 @@ export class StaffService {
       where: { campgroundId },
     });
 
-    return config || {
-      campgroundId,
-      weeklyThreshold: 40,
-      dailyThreshold: null,
-      overtimeMultiplier: 1.5,
-      doubleTimeThreshold: null,
-      doubleTimeMultiplier: null,
-      weekStartDay: 0,
-    };
+    return (
+      config || {
+        campgroundId,
+        weeklyThreshold: 40,
+        dailyThreshold: null,
+        overtimeMultiplier: 1.5,
+        doubleTimeThreshold: null,
+        doubleTimeMultiplier: null,
+        weekStartDay: 0,
+      }
+    );
   }
 
   async updateOvertimeConfig(params: {
@@ -935,11 +994,15 @@ export class StaffService {
   /**
    * Calculate net worked minutes (gross time minus unpaid breaks)
    */
-  calculateNetWorkedMinutes(clockInAt: Date, clockOutAt: Date | null, breaks: { type: string; durationMins: number | null }[]) {
+  calculateNetWorkedMinutes(
+    clockInAt: Date,
+    clockOutAt: Date | null,
+    breaks: { type: string; durationMins: number | null }[],
+  ) {
     if (!clockOutAt) return 0;
     const grossMins = Math.round((clockOutAt.getTime() - clockInAt.getTime()) / 60000);
     const unpaidBreakMins = breaks
-      .filter((b) => b.type === 'unpaid' || b.type === 'meal')
+      .filter((b) => b.type === "unpaid" || b.type === "meal")
       .reduce((sum, b) => sum + (b.durationMins || 0), 0);
     return Math.max(0, grossMins - unpaidBreakMins);
   }
@@ -978,12 +1041,12 @@ export class StaffService {
     const shift = await this.prisma.staffShift.findUnique({
       where: { id: dto.requesterShiftId },
     });
-    if (!shift) throw new NotFoundException('Shift not found');
+    if (!shift) throw new NotFoundException("Shift not found");
     if (shift.userId !== dto.requesterId) {
-      throw new BadRequestException('You can only swap your own shifts');
+      throw new BadRequestException("You can only swap your own shifts");
     }
-    if (shift.status !== 'scheduled') {
-      throw new BadRequestException('Can only swap scheduled shifts');
+    if (shift.status !== "scheduled") {
+      throw new BadRequestException("Can only swap scheduled shifts");
     }
 
     const swap = await this.prisma.shiftSwapRequest.create({
@@ -994,14 +1057,20 @@ export class StaffService {
         requesterId: dto.requesterId,
         recipientUserId: dto.recipientUserId,
         requesterNote: dto.note,
-        status: 'pending_recipient',
+        status: "pending_recipient",
         updatedAt: new Date(),
       },
       include: {
         StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_ShiftSwapRequest_requesterIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_recipientUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_managerIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
       },
     });
     const normalizedSwap = this.normalizeShiftSwap(swap);
@@ -1011,9 +1080,9 @@ export class StaffService {
       dto.campgroundId,
       dto.recipientUserId,
       PushNotificationType.general,
-      'Shift Swap Request',
+      "Shift Swap Request",
       `${normalizedSwap.requester.firstName} ${normalizedSwap.requester.lastName} wants to swap shifts with you`,
-      { swapId: normalizedSwap.id }
+      { swapId: normalizedSwap.id },
     );
 
     // Send email notification to recipient
@@ -1026,50 +1095,56 @@ export class StaffService {
       const startTime = normalizedSwap.requesterShift.startTime;
       const endTime = normalizedSwap.requesterShift.endTime;
 
-      await this.emailService.sendShiftSwapRequest({
-        recipientEmail: normalizedSwap.recipient.email,
-        recipientName: `${normalizedSwap.recipient.firstName} ${normalizedSwap.recipient.lastName}`,
-        requesterName: `${normalizedSwap.requester.firstName} ${normalizedSwap.requester.lastName}`,
-        campgroundName: campground?.name || 'your campground',
-        shiftDate: normalizedSwap.requesterShift.shiftDate,
-        shiftStartTime: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        shiftEndTime: endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        role: normalizedSwap.requesterShift.role || undefined,
-        note: dto.note,
-        actionUrl: `${process.env.WEB_URL || 'http://localhost:3000'}/campgrounds/${dto.campgroundId}/staff/swaps`,
-      }).catch((err) => {
-        this.logger.warn(`Failed to send shift swap request email: ${err.message}`);
-      });
+      await this.emailService
+        .sendShiftSwapRequest({
+          recipientEmail: normalizedSwap.recipient.email,
+          recipientName: `${normalizedSwap.recipient.firstName} ${normalizedSwap.recipient.lastName}`,
+          requesterName: `${normalizedSwap.requester.firstName} ${normalizedSwap.requester.lastName}`,
+          campgroundName: campground?.name || "your campground",
+          shiftDate: normalizedSwap.requesterShift.shiftDate,
+          shiftStartTime: startTime.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          }),
+          shiftEndTime: endTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+          role: normalizedSwap.requesterShift.role || undefined,
+          note: dto.note,
+          actionUrl: `${process.env.WEB_URL || "http://localhost:3000"}/campgrounds/${dto.campgroundId}/staff/swaps`,
+        })
+        .catch((err) => {
+          this.logger.warn(`Failed to send shift swap request email: ${err.message}`);
+        });
     }
 
     return normalizedSwap;
   }
 
-  async respondToSwapRequest(
-    swapId: string,
-    recipientId: string,
-    accept: boolean,
-    note?: string
-  ) {
+  async respondToSwapRequest(swapId: string, recipientId: string, accept: boolean, note?: string) {
     const swap = await this.prisma.shiftSwapRequest.findUnique({
       where: { id: swapId },
       include: {
         StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_ShiftSwapRequest_requesterIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_recipientUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_managerIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
       },
     });
-    if (!swap) throw new NotFoundException('Swap request not found');
+    if (!swap) throw new NotFoundException("Swap request not found");
     const normalizedSwap = this.normalizeShiftSwap(swap);
     if (normalizedSwap.recipientUserId !== recipientId) {
-      throw new BadRequestException('Only the recipient can respond');
+      throw new BadRequestException("Only the recipient can respond");
     }
-    if (normalizedSwap.status !== 'pending_recipient') {
-      throw new BadRequestException('Swap is no longer pending recipient response');
+    if (normalizedSwap.status !== "pending_recipient") {
+      throw new BadRequestException("Swap is no longer pending recipient response");
     }
 
-    const newStatus = accept ? 'pending_manager' : 'declined';
+    const newStatus = accept ? "pending_manager" : "declined";
     const updated = await this.prisma.shiftSwapRequest.update({
       where: { id: swapId },
       data: {
@@ -1079,9 +1154,15 @@ export class StaffService {
       },
       include: {
         StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_ShiftSwapRequest_requesterIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_recipientUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_managerIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
       },
     });
 
@@ -1090,9 +1171,9 @@ export class StaffService {
       normalizedSwap.campgroundId,
       normalizedSwap.requesterId,
       PushNotificationType.general,
-      accept ? 'Swap Request Accepted' : 'Swap Request Declined',
-      `${normalizedSwap.recipient.firstName} ${normalizedSwap.recipient.lastName} has ${accept ? 'accepted' : 'declined'} your shift swap request`,
-      { swapId: normalizedSwap.id }
+      accept ? "Swap Request Accepted" : "Swap Request Declined",
+      `${normalizedSwap.recipient.firstName} ${normalizedSwap.recipient.lastName} has ${accept ? "accepted" : "declined"} your shift swap request`,
+      { swapId: normalizedSwap.id },
     );
 
     return this.normalizeShiftSwap(updated);
@@ -1103,18 +1184,24 @@ export class StaffService {
       where: { id: swapId },
       include: {
         StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_ShiftSwapRequest_requesterIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_recipientUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_managerIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
       },
     });
-    if (!swap) throw new NotFoundException('Swap request not found');
+    if (!swap) throw new NotFoundException("Swap request not found");
     const normalizedSwap = this.normalizeShiftSwap(swap);
-    if (normalizedSwap.status !== 'pending_manager') {
-      throw new BadRequestException('Swap is not awaiting manager approval');
+    if (normalizedSwap.status !== "pending_manager") {
+      throw new BadRequestException("Swap is not awaiting manager approval");
     }
 
-    const newStatus = approve ? 'approved' : 'rejected';
+    const newStatus = approve ? "approved" : "rejected";
 
     // If approved, actually swap the shift assignment
     if (approve) {
@@ -1134,22 +1221,28 @@ export class StaffService {
       },
       include: {
         StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_ShiftSwapRequest_requesterIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_recipientUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        User_ShiftSwapRequest_managerIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
       },
     });
 
     // Notify both parties via push notification
-    const statusText = approve ? 'approved' : 'rejected';
+    const statusText = approve ? "approved" : "rejected";
     for (const userId of [swap.requesterId, swap.recipientUserId]) {
       await this.sendNotification(
         normalizedSwap.campgroundId,
         userId,
         PushNotificationType.general,
-        `Shift Swap ${approve ? 'Approved' : 'Rejected'}`,
+        `Shift Swap ${approve ? "Approved" : "Rejected"}`,
         `Manager has ${statusText} the shift swap request`,
-        { swapId: normalizedSwap.id }
+        { swapId: normalizedSwap.id },
       );
     }
 
@@ -1164,24 +1257,37 @@ export class StaffService {
 
     const normalizedUpdated = this.normalizeShiftSwap(updated);
     const emailNotifications = [
-      { email: normalizedUpdated.requester.email, name: `${normalizedUpdated.requester.firstName} ${normalizedUpdated.requester.lastName}` },
-      { email: normalizedUpdated.recipient.email, name: `${normalizedUpdated.recipient.firstName} ${normalizedUpdated.recipient.lastName}` },
+      {
+        email: normalizedUpdated.requester.email,
+        name: `${normalizedUpdated.requester.firstName} ${normalizedUpdated.requester.lastName}`,
+      },
+      {
+        email: normalizedUpdated.recipient.email,
+        name: `${normalizedUpdated.recipient.firstName} ${normalizedUpdated.recipient.lastName}`,
+      },
     ].filter((n) => n.email);
 
     for (const recipient of emailNotifications) {
-      await this.emailService.sendShiftSwapDecision({
-        recipientEmail: recipient.email!,
-        recipientName: recipient.name,
-        approved: approve,
-        campgroundName: campground?.name || 'your campground',
-        shiftDate: normalizedSwap.requesterShift.shiftDate,
-        shiftStartTime: startTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        shiftEndTime: endTime.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        managerName: normalizedUpdated.manager ? `${normalizedUpdated.manager.firstName} ${normalizedUpdated.manager.lastName}` : undefined,
-        note,
-      }).catch((err) => {
-        this.logger.warn(`Failed to send shift swap decision email: ${err.message}`);
-      });
+      await this.emailService
+        .sendShiftSwapDecision({
+          recipientEmail: recipient.email!,
+          recipientName: recipient.name,
+          approved: approve,
+          campgroundName: campground?.name || "your campground",
+          shiftDate: normalizedSwap.requesterShift.shiftDate,
+          shiftStartTime: startTime.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+          }),
+          shiftEndTime: endTime.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+          managerName: normalizedUpdated.manager
+            ? `${normalizedUpdated.manager.firstName} ${normalizedUpdated.manager.lastName}`
+            : undefined,
+          note,
+        })
+        .catch((err) => {
+          this.logger.warn(`Failed to send shift swap decision email: ${err.message}`);
+        });
     }
 
     return normalizedUpdated;
@@ -1189,17 +1295,17 @@ export class StaffService {
 
   async cancelSwapRequest(swapId: string, requesterId: string) {
     const swap = await this.prisma.shiftSwapRequest.findUnique({ where: { id: swapId } });
-    if (!swap) throw new NotFoundException('Swap request not found');
+    if (!swap) throw new NotFoundException("Swap request not found");
     if (swap.requesterId !== requesterId) {
-      throw new BadRequestException('Only the requester can cancel');
+      throw new BadRequestException("Only the requester can cancel");
     }
-    if (!['pending_recipient', 'pending_manager'].includes(swap.status)) {
-      throw new BadRequestException('Cannot cancel a finalized swap');
+    if (!["pending_recipient", "pending_manager"].includes(swap.status)) {
+      throw new BadRequestException("Cannot cancel a finalized swap");
     }
 
     return this.prisma.shiftSwapRequest.update({
       where: { id: swapId },
-      data: { status: 'cancelled' },
+      data: { status: "cancelled" },
     });
   }
 
@@ -1208,36 +1314,44 @@ export class StaffService {
     options?: {
       userId?: string;
       status?: string;
-      role?: 'requester' | 'recipient' | 'any';
-    }
+      role?: "requester" | "recipient" | "any";
+    },
   ) {
-    const { userId, status, role = 'any' } = options || {};
+    const { userId, status, role = "any" } = options || {};
 
     let userFilter = {};
     if (userId) {
-      if (role === 'requester') {
+      if (role === "requester") {
         userFilter = { requesterId: userId };
-      } else if (role === 'recipient') {
+      } else if (role === "recipient") {
         userFilter = { recipientUserId: userId };
       } else {
         userFilter = { OR: [{ requesterId: userId }, { recipientUserId: userId }] };
       }
     }
 
-    return this.prisma.shiftSwapRequest.findMany({
-      where: {
-        campgroundId,
-        ...userFilter,
-        ...(status && isSwapStatus(status) ? { status } : {}),
-      },
-      include: {
-        StaffShift: true,
-        User_ShiftSwapRequest_requesterIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_recipientUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
-        User_ShiftSwapRequest_managerIdToUser: { select: { id: true, firstName: true, lastName: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    }).then((swaps) => swaps.map((swap) => this.normalizeShiftSwap(swap)));
+    return this.prisma.shiftSwapRequest
+      .findMany({
+        where: {
+          campgroundId,
+          ...userFilter,
+          ...(status && isSwapStatus(status) ? { status } : {}),
+        },
+        include: {
+          StaffShift: true,
+          User_ShiftSwapRequest_requesterIdToUser: {
+            select: { id: true, firstName: true, lastName: true, email: true },
+          },
+          User_ShiftSwapRequest_recipientUserIdToUser: {
+            select: { id: true, firstName: true, lastName: true, email: true },
+          },
+          User_ShiftSwapRequest_managerIdToUser: {
+            select: { id: true, firstName: true, lastName: true },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      })
+      .then((swaps) => swaps.map((swap) => this.normalizeShiftSwap(swap)));
   }
 
   // ---- Schedule Templates ----
@@ -1290,9 +1404,9 @@ export class StaffService {
         endTime: string;
         userId?: string;
       }>;
-    }
+    },
   ) {
-    const shifts = dto.shifts !== undefined ? toJsonValue(dto.shifts) ?? [] : undefined;
+    const shifts = dto.shifts !== undefined ? (toJsonValue(dto.shifts) ?? []) : undefined;
     const template = await this.prisma.scheduleTemplate.update({
       where: { id: templateId },
       data: {
@@ -1328,7 +1442,7 @@ export class StaffService {
       include: {
         User: { select: { id: true, firstName: true, lastName: true } },
       },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
     return templates.map((template) => {
       const { User, ...rest } = template;
@@ -1343,16 +1457,12 @@ export class StaffService {
         User: { select: { id: true, firstName: true, lastName: true } },
       },
     });
-    if (!template) throw new NotFoundException('Template not found');
+    if (!template) throw new NotFoundException("Template not found");
     const { User, ...rest } = template;
     return { ...rest, createdBy: User, User: undefined };
   }
 
-  async applyScheduleTemplate(
-    templateId: string,
-    weekStartDate: Date,
-    createdBy: string
-  ) {
+  async applyScheduleTemplate(templateId: string, weekStartDate: Date, createdBy: string) {
     const template = await this.getScheduleTemplate(templateId);
     const shifts = normalizeTemplateShifts(template.shifts);
 
@@ -1365,7 +1475,7 @@ export class StaffService {
       const shiftDate = new Date(weekStartDate);
       shiftDate.setDate(shiftDate.getDate() + shiftDef.dayOfWeek);
 
-      const dateStr = shiftDate.toISOString().split('T')[0];
+      const dateStr = shiftDate.toISOString().split("T")[0];
       const start = new Date(`${dateStr}T${shiftDef.startTime}`);
       const end = new Date(`${dateStr}T${shiftDef.endTime}`);
       const scheduledMinutes = Math.max(0, Math.round((end.getTime() - start.getTime()) / 60000));
@@ -1399,7 +1509,7 @@ export class StaffService {
     campgroundId: string,
     sourceWeekStart: Date,
     targetWeekStart: Date,
-    createdBy: string
+    createdBy: string,
   ) {
     // Get all shifts from the source week
     const sourceWeekEnd = new Date(sourceWeekStart);
@@ -1413,7 +1523,7 @@ export class StaffService {
     });
 
     const daysDiff = Math.round(
-      (targetWeekStart.getTime() - sourceWeekStart.getTime()) / (1000 * 60 * 60 * 24)
+      (targetWeekStart.getTime() - sourceWeekStart.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     const createdShifts = [];
@@ -1462,10 +1572,10 @@ export class StaffService {
     periodEnd: Date,
     options?: {
       userId?: string;
-      groupBy?: 'user' | 'day' | 'role';
-    }
+      groupBy?: "user" | "day" | "role";
+    },
   ) {
-    const { userId, groupBy = 'user' } = options || {};
+    const { userId, groupBy = "user" } = options || {};
 
     // Get all time entries for the period
     const entries = await this.prisma.staffTimeEntry.findMany({
@@ -1476,11 +1586,13 @@ export class StaffService {
         ...(userId ? { userId } : {}),
       },
       include: {
-        User_StaffTimeEntry_userIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
+        User_StaffTimeEntry_userIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
         StaffShift: { select: { id: true, role: true, shiftDate: true } },
         StaffBreak: true,
       },
-      orderBy: { clockInAt: 'asc' },
+      orderBy: { clockInAt: "asc" },
     });
 
     // Get overtime config
@@ -1510,7 +1622,7 @@ export class StaffService {
           id: e.id,
           userId: e.userId,
           userName: `${e.User_StaffTimeEntry_userIdToUser.firstName} ${e.User_StaffTimeEntry_userIdToUser.lastName}`,
-          date: e.clockInAt.toISOString().split('T')[0],
+          date: e.clockInAt.toISOString().split("T")[0],
           clockIn: e.clockInAt,
           clockOut: e.clockOutAt,
           role: e.StaffShift?.role,
@@ -1592,7 +1704,7 @@ export class StaffService {
         campground: Campground,
         createdBy: User,
         Campground: undefined,
-        User: undefined
+        User: undefined,
       };
     });
   }
@@ -1628,7 +1740,7 @@ export class StaffService {
         if (template.lastAppliedAt) {
           const lastAppliedDate = new Date(template.lastAppliedAt);
           const daysSinceLastApplied = Math.floor(
-            (today.getTime() - lastAppliedDate.getTime()) / (1000 * 60 * 60 * 24)
+            (today.getTime() - lastAppliedDate.getTime()) / (1000 * 60 * 60 * 24),
           );
           if (daysSinceLastApplied < 6) {
             // Already ran within the last week, skip
@@ -1641,7 +1753,7 @@ export class StaffService {
         const result = await this.applyScheduleTemplate(
           template.id,
           nextWeekStart,
-          template.createdById // Use template creator as the "createdBy" for shifts
+          template.createdById, // Use template creator as the "createdBy" for shifts
         );
 
         // Update lastAppliedAt
@@ -1659,10 +1771,10 @@ export class StaffService {
         });
 
         this.logger.log(
-          `Applied recurring template "${template.name}" for ${template.campground.name}: ${result.count} shifts created`
+          `Applied recurring template "${template.name}" for ${template.campground.name}: ${result.count} shifts created`,
         );
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Unknown error';
+        const message = error instanceof Error ? error.message : "Unknown error";
         results.push({
           templateId: template.id,
           templateName: template.name,
@@ -1671,9 +1783,7 @@ export class StaffService {
           shiftsCreated: 0,
           error: message,
         });
-        this.logger.error(
-          `Failed to apply recurring template "${template.name}": ${message}`
-        );
+        this.logger.error(`Failed to apply recurring template "${template.name}": ${message}`);
       }
     }
 
@@ -1691,7 +1801,7 @@ export class StaffService {
     templateId: string,
     isRecurring: boolean,
     recurringDay?: number,
-    recurringWeeksAhead?: number
+    recurringWeeksAhead?: number,
   ) {
     const template = await this.getScheduleTemplate(templateId);
 

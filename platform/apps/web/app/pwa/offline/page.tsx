@@ -9,8 +9,8 @@ export default function OfflinePage() {
       <div className="max-w-md w-full rounded-2xl border border-slate-200 bg-white shadow-sm p-6 space-y-4 text-center">
         <div className="text-lg font-semibold text-slate-900">You&apos;re offline</div>
         <p className="text-sm text-slate-600">
-          We couldn&apos;t reach the server. You can keep viewing any cached screens; new actions will retry when
-          you&apos;re back online.
+          We couldn&apos;t reach the server. You can keep viewing any cached screens; new actions
+          will retry when you&apos;re back online.
         </p>
         <div className="space-y-2 text-sm text-left text-slate-600 bg-slate-50 border border-slate-200 rounded-lg p-3">
           <div className="font-medium text-slate-800">What still works:</div>
@@ -29,4 +29,3 @@ export default function OfflinePage() {
     </div>
   );
 }
-

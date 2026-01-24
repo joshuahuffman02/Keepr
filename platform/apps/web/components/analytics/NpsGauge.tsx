@@ -61,7 +61,7 @@ export function NpsGauge({
 
   // NPS ranges from -100 to +100, map to 0-180 degrees
   const normalizedScore = ((score + 100) / 200) * 180;
-  const radius = (width / 2) - strokeWidth;
+  const radius = width / 2 - strokeWidth;
   const centerX = width / 2;
   const centerY = height - 10;
 
@@ -217,9 +217,7 @@ export function NpsGauge({
 
           {/* Score Display */}
           <div className="text-center -mt-2">
-            <p className={cn(fontSize, "font-bold", getNpsTextColor(score))}>
-              {score}
-            </p>
+            <p className={cn(fontSize, "font-bold", getNpsTextColor(score))}>{score}</p>
             <p className={cn(labelSize, "font-medium", getNpsTextColor(score))}>
               {getNpsLabel(score)}
             </p>
@@ -236,7 +234,8 @@ export function NpsGauge({
                 <Minus className="h-4 w-4 text-muted-foreground" />
               )}
               <span className={scoreTrend >= 0 ? "text-status-success" : "text-status-error"}>
-                {scoreTrend > 0 ? "+" : ""}{scoreTrend} pts
+                {scoreTrend > 0 ? "+" : ""}
+                {scoreTrend} pts
               </span>
               <span className="text-muted-foreground text-sm">vs previous period</span>
             </div>
@@ -254,17 +253,18 @@ export function NpsGauge({
                 ) : (
                   <Minus className="h-4 w-4 text-muted-foreground" />
                 )}
-                <span className={cn(
-                  "font-semibold",
-                  yoyChange !== null && yoyChange !== undefined && yoyChange >= 0
-                    ? "text-status-success"
-                    : "text-status-error"
-                )}>
-                  {yoyChange !== null && yoyChange !== undefined && yoyChange > 0 ? "+" : ""}{yoyChange} pts
+                <span
+                  className={cn(
+                    "font-semibold",
+                    yoyChange !== null && yoyChange !== undefined && yoyChange >= 0
+                      ? "text-status-success"
+                      : "text-status-error",
+                  )}
+                >
+                  {yoyChange !== null && yoyChange !== undefined && yoyChange > 0 ? "+" : ""}
+                  {yoyChange} pts
                 </span>
-                <span className="text-muted-foreground text-sm">
-                  (was {yoyScore})
-                </span>
+                <span className="text-muted-foreground text-sm">(was {yoyScore})</span>
               </div>
             </div>
           )}

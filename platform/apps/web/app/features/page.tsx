@@ -40,9 +40,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   value !== null && typeof value === "object";
 
 function getAuthHeaders(): HeadersInit {
-  const token = typeof window !== "undefined"
-    ? localStorage.getItem("campreserv:authToken")
-    : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : null;
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -127,9 +125,7 @@ function FeatureItem({
       className={cn(
         "flex items-center gap-3 p-3 rounded-lg transition-all group",
         "border bg-white",
-        isChecked
-          ? "border-emerald-200 bg-emerald-50"
-          : "border-slate-200 hover:border-slate-300"
+        isChecked ? "border-emerald-200 bg-emerald-50" : "border-slate-200 hover:border-slate-300",
       )}
     >
       <button
@@ -138,23 +134,16 @@ function FeatureItem({
           "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
           isChecked
             ? "bg-emerald-500 text-white"
-            : "border border-slate-300 bg-white hover:border-emerald-400"
+            : "border border-slate-300 bg-white hover:border-emerald-400",
         )}
       >
         {isChecked && <Check className="w-3 h-3" />}
       </button>
       <div className="flex-1 min-w-0">
-        <p className={cn(
-          "text-sm font-medium",
-          isChecked
-            ? "text-emerald-700"
-            : "text-slate-900"
-        )}>
+        <p className={cn("text-sm font-medium", isChecked ? "text-emerald-700" : "text-slate-900")}>
           {feature.label}
         </p>
-        <p className="text-xs text-slate-500 truncate">
-          {feature.description}
-        </p>
+        <p className="text-xs text-slate-500 truncate">{feature.description}</p>
       </div>
       <Link
         href={feature.href}
@@ -200,16 +189,14 @@ function CategorySection({
         className={cn(
           "w-full flex items-center justify-between p-4 transition-colors",
           "hover:bg-slate-50",
-          isExpanded && "bg-slate-50"
+          isExpanded && "bg-slate-50",
         )}
       >
         <div className="flex items-center gap-3">
           <div
             className={cn(
               "w-10 h-10 rounded-lg flex items-center justify-center",
-              allCompleted
-                ? "bg-emerald-100"
-                : "bg-slate-100"
+              allCompleted ? "bg-emerald-100" : "bg-slate-100",
             )}
           >
             {allCompleted ? (
@@ -230,9 +217,7 @@ function CategorySection({
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-500",
-                  allCompleted
-                    ? "bg-emerald-500"
-                    : "bg-gradient-to-r from-emerald-500 to-teal-500"
+                  allCompleted ? "bg-emerald-500" : "bg-gradient-to-r from-emerald-500 to-teal-500",
                 )}
                 style={{ width: `${progressPercent}%` }}
               />
@@ -241,9 +226,7 @@ function CategorySection({
           <span
             className={cn(
               "text-sm font-medium tabular-nums",
-              allCompleted
-                ? "text-emerald-600"
-                : "text-slate-500"
+              allCompleted ? "text-emerald-600" : "text-slate-500",
             )}
           >
             {completedCount}/{totalCount}
@@ -251,7 +234,7 @@ function CategorySection({
           <ChevronDown
             className={cn(
               "w-5 h-5 text-slate-400 transition-transform",
-              isExpanded && "rotate-180"
+              isExpanded && "rotate-180",
             )}
           />
         </div>
@@ -367,7 +350,7 @@ function FeaturesPageContent() {
   const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<PageCategory>>(
-    new Set(["operations"])
+    new Set(["operations"]),
   );
 
   // Fetch queue data
@@ -377,7 +360,7 @@ function FeaturesPageContent() {
       if (!campgroundId) return null;
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue`,
-        { headers: getAuthHeaders() }
+        { headers: getAuthHeaders() },
       );
       if (!response.ok) throw new Error("Failed to fetch queue");
       const data = await response.json();
@@ -395,7 +378,7 @@ function FeaturesPageContent() {
     mutationFn: async (featureKey: string) => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/complete`,
-        { method: "POST", headers: getAuthHeaders() }
+        { method: "POST", headers: getAuthHeaders() },
       );
       if (!response.ok) throw new Error("Failed to complete feature");
       return response.json();
@@ -410,7 +393,7 @@ function FeaturesPageContent() {
     mutationFn: async (featureKey: string) => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/skip`,
-        { method: "POST", headers: getAuthHeaders() }
+        { method: "POST", headers: getAuthHeaders() },
       );
       if (!response.ok) throw new Error("Failed to skip feature");
       return response.json();
@@ -425,7 +408,7 @@ function FeaturesPageContent() {
     mutationFn: async (featureKey: string) => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/${featureKey}/requeue`,
-        { method: "POST", headers: getAuthHeaders() }
+        { method: "POST", headers: getAuthHeaders() },
       );
       if (!response.ok) throw new Error("Failed to requeue feature");
       return response.json();
@@ -439,7 +422,7 @@ function FeaturesPageContent() {
   // Build completed features list from API data
   const completedFeatures = useMemo(
     () => progress.filter((p) => p.completed).map((p) => p.featureKey),
-    [progress]
+    [progress],
   );
 
   // Group pages by category
@@ -475,8 +458,8 @@ function FeaturesPageContent() {
         (page) =>
           page.label.toLowerCase().includes(query) ||
           page.description.toLowerCase().includes(query) ||
-          page.keywords.some((k) => k.toLowerCase().includes(query))
-      )
+          page.keywords.some((k) => k.toLowerCase().includes(query)),
+      ),
     );
   }, [searchQuery, pagesByCategory]);
 
@@ -498,26 +481,21 @@ function FeaturesPageContent() {
 
   const totalFeatures = PAGE_REGISTRY.length;
   const completedCount = completedFeatures.length;
-  const progressPercent = totalFeatures > 0 ? Math.round((completedCount / totalFeatures) * 100) : 0;
+  const progressPercent =
+    totalFeatures > 0 ? Math.round((completedCount / totalFeatures) * 100) : 0;
 
   // Queue counts for tab badges
-  const pendingQueueCount = queueData
-    ? queueData.setupNowCount + queueData.setupLaterCount
-    : 0;
+  const pendingQueueCount = queueData ? queueData.setupNowCount + queueData.setupLaterCount : 0;
   const completedQueueCount = queueData?.completedCount || 0;
 
   // Filter queue items by tab
   const filteredQueueItems = useMemo(() => {
     if (!queueData) return [];
     if (activeTab === "queue") {
-      return queueData.items.filter(
-        (i) => i.status === "setup_now" || i.status === "setup_later"
-      );
+      return queueData.items.filter((i) => i.status === "setup_now" || i.status === "setup_later");
     }
     if (activeTab === "completed") {
-      return queueData.items.filter(
-        (i) => i.status === "completed" || i.status === "skipped"
-      );
+      return queueData.items.filter((i) => i.status === "completed" || i.status === "skipped");
     }
     return [];
   }, [queueData, activeTab]);
@@ -532,9 +510,7 @@ function FeaturesPageContent() {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
-                Feature Discovery
-              </h1>
+              <h1 className="text-2xl font-bold text-slate-900">Feature Discovery</h1>
               <p className="text-slate-500">
                 Track your journey through all {totalFeatures} features
               </p>
@@ -561,7 +537,7 @@ function FeaturesPageContent() {
               "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
               activeTab === "all"
                 ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                : "text-slate-600 hover:text-slate-900",
             )}
           >
             <Sparkles className="w-4 h-4" />
@@ -573,7 +549,7 @@ function FeaturesPageContent() {
               "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
               activeTab === "queue"
                 ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                : "text-slate-600 hover:text-slate-900",
             )}
           >
             <ListTodo className="w-4 h-4" />
@@ -590,7 +566,7 @@ function FeaturesPageContent() {
               "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
               activeTab === "completed"
                 ? "bg-white text-slate-900 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
+                : "text-slate-600 hover:text-slate-900",
             )}
           >
             <CheckCircle className="w-4 h-4" />
@@ -698,12 +674,8 @@ function FeaturesPageContent() {
             ) : filteredQueueItems.length === 0 ? (
               <div className="text-center py-12 bg-slate-50 rounded-2xl">
                 <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  All caught up!
-                </h3>
-                <p className="text-slate-500">
-                  No features pending in your queue.
-                </p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">All caught up!</h3>
+                <p className="text-slate-500">No features pending in your queue.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -717,15 +689,15 @@ function FeaturesPageContent() {
                       transition={{ delay: index * 0.03 }}
                       className={cn(
                         "flex items-center gap-4 p-4 rounded-xl border transition-colors",
-                        "bg-white border-slate-200"
+                        "bg-white border-slate-200",
                       )}
                     >
-                      <div className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
-                        item.status === "setup_now"
-                          ? "bg-emerald-100"
-                          : "bg-amber-100"
-                      )}>
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                          item.status === "setup_now" ? "bg-emerald-100" : "bg-amber-100",
+                        )}
+                      >
                         {item.status === "setup_now" ? (
                           <Play className="w-5 h-5 text-emerald-600" />
                         ) : (
@@ -733,9 +705,7 @@ function FeaturesPageContent() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900">
-                          {info.label}
-                        </p>
+                        <p className="font-medium text-slate-900">{info.label}</p>
                         <p className="text-sm text-slate-500">
                           {item.status === "setup_now" ? "Set up now" : "Set up later"}
                         </p>
@@ -779,7 +749,10 @@ function FeaturesPageContent() {
             {queueLoading ? (
               <div className="space-y-3">
                 {[...Array(3)].map((_, i) => (
-                  <div key={i} className="animate-pulse bg-white rounded-xl border border-slate-200 p-6">
+                  <div
+                    key={i}
+                    className="animate-pulse bg-white rounded-xl border border-slate-200 p-6"
+                  >
                     <div className="flex items-start gap-4">
                       <div className="w-10 h-10 bg-slate-200 rounded-lg" />
                       <div className="flex-1 space-y-3">
@@ -797,9 +770,7 @@ function FeaturesPageContent() {
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
                   No completed features yet
                 </h3>
-                <p className="text-slate-500">
-                  Features you complete or skip will appear here.
-                </p>
+                <p className="text-slate-500">Features you complete or skip will appear here.</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -815,15 +786,15 @@ function FeaturesPageContent() {
                       className={cn(
                         "flex items-center gap-4 p-4 rounded-xl border transition-colors",
                         "bg-white border-slate-200",
-                        isSkipped && "opacity-60"
+                        isSkipped && "opacity-60",
                       )}
                     >
-                      <div className={cn(
-                        "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
-                        isSkipped
-                          ? "bg-slate-100"
-                          : "bg-emerald-100"
-                      )}>
+                      <div
+                        className={cn(
+                          "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+                          isSkipped ? "bg-slate-100" : "bg-emerald-100",
+                        )}
+                      >
                         {isSkipped ? (
                           <SkipForward className="w-5 h-5 text-slate-400" />
                         ) : (
@@ -831,12 +802,12 @@ function FeaturesPageContent() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={cn(
-                          "font-medium",
-                          isSkipped
-                            ? "text-slate-500 line-through"
-                            : "text-slate-900"
-                        )}>
+                        <p
+                          className={cn(
+                            "font-medium",
+                            isSkipped ? "text-slate-500 line-through" : "text-slate-900",
+                          )}
+                        >
                           {info.label}
                         </p>
                         <p className="text-sm text-slate-500">
@@ -868,13 +839,15 @@ function FeaturesPageContent() {
 
 export default function FeaturesPage() {
   return (
-    <Suspense fallback={
-      <DashboardShell>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-pulse text-muted-foreground">Loading features...</div>
-        </div>
-      </DashboardShell>
-    }>
+    <Suspense
+      fallback={
+        <DashboardShell>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-pulse text-muted-foreground">Loading features...</div>
+          </div>
+        </DashboardShell>
+      }
+    >
       <FeaturesPageContent />
     </Suspense>
   );

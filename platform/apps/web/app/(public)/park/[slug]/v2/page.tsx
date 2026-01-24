@@ -22,7 +22,7 @@ const getNumber = (value: unknown): number | undefined =>
 
 export async function generateMetadata(
   { params, searchParams }: Props,
-  parent: ResolvingMetadata
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const { slug } = await params;
   const { token } = await searchParams;
@@ -30,7 +30,8 @@ export async function generateMetadata(
     const campground = await apiClient.getPublicCampground(slug, token);
     const previousImages = (await parent).openGraph?.images || [];
     const canonical = `${baseUrl}/park/${slug}/v2`;
-    const description = campground.description || campground.tagline || `Book your stay at ${campground.name}`;
+    const description =
+      campground.description || campground.tagline || `Book your stay at ${campground.name}`;
     const images = campground.heroImageUrl
       ? [campground.heroImageUrl, ...(campground.photos || [])]
       : campground.photos || [];
@@ -75,8 +76,8 @@ export default async function Page({ params, searchParams }: Props) {
           initialData.photos && initialData.photos.length
             ? initialData.photos
             : initialData.heroImageUrl
-            ? [initialData.heroImageUrl]
-            : undefined,
+              ? [initialData.heroImageUrl]
+              : undefined,
         address: {
           "@type": "PostalAddress",
           streetAddress: initialData.address1,
@@ -100,73 +101,69 @@ export default async function Page({ params, searchParams }: Props) {
               reviewCount: initialData.reviewCount ?? 0,
             }
           : undefined,
-        event: (initialData.events || [])
-          .filter(isRecord)
-          .map((event) => {
-            const title = getString(event.title) || "Event";
-            const startDate = getString(event.startDate) || new Date().toISOString();
-            const endDate = getString(event.endDate) || startDate;
-            const priceCents = getNumber(event.priceCents);
-            const photoUrl = getString(event.photoUrl);
-            const description = getString(event.description);
-            const arrivalDate = startDate.split("T")[0];
-            const departureDate = endDate.split("T")[0];
+        event: (initialData.events || []).filter(isRecord).map((event) => {
+          const title = getString(event.title) || "Event";
+          const startDate = getString(event.startDate) || new Date().toISOString();
+          const endDate = getString(event.endDate) || startDate;
+          const priceCents = getNumber(event.priceCents);
+          const photoUrl = getString(event.photoUrl);
+          const description = getString(event.description);
+          const arrivalDate = startDate.split("T")[0];
+          const departureDate = endDate.split("T")[0];
 
-            return {
-              "@type": "Event",
-              name: title,
-              startDate,
-              endDate,
-              eventStatus: "https://schema.org/EventScheduled",
-              eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-              location: {
-                "@type": "Place",
-                name: initialData.name,
-                address: {
-                  "@type": "PostalAddress",
-                  streetAddress: initialData.address1,
-                  addressLocality: initialData.city,
-                  addressRegion: initialData.state,
-                  postalCode: initialData.postalCode,
-                  addressCountry: initialData.country,
-                },
+          return {
+            "@type": "Event",
+            name: title,
+            startDate,
+            endDate,
+            eventStatus: "https://schema.org/EventScheduled",
+            eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+            location: {
+              "@type": "Place",
+              name: initialData.name,
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: initialData.address1,
+                addressLocality: initialData.city,
+                addressRegion: initialData.state,
+                postalCode: initialData.postalCode,
+                addressCountry: initialData.country,
               },
-              image: photoUrl || initialData.heroImageUrl || initialData.photos?.[0],
-              description,
-              offers: {
-                "@type": "Offer",
-                price: priceCents ? (priceCents / 100).toFixed(2) : "0",
-                priceCurrency: "USD",
-                availability: "https://schema.org/InStock",
-                url: `${baseUrl}/park/${slug}/book?arrivalDate=${arrivalDate}&departureDate=${departureDate}`,
-              },
-            };
-          }),
-        makesOffer: (initialData.promotions || [])
-          .filter(isRecord)
-          .map((promo) => {
-            const code = getString(promo.code) || "";
-            const description = getString(promo.description);
-            const type = getString(promo.type);
-            const value = getNumber(promo.value);
-            const validThrough = getString(promo.validTo);
-            const price =
-              value !== undefined
-                ? type === "percentage"
-                  ? `${value}%`
-                  : (value / 100).toFixed(2)
-                : undefined;
-
-            return {
+            },
+            image: photoUrl || initialData.heroImageUrl || initialData.photos?.[0],
+            description,
+            offers: {
               "@type": "Offer",
-              name: code,
-              description,
-              price,
+              price: priceCents ? (priceCents / 100).toFixed(2) : "0",
               priceCurrency: "USD",
-              validThrough,
-              url: `${baseUrl}/park/${slug}/book?promoCode=${code}`,
-            };
-          }),
+              availability: "https://schema.org/InStock",
+              url: `${baseUrl}/park/${slug}/book?arrivalDate=${arrivalDate}&departureDate=${departureDate}`,
+            },
+          };
+        }),
+        makesOffer: (initialData.promotions || []).filter(isRecord).map((promo) => {
+          const code = getString(promo.code) || "";
+          const description = getString(promo.description);
+          const type = getString(promo.type);
+          const value = getNumber(promo.value);
+          const validThrough = getString(promo.validTo);
+          const price =
+            value !== undefined
+              ? type === "percentage"
+                ? `${value}%`
+                : (value / 100).toFixed(2)
+              : undefined;
+
+          return {
+            "@type": "Offer",
+            name: code,
+            description,
+            price,
+            priceCurrency: "USD",
+            validThrough,
+            url: `${baseUrl}/park/${slug}/book?promoCode=${code}`,
+          };
+        }),
       }
     : null;
 
@@ -180,7 +177,11 @@ export default async function Page({ params, searchParams }: Props) {
         />
       )}
       {jsonLd && (
-        <Script id="campground-json-ld-v2" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <Script
+          id="campground-json-ld-v2"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       )}
       <CampgroundV2Client slug={slug} initialData={initialData} previewToken={token} />
     </>

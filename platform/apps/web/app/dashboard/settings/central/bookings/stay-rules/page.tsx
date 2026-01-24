@@ -24,7 +24,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Calendar, Moon, Info, Pencil, Trash2, MoreHorizontal, Copy, Loader2 } from "lucide-react";
+import {
+  Plus,
+  Calendar,
+  Moon,
+  Info,
+  Pencil,
+  Trash2,
+  MoreHorizontal,
+  Copy,
+  Loader2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,7 +73,7 @@ async function deleteStayRule(campgroundId: string, ruleId: string): Promise<voi
     {
       method: "DELETE",
       credentials: "include",
-    }
+    },
   );
   if (!response.ok) {
     throw new Error("Failed to delete stay rule");
@@ -125,9 +135,9 @@ export default function StayRulesPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Stay rules enforce minimum and maximum night requirements. Rules with date ranges
-          apply only during those periods. The "Ignore Days Before" setting allows last-minute
-          bookings to bypass minimum requirements.
+          Stay rules enforce minimum and maximum night requirements. Rules with date ranges apply
+          only during those periods. The "Ignore Days Before" setting allows last-minute bookings to
+          bypass minimum requirements.
         </AlertDescription>
       </Alert>
 
@@ -135,9 +145,7 @@ export default function StayRulesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Default Stay Limits</CardTitle>
-          <CardDescription>
-            These apply when no specific rules match
-          </CardDescription>
+          <CardDescription>These apply when no specific rules match</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -155,9 +163,7 @@ export default function StayRulesPage() {
 
       {/* Rules List */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">
-          Custom Rules ({rules.length})
-        </h3>
+        <h3 className="text-sm font-medium text-foreground">Custom Rules ({rules.length})</h3>
 
         {rules.length === 0 ? (
           <Card className="border-dashed">
@@ -177,85 +183,82 @@ export default function StayRulesPage() {
           </Card>
         ) : (
           rules.map((rule) => (
-          <Card
-            key={rule.id}
-            className={cn(
-              "transition-all hover:shadow-md group",
-              !rule.isActive && "opacity-60"
-            )}
-          >
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <Moon className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-foreground">{rule.name}</p>
-                      {!rule.isActive && (
-                        <Badge variant="secondary" className="text-xs">
-                          Inactive
-                        </Badge>
-                      )}
+            <Card
+              key={rule.id}
+              className={cn("transition-all hover:shadow-md group", !rule.isActive && "opacity-60")}
+            >
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-muted">
+                      <Moon className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">
-                        {rule.minNights}-{rule.maxNights} nights
-                      </span>
-                      <span>•</span>
-                      <span>{rule.siteClasses.join(", ")}</span>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground">{rule.name}</p>
+                        {!rule.isActive && (
+                          <Badge variant="secondary" className="text-xs">
+                            Inactive
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">
+                          {rule.minNights}-{rule.maxNights} nights
+                        </span>
+                        <span>•</span>
+                        <span>{rule.siteClasses.join(", ")}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  {rule.dateRanges.length > 0 && (
-                    <Badge variant="outline" className="text-xs">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {rule.dateRanges.length} date range{rule.dateRanges.length !== 1 && "s"}
-                    </Badge>
-                  )}
+                  <div className="flex items-center gap-4">
+                    {rule.dateRanges.length > 0 && (
+                      <Badge variant="outline" className="text-xs">
+                        <Calendar className="h-3 w-3 mr-1" />
+                        {rule.dateRanges.length} date range{rule.dateRanges.length !== 1 && "s"}
+                      </Badge>
+                    )}
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="More options"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Duplicate
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        {rule.isActive ? "Deactivate" : "Activate"}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => deleteMutation.mutate(rule.id)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="More options"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Duplicate
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          {rule.isActive ? "Deactivate" : "Activate"}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => deleteMutation.mutate(rule.id)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
 
@@ -264,18 +267,13 @@ export default function StayRulesPage() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Add Stay Rule</DialogTitle>
-            <DialogDescription>
-              Create a new minimum/maximum night requirement
-            </DialogDescription>
+            <DialogDescription>Create a new minimum/maximum night requirement</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="rule-name">Rule Name</Label>
-              <Input
-                id="rule-name"
-                placeholder="e.g., Peak Summer Minimum"
-              />
+              <Input id="rule-name" placeholder="e.g., Peak Summer Minimum" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -320,9 +318,7 @@ export default function StayRulesPage() {
             <Button variant="outline" onClick={() => setIsEditorOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setIsEditorOpen(false)}>
-              Add Rule
-            </Button>
+            <Button onClick={() => setIsEditorOpen(false)}>Add Rule</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -4,7 +4,17 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "../../../ui/button";
 import { Input } from "../../../ui/input";
 import { Label } from "../../../ui/label";
-import { Loader2, Home, AlertCircle, Info, Search, User, MapPin, Calendar, Check } from "lucide-react";
+import {
+  Loader2,
+  Home,
+  AlertCircle,
+  Info,
+  Search,
+  User,
+  MapPin,
+  Calendar,
+  Check,
+} from "lucide-react";
 import { usePaymentContext } from "../context/PaymentContext";
 import { apiClient } from "../../../../lib/api-client";
 import { cn } from "../../../../lib/utils";
@@ -25,7 +35,12 @@ interface ReservationSearchResult {
   paidAmount: number;
   balanceAmount: number;
   guest: { id: string; firstName: string; lastName: string; email: string; phone: string } | null;
-  site: { id: string; number: string; name: string | null; siteClass: { id: string; name: string } | null } | null;
+  site: {
+    id: string;
+    number: string;
+    name: string | null;
+    siteClass: { id: string; name: string } | null;
+  } | null;
   displayLabel: string;
 }
 
@@ -34,7 +49,9 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<ReservationSearchResult[]>([]);
-  const [selectedReservation, setSelectedReservation] = useState<ReservationSearchResult | null>(null);
+  const [selectedReservation, setSelectedReservation] = useState<ReservationSearchResult | null>(
+    null,
+  );
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -50,25 +67,28 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
     props.subject.type === "reservation" || props.subject.type === "balance";
 
   // Debounced search
-  const handleSearch = useCallback(async (query: string) => {
-    if (!query || query.length < 1) {
-      setSearchResults([]);
-      setShowResults(false);
-      return;
-    }
+  const handleSearch = useCallback(
+    async (query: string) => {
+      if (!query || query.length < 1) {
+        setSearchResults([]);
+        setShowResults(false);
+        return;
+      }
 
-    setIsSearching(true);
-    try {
-      const results = await apiClient.searchReservations(props.campgroundId, query);
-      setSearchResults(results);
-      setShowResults(true);
-    } catch (err) {
-      console.error("Search failed:", err);
-      setSearchResults([]);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [props.campgroundId]);
+      setIsSearching(true);
+      try {
+        const results = await apiClient.searchReservations(props.campgroundId, query);
+        setSearchResults(results);
+        setShowResults(true);
+      } catch (err) {
+        console.error("Search failed:", err);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [props.campgroundId],
+  );
 
   // Handle input change with debounce
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,11 +137,11 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
     setError(null);
 
     try {
-      const targetReservationId = selectedReservation?.id || (
-        props.subject?.type === "reservation" || props.subject?.type === "balance"
+      const targetReservationId =
+        selectedReservation?.id ||
+        (props.subject?.type === "reservation" || props.subject?.type === "balance"
           ? props.subject.reservationId
-          : undefined
-      );
+          : undefined);
 
       if (!targetReservationId) {
         throw new Error("No reservation selected");
@@ -137,8 +157,8 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
           amountCents,
           note: selectedReservation
             ? `Charged to ${selectedReservation.displayLabel}`
-            : "Charged to reservation"
-        }
+            : "Charged to reservation",
+        },
       ]);
 
       // Add tender entry for UI tracking
@@ -237,7 +257,7 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                   onClick={() => handleSelectReservation(reservation)}
                   className={cn(
                     "w-full px-4 py-3 text-left hover:bg-muted border-b border-border last:border-b-0 transition-colors",
-                    selectedReservation?.id === reservation.id && "bg-emerald-50"
+                    selectedReservation?.id === reservation.id && "bg-emerald-50",
                   )}
                 >
                   <div className="flex items-start justify-between gap-3">
@@ -247,7 +267,12 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                         <span className="font-semibold text-foreground">
                           {reservation.site?.number || reservation.site?.name || "No Site"}
                         </span>
-                        <span className={cn("px-2 py-0.5 text-xs font-medium rounded-full", getStatusBadge(reservation.status))}>
+                        <span
+                          className={cn(
+                            "px-2 py-0.5 text-xs font-medium rounded-full",
+                            getStatusBadge(reservation.status),
+                          )}
+                        >
                           {reservation.status.replace("_", " ")}
                         </span>
                       </div>
@@ -256,7 +281,9 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                       {reservation.guest && (
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                           <User className="h-3.5 w-3.5" />
-                          <span>{reservation.guest.firstName} {reservation.guest.lastName}</span>
+                          <span>
+                            {reservation.guest.firstName} {reservation.guest.lastName}
+                          </span>
                         </div>
                       )}
 
@@ -264,7 +291,8 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
                         <Calendar className="h-3 w-3" />
                         <span>
-                          {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
+                          {formatDate(reservation.arrivalDate)} -{" "}
+                          {formatDate(reservation.departureDate)}
                         </span>
                       </div>
                     </div>
@@ -317,7 +345,8 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
                 </div>
               )}
               <div className="text-xs text-muted-foreground mt-1">
-                {formatDate(selectedReservation.arrivalDate)} - {formatDate(selectedReservation.departureDate)}
+                {formatDate(selectedReservation.arrivalDate)} -{" "}
+                {formatDate(selectedReservation.departureDate)}
                 {" | "}
                 {selectedReservation.confirmationCode}
               </div>
@@ -337,16 +366,14 @@ export function FolioMethod({ onSuccess, onError, onCancel }: FolioMethodProps) 
         <div className="text-sm text-amber-800">
           <p className="font-medium">Payment Pending</p>
           <p className="mt-1 text-amber-700">
-            This charge will be added to the guest&apos;s folio and will need to be collected
-            at checkout.
+            This charge will be added to the guest&apos;s folio and will need to be collected at
+            checkout.
           </p>
         </div>
       </div>
 
       {/* Error display */}
-      {error && (
-        <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
       {/* Action buttons */}
       <div className="flex justify-end gap-2 pt-2">

@@ -12,13 +12,13 @@ await env.MY_QUEUE.send(message, { delaySeconds: 0 }); // Override queue default
 
 // Batch (up to 100 msgs or 256 KB)
 await env.MY_QUEUE.sendBatch([
-  { body: 'msg1' },
-  { body: 'msg2' },
-  { body: 'msg3', options: { delaySeconds: 300 } }
+  { body: "msg1" },
+  { body: "msg2" },
+  { body: "msg3", options: { delaySeconds: 300 } },
 ]);
 
 // Non-blocking
-ctx.waitUntil(env.MY_QUEUE.send({ data: 'async' }));
+ctx.waitUntil(env.MY_QUEUE.send({ data: "async" }));
 ```
 
 ## Consumer: Push-based (Worker)
@@ -36,7 +36,7 @@ export default {
         msg.retry({ delaySeconds: 600 });
       }
     }
-  }
+  },
 };
 ```
 
@@ -74,12 +74,19 @@ async queue(batch: MessageBatch, env: Env): Promise<void> {
 export default {
   async queue(batch: MessageBatch, env: Env): Promise<void> {
     switch (batch.queue) {
-      case 'high-priority': await processUrgent(batch.messages); break;
-      case 'low-priority': await processDeferred(batch.messages); break;
-      case 'email': await sendEmails(batch.messages); break;
-      default: batch.retryAll();
+      case "high-priority":
+        await processUrgent(batch.messages);
+        break;
+      case "low-priority":
+        await processDeferred(batch.messages);
+        break;
+      case "email":
+        await sendEmails(batch.messages);
+        break;
+      default:
+        batch.retryAll();
     }
-  }
+  },
 };
 ```
 
@@ -90,10 +97,10 @@ export default {
 const response = await fetch(
   `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/queues/${QUEUE_ID}/messages/pull`,
   {
-    method: 'POST',
-    headers: { 'authorization': `Bearer ${API_TOKEN}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ visibility_timeout_ms: 6000, batch_size: 50 })
-  }
+    method: "POST",
+    headers: { authorization: `Bearer ${API_TOKEN}`, "content-type": "application/json" },
+    body: JSON.stringify({ visibility_timeout_ms: 6000, batch_size: 50 }),
+  },
 );
 
 const data = await response.json();
@@ -102,13 +109,13 @@ const data = await response.json();
 await fetch(
   `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/queues/${QUEUE_ID}/messages/ack`,
   {
-    method: 'POST',
-    headers: { 'authorization': `Bearer ${API_TOKEN}`, 'content-type': 'application/json' },
+    method: "POST",
+    headers: { authorization: `Bearer ${API_TOKEN}`, "content-type": "application/json" },
     body: JSON.stringify({
       acks: [{ lease_id: msg.lease_id }],
-      retries: [{ lease_id: msg2.lease_id, delay_seconds: 600 }]
-    })
-  }
+      retries: [{ lease_id: msg2.lease_id, delay_seconds: 600 }],
+    }),
+  },
 );
 ```
 
@@ -132,7 +139,7 @@ interface Message<Body = unknown> {
 }
 
 interface QueueSendOptions {
-  contentType?: 'text' | 'bytes' | 'json' | 'v8';
+  contentType?: "text" | "bytes" | "json" | "v8";
   delaySeconds?: number; // 0-43200
 }
 ```

@@ -2,10 +2,23 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient, type LeadRecord } from "@/lib/api-client";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -16,13 +29,17 @@ const statusOptions: { value: LeadRecord["status"]; label: string }[] = [
   { value: "qualified", label: "Qualified" },
 ];
 
-const statusBadge: Record<LeadRecord["status"], { label: string; variant: "secondary" | "outline" | "default" }> = {
+const statusBadge: Record<
+  LeadRecord["status"],
+  { label: string; variant: "secondary" | "outline" | "default" }
+> = {
   new: { label: "New", variant: "secondary" },
   contacted: { label: "Contacted", variant: "outline" },
   qualified: { label: "Qualified", variant: "default" },
 };
 
-const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleString() : "Not yet");
+const formatDate = (value?: string | null) =>
+  value ? new Date(value).toLocaleString() : "Not yet";
 const getLeadStatus = (value: string): LeadRecord["status"] | null =>
   statusOptions.find((option) => option.value === value)?.value ?? null;
 
@@ -33,7 +50,9 @@ export default function AdminMarketingLeadsPage() {
   const [selectedCampground, setSelectedCampground] = useState<string>("");
 
   const campgroundOptions = useMemo(() => {
-    const options: { id: string; name: string }[] = [{ id: "public-site", name: "Public site (demo)" }];
+    const options: { id: string; name: string }[] = [
+      { id: "public-site", name: "Public site (demo)" },
+    ];
     const memberships = whoami?.user?.memberships || [];
     memberships.forEach((membership) => {
       if (!options.some((opt) => opt.id === membership.campgroundId)) {
@@ -48,7 +67,8 @@ export default function AdminMarketingLeadsPage() {
 
   useEffect(() => {
     if (selectedCampground) return;
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) {
       setSelectedCampground(stored);
       return;
@@ -71,7 +91,8 @@ export default function AdminMarketingLeadsPage() {
   });
 
   const updateStatus = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: LeadRecord["status"] }) => apiClient.updateLeadStatus(id, status),
+    mutationFn: ({ id, status }: { id: string; status: LeadRecord["status"] }) =>
+      apiClient.updateLeadStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-leads", selectedCampground] });
       toast({ title: "Status updated", description: "Lead status updated internally." });
@@ -105,11 +126,13 @@ export default function AdminMarketingLeadsPage() {
       <div className="space-y-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase text-muted-foreground">Admin · Marketing</div>
+            <div className="text-xs font-semibold uppercase text-muted-foreground">
+              Admin · Marketing
+            </div>
             <h1 className="text-2xl font-bold text-foreground">Leads</h1>
             <p className="text-sm text-muted-foreground">
-              Landing-form leads stay in-app. Track statuses (new, contacted, qualified) per campground and mark CRM sync
-              without hitting real providers.
+              Landing-form leads stay in-app. Track statuses (new, contacted, qualified) per
+              campground and mark CRM sync without hitting real providers.
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -128,7 +151,9 @@ export default function AdminMarketingLeadsPage() {
             <Button
               size="sm"
               variant="secondary"
-              onClick={() => queryClient.invalidateQueries({ queryKey: ["admin-leads", selectedCampground] })}
+              onClick={() =>
+                queryClient.invalidateQueries({ queryKey: ["admin-leads", selectedCampground] })
+              }
               disabled={!selectedCampground}
             >
               Refresh
@@ -140,17 +165,23 @@ export default function AdminMarketingLeadsPage() {
           <div className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs uppercase font-semibold text-muted-foreground">New</div>
             <div className="text-2xl font-bold text-foreground">{newCount}</div>
-            <p className="text-xs text-muted-foreground">Fresh hands-up leads waiting for outreach.</p>
+            <p className="text-xs text-muted-foreground">
+              Fresh hands-up leads waiting for outreach.
+            </p>
           </div>
           <div className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs uppercase font-semibold text-muted-foreground">Contacted</div>
             <div className="text-2xl font-bold text-foreground">{contactedCount}</div>
-            <p className="text-xs text-muted-foreground">In-progress conversations — keep notes in interest.</p>
+            <p className="text-xs text-muted-foreground">
+              In-progress conversations — keep notes in interest.
+            </p>
           </div>
           <div className="rounded-lg border border-border bg-card p-4">
             <div className="text-xs uppercase font-semibold text-muted-foreground">Qualified</div>
             <div className="text-2xl font-bold text-foreground">{qualifiedCount}</div>
-            <p className="text-xs text-muted-foreground">Ready to handoff to sales/CRM. Sync remains stubbed.</p>
+            <p className="text-xs text-muted-foreground">
+              Ready to handoff to sales/CRM. Sync remains stubbed.
+            </p>
           </div>
         </div>
 
@@ -192,10 +223,10 @@ export default function AdminMarketingLeadsPage() {
                     <TableCell className="space-y-1">
                       <Select
                         value={lead.status}
-                      onValueChange={(value) => {
-                        const status = getLeadStatus(value);
-                        if (status) updateStatus.mutate({ id: lead.id, status });
-                      }}
+                        onValueChange={(value) => {
+                          const status = getLeadStatus(value);
+                          if (status) updateStatus.mutate({ id: lead.id, status });
+                        }}
                         disabled={updateStatus.isPending}
                       >
                         <SelectTrigger className="h-9 w-[150px]">
@@ -209,12 +240,20 @@ export default function AdminMarketingLeadsPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Badge variant={statusBadge[lead.status].variant}>{statusBadge[lead.status].label}</Badge>
+                      <Badge variant={statusBadge[lead.status].variant}>
+                        {statusBadge[lead.status].label}
+                      </Badge>
                     </TableCell>
-                    <TableCell className="text-foreground">{lead.campgroundName || lead.campgroundId}</TableCell>
+                    <TableCell className="text-foreground">
+                      {lead.campgroundName || lead.campgroundId}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">{lead.source || "—"}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatDate(lead.createdAt)}</TableCell>
-                    <TableCell className="text-muted-foreground">{formatDate(lead.lastSyncedAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(lead.createdAt)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {formatDate(lead.lastSyncedAt)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         size="sm"
@@ -222,7 +261,11 @@ export default function AdminMarketingLeadsPage() {
                         disabled={syncLead.isPending}
                         onClick={() => syncLead.mutate(lead.id)}
                       >
-                        {lead.lastSyncedAt ? (syncLead.isPending ? "Syncing..." : "Resync") : "Sync to CRM (stub)"}
+                        {lead.lastSyncedAt
+                          ? syncLead.isPending
+                            ? "Syncing..."
+                            : "Resync"
+                          : "Sync to CRM (stub)"}
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -231,9 +274,13 @@ export default function AdminMarketingLeadsPage() {
             </Table>
           </div>
 
-          {leadsQuery.isLoading && <div className="text-center text-sm text-muted-foreground py-8">Loading leads…</div>}
+          {leadsQuery.isLoading && (
+            <div className="text-center text-sm text-muted-foreground py-8">Loading leads…</div>
+          )}
           {!leadsQuery.isLoading && leads.length === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-8">No leads yet for this campground.</div>
+            <div className="text-center text-sm text-muted-foreground py-8">
+              No leads yet for this campground.
+            </div>
           )}
         </div>
       </div>

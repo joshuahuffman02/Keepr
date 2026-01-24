@@ -56,7 +56,7 @@ export class SubscriptionService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly stripe: StripeService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -98,7 +98,7 @@ export class SubscriptionService {
       {
         organizationId,
         tier: org.billingTier || "standard",
-      }
+      },
     );
 
     // Store customer ID on organization
@@ -116,7 +116,7 @@ export class SubscriptionService {
    */
   async createSubscription(
     organizationId: string,
-    tier: string = "standard"
+    tier: string = "standard",
   ): Promise<{
     subscriptionId: string;
     status: string;
@@ -158,7 +158,7 @@ export class SubscriptionService {
         tier,
       },
       tierConfig.trialDays,
-      tierConfig.couponId
+      tierConfig.couponId,
     );
 
     // Store subscription ID on organization
@@ -171,7 +171,7 @@ export class SubscriptionService {
     });
 
     this.logger.log(
-      `Created subscription ${subscription.id} for org ${organizationId} on tier ${tier}`
+      `Created subscription ${subscription.id} for org ${organizationId} on tier ${tier}`,
     );
 
     return {
@@ -198,10 +198,7 @@ export class SubscriptionService {
   /**
    * Cancel subscription (at period end by default)
    */
-  async cancelSubscription(
-    organizationId: string,
-    cancelImmediately: boolean = false
-  ) {
+  async cancelSubscription(organizationId: string, cancelImmediately: boolean = false) {
     const org = await this.prisma.organization.findUniqueOrThrow({
       where: { id: organizationId },
     });
@@ -212,12 +209,10 @@ export class SubscriptionService {
 
     const result = await this.stripe.cancelSubscription(
       org.stripeSubscriptionId,
-      !cancelImmediately // cancelAtPeriodEnd
+      !cancelImmediately, // cancelAtPeriodEnd
     );
 
-    this.logger.log(
-      `Cancelled subscription ${org.stripeSubscriptionId} for org ${organizationId}`
-    );
+    this.logger.log(`Cancelled subscription ${org.stripeSubscriptionId} for org ${organizationId}`);
 
     return result;
   }
@@ -225,19 +220,13 @@ export class SubscriptionService {
   /**
    * Report a booking to Stripe for metered billing
    */
-  async reportBookingUsage(
-    organizationId: string,
-    reservationId: string,
-    quantity: number = 1
-  ) {
+  async reportBookingUsage(organizationId: string, reservationId: string, quantity: number = 1) {
     const org = await this.prisma.organization.findUniqueOrThrow({
       where: { id: organizationId },
     });
 
     if (!org.stripeSubscriptionId) {
-      this.logger.warn(
-        `Cannot report booking usage - org ${organizationId} has no subscription`
-      );
+      this.logger.warn(`Cannot report booking usage - org ${organizationId} has no subscription`);
       return null;
     }
 
@@ -252,13 +241,11 @@ export class SubscriptionService {
 
     // Find the subscription item for booking fees
     const bookingFeeItem = subscription.items.data.find(
-      (item) => item.price.id === tierConfig.bookingFeePriceId
+      (item) => item.price.id === tierConfig.bookingFeePriceId,
     );
 
     if (!bookingFeeItem) {
-      this.logger.warn(
-        `Booking fee subscription item not found for org ${organizationId}`
-      );
+      this.logger.warn(`Booking fee subscription item not found for org ${organizationId}`);
       return null;
     }
 
@@ -267,11 +254,11 @@ export class SubscriptionService {
       bookingFeeItem.id,
       quantity,
       Math.floor(Date.now() / 1000),
-      "increment"
+      "increment",
     );
 
     this.logger.log(
-      `Reported ${quantity} booking(s) for org ${organizationId}, reservation ${reservationId}`
+      `Reported ${quantity} booking(s) for org ${organizationId}, reservation ${reservationId}`,
     );
 
     return usageRecord;
@@ -283,22 +270,19 @@ export class SubscriptionService {
   async reportSmsUsage(
     organizationId: string,
     direction: "outbound" | "inbound",
-    quantity: number = 1
+    quantity: number = 1,
   ) {
     const org = await this.prisma.organization.findUniqueOrThrow({
       where: { id: organizationId },
     });
 
     if (!org.stripeSubscriptionId) {
-      this.logger.warn(
-        `Cannot report SMS usage - org ${organizationId} has no subscription`
-      );
+      this.logger.warn(`Cannot report SMS usage - org ${organizationId} has no subscription`);
       return null;
     }
 
-    const priceId = direction === "outbound"
-      ? STRIPE_SMS_PRICE_IDS.outbound
-      : STRIPE_SMS_PRICE_IDS.inbound;
+    const priceId =
+      direction === "outbound" ? STRIPE_SMS_PRICE_IDS.outbound : STRIPE_SMS_PRICE_IDS.inbound;
 
     if (!priceId) {
       this.logger.warn(`No SMS ${direction} price configured`);
@@ -308,14 +292,10 @@ export class SubscriptionService {
     // Get subscription to find the SMS subscription item
     const subscription = await this.stripe.getSubscription(org.stripeSubscriptionId);
 
-    const smsItem = subscription.items.data.find(
-      (item) => item.price.id === priceId
-    );
+    const smsItem = subscription.items.data.find((item) => item.price.id === priceId);
 
     if (!smsItem) {
-      this.logger.warn(
-        `SMS ${direction} subscription item not found for org ${organizationId}`
-      );
+      this.logger.warn(`SMS ${direction} subscription item not found for org ${organizationId}`);
       return null;
     }
 
@@ -324,12 +304,10 @@ export class SubscriptionService {
       smsItem.id,
       quantity,
       Math.floor(Date.now() / 1000),
-      "increment"
+      "increment",
     );
 
-    this.logger.log(
-      `Reported ${quantity} ${direction} SMS for org ${organizationId}`
-    );
+    this.logger.log(`Reported ${quantity} ${direction} SMS for org ${organizationId}`);
 
     return usageRecord;
   }
@@ -337,15 +315,9 @@ export class SubscriptionService {
   /**
    * Get billing portal URL for self-service management
    */
-  async getBillingPortalUrl(
-    organizationId: string,
-    returnUrl: string
-  ): Promise<string> {
+  async getBillingPortalUrl(organizationId: string, returnUrl: string): Promise<string> {
     const customerId = await this.ensureStripeCustomer(organizationId);
-    const session = await this.stripe.createBillingPortalSession(
-      customerId,
-      returnUrl
-    );
+    const session = await this.stripe.createBillingPortalSession(customerId, returnUrl);
     return session.url;
   }
 
@@ -416,7 +388,7 @@ export class SubscriptionService {
     // In production, you might want to prorate or handle this more gracefully
 
     this.logger.log(
-      `Changing tier for org ${organizationId} from ${org.billingTier} to ${newTier}`
+      `Changing tier for org ${organizationId} from ${org.billingTier} to ${newTier}`,
     );
 
     // Cancel at period end to avoid prorated charges
@@ -548,7 +520,10 @@ export class SubscriptionService {
   /**
    * Send notification to org owner about failed payment
    */
-  private async notifyOrgOwnerPaymentFailed(org: Organization, invoice: Stripe.Invoice): Promise<void> {
+  private async notifyOrgOwnerPaymentFailed(
+    org: Organization,
+    invoice: Stripe.Invoice,
+  ): Promise<void> {
     try {
       // Get the org owner (user with owner role in this org)
       const ownerMembership = await this.prisma.campgroundMembership.findFirst({
@@ -562,11 +537,15 @@ export class SubscriptionService {
       });
 
       if (!ownerMembership?.User?.email) {
-        this.logger.warn(`No owner email found for org ${org.id}, cannot send payment failed notification`);
+        this.logger.warn(
+          `No owner email found for org ${org.id}, cannot send payment failed notification`,
+        );
         return;
       }
 
-      const amountDue = invoice.amount_due ? `$${(invoice.amount_due / 100).toFixed(2)}` : "the amount due";
+      const amountDue = invoice.amount_due
+        ? `$${(invoice.amount_due / 100).toFixed(2)}`
+        : "the amount due";
       const dueDate = invoice.due_date
         ? new Date(invoice.due_date * 1000).toLocaleDateString()
         : "soon";
@@ -586,9 +565,13 @@ export class SubscriptionService {
         `,
       });
 
-      this.logger.log(`Payment failed notification sent to ${ownerMembership.User.email} for org ${org.id}`);
+      this.logger.log(
+        `Payment failed notification sent to ${ownerMembership.User.email} for org ${org.id}`,
+      );
     } catch (error: unknown) {
-      this.logger.error(`Failed to send payment failed notification for org ${org.id}: ${getErrorMessage(error)}`);
+      this.logger.error(
+        `Failed to send payment failed notification for org ${org.id}: ${getErrorMessage(error)}`,
+      );
     }
   }
 }

@@ -27,14 +27,23 @@ interface MeteredUtilitiesPanelProps {
   className?: string;
 }
 
-const UTILITY_TYPES: { value: MeteredType; label: string; icon: React.ElementType; description: string }[] = [
+const UTILITY_TYPES: {
+  value: MeteredType;
+  label: string;
+  icon: React.ElementType;
+  description: string;
+}[] = [
   { value: "power", label: "Electric Power", icon: Zap, description: "Bill by kWh usage" },
   { value: "water", label: "Water", icon: Droplets, description: "Bill by gallon usage" },
   { value: "sewer", label: "Sewer", icon: Trash2, description: "Bill by usage or flat fee" },
 ];
 
 const BILLING_MODES: { value: MeteredBillingMode; label: string; description: string }[] = [
-  { value: "per_reading", label: "Per Reading", description: "Generate invoice when meter is read" },
+  {
+    value: "per_reading",
+    label: "Per Reading",
+    description: "Generate invoice when meter is read",
+  },
   { value: "cycle", label: "Billing Cycle", description: "Bill monthly or at checkout" },
   { value: "manual", label: "Manual", description: "Bill only when you trigger it" },
 ];
@@ -64,10 +73,7 @@ export function MeteredUtilitiesPanel({
             <p className="text-xs text-muted-foreground">Bill guests based on actual usage</p>
           </div>
         </div>
-        <Switch
-          checked={enabled}
-          onCheckedChange={onEnabledChange}
-        />
+        <Switch checked={enabled} onCheckedChange={onEnabledChange} />
       </div>
 
       {/* Expanded options */}
@@ -94,10 +100,15 @@ export function MeteredUtilitiesPanel({
                         "flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
                         isSelected
                           ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
-                          : "bg-muted/50 border-border text-muted-foreground hover:border-border"
+                          : "bg-muted/50 border-border text-muted-foreground hover:border-border",
                       )}
                     >
-                      <Icon className={cn("w-5 h-5", isSelected ? "text-emerald-400" : "text-muted-foreground")} />
+                      <Icon
+                        className={cn(
+                          "w-5 h-5",
+                          isSelected ? "text-emerald-400" : "text-muted-foreground",
+                        )}
+                      />
                       <span className="text-xs font-medium">{utilityType.label}</span>
                     </button>
                   );
@@ -140,8 +151,8 @@ export function MeteredUtilitiesPanel({
             <div className="flex gap-2 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
               <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
               <p className="text-xs text-blue-300">
-                You'll set up individual meters for each site after launching.
-                This just enables metered billing for this site type.
+                You'll set up individual meters for each site after launching. This just enables
+                metered billing for this site type.
               </p>
             </div>
           </motion.div>

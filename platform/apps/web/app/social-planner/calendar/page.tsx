@@ -25,7 +25,7 @@ export default function SocialPlannerCalendar() {
 
   const { data: campgrounds = [] } = useQuery<Campground[]>({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
   const requireCampgroundId = () => {
@@ -38,7 +38,7 @@ export default function SocialPlannerCalendar() {
   const postsQuery = useQuery<SocialPost[]>({
     queryKey: ["social-posts", campgroundId],
     queryFn: () => apiClient.listSocialPosts(requireCampgroundId()),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const createPost = useMutation({
@@ -49,14 +49,14 @@ export default function SocialPlannerCalendar() {
         platform,
         status,
         category,
-        ideaParkingLot
+        ideaParkingLot,
       };
       return apiClient.createSocialPost(payload);
     },
     onSuccess: () => {
       setDraftTitle("");
       qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] });
-    }
+    },
   });
 
   const autoSlots = useMutation({
@@ -69,19 +69,19 @@ export default function SocialPlannerCalendar() {
         return slot.toISOString();
       });
       await Promise.all(
-        slots.map(date =>
+        slots.map((date) =>
           apiClient.createSocialPost({
             campgroundId: requiredCampgroundId,
             title: `Auto slot ${new Date(date).toLocaleDateString()}`,
             platform: "facebook",
             status: "scheduled",
             scheduledFor: date,
-            category: "promo"
-          })
-        )
+            category: "promo",
+          }),
+        ),
       );
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] }),
   });
 
   const filtered = useMemo(() => {
@@ -96,7 +96,7 @@ export default function SocialPlannerCalendar() {
 
   const parkingLot = useMemo(
     () => filtered.filter((post) => post.ideaParkingLot || !post.scheduledFor),
-    [filtered]
+    [filtered],
   );
   const getPostSortTime = (post: SocialPost) => {
     const dateValue = post.scheduledFor ?? post.publishedFor;
@@ -107,13 +107,15 @@ export default function SocialPlannerCalendar() {
       filtered
         .filter((post) => !parkingLot.includes(post))
         .sort((a, b) => getPostSortTime(a) - getPostSortTime(b)),
-    [filtered, parkingLot]
+    [filtered, parkingLot],
   );
 
   const groupedByDate = useMemo(() => {
     const groups: Record<string, SocialPost[]> = {};
     scheduled.forEach((post) => {
-      const key = post.scheduledFor ? new Date(post.scheduledFor).toLocaleDateString() : "Unscheduled";
+      const key = post.scheduledFor
+        ? new Date(post.scheduledFor).toLocaleDateString()
+        : "Unscheduled";
       if (!groups[key]) groups[key] = [];
       groups[key].push(post);
     });
@@ -137,7 +139,9 @@ export default function SocialPlannerCalendar() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-muted-foreground">Select a campground to use the Social Media Planner.</p>
+          <p className="text-muted-foreground">
+            Select a campground to use the Social Media Planner.
+          </p>
         </div>
       </DashboardShell>
     );
@@ -145,14 +149,21 @@ export default function SocialPlannerCalendar() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Social Media Planner</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Social Media Planner
+          </p>
           <h1 className="text-2xl font-bold text-foreground">Content Calendar</h1>
-          <p className="text-muted-foreground">Month, week, and list views with parking lot and quick slots.</p>
+          <p className="text-muted-foreground">
+            Month, week, and list views with parking lot and quick slots.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -183,16 +194,16 @@ export default function SocialPlannerCalendar() {
             className="input md:col-span-2"
             placeholder="Post title"
             value={draftTitle}
-            onChange={e => setDraftTitle(e.target.value)}
+            onChange={(e) => setDraftTitle(e.target.value)}
           />
-          <select className="input" value={platform} onChange={e => setPlatform(e.target.value)}>
+          <select className="input" value={platform} onChange={(e) => setPlatform(e.target.value)}>
             <option value="facebook">Facebook</option>
             <option value="instagram">Instagram</option>
             <option value="tiktok">TikTok</option>
             <option value="email">Email</option>
             <option value="blog">Website Blog</option>
           </select>
-          <select className="input" value={category} onChange={e => setCategory(e.target.value)}>
+          <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="promo">Promotional</option>
             <option value="engagement">Engagement</option>
             <option value="behind_the_scenes">Behind the scenes</option>
@@ -209,7 +220,11 @@ export default function SocialPlannerCalendar() {
         </div>
         <div className="flex items-center gap-2 mt-3 text-sm text-muted-foreground">
           <label className="flex items-center gap-2">
-            <input type="checkbox" checked={ideaParkingLot} onChange={e => setIdeaParkingLot(e.target.checked)} />
+            <input
+              type="checkbox"
+              checked={ideaParkingLot}
+              onChange={(e) => setIdeaParkingLot(e.target.checked)}
+            />
             Keep in idea parking lot
           </label>
           <span>Platform and category tags help filtering.</span>
@@ -220,7 +235,11 @@ export default function SocialPlannerCalendar() {
         <div className="flex flex-wrap gap-3 text-sm">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Platform</span>
-            <select className="input" value={filterPlatform} onChange={e => setFilterPlatform(e.target.value)}>
+            <select
+              className="input"
+              value={filterPlatform}
+              onChange={(e) => setFilterPlatform(e.target.value)}
+            >
               <option value="all">All</option>
               <option value="facebook">Facebook</option>
               <option value="instagram">Instagram</option>
@@ -231,7 +250,11 @@ export default function SocialPlannerCalendar() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Status</span>
-            <select className="input" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+            <select
+              className="input"
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+            >
               <option value="all">All</option>
               <option value="draft">Draft</option>
               <option value="scheduled">Scheduled</option>
@@ -242,7 +265,11 @@ export default function SocialPlannerCalendar() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground">Category</span>
-            <select className="input" value={filterCategory} onChange={e => setFilterCategory(e.target.value)}>
+            <select
+              className="input"
+              value={filterCategory}
+              onChange={(e) => setFilterCategory(e.target.value)}
+            >
               <option value="all">All</option>
               <option value="promo">Promo</option>
               <option value="engagement">Engagement</option>
@@ -257,7 +284,11 @@ export default function SocialPlannerCalendar() {
 
       <div className="flex justify-between items-center mb-3">
         <h3 className="text-lg font-semibold text-foreground">
-          {view === "list" ? "All posts (list)" : view === "week" ? "This week" : "Calendar overview"}
+          {view === "list"
+            ? "All posts (list)"
+            : view === "week"
+              ? "This week"
+              : "Calendar overview"}
         </h3>
         <div className="flex gap-2">
           <button
@@ -287,45 +318,66 @@ export default function SocialPlannerCalendar() {
             <div className="col-span-2">Category</div>
           </div>
           {filtered.map((post) => (
-            <div key={post.id} className="grid grid-cols-12 px-4 py-3 border-b border-border text-sm">
+            <div
+              key={post.id}
+              className="grid grid-cols-12 px-4 py-3 border-b border-border text-sm"
+            >
               <div className="col-span-4">
                 <div className="font-semibold text-foreground">{post.title}</div>
-                <div className="text-xs text-muted-foreground line-clamp-1">{post.caption || "Caption TBD"}</div>
+                <div className="text-xs text-muted-foreground line-clamp-1">
+                  {post.caption || "Caption TBD"}
+                </div>
               </div>
               <div className="col-span-2 text-muted-foreground">{post.platform}</div>
               <div className="col-span-2">
                 <span className="badge bg-status-info/15 text-status-info">{post.status}</span>
               </div>
               <div className="col-span-2 text-muted-foreground">
-                {post.scheduledFor ? new Date(post.scheduledFor).toLocaleDateString() : "Parking lot"}
+                {post.scheduledFor
+                  ? new Date(post.scheduledFor).toLocaleDateString()
+                  : "Parking lot"}
               </div>
               <div className="col-span-2 text-muted-foreground">{post.category || "—"}</div>
             </div>
           ))}
-          {!filtered.length && <div className="px-4 py-3 text-sm text-muted-foreground">No posts yet.</div>}
+          {!filtered.length && (
+            <div className="px-4 py-3 text-sm text-muted-foreground">No posts yet.</div>
+          )}
         </div>
       )}
 
       {view === "week" && (
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
           {upcomingWeek.map((post) => (
-          <div key={post.id} className="card p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">{post.platform}</p>
-                <h4 className="text-lg font-semibold text-foreground">{post.title}</h4>
+            <div key={post.id} className="card p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase text-muted-foreground">{post.platform}</p>
+                  <h4 className="text-lg font-semibold text-foreground">{post.title}</h4>
+                </div>
+                <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">
+                  {post.status}
+                </span>
               </div>
-              <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">{post.status}</span>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{post.caption || "Caption TBD"}</p>
-            <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-2">
-              {post.category && <span className="badge">{post.category}</span>}
-              <span className="badge bg-muted text-foreground">{post.platform}</span>
-                {post.scheduledFor && <span className="badge bg-status-success/15 text-status-success">Due {new Date(post.scheduledFor).toLocaleDateString()}</span>}
+              <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                {post.caption || "Caption TBD"}
+              </p>
+              <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-2">
+                {post.category && <span className="badge">{post.category}</span>}
+                <span className="badge bg-muted text-foreground">{post.platform}</span>
+                {post.scheduledFor && (
+                  <span className="badge bg-status-success/15 text-status-success">
+                    Due {new Date(post.scheduledFor).toLocaleDateString()}
+                  </span>
+                )}
               </div>
             </div>
           ))}
-          {!upcomingWeek.length && <div className="col-span-full text-muted-foreground text-sm">Nothing scheduled in the next 7 days.</div>}
+          {!upcomingWeek.length && (
+            <div className="col-span-full text-muted-foreground text-sm">
+              Nothing scheduled in the next 7 days.
+            </div>
+          )}
         </div>
       )}
 
@@ -343,20 +395,30 @@ export default function SocialPlannerCalendar() {
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-xs uppercase text-muted-foreground">{post.platform}</p>
-                        <div className="text-sm font-semibold text-foreground line-clamp-1">{post.title}</div>
+                        <div className="text-sm font-semibold text-foreground line-clamp-1">
+                          {post.title}
+                        </div>
                       </div>
-                      <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">{post.status}</span>
+                      <span className="text-xs px-2 py-1 rounded-full bg-muted text-foreground">
+                        {post.status}
+                      </span>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-2">
                       {post.category && <span className="badge">{post.category}</span>}
-              {post.ideaParkingLot && <span className="badge bg-status-warning/15 text-status-warning">Parking lot</span>}
+                      {post.ideaParkingLot && (
+                        <span className="badge bg-status-warning/15 text-status-warning">
+                          Parking lot
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ))}
-          {!Object.keys(groupedByDate).length && <div className="text-sm text-muted-foreground">No scheduled posts yet.</div>}
+          {!Object.keys(groupedByDate).length && (
+            <div className="text-sm text-muted-foreground">No scheduled posts yet.</div>
+          )}
         </div>
       )}
 
@@ -364,7 +426,9 @@ export default function SocialPlannerCalendar() {
         <div className="flex items-center justify-between mb-2">
           <div>
             <h3 className="text-lg font-semibold text-foreground">Idea parking lot</h3>
-            <p className="text-sm text-muted-foreground">Unscheduled ideas stay here until you move them into a slot.</p>
+            <p className="text-sm text-muted-foreground">
+              Unscheduled ideas stay here until you move them into a slot.
+            </p>
           </div>
           <span className="text-xs text-muted-foreground">{parkingLot.length} items</span>
         </div>
@@ -374,18 +438,26 @@ export default function SocialPlannerCalendar() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase text-amber-700">{post.platform}</p>
-                  <div className="text-sm font-semibold text-foreground line-clamp-1">{post.title}</div>
+                  <div className="text-sm font-semibold text-foreground line-clamp-1">
+                    {post.title}
+                  </div>
                 </div>
-                <span className="text-xs px-2 py-1 rounded-full bg-card text-amber-700 border border-amber-200">Parking</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-card text-amber-700 border border-amber-200">
+                  Parking
+                </span>
               </div>
-              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">{post.caption || "Caption TBD"}</div>
+              <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                {post.caption || "Caption TBD"}
+              </div>
               <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-2">
                 {post.category && <span className="badge">{post.category}</span>}
                 <span className="badge bg-muted text-foreground">{post.status || "draft"}</span>
+              </div>
             </div>
-          </div>
-        ))}
-          {!parkingLot.length && <div className="text-sm text-muted-foreground">No parking-lot items.</div>}
+          ))}
+          {!parkingLot.length && (
+            <div className="text-sm text-muted-foreground">No parking-lot items.</div>
+          )}
         </div>
       </div>
     </DashboardShell>

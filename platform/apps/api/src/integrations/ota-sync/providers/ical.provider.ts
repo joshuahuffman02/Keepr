@@ -22,7 +22,7 @@ export class ICalProvider extends BaseOtaProvider {
 
     const icalData = await this.fetchWithRetry(
       () => this.fetchICalFeed(this.config.icalUrl!),
-      "iCal feed fetch"
+      "iCal feed fetch",
     );
 
     return this.parseICalEvents(icalData);
@@ -225,7 +225,10 @@ export class ICalProvider extends BaseOtaProvider {
   /**
    * Extract guest information from SUMMARY and DESCRIPTION
    */
-  private extractGuestInfo(summary: string, description: string): {
+  private extractGuestInfo(
+    summary: string,
+    description: string,
+  ): {
     name?: string;
     email?: string;
     phone?: string;

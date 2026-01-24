@@ -25,7 +25,13 @@ export type OnboardingStepKey =
   | "guided_setup"
   | "review_launch";
 
-export type OnboardingPhase = "foundation" | "inventory" | "pricing" | "rules" | "features" | "launch";
+export type OnboardingPhase =
+  | "foundation"
+  | "inventory"
+  | "pricing"
+  | "rules"
+  | "features"
+  | "launch";
 
 type SiteType = "rv" | "tent" | "cabin" | "yurt";
 

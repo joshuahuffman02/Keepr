@@ -10,12 +10,14 @@ When working in the NestJS API:
 ## Service Methods
 
 1. **Always validate before mutating**
+
    ```typescript
    const record = await this.prisma.model.findUnique({ where: { id } });
    if (!record) throw new NotFoundException(`Model ${id} not found`);
    ```
 
 2. **Use transactions for multi-step operations**
+
    ```typescript
    await this.prisma.$transaction(async (tx) => {
      // All operations use tx, not this.prisma
@@ -33,6 +35,7 @@ When working in the NestJS API:
 ## Controllers
 
 1. **Always add guards** - No unprotected endpoints
+
    ```typescript
    @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
    ```

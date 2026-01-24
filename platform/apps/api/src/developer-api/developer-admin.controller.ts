@@ -1,4 +1,16 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import type { Request } from "express";
 import {
   ApiTags,
@@ -50,7 +62,7 @@ class UpdateTierDto {
 @Roles(UserRole.owner, UserRole.manager)
 @Controller("developer/clients")
 export class DeveloperAdminController {
-  constructor(private readonly apiAuth: ApiAuthService) { }
+  constructor(private readonly apiAuth: ApiAuthService) {}
 
   private requireCampgroundId(req: DeveloperRequest, fallback?: string): string {
     const headerValue = req?.headers?.["x-campground-id"];
@@ -63,7 +75,10 @@ export class DeveloperAdminController {
   }
 
   @Get()
-  @ApiOperation({ summary: "List API clients", description: "List all API clients for a campground" })
+  @ApiOperation({
+    summary: "List API clients",
+    description: "List all API clients for a campground",
+  })
   @ApiQuery({ name: "campgroundId", required: true, description: "Campground ID" })
   @ApiResponse({ status: 200, description: "List of API clients" })
   list(@Query("campgroundId") campgroundId: string, @Req() req: DeveloperRequest) {
@@ -72,7 +87,10 @@ export class DeveloperAdminController {
   }
 
   @Post()
-  @ApiOperation({ summary: "Create API client", description: "Create a new API client for a campground" })
+  @ApiOperation({
+    summary: "Create API client",
+    description: "Create a new API client for a campground",
+  })
   @ApiBody({ type: CreateClientDto })
   @ApiResponse({ status: 201, description: "API client created successfully" })
   async create(@Body() body: CreateClientDto, @Req() req: DeveloperRequest) {
@@ -86,7 +104,7 @@ export class DeveloperAdminController {
   rotate(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DeveloperRequest
+    @Req() req: DeveloperRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.rotateSecret(requiredCampgroundId, id);
@@ -100,21 +118,24 @@ export class DeveloperAdminController {
     @Param("id") id: string,
     @Body() body: ToggleClientDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DeveloperRequest
+    @Req() req: DeveloperRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.setClientActive(requiredCampgroundId, id, body.isActive);
   }
 
   @Patch(":id/tier")
-  @ApiOperation({ summary: "Update client tier", description: "Change the tier and associated rate limits for an API client" })
+  @ApiOperation({
+    summary: "Update client tier",
+    description: "Change the tier and associated rate limits for an API client",
+  })
   @ApiBody({ type: UpdateTierDto })
   @ApiResponse({ status: 200, description: "Client tier updated" })
   updateTier(
     @Param("id") id: string,
     @Body() body: UpdateTierDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DeveloperRequest
+    @Req() req: DeveloperRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.updateClientTier(requiredCampgroundId, id, body.tier);
@@ -126,30 +147,36 @@ export class DeveloperAdminController {
   revokeToken(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DeveloperRequest
+    @Req() req: DeveloperRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.revokeToken(requiredCampgroundId, id);
   }
 
   @Delete(":id")
-  @ApiOperation({ summary: "Delete API client", description: "Delete an API client and all its tokens" })
+  @ApiOperation({
+    summary: "Delete API client",
+    description: "Delete an API client and all its tokens",
+  })
   @ApiResponse({ status: 200, description: "Client deleted" })
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: DeveloperRequest
+    @Req() req: DeveloperRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.deleteClient(requiredCampgroundId, id);
   }
 
   @Get("tiers")
-  @ApiOperation({ summary: "Get tier information", description: "Get available tiers and their limits" })
+  @ApiOperation({
+    summary: "Get tier information",
+    description: "Get available tiers and their limits",
+  })
   @ApiResponse({ status: 200, description: "Tier information" })
   getTiers() {
     return {
-      tiers: Object.values(ApiClientTier).map(tier => ({
+      tiers: Object.values(ApiClientTier).map((tier) => ({
         tier,
         limits: TIER_LIMITS[tier],
         defaultScopes: DEFAULT_TIER_SCOPES[tier],

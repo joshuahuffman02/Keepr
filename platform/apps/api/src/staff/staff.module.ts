@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { StaffService } from './staff.service';
-import { StaffController } from './staff.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from "@nestjs/common";
+import { StaffService } from "./staff.service";
+import { StaffController } from "./staff.controller";
+import { PrismaModule } from "../prisma/prisma.module";
 import { AuditModule } from "../audit/audit.module";
 import { EmailModule } from "../email/email.module";
 import { PayrollService } from "./payroll.service";
@@ -13,4 +13,3 @@ import { PayrollService } from "./payroll.service";
   exports: [StaffService, PayrollService],
 })
 export class StaffModule {}
-

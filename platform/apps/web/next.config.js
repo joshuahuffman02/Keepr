@@ -69,7 +69,9 @@ const nextConfig = {
       "form-action 'self' https://hooks.stripe.com",
       "frame-ancestors 'none'",
       isProduction ? "upgrade-insecure-requests" : "",
-    ].filter(Boolean).join("; ");
+    ]
+      .filter(Boolean)
+      .join("; ");
 
     return [
       {
@@ -81,10 +83,14 @@ const nextConfig = {
             value: cspDirectives,
           },
           // HTTP Strict Transport Security (HSTS) - only in production
-          ...(isProduction ? [{
-            key: "Strict-Transport-Security",
-            value: "max-age=31536000; includeSubDomains; preload",
-          }] : []),
+          ...(isProduction
+            ? [
+                {
+                  key: "Strict-Transport-Security",
+                  value: "max-age=31536000; includeSubDomains; preload",
+                },
+              ]
+            : []),
           // Prevent MIME type sniffing
           {
             key: "X-Content-Type-Options",
@@ -203,7 +209,6 @@ const nextConfig = {
       "@tanstack/react-query",
     ],
   },
-
 };
 
 // Detect if this is a production build (main branch on Vercel)

@@ -24,7 +24,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type TimeOffType = "vacation" | "sick" | "personal" | "bereavement" | "jury_duty" | "unpaid" | "other";
+type TimeOffType =
+  | "vacation"
+  | "sick"
+  | "personal"
+  | "bereavement"
+  | "jury_duty"
+  | "unpaid"
+  | "other";
 type TimeOffStatus = "pending" | "approved" | "rejected" | "cancelled";
 
 type TimeOffRequest = {
@@ -69,10 +76,26 @@ const TIME_OFF_TYPES: { value: TimeOffType; label: string; icon: string }[] = [
 ];
 
 const STATUS_STYLES: Record<TimeOffStatus, { bg: string; text: string; icon: React.ReactNode }> = {
-  pending: { bg: "bg-status-warning/15", text: "text-status-warning", icon: <Clock className="w-3.5 h-3.5" /> },
-  approved: { bg: "bg-status-success/15", text: "text-status-success", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
-  rejected: { bg: "bg-status-error/15", text: "text-status-error", icon: <XCircle className="w-3.5 h-3.5" /> },
-  cancelled: { bg: "bg-muted", text: "text-muted-foreground", icon: <XCircle className="w-3.5 h-3.5" /> },
+  pending: {
+    bg: "bg-status-warning/15",
+    text: "text-status-warning",
+    icon: <Clock className="w-3.5 h-3.5" />,
+  },
+  approved: {
+    bg: "bg-status-success/15",
+    text: "text-status-success",
+    icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+  },
+  rejected: {
+    bg: "bg-status-error/15",
+    text: "text-status-error",
+    icon: <XCircle className="w-3.5 h-3.5" />,
+  },
+  cancelled: {
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    icon: <XCircle className="w-3.5 h-3.5" />,
+  },
 };
 
 export default function TimeOffPage({ params }: { params: { campgroundId: string } }) {
@@ -263,7 +286,10 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
-            <button onClick={() => setError(null)} className="ml-auto text-red-800 underline text-xs font-medium">
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-800 underline text-xs font-medium"
+            >
               Dismiss
             </button>
           </motion.div>
@@ -281,7 +307,9 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
             >
               <div className="bg-purple-50 border-b border-purple-100 px-6 py-4">
                 <h2 className="text-lg font-semibold text-foreground">Request Time Off</h2>
-                <p className="text-sm text-muted-foreground">Select the type and dates for your time-off request</p>
+                <p className="text-sm text-muted-foreground">
+                  Select the type and dates for your time-off request
+                </p>
               </div>
 
               <form onSubmit={submitRequest} className="p-6 space-y-4">
@@ -298,7 +326,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                           "flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all",
                           formType === type.value
                             ? "border-purple-500 bg-status-info/10 text-purple-700"
-                            : "border-border hover:border-border text-foreground"
+                            : "border-border hover:border-border text-foreground",
                         )}
                       >
                         <span>{type.icon}</span>
@@ -310,7 +338,10 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="timeoff-start-date" className="block text-sm font-medium text-foreground mb-2">
+                    <Label
+                      htmlFor="timeoff-start-date"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       Start Date
                     </Label>
                     <Input
@@ -323,7 +354,10 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                     />
                   </div>
                   <div>
-                    <Label htmlFor="timeoff-end-date" className="block text-sm font-medium text-foreground mb-2">
+                    <Label
+                      htmlFor="timeoff-end-date"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       End Date
                     </Label>
                     <Input
@@ -339,7 +373,10 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                 </div>
 
                 <div>
-                  <Label htmlFor="timeoff-reason" className="block text-sm font-medium text-foreground mb-2">
+                  <Label
+                    htmlFor="timeoff-reason"
+                    className="block text-sm font-medium text-foreground mb-2"
+                  >
                     Reason <span className="text-muted-foreground">(optional)</span>
                   </Label>
                   <Textarea
@@ -360,7 +397,11 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                     disabled={submitting}
                     className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-purple-600 text-white font-medium disabled:opacity-50 hover:bg-purple-700 transition-colors"
                   >
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Palmtree className="w-4 h-4" />}
+                    {submitting ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Palmtree className="w-4 h-4" />
+                    )}
                     Submit Request
                   </motion.button>
                   <button
@@ -390,13 +431,15 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "my"
                 ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
-                : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted/60",
             )}
           >
             <User className="w-4 h-4" />
             My Requests
             {myRequests.length > 0 && (
-              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-card/20 text-xs">{myRequests.length}</span>
+              <span className="ml-1 px-1.5 py-0.5 rounded-full bg-card/20 text-xs">
+                {myRequests.length}
+              </span>
             )}
           </button>
           <button
@@ -406,16 +449,20 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "pending"
                 ? "bg-purple-600 text-white shadow-lg shadow-purple-600/20"
-                : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
+                : "bg-card border border-border text-muted-foreground hover:bg-muted/60",
             )}
           >
             <Clock className="w-4 h-4" />
             Pending Review
             {pendingRequests.length > 0 && (
-              <span className={cn(
-                "ml-1 px-1.5 py-0.5 rounded-full text-xs",
-                activeTab === "pending" ? "bg-card/20" : "bg-status-warning/15 text-status-warning"
-              )}>
+              <span
+                className={cn(
+                  "ml-1 px-1.5 py-0.5 rounded-full text-xs",
+                  activeTab === "pending"
+                    ? "bg-card/20"
+                    : "bg-status-warning/15 text-status-warning",
+                )}
+              >
                 {pendingRequests.length}
               </span>
             )}
@@ -439,7 +486,9 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                   {activeTab === "my" ? "Your Requests" : "Pending Requests"}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  {activeTab === "my" ? "View your time-off history" : "Review and approve requests"}
+                  {activeTab === "my"
+                    ? "View your time-off history"
+                    : "Review and approve requests"}
                 </p>
               </div>
             </div>
@@ -488,11 +537,13 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                         <div>
                           <div className="font-semibold text-foreground flex items-center gap-2">
                             {typeInfo?.label || request.type}
-                            <span className={cn(
-                              "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
-                              statusStyle.bg,
-                              statusStyle.text
-                            )}>
+                            <span
+                              className={cn(
+                                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium",
+                                statusStyle.bg,
+                                statusStyle.text,
+                              )}
+                            >
                               {statusStyle.icon}
                               {request.status}
                             </span>
@@ -510,7 +561,9 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                             )}
                           </div>
                           {request.reason && (
-                            <div className="text-xs text-muted-foreground mt-1">{request.reason}</div>
+                            <div className="text-xs text-muted-foreground mt-1">
+                              {request.reason}
+                            </div>
                           )}
                         </div>
                       </div>

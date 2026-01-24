@@ -34,7 +34,7 @@ const toStringRecord = (value: unknown): Record<string, string> | null => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -58,15 +58,15 @@ export class PushSubscriptionsService {
 
     const expirationValue = record?.expirationTime;
     const normalizedExpiration =
-      typeof expirationValue === "string" || typeof expirationValue === "number" ? expirationValue : null;
-    const expirationTime = normalizedExpiration !== null
-      ? new Date(normalizedExpiration)
-      : null;
+      typeof expirationValue === "string" || typeof expirationValue === "number"
+        ? expirationValue
+        : null;
+    const expirationTime = normalizedExpiration !== null ? new Date(normalizedExpiration) : null;
     const keys = toStringRecord(record?.keys) ?? null;
     const payload: PushSubscriptionPayload = {
       endpoint,
       expirationTime: normalizedExpiration,
-      keys: keys ?? undefined
+      keys: keys ?? undefined,
     };
 
     return this.prisma.pushSubscription.upsert({
@@ -78,7 +78,7 @@ export class PushSubscriptionsService {
         userId: userId ?? null,
         campgroundId: campgroundId ?? null,
         userAgent: userAgent ?? null,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       create: {
         id: randomUUID(),
@@ -89,7 +89,7 @@ export class PushSubscriptionsService {
         userId: userId ?? null,
         campgroundId: campgroundId ?? null,
         userAgent: userAgent ?? null,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
     });
   }

@@ -44,8 +44,7 @@ interface HistogramValue {
 export class PrometheusService implements OnModuleInit {
   private readonly logger = new Logger(PrometheusService.name);
   private readonly namespace = process.env.METRICS_NAMESPACE || "campreserv";
-  private readonly enabled =
-    (process.env.PROMETHEUS_ENABLED ?? "true").toLowerCase() === "true";
+  private readonly enabled = (process.env.PROMETHEUS_ENABLED ?? "true").toLowerCase() === "true";
 
   // Metric definitions
   private readonly definitions: Map<string, MetricDefinition> = new Map();
@@ -85,11 +84,11 @@ export class PrometheusService implements OnModuleInit {
       "path",
       "status",
     ]);
-    this.defineHistogram(
-      "http_request_duration_seconds",
-      "HTTP request duration in seconds",
-      ["method", "path", "status"]
-    );
+    this.defineHistogram("http_request_duration_seconds", "HTTP request duration in seconds", [
+      "method",
+      "path",
+      "status",
+    ]);
 
     // Business metrics
     this.defineGauge("active_reservations", "Number of active reservations", ["campground_id"]);
@@ -164,7 +163,7 @@ export class PrometheusService implements OnModuleInit {
     name: string,
     help: string,
     labelNames: string[] = [],
-    buckets: number[] = this.defaultBuckets
+    buckets: number[] = this.defaultBuckets,
   ): void {
     const fullName = `${this.namespace}_${name}`;
     this.definitions.set(fullName, {
@@ -288,12 +287,7 @@ export class PrometheusService implements OnModuleInit {
   /**
    * Record an HTTP request (convenience method)
    */
-  recordHttpRequest(
-    method: string,
-    path: string,
-    status: number,
-    durationMs: number
-  ): void {
+  recordHttpRequest(method: string, path: string, status: number, durationMs: number): void {
     const labels = { method, path: this.normalizePath(path), status: String(status) };
     this.incCounter("http_requests_total", labels);
     this.observeHistogram("http_request_duration_seconds", durationMs / 1000, labels);
@@ -306,7 +300,7 @@ export class PrometheusService implements OnModuleInit {
     model: string,
     operation: string,
     status: "success" | "error",
-    durationMs: number
+    durationMs: number,
   ): void {
     const labels = { model, operation, status };
     this.incCounter("ai_requests_total", labels);
@@ -435,13 +429,13 @@ export class PrometheusService implements OnModuleInit {
         Array.from(this.counters.entries()).map(([name, values]) => [
           name,
           Object.fromEntries(values),
-        ])
+        ]),
       ),
       gauges: Object.fromEntries(
         Array.from(this.gauges.entries()).map(([name, values]) => [
           name,
           Object.fromEntries(values),
-        ])
+        ]),
       ),
       histograms: Object.fromEntries(
         Array.from(this.histograms.entries()).map(([name, values]) => [
@@ -454,9 +448,9 @@ export class PrometheusService implements OnModuleInit {
                 count: hist.count,
                 buckets: hist.buckets,
               },
-            ])
+            ]),
           ),
-        ])
+        ]),
       ),
     };
   }

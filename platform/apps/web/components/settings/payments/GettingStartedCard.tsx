@@ -20,8 +20,14 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
     <Card className="border-2 border-dashed border-status-info-border bg-status-info-bg overflow-hidden">
       <CardContent className="py-12 text-center relative">
         {/* Decorative background elements */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-status-info/15 rounded-full -translate-y-1/2 translate-x-1/2" aria-hidden="true" />
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-status-info/10 rounded-full translate-y-1/2 -translate-x-1/2" aria-hidden="true" />
+        <div
+          className="absolute top-0 right-0 w-32 h-32 bg-status-info/15 rounded-full -translate-y-1/2 translate-x-1/2"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute bottom-0 left-0 w-24 h-24 bg-status-info/10 rounded-full translate-y-1/2 -translate-x-1/2"
+          aria-hidden="true"
+        />
 
         <div className="relative">
           {/* Icon */}
@@ -30,11 +36,10 @@ export function GettingStartedCard({ onConnect, isConnecting }: GettingStartedCa
           </div>
 
           {/* Heading */}
-          <h3 className="text-xl font-semibold text-foreground mb-2">
-            Start accepting payments
-          </h3>
+          <h3 className="text-xl font-semibold text-foreground mb-2">Start accepting payments</h3>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Connect your Stripe account to accept payments from guests securely and get paid directly to your bank account.
+            Connect your Stripe account to accept payments from guests securely and get paid
+            directly to your bank account.
           </p>
 
           {/* Benefits */}

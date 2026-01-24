@@ -22,11 +22,11 @@ Campspot uses a tiered pricing model based on your park's size and features need
 
 ### Base Monthly Fees
 
-| Park Size | Monthly Range |
-|-----------|---------------|
-| Small (under 50 sites) | $199-299/month |
-| Medium (50-150 sites) | $299-449/month |
-| Large (150+ sites) | $449-599+/month |
+| Park Size              | Monthly Range   |
+| ---------------------- | --------------- |
+| Small (under 50 sites) | $199-299/month  |
+| Medium (50-150 sites)  | $299-449/month  |
+| Large (150+ sites)     | $449-599+/month |
 
 These are estimates based on industry research. Exact pricing varies and Campspot requires contacting sales for quotes.
 
@@ -41,11 +41,11 @@ This is where costs add up quickly:
 Let's calculate what this means:
 
 | Monthly Bookings | Per-Booking Cost ($2.50) |
-|------------------|-------------------------|
-| 100 | $250 |
-| 200 | $500 |
-| 300 | $750 |
-| 500 | $1,250 |
+| ---------------- | ------------------------ |
+| 100              | $250                     |
+| 200              | $500                     |
+| 300              | $750                     |
+| 500              | $1,250                   |
 
 A medium park with 200 monthly bookings pays approximately $500/month just in per-booking fees, on top of the base subscription.
 
@@ -69,6 +69,7 @@ New Campspot customers typically face:
 - Basic feature needs
 
 **Monthly costs:**
+
 - Base fee: ~$249/month
 - Per-booking ($2.50 x 150): $375/month
 - **Total monthly:** ~$624/month = **$7,488/year**
@@ -82,6 +83,7 @@ Plus first-year setup: ~$2,000 = **Year 1 total: ~$9,488**
 - Full feature set
 
 **Monthly costs:**
+
 - Base fee: ~$399/month
 - Per-booking ($2.50 x 300): $750/month
 - **Total monthly:** ~$1,149/month = **$13,788/year**
@@ -95,6 +97,7 @@ Plus first-year setup: ~$2,500 = **Year 1 total: ~$16,288**
 - Enterprise features
 
 **Monthly costs:**
+
 - Base fee: ~$549/month
 - Per-booking ($2.50 x 600): $1,500/month
 - **Total monthly:** ~$2,049/month = **$24,588/year**
@@ -124,6 +127,7 @@ Credit card processing fees are separate from software fees:
 - Not always obvious in initial pricing discussions
 
 For a park processing $50,000/month in payments:
+
 - Processing fees: ~$1,480/month
 - That's $17,760/year in payment processing alone
 
@@ -182,24 +186,24 @@ To be fair, let's acknowledge what Campspot provides:
 
 Let's compare the medium park example (120 sites, 300 bookings/month) across different options:
 
-| Software | Monthly Cost | Annual Cost |
-|----------|-------------|-------------|
-| Campspot | ~$1,149 | ~$13,788 |
-| Newbook | ~$800-1,000 | ~$9,600-12,000 |
-| Keepr | ~$790 | ~$9,480 |
-| CampLife | ~$600-800 | ~$7,200-9,600 |
+| Software | Monthly Cost | Annual Cost    |
+| -------- | ------------ | -------------- |
+| Campspot | ~$1,149      | ~$13,788       |
+| Newbook  | ~$800-1,000  | ~$9,600-12,000 |
+| Keepr    | ~$790        | ~$9,480        |
+| CampLife | ~$600-800    | ~$7,200-9,600  |
 
-*Note: These are estimates. Actual costs vary by features, negotiations, and specific park needs.*
+_Note: These are estimates. Actual costs vary by features, negotiations, and specific park needs._
 
 The differences become more dramatic at higher volumes:
 
 **500 bookings/month:**
 
-| Software | Per-Booking Cost | Monthly Total |
-|----------|-----------------|---------------|
-| Campspot ($2.50/booking) | $1,250 | ~$1,649+ |
-| Keepr ($2.30/booking) | $1,150 | ~$1,250 |
-| **Annual difference** | | **~$4,788** |
+| Software                 | Per-Booking Cost | Monthly Total |
+| ------------------------ | ---------------- | ------------- |
+| Campspot ($2.50/booking) | $1,250           | ~$1,649+      |
+| Keepr ($2.30/booking)    | $1,150           | ~$1,250       |
+| **Annual difference**    |                  | **~$4,788**   |
 
 ---
 
@@ -258,4 +262,4 @@ The best software is the one that fits your operation's needs at a price that ma
 
 ---
 
-*Calculating software costs shouldn't require a spreadsheet. Keepr offers transparent pricing: $100/month base + $2.30 per booking, AI included, no setup fees. [Compare at campeveryday.com](https://campeveryday.com/pricing)*
+_Calculating software costs shouldn't require a spreadsheet. Keepr offers transparent pricing: $100/month base + $2.30 per booking, AI included, no setup fees. [Compare at campeveryday.com](https://campeveryday.com/pricing)_

@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { GlAccountType } from "@prisma/client";
 import { createHash, randomUUID } from "crypto";
 import type { Prisma } from "@prisma/client";
@@ -43,7 +48,8 @@ class LedgerGuard {
     let credit = 0;
     for (const line of lines) {
       if (!line.glAccountId) throw new BadRequestException("Ledger line missing GL account id");
-      if (line.amountCents <= 0) throw new BadRequestException("Ledger line amount must be positive");
+      if (line.amountCents <= 0)
+        throw new BadRequestException("Ledger line amount must be positive");
       if (line.side !== "debit" && line.side !== "credit") {
         throw new BadRequestException("Ledger line side must be debit or credit");
       }
@@ -68,7 +74,7 @@ export class LedgerService {
       glCode?: string;
       limit?: number;
       offset?: number;
-    }
+    },
   ) {
     const limit = Math.min(options?.limit ?? 100, 1000);
     const offset = options?.offset ?? 0;
@@ -81,24 +87,28 @@ export class LedgerService {
           ? {
               occurredAt: {
                 gte: options?.start,
-                lte: options?.end
-              }
+                lte: options?.end,
+              },
             }
-          : {})
+          : {}),
       },
       orderBy: { occurredAt: "desc" },
       take: limit,
-      skip: offset
+      skip: offset,
     });
   }
 
-  async listByReservation(reservationId: string, campgroundId: string, options?: { limit?: number; offset?: number }) {
+  async listByReservation(
+    reservationId: string,
+    campgroundId: string,
+    options?: { limit?: number; offset?: number },
+  ) {
     const limit = Math.min(options?.limit ?? 100, 500);
     const offset = options?.offset ?? 0;
 
     const reservation = await this.prisma.reservation.findFirst({
       where: { id: reservationId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!reservation) {
       throw new NotFoundException("Reservation not found");
@@ -108,20 +118,21 @@ export class LedgerService {
       where: { reservationId, campgroundId },
       orderBy: { occurredAt: "desc" },
       take: limit,
-      skip: offset
+      skip: offset,
     });
   }
 
   async summaryByGl(campgroundId: string, start?: Date, end?: Date) {
     // Use Prisma aggregation to avoid fetching all entries
-    const dateFilter = start || end
-      ? {
-          occurredAt: {
-            gte: start,
-            lte: end
+    const dateFilter =
+      start || end
+        ? {
+            occurredAt: {
+              gte: start,
+              lte: end,
+            },
           }
-        }
-      : {};
+        : {};
 
     // Aggregate debits and credits separately, then combine
     const [debits, credits] = await Promise.all([
@@ -130,23 +141,23 @@ export class LedgerService {
         where: {
           campgroundId,
           direction: "debit",
-          ...dateFilter
+          ...dateFilter,
         },
         _sum: {
-          amountCents: true
-        }
+          amountCents: true,
+        },
       }),
       this.prisma.ledgerEntry.groupBy({
         by: ["glCode"],
         where: {
           campgroundId,
           direction: "credit",
-          ...dateFilter
+          ...dateFilter,
         },
         _sum: {
-          amountCents: true
-        }
-      })
+          amountCents: true,
+        },
+      }),
     ]);
 
     // Combine debits (negative) and credits (positive)
@@ -166,10 +177,13 @@ export class LedgerService {
   }
 
   async ensureAccount(campgroundId: string, code: string, name: string, type: GlAccountType) {
-    const existing = await this.prisma.glAccount.findFirst({ where: { campgroundId, code }, select: { id: true } });
+    const existing = await this.prisma.glAccount.findFirst({
+      where: { campgroundId, code },
+      select: { id: true },
+    });
     if (existing) return existing.id;
     const created = await this.prisma.glAccount.create({
-      data: { id: randomUUID(), campgroundId, code, name, type }
+      data: { id: randomUUID(), campgroundId, code, name, type },
     });
     return created.id;
   }
@@ -177,7 +191,7 @@ export class LedgerService {
   private async resolvePeriodId(campgroundId: string, occurredAt: Date, allowAdjustment: boolean) {
     const period = await this.prisma.glPeriod.findFirst({
       where: { campgroundId, startDate: { lte: occurredAt }, endDate: { gte: occurredAt } },
-      orderBy: { startDate: "desc" }
+      orderBy: { startDate: "desc" },
     });
     if (!period) return null;
     if (period.status !== "open" && !allowAdjustment) {
@@ -190,7 +204,9 @@ export class LedgerService {
     LedgerGuard.ensureBalanced(request.lines);
     const occurredAt = request.occurredAt ?? new Date();
     const allowAdjustment = request.adjustment ?? false;
-    const periodId = request.periodId ?? (await this.resolvePeriodId(request.campgroundId, occurredAt, allowAdjustment));
+    const periodId =
+      request.periodId ??
+      (await this.resolvePeriodId(request.campgroundId, occurredAt, allowAdjustment));
     const payloadForHash = {
       campgroundId: request.campgroundId,
       reservationId: request.reservationId ?? null,
@@ -198,7 +214,12 @@ export class LedgerService {
       sourceType: request.sourceType ?? null,
       sourceTxId: request.sourceTxId ?? null,
       description: request.description ?? null,
-      lines: request.lines.map((l) => ({ side: l.side, amountCents: l.amountCents, glAccountId: l.glAccountId, memo: l.memo }))
+      lines: request.lines.map((l) => ({
+        side: l.side,
+        amountCents: l.amountCents,
+        glAccountId: l.glAccountId,
+        memo: l.memo,
+      })),
     };
     const hash = createHash("sha256").update(JSON.stringify(payloadForHash)).digest("hex");
     const dedupeKey = request.dedupeKey ?? hash;
@@ -210,9 +231,9 @@ export class LedgerService {
       const exists = await this.prisma.ledgerEntry.findFirst({
         where: {
           campgroundId: request.campgroundId,
-          OR: dedupeFilters
+          OR: dedupeFilters,
         },
-        select: { id: true }
+        select: { id: true },
       });
       if (exists) {
         return { duplicated: true, entryIds: [exists.id] };
@@ -240,8 +261,8 @@ export class LedgerService {
             sourceTxId: request.sourceTxId ?? null,
             sourceTs: request.sourceTs ?? occurredAt,
             hash,
-            adjustment: allowAdjustment
-          }
+            adjustment: allowAdjustment,
+          },
         });
         entryIds.push(entry.id);
         await tx.ledgerLine.create({
@@ -257,8 +278,8 @@ export class LedgerService {
             taxJurisdiction: line.taxJurisdiction ?? null,
             taxRateBps: line.taxRateBps ?? null,
             taxableBaseCents: line.taxableBaseCents ?? null,
-            reconciliationKey: line.reconciliationKey ?? request.sourceTxId ?? null
-          }
+            reconciliationKey: line.reconciliationKey ?? request.sourceTxId ?? null,
+          },
         });
       }
     });
@@ -269,7 +290,7 @@ export class LedgerService {
   async listPeriods(campgroundId: string) {
     return this.prisma.glPeriod.findMany({
       where: { campgroundId },
-      orderBy: [{ startDate: "asc" }, { endDate: "asc" }]
+      orderBy: [{ startDate: "asc" }, { endDate: "asc" }],
     });
   }
 
@@ -278,13 +299,13 @@ export class LedgerService {
       where: {
         campgroundId,
         startDate: { lte: endDate },
-        endDate: { gte: startDate }
+        endDate: { gte: startDate },
       },
-      select: { id: true, status: true, startDate: true, endDate: true }
+      select: { id: true, status: true, startDate: true, endDate: true },
     });
     if (overlap) {
       throw new BadRequestException(
-        `GL period overlaps existing period (${overlap.startDate.toISOString()} - ${overlap.endDate.toISOString()})`
+        `GL period overlaps existing period (${overlap.startDate.toISOString()} - ${overlap.endDate.toISOString()})`,
       );
     }
   }
@@ -300,9 +321,10 @@ export class LedgerService {
         campgroundId,
         startDate,
         endDate,
-        name: name ?? `${startDate.toISOString().slice(0, 10)}-${endDate.toISOString().slice(0, 10)}`,
-        status: "open"
-      }
+        name:
+          name ?? `${startDate.toISOString().slice(0, 10)}-${endDate.toISOString().slice(0, 10)}`,
+        status: "open",
+      },
     });
   }
 
@@ -315,7 +337,7 @@ export class LedgerService {
     if (period.status === "closed") return period;
     return this.prisma.glPeriod.update({
       where: { id },
-      data: { status: "closed", closedAt: new Date(), closedBy: actorId ?? null }
+      data: { status: "closed", closedAt: new Date(), closedBy: actorId ?? null },
     });
   }
 
@@ -330,9 +352,8 @@ export class LedgerService {
         lockedAt: new Date(),
         lockedBy: actorId ?? null,
         closedAt: period.closedAt ?? new Date(),
-        closedBy: period.closedBy ?? actorId ?? null
-      }
+        closedBy: period.closedBy ?? actorId ?? null,
+      },
     });
   }
-
 }

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "vertical" | "horizontal" | "both";
@@ -19,15 +19,15 @@ const ScrollArea = React.forwardRef<HTMLDivElement, ScrollAreaProps>(
         orientation === "both" && "overflow-auto",
         // Custom scrollbar styling
         "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border",
-        className
+        className,
       )}
       {...props}
     >
       {children}
     </div>
-  )
-)
-ScrollArea.displayName = "ScrollArea"
+  ),
+);
+ScrollArea.displayName = "ScrollArea";
 
 interface ScrollBarProps extends React.HTMLAttributes<HTMLDivElement> {
   orientation?: "vertical" | "horizontal";
@@ -39,18 +39,16 @@ const ScrollBar = React.forwardRef<HTMLDivElement, ScrollBarProps>(
       ref={ref}
       className={cn(
         "flex touch-none select-none transition-colors",
-        orientation === "vertical" &&
-          "h-full w-2.5 border-l border-l-transparent p-[1px]",
-        orientation === "horizontal" &&
-          "h-2.5 flex-col border-t border-t-transparent p-[1px]",
-        className
+        orientation === "vertical" && "h-full w-2.5 border-l border-l-transparent p-[1px]",
+        orientation === "horizontal" && "h-2.5 flex-col border-t border-t-transparent p-[1px]",
+        className,
       )}
       {...props}
     >
       <div className="relative flex-1 rounded-full bg-muted" />
     </div>
-  )
-)
-ScrollBar.displayName = "ScrollBar"
+  ),
+);
+ScrollBar.displayName = "ScrollBar";
 
-export { ScrollArea, ScrollBar }
+export { ScrollArea, ScrollBar };

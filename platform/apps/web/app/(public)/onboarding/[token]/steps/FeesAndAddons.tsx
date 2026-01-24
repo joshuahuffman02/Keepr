@@ -95,12 +95,7 @@ const PRICING_TYPE_LABELS: Record<AddOnItem["pricingType"], string> = {
   per_person: "Per person",
 };
 
-export function FeesAndAddons({
-  data,
-  onChange,
-  onNext,
-  onBack,
-}: FeesAndAddonsProps) {
+export function FeesAndAddons({ data, onChange, onNext, onBack }: FeesAndAddonsProps) {
   const prefersReducedMotion = useReducedMotion();
   const [showAddForm, setShowAddForm] = useState(false);
   const [showGlCodes, setShowGlCodes] = useState(false);
@@ -155,7 +150,7 @@ export function FeesAndAddons({
     updateData({ petFeeType: type });
   };
 
-  const addPresetItem = (preset: typeof ADD_ON_PRESETS[0]) => {
+  const addPresetItem = (preset: (typeof ADD_ON_PRESETS)[0]) => {
     // Don't add duplicates
     if (data.addOnItems.some((item) => item.name === preset.name)) return;
 
@@ -198,7 +193,7 @@ export function FeesAndAddons({
     const cents = Math.round(parseFloat(value || "0") * 100);
     updateData({
       addOnItems: data.addOnItems.map((item) =>
-        item.id === id ? { ...item, priceCents: cents } : item
+        item.id === id ? { ...item, priceCents: cents } : item,
       ),
     });
   };
@@ -240,12 +235,8 @@ export function FeesAndAddons({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-violet-500/20 mb-4">
             <Receipt className="w-8 h-8 text-violet-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Fees & Add-ons
-          </h2>
-          <p className="text-slate-400">
-            Configure booking fees, pet fees, and purchasable items
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Fees & Add-ons</h2>
+          <p className="text-slate-400">Configure booking fees, pet fees, and purchasable items</p>
         </motion.div>
 
         {/* Section 1: Booking Fees */}
@@ -270,9 +261,7 @@ export function FeesAndAddons({
                     onCheckedChange={toggleBookingFee}
                     className="data-[state=checked]:bg-emerald-500"
                   />
-                  <Label className="text-white font-medium cursor-pointer">
-                    Booking Fee
-                  </Label>
+                  <Label className="text-white font-medium cursor-pointer">Booking Fee</Label>
                 </div>
                 <p className="text-sm text-slate-400 ml-11">
                   Flat fee per booking (covers processing costs)
@@ -363,13 +352,9 @@ export function FeesAndAddons({
                     onCheckedChange={togglePetFee}
                     className="data-[state=checked]:bg-emerald-500"
                   />
-                  <Label className="text-white font-medium cursor-pointer">
-                    Pet Fee
-                  </Label>
+                  <Label className="text-white font-medium cursor-pointer">Pet Fee</Label>
                 </div>
-                <p className="text-sm text-slate-400 ml-11">
-                  Charge guests for bringing pets
-                </p>
+                <p className="text-sm text-slate-400 ml-11">Charge guests for bringing pets</p>
               </div>
 
               {data.petFeeEnabled && (
@@ -398,14 +383,14 @@ export function FeesAndAddons({
                 animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
                 className="ml-11 mt-3"
               >
-                  <Select
-                    value={data.petFeeType}
-                    onValueChange={(v) => {
-                      if (isPetFeeType(v)) {
-                        updatePetFeeType(v);
-                      }
-                    }}
-                  >
+                <Select
+                  value={data.petFeeType}
+                  onValueChange={(v) => {
+                    if (isPetFeeType(v)) {
+                      updatePetFeeType(v);
+                    }
+                  }}
+                >
                   <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white w-full">
                     <SelectValue />
                   </SelectTrigger>
@@ -448,7 +433,7 @@ export function FeesAndAddons({
                       "px-3 py-1.5 rounded-lg text-sm font-medium transition-all border",
                       isAdded
                         ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-400"
-                        : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600 hover:bg-slate-800"
+                        : "border-slate-700 bg-slate-800/50 text-slate-300 hover:border-slate-600 hover:bg-slate-800",
                     )}
                   >
                     {isAdded ? (
@@ -614,11 +599,9 @@ export function FeesAndAddons({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              All fees are optional.
-            </span>{" "}
-            You can configure these anytime in your dashboard. Add-ons will be
-            visible to guests during booking.
+            <span className="text-slate-300 font-medium">All fees are optional.</span> You can
+            configure these anytime in your dashboard. Add-ons will be visible to guests during
+            booking.
           </div>
         </motion.div>
 
@@ -647,7 +630,7 @@ export function FeesAndAddons({
             <ChevronDown
               className={cn(
                 "w-5 h-5 text-slate-500 transition-transform",
-                showGlCodes && "rotate-180"
+                showGlCodes && "rotate-180",
               )}
             />
           </button>
@@ -664,8 +647,8 @@ export function FeesAndAddons({
                   <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 flex gap-2">
                     <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                     <p className="text-xs text-blue-300">
-                      GL Codes help categorize revenue for your accountant or QuickBooks/Xero.
-                      Skip this if you're not sure - you can set it up later in Settings.
+                      GL Codes help categorize revenue for your accountant or QuickBooks/Xero. Skip
+                      this if you're not sure - you can set it up later in Settings.
                     </p>
                   </div>
 
@@ -742,7 +725,7 @@ export function FeesAndAddons({
             className={cn(
               "flex-1 py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             Continue

@@ -27,8 +27,8 @@ export class DeveloperApiClient {
         grant_type: "client_credentials",
         client_id: this.config.clientId,
         client_secret: this.config.clientSecret,
-        scope: this.config.scopes?.join(" ")
-      })
+        scope: this.config.scopes?.join(" "),
+      }),
     });
     if (!res.ok) {
       throw new Error(`Auth failed (${res.status})`);
@@ -51,9 +51,9 @@ export class DeveloperApiClient {
       method,
       headers: {
         "content-type": "application/json",
-        Authorization: `Bearer ${this.accessToken}`
+        Authorization: `Bearer ${this.accessToken}`,
       },
-      body: body ? JSON.stringify(body) : undefined
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     // Try a refresh once on 401
@@ -63,9 +63,9 @@ export class DeveloperApiClient {
         method,
         headers: {
           "content-type": "application/json",
-          Authorization: `Bearer ${this.accessToken}`
+          Authorization: `Bearer ${this.accessToken}`,
         },
-        body: body ? JSON.stringify(body) : undefined
+        body: body ? JSON.stringify(body) : undefined,
       });
       if (!retry.ok) throw new Error(`Request failed (${retry.status})`);
       const retryJson: T = await retry.json();
@@ -170,7 +170,7 @@ export class DeveloperApiClient {
         const created = { ...payload, id: `mock-site-${sites.length + 1}` };
         sites.push(created);
         return created;
-      }
+      },
     };
   }
 }

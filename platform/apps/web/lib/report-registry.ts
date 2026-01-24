@@ -8,7 +8,7 @@ import {
   LineChart,
   Calculator,
   ClipboardList,
-  type LucideIcon
+  type LucideIcon,
 } from "lucide-react";
 
 export type ReportTab =
@@ -40,13 +40,25 @@ export type ReportDefinition = {
 
 export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
   daily: [
-    { id: "daily-summary", label: "Daily summary", description: "Today’s pickup, arrivals, departures" },
+    {
+      id: "daily-summary",
+      label: "Daily summary",
+      description: "Today’s pickup, arrivals, departures",
+    },
     { id: "transaction-log", label: "Transaction log", description: "Payments, refunds, charges" },
     { id: "arrivals-list", label: "Arrivals list", description: "Expected arrivals today" },
     { id: "departures-list", label: "Departures list", description: "Expected departures today" },
     { id: "in-house-guests", label: "In-house guests", description: "Currently checked-in guests" },
-    { id: "housekeeping-status", label: "Housekeeping status", description: "Cleaning status by site" },
-    { id: "maintenance-daily", label: "Maintenance requests", description: "Open tickets for today" },
+    {
+      id: "housekeeping-status",
+      label: "Housekeeping status",
+      description: "Cleaning status by site",
+    },
+    {
+      id: "maintenance-daily",
+      label: "Maintenance requests",
+      description: "Open tickets for today",
+    },
     { id: "shift-notes", label: "Shift notes", description: "Manager log and handovers" },
     { id: "meal-count", label: "Meal count", description: "Breakfast/Dinner guest list" },
     { id: "parking-list", label: "Parking & Vehicles", description: "Registered vehicles on site" },
@@ -59,13 +71,17 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "due-outs", label: "Due outs (Overstays)", description: "Guests past departure time" },
     { id: "vip-arrivals", label: "VIP arrivals", description: "High-value guests arriving" },
     { id: "expected-occupancy", label: "Expected occupancy", description: "Forecast for next 24h" },
-    { id: "daily-rate-check", label: "Daily rate check", description: "Variance report" }
+    { id: "daily-rate-check", label: "Daily rate check", description: "Variance report" },
   ],
   revenue: [
     { id: "revenue-overview", label: "Revenue overview", description: "Gross/Net, ADR, RevPAR" },
     { id: "revenue-by-source", label: "By source", description: "Online vs admin vs kiosk" },
     { id: "revenue-by-site-type", label: "By site type", description: "Performance by category" },
-    { id: "revenue-by-rate-plan", label: "By rate plan", description: "Standard vs Promo vs Group" },
+    {
+      id: "revenue-by-rate-plan",
+      label: "By rate plan",
+      description: "Standard vs Promo vs Group",
+    },
     { id: "revenue-by-addon", label: "Add-ons & POS", description: "Firewood, ice, rentals" },
     { id: "revenue-by-user", label: "By user", description: "Staff booking performance" },
     { id: "discount-usage", label: "Discount usage", description: "Promo codes and overrides" },
@@ -76,7 +92,7 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "voided-transactions", label: "Voided transactions", description: "Cancelled payments" },
     { id: "monthly-recap", label: "Monthly recap", description: "MTD performance" },
     { id: "revpar-site-type", label: "RevPAR by type", description: "Yield efficiency" },
-    { id: "ancillary-revenue", label: "Ancillary analysis", description: "Non-room revenue" }
+    { id: "ancillary-revenue", label: "Ancillary analysis", description: "Non-room revenue" },
   ],
   performance: [
     { id: "pace", label: "Pace vs target", description: "On-the-books vs goals" },
@@ -86,14 +102,18 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "los-analysis", label: "Length of stay", description: "Average nights per stay" },
     { id: "lead-time", label: "Lead time", description: "Booking window patterns" },
     { id: "cancellations", label: "Cancellations", description: "Lost business analysis" },
-    { id: "channel-production", label: "Channel production", description: "OTA vs Direct efficiency" },
+    {
+      id: "channel-production",
+      label: "Channel production",
+      description: "OTA vs Direct efficiency",
+    },
     { id: "comp-set", label: "Competitive set", description: "Market comparison" },
     { id: "yoy-performance", label: "Year-over-Year", description: "Growth trends" },
     { id: "market-segments", label: "Market segments", description: "Business vs Leisure" },
     { id: "site-utilization", label: "Site utilization", description: "Hot vs Cold sites" },
     { id: "yield-management", label: "Yield efficiency", description: "Dynamic pricing impact" },
     { id: "promotion-perf", label: "Promotions", description: "Campaign lift" },
-    { id: "upsell-conversion", label: "Upsell conversion", description: "Add-on attachment rate" }
+    { id: "upsell-conversion", label: "Upsell conversion", description: "Add-on attachment rate" },
   ],
   guests: [
     { id: "guest-origins", label: "Guest origins", description: "State/ZIP mix" },
@@ -107,7 +127,7 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "email-capture", label: "Email capture", description: "Database growth" },
     { id: "guest-preferences", label: "Preferences", description: "Common requests" },
     { id: "banned-list", label: "Do Not Rent", description: "Restricted guests" },
-    { id: "special-dates", label: "Birthdays", description: "Celebrations this month" }
+    { id: "special-dates", label: "Birthdays", description: "Celebrations this month" },
   ],
   marketing: [
     { id: "booking-sources", label: "Booking sources", description: "Channel mix and revenue" },
@@ -119,11 +139,19 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "social-attribution", label: "Social media", description: "Platform performance" },
     { id: "geo-targeting", label: "Geo-targeting", description: "Regional performance" },
     { id: "ota-commissions", label: "OTA Commissions", description: "Cost of distribution" },
-    { id: "cart-abandonment", label: "Abandonment", description: "Booking engine drop-off" }
+    { id: "cart-abandonment", label: "Abandonment", description: "Booking engine drop-off" },
   ],
   forecasting: [
-    { id: "revenue-forecast", label: "Revenue forecast", description: "Projected revenue vs last year" },
-    { id: "demand-outlook", label: "Demand outlook", description: "Pickup by week and seasonality" },
+    {
+      id: "revenue-forecast",
+      label: "Revenue forecast",
+      description: "Projected revenue vs last year",
+    },
+    {
+      id: "demand-outlook",
+      label: "Demand outlook",
+      description: "Pickup by week and seasonality",
+    },
     { id: "pickup", label: "Pickup", description: "Bookings/revenue vs prior window" },
     { id: "peak-nonpeak", label: "Peak vs non-peak", description: "Performance by season" },
     { id: "outlook-30", label: "30-day outlook", description: "Short-term forecast" },
@@ -131,7 +159,7 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "outlook-90", label: "90-day outlook", description: "Long-term forecast" },
     { id: "year-end-proj", label: "Year-end projection", description: "Goal tracking" },
     { id: "budget-vs-actual", label: "Budget vs Actual", description: "Performance to plan" },
-    { id: "demand-alerts", label: "Demand alerts", description: "Compression dates" }
+    { id: "demand-alerts", label: "Demand alerts", description: "Compression dates" },
   ],
   accounting: [
     { id: "ledger", label: "Ledger summary", description: "GL net and exports" },
@@ -145,7 +173,7 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "bank-deposit", label: "Bank deposit", description: "Cash/Check batching" },
     { id: "ar-detail", label: "AR Detail", description: "Invoices and aging" },
     { id: "write-offs", label: "Write-offs", description: "Bad debt" },
-    { id: "liabilities", label: "Liabilities", description: "Gift certs & Deposits" }
+    { id: "liabilities", label: "Liabilities", description: "Gift certs & Deposits" },
   ],
   audits: [
     { id: "audit-log", label: "Audit log", description: "All system activity" },
@@ -155,10 +183,10 @@ export const subTabs: Record<Exclude<ReportTab, "overview">, SubTab[]> = {
     { id: "permissions", label: "Permissions", description: "Role changes" },
     { id: "access-log", label: "Access log", description: "Gate and door access" },
     { id: "night-audit", label: "Night audit", description: "Close day logs" },
-    { id: "system-errors", label: "System alerts", description: "Error tracking" }
+    { id: "system-errors", label: "System alerts", description: "Error tracking" },
   ],
   "booking-sources": [],
-  "guest-origins": []
+  "guest-origins": [],
 };
 
 export const reportCatalog: ReportDefinition[] = [
@@ -167,64 +195,70 @@ export const reportCatalog: ReportDefinition[] = [
     label: "Overview",
     icon: LayoutList,
     description: "High-level KPIs and trends at a glance",
-    subReports: [{ id: "dashboard-summary", label: "Dashboard summary", description: "Revenue, occupancy, ADR, RevPAR" }]
+    subReports: [
+      {
+        id: "dashboard-summary",
+        label: "Dashboard summary",
+        description: "Revenue, occupancy, ADR, RevPAR",
+      },
+    ],
   },
   {
     id: "daily",
     label: "Daily Operations",
     icon: Calendar,
     description: "Day-to-day arrivals, departures, and transactions",
-    subReports: subTabs.daily
+    subReports: subTabs.daily,
   },
   {
     id: "revenue",
     label: "Revenue",
     icon: TrendingUp,
     description: "Detailed revenue analysis and breakdowns",
-    subReports: subTabs.revenue
+    subReports: subTabs.revenue,
   },
   {
     id: "performance",
     label: "Performance",
     icon: BarChart3,
     description: "Site and property performance metrics",
-    subReports: subTabs.performance
+    subReports: subTabs.performance,
   },
   {
     id: "guests",
     label: "Guests",
     icon: Users,
     description: "Guest demographics and behavior patterns",
-    subReports: subTabs.guests
+    subReports: subTabs.guests,
   },
   {
     id: "marketing",
     label: "Marketing",
     icon: Megaphone,
     description: "Booking sources and campaign effectiveness",
-    subReports: subTabs.marketing
+    subReports: subTabs.marketing,
   },
   {
     id: "forecasting",
     label: "Forecasting",
     icon: LineChart,
     description: "Projections and demand predictions",
-    subReports: subTabs.forecasting
+    subReports: subTabs.forecasting,
   },
   {
     id: "accounting",
     label: "Accounting",
     icon: Calculator,
     description: "Financial ledgers and aging reports",
-    subReports: subTabs.accounting
+    subReports: subTabs.accounting,
   },
   {
     id: "audits",
     label: "Audits",
     icon: ClipboardList,
     description: "Activity logs and compliance tracking",
-    subReports: [{ id: "audit-log", label: "Audit log", description: "All system activity" }]
-  }
+    subReports: [{ id: "audit-log", label: "Audit log", description: "All system activity" }],
+  },
 ];
 
 export function isReportTab(value: string): value is ReportTab {

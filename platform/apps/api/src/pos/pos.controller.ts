@@ -1,6 +1,21 @@
-import { Body, Controller, Param, Patch, Post, Req, UseGuards, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
-import { CheckoutCartDto, CreateCartDto, OfflineReplayDto, UpdateCartDto, CreateReturnDto } from "./pos.dto";
+import {
+  CheckoutCartDto,
+  CreateCartDto,
+  OfflineReplayDto,
+  UpdateCartDto,
+  CreateReturnDto,
+} from "./pos.dto";
 import { PosService } from "./pos.service";
 import type { Request } from "express";
 
@@ -42,7 +57,11 @@ export class PosController {
     if (!user) {
       throw new UnauthorizedException();
     }
-    return this.service.replayOffline(payload, getHeaderValue(req.headers, "idempotency-key"), user);
+    return this.service.replayOffline(
+      payload,
+      getHeaderValue(req.headers, "idempotency-key"),
+      user,
+    );
   }
 
   @Post("returns")

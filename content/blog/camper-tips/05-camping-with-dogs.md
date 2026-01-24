@@ -17,18 +17,21 @@ Camping with your dog can be an incredible bonding experience—fresh air, new s
 ## Before You Go
 
 ### Check Campground Pet Policies
+
 - Confirm pets are allowed
 - Note any breed or size restrictions
 - Understand leash requirements
 - Check for pet fees
 
 ### Prepare Your Dog
+
 - Ensure vaccinations are current
 - Update ID tags with cell phone number
 - Consider a GPS collar for safety
 - Practice commands (recall especially)
 
 ### Pack for Your Pup
+
 - [ ] Food and treats (plus extra)
 - [ ] Water and travel bowl
 - [ ] Leash(es) and collar
@@ -44,12 +47,14 @@ Camping with your dog can be an incredible bonding experience—fresh air, new s
 ## At the Campsite
 
 ### Site Setup
+
 - Identify potential hazards
 - Set up tie-out or containment
 - Create a comfortable resting spot
 - Keep food secured from wildlife
 
 ### Campground Etiquette
+
 - **Always leash**: Even if your dog is friendly
 - **Pick up after them**: Every time, everywhere
 - **Minimize barking**: Be considerate of neighbors
@@ -60,12 +65,14 @@ Camping with your dog can be an incredible bonding experience—fresh air, new s
 ## On the Trail
 
 ### Hiking with Dogs
+
 - Check trail rules (some don't allow dogs)
 - Bring water for both of you
 - Watch for hazards (thorns, snakes, heat)
 - Know your dog's limits
 
 ### Wildlife Encounters
+
 - Keep dog close and leashed
 - Don't let them chase wildlife
 - Watch for signs of predators
@@ -76,6 +83,7 @@ Camping with your dog can be an incredible bonding experience—fresh air, new s
 ## Safety Concerns
 
 ### Common Hazards
+
 - Ticks and fleas
 - Poison ivy/oak
 - Wildlife
@@ -83,7 +91,9 @@ Camping with your dog can be an incredible bonding experience—fresh air, new s
 - Water safety
 
 ### First Aid Basics
+
 Know how to handle:
+
 - Cuts and scrapes
 - Bee stings
 - Overheating
@@ -109,4 +119,4 @@ Know how to handle:
 
 ---
 
-*Find pet-friendly campsites at [campreserv.com](https://campreserv.com)*
+_Find pet-friendly campsites at [campreserv.com](https://campreserv.com)_

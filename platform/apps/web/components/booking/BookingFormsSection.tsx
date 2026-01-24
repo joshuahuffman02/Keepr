@@ -24,7 +24,10 @@ interface BookingFormsSectionProps {
     };
   };
   stayLength: number;
-  onFormsComplete: (complete: boolean, responses: Record<string, Record<string, string | boolean>>) => void;
+  onFormsComplete: (
+    complete: boolean,
+    responses: Record<string, Record<string, string | boolean>>,
+  ) => void;
 }
 
 interface FormQuestion {
@@ -64,14 +67,18 @@ function shouldShowForm(
     rigType: string;
     siteClassId?: string;
     stayLength: number;
-  }
+  },
 ): boolean {
   const conditions = template.displayConditions || [];
   if (conditions.length === 0) return true;
 
   const logic = template.conditionLogic || "all";
 
-  const evaluateCondition = (cond: { field: string; operator: string; value: string | number | string[] }) => {
+  const evaluateCondition = (cond: {
+    field: string;
+    operator: string;
+    value: string | number | string[];
+  }) => {
     let fieldValue: string | number | undefined;
     switch (cond.field) {
       case "pets":
@@ -102,15 +109,27 @@ function shouldShowForm(
       case "not_equals":
         return fieldValue !== cond.value;
       case "greater_than":
-        return typeof fieldValue === "number" && typeof cond.value === "number" && fieldValue > cond.value;
+        return (
+          typeof fieldValue === "number" &&
+          typeof cond.value === "number" &&
+          fieldValue > cond.value
+        );
       case "less_than":
-        return typeof fieldValue === "number" && typeof cond.value === "number" && fieldValue < cond.value;
+        return (
+          typeof fieldValue === "number" &&
+          typeof cond.value === "number" &&
+          fieldValue < cond.value
+        );
       case "in":
         return Array.isArray(cond.value) && cond.value.some((val) => val === fieldValue);
       case "not_in":
         return Array.isArray(cond.value) && !cond.value.some((val) => val === fieldValue);
       case "contains":
-        return typeof fieldValue === "string" && typeof cond.value === "string" && fieldValue.includes(cond.value);
+        return (
+          typeof fieldValue === "string" &&
+          typeof cond.value === "string" &&
+          fieldValue.includes(cond.value)
+        );
       default:
         return true;
     }
@@ -125,9 +144,11 @@ export function BookingFormsSection({
   siteClassId,
   guestInfo,
   stayLength,
-  onFormsComplete
+  onFormsComplete,
 }: BookingFormsSectionProps) {
-  const [formResponses, setFormResponses] = useState<Record<string, Record<string, string | boolean>>>({});
+  const [formResponses, setFormResponses] = useState<
+    Record<string, Record<string, string | boolean>>
+  >({});
   const [completedForms, setCompletedForms] = useState<Set<string>>(new Set());
   const [expandedForm, setExpandedForm] = useState<string | null>(null);
   const [skipNotes, setSkipNotes] = useState<Record<string, string>>({});
@@ -140,7 +161,7 @@ export function BookingFormsSection({
       if (!res.ok) return [];
       return res.json();
     },
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const templates = templatesQuery.data || [];
@@ -153,7 +174,7 @@ export function BookingFormsSection({
       children: guestInfo.children || 0,
       rigType: guestInfo.equipment?.type || "",
       siteClassId: siteClassId || "",
-      stayLength
+      stayLength,
     };
 
     return templates.filter((t: FormTemplate) => {
@@ -166,8 +187,8 @@ export function BookingFormsSection({
 
   // Calculate completion status
   const requiredForms = bookingForms.filter((f: FormTemplate) => f.isRequired !== false);
-  const allRequiredComplete = requiredForms.every((f: FormTemplate) =>
-    completedForms.has(f.id) || (f.allowSkipWithNote && skipNotes[f.id])
+  const allRequiredComplete = requiredForms.every(
+    (f: FormTemplate) => completedForms.has(f.id) || (f.allowSkipWithNote && skipNotes[f.id]),
   );
 
   // Notify parent of completion status
@@ -184,12 +205,12 @@ export function BookingFormsSection({
   }
 
   const handleInputChange = (formId: string, questionId: string, value: string | boolean) => {
-    setFormResponses(prev => ({
+    setFormResponses((prev) => ({
       ...prev,
       [formId]: {
         ...(prev[formId] || {}),
-        [questionId]: value
-      }
+        [questionId]: value,
+      },
     }));
   };
 
@@ -203,11 +224,13 @@ export function BookingFormsSection({
     // Check required questions
     const missingRequired = questions.filter((q: FormQuestion) => q.required && !responses[q.id]);
     if (missingRequired.length > 0) {
-      alert(`Please complete all required fields: ${missingRequired.map((q: FormQuestion) => q.label).join(", ")}`);
+      alert(
+        `Please complete all required fields: ${missingRequired.map((q: FormQuestion) => q.label).join(", ")}`,
+      );
       return;
     }
 
-    setCompletedForms(prev => new Set([...prev, formId]));
+    setCompletedForms((prev) => new Set([...prev, formId]));
     setExpandedForm(null);
   };
 
@@ -216,7 +239,7 @@ export function BookingFormsSection({
       alert("Please provide a reason for skipping this form.");
       return;
     }
-    setCompletedForms(prev => new Set([...prev, formId]));
+    setCompletedForms((prev) => new Set([...prev, formId]));
     setExpandedForm(null);
   };
 
@@ -237,10 +260,10 @@ export function BookingFormsSection({
           const questions = template.fields?.questions || [];
 
           return (
-            <Card key={template.id} className={cn(
-              "transition-all",
-              isComplete && "bg-emerald-50 border-emerald-200"
-            )}>
+            <Card
+              key={template.id}
+              className={cn("transition-all", isComplete && "bg-emerald-50 border-emerald-200")}
+            >
               <CardHeader
                 className="cursor-pointer py-3"
                 onClick={() => setExpandedForm(isExpanded ? null : template.id)}
@@ -256,7 +279,9 @@ export function BookingFormsSection({
                     )}
                     <CardTitle className="text-base">{template.title}</CardTitle>
                     {template.isRequired === false && (
-                      <Badge variant="outline" className="text-xs">Optional</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Optional
+                      </Badge>
                     )}
                   </div>
                   {isExpanded ? (
@@ -319,7 +344,9 @@ export function BookingFormsSection({
                             <div className="flex items-center gap-2">
                               <Checkbox
                                 checked={Boolean(formResponses[template.id]?.[q.id])}
-                                onCheckedChange={(checked) => handleInputChange(template.id, q.id, checked)}
+                                onCheckedChange={(checked) =>
+                                  handleInputChange(template.id, q.id, checked)
+                                }
                               />
                               <span className="text-sm text-muted-foreground">I agree</span>
                             </div>
@@ -335,7 +362,9 @@ export function BookingFormsSection({
                               </SelectTrigger>
                               <SelectContent>
                                 {q.options.map((opt) => (
-                                  <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                  <SelectItem key={opt} value={opt}>
+                                    {opt}
+                                  </SelectItem>
                                 ))}
                               </SelectContent>
                             </Select>
@@ -346,10 +375,7 @@ export function BookingFormsSection({
                   )}
 
                   <div className="flex items-center gap-2 pt-2 border-t border-border">
-                    <Button
-                      size="sm"
-                      onClick={() => handleCompleteForm(template.id)}
-                    >
+                    <Button size="sm" onClick={() => handleCompleteForm(template.id)}>
                       <Check className="h-4 w-4 mr-1" />
                       Complete
                     </Button>
@@ -359,7 +385,9 @@ export function BookingFormsSection({
                         <Input
                           placeholder="Reason for skipping..."
                           value={skipNotes[template.id] || ""}
-                          onChange={(e) => setSkipNotes(prev => ({ ...prev, [template.id]: e.target.value }))}
+                          onChange={(e) =>
+                            setSkipNotes((prev) => ({ ...prev, [template.id]: e.target.value }))
+                          }
                           className="flex-1"
                         />
                         <Button

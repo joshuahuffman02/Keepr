@@ -20,7 +20,7 @@ import {
   Zap,
   Calendar,
   MapPin,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -85,7 +85,11 @@ export default function AIMaintenancePage() {
   const campground = campgrounds[0];
 
   // Get maintenance alerts
-  const { data: alerts = [], isLoading, refetch } = useQuery<MaintenanceAlert[]>({
+  const {
+    data: alerts = [],
+    isLoading,
+    refetch,
+  } = useQuery<MaintenanceAlert[]>({
     queryKey: ["maintenance-alerts", campground?.id],
     queryFn: () => apiClient.getMaintenanceAlerts(campground!.id),
     enabled: !!campground?.id,
@@ -93,8 +97,7 @@ export default function AIMaintenancePage() {
 
   // Acknowledge alert mutation
   const acknowledgeMutation = useMutation({
-    mutationFn: (alertId: string) =>
-      apiClient.acknowledgeMaintenanceAlert(alertId),
+    mutationFn: (alertId: string) => apiClient.acknowledgeMaintenanceAlert(alertId),
     onSuccess: () => {
       toast({ title: "Alert acknowledged" });
       refetch();
@@ -105,13 +108,11 @@ export default function AIMaintenancePage() {
     },
   });
 
-  const filteredAlerts = alerts.filter(a =>
-    filter === "all" ? true : a.status === filter
-  );
+  const filteredAlerts = alerts.filter((a) => (filter === "all" ? true : a.status === filter));
 
-  const newCount = alerts.filter(a => a.status === "new").length;
-  const criticalCount = alerts.filter(a =>
-    a.status === "new" && (a.severity === "critical" || a.severity === "high")
+  const newCount = alerts.filter((a) => a.status === "new").length;
+  const criticalCount = alerts.filter(
+    (a) => a.status === "new" && (a.severity === "critical" || a.severity === "high"),
   ).length;
 
   if (!campground) {
@@ -203,7 +204,7 @@ export default function AIMaintenancePage() {
             <CardContent className="p-4">
               <CheckCircle2 className="h-5 w-5 text-status-success-text mb-2" />
               <div className="text-2xl font-bold text-foreground">
-                {alerts.filter(a => a.status === "scheduled").length}
+                {alerts.filter((a) => a.status === "scheduled").length}
               </div>
               <p className="text-xs text-muted-foreground">Scheduled</p>
             </CardContent>
@@ -212,7 +213,7 @@ export default function AIMaintenancePage() {
             <CardContent className="p-4">
               <Calendar className="h-5 w-5 text-status-info-text mb-2" />
               <div className="text-2xl font-bold text-foreground">
-                {alerts.filter(a => a.status === "resolved").length}
+                {alerts.filter((a) => a.status === "resolved").length}
               </div>
               <p className="text-xs text-muted-foreground">Resolved</p>
             </CardContent>
@@ -257,9 +258,7 @@ export default function AIMaintenancePage() {
               <div className="text-center">
                 <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-status-success/50" />
                 <h3 className="text-lg font-semibold text-foreground mb-2">No Alerts</h3>
-                <p className="text-sm text-muted-foreground">
-                  All systems operating normally
-                </p>
+                <p className="text-sm text-muted-foreground">All systems operating normally</p>
               </div>
             </CardContent>
           </Card>
@@ -279,9 +278,10 @@ export default function AIMaintenancePage() {
                     <Card
                       className={cn(
                         "transition-all hover:shadow-md",
-                        alert.status === "new" && (alert.severity === "critical" || alert.severity === "high")
+                        alert.status === "new" &&
+                          (alert.severity === "critical" || alert.severity === "high")
                           ? "border-l-4 border-l-status-error"
-                          : alert.status === "new" && "border-l-4 border-l-status-warning"
+                          : alert.status === "new" && "border-l-4 border-l-status-warning",
                       )}
                     >
                       <CardContent className="p-5">
@@ -323,13 +323,17 @@ export default function AIMaintenancePage() {
                               <p className="text-xs text-muted-foreground">Confidence</p>
                               <div className="flex items-center gap-2">
                                 <Progress value={alert.confidence * 100} className="w-16 h-2" />
-                                <span className="text-sm font-medium">{Math.round(alert.confidence * 100)}%</span>
+                                <span className="text-sm font-medium">
+                                  {Math.round(alert.confidence * 100)}%
+                                </span>
                               </div>
                             </div>
 
                             <div className="text-right">
                               <p className="text-xs text-muted-foreground">Incidents</p>
-                              <p className="text-lg font-bold text-foreground">{alert.incidentCount}</p>
+                              <p className="text-lg font-bold text-foreground">
+                                {alert.incidentCount}
+                              </p>
                             </div>
 
                             {alert.status === "new" && (

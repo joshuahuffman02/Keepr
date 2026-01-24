@@ -71,27 +71,24 @@ function MethodToggle({
   comingSoon,
 }: MethodToggleProps) {
   return (
-    <div className={cn(
-      "flex items-center justify-between p-3 rounded-lg transition-colors",
-      checked && !disabled ? "bg-status-success-bg/60" : "hover:bg-muted",
-      disabled && "opacity-60"
-    )}>
+    <div
+      className={cn(
+        "flex items-center justify-between p-3 rounded-lg transition-colors",
+        checked && !disabled ? "bg-status-success-bg/60" : "hover:bg-muted",
+        disabled && "opacity-60",
+      )}
+    >
       <div className="flex-1 min-w-0">
         <Label
           htmlFor={id}
-          className={cn(
-            "font-medium cursor-pointer",
-            disabled && "cursor-not-allowed"
-          )}
+          className={cn("font-medium cursor-pointer", disabled && "cursor-not-allowed")}
         >
           {label}
           {comingSoon && (
             <span className="ml-2 text-xs text-muted-foreground font-normal">Coming soon</span>
           )}
         </Label>
-        {description && (
-          <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
-        )}
+        {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
       </div>
       <Switch
         id={id}
@@ -100,7 +97,11 @@ function MethodToggle({
         disabled={disabled}
         aria-describedby={description ? `${id}-desc` : undefined}
       />
-      {description && <span id={`${id}-desc`} className="sr-only">{description}</span>}
+      {description && (
+        <span id={`${id}-desc`} className="sr-only">
+          {description}
+        </span>
+      )}
     </div>
   );
 }
@@ -167,7 +168,10 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
       </TabsList>
 
       {/* Settings Tab */}
-      <TabsContent value="settings" className="space-y-6 motion-safe:animate-in motion-safe:fade-in">
+      <TabsContent
+        value="settings"
+        className="space-y-6 motion-safe:animate-in motion-safe:fade-in"
+      >
         {/* Info Banner - Warmer design */}
         <div
           className="p-4 bg-status-info-bg border border-status-info-border rounded-xl"
@@ -193,176 +197,162 @@ export function PaymentMethodsConfig({ campgroundId }: PaymentMethodsConfigProps
           <span>{enabledCount} payment methods enabled</span>
         </div>
 
-      {/* Card Payments */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/40">
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            Card Payments
-          </CardTitle>
-          <CardDescription>
-            Accept credit and debit card payments via Stripe
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 pt-4">
-          <MethodToggle
-            id="enable-cards"
-            label="Enable card payments"
-            description="Accept Visa, Mastercard, and other major cards"
-            checked={settings.enableCardPayments}
-            onCheckedChange={(checked) => handleToggle("enableCardPayments", checked)}
-          />
+        {/* Card Payments */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/40">
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              Card Payments
+            </CardTitle>
+            <CardDescription>Accept credit and debit card payments via Stripe</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
+            <MethodToggle
+              id="enable-cards"
+              label="Enable card payments"
+              description="Accept Visa, Mastercard, and other major cards"
+              checked={settings.enableCardPayments}
+              onCheckedChange={(checked) => handleToggle("enableCardPayments", checked)}
+            />
 
-          {settings.enableCardPayments && (
-            <div
-              className="ml-4 pl-4 border-l-2 border-status-success-border space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-2"
-            >
-              <p className="text-sm font-medium text-foreground">Accepted Card Brands</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {CARD_BRANDS.map((brand) => {
-                  const isChecked = settings.allowedCardBrands.includes(brand.id);
-                  return (
-                    <label
-                      key={brand.id}
-                      className={cn(
-                        "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors border",
-                        isChecked
-                          ? "bg-status-success-bg border-status-success-border"
-                          : "bg-card border-border hover:border-border"
-                      )}
-                    >
-                      <Checkbox
-                        id={`brand-${brand.id}`}
-                        checked={isChecked}
-                        onCheckedChange={() => handleCardBrandToggle(brand.id)}
-                        aria-label={`Accept ${brand.label}`}
-                      />
-                      <span className="text-sm">{brand.label}</span>
-                    </label>
-                  );
-                })}
+            {settings.enableCardPayments && (
+              <div className="ml-4 pl-4 border-l-2 border-status-success-border space-y-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-left-2">
+                <p className="text-sm font-medium text-foreground">Accepted Card Brands</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {CARD_BRANDS.map((brand) => {
+                    const isChecked = settings.allowedCardBrands.includes(brand.id);
+                    return (
+                      <label
+                        key={brand.id}
+                        className={cn(
+                          "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors border",
+                          isChecked
+                            ? "bg-status-success-bg border-status-success-border"
+                            : "bg-card border-border hover:border-border",
+                        )}
+                      >
+                        <Checkbox
+                          id={`brand-${brand.id}`}
+                          checked={isChecked}
+                          onCheckedChange={() => handleCardBrandToggle(brand.id)}
+                          aria-label={`Accept ${brand.label}`}
+                        />
+                        <span className="text-sm">{brand.label}</span>
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
 
-      {/* Digital Wallets */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/40">
-          <CardTitle className="flex items-center gap-2">
-            <Smartphone className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            Digital Wallets
-          </CardTitle>
-          <CardDescription>
-            Fast checkout with Apple Pay, Google Pay, and Stripe Link
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="divide-y divide-border">
-          <MethodToggle
-            id="enable-apple-pay"
-            label="Apple Pay"
-            description="One-tap payments on Apple devices"
-            checked={settings.enableApplePay}
-            onCheckedChange={(checked) => handleToggle("enableApplePay", checked)}
-          />
-          <MethodToggle
-            id="enable-google-pay"
-            label="Google Pay"
-            description="Quick checkout on Android and web"
-            checked={settings.enableGooglePay}
-            onCheckedChange={(checked) => handleToggle("enableGooglePay", checked)}
-          />
-        </CardContent>
-      </Card>
+        {/* Digital Wallets */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/40">
+            <CardTitle className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              Digital Wallets
+            </CardTitle>
+            <CardDescription>
+              Fast checkout with Apple Pay, Google Pay, and Stripe Link
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y divide-border">
+            <MethodToggle
+              id="enable-apple-pay"
+              label="Apple Pay"
+              description="One-tap payments on Apple devices"
+              checked={settings.enableApplePay}
+              onCheckedChange={(checked) => handleToggle("enableApplePay", checked)}
+            />
+            <MethodToggle
+              id="enable-google-pay"
+              label="Google Pay"
+              description="Quick checkout on Android and web"
+              checked={settings.enableGooglePay}
+              onCheckedChange={(checked) => handleToggle("enableGooglePay", checked)}
+            />
+          </CardContent>
+        </Card>
 
-      {/* Bank Payments */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/40">
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            Bank Payments
-          </CardTitle>
-          <CardDescription>
-            ACH bank transfers for US customers (lower fees)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <MethodToggle
-            id="enable-ach"
-            label="ACH bank transfers"
-            description="Direct bank debits with lower processing fees"
-            checked={settings.enableACH}
-            onCheckedChange={(checked) => handleToggle("enableACH", checked)}
-          />
-        </CardContent>
-      </Card>
+        {/* Bank Payments */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/40">
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              Bank Payments
+            </CardTitle>
+            <CardDescription>ACH bank transfers for US customers (lower fees)</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <MethodToggle
+              id="enable-ach"
+              label="ACH bank transfers"
+              description="Direct bank debits with lower processing fees"
+              checked={settings.enableACH}
+              onCheckedChange={(checked) => handleToggle("enableACH", checked)}
+            />
+          </CardContent>
+        </Card>
 
-      {/* Manual Payments */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/40">
-          <CardTitle className="flex items-center gap-2">
-            <Banknote className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            In-Person Payments
-          </CardTitle>
-          <CardDescription>
-            Cash, check, and charge-to-site options for staff
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="divide-y divide-border">
-          <MethodToggle
-            id="enable-cash"
-            label="Cash payments"
-            description="Record cash payments at check-in"
-            checked={settings.enableCash}
-            onCheckedChange={(checked) => handleToggle("enableCash", checked)}
-          />
-          <MethodToggle
-            id="enable-check"
-            label="Check payments"
-            description="Accept personal or business checks"
-            checked={settings.enableCheck}
-            onCheckedChange={(checked) => handleToggle("enableCheck", checked)}
-          />
-          <MethodToggle
-            id="enable-folio"
-            label="Charge to site/folio"
-            description="Let guests charge purchases to their reservation"
-            checked={settings.enableFolio}
-            onCheckedChange={(checked) => handleToggle("enableFolio", checked)}
-          />
-        </CardContent>
-      </Card>
+        {/* Manual Payments */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/40">
+            <CardTitle className="flex items-center gap-2">
+              <Banknote className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              In-Person Payments
+            </CardTitle>
+            <CardDescription>Cash, check, and charge-to-site options for staff</CardDescription>
+          </CardHeader>
+          <CardContent className="divide-y divide-border">
+            <MethodToggle
+              id="enable-cash"
+              label="Cash payments"
+              description="Record cash payments at check-in"
+              checked={settings.enableCash}
+              onCheckedChange={(checked) => handleToggle("enableCash", checked)}
+            />
+            <MethodToggle
+              id="enable-check"
+              label="Check payments"
+              description="Accept personal or business checks"
+              checked={settings.enableCheck}
+              onCheckedChange={(checked) => handleToggle("enableCheck", checked)}
+            />
+            <MethodToggle
+              id="enable-folio"
+              label="Charge to site/folio"
+              description="Let guests charge purchases to their reservation"
+              checked={settings.enableFolio}
+              onCheckedChange={(checked) => handleToggle("enableFolio", checked)}
+            />
+          </CardContent>
+        </Card>
 
-      {/* Fee Display */}
-      <Card className="overflow-hidden">
-        <CardHeader className="bg-muted/40">
-          <CardTitle className="flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            Fee Transparency
-          </CardTitle>
-          <CardDescription>
-            Control how processing fees appear to guests
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <MethodToggle
-            id="show-fee-breakdown"
-            label="Show fee breakdown"
-            description="Display processing fees as a separate line item at checkout"
-            checked={settings.showFeeBreakdown}
-            onCheckedChange={(checked) => handleToggle("showFeeBreakdown", checked)}
-          />
-        </CardContent>
-      </Card>
+        {/* Fee Display */}
+        <Card className="overflow-hidden">
+          <CardHeader className="bg-muted/40">
+            <CardTitle className="flex items-center gap-2">
+              <Receipt className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              Fee Transparency
+            </CardTitle>
+            <CardDescription>Control how processing fees appear to guests</CardDescription>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <MethodToggle
+              id="show-fee-breakdown"
+              label="Show fee breakdown"
+              description="Display processing fees as a separate line item at checkout"
+              checked={settings.showFeeBreakdown}
+              onCheckedChange={(checked) => handleToggle("showFeeBreakdown", checked)}
+            />
+          </CardContent>
+        </Card>
 
         {/* Save Button */}
         <div className="flex justify-end pt-4">
-          <Button
-            disabled
-            className="opacity-50 cursor-not-allowed"
-            aria-describedby="save-note"
-          >
+          <Button disabled className="opacity-50 cursor-not-allowed" aria-describedby="save-note">
             Save Changes
           </Button>
         </div>

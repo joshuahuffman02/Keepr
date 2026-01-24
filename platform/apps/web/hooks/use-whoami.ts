@@ -29,6 +29,6 @@ export function useWhoami() {
     queryFn: () => apiClient.getWhoami(sessionToken || token || undefined),
     enabled: isBrowser && hasAuth,
     staleTime: 5 * 60 * 1000,
-    retry: false
+    retry: false,
   });
 }

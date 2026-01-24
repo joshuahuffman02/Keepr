@@ -6,7 +6,6 @@ import { StripeService } from "../payments/stripe.service";
 
 @Module({
   providers: [AutoCollectService, IdempotencyService, StripeService],
-  exports: [AutoCollectService]
+  exports: [AutoCollectService],
 })
 export class AutoCollectModule {}
-

@@ -9,12 +9,7 @@ import { InventoryModule } from "../inventory/inventory.module";
 @Module({
   imports: [forwardRef(() => InventoryModule)],
   controllers: [PartnerApiController],
-  providers: [
-    PartnerApiService,
-    PrismaService,
-    ApiTokenGuard,
-    ApiScopeGuard,
-  ],
+  providers: [PartnerApiService, PrismaService, ApiTokenGuard, ApiScopeGuard],
   exports: [PartnerApiService],
 })
 export class PartnerApiModule {}

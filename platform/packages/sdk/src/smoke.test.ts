@@ -10,7 +10,7 @@ describe("DeveloperApiClient entrypoint (mock mode)", () => {
       guestId: "guest-123",
       arrivalDate: "2024-09-01",
       departureDate: "2024-09-03",
-      adults: 2
+      adults: 2,
     });
 
     const list = await mock.listReservations();
@@ -20,9 +20,7 @@ describe("DeveloperApiClient entrypoint (mock mode)", () => {
     expect(list[0]).toMatchObject({
       id: created.id,
       siteId: "site-123",
-      guestId: "guest-123"
+      guestId: "guest-123",
     });
   });
 });
-
-

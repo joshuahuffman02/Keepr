@@ -6,8 +6,8 @@ import {
   Logger,
   Inject,
   forwardRef,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 import {
   OpTask,
   OpTaskState,
@@ -15,16 +15,16 @@ import {
   OpTriggerEvent,
   Prisma,
   GamificationEventCategory,
-} from '@prisma/client';
+} from "@prisma/client";
 import { randomUUID } from "crypto";
 import {
   CreateOpTaskDto,
   UpdateOpTaskDto,
   OpTaskQueryDto,
   CreateOpTaskCommentDto,
-} from '../dto/op-task.dto';
-import { GamificationService } from '../../gamification/gamification.service';
-import { OpGamificationService } from './op-gamification.service';
+} from "../dto/op-task.dto";
+import { GamificationService } from "../../gamification/gamification.service";
+import { OpGamificationService } from "./op-gamification.service";
 
 type ChecklistTemplateItem = {
   id: string;
@@ -48,7 +48,8 @@ const normalizeChecklistTemplate = (value: unknown): ChecklistTemplateItem[] => 
       text: item.text,
       required: item.required === true ? true : undefined,
       category: typeof item.category === "string" ? item.category : undefined,
-      estimatedMinutes: typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
+      estimatedMinutes:
+        typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
     });
   }
   return items;
@@ -64,7 +65,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -86,11 +87,7 @@ export class OpTaskService {
   /**
    * Create a new task
    */
-  async create(
-    campgroundId: string,
-    dto: CreateOpTaskDto,
-    createdById: string,
-  ): Promise<OpTask> {
+  async create(campgroundId: string, dto: CreateOpTaskDto, createdById: string): Promise<OpTask> {
     // If template provided, inherit defaults
     let templateChecklistItems: ChecklistTemplateItem[] = [];
     let slaMinutes: number | null = null;
@@ -129,14 +126,14 @@ export class OpTaskService {
         category: dto.category,
         title: dto.title,
         description: dto.description,
-        priority: dto.priority ?? 'medium',
+        priority: dto.priority ?? "medium",
         siteId: dto.siteId,
         reservationId: dto.reservationId,
         locationDescription: dto.locationDescription,
         assignedToUserId: dto.assignedToUserId,
         assignedToTeamId: dto.assignedToTeamId,
         slaDueAt,
-        slaStatus: 'on_track',
+        slaStatus: "on_track",
         checklist: toNullableJsonInput(checklist),
         checklistProgress: 0,
         notes: dto.notes,
@@ -149,7 +146,9 @@ export class OpTaskService {
       include: {
         Site: true,
         Reservation: { include: { Guest: true } },
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
         OpTaskTemplate: true,
       },
@@ -187,15 +186,13 @@ export class OpTaskService {
         where,
         take: query.limit ?? 50,
         skip: query.offset ?? 0,
-        orderBy: [
-          { priority: 'desc' },
-          { slaDueAt: 'asc' },
-          { createdAt: 'desc' },
-        ],
+        orderBy: [{ priority: "desc" }, { slaDueAt: "asc" }, { createdAt: "desc" }],
         include: {
           Site: true,
           Reservation: { include: { Guest: true } },
-          User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+          User_OpTask_assignedToUserIdToUser: {
+            select: { id: true, firstName: true, lastName: true },
+          },
           OpTeam: true,
           OpTaskTemplate: true,
         },
@@ -215,7 +212,9 @@ export class OpTaskService {
       include: {
         Site: true,
         Reservation: { include: { Guest: true } },
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
         OpTeam: { include: { OpTeamMember: { include: { User: true } } } },
         User_OpTask_completedByIdToUser: { select: { id: true, firstName: true, lastName: true } },
         User_OpTask_verifiedByIdToUser: { select: { id: true, firstName: true, lastName: true } },
@@ -224,13 +223,13 @@ export class OpTaskService {
         OpRecurrenceRule: true,
         OpTaskComment: {
           include: { User: { select: { id: true, firstName: true, lastName: true } } },
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     return task;
@@ -239,14 +238,10 @@ export class OpTaskService {
   /**
    * Update a task
    */
-  async update(
-    id: string,
-    dto: UpdateOpTaskDto,
-    userId: string,
-  ): Promise<OpTask> {
+  async update(id: string, dto: UpdateOpTaskDto, userId: string): Promise<OpTask> {
     const existing = await this.prisma.opTask.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     // Track state changes
@@ -281,7 +276,8 @@ export class OpTaskService {
       checklistProgress,
       ...(isCompleting && { completedAt: new Date(), completedById: userId }),
       ...(isVerifying && { verifiedAt: new Date(), verifiedById: userId }),
-      ...(dto.state === OpTaskState.in_progress && !existing.startedAt && { startedAt: new Date() }),
+      ...(dto.state === OpTaskState.in_progress &&
+        !existing.startedAt && { startedAt: new Date() }),
       updatedAt: new Date(),
     };
 
@@ -291,7 +287,9 @@ export class OpTaskService {
       include: {
         Site: true,
         Reservation: { include: { Guest: true } },
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
         OpTaskTemplate: true,
       },
@@ -321,7 +319,7 @@ export class OpTaskService {
         );
         this.logger.log(
           `Op gamification: +${opResult.pointsEarned} pts, ${opResult.newBadges.length} badges, ` +
-          `streak=${opResult.streakUpdated}, levelUp=${opResult.levelUp}`,
+            `streak=${opResult.streakUpdated}, levelUp=${opResult.levelUp}`,
         );
       } catch (error) {
         this.logger.error(`Op gamification error: ${error}`);
@@ -334,7 +332,7 @@ export class OpTaskService {
           userId: completingUserId,
           category: GamificationEventCategory.task,
           reason: `Completed task: ${existing.title}`,
-          sourceType: 'op_task',
+          sourceType: "op_task",
           sourceId: id,
           eventKey: `op_task_complete:${id}`, // Prevent duplicate awards
         });
@@ -352,7 +350,7 @@ export class OpTaskService {
   async delete(id: string): Promise<void> {
     const existing = await this.prisma.opTask.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     // Soft delete by marking as cancelled
@@ -365,14 +363,10 @@ export class OpTaskService {
   /**
    * Add a comment to a task
    */
-  async addComment(
-    taskId: string,
-    userId: string,
-    dto: CreateOpTaskCommentDto,
-  ) {
+  async addComment(taskId: string, userId: string, dto: CreateOpTaskCommentDto) {
     const task = await this.prisma.opTask.findUnique({ where: { id: taskId } });
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     return this.prisma.opTaskComment.create({
@@ -409,11 +403,7 @@ export class OpTaskService {
   /**
    * Bulk update task state (for batch operations)
    */
-  async bulkUpdateState(
-    ids: string[],
-    state: OpTaskState,
-    userId: string,
-  ): Promise<number> {
+  async bulkUpdateState(ids: string[], state: OpTaskState, userId: string): Promise<number> {
     const isCompleting = state === OpTaskState.completed;
     const isVerifying = state === OpTaskState.verified;
 
@@ -441,7 +431,7 @@ export class OpTaskService {
   ): Promise<OpTask> {
     const task = await this.prisma.opTask.findUnique({ where: { id } });
     if (!task) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     const updated = await this.prisma.opTask.update({
@@ -452,7 +442,9 @@ export class OpTaskService {
         state: task.state === OpTaskState.pending ? OpTaskState.assigned : task.state,
       },
       include: {
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
       },
     });
@@ -484,26 +476,20 @@ export class OpTaskService {
    * Get task statistics for a campground
    */
   async getStats(campgroundId: string) {
-    const [
-      byState,
-      byCategory,
-      bySlaStatus,
-      todayCompleted,
-      overdueCount,
-    ] = await Promise.all([
+    const [byState, byCategory, bySlaStatus, todayCompleted, overdueCount] = await Promise.all([
       this.prisma.opTask.groupBy({
-        by: ['state'],
+        by: ["state"],
         where: { campgroundId },
         _count: true,
       }),
       this.prisma.opTask.groupBy({
-        by: ['category'],
-        where: { campgroundId, state: { notIn: ['completed', 'cancelled'] } },
+        by: ["category"],
+        where: { campgroundId, state: { notIn: ["completed", "cancelled"] } },
         _count: true,
       }),
       this.prisma.opTask.groupBy({
-        by: ['slaStatus'],
-        where: { campgroundId, state: { notIn: ['completed', 'cancelled'] } },
+        by: ["slaStatus"],
+        where: { campgroundId, state: { notIn: ["completed", "cancelled"] } },
         _count: true,
       }),
       this.prisma.opTask.count({
@@ -516,7 +502,7 @@ export class OpTaskService {
       this.prisma.opTask.count({
         where: {
           campgroundId,
-          state: { notIn: ['completed', 'cancelled'] },
+          state: { notIn: ["completed", "cancelled"] },
           slaDueAt: { lt: new Date() },
         },
       }),
@@ -544,13 +530,15 @@ export class OpTaskService {
     return this.prisma.opTask.findMany({
       where: {
         campgroundId,
-        state: { notIn: ['completed', 'cancelled'] },
+        state: { notIn: ["completed", "cancelled"] },
         slaDueAt: { gte: startOfDay, lte: endOfDay },
       },
-      orderBy: { slaDueAt: 'asc' },
+      orderBy: { slaDueAt: "asc" },
       include: {
         Site: true,
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
       },
     });
@@ -563,13 +551,15 @@ export class OpTaskService {
     return this.prisma.opTask.findMany({
       where: {
         campgroundId,
-        state: { notIn: ['completed', 'cancelled'] },
+        state: { notIn: ["completed", "cancelled"] },
         slaDueAt: { lt: new Date() },
       },
-      orderBy: { slaDueAt: 'asc' },
+      orderBy: { slaDueAt: "asc" },
       include: {
         Site: true,
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
       },
     });
@@ -589,13 +579,13 @@ export class OpTaskService {
     return this.prisma.opTask.findMany({
       where: {
         campgroundId,
-        state: { notIn: ['completed', 'cancelled'] },
+        state: { notIn: ["completed", "cancelled"] },
         OR: [
           { assignedToUserId: userId },
           ...(teamIds.length > 0 ? [{ assignedToTeamId: { in: teamIds } }] : []),
         ],
       },
-      orderBy: [{ priority: 'desc' }, { slaDueAt: 'asc' }],
+      orderBy: [{ priority: "desc" }, { slaDueAt: "asc" }],
       include: {
         Site: true,
         Reservation: { include: { Guest: true } },

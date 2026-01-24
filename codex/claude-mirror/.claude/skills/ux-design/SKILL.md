@@ -9,16 +9,19 @@ allowed-tools: Read, Glob, Grep
 ## User Types
 
 ### 1. Guests (Public)
+
 - **Goals**: Find and book camping spots quickly
 - **Context**: Often on mobile, may be in areas with poor connectivity
 - **Key flows**: Search → View availability → Book → Pay → Manage reservation
 
 ### 2. Front Desk Staff
+
 - **Goals**: Process check-ins/outs fast, handle walk-ins, process payments
 - **Context**: High-volume, time-sensitive, often interruption-driven
 - **Key flows**: Check-in → Assign site → Collect payment → Print receipt
 
 ### 3. Managers/Owners
+
 - **Goals**: Monitor performance, configure settings, run reports
 - **Context**: Less frequent usage, needs comprehensive data views
 - **Key flows**: View dashboard → Run reports → Adjust settings
@@ -26,24 +29,29 @@ allowed-tools: Read, Glob, Grep
 ## Core UX Principles
 
 ### 1. Speed Over Polish
+
 Staff operations must be FAST. Every extra click costs time during busy check-in periods.
+
 - Minimize clicks for common tasks
 - Provide keyboard shortcuts
 - Auto-focus important fields
 - Use smart defaults
 
 ### 2. Error Prevention
+
 - Validate inputs before submission
 - Confirm destructive actions
 - Show clear error messages with recovery steps
 - Prevent invalid states (e.g., can't book occupied site)
 
 ### 3. Progressive Disclosure
+
 - Show essential info first
 - Hide advanced options behind "More" or expandable sections
 - Use modals sparingly—only for focused tasks
 
 ### 4. Consistent Feedback
+
 - Loading spinners for async operations
 - Success toasts for completed actions
 - Inline validation for forms
@@ -52,12 +60,14 @@ Staff operations must be FAST. Every extra click costs time during busy check-in
 ## Key Interaction Patterns
 
 ### Calendar/Grid Booking
+
 - Click-and-drag for date range selection
 - Visual differentiation: available (green), occupied (red), blocked (gray)
 - Hover tooltips with quick info
 - Quick-book modal on click
 
 ### Forms
+
 - Logical grouping with clear headers
 - Required fields marked with asterisk
 - Tab order follows visual flow
@@ -65,6 +75,7 @@ Staff operations must be FAST. Every extra click costs time during busy check-in
 - Show progress for multi-step flows
 
 ### Tables/Lists
+
 - Sortable columns
 - Search/filter prominently placed
 - Bulk actions for multi-select
@@ -72,6 +83,7 @@ Staff operations must be FAST. Every extra click costs time during busy check-in
 - Row click opens detail view
 
 ### Notifications
+
 - Non-blocking toasts for success
 - Modal alerts for critical decisions
 - Badge counts for unread items

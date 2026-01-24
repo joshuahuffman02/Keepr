@@ -11,7 +11,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { randomUUID } from "crypto";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -26,17 +26,52 @@ async function main() {
     { role: UserRole.manager, resource: "audit", action: "export", effect: PermissionEffect.allow },
     // Privacy
     { role: UserRole.owner, resource: "privacy", action: "write", effect: PermissionEffect.allow },
-    { role: UserRole.manager, resource: "privacy", action: "write", effect: PermissionEffect.allow },
+    {
+      role: UserRole.manager,
+      resource: "privacy",
+      action: "write",
+      effect: PermissionEffect.allow,
+    },
     { role: UserRole.owner, resource: "privacy", action: "read", effect: PermissionEffect.allow },
     { role: UserRole.manager, resource: "privacy", action: "read", effect: PermissionEffect.allow },
     // Permissions admin
-    { role: UserRole.owner, resource: "permissions", action: "write", effect: PermissionEffect.allow },
-    { role: UserRole.owner, resource: "permissions", action: "read", effect: PermissionEffect.allow },
-    { role: UserRole.manager, resource: "permissions", action: "read", effect: PermissionEffect.allow },
+    {
+      role: UserRole.owner,
+      resource: "permissions",
+      action: "write",
+      effect: PermissionEffect.allow,
+    },
+    {
+      role: UserRole.owner,
+      resource: "permissions",
+      action: "read",
+      effect: PermissionEffect.allow,
+    },
+    {
+      role: UserRole.manager,
+      resource: "permissions",
+      action: "read",
+      effect: PermissionEffect.allow,
+    },
     // Default deny for export PII for non-owners
-    { role: UserRole.manager, resource: "privacy", action: "export_pii", effect: PermissionEffect.deny },
-    { role: UserRole.front_desk, resource: "privacy", action: "export_pii", effect: PermissionEffect.deny },
-    { role: UserRole.readonly, resource: "privacy", action: "export_pii", effect: PermissionEffect.deny },
+    {
+      role: UserRole.manager,
+      resource: "privacy",
+      action: "export_pii",
+      effect: PermissionEffect.deny,
+    },
+    {
+      role: UserRole.front_desk,
+      resource: "privacy",
+      action: "export_pii",
+      effect: PermissionEffect.deny,
+    },
+    {
+      role: UserRole.readonly,
+      resource: "privacy",
+      action: "export_pii",
+      effect: PermissionEffect.deny,
+    },
   ];
 
   const targetCampIds = await resolveCampIds(SEED_CAMP_ID);
@@ -49,11 +84,11 @@ async function main() {
             campgroundId: campId,
             role: rule.role,
             resource: rule.resource,
-            action: rule.action
-          }
+            action: rule.action,
+          },
         },
         create: { ...rule, campgroundId: campId, fields: [] },
-        update: { effect: rule.effect, fields: [] }
+        update: { effect: rule.effect, fields: [] },
       });
     }
   }
@@ -70,35 +105,35 @@ async function main() {
       name: "Export PII",
       description: "PII export requires owner approval",
       approverRoles: [UserRole.owner],
-      appliesTo: ["export_pii"]
+      appliesTo: ["export_pii"],
     },
     {
       action: "refund_over_500",
       name: "Refund Over $500",
       description: "High-value refund",
       approverRoles: [UserRole.owner, UserRole.manager],
-      appliesTo: ["refund_over_500"]
+      appliesTo: ["refund_over_500"],
     },
     {
       action: "role_change_owner",
       name: "Owner Role Change",
       description: "Protect ownership changes",
       approverRoles: [UserRole.owner],
-      appliesTo: ["role_change_owner"]
+      appliesTo: ["role_change_owner"],
     },
     {
       action: "subject_request",
       name: "Subject Request",
       description: "Data subject request confirmation",
       approverRoles: [UserRole.owner],
-      appliesTo: ["subject_request"]
+      appliesTo: ["subject_request"],
     },
   ];
 
   for (const campId of targetCampIds) {
     for (const policy of policies) {
       const where: Prisma.ApprovalPolicyWhereUniqueInput = {
-        campgroundId_action: { campgroundId: campId, action: policy.action }
+        campgroundId_action: { campgroundId: campId, action: policy.action },
       };
       await prisma.approvalPolicy.upsert({
         where,
@@ -109,19 +144,21 @@ async function main() {
           name: policy.name,
           description: policy.description,
           approverRoles: policy.approverRoles,
-          appliesTo: policy.appliesTo
+          appliesTo: policy.appliesTo,
         },
         update: {
           name: policy.name,
           description: policy.description,
           approverRoles: policy.approverRoles,
-          appliesTo: policy.appliesTo
-        }
+          appliesTo: policy.appliesTo,
+        },
       });
     }
   }
 
-  console.log(`Seeded permission rules and approval policies for campgrounds: ${targetCampIds.join(", ") || "none"}.`);
+  console.log(
+    `Seeded permission rules and approval policies for campgrounds: ${targetCampIds.join(", ") || "none"}.`,
+  );
 }
 
 async function resolveCampIds(seedCampId: string | null): Promise<string[]> {
@@ -131,7 +168,9 @@ async function resolveCampIds(seedCampId: string | null): Promise<string[]> {
   }
   const exists = camps.find((c) => c.id === seedCampId);
   if (!exists) {
-    throw new Error(`Campground ${seedCampId} not found. Set SEED_CAMP_ID=all or omit for global defaults.`);
+    throw new Error(
+      `Campground ${seedCampId} not found. Set SEED_CAMP_ID=all or omit for global defaults.`,
+    );
   }
   return [seedCampId];
 }

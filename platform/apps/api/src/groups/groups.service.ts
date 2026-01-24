@@ -1,6 +1,6 @@
-import { Injectable, ConflictException, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { EmailService } from '../email/email.service';
+import { Injectable, ConflictException, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { EmailService } from "../email/email.service";
 import { randomUUID } from "crypto";
 
 type GroupNotificationPayload = {
@@ -47,7 +47,7 @@ export class GroupsService {
         where: { id: { in: data.reservationIds } },
         data: {
           groupId: group.id,
-          groupRole: 'member',
+          groupRole: "member",
         },
       });
 
@@ -55,7 +55,7 @@ export class GroupsService {
       if (data.primaryReservationId) {
         await this.prisma.reservation.update({
           where: { id: data.primaryReservationId },
-          data: { groupRole: 'primary' },
+          data: { groupRole: "primary" },
         });
       }
     }
@@ -66,7 +66,7 @@ export class GroupsService {
   async findAll(tenantId: string) {
     const groups = await this.prisma.group.findMany({
       where: { tenantId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     // Enrich with reservation counts
@@ -153,7 +153,7 @@ export class GroupsService {
         where: { id: { in: data.addReservationIds } },
         data: {
           groupId: id,
-          groupRole: 'member',
+          groupRole: "member",
         },
       });
     }
@@ -171,7 +171,10 @@ export class GroupsService {
 
     // Notify group members of changes if sharedComm is enabled
     const group = await this.findOne(id);
-    if (group?.sharedComm && (data.addReservationIds?.length || data.removeReservationIds?.length)) {
+    if (
+      group?.sharedComm &&
+      (data.addReservationIds?.length || data.removeReservationIds?.length)
+    ) {
       await this.notifyGroupChange(group, data.addReservationIds, data.removeReservationIds);
     }
 
@@ -184,7 +187,7 @@ export class GroupsService {
   private async notifyGroupChange(
     group: GroupNotificationPayload,
     addedIds: string[] | undefined,
-    removedIds: string[] | undefined
+    removedIds: string[] | undefined,
   ) {
     try {
       if (!group.reservations?.length) return;
@@ -198,7 +201,7 @@ export class GroupsService {
       }
 
       if (!guestEmails.length) {
-        this.logger.debug('No guest emails found for group notification');
+        this.logger.debug("No guest emails found for group notification");
         return;
       }
 
@@ -217,7 +220,7 @@ export class GroupsService {
           html: `
             <h2>Group Booking Update</h2>
             <p>Your group booking <strong>${groupName}</strong> has been updated.</p>
-            <p><strong>Changes:</strong> ${changes.join(', ')}</p>
+            <p><strong>Changes:</strong> ${changes.join(", ")}</p>
             <p><strong>Current Group Size:</strong> ${group.reservations.length} reservation(s)</p>
             <p>If you have any questions about these changes, please contact the campground directly.</p>
           `,

@@ -19,7 +19,7 @@ import {
   Sparkles,
   Crown,
   Rocket,
-  Star
+  Star,
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -39,7 +39,7 @@ export default function WelcomePage() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
 
   const selectedCampground = campgrounds[0];
@@ -48,13 +48,13 @@ export default function WelcomePage() {
   const { data: sites = [] } = useQuery({
     queryKey: ["sites", campgroundId],
     queryFn: () => apiClient.getSites(campgroundId ?? ""),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const { data: siteClasses = [] } = useQuery({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(campgroundId ?? ""),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Check if Stripe is connected (simplified check)
@@ -70,7 +70,7 @@ export default function WelcomePage() {
       try {
         const res = await fetch(
           `${API_BASE}/early-access/enrollment/${selectedCampground.organizationId}`,
-          { headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` } }
+          { headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` } },
         );
         if (res.ok) {
           const data = await res.json();
@@ -91,7 +91,7 @@ export default function WelcomePage() {
       href: "/dashboard/settings/payments",
       icon: <CreditCard className="h-5 w-5" />,
       isComplete: stripeConnected,
-      priority: 1
+      priority: 1,
     },
     {
       id: "sites",
@@ -100,7 +100,7 @@ export default function WelcomePage() {
       href: "/campgrounds",
       icon: <MapPin className="h-5 w-5" />,
       isComplete: hasSites,
-      priority: 2
+      priority: 2,
     },
     {
       id: "rates",
@@ -109,7 +109,7 @@ export default function WelcomePage() {
       href: "/dashboard/settings/pricing-rules",
       icon: <DollarSign className="h-5 w-5" />,
       isComplete: hasRates,
-      priority: 3
+      priority: 3,
     },
     {
       id: "communications",
@@ -118,29 +118,32 @@ export default function WelcomePage() {
       href: "/dashboard/settings/communications",
       icon: <MessageSquare className="h-5 w-5" />,
       isComplete: false, // Would need API check
-      priority: 4
-    }
+      priority: 4,
+    },
   ];
 
   const completedTasks = setupTasks.filter((t) => t.isComplete).length;
   const progressPercent = Math.round((completedTasks / setupTasks.length) * 100);
 
-  const tierDisplayNames: Record<string, { name: string; icon: React.ReactNode; className: string }> = {
+  const tierDisplayNames: Record<
+    string,
+    { name: string; icon: React.ReactNode; className: string }
+  > = {
     founders_circle: {
       name: "Founder's Circle",
       icon: <Crown className="h-5 w-5" />,
-      className: "bg-status-warning"
+      className: "bg-status-warning",
     },
     pioneer: {
       name: "Pioneer",
       icon: <Rocket className="h-5 w-5" />,
-      className: "bg-status-success"
+      className: "bg-status-success",
     },
     trailblazer: {
       name: "Trailblazer",
       icon: <Star className="h-5 w-5" />,
-      className: "bg-status-info"
-    }
+      className: "bg-status-info",
+    },
   };
 
   const tierInfo = earlyAccessTier ? tierDisplayNames[earlyAccessTier] : null;
@@ -154,15 +157,14 @@ export default function WelcomePage() {
             <Sparkles className="h-8 w-8 text-status-success" />
           </div>
 
-          <h1 className="text-3xl font-bold text-foreground">
-            Welcome to Keepr!
-          </h1>
+          <h1 className="text-3xl font-bold text-foreground">Welcome to Keepr!</h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
             {selectedCampground ? (
               <>
-                Great job setting up <span className="font-semibold">{selectedCampground.name}</span>.
-                Let's get you ready to accept bookings!
+                Great job setting up{" "}
+                <span className="font-semibold">{selectedCampground.name}</span>. Let's get you
+                ready to accept bookings!
               </>
             ) : (
               "Let's get your campground ready to accept bookings!"
@@ -219,11 +221,7 @@ export default function WelcomePage() {
                         : "bg-muted text-muted-foreground group-hover:bg-emerald-50 group-hover:text-emerald-500"
                     }`}
                   >
-                    {task.isComplete ? (
-                      <CheckCircle2 className="h-5 w-5" />
-                    ) : (
-                      task.icon
-                    )}
+                    {task.isComplete ? <CheckCircle2 className="h-5 w-5" /> : task.icon}
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -262,7 +260,11 @@ export default function WelcomePage() {
             <p className="text-muted-foreground text-sm mb-4">
               See your availability at a glance and manage reservations.
             </p>
-            <Button asChild variant="outline" className="border-status-success text-status-success hover:bg-status-success/10">
+            <Button
+              asChild
+              variant="outline"
+              className="border-status-success text-status-success hover:bg-status-success/10"
+            >
               <Link href="/calendar">
                 Open Calendar
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -293,18 +295,19 @@ export default function WelcomePage() {
         <div className="bg-status-success/5 border border-status-success/20 rounded-2xl p-6 text-center">
           <h3 className="text-lg font-semibold text-foreground mb-2">Help Shape Keepr</h3>
           <p className="text-muted-foreground mb-4">
-            You're part of our founding community. Your feedback directly influences what we build next.
+            You're part of our founding community. Your feedback directly influences what we build
+            next.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Button asChild variant="outline" className="border-status-success text-status-success hover:bg-status-success/10">
-              <a href="mailto:feedback@keeprstay.com">
-                Share Feedback
-              </a>
+            <Button
+              asChild
+              variant="outline"
+              className="border-status-success text-status-success hover:bg-status-success/10"
+            >
+              <a href="mailto:feedback@keeprstay.com">Share Feedback</a>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/roadmap">
-                View Roadmap
-              </Link>
+              <Link href="/roadmap">View Roadmap</Link>
             </Button>
           </div>
         </div>
@@ -317,14 +320,10 @@ export default function WelcomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline">
-              <Link href="/dashboard/help">
-                Browse Help Center
-              </Link>
+              <Link href="/dashboard/help">Browse Help Center</Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:support@keeprstay.com">
-                Contact Support
-              </a>
+              <a href="mailto:support@keeprstay.com">Contact Support</a>
             </Button>
           </div>
         </div>

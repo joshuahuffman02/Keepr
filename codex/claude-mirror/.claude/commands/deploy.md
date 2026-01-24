@@ -11,11 +11,13 @@ Run a deployment with validation checks.
 Before deploying, verify:
 
 1. **Build passes locally**
+
    ```bash
    pnpm build
    ```
 
 2. **No uncommitted changes**
+
    ```bash
    git status
    ```
@@ -32,16 +34,19 @@ $ARGUMENTS
 If no specific target provided:
 
 ### Full Stack Deploy
+
 1. Push to main branch (Railway auto-deploys)
 2. Monitor deployment: `railway logs`
 3. Verify API health: `curl https://[api-domain]/health`
 
 ### API Only
+
 ```bash
 railway up --service api
 ```
 
 ### Web Only
+
 ```bash
 railway up --service web
 ```
@@ -55,6 +60,7 @@ railway up --service web
 ## Rollback
 
 If issues found:
+
 ```bash
 railway rollback --service [api|web]
 ```

@@ -1,14 +1,17 @@
 # Report Inventory
 
 ## /reports (Reports dashboard)
+
 Cataloged reports available on the main reports page.
 
 ### Overview (tab: overview)
+
 - Purpose: High-level KPIs and trends at a glance
 - Reports:
   - Dashboard summary (id: dashboard-summary) - Revenue, occupancy, ADR, RevPAR
 
 ### Daily Operations (tab: daily)
+
 - Purpose: Day-to-day arrivals, departures, and transactions
 - Reports:
   - Daily summary (id: daily-summary) - Today's pickup, arrivals, departures
@@ -33,6 +36,7 @@ Cataloged reports available on the main reports page.
   - Daily rate check (id: daily-rate-check) - Variance report
 
 ### Revenue (tab: revenue)
+
 - Purpose: Detailed revenue analysis and breakdowns
 - Reports:
   - Revenue overview (id: revenue-overview) - Gross/Net, ADR, RevPAR
@@ -53,6 +57,7 @@ Cataloged reports available on the main reports page.
   - Cancellation impact (id: cancellation-impact) - Lost revenue by cancellation
 
 ### Performance (tab: performance)
+
 - Purpose: Site and property performance metrics
 - Reports:
   - Pace vs target (id: pace) - On-the-books vs goals
@@ -73,6 +78,7 @@ Cataloged reports available on the main reports page.
   - Occupancy heatmap (id: occupancy-heatmap) - Seasonality across weeks
 
 ### Guests (tab: guests)
+
 - Purpose: Guest demographics and behavior patterns
 - Reports:
   - Guest origins (id: guest-origins) - State/ZIP mix
@@ -90,6 +96,7 @@ Cataloged reports available on the main reports page.
   - Lifetime value (id: lifetime-value) - Guest spend by tenure
 
 ### Marketing (tab: marketing)
+
 - Purpose: Booking sources and campaign effectiveness
 - Reports:
   - Booking sources (id: booking-sources) - Channel mix and revenue
@@ -105,6 +112,7 @@ Cataloged reports available on the main reports page.
   - Direct vs OTA (id: direct-vs-ota) - Channel shift and margins
 
 ### Forecasting (tab: forecasting)
+
 - Purpose: Projections and demand predictions
 - Reports:
   - Revenue forecast (id: revenue-forecast) - Projected revenue vs last year
@@ -120,6 +128,7 @@ Cataloged reports available on the main reports page.
   - Weather impact (id: weather-impact) - Demand sensitivity to weather
 
 ### Accounting (tab: accounting)
+
 - Purpose: Financial ledgers and aging reports
 - Reports:
   - Ledger summary (id: ledger) - GL net and exports
@@ -137,6 +146,7 @@ Cataloged reports available on the main reports page.
   - Cash flow (id: cash-flow) - Cash in/out timing
 
 ### Audits (tab: audits)
+
 - Purpose: Activity logs and compliance tracking
 - Reports:
   - Audit log (id: audit-log) - All system activity
@@ -150,12 +160,14 @@ Cataloged reports available on the main reports page.
   - Discount overrides (id: discount-overrides) - Manual discounts log
 
 ## Other staff-facing report pages
+
 - /reports/saved - Saved report views with quick run links and report export queue history.
 - /reports/portfolio - Cross-park reporting (occupancy, ADR, RevPAR) with portfolio selection and FX conversion.
 - /reports/devices - Device analytics (sessions, bookings, conversion rate) by device type over a selectable period.
 - /reports/audit - Audit log with filters and CSV export (standalone view).
 
 ## Analytics dashboards (staff)
+
 - /dashboard/analytics - Analytics dashboard covering sessions, feature usage, booking funnel performance, and anomaly summary.
 - /dashboard/analytics/features - Feature adoption report with usage counts, unique users, success rate, and category breakdowns.
 - /dashboard/analytics/funnels - Funnel analysis for booking, check-in, staff reservation creation, and POS flows with drop-off metrics.
@@ -165,8 +177,10 @@ Cataloged reports available on the main reports page.
 - /analytics - Analytics dashboard with performance metrics, revenue trends, occupancy forecast, task metrics, and export tooling.
 
 ## Staff settings reports
+
 - /campgrounds/[campgroundId]/staff/reports - Timesheet report with summary + detailed entries, date presets, and CSV export.
 - /campgrounds/[campgroundId]/reports - Report catalog runner (dynamic list from API) with categories, dimensions/metrics, chart output, and table results.
 
 ## Notes
+
 - The report catalog runner pulls report definitions from the API at runtime, so the exact list depends on backend configuration.

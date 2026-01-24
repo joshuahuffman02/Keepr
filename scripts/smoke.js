@@ -14,7 +14,7 @@ const requiredFiles = [
   "docs/phase-2-operations.md",
   "docs/phase-3-analytics.md",
   "docs/phase-4-automation.md",
-  "docs/phase-5-finalization-ux.md"
+  "docs/phase-5-finalization-ux.md",
 ];
 
 const missing = requiredFiles.filter((file) => !fs.existsSync(path.join(root, file)));

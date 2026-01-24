@@ -8,15 +8,16 @@ allowed-tools: Read, Bash, Grep
 
 ## Services
 
-| Service | Type | Port |
-|---------|------|------|
-| api | NestJS | 4000 |
-| web | Next.js | 3000 |
-| db | PostgreSQL | 5432 |
+| Service | Type       | Port |
+| ------- | ---------- | ---- |
+| api     | NestJS     | 4000 |
+| web     | Next.js    | 3000 |
+| db      | PostgreSQL | 5432 |
 
 ## Common Commands
 
 ### Check Status
+
 ```bash
 railway status
 railway logs --service api
@@ -24,6 +25,7 @@ railway logs --service web
 ```
 
 ### Deploy
+
 ```bash
 # Auto-deploy on git push, or manual:
 railway up --service api
@@ -31,12 +33,14 @@ railway up --service web
 ```
 
 ### Environment Variables
+
 ```bash
 railway variables --service api
 railway variables --service web
 ```
 
 ### Database Access
+
 ```bash
 railway connect postgres
 ```
@@ -59,11 +63,13 @@ railway connect postgres
 ## Troubleshooting
 
 ### Build Fails
+
 - Check Node version matches (22.x)
 - Verify pnpm version (7.33.6)
 - Check for missing dependencies
 
 ### Migration Fails
+
 ```bash
 # Check migration status
 DATABASE_URL="..." npx prisma migrate status
@@ -76,12 +82,14 @@ DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 ```
 
 ### Service Won't Start
+
 1. Check logs: `railway logs --service api`
 2. Verify environment variables
 3. Check PORT is set correctly
 4. Verify DATABASE_URL format
 
 ### Memory Issues
+
 - Increase service memory in Railway dashboard
 - Check for memory leaks in Node.js
 

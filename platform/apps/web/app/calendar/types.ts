@@ -15,7 +15,7 @@ export interface DayMeta {
 
 // Calendar reservation with guest and site info
 // Using Omit to override the site/guest types from base Reservation
-export interface CalendarReservation extends Omit<Reservation, 'site' | 'guest'> {
+export interface CalendarReservation extends Omit<Reservation, "site" | "guest"> {
   guest?: {
     primaryFirstName?: string | null;
     primaryLastName?: string | null;
@@ -123,7 +123,12 @@ export interface CalendarCommunication {
 }
 
 // Reservation status type
-export type ReservationStatus = "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled";
+export type ReservationStatus =
+  | "pending"
+  | "confirmed"
+  | "checked_in"
+  | "checked_out"
+  | "cancelled";
 
 // Site type
 export type SiteType = "rv" | "tent" | "cabin" | "group" | "glamping";

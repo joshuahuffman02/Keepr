@@ -69,14 +69,11 @@ export function RateGroupRow({
       className={cn(
         "flex items-center gap-4 p-4 rounded-lg border bg-card",
         "transition-all duration-200 hover:shadow-md group",
-        !group.isActive && "opacity-60"
+        !group.isActive && "opacity-60",
       )}
     >
       {/* Color Picker */}
-      <ColorPicker
-        value={group.color}
-        onChange={(color) => onUpdate(group.id, { color })}
-      />
+      <ColorPicker value={group.color} onChange={(color) => onUpdate(group.id, { color })} />
 
       {/* Name (inline edit) */}
       <div className="flex-1 min-w-0">
@@ -137,7 +134,7 @@ export function RateGroupRow({
         className={cn(
           group.isActive
             ? "bg-status-success-bg text-status-success-text hover:bg-status-success-bg"
-            : "bg-muted text-muted-foreground"
+            : "bg-muted text-muted-foreground",
         )}
       >
         {group.isActive ? "Active" : "Inactive"}
@@ -176,9 +173,7 @@ export function RateGroupRow({
             <Copy className="h-4 w-4 mr-2" />
             Duplicate
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onUpdate(group.id, { isActive: !group.isActive })}
-          >
+          <DropdownMenuItem onClick={() => onUpdate(group.id, { isActive: !group.isActive })}>
             {group.isActive ? "Deactivate" : "Activate"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />

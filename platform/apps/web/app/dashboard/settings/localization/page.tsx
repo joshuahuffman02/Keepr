@@ -19,7 +19,10 @@ import { apiClient } from "@/lib/api-client";
 export default function LocalizationSettingsPage() {
   const { toast } = useToast();
   const localesQuery = useQuery({ queryKey: ["locales"], queryFn: apiClient.listLocales });
-  const settingsQuery = useQuery({ queryKey: ["localization-settings"], queryFn: apiClient.getLocalizationSettings });
+  const settingsQuery = useQuery({
+    queryKey: ["localization-settings"],
+    queryFn: apiClient.getLocalizationSettings,
+  });
 
   const [locale, setLocale] = useState("en-US");
   const [currency, setCurrency] = useState("USD");
@@ -54,9 +57,18 @@ export default function LocalizationSettingsPage() {
     },
   });
 
-  const selectedLocaleMeta = useMemo(() => localesQuery.data?.find((l) => l.code === locale), [localesQuery.data, locale]);
-  const currencies = useMemo(() => Array.from(new Set((localesQuery.data ?? []).map((l) => l.currency))), [localesQuery.data]);
-  const timezones = useMemo(() => Array.from(new Set((localesQuery.data ?? []).map((l) => l.timezone))), [localesQuery.data]);
+  const selectedLocaleMeta = useMemo(
+    () => localesQuery.data?.find((l) => l.code === locale),
+    [localesQuery.data, locale],
+  );
+  const currencies = useMemo(
+    () => Array.from(new Set((localesQuery.data ?? []).map((l) => l.currency))),
+    [localesQuery.data],
+  );
+  const timezones = useMemo(
+    () => Array.from(new Set((localesQuery.data ?? []).map((l) => l.timezone))),
+    [localesQuery.data],
+  );
 
   const handleSave = () => {
     updateMutation.mutate({ locale, currency, timezone });
@@ -73,7 +85,9 @@ export default function LocalizationSettingsPage() {
 
       <div className="mb-2">
         <h1 className="text-2xl font-semibold text-foreground">Localization & language</h1>
-        <p className="text-sm text-muted-foreground">Choose language, locale-aware formatting, and currency defaults.</p>
+        <p className="text-sm text-muted-foreground">
+          Choose language, locale-aware formatting, and currency defaults.
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -97,7 +111,9 @@ export default function LocalizationSettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <div className="text-xs text-muted-foreground mt-1">Includes date/number formats.</div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Includes date/number formats.
+              </div>
             </div>
             <div>
               <div className="text-sm font-semibold text-foreground">Currency</div>
@@ -141,7 +157,9 @@ export default function LocalizationSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Preview</CardTitle>
-            <CardDescription>Shows formatting with the selected language and currency</CardDescription>
+            <CardDescription>
+              Shows formatting with the selected language and currency
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-foreground">
             <div>Sample number: {previewQuery.data?.formattedNumber ?? "—"}</div>
@@ -159,7 +177,9 @@ export default function LocalizationSettingsPage() {
           <CardDescription>Upload translations or download current bundle</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground">Contact support to enable translation bundle management for your property.</div>
+          <div className="text-sm text-muted-foreground">
+            Contact support to enable translation bundle management for your property.
+          </div>
         </CardContent>
       </Card>
     </div>

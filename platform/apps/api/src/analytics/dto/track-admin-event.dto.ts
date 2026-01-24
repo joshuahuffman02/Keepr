@@ -1,5 +1,15 @@
 import { AnalyticsEventName } from "@prisma/client";
-import { IsEnum, IsInt, IsISO8601, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from "class-validator";
+import {
+  IsEnum,
+  IsInt,
+  IsISO8601,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from "class-validator";
 
 /**
  * Enhanced event tracking DTO for admin/staff actions

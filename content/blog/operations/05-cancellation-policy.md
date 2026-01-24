@@ -23,6 +23,7 @@ In this comprehensive guide, we'll walk through how to design a cancellation pol
 ### The Revenue Protection Side
 
 Without a solid cancellation policy:
+
 - Guests book "just in case" with no commitment
 - Last-minute cancellations leave sites empty
 - Peak weekends get held hostage by uncommitted reservations
@@ -31,6 +32,7 @@ Without a solid cancellation policy:
 ### The Guest Experience Side
 
 With an overly strict policy:
+
 - Guests hesitate to book far in advance
 - Bad reviews mention "unfair" policies
 - Word-of-mouth suffers
@@ -46,15 +48,16 @@ With an overly strict policy:
 
 Most campground policies use tiered timeframes:
 
-| Timeframe | Typical Policy |
-|-----------|---------------|
-| 30+ days before | Full refund (minus small processing fee) |
-| 14-29 days before | 50% refund or credit |
-| 7-13 days before | Credit only (no refund) |
-| Less than 7 days | No refund |
-| No-show | No refund, full charge |
+| Timeframe         | Typical Policy                           |
+| ----------------- | ---------------------------------------- |
+| 30+ days before   | Full refund (minus small processing fee) |
+| 14-29 days before | 50% refund or credit                     |
+| 7-13 days before  | Credit only (no refund)                  |
+| Less than 7 days  | No refund                                |
+| No-show           | No refund, full charge                   |
 
 **Adjust these based on:**
+
 - Your ability to resell the site
 - Industry norms in your area
 - Type of accommodation (RV site vs. cabin)
@@ -64,12 +67,14 @@ Most campground policies use tiered timeframes:
 Deposits serve two purposes: commitment and coverage.
 
 **Common deposit structures:**
+
 - **First night at booking** — Simple, clear
 - **50% at booking** — Balanced commitment
 - **Full prepayment** — Maximum protection, may deter bookings
 - **No deposit** — Risky, high no-show rates
 
 **Recommendation:** Require at least one night's deposit at booking for standard reservations. Consider higher deposits for:
+
 - Peak season weekends
 - Holiday periods
 - Cabins or glamping units
@@ -81,6 +86,7 @@ Deposits serve two purposes: commitment and coverage.
 Distinguish between changing a reservation and canceling it:
 
 **Modifications (more flexible):**
+
 - Date changes (when availability exists)
 - Site upgrades or changes
 - Adding/removing nights
@@ -92,11 +98,13 @@ Distinguish between changing a reservation and canceling it:
 Build in flexibility for situations beyond guests' control:
 
 **Weather policies:**
+
 - Mandatory evacuation = full refund or reschedule
 - Campground closure = full refund
 - Guest decides weather is bad = standard policy applies
 
 **Emergency exceptions:**
+
 - Medical emergencies (with documentation)
 - Death in immediate family
 - Military deployment
@@ -122,7 +130,7 @@ CANCELLATIONS:
 
 MODIFICATIONS:
 • Date and site changes: Free if requested 7+ days in advance,
-  subject to availability
+subject to availability
 • Shortened stays: Follow cancellation policy for nights removed
 
 EARLY DEPARTURES:
@@ -172,7 +180,7 @@ while protecting our small business.
 CANCELLATIONS:
 • 48+ hours before arrival: Full refund
 • Less than 48 hours: No refund, but we'll give you a credit
-  good for one year
+good for one year
 
 NO-SHOWS:
 Charged in full with no credit.
@@ -238,12 +246,14 @@ Your cancellation policy should appear:
 ### How to Present
 
 **Do:**
+
 - Use clear, plain language
 - Break into bullet points
 - Highlight key dates/deadlines
 - Provide contact information for questions
 
 **Don't:**
+
 - Bury in legal jargon
 - Hide in terms and conditions click-through
 - Leave any gray areas
@@ -259,7 +269,7 @@ We keep things simple:
 [OK] **Book with confidence** — Cancel 14+ days out for a full refund
 [OK] **Life happens** — Cancel 7-13 days out and get 50% back
 [WARN] **Last minute?** — Less than 7 days, we can't refund, but we'll
-   try to rebook your site for you
+try to rebook your site for you
 
 Questions? Call us at [phone] or email [email]—we're happy to help!
 ```
@@ -271,6 +281,7 @@ Questions? Call us at [phone] or email [email]—we're happy to help!
 ### Be Consistent
 
 The most important rule: apply your policy the same way to everyone.
+
 - Keep records of all cancellation requests
 - Train staff on exactly how to respond
 - Don't make exceptions based on how guests ask
@@ -285,11 +296,13 @@ When guests push back:
 4. **Hold firm** if policy doesn't allow exceptions
 
 **Example response:**
+
 > "I understand the last-minute change is frustrating. Our policy is [X], which we apply consistently to all guests. What I can do is offer you a credit for an off-peak stay within the next 12 months. Would that work for your situation?"
 
 ### Document Everything
 
 Keep records of:
+
 - Original booking terms agreed to
 - All cancellation requests and outcomes
 - Any exceptions made and why
@@ -332,4 +345,4 @@ Remember: your policy should encourage guests to commit meaningfully while provi
 
 ---
 
-*Keepr lets you configure custom cancellation policies by season, site type, and reservation length—then automatically applies them to bookings and communicates terms to guests. [See how at campreserv.com](https://campreserv.com)*
+_Keepr lets you configure custom cancellation policies by season, site type, and reservation length—then automatically applies them to bookings and communicates terms to guests. [See how at campreserv.com](https://campreserv.com)_

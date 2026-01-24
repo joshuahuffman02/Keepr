@@ -48,28 +48,34 @@ export function getAnalyticsSessionId() {
   return id;
 }
 
-export async function trackEvent(eventName: string, payload: Partial<{
-  campgroundId: string;
-  organizationId: string;
-  reservationId: string;
-  siteId: string;
-  siteClassId: string;
-  promotionId: string;
-  imageId: string;
-  page: string;
-  referrer: string;
-  referrerUrl: string;
-  deviceType: string;
-  region: string;
-  source: string;
-  metadata: Record<string, unknown>;
-  occurredAt: string;
-}>) {
+export async function trackEvent(
+  eventName: string,
+  payload: Partial<{
+    campgroundId: string;
+    organizationId: string;
+    reservationId: string;
+    siteId: string;
+    siteClassId: string;
+    promotionId: string;
+    imageId: string;
+    page: string;
+    referrer: string;
+    referrerUrl: string;
+    deviceType: string;
+    region: string;
+    source: string;
+    metadata: Record<string, unknown>;
+    occurredAt: string;
+  }>,
+) {
   if (ANALYTICS_DISABLED) return;
   const sessionId = getAnalyticsSessionId();
   const deviceType = payload.deviceType || getDeviceType();
-  const referrer = payload.referrer ?? (typeof document !== "undefined" ? document.referrer || undefined : undefined);
-  const page = payload.page ?? (typeof window !== "undefined" ? window.location.pathname : undefined);
+  const referrer =
+    payload.referrer ??
+    (typeof document !== "undefined" ? document.referrer || undefined : undefined);
+  const page =
+    payload.page ?? (typeof window !== "undefined" ? window.location.pathname : undefined);
 
   const body = {
     sessionId,
@@ -110,42 +116,126 @@ export async function trackEvent(eventName: string, payload: Partial<{
   }
 }
 
-export function trackPageView(payload: Partial<{ campgroundId: string; organizationId: string; page: string; referrer: string; referrerUrl: string; region: string }>) {
+export function trackPageView(
+  payload: Partial<{
+    campgroundId: string;
+    organizationId: string;
+    page: string;
+    referrer: string;
+    referrerUrl: string;
+    region: string;
+  }>,
+) {
   return trackEvent("page_view", payload);
 }
 
-export function trackAddToStay(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackAddToStay(
+  payload: Partial<{
+    campgroundId: string;
+    reservationId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("add_to_stay", payload);
 }
 
-export function trackReservationStart(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackReservationStart(
+  payload: Partial<{
+    campgroundId: string;
+    reservationId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("reservation_start", payload);
 }
 
-export function trackReservationCompleted(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackReservationCompleted(
+  payload: Partial<{
+    campgroundId: string;
+    reservationId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("reservation_completed", payload);
 }
 
-export function trackReservationAbandoned(payload: Partial<{ campgroundId: string; reservationId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackReservationAbandoned(
+  payload: Partial<{
+    campgroundId: string;
+    reservationId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("reservation_abandoned", payload);
 }
 
-export function trackAvailabilityCheck(payload: Partial<{ campgroundId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackAvailabilityCheck(
+  payload: Partial<{
+    campgroundId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("availability_check", payload);
 }
 
-export function trackImageViewed(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackImageViewed(
+  payload: Partial<{
+    campgroundId: string;
+    imageId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("image_viewed", payload);
 }
 
-export function trackImageClicked(payload: Partial<{ campgroundId: string; imageId: string; siteId: string; siteClassId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackImageClicked(
+  payload: Partial<{
+    campgroundId: string;
+    imageId: string;
+    siteId: string;
+    siteClassId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("image_clicked", payload);
 }
 
-export function trackDealViewed(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackDealViewed(
+  payload: Partial<{
+    campgroundId: string;
+    promotionId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("deal_viewed", payload);
 }
 
-export function trackDealApplied(payload: Partial<{ campgroundId: string; promotionId: string; region: string; metadata: Record<string, unknown> }>) {
+export function trackDealApplied(
+  payload: Partial<{
+    campgroundId: string;
+    promotionId: string;
+    region: string;
+    metadata: Record<string, unknown>;
+  }>,
+) {
   return trackEvent("deal_applied", payload);
 }

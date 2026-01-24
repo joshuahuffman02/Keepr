@@ -3,7 +3,14 @@ import { Test, type TestingModule } from "@nestjs/testing";
 import { PosIntegrationStatus, PosProviderCapability } from "@prisma/client";
 import { PosProviderService } from "../pos/pos-provider.service";
 import { PosProviderRegistry } from "../pos/pos-provider.registry";
-import { CloverAdapter, SquareAdapter, ToastAdapter, LightspeedAdapter, ShopifyPosAdapter, VendAdapter } from "../pos/pos-provider.adapters";
+import {
+  CloverAdapter,
+  SquareAdapter,
+  ToastAdapter,
+  LightspeedAdapter,
+  ShopifyPosAdapter,
+  VendAdapter,
+} from "../pos/pos-provider.adapters";
 import { PrismaService } from "../prisma/prisma.service";
 import { AuditService } from "../audit/audit.service";
 import { IdempotencyService } from "../payments/idempotency.service";
@@ -67,10 +74,12 @@ describe("PosProviderService", () => {
 
   it("validates provider credentials via adapter", async () => {
     prisma.posProviderIntegration.updateMany.mockResolvedValue({ count: 1 });
-    const result = await service.validateCredentials("camp-1", "clover", { credentials: { apiKey: "abc" } });
+    const result = await service.validateCredentials("camp-1", "clover", {
+      credentials: { apiKey: "abc" },
+    });
     expect(result.ok).toBe(true);
     expect(prisma.posProviderIntegration.updateMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { campgroundId: "camp-1", provider: "clover" } })
+      expect.objectContaining({ where: { campgroundId: "camp-1", provider: "clover" } }),
     );
   });
 
@@ -109,7 +118,13 @@ describe("PosProviderService", () => {
     });
     const raw = JSON.stringify({ id: "evt-1" });
     const signature = createHmac("sha256", "whsec").update(raw).digest("hex");
-    const resp = await service.handleWebhook("clover", "camp-1", { id: "evt-1" }, { "x-pos-signature": signature }, raw);
+    const resp = await service.handleWebhook(
+      "clover",
+      "camp-1",
+      { id: "evt-1" },
+      { "x-pos-signature": signature },
+      raw,
+    );
     expect(resp.acknowledged).toBe(true);
   });
 });

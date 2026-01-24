@@ -14,20 +14,17 @@ import {
   MapPin,
   Calendar,
   Users,
-  Heart
+  Heart,
 } from "lucide-react";
 
 // Event type color mapping
-const eventTypeStyles: Record<
-  string,
-  { bg: string; text: string; icon: typeof Activity }
-> = {
+const eventTypeStyles: Record<string, { bg: string; text: string; icon: typeof Activity }> = {
   activity: { bg: "bg-keepr-evergreen/10", text: "text-keepr-evergreen", icon: Activity },
   workshop: { bg: "bg-keepr-clay/10", text: "text-keepr-clay", icon: Paintbrush },
   entertainment: { bg: "bg-keepr-charcoal/10", text: "text-keepr-charcoal", icon: Music },
   holiday: { bg: "bg-keepr-clay/15", text: "text-keepr-clay", icon: Gift },
   recurring: { bg: "bg-keepr-evergreen/15", text: "text-keepr-evergreen", icon: Repeat },
-  ongoing: { bg: "bg-keepr-charcoal/10", text: "text-keepr-charcoal", icon: Clock }
+  ongoing: { bg: "bg-keepr-charcoal/10", text: "text-keepr-charcoal", icon: Clock },
 };
 
 interface EventCardProps {
@@ -68,7 +65,7 @@ export function EventCard({
   priceCents,
   capacity,
   currentSignups,
-  campground
+  campground,
 }: EventCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -82,7 +79,7 @@ export function EventCard({
     return date.toLocaleDateString("en-US", {
       weekday: "short",
       month: "short",
-      day: "numeric"
+      day: "numeric",
     });
   };
 
@@ -151,9 +148,7 @@ export function EventCard({
         <div className="absolute top-3 right-12">
           <span
             className={`px-2.5 py-1 rounded-full text-xs font-bold ${
-              priceCents === 0
-                ? "bg-keepr-evergreen text-white"
-                : "bg-card/90 text-foreground"
+              priceCents === 0 ? "bg-keepr-evergreen text-white" : "bg-card/90 text-foreground"
             }`}
           >
             {formatPrice(priceCents)}
@@ -194,9 +189,7 @@ export function EventCard({
           <div className="absolute bottom-3 left-3">
             <span
               className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                isSoldOut
-                  ? "bg-status-error text-white"
-                  : "bg-keepr-clay text-white"
+                isSoldOut ? "bg-status-error text-white" : "bg-keepr-clay text-white"
               }`}
             >
               {isSoldOut ? "Sold Out" : `Only ${spotsLeft} spots left`}
@@ -232,9 +225,7 @@ export function EventCard({
         </h3>
 
         {/* Description */}
-        {description && (
-          <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground line-clamp-2">{description}</p>}
 
         {/* Campground Info */}
         <Link
@@ -267,7 +258,7 @@ export function EventCard({
                   isAlmostFull ? "bg-keepr-clay" : "bg-keepr-evergreen"
                 }`}
                 style={{
-                  width: `${Math.min((currentSignups / capacity) * 100, 100)}%`
+                  width: `${Math.min((currentSignups / capacity) * 100, 100)}%`,
                 }}
               />
             </div>

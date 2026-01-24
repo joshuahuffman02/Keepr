@@ -40,11 +40,7 @@ interface RentalTypeSelectorProps {
   disabled?: boolean;
 }
 
-export function RentalTypeSelector({
-  value,
-  onChange,
-  disabled = false,
-}: RentalTypeSelectorProps) {
+export function RentalTypeSelector({ value, onChange, disabled = false }: RentalTypeSelectorProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {rentalTypes.map((rentalType, index) => {
@@ -65,9 +61,7 @@ export function RentalTypeSelector({
               disabled
                 ? "cursor-not-allowed opacity-50"
                 : "hover:border-emerald-500/50 hover:bg-muted/50",
-              isSelected
-                ? "border-emerald-500 bg-emerald-500/10"
-                : "border-border bg-muted/30"
+              isSelected ? "border-emerald-500 bg-emerald-500/10" : "border-border bg-muted/30",
             )}
           >
             <div className="flex flex-col items-center text-center gap-4">
@@ -76,7 +70,7 @@ export function RentalTypeSelector({
                   "p-4 rounded-lg",
                   isSelected
                     ? "bg-emerald-500/20 text-emerald-400"
-                    : "bg-muted text-muted-foreground"
+                    : "bg-muted text-muted-foreground",
                 )}
               >
                 <Icon className="w-8 h-8" />
@@ -85,7 +79,7 @@ export function RentalTypeSelector({
                 <h4
                   className={cn(
                     "font-semibold text-lg",
-                    isSelected ? "text-emerald-400" : "text-muted-foreground"
+                    isSelected ? "text-emerald-400" : "text-muted-foreground",
                   )}
                 >
                   {rentalType.label}

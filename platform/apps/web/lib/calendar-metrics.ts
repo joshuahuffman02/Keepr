@@ -25,7 +25,7 @@ export function recordError(stage: string, error: unknown) {
   dispatchMetric("calendar.error", {
     stage,
     message,
-    status
+    status,
   });
 }
 
@@ -37,6 +37,6 @@ export function startTiming(label: string) {
       const durationMs = endedAt - startedAt;
       recordMetric("calendar.timing", { label, durationMs, ...extra });
       return durationMs;
-    }
+    },
   };
 }

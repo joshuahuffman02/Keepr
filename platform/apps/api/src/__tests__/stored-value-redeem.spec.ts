@@ -13,7 +13,11 @@ type PrismaMock = {
   $transaction: jest.Mock;
 };
 
-const createService = async (prisma: PrismaMock, idempotency: Record<string, jest.Mock>, observability: { recordRedeemOutcome: jest.Mock }) => {
+const createService = async (
+  prisma: PrismaMock,
+  idempotency: Record<string, jest.Mock>,
+  observability: { recordRedeemOutcome: jest.Mock },
+) => {
   const moduleRef = await Test.createTestingModule({
     providers: [
       StoredValueService,
@@ -28,7 +32,13 @@ const createService = async (prisma: PrismaMock, idempotency: Record<string, jes
 
 describe("StoredValueService redeem double guard", () => {
   it("returns conflict on double redeem for same reference", async () => {
-    const account = { id: "acct-1", campgroundId: "camp-1", status: "active", currency: "usd", expiresAt: null };
+    const account = {
+      id: "acct-1",
+      campgroundId: "camp-1",
+      status: "active",
+      currency: "usd",
+      expiresAt: null,
+    };
 
     const tx = {
       storedValueLedger: {
@@ -74,8 +84,8 @@ describe("StoredValueService redeem double guard", () => {
             referenceId: "cart-1",
           },
           "redeem-key",
-          { campgroundId: "camp-1" }
-        )
+          { campgroundId: "camp-1" },
+        ),
       ).rejects.toBeInstanceOf(ConflictException);
     } finally {
       await close();
@@ -83,21 +93,39 @@ describe("StoredValueService redeem double guard", () => {
   });
 
   it("returns conflict when idempotency record is inflight (parallel redeem)", async () => {
-    const account = { id: "acct-2", campgroundId: "camp-2", status: "active", currency: "usd", expiresAt: null };
+    const account = {
+      id: "acct-2",
+      campgroundId: "camp-2",
+      status: "active",
+      currency: "usd",
+      expiresAt: null,
+    };
     const prisma: PrismaMock = {
       storedValueAccount: { findUnique: jest.fn().mockResolvedValue(account) },
       storedValueCode: { findUnique: jest.fn(), findFirst: jest.fn().mockResolvedValue(null) },
       storedValueHold: { aggregate: jest.fn().mockResolvedValue({ _sum: { amountCents: 0 } }) },
-      storedValueLedger: { findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn(), create: jest.fn() },
-      $transaction: jest.fn(async (cb: (client: { storedValueLedger: { findMany: jest.Mock; findFirst: jest.Mock; create: jest.Mock }; storedValueHold: { aggregate: jest.Mock } }) => Promise<unknown>) =>
-        cb({
-          storedValueLedger: {
-            findMany: jest.fn().mockResolvedValue([{ direction: "issue", amountCents: 1000 }]),
-            findFirst: jest.fn(),
-            create: jest.fn(),
-          },
-          storedValueHold: { aggregate: jest.fn().mockResolvedValue({ _sum: { amountCents: 0 } }) },
-        })
+      storedValueLedger: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn(),
+        create: jest.fn(),
+      },
+      $transaction: jest.fn(
+        async (
+          cb: (client: {
+            storedValueLedger: { findMany: jest.Mock; findFirst: jest.Mock; create: jest.Mock };
+            storedValueHold: { aggregate: jest.Mock };
+          }) => Promise<unknown>,
+        ) =>
+          cb({
+            storedValueLedger: {
+              findMany: jest.fn().mockResolvedValue([{ direction: "issue", amountCents: 1000 }]),
+              findFirst: jest.fn(),
+              create: jest.fn(),
+            },
+            storedValueHold: {
+              aggregate: jest.fn().mockResolvedValue({ _sum: { amountCents: 0 } }),
+            },
+          }),
       ),
     };
 
@@ -126,8 +154,8 @@ describe("StoredValueService redeem double guard", () => {
             referenceId: "cart-2",
           },
           "redeem-key-2",
-          { campgroundId: "camp-2" }
-        )
+          { campgroundId: "camp-2" },
+        ),
       ).rejects.toBeInstanceOf(ConflictException);
     } finally {
       await close();

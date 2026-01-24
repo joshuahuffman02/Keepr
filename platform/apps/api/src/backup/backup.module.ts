@@ -12,10 +12,9 @@ import { PermissionsModule } from "../permissions/permissions.module";
     PrismaService,
     {
       provide: BackupProvider,
-      useFactory: () => new HttpBackupProvider()
-    }
+      useFactory: () => new HttpBackupProvider(),
+    },
   ],
-  exports: [BackupService, BackupProvider]
+  exports: [BackupService, BackupProvider],
 })
 export class BackupModule {}
-

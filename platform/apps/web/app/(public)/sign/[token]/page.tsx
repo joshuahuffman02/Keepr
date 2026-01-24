@@ -92,8 +92,8 @@ export default function SignPage() {
           token,
           status,
           recipientEmail: email || undefined,
-          metadata: { signer: name, signerName: name, signerEmail: email }
-        })
+          metadata: { signer: name, signerName: name, signerEmail: email },
+        }),
       });
       if (!res.ok) throw new Error("Failed");
       setResult(status);
@@ -133,26 +133,58 @@ export default function SignPage() {
             )}
 
             <div className="space-y-2">
-              <Input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} />
-              <Input placeholder="Email for receipt" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+              <Input
+                placeholder="Email for receipt"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
 
             <div className="flex items-start gap-2 rounded border border-slate-200 bg-slate-50 p-3">
-              <Checkbox id="accept" checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} />
+              <Checkbox
+                id="accept"
+                checked={accepted}
+                onCheckedChange={(v) => setAccepted(v === true)}
+              />
               <label htmlFor="accept" className="text-sm text-slate-700">
-                I have reviewed the long-term stay agreement, park rules, deposit/fee summary, waiver, and COI requirements.
+                I have reviewed the long-term stay agreement, park rules, deposit/fee summary,
+                waiver, and COI requirements.
               </label>
             </div>
 
-            {result === "signed" && <div className="rounded bg-emerald-50 px-3 py-2 text-sm text-emerald-700">Thank you! Your signature is recorded.</div>}
-            {result === "declined" && <div className="rounded bg-amber-50 px-3 py-2 text-sm text-amber-700">You declined this request. The park will be notified.</div>}
-            {result === "error" && <div className="rounded bg-rose-50 px-3 py-2 text-sm text-rose-700">Something went wrong. Please try again.</div>}
+            {result === "signed" && (
+              <div className="rounded bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+                Thank you! Your signature is recorded.
+              </div>
+            )}
+            {result === "declined" && (
+              <div className="rounded bg-amber-50 px-3 py-2 text-sm text-amber-700">
+                You declined this request. The park will be notified.
+              </div>
+            )}
+            {result === "error" && (
+              <div className="rounded bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                Something went wrong. Please try again.
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-2">
-              <Button disabled={!accepted || loading || result === "signed"} onClick={() => submit("signed")}>
+              <Button
+                disabled={!accepted || loading || result === "signed"}
+                onClick={() => submit("signed")}
+              >
                 {loading ? "Submitting..." : "Sign and submit"}
               </Button>
-              <Button variant="outline" disabled={loading || result === "signed"} onClick={() => submit("declined")}>
+              <Button
+                variant="outline"
+                disabled={loading || result === "signed"}
+                onClick={() => submit("declined")}
+              >
                 Decline
               </Button>
             </div>

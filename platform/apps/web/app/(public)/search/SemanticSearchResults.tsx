@@ -122,9 +122,7 @@ export function SemanticSearchResults({ query }: { query: string }) {
                     {Math.round(result.similarity * 100)}% match
                   </span>
                 </div>
-                <span className="text-sm text-emerald-600 font-medium">
-                  View Details →
-                </span>
+                <span className="text-sm text-emerald-600 font-medium">View Details →</span>
               </div>
             </div>
           </Link>

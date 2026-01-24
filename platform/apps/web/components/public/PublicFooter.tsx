@@ -52,7 +52,7 @@ export function PublicFooter() {
         name: "Newsletter subscriber",
         email: email.trim(),
         interest: "newsletter",
-        source: "public-footer"
+        source: "public-footer",
       });
       setEmail("");
       setStatus("success");
@@ -69,7 +69,9 @@ export function PublicFooter() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <h3 className="text-xl font-semibold mb-2">Get camping inspiration & deals</h3>
-              <p className="text-slate-400 text-sm">Join thousands of families discovering their next adventure.</p>
+              <p className="text-slate-400 text-sm">
+                Join thousands of families discovering their next adventure.
+              </p>
             </div>
             <div className="w-full md:w-auto space-y-2">
               <form className="flex gap-3 w-full md:w-auto" onSubmit={handleSubscribe}>
@@ -112,7 +114,16 @@ export function PublicFooter() {
           <div className="col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-keepr-evergreen to-teal-600 flex items-center justify-center shadow-lg">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="m4 20 8-14 8 14" />
                   <path d="M2 20h20" />
                 </svg>
@@ -120,7 +131,8 @@ export function PublicFooter() {
               <span className="text-xl font-bold">Keepr</span>
             </div>
             <p className="text-slate-400 text-sm mb-6 max-w-xs">
-              Find your perfect campground and create memories that last a lifetime. Family-trusted, nature-approved.
+              Find your perfect campground and create memories that last a lifetime. Family-trusted,
+              nature-approved.
             </p>
 
             {/* Social Links */}
@@ -145,11 +157,16 @@ export function PublicFooter() {
 
           {/* Explore */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">Explore</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">
+              Explore
+            </h4>
             <ul className="space-y-3">
               {navigation.explore.map((item) => (
                 <li key={item.name}>
-                  <Link href={item.href} className="text-slate-300 hover:text-white transition-colors text-sm">
+                  <Link
+                    href={item.href}
+                    className="text-slate-300 hover:text-white transition-colors text-sm"
+                  >
                     {item.name}
                   </Link>
                 </li>
@@ -159,11 +176,16 @@ export function PublicFooter() {
 
           {/* Company */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">Company</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">
+              Company
+            </h4>
             <ul className="space-y-3">
               {navigation.company.map((item) => (
                 <li key={item.name}>
-                  <Link href={item.href} className="text-slate-300 hover:text-white transition-colors text-sm">
+                  <Link
+                    href={item.href}
+                    className="text-slate-300 hover:text-white transition-colors text-sm"
+                  >
                     {item.name}
                   </Link>
                 </li>
@@ -173,11 +195,16 @@ export function PublicFooter() {
 
           {/* Support */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">Support</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">
+              Support
+            </h4>
             <ul className="space-y-3">
               {navigation.support.map((item) => (
                 <li key={item.name}>
-                  <Link href={item.href} className="text-slate-300 hover:text-white transition-colors text-sm">
+                  <Link
+                    href={item.href}
+                    className="text-slate-300 hover:text-white transition-colors text-sm"
+                  >
                     {item.name}
                   </Link>
                 </li>
@@ -187,10 +214,15 @@ export function PublicFooter() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">Get in Touch</h4>
+            <h4 className="font-semibold text-sm uppercase tracking-wider text-slate-400 mb-4">
+              Get in Touch
+            </h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <a href="mailto:hello@keeprstay.com" className="text-slate-300 hover:text-white transition-colors flex items-center gap-2">
+                <a
+                  href="mailto:hello@keeprstay.com"
+                  className="text-slate-300 hover:text-white transition-colors flex items-center gap-2"
+                >
                   <Mail className="w-4 h-4" />
                   hello@keeprstay.com
                 </a>
@@ -221,7 +253,11 @@ export function PublicFooter() {
             {/* Legal Links */}
             <div className="flex items-center gap-4">
               {navigation.legal.map((item) => (
-                <Link key={item.name} href={item.href} className="text-sm text-slate-500 hover:text-slate-300 transition-colors">
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="text-sm text-slate-500 hover:text-slate-300 transition-colors"
+                >
                   {item.name}
                 </Link>
               ))}

@@ -75,20 +75,14 @@ export function ScarcityIndicator({
   if (variant === "banner") {
     return (
       <div
-        className={cn(
-          "rounded-lg border px-4 py-3 flex items-center gap-3",
-          styles.bg,
-          className
-        )}
+        className={cn("rounded-lg border px-4 py-3 flex items-center gap-3", styles.bg, className)}
       >
         <div className={cn("flex-shrink-0", styles.icon)}>
           <Icon className="h-5 w-5" />
         </div>
         <div className="flex-1">
           <p className={cn("font-semibold", styles.text)}>{message}</p>
-          {dateRange && (
-            <p className={cn("text-sm opacity-80", styles.text)}>for {dateRange}</p>
-          )}
+          {dateRange && <p className={cn("text-sm opacity-80", styles.text)}>for {dateRange}</p>}
         </div>
         {totalSites && (
           <div className={cn("text-sm", styles.text)}>
@@ -115,7 +109,7 @@ export function ScarcityIndicator({
         "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
         styles.bg,
         styles.text,
-        className
+        className,
       )}
     >
       <Icon className="h-3.5 w-3.5" />
@@ -134,10 +128,8 @@ export function ScarcityBadge({ sitesLeft, className }: { sitesLeft: number; cla
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold",
-        isCritical
-          ? "bg-status-error text-white"
-          : "bg-keepr-clay text-white",
-        className
+        isCritical ? "bg-status-error text-white" : "bg-keepr-clay text-white",
+        className,
       )}
     >
       <Flame className="h-3 w-3" />

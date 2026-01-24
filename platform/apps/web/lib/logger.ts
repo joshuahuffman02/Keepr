@@ -94,12 +94,7 @@ function sendToRemote(entry: LogEntry): void {
 /**
  * Create a log entry
  */
-function createEntry(
-  level: LogLevel,
-  message: string,
-  context?: string,
-  data?: unknown
-): LogEntry {
+function createEntry(level: LogLevel, message: string, context?: string, data?: unknown): LogEntry {
   return {
     level,
     message,

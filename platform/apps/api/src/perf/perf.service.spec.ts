@@ -14,7 +14,7 @@ describe("PerfService", () => {
         durationMs: duration,
         statusCode: index === samples.length - 1 ? 500 : 200,
         route: "GET /test",
-      })
+      }),
     );
 
     const snapshot = service.getSnapshot();
@@ -50,4 +50,3 @@ describe("PerfService", () => {
     expect(snapshot.limiter.org).toBe(1);
   });
 });
-

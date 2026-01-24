@@ -55,18 +55,18 @@ export class BillingService {
     type: string,
     serialNumber?: string,
     ratePlanId?: string,
-    config?: { billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean }
+    config?: { billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean },
   ) {
     const site = await this.prisma.site.findFirst({
       where: { id: siteId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!site) throw new NotFoundException("Site not found");
 
     if (ratePlanId) {
       const plan = await this.prisma.utilityRatePlan.findFirst({
         where: { id: ratePlanId, campgroundId },
-        select: { id: true }
+        select: { id: true },
       });
       if (!plan) throw new NotFoundException("Rate plan not found");
     }
@@ -82,22 +82,22 @@ export class BillingService {
         billingMode: config?.billingMode || "cycle",
         billTo: config?.billTo || "reservation",
         multiplier: config?.multiplier ?? 1.0,
-        autoEmail: config?.autoEmail ?? false
-      }
+        autoEmail: config?.autoEmail ?? false,
+      },
     });
   }
 
   async listMeters(campgroundId: string) {
     return this.prisma.utilityMeter.findMany({
       where: { campgroundId },
-      include: { UtilityRatePlan: true }
+      include: { UtilityRatePlan: true },
     });
   }
 
   async listRatePlans(campgroundId: string) {
     return this.prisma.utilityRatePlan.findMany({
       where: { campgroundId },
-      orderBy: { effectiveFrom: "desc" }
+      orderBy: { effectiveFrom: "desc" },
     });
   }
 
@@ -108,11 +108,11 @@ export class BillingService {
     readAt: Date,
     readBy?: string,
     note?: string,
-    source: string = "manual"
+    source: string = "manual",
   ) {
     const meter = await this.prisma.utilityMeter.findFirst({
       where: { id: meterId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!meter) throw new NotFoundException("Meter not found");
 
@@ -124,17 +124,26 @@ export class BillingService {
         readAt,
         readBy: readBy || null,
         note: note || null,
-        source
-      }
+        source,
+      },
     });
   }
 
   async importMeterReads(
     campgroundId: string,
-    reads: Array<{ meterId: string; readingValue: number; readAt: Date; note?: string; readBy?: string; source?: string }>
+    reads: Array<{
+      meterId: string;
+      readingValue: number;
+      readAt: Date;
+      note?: string;
+      readBy?: string;
+      source?: string;
+    }>,
   ) {
     const meterIds = Array.from(new Set(reads.map((r) => r.meterId)));
-    const meters = await this.prisma.utilityMeter.findMany({ where: { id: { in: meterIds }, campgroundId } });
+    const meters = await this.prisma.utilityMeter.findMany({
+      where: { id: { in: meterIds }, campgroundId },
+    });
     const allowed = new Set(meters.map((m) => m.id));
     const validReads = reads.filter((r) => allowed.has(r.meterId));
     await this.prisma.$transaction(
@@ -147,10 +156,10 @@ export class BillingService {
             readAt: r.readAt,
             note: r.note || null,
             readBy: r.readBy || null,
-            source: r.source || "import"
-          }
-        })
-      )
+            source: r.source || "import",
+          },
+        }),
+      ),
     );
     return { imported: validReads.length, skipped: reads.length - validReads.length };
   }
@@ -158,7 +167,7 @@ export class BillingService {
   async listReads(campgroundId: string, meterId: string, start?: Date, end?: Date) {
     const meter = await this.prisma.utilityMeter.findFirst({
       where: { id: meterId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!meter) throw new NotFoundException("Meter not found");
 
@@ -169,12 +178,12 @@ export class BillingService {
           ? {
               readAt: {
                 gte: start,
-                lte: end
-              }
+                lte: end,
+              },
             }
-          : {})
+          : {}),
       },
-      orderBy: { readAt: "asc" }
+      orderBy: { readAt: "asc" },
     });
   }
 
@@ -189,18 +198,18 @@ export class BillingService {
       autoEmail?: boolean;
       active?: boolean;
       serialNumber?: string | null;
-    }
+    },
   ) {
     const meter = await this.prisma.utilityMeter.findFirst({
       where: { id: meterId, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!meter) throw new NotFoundException("Meter not found");
 
     if (data.ratePlanId !== undefined && data.ratePlanId !== null) {
       const plan = await this.prisma.utilityRatePlan.findFirst({
         where: { id: data.ratePlanId, campgroundId },
-        select: { id: true }
+        select: { id: true },
       });
       if (!plan) throw new NotFoundException("Rate plan not found");
     }
@@ -214,8 +223,8 @@ export class BillingService {
         multiplier: data.multiplier ?? undefined,
         autoEmail: data.autoEmail ?? undefined,
         active: data.active ?? undefined,
-        serialNumber: data.serialNumber ?? undefined
-      }
+        serialNumber: data.serialNumber ?? undefined,
+      },
     });
   }
 
@@ -224,8 +233,8 @@ export class BillingService {
       where: { id: meterId, campgroundId },
       include: {
         UtilityMeterRead: { orderBy: { readAt: "asc" } },
-        UtilityRatePlan: true
-      }
+        UtilityRatePlan: true,
+      },
     });
     if (!meter) throw new NotFoundException("Meter not found");
     if (!meter.active) throw new BadRequestException("Meter inactive");
@@ -233,20 +242,24 @@ export class BillingService {
     const reservation = await this.prisma.reservation.findFirst({
       where: {
         siteId: meter.siteId,
-        status: { in: ["pending", "confirmed", "checked_in"] }
+        status: { in: ["pending", "confirmed", "checked_in"] },
       },
-      orderBy: { arrivalDate: "desc" }
+      orderBy: { arrivalDate: "desc" },
     });
     if (!reservation) throw new NotFoundException("No active reservation on this site");
 
     const reads = meter.UtilityMeterRead;
-    if (!reads || reads.length < 2) throw new BadRequestException("Need at least two reads to bill");
+    if (!reads || reads.length < 2)
+      throw new BadRequestException("Need at least two reads to bill");
 
     const lastBilledAt = meter.lastBilledReadAt ? new Date(meter.lastBilledReadAt) : null;
-    const candidates = lastBilledAt ? reads.filter((r) => r.readAt > lastBilledAt) : reads.slice(-1);
+    const candidates = lastBilledAt
+      ? reads.filter((r) => r.readAt > lastBilledAt)
+      : reads.slice(-1);
     const endRead = candidates[candidates.length - 1];
     const prevReadCandidates = reads.filter((r) => r.readAt < endRead.readAt);
-    const startRead = prevReadCandidates.length > 0 ? prevReadCandidates[prevReadCandidates.length - 1] : reads[0];
+    const startRead =
+      prevReadCandidates.length > 0 ? prevReadCandidates[prevReadCandidates.length - 1] : reads[0];
 
     const usage = Math.max(0, Number(endRead.readingValue) - Number(startRead.readingValue));
     const multiplier = Number(meter.multiplier ?? 1);
@@ -266,8 +279,8 @@ export class BillingService {
         periodEnd: endRead.readAt,
         status: "closed",
         generatedAt: new Date(),
-        closedAt: new Date()
-      }
+        closedAt: new Date(),
+      },
     });
 
     const invoice = await this.prisma.invoice.create({
@@ -296,13 +309,13 @@ export class BillingService {
                 utilityType: meter.type,
                 ratePlanId: meter.ratePlanId ?? undefined,
                 readStartAt: startRead.readAt,
-                readEndAt: endRead.readAt
-              })
-            }
-          ]
-        }
+                readEndAt: endRead.readAt,
+              }),
+            },
+          ],
+        },
       },
-      include: { InvoiceLine: true }
+      include: { InvoiceLine: true },
     });
 
     const line = invoice.InvoiceLine[0];
@@ -313,12 +326,12 @@ export class BillingService {
       invoiceLineId: line.id,
       amountCents: line.amountCents,
       revenueGl: "UTILITY",
-      description: line.description
+      description: line.description,
     });
 
     await this.prisma.utilityMeter.update({
       where: { id: meter.id },
-      data: { lastBilledReadAt: endRead.readAt }
+      data: { lastBilledReadAt: endRead.readAt },
     });
 
     return this.getInvoice(campgroundId, invoice.id);
@@ -327,7 +340,7 @@ export class BillingService {
   async seedMetersForSiteClass(campgroundId: string, siteClassId: string) {
     const siteClass = await this.prisma.siteClass.findFirst({
       where: { id: siteClassId, campgroundId },
-      include: { Site: true }
+      include: { Site: true },
     });
     if (!siteClass) throw new NotFoundException("Site class not found");
     if (!siteClass.meteredEnabled || !siteClass.meteredType) {
@@ -338,7 +351,7 @@ export class BillingService {
     if (!sites || sites.length === 0) return { created: 0 };
 
     const existing = await this.prisma.utilityMeter.findMany({
-      where: { siteId: { in: sites.map((s) => s.id) }, type, active: true }
+      where: { siteId: { in: sites.map((s) => s.id) }, type, active: true },
     });
     const existingBySite = new Set(existing.map((m) => m.siteId));
 
@@ -355,8 +368,8 @@ export class BillingService {
           billingMode: siteClass.meteredBillingMode || "cycle",
           billTo: siteClass.meteredBillTo || "reservation",
           multiplier: siteClass.meteredMultiplier ?? 1.0,
-          autoEmail: siteClass.meteredAutoEmail ?? false
-        }
+          autoEmail: siteClass.meteredAutoEmail ?? false,
+        },
       });
       created += 1;
     }
@@ -368,10 +381,10 @@ export class BillingService {
     reservationId: string,
     cadence: string,
     periodStart: Date,
-    periodEnd: Date
+    periodEnd: Date,
   ) {
     const reservation = await this.prisma.reservation.findFirst({
-      where: { id: reservationId, campgroundId }
+      where: { id: reservationId, campgroundId },
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
     return this.prisma.billingCycle.create({
@@ -381,8 +394,8 @@ export class BillingService {
         campgroundId: reservation.campgroundId,
         cadence,
         periodStart,
-        periodEnd
-      }
+        periodEnd,
+      },
     });
   }
 
@@ -393,20 +406,31 @@ export class BillingService {
     const now = new Date();
     const anchor = reservation.billingAnchorDate || reservation.arrivalDate;
     const lengthDays = cadence === "weekly" ? 7 : 30;
-    const periodsSinceStart = Math.max(0, Math.floor((now.getTime() - anchor.getTime()) / (lengthDays * 24 * 3600 * 1000)));
-    const periodStart = new Date(anchor.getTime() + periodsSinceStart * lengthDays * 24 * 3600 * 1000);
+    const periodsSinceStart = Math.max(
+      0,
+      Math.floor((now.getTime() - anchor.getTime()) / (lengthDays * 24 * 3600 * 1000)),
+    );
+    const periodStart = new Date(
+      anchor.getTime() + periodsSinceStart * lengthDays * 24 * 3600 * 1000,
+    );
     const periodEnd = new Date(periodStart.getTime() + lengthDays * 24 * 3600 * 1000);
 
     const existing = await this.prisma.billingCycle.findFirst({
       where: {
         reservationId,
         periodStart,
-        periodEnd
-      }
+        periodEnd,
+      },
     });
     if (existing) return existing;
 
-    return this.createBillingCycle(reservation.campgroundId, reservationId, cadence, periodStart, periodEnd);
+    return this.createBillingCycle(
+      reservation.campgroundId,
+      reservationId,
+      cadence,
+      periodStart,
+      periodEnd,
+    );
   }
 
   private buildInvoiceNumber(campgroundId: string) {
@@ -415,25 +439,25 @@ export class BillingService {
 
   private async calcUtilityCharges(
     reservation: ReservationForBilling,
-    cycle: BillingCycleWindow
+    cycle: BillingCycleWindow,
   ): Promise<UtilityCharge[]> {
     const meters = await this.prisma.utilityMeter.findMany({
       where: {
         campgroundId: reservation.campgroundId,
         siteId: reservation.siteId,
-        active: true
+        active: true,
       },
       include: {
         UtilityMeterRead: {
           where: {
             readAt: {
-              lte: cycle.periodEnd
-            }
+              lte: cycle.periodEnd,
+            },
           },
-          orderBy: { readAt: "asc" }
+          orderBy: { readAt: "asc" },
         },
-        UtilityRatePlan: true
-      }
+        UtilityRatePlan: true,
+      },
     });
 
     const charges: UtilityCharge[] = [];
@@ -443,7 +467,8 @@ export class BillingService {
       if (!reads || reads.length === 0) continue;
 
       const startRead = [...reads].filter((r) => r.readAt <= cycle.periodStart).pop() || reads[0];
-      const endRead = [...reads].filter((r) => r.readAt <= cycle.periodEnd).pop() || reads[reads.length - 1];
+      const endRead =
+        [...reads].filter((r) => r.readAt <= cycle.periodEnd).pop() || reads[reads.length - 1];
       const usage = Math.max(0, Number(endRead.readingValue) - Number(startRead.readingValue));
       const multiplier = Number(meter.multiplier ?? 1);
       const billedUsage = usage * (Number.isFinite(multiplier) ? multiplier : 1);
@@ -460,7 +485,7 @@ export class BillingService {
         rateCents: rate,
         amountCents,
         description: `${meter.type} usage ${billedUsage.toFixed(2)} @ ${rate}c`,
-        meta: { meterId: meter.id, usage: billedUsage, planId: plan?.id ?? null }
+        meta: { meterId: meter.id, usage: billedUsage, planId: plan?.id ?? null },
       });
     }
 
@@ -468,10 +493,19 @@ export class BillingService {
   }
 
   private estimateRentPerCycle(reservation: ReservationForBilling, cadence: string) {
-    const start = reservation.arrivalDate instanceof Date ? reservation.arrivalDate : new Date(reservation.arrivalDate);
-    const end = reservation.departureDate instanceof Date ? reservation.departureDate : new Date(reservation.departureDate);
+    const start =
+      reservation.arrivalDate instanceof Date
+        ? reservation.arrivalDate
+        : new Date(reservation.arrivalDate);
+    const end =
+      reservation.departureDate instanceof Date
+        ? reservation.departureDate
+        : new Date(reservation.departureDate);
     const stayDays = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (24 * 3600 * 1000)));
-    const divisor = cadence === "weekly" ? Math.max(1, Math.ceil(stayDays / 7)) : Math.max(1, Math.ceil(stayDays / 30));
+    const divisor =
+      cadence === "weekly"
+        ? Math.max(1, Math.ceil(stayDays / 7))
+        : Math.max(1, Math.ceil(stayDays / 30));
     return Math.round((reservation.baseSubtotal ?? reservation.totalAmount ?? 0) / divisor);
   }
 
@@ -499,7 +533,7 @@ export class BillingService {
           direction: "debit",
           occurredAt,
           externalRef: opts.invoiceLineId ?? opts.invoiceId,
-          dedupeKey: `inv:${opts.invoiceId}:${opts.invoiceLineId ?? "line"}:ar`
+          dedupeKey: `inv:${opts.invoiceId}:${opts.invoiceLineId ?? "line"}:ar`,
         },
         {
           campgroundId: opts.campgroundId,
@@ -511,10 +545,10 @@ export class BillingService {
           direction: "credit",
           occurredAt,
           externalRef: opts.invoiceLineId ?? opts.invoiceId,
-          dedupeKey: `inv:${opts.invoiceId}:${opts.invoiceLineId ?? "line"}:rev`
-        }
+          dedupeKey: `inv:${opts.invoiceId}:${opts.invoiceLineId ?? "line"}:rev`,
+        },
       ],
-      { requireGlCode: true }
+      { requireGlCode: true },
     );
 
     const debit = entries.find((entry) => entry.direction === "debit");
@@ -525,8 +559,8 @@ export class BillingService {
           ledgerEntryId: debit.id,
           invoiceId: opts.invoiceId,
           invoiceLineId: opts.invoiceLineId || null,
-          type: "ar_open"
-        }
+          type: "ar_open",
+        },
       });
     }
   }
@@ -534,7 +568,7 @@ export class BillingService {
   async generateInvoiceForCycle(campgroundId: string, cycleId: string) {
     const cycle = await this.prisma.billingCycle.findFirst({
       where: { id: cycleId, campgroundId },
-      include: { Reservation: true }
+      include: { Reservation: true },
     });
     if (!cycle) throw new NotFoundException("Cycle not found");
 
@@ -554,7 +588,7 @@ export class BillingService {
         quantity: 1,
         unitCents: rentCents,
         amountCents: rentCents,
-        meta: {}
+        meta: {},
       });
     }
 
@@ -570,8 +604,8 @@ export class BillingService {
           meterId: charge.meterId,
           usage: charge.usage,
           utilityType: charge.type,
-          ratePlanId: charge.ratePlanId ?? undefined
-        }
+          ratePlanId: charge.ratePlanId ?? undefined,
+        },
       });
     }
 
@@ -597,11 +631,11 @@ export class BillingService {
             quantity: line.quantity,
             unitCents: line.unitCents,
             amountCents: line.amountCents,
-            meta: toJsonValue(line.meta)
-          }))
-        }
+            meta: toJsonValue(line.meta),
+          })),
+        },
       },
-      include: { InvoiceLine: true }
+      include: { InvoiceLine: true },
     });
 
     // Ledger posting
@@ -614,20 +648,23 @@ export class BillingService {
         invoiceLineId: line.id,
         amountCents: line.amountCents,
         revenueGl: gl,
-        description: line.description
+        description: line.description,
       });
     }
 
     await this.prisma.billingCycle.update({
       where: { id: cycleId },
-      data: { generatedAt: new Date(), status: "closed" }
+      data: { generatedAt: new Date(), status: "closed" },
     });
 
     return invoice;
   }
 
   private async recalcInvoiceTotals(invoiceId: string) {
-    const invoice = await this.prisma.invoice.findUnique({ where: { id: invoiceId }, include: { InvoiceLine: true } });
+    const invoice = await this.prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: { InvoiceLine: true },
+    });
     if (!invoice) return;
     const subtotal = invoice.InvoiceLine.reduce((acc, line) => acc + line.amountCents, 0);
     const total = subtotal;
@@ -638,8 +675,8 @@ export class BillingService {
       data: {
         subtotalCents: subtotal,
         totalCents: total,
-        balanceCents: balance
-      }
+        balanceCents: balance,
+      },
     });
   }
 
@@ -650,13 +687,13 @@ export class BillingService {
         status: "open",
         dueDate: { lt: now },
         balanceCents: { gt: 0 },
-        ...(campgroundId ? { campgroundId } : {})
+        ...(campgroundId ? { campgroundId } : {}),
       },
       include: {
         BillingCycle: true,
         InvoiceLine: true,
-        Reservation: true
-      }
+        Reservation: true,
+      },
     });
 
     for (const invoice of invoices) {
@@ -667,16 +704,16 @@ export class BillingService {
         where: {
           campgroundId: invoice.campgroundId,
           cadence: invoice.BillingCycle?.cadence ?? "monthly",
-          active: true
+          active: true,
         },
-        orderBy: { effectiveFrom: "desc" }
+        orderBy: { effectiveFrom: "desc" },
       });
       if (!rule) continue;
 
       const amount =
         rule.feeType === "percent"
           ? Math.round((invoice.balanceCents * (rule.feePercentBp ?? 0)) / 10000)
-          : rule.feeCents ?? 0;
+          : (rule.feeCents ?? 0);
       if (amount <= 0) continue;
 
       const lateLine = await this.prisma.invoiceLine.create({
@@ -687,8 +724,8 @@ export class BillingService {
           description: "Late fee",
           quantity: 1,
           unitCents: amount,
-          amountCents: amount
-        }
+          amountCents: amount,
+        },
       });
 
       await this.createLedgerPair({
@@ -698,7 +735,7 @@ export class BillingService {
         invoiceLineId: lateLine.id,
         amountCents: amount,
         revenueGl: "LATE_FEE",
-        description: "Late fee"
+        description: "Late fee",
       });
 
       await this.recalcInvoiceTotals(invoice.id);
@@ -707,7 +744,7 @@ export class BillingService {
 
   async writeOffInvoice(campgroundId: string, invoiceId: string, reason: string, actorId?: string) {
     const invoice = await this.prisma.invoice.findFirst({
-      where: { id: invoiceId, campgroundId }
+      where: { id: invoiceId, campgroundId },
     });
     if (!invoice) throw new NotFoundException("Invoice not found");
     if (invoice.status === "written_off") return invoice;
@@ -728,8 +765,8 @@ export class BillingService {
           quantity: 1,
           unitCents: -amount,
           amountCents: -amount,
-          meta: toJsonValue({ reason })
-        }
+          meta: toJsonValue({ reason }),
+        },
       });
 
       // Post balanced ledger entries with deduplication
@@ -742,7 +779,7 @@ export class BillingService {
           description: `Write-off ${invoice.number}`,
           amountCents: amount,
           direction: "debit",
-          dedupeKey: `${dedupeKey}:debit`
+          dedupeKey: `${dedupeKey}:debit`,
         },
         {
           campgroundId: invoice.campgroundId,
@@ -752,8 +789,8 @@ export class BillingService {
           description: `Write-off ${invoice.number}`,
           amountCents: amount,
           direction: "credit",
-          dedupeKey: `${dedupeKey}:credit`
-        }
+          dedupeKey: `${dedupeKey}:credit`,
+        },
       ]);
 
       // Find the AR credit entry for arLedgerEntry link
@@ -764,15 +801,15 @@ export class BillingService {
             id: randomUUID(),
             ledgerEntryId: creditEntry.id,
             invoiceId,
-            type: "writeoff"
-          }
+            type: "writeoff",
+          },
         });
       }
 
       // Update invoice status
       await tx.invoice.update({
         where: { id: invoiceId },
-        data: { status: "written_off", balanceCents: 0, closedAt: new Date() }
+        data: { status: "written_off", balanceCents: 0, closedAt: new Date() },
       });
     });
 
@@ -787,8 +824,8 @@ export class BillingService {
         entity: "invoice",
         entityId: invoiceId,
         before: beforeSnapshot,
-        after: { status: "written_off", reason }
-      }
+        after: { status: "written_off", reason },
+      },
     });
 
     return this.getInvoice(campgroundId, invoiceId);
@@ -800,10 +837,10 @@ export class BillingService {
     lineId: string,
     amountCents: number,
     note: string,
-    actorId?: string
+    actorId?: string,
   ) {
     const invoice = await this.prisma.invoice.findFirst({
-      where: { id: invoiceId, campgroundId }
+      where: { id: invoiceId, campgroundId },
     });
     if (!invoice) throw new NotFoundException("Invoice not found");
     const line = await this.prisma.invoiceLine.findUnique({ where: { id: lineId } });
@@ -818,9 +855,9 @@ export class BillingService {
         meta: toJsonValue({
           ...(isRecord(line.meta) ? line.meta : {}),
           overrideNote: note,
-          overriddenBy: actorId || "system"
-        })
-      }
+          overriddenBy: actorId || "system",
+        }),
+      },
     });
 
     await this.recalcInvoiceTotals(invoiceId);
@@ -834,8 +871,8 @@ export class BillingService {
         entity: "invoice_line",
         entityId: lineId,
         before,
-        after: { amountCents, note }
-      }
+        after: { amountCents, note },
+      },
     });
 
     return this.getInvoice(campgroundId, invoiceId);
@@ -844,14 +881,14 @@ export class BillingService {
   async listInvoicesByReservation(campgroundId: string, reservationId: string) {
     return this.prisma.invoice.findMany({
       where: { reservationId, campgroundId },
-      include: { InvoiceLine: true, BillingCycle: true }
+      include: { InvoiceLine: true, BillingCycle: true },
     });
   }
 
   async getInvoice(campgroundId: string, id: string) {
     const invoice = await this.prisma.invoice.findFirst({
       where: { id, campgroundId },
-      include: { InvoiceLine: true, BillingCycle: true }
+      include: { InvoiceLine: true, BillingCycle: true },
     });
     if (!invoice) throw new NotFoundException("Invoice not found");
     return invoice;
@@ -861,8 +898,8 @@ export class BillingService {
     const reservations = await this.prisma.reservation.findMany({
       where: {
         billingCadence: { in: ["weekly", "monthly"] },
-        status: { in: ["pending", "confirmed", "checked_in"] }
-      }
+        status: { in: ["pending", "confirmed", "checked_in"] },
+      },
     });
 
     for (const reservation of reservations) {
@@ -871,7 +908,9 @@ export class BillingService {
       const now = new Date();
       if (cycle.periodEnd <= now) {
         await this.generateInvoiceForCycle(reservation.campgroundId, cycle.id).catch((err) => {
-          this.logger.warn(`Failed to generate invoice for cycle ${cycle.id}: ${err instanceof Error ? err.message : err}`);
+          this.logger.warn(
+            `Failed to generate invoice for cycle ${cycle.id}: ${err instanceof Error ? err.message : err}`,
+          );
         });
       }
     }

@@ -24,7 +24,7 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  Play
+  Play,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -83,9 +83,13 @@ function getDifficultyBadge(difficulty: string) {
     case "easy":
       return <Badge className="bg-status-success text-status-success-foreground">Easy Win</Badge>;
     case "medium":
-      return <Badge className="bg-status-warning text-status-warning-foreground">Medium Effort</Badge>;
+      return (
+        <Badge className="bg-status-warning text-status-warning-foreground">Medium Effort</Badge>
+      );
     case "hard":
-      return <Badge className="bg-status-error text-status-error-foreground">Significant Effort</Badge>;
+      return (
+        <Badge className="bg-status-error text-status-error-foreground">Significant Effort</Badge>
+      );
     default:
       return <Badge variant="secondary">{difficulty}</Badge>;
   }
@@ -111,7 +115,11 @@ export default function AIRevenuePage() {
   };
 
   // Get revenue insights
-  const { data: insights = [], isLoading, refetch } = useQuery<RevenueInsight[]>({
+  const {
+    data: insights = [],
+    isLoading,
+    refetch,
+  } = useQuery<RevenueInsight[]>({
     queryKey: ["revenue-insights", campgroundId],
     queryFn: () => apiClient.getRevenueInsights(requireCampgroundId()),
     enabled: !!campgroundId,
@@ -119,8 +127,7 @@ export default function AIRevenuePage() {
 
   // Start working on insight
   const startMutation = useMutation({
-    mutationFn: (insightId: string) =>
-      apiClient.startRevenueInsight(insightId),
+    mutationFn: (insightId: string) => apiClient.startRevenueInsight(insightId),
     onSuccess: () => {
       toast({ title: "Started", description: "Insight marked as in progress." });
       refetch();
@@ -132,8 +139,7 @@ export default function AIRevenuePage() {
 
   // Complete insight
   const completeMutation = useMutation({
-    mutationFn: (insightId: string) =>
-      apiClient.completeRevenueInsight(insightId),
+    mutationFn: (insightId: string) => apiClient.completeRevenueInsight(insightId),
     onSuccess: () => {
       toast({ title: "Completed", description: "Insight marked as completed." });
       refetch();
@@ -143,16 +149,14 @@ export default function AIRevenuePage() {
     },
   });
 
-  const filteredInsights = insights.filter(i =>
-    filter === "all" ? true : i.status === filter
-  );
+  const filteredInsights = insights.filter((i) => (filter === "all" ? true : i.status === filter));
 
   const totalOpportunity = insights
-    .filter(i => i.status !== "completed" && i.status !== "dismissed")
+    .filter((i) => i.status !== "completed" && i.status !== "dismissed")
     .reduce((acc, i) => acc + i.impactCents, 0);
 
-  const newCount = insights.filter(i => i.status === "new").length;
-  const easyWins = insights.filter(i => i.difficulty === "easy" && i.status === "new");
+  const newCount = insights.filter((i) => i.status === "new").length;
+  const easyWins = insights.filter((i) => i.difficulty === "easy" && i.status === "new");
 
   if (!campground) {
     return (
@@ -211,7 +215,9 @@ export default function AIRevenuePage() {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Estimated Revenue Opportunity</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Estimated Revenue Opportunity
+                    </p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-bold text-status-info-text">
                         ${(totalOpportunity / 100).toLocaleString()}
@@ -231,7 +237,8 @@ export default function AIRevenuePage() {
                         </span>
                       </div>
                       <p className="text-sm text-status-success-text">
-                        Quick actions worth ${(easyWins.reduce((a, i) => a + i.impactCents, 0) / 100).toLocaleString()}
+                        Quick actions worth $
+                        {(easyWins.reduce((a, i) => a + i.impactCents, 0) / 100).toLocaleString()}
                       </p>
                     </div>
                   )}
@@ -264,7 +271,7 @@ export default function AIRevenuePage() {
                 <Play className="h-5 w-5 text-status-info-text" />
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {insights.filter(i => i.status === "in_progress").length}
+                {insights.filter((i) => i.status === "in_progress").length}
               </div>
               <p className="text-xs text-muted-foreground">In Progress</p>
             </CardContent>
@@ -276,7 +283,7 @@ export default function AIRevenuePage() {
                 <CheckCircle2 className="h-5 w-5 text-status-success-text" />
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {insights.filter(i => i.status === "completed").length}
+                {insights.filter((i) => i.status === "completed").length}
               </div>
               <p className="text-xs text-muted-foreground">Completed</p>
             </CardContent>
@@ -352,13 +359,20 @@ export default function AIRevenuePage() {
                       exit={{ opacity: 0, x: -20 }}
                       transition={{ delay: index * 0.02, ...SPRING_CONFIG }}
                     >
-                      <Card className={cn(
-                        "transition-all hover:shadow-md",
-                        insight.status === "new" && "border-l-4 border-l-blue-500"
-                      )}>
+                      <Card
+                        className={cn(
+                          "transition-all hover:shadow-md",
+                          insight.status === "new" && "border-l-4 border-l-blue-500",
+                        )}
+                      >
                         <CardContent className="p-5">
                           <div className="flex flex-col lg:flex-row gap-4">
-                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0", colorClass)}>
+                            <div
+                              className={cn(
+                                "flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0",
+                                colorClass,
+                              )}
+                            >
                               <Icon className="h-6 w-6" />
                             </div>
 
@@ -373,7 +387,9 @@ export default function AIRevenuePage() {
                                 )}
                               </div>
 
-                              <p className="text-sm text-muted-foreground mb-4">{insight.summary}</p>
+                              <p className="text-sm text-muted-foreground mb-4">
+                                {insight.summary}
+                              </p>
 
                               {insight.recommendations.length > 0 && (
                                 <div className="space-y-2">
@@ -384,9 +400,14 @@ export default function AIRevenuePage() {
                                     <div key={i} className="flex items-start gap-2 text-sm">
                                       <ChevronRight className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                                       <div>
-                                        <span className="font-medium text-foreground">{rec.action}</span>
+                                        <span className="font-medium text-foreground">
+                                          {rec.action}
+                                        </span>
                                         {rec.details && (
-                                          <span className="text-muted-foreground"> - {rec.details}</span>
+                                          <span className="text-muted-foreground">
+                                            {" "}
+                                            - {rec.details}
+                                          </span>
                                         )}
                                       </div>
                                     </div>
@@ -437,7 +458,9 @@ export default function AIRevenuePage() {
                             {insight.createdAt && (
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                {formatDistanceToNow(new Date(insight.createdAt), { addSuffix: true })}
+                                {formatDistanceToNow(new Date(insight.createdAt), {
+                                  addSuffix: true,
+                                })}
                               </div>
                             )}
                             <Badge variant="outline" className="text-xs capitalize">

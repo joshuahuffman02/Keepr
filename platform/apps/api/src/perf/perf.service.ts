@@ -69,10 +69,7 @@ export class PerfService {
   private percentile(values: number[], percentile: number): number | null {
     if (values.length === 0) return null;
     if (values.length === 1) return values[0];
-    const index = Math.min(
-      values.length - 1,
-      Math.floor((values.length - 1) * percentile)
-    );
+    const index = Math.min(values.length - 1, Math.floor((values.length - 1) * percentile));
     return values[index];
   }
 
@@ -82,4 +79,3 @@ export class PerfService {
     this.limiterEvents = this.limiterEvents.filter((e) => e.ts >= cutoff);
   }
 }
-

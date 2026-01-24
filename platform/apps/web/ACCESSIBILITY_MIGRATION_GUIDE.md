@@ -7,6 +7,7 @@ This guide helps you migrate existing components to use the new accessible patte
 ### 1. Update Icon-Only Buttons
 
 **Before:**
+
 ```tsx
 <button onClick={handleDelete}>
   <Trash className="h-4 w-4" />
@@ -14,17 +15,19 @@ This guide helps you migrate existing components to use the new accessible patte
 ```
 
 **After (Option 1 - Using IconButton):**
+
 ```tsx
-import { IconButton } from "@/components/ui/icon-button"
+import { IconButton } from "@/components/ui/icon-button";
 
 <IconButton
   ariaLabel="Delete reservation"
   icon={<Trash className="h-4 w-4" />}
   onClick={handleDelete}
-/>
+/>;
 ```
 
 **After (Option 2 - Manual):**
+
 ```tsx
 <button onClick={handleDelete} aria-label="Delete reservation">
   <Trash className="h-4 w-4" aria-hidden="true" />
@@ -34,12 +37,14 @@ import { IconButton } from "@/components/ui/icon-button"
 ### 2. Add aria-hidden to Decorative Icons
 
 **Before:**
+
 ```tsx
 <Calendar className="h-4 w-4" />
 Today's Schedule
 ```
 
 **After:**
+
 ```tsx
 <Calendar className="h-4 w-4" aria-hidden="true" />
 Today's Schedule
@@ -48,11 +53,13 @@ Today's Schedule
 ### 3. Enhance Status Badges
 
 **Before:**
+
 ```tsx
 <Badge variant="success">Active</Badge>
 ```
 
 **After:**
+
 ```tsx
 <Badge variant="success" srText="Status: Active and available">
   Active
@@ -62,22 +69,19 @@ Today's Schedule
 ### 4. Update Form Inputs
 
 **Before:**
+
 ```tsx
 <div>
   <label htmlFor="email">Email</label>
-  <input
-    id="email"
-    type="email"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-  />
+  <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
   {error && <p className="text-red-500">{error}</p>}
 </div>
 ```
 
 **After:**
+
 ```tsx
-import { FormField } from "@/components/ui/form-field"
+import { FormField } from "@/components/ui/form-field";
 
 <FormField
   label="Email"
@@ -87,21 +91,27 @@ import { FormField } from "@/components/ui/form-field"
   error={error}
   helperText="We'll never share your email"
   required
-/>
+/>;
 ```
 
 ### 5. Update Loading States
 
 **Before:**
+
 ```tsx
-{isLoading && <div className="spinner" />}
+{
+  isLoading && <div className="spinner" />;
+}
 ```
 
 **After:**
-```tsx
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
 
-{isLoading && <LoadingSpinner label="Loading reservations" />}
+```tsx
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
+{
+  isLoading && <LoadingSpinner label="Loading reservations" />;
+}
 ```
 
 ## Component-by-Component Migration
@@ -109,16 +119,14 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 ### Migrating a Card Component
 
 **Before:**
+
 ```tsx
 function ReservationCard({ reservation }) {
   return (
     <div className="card">
       <div className="card-header">
         <div className="text-lg font-bold">{reservation.guestName}</div>
-        <span className={cn(
-          "badge",
-          reservation.status === "confirmed" && "bg-green-500"
-        )}>
+        <span className={cn("badge", reservation.status === "confirmed" && "bg-green-500")}>
           {reservation.status}
         </span>
       </div>
@@ -130,22 +138,20 @@ function ReservationCard({ reservation }) {
         <Trash className="h-4 w-4" />
       </button>
     </div>
-  )
+  );
 }
 ```
 
 **After:**
+
 ```tsx
-import { Badge } from "@/components/ui/badge"
-import { IconButton } from "@/components/ui/icon-button"
-import { VisuallyHidden } from "@/components/ui/visually-hidden"
+import { Badge } from "@/components/ui/badge";
+import { IconButton } from "@/components/ui/icon-button";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 function ReservationCard({ reservation }) {
   return (
-    <article
-      className="card"
-      aria-labelledby={`reservation-${reservation.id}-title`}
-    >
+    <article className="card" aria-labelledby={`reservation-${reservation.id}-title`}>
       <header className="card-header">
         <h2 id={`reservation-${reservation.id}-title`} className="text-lg font-bold">
           {reservation.guestName}
@@ -162,13 +168,9 @@ function ReservationCard({ reservation }) {
       <div className="card-body">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4" aria-hidden="true" />
-          <time dateTime={reservation.checkIn}>
-            {formatDate(reservation.checkIn)}
-          </time>
+          <time dateTime={reservation.checkIn}>{formatDate(reservation.checkIn)}</time>
           {" - "}
-          <time dateTime={reservation.checkOut}>
-            {formatDate(reservation.checkOut)}
-          </time>
+          <time dateTime={reservation.checkOut}>{formatDate(reservation.checkOut)}</time>
         </div>
       </div>
 
@@ -178,17 +180,18 @@ function ReservationCard({ reservation }) {
         onClick={handleDelete}
       />
     </article>
-  )
+  );
 }
 ```
 
 ### Migrating a Form
 
 **Before:**
+
 ```tsx
 function BookingForm({ onSubmit }) {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "" })
-  const [errors, setErrors] = useState({})
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
+  const [errors, setErrors] = useState({});
 
   return (
     <form onSubmit={onSubmit}>
@@ -214,18 +217,19 @@ function BookingForm({ onSubmit }) {
 
       <button type="submit">Book Now</button>
     </form>
-  )
+  );
 }
 ```
 
 **After:**
+
 ```tsx
-import { FormField } from "@/components/ui/form-field"
-import { Button } from "@/components/ui/button"
+import { FormField } from "@/components/ui/form-field";
+import { Button } from "@/components/ui/button";
 
 function BookingForm({ onSubmit }) {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "" })
-  const [errors, setErrors] = useState({})
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "" });
+  const [errors, setErrors] = useState({});
 
   return (
     <form onSubmit={onSubmit} aria-labelledby="booking-form-title">
@@ -267,16 +271,17 @@ function BookingForm({ onSubmit }) {
         Book Now
       </Button>
     </form>
-  )
+  );
 }
 ```
 
 ### Migrating a Modal/Dialog
 
 **Before:**
+
 ```tsx
 function DeleteModal({ isOpen, onClose, onConfirm }) {
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50" onClick={onClose}>
@@ -287,11 +292,12 @@ function DeleteModal({ isOpen, onClose, onConfirm }) {
         <button onClick={onConfirm}>Delete</button>
       </div>
     </div>
-  )
+  );
 }
 ```
 
 **After:**
+
 ```tsx
 import {
   Dialog,
@@ -300,8 +306,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 function DeleteModal({ isOpen, onClose, onConfirm }) {
   return (
@@ -324,13 +330,14 @@ function DeleteModal({ isOpen, onClose, onConfirm }) {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 ```
 
 ### Migrating a Data Table
 
 **Before:**
+
 ```tsx
 function ReservationsTable({ reservations }) {
   return (
@@ -348,14 +355,22 @@ function ReservationsTable({ reservations }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 ```
 
 **After:**
+
 ```tsx
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 function ReservationsTable({ reservations }) {
   return (
@@ -372,9 +387,7 @@ function ReservationsTable({ reservations }) {
           <TableRow key={r.id}>
             <TableCell className="font-medium">{r.guestName}</TableCell>
             <TableCell>
-              <time dateTime={r.checkIn}>
-                {formatDate(r.checkIn)}
-              </time>
+              <time dateTime={r.checkIn}>{formatDate(r.checkIn)}</time>
             </TableCell>
             <TableCell>
               <Badge
@@ -388,7 +401,7 @@ function ReservationsTable({ reservations }) {
         ))}
       </TableBody>
     </Table>
-  )
+  );
 }
 ```
 
@@ -397,18 +410,20 @@ function ReservationsTable({ reservations }) {
 ### Pattern 1: Lists of Items
 
 **Before:**
+
 ```tsx
 <div className="grid gap-4">
-  {items.map(item => (
+  {items.map((item) => (
     <div key={item.id}>...</div>
   ))}
 </div>
 ```
 
 **After:**
+
 ```tsx
 <ul className="grid gap-4" role="list">
-  {items.map(item => (
+  {items.map((item) => (
     <li key={item.id}>
       <article aria-labelledby={`item-${item.id}-title`}>
         <h3 id={`item-${item.id}-title`}>{item.name}</h3>
@@ -422,6 +437,7 @@ function ReservationsTable({ reservations }) {
 ### Pattern 2: Action Menus
 
 **Before:**
+
 ```tsx
 <div className="menu">
   <button onClick={handleEdit}>Edit</button>
@@ -430,6 +446,7 @@ function ReservationsTable({ reservations }) {
 ```
 
 **After:**
+
 ```tsx
 <nav aria-label="Reservation actions">
   <ul role="menu">
@@ -450,6 +467,7 @@ function ReservationsTable({ reservations }) {
 ### Pattern 3: Collapsible Sections
 
 **Before:**
+
 ```tsx
 const [isOpen, setIsOpen] = useState(false)
 
@@ -462,6 +480,7 @@ const [isOpen, setIsOpen] = useState(false)
 ```
 
 **After:**
+
 ```tsx
 const [isOpen, setIsOpen] = useState(false)
 
@@ -487,6 +506,7 @@ const [isOpen, setIsOpen] = useState(false)
 After migrating a component, test it with:
 
 1. **Keyboard navigation**
+
    ```
    - Tab through all interactive elements
    - Verify focus is visible
@@ -495,6 +515,7 @@ After migrating a component, test it with:
    ```
 
 2. **Screen reader** (VoiceOver on Mac: Cmd+F5)
+
    ```
    - Navigate with VO+arrow keys
    - Verify all content is announced
@@ -503,6 +524,7 @@ After migrating a component, test it with:
    ```
 
 3. **Visual inspection**
+
    ```
    - Check focus rings are visible
    - Verify color contrast

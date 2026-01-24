@@ -98,13 +98,11 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
     queueName: string,
     jobName: string,
     data: T,
-    options: JobOptions = {}
+    options: JobOptions = {},
   ): Promise<string> {
     const jobId = options.jobId || this.generateJobId();
     const now = new Date();
-    const processAfter = options.delay
-      ? new Date(now.getTime() + options.delay)
-      : now;
+    const processAfter = options.delay ? new Date(now.getTime() + options.delay) : now;
 
     const job: JobData<T> = {
       id: jobId,
@@ -138,7 +136,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
     jobName: string,
     data: T,
     delayMs: number,
-    options: Omit<JobOptions, "delay"> = {}
+    options: Omit<JobOptions, "delay"> = {},
   ): Promise<string> {
     return this.addJob(queueName, jobName, data, { ...options, delay: delayMs });
   }
@@ -148,7 +146,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
    */
   async addBulk<T>(
     queueName: string,
-    jobs: Array<{ name: string; data: T; options?: JobOptions }>
+    jobs: Array<{ name: string; data: T; options?: JobOptions }>,
   ): Promise<string[]> {
     const ids: string[] = [];
     for (const job of jobs) {
@@ -218,7 +216,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
       const failedList = this.failedJobs.get(queueName) || [];
       this.failedJobs.set(
         queueName,
-        failedList.filter((j) => !toRetry.find((r) => r.id === j.id))
+        failedList.filter((j) => !toRetry.find((r) => r.id === j.id)),
       );
     }
 
@@ -231,7 +229,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
   async clean(
     queueName: string,
     grace: number,
-    status: "completed" | "failed" = "completed"
+    status: "completed" | "failed" = "completed",
   ): Promise<number> {
     const cutoff = Date.now() - grace;
     let cleaned = 0;
@@ -243,8 +241,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
       const jobs = await client.lrange(key, 0, -1);
       for (const jobStr of jobs) {
         const job = JSON.parse(jobStr);
-        const timestamp =
-          status === "completed" ? job.completedAt : job.failedAt;
+        const timestamp = status === "completed" ? job.completedAt : job.failedAt;
         if (new Date(timestamp).getTime() < cutoff) {
           await client.lrem(key, 1, jobStr);
           cleaned++;
@@ -252,14 +249,11 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
       }
     } else {
       const list =
-        status === "completed"
-          ? this.completedJobs.get(queueName)
-          : this.failedJobs.get(queueName);
+        status === "completed" ? this.completedJobs.get(queueName) : this.failedJobs.get(queueName);
       if (list) {
         const before = list.length;
         const filtered = list.filter((j) => {
-          const timestamp =
-            status === "completed" ? j.completedAt : j.failedAt;
+          const timestamp = status === "completed" ? j.completedAt : j.failedAt;
           return new Date(timestamp!).getTime() >= cutoff;
         });
         if (status === "completed") {
@@ -353,14 +347,14 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
         job.processAfter = new Date(Date.now() + delay);
         await this.requeue(queueName, job);
         this.logger.warn(
-          `Job ${job.id} failed (attempt ${job.attempts}/${job.maxAttempts}), retrying in ${delay}ms`
+          `Job ${job.id} failed (attempt ${job.attempts}/${job.maxAttempts}), retrying in ${delay}ms`,
         );
       } else {
         job.status = "failed";
         job.failedAt = new Date();
         await this.moveToFailed(queueName, job);
         this.logger.error(
-          `Job ${job.id} failed permanently after ${job.attempts} attempts: ${error}`
+          `Job ${job.id} failed permanently after ${job.attempts} attempts: ${error}`,
         );
       }
     } finally {
@@ -402,8 +396,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
       const queue = this.memoryQueues.get(queueName) || [];
       const readyIndex = queue.findIndex(
         (j) =>
-          (j.status === "waiting" || j.status === "delayed") &&
-          j.processAfter.getTime() <= now
+          (j.status === "waiting" || j.status === "delayed") && j.processAfter.getTime() <= now,
       );
       if (readyIndex === -1) return null;
       return queue.splice(readyIndex, 1)[0];
@@ -487,10 +480,10 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
 
     const now = Date.now();
     const waiting = queue.filter(
-      (j) => j.status === "waiting" && j.processAfter.getTime() <= now
+      (j) => j.status === "waiting" && j.processAfter.getTime() <= now,
     ).length;
     const delayed = queue.filter(
-      (j) => j.status === "delayed" || j.processAfter.getTime() > now
+      (j) => j.status === "delayed" || j.processAfter.getTime() > now,
     ).length;
 
     return {

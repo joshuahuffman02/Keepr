@@ -121,7 +121,6 @@ export function ROICalculatorClient() {
 
   return (
     <div className="min-h-screen bg-keepr-off-white">
-
       {/* Hero */}
       <section className="relative pt-32 pb-16 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
@@ -139,8 +138,8 @@ export function ROICalculatorClient() {
           </h1>
 
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Compare your current software costs to Keepr&apos;s transparent pricing.
-            Most parks save $5,000-15,000 per year.
+            Compare your current software costs to Keepr&apos;s transparent pricing. Most parks save
+            $5,000-15,000 per year.
           </p>
         </div>
       </section>
@@ -236,7 +235,11 @@ export function ROICalculatorClient() {
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
                 >
-                  {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  {showAdvanced ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
                   Advanced Options
                 </button>
 
@@ -286,7 +289,9 @@ export function ROICalculatorClient() {
                         <span>{formatCurrency(estimatedCompetitorBase)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Per-booking ({monthlyBookings} x ${competitor.perBooking})</span>
+                        <span>
+                          Per-booking ({monthlyBookings} x ${competitor.perBooking})
+                        </span>
                         <span>{formatCurrency(competitorPerBookingCost)}</span>
                       </div>
                       {wantsAI && competitor.aiExtra > 0 && (
@@ -318,7 +323,9 @@ export function ROICalculatorClient() {
                         <span>{formatCurrency(KEEPR_BASE)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Per-booking ({monthlyBookings} x ${KEEPR_PER_BOOKING})</span>
+                        <span>
+                          Per-booking ({monthlyBookings} x ${KEEPR_PER_BOOKING})
+                        </span>
                         <span>{formatCurrency(keeprPerBooking)}</span>
                       </div>
                       <div className="flex justify-between">
@@ -441,8 +448,8 @@ export function ROICalculatorClient() {
               <Clock className="h-10 w-10 text-keepr-evergreen mb-4" />
               <h3 className="text-lg font-bold text-foreground mb-2">Time Savings</h3>
               <p className="text-muted-foreground text-sm">
-                Parks report saving 10-15 hours per week with automated booking, communication,
-                and reporting.
+                Parks report saving 10-15 hours per week with automated booking, communication, and
+                reporting.
               </p>
             </div>
 
@@ -450,8 +457,8 @@ export function ROICalculatorClient() {
               <Sparkles className="h-10 w-10 text-keepr-evergreen mb-4" />
               <h3 className="text-lg font-bold text-foreground mb-2">AI Revenue Boost</h3>
               <p className="text-muted-foreground text-sm">
-                Dynamic pricing and demand forecasting typically increase revenue 15-20%.
-                Included free.
+                Dynamic pricing and demand forecasting typically increase revenue 15-20%. Included
+                free.
               </p>
             </div>
 
@@ -473,8 +480,8 @@ export function ROICalculatorClient() {
             Ready to See the Full Picture?
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
-            Book a demo and we&apos;ll walk through your specific situation.
-            No pressure, just honest numbers.
+            Book a demo and we&apos;ll walk through your specific situation. No pressure, just
+            honest numbers.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
@@ -493,7 +500,6 @@ export function ROICalculatorClient() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

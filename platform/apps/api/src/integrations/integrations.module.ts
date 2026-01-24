@@ -12,5 +12,4 @@ import { OtaSyncModule } from "./ota-sync/ota-sync.module";
   providers: [IntegrationsService],
   exports: [QuickBooksModule, MarketplaceModule, OtaSyncModule],
 })
-export class IntegrationsModule { }
-
+export class IntegrationsModule {}

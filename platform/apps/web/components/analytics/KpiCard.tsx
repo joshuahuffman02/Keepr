@@ -79,18 +79,10 @@ export function KpiCard({
         <div className="flex items-start justify-between">
           <div>
             <p className="text-sm text-muted-foreground font-medium">{title}</p>
-            <p className="text-2xl font-bold text-white mt-1">
-              {formatValue(value)}
-            </p>
-            {subtitle && (
-              <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-            )}
+            <p className="text-2xl font-bold text-white mt-1">{formatValue(value)}</p>
+            {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
           </div>
-          {icon && (
-            <div className="p-2 bg-muted/50 rounded-lg">
-              {icon}
-            </div>
-          )}
+          {icon && <div className="p-2 bg-muted/50 rounded-lg">{icon}</div>}
         </div>
 
         {change !== undefined && (

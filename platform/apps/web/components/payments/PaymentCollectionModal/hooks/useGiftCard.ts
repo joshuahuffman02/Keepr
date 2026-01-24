@@ -55,7 +55,7 @@ export function useGiftCard(): UseGiftCardResult {
       setLoading(false);
       return null;
     },
-    [props.campgroundId]
+    [props.campgroundId],
   );
 
   const redeemGiftCard = useCallback(
@@ -76,7 +76,7 @@ export function useGiftCard(): UseGiftCardResult {
       setLoading(false);
       return null;
     },
-    [props.campgroundId, props.subject, giftCard]
+    [props.campgroundId, props.subject, giftCard],
   );
 
   const clearGiftCard = useCallback(() => {

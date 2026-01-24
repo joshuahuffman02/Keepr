@@ -45,7 +45,11 @@ type CampgroundWithAda = Awaited<ReturnType<typeof apiClient.getCampground>> & {
   adaCertificationLevel?: AdaCertificationLevel | null;
 };
 
-const certificationLevels: Array<Exclude<AdaCertificationLevel, "none">> = ["friendly", "compliant", "excellence"];
+const certificationLevels: Array<Exclude<AdaCertificationLevel, "none">> = [
+  "friendly",
+  "compliant",
+  "excellence",
+];
 
 const createEmptyItemsByCategory = (): Record<AdaCategory, typeof ADA_CHECKLIST> => ({
   accessible_sites: [],
@@ -82,7 +86,8 @@ export default function AccessibilitySettingsPage() {
 
   // Load campground ID from localStorage
   useEffect(() => {
-    const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const cg =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     setCampgroundId(cg);
   }, []);
 
@@ -90,20 +95,22 @@ export default function AccessibilitySettingsPage() {
   const campgroundQuery = useQuery<CampgroundWithAda>({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Fetch sites to calculate actual accessible site counts
   const sitesQuery = useQuery({
     queryKey: ["sites", campgroundId],
     queryFn: () => apiClient.getSites(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Calculate site counts from actual site data
   const sites = sitesQuery.data ?? [];
   const totalSiteCount = sites.length;
-  const accessibleSiteCount = sites.filter((site: { accessible?: boolean }) => site.accessible === true).length;
+  const accessibleSiteCount = sites.filter(
+    (site: { accessible?: boolean }) => site.accessible === true,
+  ).length;
   const accessibleSiteNames = sites
     .filter((site: { accessible?: boolean }) => site.accessible === true)
     .map((site: { name?: string; siteNumber?: string }) => site.name || site.siteNumber)
@@ -145,21 +152,34 @@ export default function AccessibilitySettingsPage() {
   const badgeInfo = getAdaBadgeInfo(certificationLevel);
   const badgeTones: Record<AdaCertificationLevel, { bg: string; text: string; border: string }> = {
     none: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-    friendly: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/30" },
-    compliant: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/30" },
-    excellence: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/30" },
+    friendly: {
+      bg: "bg-status-info/15",
+      text: "text-status-info",
+      border: "border-status-info/30",
+    },
+    compliant: {
+      bg: "bg-status-success/15",
+      text: "text-status-success",
+      border: "border-status-success/30",
+    },
+    excellence: {
+      bg: "bg-status-warning/15",
+      text: "text-status-warning",
+      border: "border-status-warning/30",
+    },
   };
   const badgeTone = badgeTones[certificationLevel];
   const requiredUnits = getRequiredAccessibleUnits(totalSiteCount);
   const meetsScoping = accessibleSiteCount >= requiredUnits;
 
   // Calculate progress
-  const totalPoints = ADA_CHECKLIST
-    .filter(item => completedItems.has(item.id))
-    .reduce((sum, item) => sum + item.points, 0);
+  const totalPoints = ADA_CHECKLIST.filter((item) => completedItems.has(item.id)).reduce(
+    (sum, item) => sum + item.points,
+    0,
+  );
   const maxPoints = ADA_CHECKLIST.reduce((sum, item) => sum + item.points, 0);
-  const requiredItems = ADA_CHECKLIST.filter(item => item.required);
-  const completedRequired = requiredItems.filter(item => completedItems.has(item.id));
+  const requiredItems = ADA_CHECKLIST.filter((item) => item.required);
+  const completedRequired = requiredItems.filter((item) => completedItems.has(item.id));
 
   // Track unsaved changes
   const hasUnsavedChanges = useMemo(() => {
@@ -171,11 +191,18 @@ export default function AccessibilitySettingsPage() {
   }, [completedItems, initialCompletedItems]);
 
   // Calculate next tier info
-  const nextTierInfo = useMemo((): { tier: AdaCertificationLevel; pointsNeeded: number; isClose: boolean } | null => {
+  const nextTierInfo = useMemo((): {
+    tier: AdaCertificationLevel;
+    pointsNeeded: number;
+    isClose: boolean;
+  } | null => {
     if (certificationLevel === "excellence") return null;
-    const nextTier: AdaCertificationLevel = certificationLevel === "none" ? "friendly"
-      : certificationLevel === "friendly" ? "compliant"
-      : "excellence";
+    const nextTier: AdaCertificationLevel =
+      certificationLevel === "none"
+        ? "friendly"
+        : certificationLevel === "friendly"
+          ? "compliant"
+          : "excellence";
     const threshold = CERTIFICATION_THRESHOLDS[nextTier];
     const pointsNeeded = threshold.minPoints - totalPoints;
     return { tier: nextTier, pointsNeeded, isClose: pointsNeeded > 0 && pointsNeeded <= 15 };
@@ -186,7 +213,7 @@ export default function AccessibilitySettingsPage() {
     // Don't toggle auto-calculated items
     if (itemId === "sites_meet_scoping") return;
 
-    setCompletedItems(prev => {
+    setCompletedItems((prev) => {
       const next = new Set(prev);
       if (next.has(itemId)) {
         next.delete(itemId);
@@ -233,9 +260,10 @@ export default function AccessibilitySettingsPage() {
       } else {
         toast({
           title: "Assessment saved",
-          description: certificationLevel !== "none"
-            ? `Your ${badgeInfo?.label} certification has been updated.`
-            : "Your progress has been saved. Keep going!",
+          description:
+            certificationLevel !== "none"
+              ? `Your ${badgeInfo?.label} certification has been updated.`
+              : "Your progress has been saved. Keep going!",
         });
       }
     },
@@ -245,20 +273,25 @@ export default function AccessibilitySettingsPage() {
         description: "There was an error saving your assessment. Please try again.",
         variant: "destructive",
       });
-    }
+    },
   });
 
   // Group checklist items by category
-  const itemsByCategory = ADA_CHECKLIST.reduce<Record<AdaCategory, typeof ADA_CHECKLIST>>((acc, item) => {
-    if (!acc[item.category]) acc[item.category] = [];
-    acc[item.category].push(item);
-    return acc;
-  }, createEmptyItemsByCategory());
+  const itemsByCategory = ADA_CHECKLIST.reduce<Record<AdaCategory, typeof ADA_CHECKLIST>>(
+    (acc, item) => {
+      if (!acc[item.category]) acc[item.category] = [];
+      acc[item.category].push(item);
+      return acc;
+    },
+    createEmptyItemsByCategory(),
+  );
 
   if (!campgroundId) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <p className="text-muted-foreground">Select a campground to configure accessibility settings.</p>
+        <p className="text-muted-foreground">
+          Select a campground to configure accessibility settings.
+        </p>
       </div>
     );
   }
@@ -285,8 +318,8 @@ export default function AccessibilitySettingsPage() {
             certificationLevel === "excellence"
               ? ["#f59e0b", "#fbbf24", "#fcd34d", "#fef3c7"]
               : certificationLevel === "compliant"
-              ? ["#3b82f6", "#60a5fa", "#93c5fd", "#dbeafe"]
-              : ["#10b981", "#34d399", "#6ee7b7", "#d1fae5"]
+                ? ["#3b82f6", "#60a5fa", "#93c5fd", "#dbeafe"]
+                : ["#10b981", "#34d399", "#6ee7b7", "#d1fae5"]
           }
         />
       )}
@@ -315,7 +348,7 @@ export default function AccessibilitySettingsPage() {
                 transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
                 className={cn(
                   "w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center",
-                  badgeTone.bg
+                  badgeTone.bg,
                 )}
               >
                 <Accessibility className={cn("w-12 h-12", badgeTone.text)} />
@@ -334,10 +367,7 @@ export default function AccessibilitySettingsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className={cn(
-                  "text-lg font-semibold mb-4",
-                  badgeTone.text
-                )}
+                className={cn("text-lg font-semibold mb-4", badgeTone.text)}
               >
                 {badgeInfo?.label}
               </motion.p>
@@ -373,7 +403,10 @@ export default function AccessibilitySettingsPage() {
           </div>
           <div className="flex items-center gap-2">
             {hasUnsavedChanges && (
-              <Badge variant="outline" className="bg-status-warning/15 text-status-warning border-amber-200">
+              <Badge
+                variant="outline"
+                className="bg-status-warning/15 text-status-warning border-amber-200"
+              >
                 Unsaved changes
               </Badge>
             )}
@@ -382,7 +415,7 @@ export default function AccessibilitySettingsPage() {
               disabled={saveMutation.isPending}
               className={cn(
                 "transition-all duration-200",
-                "motion-safe:hover:scale-105 motion-safe:active:scale-95"
+                "motion-safe:hover:scale-105 motion-safe:active:scale-95",
               )}
             >
               {saveMutation.isPending ? (
@@ -415,7 +448,8 @@ export default function AccessibilitySettingsPage() {
                 <Sparkles className="w-5 h-5 text-status-warning" />
               </motion.div>
               <p className="text-sm font-medium text-status-warning">
-                You&apos;re only {nextTierInfo.pointsNeeded} points away from {getAdaBadgeInfo(nextTierInfo.tier)?.label}!
+                You&apos;re only {nextTierInfo.pointsNeeded} points away from{" "}
+                {getAdaBadgeInfo(nextTierInfo.tier)?.label}!
               </p>
             </div>
           </motion.div>
@@ -438,17 +472,13 @@ export default function AccessibilitySettingsPage() {
                     <motion.div
                       className={cn(
                         "w-16 h-16 rounded-full flex items-center justify-center mb-3",
-                        badgeTone.bg
+                        badgeTone.bg,
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.1, rotate: 5 }}
                     >
                       <Accessibility className={cn("w-8 h-8", badgeTone.text)} />
                     </motion.div>
-                    <Badge className={cn(
-                      "mb-2",
-                      badgeTone.bg,
-                      badgeTone.text
-                    )}>
+                    <Badge className={cn("mb-2", badgeTone.bg, badgeTone.text)}>
                       {badgeInfo.label}
                     </Badge>
                     <p className="text-xs text-muted-foreground">{badgeInfo.description}</p>
@@ -458,8 +488,12 @@ export default function AccessibilitySettingsPage() {
                     <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 bg-muted">
                       <Accessibility className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <Badge variant="secondary" className="mb-2">Not Certified</Badge>
-                    <p className="text-xs text-muted-foreground">Start your accessibility journey!</p>
+                    <Badge variant="secondary" className="mb-2">
+                      Not Certified
+                    </Badge>
+                    <p className="text-xs text-muted-foreground">
+                      Start your accessibility journey!
+                    </p>
                   </>
                 )}
               </div>
@@ -469,7 +503,9 @@ export default function AccessibilitySettingsPage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground font-medium">Your Progress</span>
-                    <span className="font-medium text-foreground">{totalPoints} / {maxPoints}</span>
+                    <span className="font-medium text-foreground">
+                      {totalPoints} / {maxPoints}
+                    </span>
                   </div>
                   <div
                     className="h-2 bg-muted rounded-full overflow-hidden"
@@ -481,7 +517,7 @@ export default function AccessibilitySettingsPage() {
                     <motion.div
                       className={cn(
                         "h-full bg-status-success relative",
-                        (totalPoints / maxPoints) > 0.9 && "motion-safe:animate-pulse"
+                        totalPoints / maxPoints > 0.9 && "motion-safe:animate-pulse",
                       )}
                       initial={{ width: 0 }}
                       animate={{ width: `${(totalPoints / maxPoints) * 100}%` }}
@@ -492,7 +528,9 @@ export default function AccessibilitySettingsPage() {
                 <div>
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted-foreground">Required Items</span>
-                    <span className="font-medium text-foreground">{completedRequired.length} / {requiredItems.length}</span>
+                    <span className="font-medium text-foreground">
+                      {completedRequired.length} / {requiredItems.length}
+                    </span>
                   </div>
                   <div
                     className="h-2 bg-muted rounded-full overflow-hidden"
@@ -504,7 +542,9 @@ export default function AccessibilitySettingsPage() {
                     <motion.div
                       className="h-full bg-status-info"
                       initial={{ width: 0 }}
-                      animate={{ width: `${(completedRequired.length / requiredItems.length) * 100}%` }}
+                      animate={{
+                        width: `${(completedRequired.length / requiredItems.length) * 100}%`,
+                      }}
                       transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
                     />
                   </div>
@@ -539,7 +579,10 @@ export default function AccessibilitySettingsPage() {
               <span>Site Inventory</span>
               {campgroundId && (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/campgrounds/${campgroundId}/sites`} className="flex items-center gap-1">
+                  <Link
+                    href={`/campgrounds/${campgroundId}/sites`}
+                    className="flex items-center gap-1"
+                  >
                     Manage Sites
                     <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
                   </Link>
@@ -563,30 +606,39 @@ export default function AccessibilitySettingsPage() {
                     <div className="text-3xl font-bold text-foreground">{totalSiteCount}</div>
                     <div className="text-sm text-muted-foreground">Total Sites</div>
                     <p className="text-xs text-muted-foreground mt-2">
-                      ADA scoping requires at least <span className="font-semibold">{requiredUnits}</span> accessible units
+                      ADA scoping requires at least{" "}
+                      <span className="font-semibold">{requiredUnits}</span> accessible units
                     </p>
                   </div>
-                  <div className={cn(
-                    "p-4 rounded-xl border",
-                    meetsScoping
-                      ? "bg-emerald-50 border-emerald-200"
-                      : "bg-amber-50 border-amber-200"
-                  )}>
-                    <div className={cn(
-                      "text-3xl font-bold",
-                      meetsScoping ? "text-status-success" : "text-status-warning"
-                    )}>
+                  <div
+                    className={cn(
+                      "p-4 rounded-xl border",
+                      meetsScoping
+                        ? "bg-emerald-50 border-emerald-200"
+                        : "bg-amber-50 border-amber-200",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "text-3xl font-bold",
+                        meetsScoping ? "text-status-success" : "text-status-warning",
+                      )}
+                    >
                       {accessibleSiteCount}
                     </div>
-                    <div className={cn(
-                      "text-sm",
-                      meetsScoping ? "text-status-success" : "text-status-warning"
-                    )}>
+                    <div
+                      className={cn(
+                        "text-sm",
+                        meetsScoping ? "text-status-success" : "text-status-warning",
+                      )}
+                    >
                       Accessible Sites
                     </div>
                     {!meetsScoping && totalSiteCount > 0 && (
                       <p className="text-xs text-status-warning mt-2 font-medium">
-                        Making {requiredUnits - accessibleSiteCount} more {requiredUnits - accessibleSiteCount === 1 ? 'site' : 'sites'} accessible will unlock certification
+                        Making {requiredUnits - accessibleSiteCount} more{" "}
+                        {requiredUnits - accessibleSiteCount === 1 ? "site" : "sites"} accessible
+                        will unlock certification
                       </p>
                     )}
                     {meetsScoping && (
@@ -605,14 +657,20 @@ export default function AccessibilitySettingsPage() {
                       Accessible Sites
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      {accessibleSiteNames.filter((n): n is string => !!n).map((name, idx) => (
-                        <span key={idx} className="px-2 py-1 bg-status-info/15 text-status-info text-xs rounded-md font-medium">
-                          {name}
-                        </span>
-                      ))}
+                      {accessibleSiteNames
+                        .filter((n): n is string => !!n)
+                        .map((name, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-1 bg-status-info/15 text-status-info text-xs rounded-md font-medium"
+                          >
+                            {name}
+                          </span>
+                        ))}
                       {sites.filter((s: { accessible?: boolean }) => s.accessible).length > 10 && (
                         <span className="px-2 py-1 bg-status-info/15 text-status-info text-xs rounded-md">
-                          +{sites.filter((s: { accessible?: boolean }) => s.accessible).length - 10} more
+                          +{sites.filter((s: { accessible?: boolean }) => s.accessible).length - 10}{" "}
+                          more
                         </span>
                       )}
                     </div>
@@ -624,14 +682,15 @@ export default function AccessibilitySettingsPage() {
                     <div className="flex items-start gap-3">
                       <AlertCircle className="w-5 h-5 text-status-warning flex-shrink-0 mt-0.5" />
                       <div>
-                        <div className="text-sm font-medium text-amber-900">No accessible sites configured</div>
+                        <div className="text-sm font-medium text-amber-900">
+                          No accessible sites configured
+                        </div>
                         <p className="text-xs text-status-warning mt-1">
-                          Go to your site management and enable the &quot;Accessible&quot; toggle on sites that meet accessibility standards.
+                          Go to your site management and enable the &quot;Accessible&quot; toggle on
+                          sites that meet accessibility standards.
                         </p>
                         <Button variant="outline" size="sm" className="mt-2" asChild>
-                          <Link href={`/campgrounds/${campgroundId}/sites`}>
-                            Configure Sites
-                          </Link>
+                          <Link href={`/campgrounds/${campgroundId}/sites`}>Configure Sites</Link>
                         </Button>
                       </div>
                     </div>
@@ -652,10 +711,12 @@ export default function AccessibilitySettingsPage() {
                     <Lightbulb className="w-5 h-5 text-status-info" />
                     What Makes a Campsite ADA Compliant?
                   </span>
-                  <ChevronDown className={cn(
-                    "w-5 h-5 text-muted-foreground transition-transform duration-200",
-                    isGuideExpanded && "rotate-180"
-                  )} />
+                  <ChevronDown
+                    className={cn(
+                      "w-5 h-5 text-muted-foreground transition-transform duration-200",
+                      isGuideExpanded && "rotate-180",
+                    )}
+                  />
                 </CardTitle>
                 <CardDescription className="">
                   {isGuideExpanded ? "Click to collapse" : "Click to expand site compliance guide"}
@@ -674,28 +735,28 @@ export default function AccessibilitySettingsPage() {
                         "Minimum 20' × 36' level pad area",
                         "Firm, stable surface (gravel, pavement, or compacted soil)",
                         "Maximum 2% cross-slope, 5% running slope",
-                        "Clear ground space for wheelchair maneuvering (60\" turning radius)"
-                      ]
+                        'Clear ground space for wheelchair maneuvering (60" turning radius)',
+                      ],
                     },
                     {
                       num: 2,
                       title: "Access Routes",
                       items: [
-                        "36\" minimum clear width pathway to site",
+                        '36" minimum clear width pathway to site',
                         "No steps or abrupt level changes (use ramps if needed)",
                         "Connected path to restrooms and amenities",
-                        "Well-maintained, no loose gravel or hazards"
-                      ]
+                        "Well-maintained, no loose gravel or hazards",
+                      ],
                     },
                     {
                       num: 3,
                       title: "Utility Connections",
                       items: [
-                        "Electric/water hookups at 15\"-48\" height",
+                        'Electric/water hookups at 15"-48" height',
                         "Clear floor space in front of connections",
                         "Easy-to-operate handles/valves",
-                        "No reaching over obstructions required"
-                      ]
+                        "No reaching over obstructions required",
+                      ],
                     },
                     {
                       num: 4,
@@ -704,10 +765,10 @@ export default function AccessibilitySettingsPage() {
                         "Accessible picnic table (extended end for wheelchair)",
                         "Fire ring/grill with level access and reach",
                         "Tent pad on firm, level surface",
-                        "Trash receptacle within reach range"
-                      ]
-                    }
-                  ].map(section => (
+                        "Trash receptacle within reach range",
+                      ],
+                    },
+                  ].map((section) => (
                     <div key={section.num} className="p-4 rounded-lg bg-card border border-border">
                       <div className="flex items-center gap-2 mb-3">
                         <div className="w-8 h-8 rounded-lg bg-status-info/15 text-status-info flex items-center justify-center">
@@ -736,7 +797,15 @@ export default function AccessibilitySettingsPage() {
                   <ol className="text-sm text-emerald-800 space-y-2">
                     <li className="flex items-start gap-2">
                       <span className="font-bold">1.</span>
-                      <span>Go to <Link href={`/campgrounds/${campgroundId}/sites`} className="underline hover:no-underline font-medium">Campground → Sites</Link></span>
+                      <span>
+                        Go to{" "}
+                        <Link
+                          href={`/campgrounds/${campgroundId}/sites`}
+                          className="underline hover:no-underline font-medium"
+                        >
+                          Campground → Sites
+                        </Link>
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="font-bold">2.</span>
@@ -744,11 +813,17 @@ export default function AccessibilitySettingsPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="font-bold">3.</span>
-                      <span>In the site editor, find the <strong>&quot;Accessible&quot;</strong> toggle and enable it</span>
+                      <span>
+                        In the site editor, find the <strong>&quot;Accessible&quot;</strong> toggle
+                        and enable it
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="font-bold">4.</span>
-                      <span>Save your changes - the site will now count toward your accessible unit total</span>
+                      <span>
+                        Save your changes - the site will now count toward your accessible unit
+                        total
+                      </span>
                     </li>
                   </ol>
                 </div>
@@ -763,16 +838,31 @@ export default function AccessibilitySettingsPage() {
             <h4 className="font-semibold text-amber-900 mb-2">Your Next Steps</h4>
             <ul className="text-sm text-amber-800 space-y-2">
               <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">1</span>
-                <span><strong>Evaluate your sites:</strong> Use the guide above to walk through each site</span>
+                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                  1
+                </span>
+                <span>
+                  <strong>Evaluate your sites:</strong> Use the guide above to walk through each
+                  site
+                </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">2</span>
-                <span><strong>Mark compliant sites:</strong> You need {requiredUnits} accessible sites for {totalSiteCount} total</span>
+                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                  2
+                </span>
+                <span>
+                  <strong>Mark compliant sites:</strong> You need {requiredUnits} accessible sites
+                  for {totalSiteCount} total
+                </span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">3</span>
-                <span><strong>Complete the checklist below:</strong> Check off features your campground already has</span>
+                <span className="w-5 h-5 rounded-full bg-amber-200 text-amber-800 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                  3
+                </span>
+                <span>
+                  <strong>Complete the checklist below:</strong> Check off features your campground
+                  already has
+                </span>
               </li>
             </ul>
           </div>
@@ -780,11 +870,15 @@ export default function AccessibilitySettingsPage() {
 
         {certificationLevel === "friendly" && (
           <div className="p-4 rounded-lg bg-emerald-50 border border-emerald-200">
-            <h4 className="font-semibold text-emerald-800 mb-2">Great progress! To reach ADA Compliant:</h4>
+            <h4 className="font-semibold text-emerald-800 mb-2">
+              Great progress! To reach ADA Compliant:
+            </h4>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
-                <span>Complete all <strong>required</strong> checklist items below</span>
+                <span>
+                  Complete all <strong>required</strong> checklist items below
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5" />
@@ -800,7 +894,9 @@ export default function AccessibilitySettingsPage() {
 
         {certificationLevel === "compliant" && (
           <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
-            <h4 className="font-semibold text-blue-800 mb-2">Almost there! To reach ADA Excellence:</h4>
+            <h4 className="font-semibold text-blue-800 mb-2">
+              Almost there! To reach ADA Excellence:
+            </h4>
             <ul className="text-sm text-muted-foreground space-y-2">
               <li className="flex items-start gap-2">
                 <Award className="w-4 h-4 text-blue-500 mt-0.5" />
@@ -829,8 +925,8 @@ export default function AccessibilitySettingsPage() {
               Congratulations! You&apos;ve achieved ADA Excellence!
             </h4>
             <p className="text-sm text-muted-foreground">
-              Your campground provides exceptional accessibility features. Your badge now appears on your booking page,
-              helping guests find accessible camping.
+              Your campground provides exceptional accessibility features. Your badge now appears on
+              your booking page, helping guests find accessible camping.
             </p>
           </motion.div>
         )}
@@ -840,19 +936,27 @@ export default function AccessibilitySettingsPage() {
           <div className="p-4 rounded-lg bg-muted/60 border border-border">
             <h4 className="font-semibold text-foreground mb-2">Quick Wins (Highest Point Items)</h4>
             <div className="space-y-2">
-              {ADA_CHECKLIST
-                .filter(item => !completedItems.has(item.id) && item.id !== "sites_meet_scoping")
+              {ADA_CHECKLIST.filter(
+                (item) => !completedItems.has(item.id) && item.id !== "sites_meet_scoping",
+              )
                 .sort((a, b) => b.points - a.points)
                 .slice(0, 5)
-                .map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-2 bg-card rounded border border-border">
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between p-2 bg-card rounded border border-border"
+                  >
                     <div>
                       <span className="text-sm text-foreground">{item.label}</span>
                       {item.required && (
-                        <Badge variant="outline" className="ml-2 text-xs">Required</Badge>
+                        <Badge variant="outline" className="ml-2 text-xs">
+                          Required
+                        </Badge>
                       )}
                     </div>
-                    <Badge variant="secondary" className="ml-2">{item.points} pts</Badge>
+                    <Badge variant="secondary" className="ml-2">
+                      {item.points} pts
+                    </Badge>
                   </div>
                 ))}
             </div>
@@ -875,7 +979,8 @@ export default function AccessibilitySettingsPage() {
               {certificationLevels.map((level) => {
                 const info = getAdaBadgeInfo(level);
                 const threshold = CERTIFICATION_THRESHOLDS[level];
-                const isAchieved = certificationLevel === level ||
+                const isAchieved =
+                  certificationLevel === level ||
                   (level === "friendly" && certificationLevel !== "none") ||
                   (level === "compliant" && certificationLevel === "excellence");
                 const pointsNeeded = threshold.minPoints - totalPoints;
@@ -888,7 +993,7 @@ export default function AccessibilitySettingsPage() {
                       "p-4 rounded-xl border-2 transition-all cursor-pointer",
                       isAchieved
                         ? `${tone.border} ${tone.bg}`
-                        : "border-border bg-card hover:border-border hover:shadow-lg"
+                        : "border-border bg-card hover:border-border hover:shadow-lg",
                     )}
                     whileHover={prefersReducedMotion || isAchieved ? {} : { scale: 1.03, y: -2 }}
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -897,23 +1002,27 @@ export default function AccessibilitySettingsPage() {
                       <motion.div
                         className={cn(
                           "w-8 h-8 rounded-full flex items-center justify-center",
-                          isAchieved
-                            ? tone.bg
-                            : "bg-muted"
+                          isAchieved ? tone.bg : "bg-muted",
                         )}
-                        whileHover={prefersReducedMotion || isAchieved ? {} : { rotate: [0, -10, 10, -10, 0] }}
+                        whileHover={
+                          prefersReducedMotion || isAchieved ? {} : { rotate: [0, -10, 10, -10, 0] }
+                        }
                         transition={{ duration: 0.5 }}
                       >
-                        <Accessibility className={cn(
-                          "w-4 h-4",
-                          isAchieved ? tone.text : "text-muted-foreground"
-                        )} />
+                        <Accessibility
+                          className={cn(
+                            "w-4 h-4",
+                            isAchieved ? tone.text : "text-muted-foreground",
+                          )}
+                        />
                       </motion.div>
                       <span className="font-semibold text-foreground">{info?.label}</span>
                     </div>
                     <ul className="text-xs text-muted-foreground space-y-1">
                       <li>&bull; {threshold.minPoints}+ points</li>
-                      <li>&bull; {Math.round(threshold.requiredItemsRatio * 100)}% required items</li>
+                      <li>
+                        &bull; {Math.round(threshold.requiredItemsRatio * 100)}% required items
+                      </li>
                       <li>&bull; Meet scoping requirements</li>
                     </ul>
                     {!isAchieved && pointsNeeded > 0 && (
@@ -932,17 +1041,17 @@ export default function AccessibilitySettingsPage() {
         {categoryList.map((category) => {
           const items = itemsByCategory[category];
           const catInfo = ADA_CATEGORIES[category];
-          const completedCount = items.filter(item => completedItems.has(item.id)).length;
+          const completedCount = items.filter((item) => completedItems.has(item.id)).length;
           const isComplete = completedCount === items.length;
-          const requiredInCategory = items.filter(i => i.required);
-          const optionalInCategory = items.filter(i => !i.required);
+          const requiredInCategory = items.filter((i) => i.required);
+          const optionalInCategory = items.filter((i) => !i.required);
 
           return (
             <Card
               key={category}
               className={cn(
                 "transition-all duration-300",
-                isComplete && "ring-2 ring-emerald-400 shadow-lg shadow-emerald-100"
+                isComplete && "ring-2 ring-emerald-400 shadow-lg shadow-emerald-100",
               )}
             >
               <CardHeader>
@@ -961,10 +1070,7 @@ export default function AccessibilitySettingsPage() {
                   </span>
                   <Badge
                     variant={isComplete ? "default" : "secondary"}
-                    className={cn(
-                      "transition-colors duration-300",
-                      isComplete && "bg-emerald-500"
-                    )}
+                    className={cn("transition-colors duration-300", isComplete && "bg-emerald-500")}
                   >
                     {completedCount} / {items.length}
                   </Badge>
@@ -989,17 +1095,14 @@ export default function AccessibilitySettingsPage() {
                               key={item.id}
                               className="flex items-start gap-3 p-3 rounded-lg border bg-muted/60 border-border cursor-not-allowed"
                             >
-                              <Checkbox
-                                checked={meetsScoping}
-                                disabled
-                                className="mt-1"
-                              />
+                              <Checkbox checked={meetsScoping} disabled className="mt-1" />
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-foreground">
-                                    {item.label}
-                                  </span>
-                                  <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                                  <span className="font-medium text-foreground">{item.label}</span>
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs flex items-center gap-1"
+                                  >
                                     <Lock className="w-3 h-3" />
                                     Auto-calculated
                                   </Badge>
@@ -1012,7 +1115,10 @@ export default function AccessibilitySettingsPage() {
                                 </p>
                                 <p className="text-xs mt-2 text-muted-foreground">
                                   You have {accessibleSiteCount} of {requiredUnits} required sites.{" "}
-                                  <Link href={`/campgrounds/${campgroundId}/sites`} className="text-status-success underline hover:no-underline">
+                                  <Link
+                                    href={`/campgrounds/${campgroundId}/sites`}
+                                    className="text-status-success underline hover:no-underline"
+                                  >
                                     Manage sites to update this →
                                   </Link>
                                 </p>
@@ -1033,7 +1139,7 @@ export default function AccessibilitySettingsPage() {
                               "motion-safe:hover:translate-x-1 hover:shadow-md",
                               isChecked
                                 ? "border-emerald-200 bg-emerald-50"
-                                : "border-border bg-card hover:border-border"
+                                : "border-border bg-card hover:border-border",
                             )}
                             onClick={() => toggleItem(item.id)}
                             whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
@@ -1045,10 +1151,12 @@ export default function AccessibilitySettingsPage() {
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={cn(
-                                  "font-medium transition-colors duration-200",
-                                  isChecked ? "text-emerald-800" : "text-foreground"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "font-medium transition-colors duration-200",
+                                    isChecked ? "text-emerald-800" : "text-foreground",
+                                  )}
+                                >
                                   {item.label}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
@@ -1058,10 +1166,12 @@ export default function AccessibilitySettingsPage() {
                                   {item.points} pts
                                 </Badge>
                               </div>
-                              <p className={cn(
-                                "text-sm mt-1 transition-colors duration-200",
-                                isChecked ? "text-status-success" : "text-muted-foreground"
-                              )}>
+                              <p
+                                className={cn(
+                                  "text-sm mt-1 transition-colors duration-200",
+                                  isChecked ? "text-status-success" : "text-muted-foreground",
+                                )}
+                              >
                                 {item.description}
                               </p>
                             </div>
@@ -1100,7 +1210,7 @@ export default function AccessibilitySettingsPage() {
                               "motion-safe:hover:translate-x-1 hover:shadow-md",
                               isChecked
                                 ? "border-emerald-200 bg-emerald-50"
-                                : "border-border bg-card hover:border-border"
+                                : "border-border bg-card hover:border-border",
                             )}
                             onClick={() => toggleItem(item.id)}
                             whileTap={prefersReducedMotion ? {} : { scale: 0.99 }}
@@ -1112,20 +1222,24 @@ export default function AccessibilitySettingsPage() {
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className={cn(
-                                  "font-medium transition-colors duration-200",
-                                  isChecked ? "text-emerald-800" : "text-foreground"
-                                )}>
+                                <span
+                                  className={cn(
+                                    "font-medium transition-colors duration-200",
+                                    isChecked ? "text-emerald-800" : "text-foreground",
+                                  )}
+                                >
                                   {item.label}
                                 </span>
                                 <Badge variant="secondary" className="text-xs">
                                   {item.points} pts
                                 </Badge>
                               </div>
-                              <p className={cn(
-                                "text-sm mt-1 transition-colors duration-200",
-                                isChecked ? "text-status-success" : "text-muted-foreground"
-                              )}>
+                              <p
+                                className={cn(
+                                  "text-sm mt-1 transition-colors duration-200",
+                                  isChecked ? "text-status-success" : "text-muted-foreground",
+                                )}
+                              >
                                 {item.description}
                               </p>
                             </div>
@@ -1190,7 +1304,10 @@ export default function AccessibilitySettingsPage() {
         {/* Bottom Save Button */}
         <div className="flex justify-end pb-8 gap-3">
           {hasUnsavedChanges && (
-            <Badge variant="outline" className="self-center bg-status-warning/15 text-status-warning border-amber-200">
+            <Badge
+              variant="outline"
+              className="self-center bg-status-warning/15 text-status-warning border-amber-200"
+            >
               Unsaved changes
             </Badge>
           )}
@@ -1200,7 +1317,7 @@ export default function AccessibilitySettingsPage() {
             disabled={saveMutation.isPending}
             className={cn(
               "transition-all duration-200",
-              "motion-safe:hover:scale-105 motion-safe:active:scale-95"
+              "motion-safe:hover:scale-105 motion-safe:active:scale-95",
             )}
           >
             {saveMutation.isPending ? (

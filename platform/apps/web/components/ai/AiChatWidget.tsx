@@ -76,7 +76,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
       const newUrl = `${baseUrl}?${params.toString()}`;
       router.push(newUrl);
     },
-    [router]
+    [router],
   );
 
   const chat = useChatStreamSse({
@@ -126,13 +126,10 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">Keepr Host</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        Share dates, guests, rig size, and must-have amenities. I will match you with the right site.
+        Share dates, guests, rig size, and must-have amenities. I will match you with the right
+        site.
       </p>
-      <SuggestedPrompts
-        prompts={PROMPTS.public}
-        onSelect={handleQuickReply}
-        accent={accent}
-      />
+      <SuggestedPrompts prompts={PROMPTS.public} onSelect={handleQuickReply} accent={accent} />
     </div>
   );
 
@@ -157,7 +154,8 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">Keepr Host</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Share dates, guests, rig size, and must-have amenities. I will match you with the right site.
+            Share dates, guests, rig size, and must-have amenities. I will match you with the right
+            site.
           </p>
           <div className="text-xs text-muted-foreground mb-6 p-3 bg-muted rounded-lg">
             <div className="flex items-center gap-2 mb-1">

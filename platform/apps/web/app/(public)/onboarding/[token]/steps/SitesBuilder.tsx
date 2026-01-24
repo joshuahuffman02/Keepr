@@ -96,13 +96,13 @@ function SiteCard({
       exit={{ opacity: 0, scale: 0.95 }}
       className={cn(
         "border rounded-lg overflow-hidden transition-all",
-        expanded ? "border-emerald-500/50 bg-slate-800/50" : "border-slate-700 bg-slate-800/30"
+        expanded ? "border-emerald-500/50 bg-slate-800/50" : "border-slate-700 bg-slate-800/30",
       )}
     >
       <div
         className={cn(
           "flex items-center gap-2 px-3 py-2 cursor-pointer",
-          needsConfig && "hover:bg-slate-800/50"
+          needsConfig && "hover:bg-slate-800/50",
         )}
         onClick={() => needsConfig && setExpanded(!expanded)}
       >
@@ -117,13 +117,12 @@ function SiteCard({
         {isRv && site.rigMaxLength && (
           <span className="text-xs text-slate-400">{site.rigMaxLength}ft</span>
         )}
-        {needsConfig && (
-          expanded ? (
+        {needsConfig &&
+          (expanded ? (
             <ChevronUp className="w-4 h-4 text-slate-400" />
           ) : (
             <ChevronDown className="w-4 h-4 text-slate-400" />
-          )
-        )}
+          ))}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -209,15 +208,11 @@ export function SitesBuilder({
   const [viewMode, setViewMode] = useState<"compact" | "detailed">("compact");
 
   // Quick entry state
-  const [quickSiteClassId, setQuickSiteClassId] = useState<string>(
-    siteClasses[0]?.id || ""
-  );
+  const [quickSiteClassId, setQuickSiteClassId] = useState<string>(siteClasses[0]?.id || "");
   const [quickText, setQuickText] = useState("");
 
   // Bulk creation state
-  const [bulkSiteClassId, setBulkSiteClassId] = useState<string>(
-    siteClasses[0]?.id || ""
-  );
+  const [bulkSiteClassId, setBulkSiteClassId] = useState<string>(siteClasses[0]?.id || "");
   const [bulkPrefix, setBulkPrefix] = useState("");
   const [bulkStart, setBulkStart] = useState(1);
   const [bulkCount, setBulkCount] = useState(10);
@@ -226,9 +221,7 @@ export function SitesBuilder({
 
   // Individual creation state
   const [newSiteName, setNewSiteName] = useState("");
-  const [newSiteClassId, setNewSiteClassId] = useState<string>(
-    siteClasses[0]?.id || ""
-  );
+  const [newSiteClassId, setNewSiteClassId] = useState<string>(siteClasses[0]?.id || "");
   const [newSiteLength, setNewSiteLength] = useState<number | undefined>(undefined);
   const [newSiteAmp, setNewSiteAmp] = useState<number | undefined>(undefined);
 
@@ -336,9 +329,7 @@ export function SitesBuilder({
             onClick={() => setMode("bulk")}
             className={cn(
               "px-4 py-2 rounded-md text-sm font-medium transition-all",
-              mode === "bulk"
-                ? "bg-emerald-500 text-white"
-                : "text-slate-400 hover:text-white"
+              mode === "bulk" ? "bg-emerald-500 text-white" : "text-slate-400 hover:text-white",
             )}
           >
             <Layers className="w-4 h-4 inline-block mr-2" />
@@ -348,9 +339,7 @@ export function SitesBuilder({
             onClick={() => setMode("quick")}
             className={cn(
               "px-4 py-2 rounded-md text-sm font-medium transition-all",
-              mode === "quick"
-                ? "bg-emerald-500 text-white"
-                : "text-slate-400 hover:text-white"
+              mode === "quick" ? "bg-emerald-500 text-white" : "text-slate-400 hover:text-white",
             )}
           >
             <Edit2 className="w-4 h-4 inline-block mr-2" />
@@ -362,7 +351,7 @@ export function SitesBuilder({
               "px-4 py-2 rounded-md text-sm font-medium transition-all",
               mode === "individual"
                 ? "bg-emerald-500 text-white"
-                : "text-slate-400 hover:text-white"
+                : "text-slate-400 hover:text-white",
             )}
           >
             <Plus className="w-4 h-4 inline-block mr-2" />
@@ -385,10 +374,7 @@ export function SitesBuilder({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm text-slate-300">Site Type</Label>
-                  <Select
-                    value={bulkSiteClassId}
-                    onValueChange={setBulkSiteClassId}
-                  >
+                  <Select value={bulkSiteClassId} onValueChange={setBulkSiteClassId}>
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                       <SelectValue />
                     </SelectTrigger>
@@ -403,9 +389,7 @@ export function SitesBuilder({
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm text-slate-300">
-                    Prefix (optional)
-                  </Label>
+                  <Label className="text-sm text-slate-300">Prefix (optional)</Label>
                   <Input
                     value={bulkPrefix}
                     onChange={(e) => setBulkPrefix(e.target.value)}
@@ -430,9 +414,7 @@ export function SitesBuilder({
                   <Input
                     type="number"
                     value={bulkCount}
-                    onChange={(e) =>
-                      setBulkCount(parseInt(e.target.value) || 1)
-                    }
+                    onChange={(e) => setBulkCount(parseInt(e.target.value) || 1)}
                     className="bg-slate-800/50 border-slate-700 text-white"
                   />
                 </div>
@@ -449,9 +431,7 @@ export function SitesBuilder({
                     <Input
                       type="number"
                       value={bulkLength || ""}
-                      onChange={(e) =>
-                        setBulkLength(parseInt(e.target.value) || undefined)
-                      }
+                      onChange={(e) => setBulkLength(parseInt(e.target.value) || undefined)}
                       placeholder="45"
                       className="bg-slate-800/50 border-slate-700 text-white"
                     />
@@ -473,7 +453,8 @@ export function SitesBuilder({
                         ))}
                       </div>
                       <p className="text-xs text-slate-500 mt-2">
-                        All sites will support these amp options. You can restrict individual sites later.
+                        All sites will support these amp options. You can restrict individual sites
+                        later.
                       </p>
                     </div>
                   )}
@@ -490,16 +471,11 @@ export function SitesBuilder({
                   {bulkStart + bulkCount - 1}
                 </p>
                 {isBulkRv && bulkLength && (
-                  <p className="text-slate-500 text-xs mt-1">
-                    Each with: {bulkLength}ft max
-                  </p>
+                  <p className="text-slate-500 text-xs mt-1">Each with: {bulkLength}ft max</p>
                 )}
               </div>
 
-              <Button
-                onClick={addBulkSites}
-                className="w-full bg-emerald-600 hover:bg-emerald-500"
-              >
+              <Button onClick={addBulkSites} className="w-full bg-emerald-600 hover:bg-emerald-500">
                 <Plus className="w-4 h-4 mr-2" />
                 Add {bulkCount} Sites
               </Button>
@@ -516,15 +492,13 @@ export function SitesBuilder({
             >
               <h3 className="font-medium text-white">Add Custom Site Numbers</h3>
               <p className="text-sm text-slate-400">
-                Enter your site numbers separated by commas or new lines. Perfect for parks with non-sequential numbering.
+                Enter your site numbers separated by commas or new lines. Perfect for parks with
+                non-sequential numbering.
               </p>
 
               <div className="space-y-2">
                 <Label className="text-sm text-slate-300">Site Type</Label>
-                <Select
-                  value={quickSiteClassId}
-                  onValueChange={setQuickSiteClassId}
-                >
+                <Select value={quickSiteClassId} onValueChange={setQuickSiteClassId}>
                   <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                     <SelectValue />
                   </SelectTrigger>
@@ -539,9 +513,7 @@ export function SitesBuilder({
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm text-slate-300">
-                  Site Numbers
-                </Label>
+                <Label className="text-sm text-slate-300">Site Numbers</Label>
                 <textarea
                   value={quickText}
                   onChange={(e) => setQuickText(e.target.value)}
@@ -554,7 +526,9 @@ export function SitesBuilder({
               {/* Preview */}
               {quickText.trim() && (
                 <div className="bg-slate-900/50 rounded-lg p-3 text-sm">
-                  <p className="text-slate-400 mb-2">Preview ({quickText.split(/[,\n]+/).filter(s => s.trim()).length} sites):</p>
+                  <p className="text-slate-400 mb-2">
+                    Preview ({quickText.split(/[,\n]+/).filter((s) => s.trim()).length} sites):
+                  </p>
                   <div className="flex flex-wrap gap-1">
                     {quickText
                       .split(/[,\n]+/)
@@ -562,13 +536,16 @@ export function SitesBuilder({
                       .filter((s) => s.length > 0)
                       .slice(0, 12)
                       .map((s, i) => (
-                        <span key={i} className="px-2 py-0.5 bg-slate-800 rounded text-white text-xs">
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 bg-slate-800 rounded text-white text-xs"
+                        >
                           {s}
                         </span>
                       ))}
-                    {quickText.split(/[,\n]+/).filter(s => s.trim()).length > 12 && (
+                    {quickText.split(/[,\n]+/).filter((s) => s.trim()).length > 12 && (
                       <span className="px-2 py-0.5 text-slate-500 text-xs">
-                        +{quickText.split(/[,\n]+/).filter(s => s.trim()).length - 12} more
+                        +{quickText.split(/[,\n]+/).filter((s) => s.trim()).length - 12} more
                       </span>
                     )}
                   </div>
@@ -598,9 +575,7 @@ export function SitesBuilder({
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm text-slate-300">
-                    Site Name/Number
-                  </Label>
+                  <Label className="text-sm text-slate-300">Site Name/Number</Label>
                   <Input
                     value={newSiteName}
                     onChange={(e) => setNewSiteName(e.target.value)}
@@ -644,9 +619,7 @@ export function SitesBuilder({
                     <Input
                       type="number"
                       value={newSiteLength || ""}
-                      onChange={(e) =>
-                        setNewSiteLength(parseInt(e.target.value) || undefined)
-                      }
+                      onChange={(e) => setNewSiteLength(parseInt(e.target.value) || undefined)}
                       placeholder="45"
                       className="bg-slate-800/50 border-slate-700 text-white"
                     />
@@ -659,9 +632,7 @@ export function SitesBuilder({
                       </Label>
                       <Select
                         value={newSiteAmp?.toString() || ""}
-                        onValueChange={(val) =>
-                          setNewSiteAmp(val ? parseInt(val) : undefined)
-                        }
+                        onValueChange={(val) => setNewSiteAmp(val ? parseInt(val) : undefined)}
                       >
                         <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                           <SelectValue placeholder="Select amp" />
@@ -699,9 +670,7 @@ export function SitesBuilder({
             className="space-y-4"
           >
             <div className="flex items-center justify-between">
-              <h3 className="font-medium text-white">
-                Your Sites ({sites.length})
-              </h3>
+              <h3 className="font-medium text-white">Your Sites ({sites.length})</h3>
               <div className="flex items-center gap-3">
                 {/* View mode toggle */}
                 <div className="flex gap-1 p-0.5 bg-slate-800/50 rounded-md">
@@ -711,7 +680,7 @@ export function SitesBuilder({
                       "px-2 py-1 rounded text-xs transition-all",
                       viewMode === "compact"
                         ? "bg-slate-700 text-white"
-                        : "text-slate-500 hover:text-white"
+                        : "text-slate-500 hover:text-white",
                     )}
                   >
                     Compact
@@ -722,7 +691,7 @@ export function SitesBuilder({
                       "px-2 py-1 rounded text-xs transition-all",
                       viewMode === "detailed"
                         ? "bg-slate-700 text-white"
-                        : "text-slate-500 hover:text-white"
+                        : "text-slate-500 hover:text-white",
                     )}
                   >
                     Detailed
@@ -745,18 +714,11 @@ export function SitesBuilder({
               const isRvClass = siteClass?.siteType === "rv";
 
               return (
-                <div
-                  key={classId}
-                  className="border border-slate-700 rounded-xl overflow-hidden"
-                >
+                <div key={classId} className="border border-slate-700 rounded-xl overflow-hidden">
                   <div className="bg-slate-800/50 px-4 py-3 flex items-center gap-3">
                     <Icon className="w-5 h-5 text-emerald-400" />
-                    <span className="font-medium text-white">
-                      {siteClass?.name || "Unknown"}
-                    </span>
-                    <span className="text-sm text-slate-500">
-                      ({classSites.length} sites)
-                    </span>
+                    <span className="font-medium text-white">{siteClass?.name || "Unknown"}</span>
+                    <span className="text-sm text-slate-500">({classSites.length} sites)</span>
                     {isRvClass && viewMode === "compact" && (
                       <span className="text-xs text-slate-500 ml-auto">
                         Click a site to edit length/amp
@@ -764,16 +726,17 @@ export function SitesBuilder({
                     )}
                   </div>
 
-                  <div className={cn(
-                    "p-4",
-                    viewMode === "compact" ? "flex flex-wrap gap-2" : "space-y-2"
-                  )}>
+                  <div
+                    className={cn(
+                      "p-4",
+                      viewMode === "compact" ? "flex flex-wrap gap-2" : "space-y-2",
+                    )}
+                  >
                     <AnimatePresence mode="popLayout">
                       {classSites.map((site, i) => {
                         const globalIndex = sites.findIndex(
                           (s) =>
-                            s.siteNumber === site.siteNumber &&
-                            s.siteClassId === site.siteClassId
+                            s.siteNumber === site.siteNumber && s.siteClassId === site.siteClassId,
                         );
 
                         if (viewMode === "detailed" || isRvClass) {
@@ -792,25 +755,13 @@ export function SitesBuilder({
                         return (
                           <motion.div
                             key={`${site.siteNumber}-${i}`}
-                            initial={
-                              prefersReducedMotion
-                                ? {}
-                                : { opacity: 0, scale: 0.8 }
-                            }
-                            animate={
-                              prefersReducedMotion ? {} : { opacity: 1, scale: 1 }
-                            }
-                            exit={
-                              prefersReducedMotion
-                                ? {}
-                                : { opacity: 0, scale: 0.8 }
-                            }
+                            initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
+                            animate={prefersReducedMotion ? {} : { opacity: 1, scale: 1 }}
+                            exit={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
                             className="group flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5"
                           >
                             <Hash className="w-3 h-3 text-slate-500" />
-                            <span className="text-sm text-white">
-                              {site.siteNumber}
-                            </span>
+                            <span className="text-sm text-white">{site.siteNumber}</span>
                             <button
                               onClick={() => removeSite(globalIndex)}
                               className="ml-1 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-400 transition-all"
@@ -854,7 +805,7 @@ export function SitesBuilder({
                 "w-full py-6 text-lg font-semibold transition-all",
                 "bg-gradient-to-r from-emerald-500 to-teal-500",
                 "hover:from-emerald-400 hover:to-teal-400",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
             >
               {saving ? "Creating Sites..." : `Create ${sites.length} Sites`}

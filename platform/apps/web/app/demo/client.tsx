@@ -111,8 +111,8 @@ export function DemoClient() {
               </h1>
 
               <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-                Explore a fully-loaded demo with real data. 75 sites, 200+ reservations, AI insights,
-                and every feature you'd use day-to-day. No sales pitch required.
+                Explore a fully-loaded demo with real data. 75 sites, 200+ reservations, AI
+                insights, and every feature you'd use day-to-day. No sales pitch required.
               </p>
 
               <div className="space-y-4 mb-8">
@@ -138,9 +138,7 @@ export function DemoClient() {
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-keepr-evergreen/10 mb-4">
                       <Zap className="h-8 w-8 text-keepr-evergreen" />
                     </div>
-                    <h2 className="text-2xl font-bold text-slate-900 mb-2">
-                      Access the Demo
-                    </h2>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Access the Demo</h2>
                     <p className="text-slate-600">
                       Enter your email to get instant access. We'll send you login credentials.
                     </p>
@@ -148,7 +146,10 @@ export function DemoClient() {
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-slate-700 mb-1"
+                      >
                         Your Name
                       </label>
                       <input
@@ -163,7 +164,10 @@ export function DemoClient() {
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-slate-700 mb-1"
+                      >
                         Work Email
                       </label>
                       <input
@@ -178,7 +182,10 @@ export function DemoClient() {
                     </div>
 
                     <div>
-                      <label htmlFor="parkName" className="block text-sm font-medium text-slate-700 mb-1">
+                      <label
+                        htmlFor="parkName"
+                        className="block text-sm font-medium text-slate-700 mb-1"
+                      >
                         Park/Campground Name (optional)
                       </label>
                       <input
@@ -233,7 +240,10 @@ export function DemoClient() {
                     <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
                       <Eye className="h-4 w-4" />
                       <span>Or</span>
-                      <Link href="/demo/preview" className="text-keepr-evergreen hover:text-keepr-evergreen-light font-medium">
+                      <Link
+                        href="/demo/preview"
+                        className="text-keepr-evergreen hover:text-keepr-evergreen-light font-medium"
+                      >
                         browse without signing up
                       </Link>
                     </div>
@@ -244,12 +254,10 @@ export function DemoClient() {
                   <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-keepr-evergreen/10 mb-6">
                     <Check className="h-8 w-8 text-keepr-evergreen" />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                    You're In!
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">You're In!</h2>
                   <p className="text-slate-600 mb-6">
-                    We've sent login credentials to <strong>{email}</strong>.
-                    Check your inbox (and spam folder, just in case).
+                    We've sent login credentials to <strong>{email}</strong>. Check your inbox (and
+                    spam folder, just in case).
                   </p>
                   <Button
                     asChild
@@ -261,7 +269,8 @@ export function DemoClient() {
                     </Link>
                   </Button>
                   <p className="mt-4 text-sm text-slate-500">
-                    Demo credentials: <code className="bg-slate-100 px-2 py-1 rounded">demo@keeprstay.com</code>
+                    Demo credentials:{" "}
+                    <code className="bg-slate-100 px-2 py-1 rounded">demo@keeprstay.com</code>
                   </p>
                 </div>
               )}
@@ -301,9 +310,7 @@ export function DemoClient() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Everything You Can Explore
-            </h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Everything You Can Explore</h2>
           </div>
 
           <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
@@ -328,7 +335,8 @@ export function DemoClient() {
           </div>
           <p className="text-keepr-off-white/90 max-w-2xl mx-auto">
             The demo environment is completely sandboxed. Create reservations, modify rates,
-            experiment with settings - nothing you do affects real data. The demo resets every night.
+            experiment with settings - nothing you do affects real data. The demo resets every
+            night.
           </p>
         </div>
       </section>
@@ -336,9 +344,7 @@ export function DemoClient() {
       {/* CTA Section */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-6">
-            Ready to See It for Yourself?
-          </h2>
+          <h2 className="text-3xl font-bold text-slate-900 mb-6">Ready to See It for Yourself?</h2>
           <p className="text-lg text-slate-600 mb-8">
             Join hundreds of park owners who've explored the demo before making the switch.
           </p>
@@ -353,12 +359,7 @@ export function DemoClient() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </a>
             </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="px-8 py-6 text-lg"
-            >
+            <Button asChild size="lg" variant="outline" className="px-8 py-6 text-lg">
               <Link href="/signup">Start Free Trial Instead</Link>
             </Button>
           </div>

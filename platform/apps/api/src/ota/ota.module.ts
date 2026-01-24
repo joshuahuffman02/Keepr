@@ -12,4 +12,3 @@ import { OtaService } from "./ota.service";
   exports: [OtaService],
 })
 export class OtaModule {}
-

@@ -7,10 +7,12 @@ Actionable steps required before going live with paying customers.
 ## 1. Payments (Stripe)
 
 ### Current State
+
 - Using Stripe **test mode** (`sk_test_...`)
 - Test cards work, but no real money flows
 
 ### Action Items
+
 - [ ] Complete Stripe account verification (business info, bank account)
 - [ ] Switch to **live mode** API keys
 - [ ] Set environment variables in Railway:
@@ -20,7 +22,7 @@ Actionable steps required before going live with paying customers.
   STRIPE_WEBHOOK_SECRET=whsec_...  (create new webhook for production URL)
   ```
 - [ ] Create production webhook endpoint in Stripe Dashboard pointing to:
-  `https://your-api-domain.railway.app/payments/webhook`
+      `https://your-api-domain.railway.app/payments/webhook`
 - [ ] Test a real $1 transaction, then refund it
 
 ---
@@ -28,6 +30,7 @@ Actionable steps required before going live with paying customers.
 ## 2. Domain & SSL
 
 ### Current State
+
 - [x] **COMPLETE** - Custom domains configured:
   - Production: `keeprstay.com` (Vercel) + `api.keeprstay.com` (Railway)
   - Staging: `staging.keeprstay.com` (Vercel) + `api-staging.keeprstay.com` (Railway)
@@ -35,6 +38,7 @@ Actionable steps required before going live with paying customers.
 - [x] DNS managed via Cloudflare
 
 ### Action Items
+
 - [x] ~~Purchase domain~~ - `keeprstay.com` acquired
 - [x] ~~Add custom domain in Vercel for frontend~~
 - [x] ~~Add custom domain in Railway for API~~
@@ -49,9 +53,11 @@ Actionable steps required before going live with paying customers.
 ## 3. QuickBooks Integration
 
 ### Current State
+
 - OAuth flow is built but no developer app registered
 
 ### Action Items
+
 - [ ] Create Intuit Developer account: https://developer.intuit.com/
 - [ ] Create a new app (QuickBooks Online and Payments)
 - [ ] Set OAuth redirect URI: `https://api.keeprstay.com/integrations/oauth/qbo/callback`
@@ -68,11 +74,13 @@ Actionable steps required before going live with paying customers.
 ## 4. Email Provider
 
 ### Current State
+
 - [x] **COMPLETE** - Resend integration built (`email.service.ts`)
 - Supports Resend (primary), Postmark, and SMTP fallback
 - All transactional email templates implemented
 
 ### Action Items
+
 - [x] ~~Choose email provider~~ - Resend selected
 - [x] ~~Integration code~~ - Full Resend API integration in `email.service.ts`
 - [ ] Set `RESEND_API_KEY` in Railway (or use `onboarding@resend.dev` for testing)
@@ -85,10 +93,12 @@ Actionable steps required before going live with paying customers.
 ## 5. SMS Provider (Optional)
 
 ### Current State
+
 - [x] **COMPLETE** - Twilio integration built (`sms.service.ts`)
 - SMS delivery tracking and DLR (delivery receipts) supported
 
 ### Action Items
+
 - [x] ~~Choose provider~~ - Twilio selected
 - [x] ~~Integration code~~ - Full Twilio integration in `sms.service.ts`
 - [ ] Set Twilio env vars in Railway:
@@ -104,11 +114,13 @@ Actionable steps required before going live with paying customers.
 ## 6. Database
 
 ### Current State
+
 - [x] **COMPLETE** - Using Supabase PostgreSQL with GitHub branching integration
 - Production database on main Supabase project
 - Staging uses Supabase branch database
 
 ### Action Items
+
 - [x] ~~Automated backups~~ - enabled via Supabase
 - [x] ~~Point-in-time recovery~~ - available via Supabase
 - [ ] Document backup/restore procedure
@@ -119,6 +131,7 @@ Actionable steps required before going live with paying customers.
 ## 7. Authentication & Security
 
 ### Current State
+
 - [x] **MOSTLY COMPLETE** - NextAuth v5 configured with JWT strategy
 - [x] Rate limiting via `@nestjs/throttler` on all endpoints
 - [x] ScopeGuard validates campgroundId ownership on every request
@@ -126,6 +139,7 @@ Actionable steps required before going live with paying customers.
 - [x] Account lockout after failed login attempts
 
 ### Action Items
+
 - [x] ~~Rate limiting~~ - Implemented via @Throttle decorators
 - [x] ~~Auth guards~~ - JwtAuthGuard, ScopeGuard, RolesGuard all active
 - [x] ~~Multi-tenant isolation~~ - ScopeGuard validates user memberships
@@ -142,9 +156,11 @@ Actionable steps required before going live with paying customers.
 ## 8. File Storage (Photos/Documents)
 
 ### Current State
+
 - May be using local storage or placeholder
 
 ### Action Items
+
 - [ ] Set up AWS S3 bucket (or Cloudflare R2, Railway Object Storage)
 - [ ] Configure bucket for public read (photos) or signed URLs (documents)
 - [ ] Set environment variables:
@@ -162,6 +178,7 @@ Actionable steps required before going live with paying customers.
 ## 9. Monitoring & Alerts
 
 ### Current State
+
 - [x] **COMPLETE** - Full observability stack built
 - [x] Sentry integration ready (`sentry.ts` + `sentry.*.config.ts`)
 - [x] Health endpoints: `/health` (liveness) + `/ready` (readiness)
@@ -171,6 +188,7 @@ Actionable steps required before going live with paying customers.
 - [x] Queue lag monitoring with alerts
 
 ### Action Items
+
 - [x] ~~Error tracking code~~ - Sentry fully integrated
 - [x] ~~Health endpoints~~ - `/health` and `/ready` implemented
 - [x] ~~Alert infrastructure~~ - AlertSinksService with rate limiting
@@ -184,6 +202,7 @@ Actionable steps required before going live with paying customers.
 ## 10. Legal & Compliance
 
 ### Action Items
+
 - [ ] Privacy Policy page (required for Stripe, email providers)
 - [ ] Terms of Service page
 - [ ] Cookie consent banner (if serving EU users)
@@ -195,15 +214,18 @@ Actionable steps required before going live with paying customers.
 ## 11. Other Integrations (As Needed)
 
 ### Xero (International Accounting)
+
 - [ ] Register at https://developer.xero.com/
 - [ ] Set `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`
 - [ ] Callback: `https://api.keeprstay.com/integrations/oauth/xero/callback`
 
 ### HubSpot (CRM)
+
 - [ ] Register at https://developers.hubspot.com/
 - [ ] Set `HUBSPOT_CLIENT_ID`, `HUBSPOT_CLIENT_SECRET`
 
 ### Zendesk (Support)
+
 - [ ] Create OAuth client in Zendesk admin
 - [ ] Set `ZENDESK_CLIENT_ID`, `ZENDESK_CLIENT_SECRET`, `ZENDESK_SUBDOMAIN`
 
@@ -212,6 +234,7 @@ Actionable steps required before going live with paying customers.
 ## 12. Pre-Launch Testing
 
 ### Action Items
+
 - [ ] Create test campground account end-to-end
 - [ ] Complete full booking flow with real (test mode) payment
 - [ ] Test email delivery to multiple providers (Gmail, Outlook, Yahoo)
@@ -224,6 +247,7 @@ Actionable steps required before going live with paying customers.
 ## Environment Variables Summary
 
 ### Railway (API) - Required
+
 ```bash
 NODE_ENV=production
 DATABASE_URL=postgresql://...    # Supabase connection string
@@ -249,6 +273,7 @@ SLACK_WEBHOOK_URL=https://hooks.slack.com/...  # For alerts
 ```
 
 ### Vercel (Web) - Required
+
 ```bash
 NEXT_PUBLIC_API_BASE=https://api.keeprstay.com/api
 NEXTAUTH_URL=https://keeprstay.com
@@ -259,6 +284,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 ```
 
 ### Optional Integrations
+
 ```bash
 # QuickBooks
 QBO_CLIENT_ID=...
@@ -275,12 +301,14 @@ AWS_S3_BUCKET=keepr-uploads
 ## Launch Day Checklist
 
 ### Infrastructure (Already Done)
+
 - [x] DNS configured (Cloudflare)
 - [x] SSL working on custom domains
 - [x] Database backups enabled (Supabase)
 - [x] Health endpoints responding
 
 ### Before Launch
+
 - [ ] All env vars set in Railway + Vercel (see summary above)
 - [ ] Sentry DSN configured and test error captured
 - [ ] Slack webhook configured and test alert sent
@@ -289,6 +317,7 @@ AWS_S3_BUCKET=keepr-uploads
 - [ ] Full booking flow tested end-to-end
 
 ### Go Live
+
 - [ ] Switch Stripe to live mode keys
 - [ ] Test real $1 payment + refund
 - [ ] Monitor error dashboard for first 24 hours

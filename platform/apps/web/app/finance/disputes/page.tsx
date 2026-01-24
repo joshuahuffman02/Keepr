@@ -7,7 +7,14 @@ import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { format } from "date-fns";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
@@ -28,7 +35,7 @@ const statusColors: Record<string, string> = {
   under_review: "bg-status-info-bg text-status-info-text",
   charge_refunded: "bg-status-error-bg text-status-error-text",
   won: "bg-status-success-bg text-status-success-text",
-  lost: "bg-status-error-bg text-status-error-text"
+  lost: "bg-status-error-bg text-status-error-text",
 };
 
 const DUE_SOON_HOURS = 48;
@@ -54,12 +61,15 @@ export default function DisputesPage() {
     queryKey: ["disputes", campgroundId, status],
     queryFn: () => apiClient.listDisputes(campgroundId, status),
     enabled: !!campgroundId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   useEffect(() => {
     if (!campgroundId) return;
-    apiClient.listDisputeTemplates(campgroundId).then(setTemplates).catch(() => {});
+    apiClient
+      .listDisputeTemplates(campgroundId)
+      .then(setTemplates)
+      .catch(() => {});
   }, [campgroundId]);
 
   const counts = useMemo(() => {
@@ -78,7 +88,7 @@ export default function DisputesPage() {
         d.evidenceDueBy &&
         new Date(d.evidenceDueBy).getTime() <= cutoff &&
         new Date(d.evidenceDueBy).getTime() >= now &&
-        !["won", "lost", "charge_refunded"].includes(d.status)
+        !["won", "lost", "charge_refunded"].includes(d.status),
     ).length;
   }, [data]);
 
@@ -88,20 +98,26 @@ export default function DisputesPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-foreground">Dispute Center</h1>
-            <p className="text-sm text-muted-foreground">Stripe chargebacks with due dates for evidence.</p>
+            <p className="text-sm text-muted-foreground">
+              Stripe chargebacks with due dates for evidence.
+            </p>
           </div>
           <div className="flex gap-2">
-            {["all", "needs_response", "under_review", "charge_refunded", "won", "lost"].map((s) => (
-              <Button
-                key={s}
-                size="sm"
-                variant={status === (s === "all" ? undefined : s) ? "default" : "outline"}
-                onClick={() => setStatus(s === "all" ? undefined : s)}
-                aria-pressed={status === (s === "all" ? undefined : s)}
-              >
-                {s === "all" ? "All" : `${s.replace("_", " ")}${counts[s] ? ` (${counts[s]})` : ""}`}
-              </Button>
-            ))}
+            {["all", "needs_response", "under_review", "charge_refunded", "won", "lost"].map(
+              (s) => (
+                <Button
+                  key={s}
+                  size="sm"
+                  variant={status === (s === "all" ? undefined : s) ? "default" : "outline"}
+                  onClick={() => setStatus(s === "all" ? undefined : s)}
+                  aria-pressed={status === (s === "all" ? undefined : s)}
+                >
+                  {s === "all"
+                    ? "All"
+                    : `${s.replace("_", " ")}${counts[s] ? ` (${counts[s]})` : ""}`}
+                </Button>
+              ),
+            )}
             <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isLoading}>
               Refresh
             </Button>
@@ -113,7 +129,11 @@ export default function DisputesPage() {
                 try {
                   await apiClient.exportDisputesCsv(campgroundId, status);
                 } catch (err: unknown) {
-                  toast({ title: "Export failed", description: getErrorMessage(err, "Export failed"), variant: "destructive" });
+                  toast({
+                    title: "Export failed",
+                    description: getErrorMessage(err, "Export failed"),
+                    variant: "destructive",
+                  });
                 }
               }}
               disabled={!campgroundId}
@@ -126,7 +146,9 @@ export default function DisputesPage() {
         {dueSoonCount > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm text-status-warning">Disputes due soon: {dueSoonCount} (within {DUE_SOON_HOURS}h)</CardTitle>
+              <CardTitle className="text-sm text-status-warning">
+                Disputes due soon: {dueSoonCount} (within {DUE_SOON_HOURS}h)
+              </CardTitle>
             </CardHeader>
           </Card>
         )}
@@ -138,7 +160,9 @@ export default function DisputesPage() {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               {templates.map((t) => (
-                <Badge key={t.id} variant="outline">{t.label}</Badge>
+                <Badge key={t.id} variant="outline">
+                  {t.label}
+                </Badge>
               ))}
             </CardContent>
           </Card>
@@ -165,18 +189,25 @@ export default function DisputesPage() {
               <TableBody>
                 {!data && isLoading && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">Loading...</TableCell>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                      Loading...
+                    </TableCell>
                   </TableRow>
                 )}
                 {data?.length === 0 && !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">No disputes.</TableCell>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                      No disputes.
+                    </TableCell>
                   </TableRow>
                 )}
                 {data?.map((d) => (
                   <TableRow key={d.id}>
                     <TableCell className="font-mono text-xs">
-                      <Link className="text-primary hover:underline" href={`/finance/disputes/${d.id}`}>
+                      <Link
+                        className="text-primary hover:underline"
+                        href={`/finance/disputes/${d.id}`}
+                      >
                         {d.stripeDisputeId}
                       </Link>
                     </TableCell>
@@ -189,16 +220,23 @@ export default function DisputesPage() {
                     <TableCell className="text-xs text-foreground">{d.reason ?? "—"}</TableCell>
                     <TableCell className="text-xs text-foreground">
                       {d.reservationId ? (
-                        <Link className="text-primary hover:underline" href={`/campgrounds/${campgroundId}/reservations/${d.reservationId}`}>
+                        <Link
+                          className="text-primary hover:underline"
+                          href={`/campgrounds/${campgroundId}/reservations/${d.reservationId}`}
+                        >
                           {d.reservationId}
                         </Link>
-                      ) : "—"}
+                      ) : (
+                        "—"
+                      )}
                     </TableCell>
                     <TableCell className="text-xs text-foreground">
                       {d.evidenceDueBy ? format(new Date(d.evidenceDueBy), "yyyy-MM-dd") : "—"}
                     </TableCell>
                     <TableCell className="font-mono text-xs">{d.stripeChargeId ?? "—"}</TableCell>
-                    <TableCell className="font-mono text-xs">{d.stripePaymentIntentId ?? "—"}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      {d.stripePaymentIntentId ?? "—"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

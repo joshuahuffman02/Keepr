@@ -107,6 +107,7 @@ Backup Manager: [number]
 How you'll alert guests and coordinate response:
 
 **Alert methods:**
+
 - PA system (if available)
 - Vehicle-mounted loudspeaker
 - Staff going site-to-site
@@ -114,6 +115,7 @@ How you'll alert guests and coordinate response:
 - Signage posting
 
 **Chain of communication:**
+
 1. Staff member identifies emergency
 2. Contact manager/on-duty lead immediately
 3. Call 911 if appropriate
@@ -123,6 +125,7 @@ How you'll alert guests and coordinate response:
 ### 3. Evacuation Routes and Procedures
 
 **Documented evacuation plan:**
+
 - Primary exit route clearly marked
 - Secondary route(s) identified
 - Rally point(s) designated
@@ -130,6 +133,7 @@ How you'll alert guests and coordinate response:
 - Guest count/accountability process
 
 **Posted evacuation maps:**
+
 - At office/registration
 - At restroom facilities
 - At each cabin/rental unit
@@ -155,12 +159,14 @@ When evacuation isn't safe (tornadoes, active threats):
 TORNADO PROCEDURE
 
 WATCH (conditions favorable):
+
 1. Staff: Monitor weather closely
 2. Prepare shelter areas
 3. Brief arriving guests on shelter location
 4. Have communication equipment ready
 
 WARNING (tornado imminent or sighted):
+
 1. Activate PA/alert system immediately
 2. Direct all guests to shelter location: [building/area]
 3. Staff sweep campground to ensure notification
@@ -196,10 +202,12 @@ MEDICAL EMERGENCY PROCEDURE
 6. Document incident after situation stabilized
 
 AED LOCATIONS:
+
 - Office building
 - [Other locations]
 
 FIRST AID KIT LOCATIONS:
+
 - Behind front desk
 - Maintenance building
 - Pool area (if applicable)
@@ -211,6 +219,7 @@ FIRST AID KIT LOCATIONS:
 FIRE EMERGENCY PROCEDURE
 
 STRUCTURE FIRE:
+
 1. Activate alarm if present
 2. Call 911 immediately
 3. Evacuate all persons from building
@@ -220,6 +229,7 @@ STRUCTURE FIRE:
 7. Meet fire department at entrance
 
 WILDFIRE THREAT:
+
 1. Monitor conditions via local authorities
 2. Prepare for possible evacuation
 3. If ordered, begin guest notification immediately
@@ -228,6 +238,7 @@ WILDFIRE THREAT:
 6. Owner/manager evacuates last
 
 RV/VEHICLE FIRE:
+
 1. Ensure occupants evacuated
 2. Call 911
 3. Clear area 50+ feet around vehicle
@@ -244,24 +255,28 @@ RV/VEHICLE FIRE:
 Maintain and check regularly:
 
 **First Aid:**
+
 - [ ] Fully stocked first aid kit
 - [ ] AED (automated external defibrillator)
 - [ ] Blankets
 - [ ] Splints and bandages
 
 **Communication:**
+
 - [ ] Battery-powered weather radio
 - [ ] Bullhorn/megaphone
 - [ ] Flashlights with extra batteries
 - [ ] Two-way radios
 
 **Shelter:**
+
 - [ ] Bottled water
 - [ ] Non-perishable snacks
 - [ ] Blankets
 - [ ] Battery-powered lights
 
 **Documentation:**
+
 - [ ] Guest registration list (printed copy)
 - [ ] Emergency contact numbers
 - [ ] Incident report forms
@@ -413,4 +428,4 @@ Build your emergency plan now, train your team, and practice regularly. The goal
 
 ---
 
-*Keepr stores guest contact information and emergency notes for quick access during any situation, helping you communicate with all guests instantly. [Prepare your campground at campreserv.com](https://campreserv.com)*
+_Keepr stores guest contact information and emergency notes for quick access during any situation, helping you communicate with all guests instantly. [Prepare your campground at campreserv.com](https://campreserv.com)_

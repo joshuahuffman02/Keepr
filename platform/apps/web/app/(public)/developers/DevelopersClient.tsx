@@ -168,11 +168,10 @@ export default function DevelopersClient() {
             <Zap className="h-3 w-3" />
             Developer Preview
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Build with Keepr API
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Build with Keepr API</h1>
           <p className="text-xl text-white/70 max-w-2xl mb-8">
-            Integrate campground availability, reservations, and payments into your applications with our RESTful API.
+            Integrate campground availability, reservations, and payments into your applications
+            with our RESTful API.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -242,9 +241,9 @@ export default function DevelopersClient() {
               <div className="prose prose-slate max-w-none">
                 <h2 className="text-2xl font-bold text-foreground">API Overview</h2>
                 <p className="text-muted-foreground">
-                  The Keepr API provides programmatic access to campground management
-                  functionality. Use it to build integrations, sync data with external systems,
-                  or create custom booking experiences.
+                  The Keepr API provides programmatic access to campground management functionality.
+                  Use it to build integrations, sync data with external systems, or create custom
+                  booking experiences.
                 </p>
               </div>
 
@@ -343,8 +342,8 @@ export default function DevelopersClient() {
               <div className="prose prose-slate max-w-none">
                 <h2 className="text-2xl font-bold text-foreground">Authentication</h2>
                 <p className="text-muted-foreground">
-                  The API uses OAuth 2.0 for authentication. We support the client credentials
-                  flow for server-to-server integrations.
+                  The API uses OAuth 2.0 for authentication. We support the client credentials flow
+                  for server-to-server integrations.
                 </p>
               </div>
 
@@ -418,8 +417,8 @@ export default function DevelopersClient() {
 
               <div className="bg-keepr-charcoal/5 border border-keepr-charcoal/10 rounded-lg p-4">
                 <p className="text-sm text-keepr-charcoal">
-                  <strong>Security:</strong> All webhook payloads include a signature header.
-                  Verify the signature using your webhook secret to ensure authenticity.
+                  <strong>Security:</strong> All webhook payloads include a signature header. Verify
+                  the signature using your webhook secret to ensure authenticity.
                 </p>
               </div>
             </div>

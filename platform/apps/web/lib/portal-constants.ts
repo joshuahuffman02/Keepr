@@ -36,30 +36,31 @@ export const scaleIn = {
 // Status color mapping using semantic tokens (auto dark mode via CSS variables)
 export type StatusVariant = "success" | "warning" | "error" | "info" | "neutral";
 
-export const STATUS_VARIANTS: Record<StatusVariant, { bg: string; text: string; border: string }> = {
-  success: {
-    bg: "bg-status-success-bg",
-    text: "text-status-success-text",
-    border: "border-status-success-border",
-  },
-  warning: {
-    bg: "bg-status-warning-bg",
-    text: "text-status-warning-text",
-    border: "border-status-warning-border",
-  },
-  error: {
-    bg: "bg-status-error-bg",
-    text: "text-status-error-text",
-    border: "border-status-error-border",
-  },
-  info: {
-    bg: "bg-status-info-bg",
-    text: "text-status-info-text",
-    border: "border-status-info-border",
-  },
-  neutral: {
-    bg: "bg-muted",
-    text: "text-muted-foreground",
-    border: "border-border",
-  },
-};
+export const STATUS_VARIANTS: Record<StatusVariant, { bg: string; text: string; border: string }> =
+  {
+    success: {
+      bg: "bg-status-success-bg",
+      text: "text-status-success-text",
+      border: "border-status-success-border",
+    },
+    warning: {
+      bg: "bg-status-warning-bg",
+      text: "text-status-warning-text",
+      border: "border-status-warning-border",
+    },
+    error: {
+      bg: "bg-status-error-bg",
+      text: "text-status-error-text",
+      border: "border-status-error-border",
+    },
+    info: {
+      bg: "bg-status-info-bg",
+      text: "text-status-info-text",
+      border: "border-status-info-border",
+    },
+    neutral: {
+      bg: "bg-muted",
+      text: "text-muted-foreground",
+      border: "border-border",
+    },
+  };

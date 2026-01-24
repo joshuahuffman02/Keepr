@@ -21,18 +21,19 @@ import {
   PricingStructure,
   ChargeStatus,
   GamificationEventCategory,
-  StayType
+  StayType,
 } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
 
-const randomBetween = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 const pick = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
 const addDays = (date: Date, days: number) => {
   const next = new Date(date);
@@ -43,7 +44,7 @@ const addDays = (date: Date, days: number) => {
 const SEASON_WINDOW = { startMonth: 3, startDay: 15, endMonth: 9, endDay: 30 }; // Apr 15 - Oct 30-ish
 const seasonForYear = (year: number) => ({
   start: new Date(Date.UTC(year, SEASON_WINDOW.startMonth, SEASON_WINDOW.startDay, 12, 0, 0)),
-  end: new Date(Date.UTC(year, SEASON_WINDOW.endMonth, SEASON_WINDOW.endDay, 12, 0, 0))
+  end: new Date(Date.UTC(year, SEASON_WINDOW.endMonth, SEASON_WINDOW.endDay, 12, 0, 0)),
 });
 
 // GL Code constants for accounting
@@ -53,7 +54,7 @@ const GL_CODES = {
   TAX_PAYABLE: "2100",
   ACCOUNTS_RECEIVABLE: "1200",
   CASH: "1000",
-  DISCOUNTS: "4900"
+  DISCOUNTS: "4900",
 };
 
 const seededCampgrounds = [
@@ -65,7 +66,7 @@ const seededCampgrounds = [
     timezone: "America/Chicago",
     vibe: "river",
     size: "medium",
-    guestOffset: 0
+    guestOffset: 0,
   },
   {
     name: "Keepr – Mountain Base",
@@ -75,7 +76,7 @@ const seededCampgrounds = [
     timezone: "America/Denver",
     vibe: "mountain",
     size: "medium",
-    guestOffset: 240
+    guestOffset: 240,
   },
   {
     name: "Sunset Sands RV Resort",
@@ -85,7 +86,7 @@ const seededCampgrounds = [
     timezone: "America/Denver",
     vibe: "desert_resort",
     size: "resort",
-    guestOffset: 480
+    guestOffset: 480,
   },
   {
     name: "Blueberry Hill Camp & Cabin",
@@ -95,7 +96,7 @@ const seededCampgrounds = [
     timezone: "America/New_York",
     vibe: "boutique",
     size: "small",
-    guestOffset: 720
+    guestOffset: 720,
   },
   {
     name: "Redwood Ridge Hideout",
@@ -105,8 +106,8 @@ const seededCampgrounds = [
     timezone: "America/Los_Angeles",
     vibe: "redwoods",
     size: "mom_pop",
-    guestOffset: 960
-  }
+    guestOffset: 960,
+  },
 ];
 
 async function resetCampgroundData(campgroundId: string) {
@@ -115,7 +116,9 @@ async function resetCampgroundData(campgroundId: string) {
   const membershipTypeIds = membershipTypes.map((m) => m.id);
 
   if (membershipTypeIds.length) {
-    await prisma.guestMembership.deleteMany({ where: { membershipTypeId: { in: membershipTypeIds } } });
+    await prisma.guestMembership.deleteMany({
+      where: { membershipTypeId: { in: membershipTypeIds } },
+    });
   }
 
   await prisma.$transaction([
@@ -140,7 +143,7 @@ async function resetCampgroundData(campgroundId: string) {
     prisma.xpBalance.deleteMany({ where: { campgroundId } }),
     prisma.xpEvent.deleteMany({ where: { campgroundId } }),
     prisma.site.deleteMany({ where: { campgroundId } }),
-    prisma.siteClass.deleteMany({ where: { campgroundId } })
+    prisma.siteClass.deleteMany({ where: { campgroundId } }),
   ]);
 }
 
@@ -148,17 +151,47 @@ async function resetCampgroundData(campgroundId: string) {
 async function seedUsers() {
   const password = await bcrypt.hash("password123", 12);
 
-  const userDefs: Array<{ email: string; firstName: string; lastName: string; platformRole?: PlatformRole }> = [
-    { email: "admin@keeprstay.com", firstName: "Admin", lastName: "User", platformRole: PlatformRole.platform_admin },
-    { email: "josh@keeprstay.com", firstName: "Josh", lastName: "Owner", platformRole: PlatformRole.platform_admin },
+  const userDefs: Array<{
+    email: string;
+    firstName: string;
+    lastName: string;
+    platformRole?: PlatformRole;
+  }> = [
+    {
+      email: "admin@keeprstay.com",
+      firstName: "Admin",
+      lastName: "User",
+      platformRole: PlatformRole.platform_admin,
+    },
+    {
+      email: "josh@keeprstay.com",
+      firstName: "Josh",
+      lastName: "Owner",
+      platformRole: PlatformRole.platform_admin,
+    },
     { email: "manager@keeprstay.com", firstName: "Sarah", lastName: "Manager" },
     { email: "frontdesk@keeprstay.com", firstName: "Mike", lastName: "Reception" },
     { email: "maintenance@keeprstay.com", firstName: "Bob", lastName: "Fixit" },
     { email: "finance@keeprstay.com", firstName: "Priya", lastName: "Ledger" },
     { email: "marketing@keeprstay.com", firstName: "Lena", lastName: "Hype" },
-    { email: "bucky@keeprstay.com", firstName: "Bucky", lastName: "Admin", platformRole: PlatformRole.platform_admin },
-    { email: "allie@keeprstay.com", firstName: "Allie", lastName: "Admin", platformRole: PlatformRole.platform_admin },
-    { email: "murf@keeprstay.com", firstName: "Murf", lastName: "Admin", platformRole: PlatformRole.platform_admin }
+    {
+      email: "bucky@keeprstay.com",
+      firstName: "Bucky",
+      lastName: "Admin",
+      platformRole: PlatformRole.platform_admin,
+    },
+    {
+      email: "allie@keeprstay.com",
+      firstName: "Allie",
+      lastName: "Admin",
+      platformRole: PlatformRole.platform_admin,
+    },
+    {
+      email: "murf@keeprstay.com",
+      firstName: "Murf",
+      lastName: "Admin",
+      platformRole: PlatformRole.platform_admin,
+    },
   ];
 
   const users = await Promise.all(
@@ -170,11 +203,16 @@ async function seedUsers() {
           isActive: true,
           firstName: user.firstName,
           lastName: user.lastName,
-          platformRole: user.platformRole ?? null
+          platformRole: user.platformRole ?? null,
         },
-        create: { ...user, passwordHash: password, isActive: true, platformRole: user.platformRole ?? null }
-      })
-    )
+        create: {
+          ...user,
+          passwordHash: password,
+          isActive: true,
+          platformRole: user.platformRole ?? null,
+        },
+      }),
+    ),
   );
 
   console.log(`  Created ${users.length} users (password: password123)`);
@@ -187,7 +225,7 @@ function buildSiteClasses(
   opts: {
     rateMultiplier?: number;
     addGlamping?: boolean;
-  } = {}
+  } = {},
 ) {
   const rate = (base: number) => Math.round(base * (opts.rateMultiplier ?? 1));
 
@@ -209,7 +247,7 @@ function buildSiteClasses(
       policyVersion: "spring-2025",
       isActive: true,
       glCode: GL_CODES.SITE_REVENUE,
-      campgroundId
+      campgroundId,
     },
     {
       name: "Standard RV",
@@ -227,7 +265,7 @@ function buildSiteClasses(
       photos: [],
       isActive: true,
       glCode: GL_CODES.SITE_REVENUE,
-      campgroundId
+      campgroundId,
     },
     {
       name: "Tent Meadow",
@@ -245,7 +283,7 @@ function buildSiteClasses(
       photos: [],
       isActive: true,
       glCode: GL_CODES.SITE_REVENUE,
-      campgroundId
+      campgroundId,
     },
     {
       name: "Cabins",
@@ -263,7 +301,7 @@ function buildSiteClasses(
       photos: [],
       isActive: true,
       glCode: GL_CODES.SITE_REVENUE,
-      campgroundId
+      campgroundId,
     },
     {
       name: "Group Field",
@@ -281,31 +319,31 @@ function buildSiteClasses(
       photos: [],
       isActive: true,
       glCode: GL_CODES.SITE_REVENUE,
-      campgroundId
+      campgroundId,
     },
     ...(opts.addGlamping
       ? [
-        {
-          name: "Glamping Safari",
-          description: "Canvas tents with decks and AC.",
-          defaultRate: rate(17500),
-          siteType: SiteType.glamping,
-          maxOccupancy: 4,
-          rigMaxLength: null,
-          hookupsPower: true,
-          hookupsWater: true,
-          hookupsSewer: false,
-          minNights: 2,
-          petFriendly: false,
-          accessible: true,
-          photos: [],
-          policyVersion: "glamping-1",
-          isActive: true,
-          glCode: GL_CODES.SITE_REVENUE,
-          campgroundId
-        }
-      ]
-      : [])
+          {
+            name: "Glamping Safari",
+            description: "Canvas tents with decks and AC.",
+            defaultRate: rate(17500),
+            siteType: SiteType.glamping,
+            maxOccupancy: 4,
+            rigMaxLength: null,
+            hookupsPower: true,
+            hookupsWater: true,
+            hookupsSewer: false,
+            minNights: 2,
+            petFriendly: false,
+            accessible: true,
+            photos: [],
+            policyVersion: "glamping-1",
+            isActive: true,
+            glCode: GL_CODES.SITE_REVENUE,
+            campgroundId,
+          },
+        ]
+      : []),
   ];
 }
 
@@ -320,11 +358,17 @@ function buildSites(
     cabin: number;
     group: number;
     glamping: number;
-  }> = {}
+  }> = {},
 ) {
   const sites: Prisma.SiteUncheckedCreateInput[] = [];
 
-  const addSites = (clsName: string, count: number, prefix: string, startNum: number, opts?: Partial<Prisma.SiteUncheckedCreateInput>) => {
+  const addSites = (
+    clsName: string,
+    count: number,
+    prefix: string,
+    startNum: number,
+    opts?: Partial<Prisma.SiteUncheckedCreateInput>,
+  ) => {
     const cls = siteClasses.find((c) => c.name === clsName);
     if (!cls) return;
     for (let i = 0; i < count; i++) {
@@ -335,7 +379,14 @@ function buildSites(
         name: siteNumber,
         siteNumber,
         siteType: cls.siteType,
-        maxOccupancy: cls.siteType === SiteType.group ? 30 : cls.siteType === SiteType.cabin ? 6 : cls.siteType === SiteType.tent ? 4 : 6,
+        maxOccupancy:
+          cls.siteType === SiteType.group
+            ? 30
+            : cls.siteType === SiteType.cabin
+              ? 6
+              : cls.siteType === SiteType.tent
+                ? 4
+                : 6,
         rigMaxLength: cls.siteType === SiteType.rv ? randomBetween(30, 45) : null,
         hookupsPower: cls.siteType !== SiteType.tent,
         hookupsWater: cls.siteType !== SiteType.tent,
@@ -349,12 +400,15 @@ function buildSites(
         description: opts?.description ?? null,
         tags: [],
         isActive: true,
-        status: "available"
+        status: "available",
       });
     }
   };
 
-  addSites("Premium RV", mix.premium ?? 15, "P", 1, { minNights: 2, description: "Premium pull-through" });
+  addSites("Premium RV", mix.premium ?? 15, "P", 1, {
+    minNights: 2,
+    description: "Premium pull-through",
+  });
   addSites("Standard RV", mix.standard ?? 20, "R", 101);
   addSites("Tent Meadow", mix.tent ?? 12, "T", 201);
   addSites("Cabins", mix.cabin ?? 8, "C", 301, { accessible: true, minNights: 2 });
@@ -368,8 +422,50 @@ function buildSites(
 
 // ============ GUESTS ============
 function generateGuests(count: number, offset: number = 0, emailSuffix: string) {
-  const firstNames = ["Riley", "Jamie", "Alex", "Taylor", "Jordan", "Casey", "Morgan", "Charlie", "Hayden", "Avery", "John", "Jane", "Michael", "Emily", "David", "Sarah", "Chris", "Lisa", "Matt", "Rachel"];
-  const lastNames = ["Smith", "Garcia", "Nguyen", "Johnson", "Brown", "Lee", "Patel", "Kim", "Lopez", "Davis", "Wilson", "Moore", "Taylor", "Anderson", "Thomas", "Jackson", "White", "Harris", "Martin", "Thompson"];
+  const firstNames = [
+    "Riley",
+    "Jamie",
+    "Alex",
+    "Taylor",
+    "Jordan",
+    "Casey",
+    "Morgan",
+    "Charlie",
+    "Hayden",
+    "Avery",
+    "John",
+    "Jane",
+    "Michael",
+    "Emily",
+    "David",
+    "Sarah",
+    "Chris",
+    "Lisa",
+    "Matt",
+    "Rachel",
+  ];
+  const lastNames = [
+    "Smith",
+    "Garcia",
+    "Nguyen",
+    "Johnson",
+    "Brown",
+    "Lee",
+    "Patel",
+    "Kim",
+    "Lopez",
+    "Davis",
+    "Wilson",
+    "Moore",
+    "Taylor",
+    "Anderson",
+    "Thomas",
+    "Jackson",
+    "White",
+    "Harris",
+    "Martin",
+    "Thompson",
+  ];
   const guests = [];
   for (let i = 0; i < count; i++) {
     const globalIndex = i + offset;
@@ -392,7 +488,7 @@ function generateGuests(count: number, offset: number = 0, emailSuffix: string) 
       tags: i % 10 === 0 ? ["seasonal"] : i % 6 === 0 ? ["vip"] : [],
       rigType: i % 2 === 0 ? pick(["Class A", "Fifth Wheel", "Travel Trailer", "Pop-up"]) : null,
       rigLength: i % 2 === 0 ? randomBetween(20, 42) : null,
-      repeatStays: randomBetween(0, 5)
+      repeatStays: randomBetween(0, 5),
     });
   }
   return guests;
@@ -412,7 +508,7 @@ function buildPricingRules(campgroundId: string, siteClasses: { id: string; name
       ruleType: "dow",
       dayOfWeek: 5,
       percentAdjust: 0.15,
-      isActive: true
+      isActive: true,
     });
     // Saturday surcharge
     rules.push({
@@ -421,8 +517,8 @@ function buildPricingRules(campgroundId: string, siteClasses: { id: string; name
       label: "Saturday Premium",
       ruleType: "dow",
       dayOfWeek: 6,
-      percentAdjust: 0.20,
-      isActive: true
+      percentAdjust: 0.2,
+      isActive: true,
     });
   });
 
@@ -435,7 +531,7 @@ function buildPricingRules(campgroundId: string, siteClasses: { id: string; name
     startDate: new Date("2025-05-23"),
     endDate: new Date("2025-05-26"),
     percentAdjust: 0.25,
-    isActive: true
+    isActive: true,
   });
 
   rules.push({
@@ -445,8 +541,8 @@ function buildPricingRules(campgroundId: string, siteClasses: { id: string; name
     ruleType: "seasonal",
     startDate: new Date("2025-07-01"),
     endDate: new Date("2025-07-07"),
-    percentAdjust: 0.30,
-    isActive: true
+    percentAdjust: 0.3,
+    isActive: true,
   });
 
   rules.push({
@@ -457,14 +553,17 @@ function buildPricingRules(campgroundId: string, siteClasses: { id: string; name
     startDate: new Date("2025-08-29"),
     endDate: new Date("2025-09-01"),
     percentAdjust: 0.25,
-    isActive: true
+    isActive: true,
   });
 
   return rules;
 }
 
 // ============ SEASONAL & LONG-STAY RATES ============
-function buildSeasonalRates(campgroundId: string, siteClasses: { id: string; name: string; siteType: SiteType }[]) {
+function buildSeasonalRates(
+  campgroundId: string,
+  siteClasses: { id: string; name: string; siteType: SiteType }[],
+) {
   const premium = siteClasses.find((c) => c.name === "Premium RV");
   const cabins = siteClasses.find((c) => c.siteType === SiteType.cabin);
   const standard = siteClasses.find((c) => c.name === "Standard RV");
@@ -484,7 +583,7 @@ function buildSeasonalRates(campgroundId: string, siteClasses: { id: string; nam
       offseasonInterval: 1,
       offseasonAmount: 120000,
       prorateExcess: true,
-      isActive: true
+      isActive: true,
     },
     {
       campgroundId,
@@ -498,7 +597,7 @@ function buildSeasonalRates(campgroundId: string, siteClasses: { id: string; nam
       paymentSchedule: PaymentSchedule.as_you_stay,
       pricingStructure: PricingStructure.flat_week,
       prorateExcess: true,
-      isActive: true
+      isActive: true,
     },
     {
       campgroundId,
@@ -512,8 +611,8 @@ function buildSeasonalRates(campgroundId: string, siteClasses: { id: string; nam
       paymentSchedule: PaymentSchedule.monthly,
       pricingStructure: PricingStructure.flat_month,
       prorateExcess: true,
-      isActive: true
-    }
+      isActive: true,
+    },
   ];
 }
 
@@ -529,7 +628,7 @@ function buildMaintenanceTickets(campgroundId: string, sites: { id: string; name
     "Shower head broken",
     "Light fixture out",
     "Fence repair needed",
-    "Trash can missing"
+    "Trash can missing",
   ];
 
   const tickets: Prisma.MaintenanceTicketUncheckedCreateInput[] = [];
@@ -537,8 +636,18 @@ function buildMaintenanceTickets(campgroundId: string, sites: { id: string; name
   // Create various maintenance tickets
   for (let i = 0; i < 25; i++) {
     const site = i < 15 ? pick(sites) : null;
-    const statusPool = [MaintenanceStatus.open, MaintenanceStatus.open, MaintenanceStatus.in_progress, MaintenanceStatus.closed];
-    const priorityPool = [MaintenancePriority.low, MaintenancePriority.medium, MaintenancePriority.medium, MaintenancePriority.high];
+    const statusPool = [
+      MaintenanceStatus.open,
+      MaintenanceStatus.open,
+      MaintenanceStatus.in_progress,
+      MaintenanceStatus.closed,
+    ];
+    const priorityPool = [
+      MaintenancePriority.low,
+      MaintenancePriority.medium,
+      MaintenancePriority.medium,
+      MaintenancePriority.high,
+    ];
 
     const dueOffset = randomBetween(-5, 14);
     const dueDate = new Date();
@@ -551,7 +660,7 @@ function buildMaintenanceTickets(campgroundId: string, sites: { id: string; name
       description: i % 3 === 0 ? "Guest reported issue. Please address ASAP." : null,
       status: pick(statusPool),
       priority: pick(priorityPool),
-      dueDate: dueDate
+      dueDate: dueDate,
     });
   }
 
@@ -572,24 +681,132 @@ function buildEvents(campgroundId: string, state: string, seasonStart: Date) {
     capacity: number | null;
   };
 
-  const eventTemplates: EventTemplate[] = state === "MN" ? [
-    { title: "River Fishing Tournament", type: EventType.activity, description: "Catch the biggest walleye and win prizes!", location: "Fishing Dock", price: 2500, capacity: 50 },
-    { title: "Sunset Kayak Tour", type: EventType.activity, description: "Guided kayak paddle along the river bluffs at sunset.", location: "Boat Ramp", price: 3500, capacity: 12 },
-    { title: "Kids Nature Scavenger Hunt", type: EventType.activity, description: "Fun outdoor adventure for kids ages 5-12.", location: "Nature Trail", price: 0, capacity: 20 },
-    { title: "Campfire Cookout Class", type: EventType.workshop, description: "Learn to make delicious campfire meals.", location: "Main Pavilion", price: 1500, capacity: 15 },
-    { title: "Saturday Night Live Music", type: EventType.entertainment, description: "Local bluegrass band performs live.", location: "Amphitheater", price: 0, capacity: 100 },
-    { title: "Memorial Day Weekend BBQ", type: EventType.holiday, description: "Annual kick-off to summer celebration with BBQ and games.", location: "Main Pavilion", price: 1000, capacity: 150 },
-    { title: "4th of July Fireworks", type: EventType.holiday, description: "Watch fireworks over the river.", location: "Riverfront", price: 0, capacity: null },
-    { title: "Weekly Potluck Dinner", type: EventType.recurring, description: "Bring a dish to share every Wednesday evening.", location: "Pavilion", price: 0, capacity: 40 },
-  ] : [
-    { title: "Mountain Sunrise Hike", type: EventType.activity, description: "Early morning hike to catch the sunrise over the peaks.", location: "Trailhead", price: 0, capacity: 15 },
-    { title: "Guided Mountain Biking", type: EventType.activity, description: "Intermediate level trail ride with guide.", location: "Bike Shop", price: 4500, capacity: 8 },
-    { title: "Whitewater Rafting Trip", type: EventType.activity, description: "Half-day rafting adventure on the Arkansas River.", location: "River Put-In", price: 7500, capacity: 10 },
-    { title: "Wilderness Photography Workshop", type: EventType.workshop, description: "Learn to capture stunning mountain landscapes.", location: "Base Camp", price: 5000, capacity: 12 },
-    { title: "Star Gazing Night", type: EventType.entertainment, description: "Telescope viewing with astronomy expert.", location: "Upper Meadow", price: 1000, capacity: 25 },
-    { title: "4th of July Mountain Fest", type: EventType.holiday, description: "Live music, food trucks, and fireworks.", location: "Main Field", price: 0, capacity: 200 },
-    { title: "Weekly Yoga in the Meadow", type: EventType.recurring, description: "Morning yoga class every Saturday.", location: "Meadow", price: 500, capacity: 20 },
-  ];
+  const eventTemplates: EventTemplate[] =
+    state === "MN"
+      ? [
+          {
+            title: "River Fishing Tournament",
+            type: EventType.activity,
+            description: "Catch the biggest walleye and win prizes!",
+            location: "Fishing Dock",
+            price: 2500,
+            capacity: 50,
+          },
+          {
+            title: "Sunset Kayak Tour",
+            type: EventType.activity,
+            description: "Guided kayak paddle along the river bluffs at sunset.",
+            location: "Boat Ramp",
+            price: 3500,
+            capacity: 12,
+          },
+          {
+            title: "Kids Nature Scavenger Hunt",
+            type: EventType.activity,
+            description: "Fun outdoor adventure for kids ages 5-12.",
+            location: "Nature Trail",
+            price: 0,
+            capacity: 20,
+          },
+          {
+            title: "Campfire Cookout Class",
+            type: EventType.workshop,
+            description: "Learn to make delicious campfire meals.",
+            location: "Main Pavilion",
+            price: 1500,
+            capacity: 15,
+          },
+          {
+            title: "Saturday Night Live Music",
+            type: EventType.entertainment,
+            description: "Local bluegrass band performs live.",
+            location: "Amphitheater",
+            price: 0,
+            capacity: 100,
+          },
+          {
+            title: "Memorial Day Weekend BBQ",
+            type: EventType.holiday,
+            description: "Annual kick-off to summer celebration with BBQ and games.",
+            location: "Main Pavilion",
+            price: 1000,
+            capacity: 150,
+          },
+          {
+            title: "4th of July Fireworks",
+            type: EventType.holiday,
+            description: "Watch fireworks over the river.",
+            location: "Riverfront",
+            price: 0,
+            capacity: null,
+          },
+          {
+            title: "Weekly Potluck Dinner",
+            type: EventType.recurring,
+            description: "Bring a dish to share every Wednesday evening.",
+            location: "Pavilion",
+            price: 0,
+            capacity: 40,
+          },
+        ]
+      : [
+          {
+            title: "Mountain Sunrise Hike",
+            type: EventType.activity,
+            description: "Early morning hike to catch the sunrise over the peaks.",
+            location: "Trailhead",
+            price: 0,
+            capacity: 15,
+          },
+          {
+            title: "Guided Mountain Biking",
+            type: EventType.activity,
+            description: "Intermediate level trail ride with guide.",
+            location: "Bike Shop",
+            price: 4500,
+            capacity: 8,
+          },
+          {
+            title: "Whitewater Rafting Trip",
+            type: EventType.activity,
+            description: "Half-day rafting adventure on the Arkansas River.",
+            location: "River Put-In",
+            price: 7500,
+            capacity: 10,
+          },
+          {
+            title: "Wilderness Photography Workshop",
+            type: EventType.workshop,
+            description: "Learn to capture stunning mountain landscapes.",
+            location: "Base Camp",
+            price: 5000,
+            capacity: 12,
+          },
+          {
+            title: "Star Gazing Night",
+            type: EventType.entertainment,
+            description: "Telescope viewing with astronomy expert.",
+            location: "Upper Meadow",
+            price: 1000,
+            capacity: 25,
+          },
+          {
+            title: "4th of July Mountain Fest",
+            type: EventType.holiday,
+            description: "Live music, food trucks, and fireworks.",
+            location: "Main Field",
+            price: 0,
+            capacity: 200,
+          },
+          {
+            title: "Weekly Yoga in the Meadow",
+            type: EventType.recurring,
+            description: "Morning yoga class every Saturday.",
+            location: "Meadow",
+            price: 500,
+            capacity: 20,
+          },
+        ];
 
   eventTemplates.forEach((template, index) => {
     // Create events spread throughout the season
@@ -616,7 +833,7 @@ function buildEvents(campgroundId: string, state: string, seasonStart: Date) {
       priceCents: template.price,
       isGuestOnly: template.price === 0,
       isPublished: true,
-      isCancelled: false
+      isCancelled: false,
     });
   });
 
@@ -661,8 +878,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         defaultCaption: "Weekends fill fast — book now and save your spot.",
         captionFillIns: "Add CTA + offer + scarcity",
         hashtagSet: ["#camping", "#weekendtrip", "#rvcamping"],
-        bestTime: "Thu 7pm"
-      }
+        bestTime: "Thu 7pm",
+      },
     }),
     prisma.socialTemplate.create({
       data: {
@@ -673,8 +890,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         style: SocialTemplateStyle.carousel,
         defaultCaption: "Christmas in July is coming! Teaser + schedule drop.",
         hashtagSet: ["#campgroundevents", "#familyfun"],
-        bestTime: "Tue 6pm"
-      }
+        bestTime: "Tue 6pm",
+      },
     }),
     prisma.socialTemplate.create({
       data: {
@@ -685,9 +902,9 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         style: SocialTemplateStyle.story,
         defaultCaption: "Meet the crew that keeps stays awesome.",
         hashtagSet: ["#campstaff", "#peopleofcamp"],
-        bestTime: "Thu 12pm"
-      }
-    })
+        bestTime: "Thu 12pm",
+      },
+    }),
   ]);
 
   const assets = await prisma.$transaction([
@@ -697,8 +914,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         title: "Pool opening hero",
         type: SocialAssetType.photo,
         url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200",
-        tags: ["pool", "summer", "hero"]
-      }
+        tags: ["pool", "summer", "hero"],
+      },
     }),
     prisma.socialContentAsset.create({
       data: {
@@ -706,8 +923,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         title: "Cabin exterior golden hour",
         type: SocialAssetType.photo,
         url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
-        tags: ["cabin", "sunset"]
-      }
+        tags: ["cabin", "sunset"],
+      },
     }),
     prisma.socialContentAsset.create({
       data: {
@@ -715,9 +932,9 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         title: "Branded caption: fall colors",
         type: SocialAssetType.other,
         url: "Fall colors peak in 2 weeks — cabins and RV spots are going fast. Book now to catch the leaves!",
-        tags: ["fall", "availability"]
-      }
-    })
+        tags: ["fall", "availability"],
+      },
+    }),
   ]);
 
   const posts = await prisma.$transaction([
@@ -733,8 +950,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         hashtags: ["#poolday", "#campfun"],
         imagePrompt: "Families enjoying pool with pine trees",
         templateId: templates[0].id,
-        assetUrls: [assets[0].url]
-      }
+        assetUrls: [assets[0].url],
+      },
     }),
     prisma.socialPost.create({
       data: {
@@ -747,9 +964,9 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         hashtags: ["#campstaff", "#behindthescenes"],
         imagePrompt: "Portrait of smiling campground manager at desk",
         templateId: templates[2].id,
-        ideaParkingLot: true
-      }
-    })
+        ideaParkingLot: true,
+      },
+    }),
   ]);
 
   const suggestions = await prisma.$transaction([
@@ -762,8 +979,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         category: SocialContentCategory.general,
         platform: SocialPlatform.facebook,
         proposedDate: addDays(new Date(), 2),
-        reason: { occupancyRatio: 0.9 }
-      }
+        reason: { occupancyRatio: 0.9 },
+      },
     }),
     prisma.socialSuggestion.create({
       data: {
@@ -774,21 +991,21 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         category: SocialContentCategory.events,
         platform: SocialPlatform.instagram,
         proposedDate: addDays(new Date(), 3),
-        reason: { event: "Cornhole tournament", utilization: 0.35 }
-      }
-    })
+        reason: { event: "Cornhole tournament", utilization: 0.35 },
+      },
+    }),
   ]);
 
   const weeklyIdeas: Prisma.InputJsonValue = [
     { type: "promotional", idea: "Early-bird bundle for July 4th", platform: "facebook" },
     { type: "engagement", idea: "Staff story or fun moment", platform: "instagram" },
-    { type: "behind_the_scenes", idea: "Cabin prep timelapse", platform: "tiktok" }
+    { type: "behind_the_scenes", idea: "Cabin prep timelapse", platform: "tiktok" },
   ];
 
   const weeklyCadence: Prisma.InputJsonValue = [
     { day: "Tuesday", theme: "Book-Now Highlight" },
     { day: "Thursday", theme: "Staff Story" },
-    { day: "Saturday", theme: "Guest Experience / UGC" }
+    { day: "Saturday", theme: "Guest Experience / UGC" },
   ];
 
   await prisma.socialWeeklyIdea.create({
@@ -796,13 +1013,13 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
       campgroundId,
       generatedFor: addDays(new Date(), -((new Date().getDay() + 6) % 7)), // anchor to Monday
       ideas: weeklyIdeas,
-      cadence: weeklyCadence
-    }
+      cadence: weeklyCadence,
+    },
   });
 
   const strategyPlan: Prisma.InputJsonValue = {
     hero: "Summer kickoff weekend",
-    topIdeas: ["Pool opening", "Staff spotlight", "Early-bird bundle"]
+    topIdeas: ["Pool opening", "Staff spotlight", "Early-bird bundle"],
   };
 
   await prisma.socialStrategy.create({
@@ -810,8 +1027,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
       campgroundId,
       month: seasonStart,
       annual: false,
-      plan: strategyPlan
-    }
+      plan: strategyPlan,
+    },
   });
 
   await prisma.socialOpportunityAlert.createMany({
@@ -821,16 +1038,16 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
         category: SocialAlertCategory.weather,
         message: "Warm weekend ahead — push pool content",
         startsAt: new Date(),
-        endsAt: addDays(new Date(), 3)
+        endsAt: addDays(new Date(), 3),
       },
       {
         campgroundId,
         category: SocialAlertCategory.occupancy,
         message: "Cabins nearly full next weekend. Encourage early booking for July 4.",
         startsAt: new Date(),
-        endsAt: addDays(new Date(), 7)
-      }
-    ]
+        endsAt: addDays(new Date(), 7),
+      },
+    ],
   });
 
   await prisma.socialPerformanceInput.create({
@@ -843,8 +1060,8 @@ async function seedSocialPlanner(campgroundId: string, seasonStart: Date) {
       shares: 3,
       saves: 4,
       notes: "Opening weekend teaser performed well.",
-      recordedAt: new Date()
-    }
+      recordedAt: new Date(),
+    },
   });
 
   console.log("  Social planner demo data seeded");
@@ -854,13 +1071,13 @@ async function seedPosData(
   campgroundId: string,
   siteLookup: Map<string, { name: string }>,
   guests: { id: string }[],
-  reservations: { id: string; guestId: string; siteId: string }[]
+  reservations: { id: string; guestId: string; siteId: string }[],
 ) {
   const category = await prisma.productCategory.create({
     data: {
       campgroundId,
-      name: "Camp Store"
-    }
+      name: "Camp Store",
+    },
   });
 
   const products = await prisma.$transaction([
@@ -874,8 +1091,8 @@ async function seedPosData(
         sku: "WOOD-BDL",
         stockQty: 120,
         trackInventory: true,
-        glCode: GL_CODES.SITE_REVENUE
-      }
+        glCode: GL_CODES.SITE_REVENUE,
+      },
     }),
     prisma.product.create({
       data: {
@@ -887,8 +1104,8 @@ async function seedPosData(
         sku: "ICE-10LB",
         stockQty: 200,
         trackInventory: true,
-        glCode: GL_CODES.SITE_REVENUE
-      }
+        glCode: GL_CODES.SITE_REVENUE,
+      },
     }),
     prisma.product.create({
       data: {
@@ -900,9 +1117,9 @@ async function seedPosData(
         sku: "SMORES-KIT",
         stockQty: 80,
         trackInventory: true,
-        glCode: GL_CODES.SITE_REVENUE
-      }
-    })
+        glCode: GL_CODES.SITE_REVENUE,
+      },
+    }),
   ]);
 
   const addOns = await prisma.$transaction([
@@ -913,8 +1130,8 @@ async function seedPosData(
         description: "Arrive up to 2 hours early",
         priceCents: 2500,
         pricingType: "flat",
-        glCode: GL_CODES.FEES_REVENUE
-      }
+        glCode: GL_CODES.FEES_REVENUE,
+      },
     }),
     prisma.addOnService.create({
       data: {
@@ -923,9 +1140,9 @@ async function seedPosData(
         description: "Stay until 2pm",
         priceCents: 2000,
         pricingType: "flat",
-        glCode: GL_CODES.FEES_REVENUE
-      }
-    })
+        glCode: GL_CODES.FEES_REVENUE,
+      },
+    }),
   ]);
 
   const orderReservations = reservations.slice(0, 6);
@@ -950,31 +1167,31 @@ async function seedPosData(
                 name: products[0].name,
                 qty: 1,
                 unitCents: products[0].priceCents,
-                totalCents: products[0].priceCents
+                totalCents: products[0].priceCents,
               },
               {
                 productId: products[2].id,
                 name: products[2].name,
                 qty: 1,
                 unitCents: products[2].priceCents,
-                totalCents: products[2].priceCents
+                totalCents: products[2].priceCents,
               },
               ...(idx % 3 === 0
                 ? [
-                  {
-                    addOnId: addOns[0].id,
-                    name: addOns[0].name,
-                    qty: 1,
-                    unitCents: addOns[0].priceCents,
-                    totalCents: addOns[0].priceCents
-                  }
-                ]
-                : [])
-            ]
-          }
-        }
-      })
-    )
+                    {
+                      addOnId: addOns[0].id,
+                      name: addOns[0].name,
+                      qty: 1,
+                      unitCents: addOns[0].priceCents,
+                      totalCents: addOns[0].priceCents,
+                    },
+                  ]
+                : []),
+            ],
+          },
+        },
+      }),
+    ),
   );
 
   console.log("  POS products and orders seeded");
@@ -983,7 +1200,7 @@ async function seedPosData(
 async function seedActivitiesData(
   campgroundId: string,
   guests: { id: string }[],
-  reservations: { id: string; guestId: string }[]
+  reservations: { id: string; guestId: string }[],
 ) {
   const activities = await prisma.$transaction([
     prisma.activity.create({
@@ -994,8 +1211,8 @@ async function seedActivitiesData(
         images: [],
         price: 4500,
         duration: 120,
-        capacity: 12
-      }
+        capacity: 12,
+      },
     }),
     prisma.activity.create({
       data: {
@@ -1005,9 +1222,9 @@ async function seedActivitiesData(
         images: [],
         price: 0,
         duration: 60,
-        capacity: 20
-      }
-    })
+        capacity: 20,
+      },
+    }),
   ]);
 
   const sessions = await prisma.$transaction([
@@ -1017,8 +1234,8 @@ async function seedActivitiesData(
         startTime: addDays(new Date(), 5),
         endTime: addDays(new Date(), 5),
         capacity: 12,
-        status: "scheduled"
-      }
+        status: "scheduled",
+      },
     }),
     prisma.activitySession.create({
       data: {
@@ -1026,8 +1243,8 @@ async function seedActivitiesData(
         startTime: addDays(new Date(), 12),
         endTime: addDays(new Date(), 12),
         capacity: 10,
-        status: "scheduled"
-      }
+        status: "scheduled",
+      },
     }),
     prisma.activitySession.create({
       data: {
@@ -1035,9 +1252,9 @@ async function seedActivitiesData(
         startTime: addDays(new Date(), 3),
         endTime: addDays(new Date(), 3),
         capacity: 20,
-        status: "scheduled"
-      }
-    })
+        status: "scheduled",
+      },
+    }),
   ]);
 
   const bookings = await prisma.$transaction(
@@ -1051,10 +1268,10 @@ async function seedActivitiesData(
           reservationId: res.id,
           quantity: idx % 2 === 0 ? 2 : 1,
           totalAmount: idx % 2 === 0 ? 9000 : 4500,
-          status: idx % 3 === 0 ? "cancelled" : "confirmed"
-        }
+          status: idx % 3 === 0 ? "cancelled" : "confirmed",
+        },
       });
-    })
+    }),
   );
 
   console.log(`  Activities seeded (${activities.length} activities, ${bookings.length} bookings)`);
@@ -1064,7 +1281,7 @@ async function seedWaitlistAndHolds(
   campgroundId: string,
   sites: { id: string; name: string; siteClassId: string | null }[],
   siteClasses: { id: string; siteType: SiteType }[],
-  guests: { id: string; primaryFirstName?: string; primaryLastName?: string }[]
+  guests: { id: string; primaryFirstName?: string; primaryLastName?: string }[],
 ) {
   const targetSite = sites.find((s) => s.name.startsWith("P")) ?? sites[0];
   const siteClass = siteClasses.find((c) => c.siteType === SiteType.rv) ?? siteClasses[0];
@@ -1079,7 +1296,7 @@ async function seedWaitlistAndHolds(
         departureDate: addDays(new Date(), 33),
         status: "active",
         type: "regular",
-        notes: "Prefers pull-through, 50A"
+        notes: "Prefers pull-through, 50A",
       },
       {
         campgroundId,
@@ -1090,16 +1307,16 @@ async function seedWaitlistAndHolds(
         type: "seasonal",
         contactName: "Seasonal Lead",
         contactEmail: "seasonal@example.com",
-        notes: "Seasonal stay request"
+        notes: "Seasonal stay request",
       },
       {
         campgroundId,
         guestId: guests[2]?.id,
         status: "fulfilled",
         type: "regular",
-        notes: "Already booked elsewhere, keep for fall"
-      }
-    ]
+        notes: "Already booked elsewhere, keep for fall",
+      },
+    ],
   });
 
   await prisma.siteHold.createMany({
@@ -1111,7 +1328,7 @@ async function seedWaitlistAndHolds(
         departureDate: addDays(new Date(), 12),
         expiresAt: addDays(new Date(), 2),
         status: "active",
-        note: "Holding for OTA import"
+        note: "Holding for OTA import",
       },
       {
         campgroundId,
@@ -1119,9 +1336,9 @@ async function seedWaitlistAndHolds(
         arrivalDate: addDays(new Date(), 45),
         departureDate: addDays(new Date(), 48),
         status: "released",
-        note: "Released after guest cancelled"
-      }
-    ]
+        note: "Released after guest cancelled",
+      },
+    ],
   });
 
   await prisma.blackoutDate.createMany({
@@ -1131,26 +1348,22 @@ async function seedWaitlistAndHolds(
         siteId: null,
         startDate: addDays(new Date(), 60),
         endDate: addDays(new Date(), 62),
-        reason: "Private event"
+        reason: "Private event",
       },
       {
         campgroundId,
         siteId: targetSite?.id ?? sites[0].id,
         startDate: addDays(new Date(), 15),
         endDate: addDays(new Date(), 18),
-        reason: "Maintenance"
-      }
-    ]
+        reason: "Maintenance",
+      },
+    ],
   });
 
   console.log("  Waitlist, holds, and blackout dates seeded");
 }
 
-async function seedMemberships(
-  campgroundId: string,
-  guests: { id: string }[],
-  vibe: string
-) {
+async function seedMemberships(campgroundId: string, guests: { id: string }[], vibe: string) {
   const isResort = vibe.includes("resort");
   const membershipType = await prisma.membershipType.create({
     data: {
@@ -1160,8 +1373,8 @@ async function seedMemberships(
       price: isResort ? 120000 : 85000,
       durationDays: 365,
       discountPercent: isResort ? 12 : 8,
-      isActive: true
-    }
+      isActive: true,
+    },
   });
 
   const seasonalGuests = guests.slice(0, 3);
@@ -1174,10 +1387,10 @@ async function seedMemberships(
           startDate: addDays(new Date(), -90 + idx * 5),
           endDate: addDays(new Date(), 270),
           status: idx === 2 ? "expired" : "active",
-          purchaseAmount: membershipType.price
-        }
-      })
-    )
+          purchaseAmount: membershipType.price,
+        },
+      }),
+    ),
   );
 
   console.log("  Memberships seeded");
@@ -1185,30 +1398,41 @@ async function seedMemberships(
 
 async function seedGamification(
   campgroundId: string,
-  memberships: { userId: string; id: string; role: UserRole }[]
+  memberships: { userId: string; id: string; role: UserRole }[],
 ) {
   await prisma.gamificationSetting.upsert({
     where: { campgroundId },
-    update: { enabled: true, enabledRoles: [UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.maintenance] },
-    create: { campgroundId, enabled: true, enabledRoles: [UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.maintenance] }
+    update: {
+      enabled: true,
+      enabledRoles: [UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.maintenance],
+    },
+    create: {
+      campgroundId,
+      enabled: true,
+      enabledRoles: [UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.maintenance],
+    },
   });
 
   const xpRules = await prisma.$transaction([
     prisma.xpRule.upsert({
-      where: { campgroundId_category: { campgroundId, category: GamificationEventCategory.check_in } },
+      where: {
+        campgroundId_category: { campgroundId, category: GamificationEventCategory.check_in },
+      },
       update: { defaultXp: 15 },
-      create: { campgroundId, category: GamificationEventCategory.check_in, defaultXp: 15 }
+      create: { campgroundId, category: GamificationEventCategory.check_in, defaultXp: 15 },
     }),
     prisma.xpRule.upsert({
-      where: { campgroundId_category: { campgroundId, category: GamificationEventCategory.maintenance } },
+      where: {
+        campgroundId_category: { campgroundId, category: GamificationEventCategory.maintenance },
+      },
       update: { defaultXp: 25 },
-      create: { campgroundId, category: GamificationEventCategory.maintenance, defaultXp: 25 }
+      create: { campgroundId, category: GamificationEventCategory.maintenance, defaultXp: 25 },
     }),
     prisma.xpRule.upsert({
       where: { campgroundId_category: { campgroundId, category: GamificationEventCategory.task } },
       update: { defaultXp: 10 },
-      create: { campgroundId, category: GamificationEventCategory.task, defaultXp: 10 }
-    })
+      create: { campgroundId, category: GamificationEventCategory.task, defaultXp: 10 },
+    }),
   ]);
 
   const xpBalances = await prisma.$transaction(
@@ -1221,10 +1445,10 @@ async function seedGamification(
           userId: mem.userId,
           totalXp: 300 + idx * 50,
           currentLevel: 1 + idx,
-          lastEventAt: addDays(new Date(), -idx)
-        }
-      })
-    )
+          lastEventAt: addDays(new Date(), -idx),
+        },
+      }),
+    ),
   );
 
   await prisma.$transaction(
@@ -1234,14 +1458,17 @@ async function seedGamification(
           campgroundId,
           userId: balance.userId,
           membershipId: memberships[idx]?.id,
-          category: idx % 2 === 0 ? GamificationEventCategory.check_in : GamificationEventCategory.maintenance,
+          category:
+            idx % 2 === 0
+              ? GamificationEventCategory.check_in
+              : GamificationEventCategory.maintenance,
           xp: 15 + idx * 5,
           reason: idx % 2 === 0 ? "Smooth check-in" : "Resolved maintenance ticket quickly",
           sourceType: "seed",
-          occurredAt: addDays(new Date(), -idx * 2)
-        }
-      })
-    )
+          occurredAt: addDays(new Date(), -idx * 2),
+        },
+      }),
+    ),
   );
 
   console.log(`  Gamification seeded (${xpRules.length} rules, ${xpBalances.length} balances)`);
@@ -1249,7 +1476,7 @@ async function seedGamification(
 
 async function seedDisputes(
   campgroundId: string,
-  reservations: { id: string; campgroundId: string }[]
+  reservations: { id: string; campgroundId: string }[],
 ) {
   const target = reservations.slice(0, 2);
   if (!target.length) return;
@@ -1265,10 +1492,10 @@ async function seedDisputes(
           amountCents: 5000 + idx * 1500,
           reason: idx === 0 ? "duplicate" : "fraudulent",
           status: idx === 0 ? "warning_needs_response" : "needs_response",
-          evidenceDueBy: addDays(new Date(), 10 + idx)
-        }
-      })
-    )
+          evidenceDueBy: addDays(new Date(), 10 + idx),
+        },
+      }),
+    ),
   );
 
   console.log("  Disputes seeded");
@@ -1279,7 +1506,7 @@ async function seedReservationsWithFinancials(
   sites: { id: string; siteClassId: string | null; siteType: SiteType; name: string }[],
   guests: { id: string; primaryFirstName: string; primaryLastName: string }[],
   classes: { id: string; name: string; defaultRate?: number }[],
-  seasonalRates: { id: string; name: string; siteClassId: string | null }[]
+  seasonalRates: { id: string; name: string; siteClassId: string | null }[],
 ) {
   const siteBookings = new Map<string, { start: Date; end: Date }[]>();
   const reservations: Awaited<ReturnType<typeof prisma.reservation.create>>[] = [];
@@ -1303,12 +1530,15 @@ async function seedReservationsWithFinancials(
       const candidateDates = randomReservationDatesForYear(year, stayType);
       const bookings = siteBookings.get(candidateSite.id) || [];
       const overlap = bookings.some(
-        (b) => candidateDates.arrivalDate < b.end && candidateDates.departureDate > b.start
+        (b) => candidateDates.arrivalDate < b.end && candidateDates.departureDate > b.start,
       );
       if (!overlap) {
         site = candidateSite;
         dates = candidateDates;
-        siteBookings.set(candidateSite.id, [...bookings, { start: candidateDates.arrivalDate, end: candidateDates.departureDate }]);
+        siteBookings.set(candidateSite.id, [
+          ...bookings,
+          { start: candidateDates.arrivalDate, end: candidateDates.departureDate },
+        ]);
         break;
       }
     }
@@ -1318,10 +1548,20 @@ async function seedReservationsWithFinancials(
     const guest = pick(guests);
     const cls = classes.find((c) => c.id === site!.siteClassId) || classes[0];
     const baseRate = cls?.defaultRate ?? 7500;
-    const baseSubtotal = Math.round(baseRate * (stayType === StayType.monthly ? dates.nights / 1.05 : stayType === StayType.seasonal ? dates.nights / 1.15 : dates.nights));
+    const baseSubtotal = Math.round(
+      baseRate *
+        (stayType === StayType.monthly
+          ? dates.nights / 1.05
+          : stayType === StayType.seasonal
+            ? dates.nights / 1.15
+            : dates.nights),
+    );
     const feesAmount = randomBetween(0, 2200);
     const taxesAmount = Math.round((baseSubtotal + feesAmount) * 0.0835);
-    const discountsAmount = (dates.nights > 20 || stayType !== StayType.standard) && randomBetween(0, 1) === 1 ? randomBetween(1500, 4000) : 0;
+    const discountsAmount =
+      (dates.nights > 20 || stayType !== StayType.standard) && randomBetween(0, 1) === 1
+        ? randomBetween(1500, 4000)
+        : 0;
     const totalAmount = Math.max(0, baseSubtotal + feesAmount + taxesAmount - discountsAmount);
     const depositAmount = Math.round(Math.min(totalAmount, baseRate));
     const leadTimeDays = randomBetween(2, 160);
@@ -1331,21 +1571,47 @@ async function seedReservationsWithFinancials(
     if (isFuture && year === 2026) {
       paidAmount = randomBetween(0, totalAmount * 0.5);
     } else {
-      paidAmount = totalAmount === 0 ? 0 : pick([totalAmount, totalAmount, Math.round(totalAmount * 0.5), 0]);
+      paidAmount =
+        totalAmount === 0 ? 0 : pick([totalAmount, totalAmount, Math.round(totalAmount * 0.5), 0]);
     }
-    const paymentStatus = paidAmount === 0 ? "unpaid" : paidAmount >= totalAmount ? "paid" : "partial";
+    const paymentStatus =
+      paidAmount === 0 ? "unpaid" : paidAmount >= totalAmount ? "paid" : "partial";
 
     const statusPool =
       year <= 2022
-        ? [ReservationStatus.checked_out, ReservationStatus.checked_out, ReservationStatus.cancelled, ReservationStatus.confirmed]
+        ? [
+            ReservationStatus.checked_out,
+            ReservationStatus.checked_out,
+            ReservationStatus.cancelled,
+            ReservationStatus.confirmed,
+          ]
         : year <= 2024
-          ? [ReservationStatus.checked_out, ReservationStatus.checked_in, ReservationStatus.confirmed, ReservationStatus.cancelled]
+          ? [
+              ReservationStatus.checked_out,
+              ReservationStatus.checked_in,
+              ReservationStatus.confirmed,
+              ReservationStatus.cancelled,
+            ]
           : isFuture
-            ? [ReservationStatus.pending, ReservationStatus.confirmed, ReservationStatus.cancelled, ReservationStatus.confirmed]
-            : [ReservationStatus.confirmed, ReservationStatus.checked_in, ReservationStatus.checked_out, ReservationStatus.pending];
+            ? [
+                ReservationStatus.pending,
+                ReservationStatus.confirmed,
+                ReservationStatus.cancelled,
+                ReservationStatus.confirmed,
+              ]
+            : [
+                ReservationStatus.confirmed,
+                ReservationStatus.checked_in,
+                ReservationStatus.checked_out,
+                ReservationStatus.pending,
+              ];
     const status = pick(statusPool);
 
-    const seasonalRateId = stayType === StayType.seasonal || stayType === StayType.monthly ? seasonalRates.find((r) => !r.siteClassId || r.siteClassId === site!.siteClassId)?.id ?? null : null;
+    const seasonalRateId =
+      stayType === StayType.seasonal || stayType === StayType.monthly
+        ? (seasonalRates.find((r) => !r.siteClassId || r.siteClassId === site!.siteClassId)?.id ??
+          null)
+        : null;
 
     const reservation = await prisma.reservation.create({
       data: {
@@ -1371,15 +1637,18 @@ async function seedReservationsWithFinancials(
         checkInWindowEnd: "21:00",
         vehiclePlate: `${pick(["ABC", "XYZ", "DEF", "GHI"])}-${randomBetween(1000, 9999)}`,
         vehicleState: pick(["MN", "WI", "IA", "CO", "TX", "UT", "CA"]),
-        rigType: site!.siteType === SiteType.rv ? pick(["Class A", "Fifth Wheel", "Travel Trailer"]) : null,
+        rigType:
+          site!.siteType === SiteType.rv
+            ? pick(["Class A", "Fifth Wheel", "Travel Trailer"])
+            : null,
         rigLength: site!.siteType === SiteType.rv ? randomBetween(28, 44) : null,
         depositAmount,
         depositDueDate: addDays(bookedAt, 2),
         leadTimeDays,
         bookedAt,
         stayType,
-        seasonalRateId
-      }
+        seasonalRateId,
+      },
     });
     reservations.push(reservation);
 
@@ -1394,8 +1663,8 @@ async function seedReservationsWithFinancials(
           method: pick(["card", "card", "card", "cash", "check"]),
           direction: "charge",
           note: paidAmount === totalAmount ? "Full payment" : "Deposit payment",
-          createdAt: paymentDate
-        }
+          createdAt: paymentDate,
+        },
       });
       paymentCount++;
 
@@ -1408,8 +1677,8 @@ async function seedReservationsWithFinancials(
           description: `Payment received - ${guest.primaryFirstName} ${guest.primaryLastName}`,
           amountCents: paidAmount,
           direction: "debit",
-          occurredAt: paymentDate
-        }
+          occurredAt: paymentDate,
+        },
       });
       ledgerCount++;
 
@@ -1422,8 +1691,8 @@ async function seedReservationsWithFinancials(
           description: `Site rental - ${site!.name}`,
           amountCents: baseSubtotal,
           direction: "credit",
-          occurredAt: paymentDate
-        }
+          occurredAt: paymentDate,
+        },
       });
       ledgerCount++;
 
@@ -1437,8 +1706,8 @@ async function seedReservationsWithFinancials(
             description: "Booking fees",
             amountCents: feesAmount,
             direction: "credit",
-            occurredAt: paymentDate
-          }
+            occurredAt: paymentDate,
+          },
         });
         ledgerCount++;
       }
@@ -1453,8 +1722,8 @@ async function seedReservationsWithFinancials(
             description: "Sales tax collected",
             amountCents: taxesAmount,
             direction: "credit",
-            occurredAt: paymentDate
-          }
+            occurredAt: paymentDate,
+          },
         });
         ledgerCount++;
       }
@@ -1468,10 +1737,16 @@ async function seedReservationsWithFinancials(
             reservationId: reservation.id,
             amount: Math.round(totalAmount / installments),
             dueDate: addDays(dates.arrivalDate, (i + 1) * 30),
-            status: i === 0 ? ChargeStatus.paid : i === installments - 1 && randomBetween(0, 1) === 1 ? ChargeStatus.failed : ChargeStatus.pending,
+            status:
+              i === 0
+                ? ChargeStatus.paid
+                : i === installments - 1 && randomBetween(0, 1) === 1
+                  ? ChargeStatus.failed
+                  : ChargeStatus.pending,
             paidAt: i === 0 ? addDays(dates.arrivalDate, -2) : null,
-            failureReason: i === installments - 1 && randomBetween(0, 1) === 1 ? "Card declined" : null
-          }
+            failureReason:
+              i === installments - 1 && randomBetween(0, 1) === 1 ? "Card declined" : null,
+          },
         });
         repeatChargeCount++;
       }
@@ -1481,7 +1756,13 @@ async function seedReservationsWithFinancials(
   for (const year of [2020, 2021, 2022, 2023, 2024, 2025]) {
     const count = perYearCounts(year);
     for (let i = 0; i < count; i++) {
-      const stayType = pick([StayType.standard, StayType.standard, StayType.weekly, StayType.monthly, StayType.seasonal]);
+      const stayType = pick([
+        StayType.standard,
+        StayType.standard,
+        StayType.weekly,
+        StayType.monthly,
+        StayType.seasonal,
+      ]);
       await createReservation(year, stayType, false);
     }
   }
@@ -1493,25 +1774,33 @@ async function seedReservationsWithFinancials(
     await createReservation(2026, stayType, true);
   }
 
-  console.log(`  Created ${reservations.length} reservations, ${paymentCount} payments, ${ledgerCount} ledger entries, ${repeatChargeCount} repeat charges`);
+  console.log(
+    `  Created ${reservations.length} reservations, ${paymentCount} payments, ${ledgerCount} ledger entries, ${repeatChargeCount} repeat charges`,
+  );
   return reservations;
 }
 
 async function seedCampground(
   config: (typeof seededCampgrounds)[number],
   orgId: string,
-  users: { id: string; email: string }[]
+  users: { id: string; email: string }[],
 ) {
   const season = seasonForYear(2025);
   const rateMultiplier =
-    config.size === "resort" ? 1.3 : config.vibe === "boutique" ? 1.1 : config.size === "mom_pop" ? 0.85 : 1;
+    config.size === "resort"
+      ? 1.3
+      : config.vibe === "boutique"
+        ? 1.1
+        : config.size === "mom_pop"
+          ? 0.85
+          : 1;
   const siteMix = {
     premium: config.size === "resort" ? 28 : config.size === "mom_pop" ? 8 : 16,
     standard: config.size === "resort" ? 42 : config.size === "mom_pop" ? 12 : 22,
     tent: config.size === "resort" ? 18 : config.size === "mom_pop" ? 14 : 12,
     cabin: config.size === "resort" ? 14 : config.size === "mom_pop" ? 6 : 8,
     group: config.size === "resort" ? 6 : 3,
-    glamping: config.size === "resort" || config.vibe === "boutique" ? 6 : 0
+    glamping: config.size === "resort" || config.vibe === "boutique" ? 6 : 0,
   };
 
   const vibeMeta = (() => {
@@ -1521,90 +1810,142 @@ async function seedCampground(
           description:
             "Riverbend offers bluffs and Mississippi views with fishing docks and shaded tent meadows.",
           tagline: "River views, river vibes",
-          amenities: ["WiFi", "Pool", "Laundry", "Camp Store", "Fishing Dock", "Boat Ramp", "Playground", "Fire Pits", "Showers", "Pet Friendly"],
+          amenities: [
+            "WiFi",
+            "Pool",
+            "Laundry",
+            "Camp Store",
+            "Fishing Dock",
+            "Boat Ramp",
+            "Playground",
+            "Fire Pits",
+            "Showers",
+            "Pet Friendly",
+          ],
           hero: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1200",
           photos: [
             "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800",
             "https://images.unsplash.com/photo-1537905569824-f89f14cceb68?w=800",
-            "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800"
+            "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=800",
           ],
           lat: 44.0498,
           lng: -91.6391,
           postal: "55987",
           taxState: 0.0685,
-          taxLocal: 0.015
+          taxLocal: 0.015,
         };
       case "mountain":
         return {
           description:
             "Mountain Base sits at the foot of fourteeners with access to biking, rafting, and hot springs.",
           tagline: "Adventure starts here",
-          amenities: ["WiFi", "Hot Tub", "Laundry", "Camp Store", "Hiking Trails", "Mountain Views", "Fire Pits", "Showers", "Pet Friendly", "Bike Rentals"],
+          amenities: [
+            "WiFi",
+            "Hot Tub",
+            "Laundry",
+            "Camp Store",
+            "Hiking Trails",
+            "Mountain Views",
+            "Fire Pits",
+            "Showers",
+            "Pet Friendly",
+            "Bike Rentals",
+          ],
           hero: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200",
           photos: [
             "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
             "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800",
-            "https://images.unsplash.com/photo-1445307806294-bff7f67ff225?w=800"
+            "https://images.unsplash.com/photo-1445307806294-bff7f67ff225?w=800",
           ],
           lat: 38.5347,
           lng: -106.0012,
           postal: "81201",
           taxState: 0.028,
-          taxLocal: 0.04
+          taxLocal: 0.04,
         };
       case "desert_resort":
         return {
           description:
             "Sunset Sands is a destination RV resort near slickrock with a pool, spa, and guided excursions.",
           tagline: "Desert sunsets and resort perks",
-          amenities: ["WiFi", "Pool", "Spa", "Laundry", "Camp Store", "Restaurant", "Bike Rentals", "UTV Parking", "Pickleball", "Pet Friendly"],
+          amenities: [
+            "WiFi",
+            "Pool",
+            "Spa",
+            "Laundry",
+            "Camp Store",
+            "Restaurant",
+            "Bike Rentals",
+            "UTV Parking",
+            "Pickleball",
+            "Pet Friendly",
+          ],
           hero: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200",
           photos: [
             "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800",
             "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800",
-            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800",
           ],
           lat: 38.5733,
           lng: -109.5498,
           postal: "84532",
           taxState: 0.061,
-          taxLocal: 0.03
+          taxLocal: 0.03,
         };
       case "boutique":
         return {
           description:
             "Blueberry Hill is a boutique cabin and camp blend with curated activities and chef-led weekends.",
           tagline: "Cozy cabins, curated stays",
-          amenities: ["WiFi", "Coffee Bar", "Laundry", "Camp Store", "Yoga Lawn", "Fire Pits", "Bathhouse", "Pet Friendly", "Live Music Patio"],
+          amenities: [
+            "WiFi",
+            "Coffee Bar",
+            "Laundry",
+            "Camp Store",
+            "Yoga Lawn",
+            "Fire Pits",
+            "Bathhouse",
+            "Pet Friendly",
+            "Live Music Patio",
+          ],
           hero: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200",
           photos: [
             "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800",
             "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800",
-            "https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800"
+            "https://images.unsplash.com/photo-1470246973918-29a93221c455?w=800",
           ],
           lat: 35.5951,
           lng: -82.5515,
           postal: "28801",
           taxState: 0.0475,
-          taxLocal: 0.025
+          taxLocal: 0.025,
         };
       default:
         return {
           description:
             "Redwood Ridge Hideout is a family-owned forest escape with big trees, quiet nights, and friendly hosts.",
           tagline: "Under the redwoods",
-          amenities: ["WiFi", "Laundry", "Camp Store", "Hiking Trails", "Shuttle to Town", "Fire Pits", "Showers", "Pet Friendly"],
+          amenities: [
+            "WiFi",
+            "Laundry",
+            "Camp Store",
+            "Hiking Trails",
+            "Shuttle to Town",
+            "Fire Pits",
+            "Showers",
+            "Pet Friendly",
+          ],
           hero: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200",
           photos: [
             "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800",
             "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800",
-            "https://images.unsplash.com/photo-1476041800959-2f6bb412c8ce?w=800"
+            "https://images.unsplash.com/photo-1476041800959-2f6bb412c8ce?w=800",
           ],
           lat: 40.8021,
           lng: -124.1637,
           postal: "95501",
           taxState: 0.0725,
-          taxLocal: 0.015
+          taxLocal: 0.015,
         };
     }
   })();
@@ -1617,74 +1958,74 @@ async function seedCampground(
 
   const cg = existing
     ? await prisma.campground.update({
-      where: { id: existing.id },
-      data: {
-        organizationId: orgId,
-        name: config.name,
-        slug: config.slug,
-        city: config.city,
-        state: config.state,
-        country: "USA",
-        address1: `${config.city} Basecamp Rd`,
-        postalCode: vibeMeta.postal,
-        latitude: vibeMeta.lat,
-        longitude: vibeMeta.lng,
-        timezone: config.timezone,
-        phone: "555-CAMP-123",
-        email: `info@${config.slug}.com`,
-        website: `https://${config.slug}.com`,
-        facebookUrl: `https://facebook.com/${config.slug}`,
-        instagramUrl: `https://instagram.com/${config.slug}`,
-        description: vibeMeta.description,
-        tagline: vibeMeta.tagline,
-        amenities: vibeMeta.amenities,
-        photos: vibeMeta.photos,
-        heroImageUrl: vibeMeta.hero,
-        isPublished: true,
-        seasonStart: season.start,
-        seasonEnd: season.end,
-        checkInTime: "15:00",
-        checkOutTime: "11:00",
-        taxState: vibeMeta.taxState,
-        taxLocal: vibeMeta.taxLocal,
-        depositRule: config.size === "resort" ? "percentage" : "first_night",
-        depositPercentage: config.size === "resort" ? 25 : null
-      }
-    })
+        where: { id: existing.id },
+        data: {
+          organizationId: orgId,
+          name: config.name,
+          slug: config.slug,
+          city: config.city,
+          state: config.state,
+          country: "USA",
+          address1: `${config.city} Basecamp Rd`,
+          postalCode: vibeMeta.postal,
+          latitude: vibeMeta.lat,
+          longitude: vibeMeta.lng,
+          timezone: config.timezone,
+          phone: "555-CAMP-123",
+          email: `info@${config.slug}.com`,
+          website: `https://${config.slug}.com`,
+          facebookUrl: `https://facebook.com/${config.slug}`,
+          instagramUrl: `https://instagram.com/${config.slug}`,
+          description: vibeMeta.description,
+          tagline: vibeMeta.tagline,
+          amenities: vibeMeta.amenities,
+          photos: vibeMeta.photos,
+          heroImageUrl: vibeMeta.hero,
+          isPublished: true,
+          seasonStart: season.start,
+          seasonEnd: season.end,
+          checkInTime: "15:00",
+          checkOutTime: "11:00",
+          taxState: vibeMeta.taxState,
+          taxLocal: vibeMeta.taxLocal,
+          depositRule: config.size === "resort" ? "percentage" : "first_night",
+          depositPercentage: config.size === "resort" ? 25 : null,
+        },
+      })
     : await prisma.campground.create({
-      data: {
-        organizationId: orgId,
-        name: config.name,
-        slug: config.slug,
-        city: config.city,
-        state: config.state,
-        country: "USA",
-        address1: `${config.city} Basecamp Rd`,
-        postalCode: vibeMeta.postal,
-        latitude: vibeMeta.lat,
-        longitude: vibeMeta.lng,
-        timezone: config.timezone,
-        phone: "555-CAMP-123",
-        email: `info@${config.slug}.com`,
-        website: `https://${config.slug}.com`,
-        facebookUrl: `https://facebook.com/${config.slug}`,
-        instagramUrl: `https://instagram.com/${config.slug}`,
-        description: vibeMeta.description,
-        tagline: vibeMeta.tagline,
-        amenities: vibeMeta.amenities,
-        photos: vibeMeta.photos,
-        heroImageUrl: vibeMeta.hero,
-        isPublished: true,
-        seasonStart: season.start,
-        seasonEnd: season.end,
-        checkInTime: "15:00",
-        checkOutTime: "11:00",
-        taxState: vibeMeta.taxState,
-        taxLocal: vibeMeta.taxLocal,
-        depositRule: config.size === "resort" ? "percentage" : "first_night",
-        depositPercentage: config.size === "resort" ? 25 : null
-      }
-    });
+        data: {
+          organizationId: orgId,
+          name: config.name,
+          slug: config.slug,
+          city: config.city,
+          state: config.state,
+          country: "USA",
+          address1: `${config.city} Basecamp Rd`,
+          postalCode: vibeMeta.postal,
+          latitude: vibeMeta.lat,
+          longitude: vibeMeta.lng,
+          timezone: config.timezone,
+          phone: "555-CAMP-123",
+          email: `info@${config.slug}.com`,
+          website: `https://${config.slug}.com`,
+          facebookUrl: `https://facebook.com/${config.slug}`,
+          instagramUrl: `https://instagram.com/${config.slug}`,
+          description: vibeMeta.description,
+          tagline: vibeMeta.tagline,
+          amenities: vibeMeta.amenities,
+          photos: vibeMeta.photos,
+          heroImageUrl: vibeMeta.hero,
+          isPublished: true,
+          seasonStart: season.start,
+          seasonEnd: season.end,
+          checkInTime: "15:00",
+          checkOutTime: "11:00",
+          taxState: vibeMeta.taxState,
+          taxLocal: vibeMeta.taxLocal,
+          depositRule: config.size === "resort" ? "percentage" : "first_night",
+          depositPercentage: config.size === "resort" ? 25 : null,
+        },
+      });
 
   const membershipDefs: Array<{ user: { id: string }; role: UserRole }> = [
     { user: users[0], role: UserRole.owner },
@@ -1693,21 +2034,23 @@ async function seedCampground(
     { user: users[3], role: UserRole.front_desk },
     { user: users[4], role: UserRole.maintenance },
     { user: users[5], role: UserRole.finance },
-    { user: users[6], role: UserRole.marketing }
+    { user: users[6], role: UserRole.marketing },
   ];
 
   const memberships = [];
   for (const mem of membershipDefs) {
     memberships.push(
       await prisma.campgroundMembership.create({
-        data: { userId: mem.user.id, campgroundId: cg.id, role: mem.role }
-      })
+        data: { userId: mem.user.id, campgroundId: cg.id, role: mem.role },
+      }),
     );
   }
   console.log(`  Created campground memberships for ${memberships.length} users`);
 
   const classes = await prisma.$transaction(
-    buildSiteClasses(cg.id, { rateMultiplier, addGlamping: siteMix.glamping > 0 }).map((data) => prisma.siteClass.create({ data }))
+    buildSiteClasses(cg.id, { rateMultiplier, addGlamping: siteMix.glamping > 0 }).map((data) =>
+      prisma.siteClass.create({ data }),
+    ),
   );
   console.log(`  Created ${classes.length} site classes`);
 
@@ -1721,24 +2064,26 @@ async function seedCampground(
       prisma.guest.upsert({
         where: { email: data.email },
         update: {},
-        create: data
-      })
-    )
+        create: data,
+      }),
+    ),
   );
   console.log(`  Created ${guests.length} guests`);
 
   const pricingRules = await prisma.$transaction(
-    buildPricingRules(cg.id, classes).map((data) => prisma.pricingRule.create({ data }))
+    buildPricingRules(cg.id, classes).map((data) => prisma.pricingRule.create({ data })),
   );
   console.log(`  Created ${pricingRules.length} pricing rules`);
 
   const seasonalRates = await prisma.$transaction(
-    buildSeasonalRates(cg.id, classes).map((data) => prisma.seasonalRate.create({ data }))
+    buildSeasonalRates(cg.id, classes).map((data) => prisma.seasonalRate.create({ data })),
   );
   console.log(`  Created ${seasonalRates.length} seasonal/long-stay rates`);
 
   const maintenanceData = buildMaintenanceTickets(cg.id, sites);
-  await prisma.$transaction(maintenanceData.map((data) => prisma.maintenanceTicket.create({ data })));
+  await prisma.$transaction(
+    maintenanceData.map((data) => prisma.maintenanceTicket.create({ data })),
+  );
   console.log(`  Created ${maintenanceData.length} maintenance tickets`);
 
   const eventsData = buildEvents(cg.id, config.state, season.start);
@@ -1756,11 +2101,17 @@ async function seedCampground(
       type: "percentage",
       value: 20,
       description: "Summer Sale 20% Off",
-      isActive: true
-    }
+      isActive: true,
+    },
   });
 
-  const reservations = await seedReservationsWithFinancials(cg.id, sites, guests, classes, seasonalRates);
+  const reservations = await seedReservationsWithFinancials(
+    cg.id,
+    sites,
+    guests,
+    classes,
+    seasonalRates,
+  );
 
   const siteLookup = new Map(sites.map((s) => [s.id, { name: s.name }]));
   await seedPosData(cg.id, siteLookup, guests, reservations);
@@ -1790,10 +2141,11 @@ async function seedApprovalPolicies() {
         thresholdCents: 25000,
         currency: "USD",
         approversNeeded: 2,
-        description: "Dual control for refunds above $250. Requires two authorized staff members to approve.",
+        description:
+          "Dual control for refunds above $250. Requires two authorized staff members to approve.",
         approverRoles: [UserRole.owner, UserRole.manager, UserRole.finance],
-        isActive: true
-      }
+        isActive: true,
+      },
     }),
     prisma.approvalPolicy.create({
       data: {
@@ -1802,10 +2154,11 @@ async function seedApprovalPolicies() {
         appliesTo: ["payout"],
         currency: "USD",
         approversNeeded: 2,
-        description: "Require two approvers for all operator payouts to ensure financial oversight.",
+        description:
+          "Require two approvers for all operator payouts to ensure financial oversight.",
         approverRoles: [UserRole.owner, UserRole.finance],
-        isActive: true
-      }
+        isActive: true,
+      },
     }),
     prisma.approvalPolicy.create({
       data: {
@@ -1816,8 +2169,8 @@ async function seedApprovalPolicies() {
         approversNeeded: 1,
         description: "Pricing, tax, and currency changes require approval before taking effect.",
         approverRoles: [UserRole.owner, UserRole.manager],
-        isActive: true
-      }
+        isActive: true,
+      },
     }),
     prisma.approvalPolicy.create({
       data: {
@@ -1829,9 +2182,9 @@ async function seedApprovalPolicies() {
         approversNeeded: 2,
         description: "Additional oversight for refunds over $1,000. Requires owner approval.",
         approverRoles: [UserRole.owner],
-        isActive: true
-      }
-    })
+        isActive: true,
+      },
+    }),
   ]);
 
   console.log(`  Created ${policies.length} approval policies`);
@@ -1849,7 +2202,7 @@ async function main() {
   let org = await prisma.organization.findFirst({ where: { name: "Keepr" } });
   if (!org) {
     org = await prisma.organization.create({
-      data: { name: "Keepr" }
+      data: { name: "Keepr" },
     });
   }
   console.log(`\nOrganization ready: ${org.name}\n`);

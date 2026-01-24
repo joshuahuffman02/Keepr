@@ -1,22 +1,22 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { EmailService } from './email.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { EmailService } from "./email.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
-@Controller('email')
+@Controller("email")
 @UseGuards(JwtAuthGuard)
 export class EmailController {
-    constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService) {}
 
-    @Get('test')
-    async sendTestEmail(@Query('to') to: string) {
-        if (!to) {
-            return { error: 'Missing "to" query parameter' };
-        }
+  @Get("test")
+  async sendTestEmail(@Query("to") to: string) {
+    if (!to) {
+      return { error: 'Missing "to" query parameter' };
+    }
 
-        const result = await this.emailService.sendEmail({
-            to,
-            subject: 'Keepr - Test Email',
-            html: `
+    const result = await this.emailService.sendEmail({
+      to,
+      subject: "Keepr - Test Email",
+      html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px;">
                         <h1 style="color: #10b981; margin: 0;">Email is Working!</h1>
@@ -41,14 +41,14 @@ export class EmailController {
                         </p>
                     </div>
                 </div>
-            `
-        });
+            `,
+    });
 
-        return {
-            success: true,
-            message: `Test email sent to ${to}`,
-            provider: result.provider,
-            providerMessageId: result.providerMessageId
-        };
-    }
+    return {
+      success: true,
+      message: `Test email sent to ${to}`,
+      provider: result.provider,
+      providerMessageId: result.providerMessageId,
+    };
+  }
 }

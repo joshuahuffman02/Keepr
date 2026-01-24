@@ -203,7 +203,16 @@ export function useVoiceCommands(options: UseVoiceCommandsOptions = {}): UseVoic
     return () => {
       recognition.abort();
     };
-  }, [commands, language, continuous, confidenceThreshold, onStart, onEnd, onError, onUnrecognized]);
+  }, [
+    commands,
+    language,
+    continuous,
+    confidenceThreshold,
+    onStart,
+    onEnd,
+    onError,
+    onUnrecognized,
+  ]);
 
   const startListening = useCallback(() => {
     if (!recognitionRef.current) return;
@@ -235,7 +244,7 @@ export function useVoiceCommands(options: UseVoiceCommandsOptions = {}): UseVoic
 
   const unregisterCommand = useCallback((phrase: string) => {
     setCommands((prev) =>
-      prev.filter((cmd) => !cmd.phrases.some((p) => p.toLowerCase() === phrase.toLowerCase()))
+      prev.filter((cmd) => !cmd.phrases.some((p) => p.toLowerCase() === phrase.toLowerCase())),
     );
   }, []);
 

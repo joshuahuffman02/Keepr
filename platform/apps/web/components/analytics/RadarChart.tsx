@@ -58,10 +58,10 @@ export function RadarChart({
 
   // Normalize data to percentiles for consistent radar display
   const maxValue = Math.max(
-    ...data.map(d => Math.max(d.value, d.benchmark || 0, d.fullMark || 100))
+    ...data.map((d) => Math.max(d.value, d.benchmark || 0, d.fullMark || 100)),
   );
 
-  const normalizedData = data.map(d => ({
+  const normalizedData = data.map((d) => ({
     ...d,
     fullMark: d.fullMark || maxValue,
   }));
@@ -119,7 +119,9 @@ export function RadarChart({
               />
               <Legend
                 wrapperStyle={{ paddingTop: "16px" }}
-                formatter={(value: string) => <span className="text-muted-foreground">{value}</span>}
+                formatter={(value: string) => (
+                  <span className="text-muted-foreground">{value}</span>
+                )}
               />
             </RechartsRadarChart>
           </ResponsiveContainer>

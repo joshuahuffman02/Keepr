@@ -95,7 +95,10 @@ const parseSiteType = (value: string): SiteImportRow["siteType"] | null => {
 const parsePowerAmps = (value: unknown): number | number[] | undefined => {
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim() !== "") {
-    const parts = value.split(",").map((entry) => Number(entry.trim())).filter(Number.isFinite);
+    const parts = value
+      .split(",")
+      .map((entry) => Number(entry.trim()))
+      .filter(Number.isFinite);
     if (parts.length === 1) return parts[0];
     if (parts.length > 1) return parts;
   }
@@ -115,18 +118,33 @@ export class SiteImportService {
 
   // Target fields with their aliases for auto-mapping
   static readonly targetFields = [
-    { name: "siteNumber", aliases: ["site_number", "site_num", "site_id", "site", "number", "spot", "site #", "site#"] },
+    {
+      name: "siteNumber",
+      aliases: ["site_number", "site_num", "site_id", "site", "number", "spot", "site #", "site#"],
+    },
     { name: "name", aliases: ["site_name", "sitename", "display_name", "title"] },
     { name: "siteType", aliases: ["site_type", "type", "category", "site_category"] },
     { name: "siteClassName", aliases: ["site_class", "class", "class_name", "category_name"] },
-    { name: "maxOccupancy", aliases: ["max_occupancy", "occupancy", "max_guests", "capacity", "max_people"] },
-    { name: "rigMaxLength", aliases: ["max_length", "rig_length", "rv_length", "length_max", "max_rig_length"] },
-    { name: "hookupsPower", aliases: ["power", "electric", "electricity", "has_power", "power_hookup"] },
+    {
+      name: "maxOccupancy",
+      aliases: ["max_occupancy", "occupancy", "max_guests", "capacity", "max_people"],
+    },
+    {
+      name: "rigMaxLength",
+      aliases: ["max_length", "rig_length", "rv_length", "length_max", "max_rig_length"],
+    },
+    {
+      name: "hookupsPower",
+      aliases: ["power", "electric", "electricity", "has_power", "power_hookup"],
+    },
     { name: "hookupsWater", aliases: ["water", "has_water", "water_hookup"] },
     { name: "hookupsSewer", aliases: ["sewer", "has_sewer", "sewer_hookup", "sewage"] },
     { name: "powerAmps", aliases: ["amps", "amperage", "power_amps", "electric_amps"] },
     { name: "petFriendly", aliases: ["pets", "pet_friendly", "allows_pets", "pets_allowed"] },
-    { name: "accessible", aliases: ["ada", "handicap", "wheelchair", "accessibility", "ada_accessible"] },
+    {
+      name: "accessible",
+      aliases: ["ada", "handicap", "wheelchair", "accessibility", "ada_accessible"],
+    },
     { name: "pullThrough", aliases: ["pull_through", "pullthru", "pull_thru", "back_in"] },
     { name: "description", aliases: ["desc", "notes", "site_description"] },
     { name: "status", aliases: ["site_status", "availability"] },
@@ -134,7 +152,7 @@ export class SiteImportService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly csvParser: CsvParserService
+    private readonly csvParser: CsvParserService,
   ) {}
 
   /**
@@ -150,7 +168,7 @@ export class SiteImportService {
   async previewImport(
     campgroundId: string,
     csvContent: string,
-    fieldMappings: FieldMapping[]
+    fieldMappings: FieldMapping[],
   ): Promise<SiteImportPreview> {
     // Verify campground exists
     const campground = await this.prisma.campground.findUnique({
@@ -174,9 +192,7 @@ export class SiteImportService {
       select: { id: true, siteNumber: true },
     });
 
-    const existingSiteMap = new Map(
-      existingSites.map((s) => [s.siteNumber?.toLowerCase(), s])
-    );
+    const existingSiteMap = new Map(existingSites.map((s) => [s.siteNumber?.toLowerCase(), s]));
 
     // Get existing site classes
     const existingClasses = await this.prisma.siteClass.findMany({
@@ -184,9 +200,7 @@ export class SiteImportService {
       select: { id: true, name: true },
     });
 
-    const classMap = new Map(
-      existingClasses.map((c) => [c.name.toLowerCase(), c.id])
-    );
+    const classMap = new Map(existingClasses.map((c) => [c.name.toLowerCase(), c.id]));
 
     const errors: Array<{ row: number; message: string }> = [];
     const warnings: Array<{ row: number; message: string }> = [];
@@ -284,7 +298,7 @@ export class SiteImportService {
     campgroundId: string,
     csvContent: string,
     fieldMappings: FieldMapping[],
-    options: { updateExisting?: boolean } = {}
+    options: { updateExisting?: boolean } = {},
   ): Promise<SiteImportResult> {
     const preview = await this.previewImport(campgroundId, csvContent, fieldMappings);
 
@@ -341,9 +355,12 @@ export class SiteImportService {
           hookupsPower: item.data.hookupsPower ?? false,
           hookupsWater: item.data.hookupsWater ?? false,
           hookupsSewer: item.data.hookupsSewer ?? false,
-          powerAmps: item.data.powerAmps != null
-            ? (Array.isArray(item.data.powerAmps) ? item.data.powerAmps : [item.data.powerAmps])
-            : [],
+          powerAmps:
+            item.data.powerAmps != null
+              ? Array.isArray(item.data.powerAmps)
+                ? item.data.powerAmps
+                : [item.data.powerAmps]
+              : [],
           petFriendly: item.data.petFriendly ?? true,
           accessible: item.data.accessible ?? false,
           pullThrough: item.data.pullThrough ?? false,
@@ -378,7 +395,7 @@ export class SiteImportService {
     }
 
     this.logger.log(
-      `Site import complete: ${created} created, ${updated} updated, ${skipped} skipped`
+      `Site import complete: ${created} created, ${updated} updated, ${skipped} skipped`,
     );
 
     return {
@@ -418,10 +435,70 @@ export class SiteImportService {
   generateExampleCSV(): string {
     const headers = this.getTemplateHeaders();
     const exampleRows = [
-      ["1", "Site 1", "rv", "Full Hookup", "6", "45", "true", "true", "true", "50", "true", "false", "true", "Large pull-through site"],
-      ["2", "Site 2", "rv", "Full Hookup", "4", "35", "true", "true", "true", "30", "true", "false", "false", "Back-in site"],
-      ["T1", "Tent Site 1", "tent", "Tent Sites", "4", "", "false", "false", "false", "", "true", "false", "false", "Shaded tent pad"],
-      ["C1", "Cabin 1", "cabin", "Standard Cabin", "4", "", "true", "true", "false", "", "false", "true", "false", "ADA accessible cabin"],
+      [
+        "1",
+        "Site 1",
+        "rv",
+        "Full Hookup",
+        "6",
+        "45",
+        "true",
+        "true",
+        "true",
+        "50",
+        "true",
+        "false",
+        "true",
+        "Large pull-through site",
+      ],
+      [
+        "2",
+        "Site 2",
+        "rv",
+        "Full Hookup",
+        "4",
+        "35",
+        "true",
+        "true",
+        "true",
+        "30",
+        "true",
+        "false",
+        "false",
+        "Back-in site",
+      ],
+      [
+        "T1",
+        "Tent Site 1",
+        "tent",
+        "Tent Sites",
+        "4",
+        "",
+        "false",
+        "false",
+        "false",
+        "",
+        "true",
+        "false",
+        "false",
+        "Shaded tent pad",
+      ],
+      [
+        "C1",
+        "Cabin 1",
+        "cabin",
+        "Standard Cabin",
+        "4",
+        "",
+        "true",
+        "true",
+        "false",
+        "",
+        "false",
+        "true",
+        "false",
+        "ADA accessible cabin",
+      ],
     ];
 
     return [headers.join(","), ...exampleRows.map((r) => r.join(","))].join("\n");

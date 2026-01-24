@@ -72,10 +72,7 @@ export class IncidentsController {
   }
 
   @Get("report/export")
-  report(
-    @Query("campgroundId") campgroundId: string,
-    @Query("format") format?: string,
-  ) {
+  report(@Query("campgroundId") campgroundId: string, @Query("format") format?: string) {
     return this.incidents.report(campgroundId, format);
   }
 }

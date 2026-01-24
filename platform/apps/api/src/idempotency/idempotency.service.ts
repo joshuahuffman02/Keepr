@@ -23,7 +23,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -42,7 +42,10 @@ export class IdempotencyService {
   private readonly scopeCache = new Map<string, string>();
   private readonly memoryCounters = new Map<string, { count: number; expiresAt: number }>();
 
-  constructor(private readonly prisma: PrismaService, private readonly redis: RedisService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redis: RedisService,
+  ) {}
 
   private stableStringify(value: unknown): string {
     if (value === null || value === undefined) return "null";
@@ -94,13 +97,19 @@ export class IdempotencyService {
   }
 
   private async touchRecord(id: string) {
-    await this.prisma.idempotencyRecord.update({
-      where: { id },
-      data: { lastSeenAt: new Date() }
-    }).catch(() => null);
+    await this.prisma.idempotencyRecord
+      .update({
+        where: { id },
+        data: { lastSeenAt: new Date() },
+      })
+      .catch(() => null);
   }
 
-  private ensureHashConsistency(existing: IdempotencyRecord, requestHash: string, checksum?: string) {
+  private ensureHashConsistency(
+    existing: IdempotencyRecord,
+    requestHash: string,
+    checksum?: string,
+  ) {
     if (existing.requestHash && existing.requestHash !== requestHash) {
       throw new ConflictException("Idempotency key reused with different payload");
     }
@@ -144,7 +153,12 @@ export class IdempotencyService {
   /**
    * Start or reuse an idempotency record. Applies per-scope rate limiting.
    */
-  async start(key: string, body: unknown, campgroundId?: string | null, options?: IdempotencyOptions) {
+  async start(
+    key: string,
+    body: unknown,
+    campgroundId?: string | null,
+    options?: IdempotencyOptions,
+  ) {
     const opts = options ?? {};
     const scope = this.scopeKey(opts.tenantId ?? null, opts.campgroundId ?? campgroundId ?? null);
     await this.enforceRateLimit(scope, opts.rateAction ?? "lookup");
@@ -157,7 +171,7 @@ export class IdempotencyService {
     if (normalizedSequence) {
       const seqExisting = await this.prisma.idempotencyRecord
         .findFirst({
-          where: { scope, endpoint, sequence: normalizedSequence }
+          where: { scope, endpoint, sequence: normalizedSequence },
         })
         .catch(() => null);
 
@@ -175,7 +189,7 @@ export class IdempotencyService {
 
     let existing = await this.prisma.idempotencyRecord
       .findUnique({
-        where: { scope_idempotencyKey: { scope, idempotencyKey: key } }
+        where: { scope_idempotencyKey: { scope, idempotencyKey: key } },
       })
       .catch(() => null);
 
@@ -191,8 +205,8 @@ export class IdempotencyService {
             status: IdempotencyStatus.inflight,
             expiresAt: this.computeExpiry(opts.ttlSeconds),
             lastSeenAt: new Date(),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       } else {
         await this.touchRecord(existing.id);
@@ -218,8 +232,8 @@ export class IdempotencyService {
         sequence: normalizedSequence,
         expiresAt: this.computeExpiry(opts.ttlSeconds),
         lastSeenAt: new Date(),
-        metadata: toNullableJsonInput(opts.metadata ?? null)
-      }
+        metadata: toNullableJsonInput(opts.metadata ?? null),
+      },
     });
 
     this.cacheScope(key, scope);
@@ -234,7 +248,7 @@ export class IdempotencyService {
       status: IdempotencyStatus.succeeded,
       responseJson: toNullableJsonInput(response),
       lastSeenAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     if (updated) return updated;
 
@@ -244,8 +258,8 @@ export class IdempotencyService {
       data: {
         status: IdempotencyStatus.succeeded,
         responseJson: toNullableJsonInput(response),
-        lastSeenAt: new Date()
-      }
+        lastSeenAt: new Date(),
+      },
     });
   }
 
@@ -256,7 +270,7 @@ export class IdempotencyService {
     const updated = await this.updateRecord(key, {
       status: IdempotencyStatus.failed,
       lastSeenAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     });
     if (updated) return updated;
 
@@ -264,8 +278,8 @@ export class IdempotencyService {
       where: { key },
       data: {
         status: IdempotencyStatus.failed,
-        lastSeenAt: new Date()
-      }
+        lastSeenAt: new Date(),
+      },
     });
   }
 
@@ -276,14 +290,18 @@ export class IdempotencyService {
     if (sequence === undefined || sequence === null) return null;
     await this.enforceRateLimit(scope, "lookup");
     return this.prisma.idempotencyRecord.findFirst({
-      where: { scope, endpoint, sequence: String(sequence) }
+      where: { scope, endpoint, sequence: String(sequence) },
     });
   }
 
   /**
    * Apply rate limiting without creating an idempotency record.
    */
-  async throttleScope(campgroundId?: string | null, tenantId?: string | null, action: RateAction = "lookup") {
+  async throttleScope(
+    campgroundId?: string | null,
+    tenantId?: string | null,
+    action: RateAction = "lookup",
+  ) {
     const scope = this.scopeKey(tenantId ?? null, campgroundId ?? null);
     await this.enforceRateLimit(scope, action);
   }
@@ -291,16 +309,18 @@ export class IdempotencyService {
   private async updateRecord(key: string, data: Prisma.IdempotencyRecordUpdateInput) {
     const scope = this.scopeCache.get(key);
     if (scope) {
-      const result = await this.prisma.idempotencyRecord.update({
-        where: { scope_idempotencyKey: { scope, idempotencyKey: key } },
-        data
-      }).catch(() => null);
+      const result = await this.prisma.idempotencyRecord
+        .update({
+          where: { scope_idempotencyKey: { scope, idempotencyKey: key } },
+          data,
+        })
+        .catch(() => null);
       if (result) return result;
     }
 
     const updated = await this.prisma.idempotencyRecord.updateMany({
       where: { idempotencyKey: key },
-      data
+      data,
     });
 
     if (updated.count > 0) {

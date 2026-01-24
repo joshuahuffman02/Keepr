@@ -109,9 +109,7 @@ export function RvConfigPanel({
                   "relative p-3 rounded-lg border-2 text-center transition-all duration-200",
                   "hover:border-yellow-500/50",
                   "focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-background",
-                  isSelected
-                    ? "border-yellow-500 bg-yellow-500/10"
-                    : "border-border bg-muted/50"
+                  isSelected ? "border-yellow-500 bg-yellow-500/10" : "border-border bg-muted/50",
                 )}
               >
                 <div className="font-bold text-lg">
@@ -151,7 +149,13 @@ interface OrientationButtonProps {
   description: string;
 }
 
-function OrientationButton({ selected, onClick, icon, label, description }: OrientationButtonProps) {
+function OrientationButton({
+  selected,
+  onClick,
+  icon,
+  label,
+  description,
+}: OrientationButtonProps) {
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}
@@ -161,22 +165,22 @@ function OrientationButton({ selected, onClick, icon, label, description }: Orie
         "relative p-4 rounded-xl border-2 text-left transition-all duration-200",
         "hover:border-emerald-500/50",
         "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-background",
-        selected
-          ? "border-emerald-500 bg-emerald-500/10"
-          : "border-border bg-muted/50"
+        selected ? "border-emerald-500 bg-emerald-500/10" : "border-border bg-muted/50",
       )}
     >
       <div className="flex items-center gap-3">
         <div
           className={cn(
             "p-2 rounded-lg",
-            selected ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground"
+            selected ? "bg-emerald-500/20 text-emerald-400" : "bg-muted text-muted-foreground",
           )}
         >
           {icon}
         </div>
         <div>
-          <div className={cn("font-medium", selected ? "text-emerald-400" : "text-muted-foreground")}>
+          <div
+            className={cn("font-medium", selected ? "text-emerald-400" : "text-muted-foreground")}
+          >
             {label}
           </div>
           <div className="text-xs text-muted-foreground">{description}</div>
@@ -209,16 +213,14 @@ function HookupToggle({ selected, onClick, icon, label }: HookupToggleProps) {
         "relative p-4 rounded-xl border-2 transition-all duration-200",
         "hover:border-blue-500/50",
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-background",
-        selected
-          ? "border-blue-500 bg-blue-500/10"
-          : "border-border bg-muted/50"
+        selected ? "border-blue-500 bg-blue-500/10" : "border-border bg-muted/50",
       )}
     >
       <div className="flex items-center justify-center gap-3">
         <div
           className={cn(
             "p-2 rounded-lg",
-            selected ? "bg-blue-500/20 text-blue-400" : "bg-muted text-muted-foreground"
+            selected ? "bg-blue-500/20 text-blue-400" : "bg-muted text-muted-foreground",
           )}
         >
           {icon}

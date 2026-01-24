@@ -205,7 +205,7 @@ export class SitemapService {
         loc: `${this.baseUrl}/pricing`,
         changefreq: "weekly",
         priority: 0.9,
-      }
+      },
     );
 
     const xml = this.generateSitemapXml(urls);

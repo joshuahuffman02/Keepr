@@ -11,16 +11,16 @@
  * 5. Restart the dev server
  */
 
-import * as Sentry from '@sentry/nextjs';
+import * as Sentry from "@sentry/nextjs";
 
 const dsn = process.env.SENTRY_DSN;
 
 if (dsn) {
   Sentry.init({
     dsn,
-    environment: process.env.NODE_ENV || 'development',
+    environment: process.env.NODE_ENV || "development",
 
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
 
     debug: false,
 
@@ -28,13 +28,15 @@ if (dsn) {
     beforeSend(event, hint) {
       // Remove authorization headers
       if (event.request?.headers) {
-        delete event.request.headers['authorization'];
-        delete event.request.headers['cookie'];
+        delete event.request.headers["authorization"];
+        delete event.request.headers["cookie"];
       }
 
       return event;
     },
   });
-} else if (process.env.NODE_ENV === 'production') {
-  console.warn('[Sentry] DSN not configured in production. Add SENTRY_DSN to enable error tracking.');
+} else if (process.env.NODE_ENV === "production") {
+  console.warn(
+    "[Sentry] DSN not configured in production. Add SENTRY_DSN to enable error tracking.",
+  );
 }

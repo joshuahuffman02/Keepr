@@ -4,7 +4,7 @@ import { DeveloperApiClient, type ReservationPayload, type Scope } from "@keepr/
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json" }
+    headers: { "content-type": "application/json" },
   });
 }
 
@@ -16,7 +16,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
     clientId: "client-id",
     clientSecret: "client-secret",
     campgroundId: "camp-1",
-    scopes
+    scopes,
   };
 
   let fetchMock: jest.Mock;
@@ -36,7 +36,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
       guestId: "guest-1",
       arrivalDate: "2024-06-01",
       departureDate: "2024-06-05",
-      adults: 2
+      adults: 2,
     };
 
     fetchMock
@@ -46,8 +46,8 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
           access_token: "mock-access",
           refresh_token: "mock-refresh",
           expires_in: 3600,
-          scope: "reservations:read reservations:write"
-        })
+          scope: "reservations:read reservations:write",
+        }),
       )
       // create
       .mockResolvedValueOnce(jsonResponse({ ...payload, id: "res-1" }))
@@ -80,9 +80,9 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
           grant_type: "client_credentials",
           client_id: "client-id",
           client_secret: "client-secret",
-          scope: "reservations:read reservations:write"
-        })
-      })
+          scope: "reservations:read reservations:write",
+        }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -92,10 +92,10 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
         method: "POST",
         headers: expect.objectContaining({
           Authorization: "Bearer mock-access",
-          "content-type": "application/json"
+          "content-type": "application/json",
         }),
-        body: JSON.stringify(payload)
-      })
+        body: JSON.stringify(payload),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -105,10 +105,10 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
         method: "PATCH",
         headers: expect.objectContaining({
           Authorization: "Bearer mock-access",
-          "content-type": "application/json"
+          "content-type": "application/json",
         }),
-        body: JSON.stringify({ notes: "updated" })
-      })
+        body: JSON.stringify({ notes: "updated" }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -117,9 +117,9 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
-          Authorization: "Bearer mock-access"
-        })
-      })
+          Authorization: "Bearer mock-access",
+        }),
+      }),
     );
 
     expect(fetchMock).toHaveBeenNthCalledWith(
@@ -128,9 +128,9 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({
-          Authorization: "Bearer mock-access"
-        })
-      })
+          Authorization: "Bearer mock-access",
+        }),
+      }),
     );
   });
 });

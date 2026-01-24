@@ -48,7 +48,12 @@ type IdempotencyRecordUpdateManyArgs = {
 };
 
 type IdempotencyRecordFindFirstArgs = {
-  where?: { scope?: string; endpoint?: string; sequence?: string | number | null; idempotencyKey?: string };
+  where?: {
+    scope?: string;
+    endpoint?: string;
+    sequence?: string | number | null;
+    idempotencyKey?: string;
+  };
 };
 
 type IdempotencyKeyWhere = { key: string };
@@ -66,7 +71,11 @@ const buildPrisma = () => {
       findUnique: jest.fn(async ({ where }: { where: IdempotencyRecordWhere }) => {
         const match = where?.scope_idempotencyKey;
         if (!match) return null;
-        return records.find((r) => r.scope === match.scope && r.idempotencyKey === match.idempotencyKey) ?? null;
+        return (
+          records.find(
+            (r) => r.scope === match.scope && r.idempotencyKey === match.idempotencyKey,
+          ) ?? null
+        );
       }),
       create: jest.fn(async ({ data }: IdempotencyRecordCreateArgs) => {
         const rec: RecordShape = {
@@ -85,7 +94,9 @@ const buildPrisma = () => {
         }
         if (where?.scope_idempotencyKey) {
           rec = records.find(
-            (r) => r.scope === where.scope_idempotencyKey?.scope && r.idempotencyKey === where.scope_idempotencyKey?.idempotencyKey
+            (r) =>
+              r.scope === where.scope_idempotencyKey?.scope &&
+              r.idempotencyKey === where.scope_idempotencyKey?.idempotencyKey,
           );
         }
         if (!rec) throw new Error("not found");
@@ -93,15 +104,22 @@ const buildPrisma = () => {
         return rec;
       }),
       updateMany: jest.fn(async ({ where, data }: IdempotencyRecordUpdateManyArgs) => {
-        const matched = records.filter((r) => (where?.idempotencyKey ? r.idempotencyKey === where.idempotencyKey : true));
+        const matched = records.filter((r) =>
+          where?.idempotencyKey ? r.idempotencyKey === where.idempotencyKey : true,
+        );
         matched.forEach((r) => Object.assign(r, data, { updatedAt: new Date() }));
         return { count: matched.length };
       }),
       findFirst: jest.fn(async ({ where }: IdempotencyRecordFindFirstArgs) => {
         if (where?.scope && where?.endpoint && where?.sequence !== undefined) {
-          return records.find(
-            (r) => r.scope === where.scope && r.endpoint === where.endpoint && r.sequence === String(where.sequence)
-          ) ?? null;
+          return (
+            records.find(
+              (r) =>
+                r.scope === where.scope &&
+                r.endpoint === where.endpoint &&
+                r.sequence === String(where.sequence),
+            ) ?? null
+          );
         }
         if (where?.idempotencyKey) {
           return records.find((r) => r.idempotencyKey === where.idempotencyKey) ?? null;
@@ -116,7 +134,10 @@ const buildPrisma = () => {
         Object.assign(rec, data);
         return rec;
       }),
-      findUnique: jest.fn(async ({ where }: { where: IdempotencyKeyWhere }) => legacy.find((entry) => entry.key === where.key) ?? null),
+      findUnique: jest.fn(
+        async ({ where }: { where: IdempotencyKeyWhere }) =>
+          legacy.find((entry) => entry.key === where.key) ?? null,
+      ),
       create: jest.fn(async ({ data }: IdempotencyKeyCreateArgs) => {
         const rec: LegacyRecord = { ...data };
         legacy.push(rec);
@@ -156,7 +177,9 @@ describe("IdempotencyService", () => {
       await service.start("key-1", { foo: "bar" }, "camp-1", { endpoint: "pos/checkout" });
       await service.complete("key-1", { ok: true });
 
-      const duplicate = await service.start("key-1", { foo: "bar" }, "camp-1", { endpoint: "pos/checkout" });
+      const duplicate = await service.start("key-1", { foo: "bar" }, "camp-1", {
+        endpoint: "pos/checkout",
+      });
       expect(duplicate?.status).toBe("succeeded");
       expect(duplicate?.responseJson).toEqual({ ok: true });
     } finally {
@@ -169,9 +192,9 @@ describe("IdempotencyService", () => {
     const { service, close } = await createService(prisma);
     try {
       await service.start("key-2", { foo: "bar" }, "camp-1", { endpoint: "pos/checkout" });
-      await expect(service.start("key-2", { foo: "baz" }, "camp-1", { endpoint: "pos/checkout" })).rejects.toBeInstanceOf(
-        ConflictException
-      );
+      await expect(
+        service.start("key-2", { foo: "baz" }, "camp-1", { endpoint: "pos/checkout" }),
+      ).rejects.toBeInstanceOf(ConflictException);
     } finally {
       await close();
     }
@@ -181,7 +204,10 @@ describe("IdempotencyService", () => {
     const prisma = buildPrisma();
     const { service, close } = await createService(prisma);
     try {
-      await service.start("key-seq", { foo: "bar" }, "camp-1", { endpoint: "pos/offline", sequence: "123" });
+      await service.start("key-seq", { foo: "bar" }, "camp-1", {
+        endpoint: "pos/offline",
+        sequence: "123",
+      });
       await service.complete("key-seq", { accepted: true });
 
       const found = await service.findBySequence("camp-1", "pos/offline", "123");
@@ -197,9 +223,9 @@ describe("IdempotencyService", () => {
     const { service, close } = await createService(prisma);
     try {
       await service.start("rate-1", {}, "camp-1", { endpoint: "pos/apply" });
-      await expect(service.start("rate-2", {}, "camp-1", { endpoint: "pos/apply" })).rejects.toThrow(
-        "Idempotency rate limit exceeded"
-      );
+      await expect(
+        service.start("rate-2", {}, "camp-1", { endpoint: "pos/apply" }),
+      ).rejects.toThrow("Idempotency rate limit exceeded");
     } finally {
       await close();
     }

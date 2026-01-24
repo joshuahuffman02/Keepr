@@ -26,7 +26,7 @@ type ApiRequest = Request & { apiPrincipal: ApiPrincipal };
 @Controller("developer/guests")
 @UseGuards(ApiTokenGuard, ApiScopeGuard)
 export class PublicGuestsController {
-  constructor(private readonly api: PublicApiService) { }
+  constructor(private readonly api: PublicApiService) {}
 
   @Get()
   @ApiScopes("guests:read")

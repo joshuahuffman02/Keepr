@@ -28,7 +28,7 @@ export class AiExecutorService {
    */
   async executeWithFallback(
     request: AiExecutionRequest,
-    fallbackChain?: AiProvider[]
+    fallbackChain?: AiProvider[],
   ): Promise<AiExecutionResult> {
     const chain = fallbackChain || this.DEFAULT_FALLBACK_CHAIN;
     const errors: Array<{ provider: string; error: string }> = [];
@@ -86,9 +86,7 @@ export class AiExecutorService {
   async executeParallel(requests: AiExecutionRequest[]): Promise<AiExecutionResult[]> {
     this.logger.debug(`Executing ${requests.length} AI tasks in parallel`);
 
-    const results = await Promise.allSettled(
-      requests.map((req) => this.executeWithFallback(req))
-    );
+    const results = await Promise.allSettled(requests.map((req) => this.executeWithFallback(req)));
 
     return results.map((result, index) => {
       if (result.status === "fulfilled") {

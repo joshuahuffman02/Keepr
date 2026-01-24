@@ -13,15 +13,15 @@ import assert from "node:assert";
 
 describe("worker", () => {
   let worker;
-  
+
   before(async () => {
     worker = await unstable_startWorker({ config: "wrangler.jsonc" });
   });
-  
+
   after(async () => {
     await worker.dispose();
   });
-  
+
   it("responds with 200", async () => {
     const response = await worker.fetch("http://example.com");
     assert.strictEqual(response.status, 200);
@@ -41,7 +41,7 @@ import { getPlatformProxy } from "wrangler";
 const { env, dispose, caches } = await getPlatformProxy<Env>({
   configPath: "wrangler.jsonc",
   environment: "production",
-  persist: { path: ".wrangler/state" }
+  persist: { path: ".wrangler/state" },
 });
 
 // Use bindings
@@ -58,30 +58,30 @@ await dispose();
 ### Use Cases
 
 **Unit Tests**
+
 ```typescript
 const { env, dispose } = await getPlatformProxy();
 
 describe("database", () => {
   after(async () => await dispose());
-  
+
   it("inserts user", async () => {
-    const result = await env.DB.prepare(
-      "INSERT INTO users (name) VALUES (?)"
-    ).bind("Alice").run();
+    const result = await env.DB.prepare("INSERT INTO users (name) VALUES (?)").bind("Alice").run();
     assert.strictEqual(result.meta.changes, 1);
   });
 });
 ```
 
 **Scripts**
+
 ```typescript
 const { env, dispose } = await getPlatformProxy({
-  persist: { path: ".wrangler/state" }
+  persist: { path: ".wrangler/state" },
 });
 
 await env.DB.batch([
   env.DB.prepare("CREATE TABLE users (id INTEGER PRIMARY KEY)"),
-  env.DB.prepare("INSERT INTO users (id) VALUES (1)")
+  env.DB.prepare("INSERT INTO users (id) VALUES (1)"),
 ]);
 
 await dispose();
@@ -104,9 +104,9 @@ interface Env {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const value = await env.MY_KV.get("key");  // Type-safe
+    const value = await env.MY_KV.get("key"); // Type-safe
     return Response.json({ value });
-  }
+  },
 } satisfies ExportedHandler<Env>;
 ```
 
@@ -118,7 +118,7 @@ Use `unstable_startWorker` instead.
 import { unstable_dev } from "wrangler";
 
 const worker = await unstable_dev("src/index.ts", {
-  config: "wrangler.jsonc"
+  config: "wrangler.jsonc",
 });
 
 const response = await worker.fetch();

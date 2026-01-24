@@ -92,8 +92,13 @@ describe("SelfCheckinService compliance enforcement", () => {
     prisma.signatureRequest.findFirst.mockResolvedValue(null);
     prisma.signatureArtifact.findFirst.mockResolvedValue(null);
     prisma.digitalWaiver.findFirst.mockResolvedValue(null);
-    prisma.reservation.update.mockResolvedValue({ ...baseReservation, checkInStatus: CheckInStatus.pending_waiver });
-    signatures.autoSendForReservation.mockResolvedValue({ signingUrl: "https://app.campreserv.com/sign/token" });
+    prisma.reservation.update.mockResolvedValue({
+      ...baseReservation,
+      checkInStatus: CheckInStatus.pending_waiver,
+    });
+    signatures.autoSendForReservation.mockResolvedValue({
+      signingUrl: "https://app.campreserv.com/sign/token",
+    });
 
     const result = await service.selfCheckin("res1");
 
@@ -103,7 +108,7 @@ describe("SelfCheckinService compliance enforcement", () => {
     expect(prisma.reservation.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ checkInStatus: CheckInStatus.pending_waiver }),
-      })
+      }),
     );
   });
 
@@ -120,7 +125,11 @@ describe("SelfCheckinService compliance enforcement", () => {
       selfCheckInAt: new Date(),
     });
 
-    const result = await service.selfCheckin("res1", { override: true, overrideReason: "staff override", actorId: "guest1" });
+    const result = await service.selfCheckin("res1", {
+      override: true,
+      overrideReason: "staff override",
+      actorId: "guest1",
+    });
 
     expect(result.status).toBe("completed");
     expect(audit.record).toHaveBeenCalledWith(
@@ -128,7 +137,7 @@ describe("SelfCheckinService compliance enforcement", () => {
         action: "checkin.override",
         actorId: "guest1",
         entityId: "res1",
-      })
+      }),
     );
     expect(access.autoGrantForReservation).toHaveBeenCalledWith("res1", "guest1");
   });

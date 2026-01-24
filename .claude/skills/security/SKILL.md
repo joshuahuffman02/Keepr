@@ -9,23 +9,27 @@ allowed-tools: Read, Glob, Grep
 ## Sensitive Data Categories
 
 ### High Sensitivity
+
 - Payment card data (handled by Stripe - never stored locally)
 - User passwords (hashed with bcrypt)
 - JWT tokens and secrets
 - API keys
 
 ### Medium Sensitivity
+
 - Guest personal information (name, email, phone)
 - Reservation details
 - Financial records
 
 ### Low Sensitivity
+
 - Site configurations
 - Public campground info
 
 ## Authentication
 
 ### JWT Implementation
+
 ```typescript
 // Token structure
 {
@@ -41,6 +45,7 @@ allowed-tools: Read, Glob, Grep
 ```
 
 ### Password Requirements
+
 - Minimum 8 characters
 - Hash with bcrypt (cost factor 10+)
 - Never log or expose passwords
@@ -49,6 +54,7 @@ allowed-tools: Read, Glob, Grep
 ## Authorization
 
 ### Permission Model
+
 ```typescript
 // Check user has permission before action
 if (!user.allowed.reportsRead) {
@@ -62,6 +68,7 @@ if (reservation.campgroundId !== user.campgroundId) {
 ```
 
 ### Common Guards
+
 - `JwtAuthGuard` - Verify authenticated
 - `RolesGuard` - Check platform role
 - `PermissionsGuard` - Check specific permissions
@@ -69,6 +76,7 @@ if (reservation.campgroundId !== user.campgroundId) {
 ## Input Validation
 
 ### Never Trust User Input
+
 ```typescript
 // Always validate DTOs
 @IsEmail()
@@ -86,6 +94,7 @@ quantity: number;
 ```
 
 ### SQL Injection Prevention
+
 Prisma uses parameterized queries by default. NEVER use raw SQL with user input:
 
 ```typescript
@@ -97,7 +106,9 @@ await prisma.$queryRaw`SELECT * FROM users WHERE email = '${email}'`; // NO!
 ```
 
 ### XSS Prevention
+
 React auto-escapes by default. Avoid:
+
 ```tsx
 // DANGEROUS
 <div dangerouslySetInnerHTML={{ __html: userInput }} />
@@ -109,6 +120,7 @@ React auto-escapes by default. Avoid:
 ## Payment Security
 
 ### Stripe Integration
+
 - Never handle raw card data - use Stripe Elements
 - Verify webhook signatures
 - Use idempotency keys for charges
@@ -116,16 +128,13 @@ React auto-escapes by default. Avoid:
 
 ```typescript
 // Verify webhook signature
-const event = stripe.webhooks.constructEvent(
-  payload,
-  signature,
-  process.env.STRIPE_WEBHOOK_SECRET
-);
+const event = stripe.webhooks.constructEvent(payload, signature, process.env.STRIPE_WEBHOOK_SECRET);
 ```
 
 ## API Security
 
 ### Rate Limiting
+
 ```typescript
 // Apply to sensitive endpoints
 @Throttle(5, 60) // 5 requests per 60 seconds
@@ -133,14 +142,16 @@ const event = stripe.webhooks.constructEvent(
 ```
 
 ### CORS Configuration
+
 ```typescript
 app.enableCors({
-  origin: process.env.ALLOWED_ORIGINS?.split(','),
+  origin: process.env.ALLOWED_ORIGINS?.split(","),
   credentials: true,
 });
 ```
 
 ### Sensitive Data in Responses
+
 ```typescript
 // Exclude sensitive fields
 const { password, ...safeUser } = user;
@@ -150,6 +161,7 @@ return safeUser;
 ## Common Vulnerabilities to Prevent
 
 ### OWASP Top 10
+
 1. **Broken Access Control** - Always verify permissions
 2. **Cryptographic Failures** - Use strong encryption, secure secrets
 3. **Injection** - Parameterized queries, input validation

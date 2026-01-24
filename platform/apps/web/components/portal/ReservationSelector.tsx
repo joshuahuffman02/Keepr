@@ -52,7 +52,7 @@ export function ReservationSelector({
           "w-full flex items-center justify-between gap-3 p-3 rounded-xl border transition-all",
           "bg-card hover:bg-muted/50 border-border",
           "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-          isOpen && "ring-2 ring-primary ring-offset-2"
+          isOpen && "ring-2 ring-primary ring-offset-2",
         )}
       >
         <div className="flex items-center gap-3 text-left">
@@ -74,7 +74,7 @@ export function ReservationSelector({
           <ChevronDown
             className={cn(
               "h-5 w-5 text-muted-foreground transition-transform",
-              isOpen && "rotate-180"
+              isOpen && "rotate-180",
             )}
           />
         </div>
@@ -84,10 +84,7 @@ export function ReservationSelector({
         {isOpen && (
           <>
             {/* Backdrop */}
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
             {/* Dropdown */}
             <motion.div
@@ -116,10 +113,8 @@ export function ReservationSelector({
                       }}
                       className={cn(
                         "w-full flex items-start gap-3 p-3 rounded-lg text-left transition-all",
-                        isSelected
-                          ? "bg-primary/10 border border-primary/20"
-                          : "hover:bg-muted/50",
-                        isPast && "opacity-60"
+                        isSelected ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/50",
+                        isPast && "opacity-60",
                       )}
                     >
                       <div
@@ -127,7 +122,7 @@ export function ReservationSelector({
                           "h-8 w-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0",
                           isSelected
                             ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
+                            : "bg-muted text-muted-foreground",
                         )}
                       >
                         {isSelected ? <Check className="h-4 w-4" /> : index + 1}
@@ -159,8 +154,8 @@ export function ReservationSelector({
                             {daysUntil === 0
                               ? "Arriving today!"
                               : daysUntil === 1
-                              ? "Arriving tomorrow"
-                              : `${daysUntil} days away`}
+                                ? "Arriving tomorrow"
+                                : `${daysUntil} days away`}
                           </p>
                         )}
                       </div>

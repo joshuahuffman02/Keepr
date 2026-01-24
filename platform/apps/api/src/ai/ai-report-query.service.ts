@@ -45,17 +45,13 @@ export class AiReportQueryService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly provider: AiProviderService,
-    private readonly gate: AiFeatureGateService
+    private readonly gate: AiFeatureGateService,
   ) {}
 
   /**
    * Parse a natural language query into report parameters
    */
-  async parseQuery(
-    campgroundId: string,
-    query: string,
-    userId?: string
-  ): Promise<ParsedQuery> {
+  async parseQuery(campgroundId: string, query: string, userId?: string): Promise<ParsedQuery> {
     await this.gate.assertFeatureEnabled(campgroundId, AiFeatureType.analytics);
 
     // Get available reports for context
@@ -209,7 +205,7 @@ If asking about "today" or "now", use "today" preset.`;
       dimensions: string[];
       timeRange?: { start?: string; end?: string; preset?: string };
     },
-    userId?: string
+    userId?: string,
   ): Promise<ReportNarrative> {
     await this.gate.assertFeatureEnabled(campgroundId, AiFeatureType.analytics);
 
@@ -284,7 +280,10 @@ Generate a narrative summary.`;
     const lines = content.split("\n").filter((l) => l.trim());
 
     // Look for structured sections
-    const summary = lines.find((l) => !l.startsWith("-") && !l.startsWith("*") && l.length > 20) || lines[0] || "Report generated successfully.";
+    const summary =
+      lines.find((l) => !l.startsWith("-") && !l.startsWith("*") && l.length > 20) ||
+      lines[0] ||
+      "Report generated successfully.";
 
     const findings: string[] = [];
     const trends: string[] = [];
@@ -298,7 +297,11 @@ Generate a narrative summary.`;
 
       if (line.toLowerCase().includes("trend")) {
         currentSection = "trends";
-      } else if (line.toLowerCase().includes("recommend") || line.toLowerCase().includes("action") || line.toLowerCase().includes("suggest")) {
+      } else if (
+        line.toLowerCase().includes("recommend") ||
+        line.toLowerCase().includes("action") ||
+        line.toLowerCase().includes("suggest")
+      ) {
         currentSection = "recommendations";
       }
 
@@ -334,7 +337,7 @@ Generate a narrative summary.`;
    */
   private fallbackNarrative(
     reportName: string,
-    stats: Record<string, { min: number; max: number; sum: number; avg: number }>
+    stats: Record<string, { min: number; max: number; sum: number; avg: number }>,
   ): ReportNarrative {
     const findings: string[] = [];
 

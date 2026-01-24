@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { DynamicPricingService } from './dynamic-pricing.service';
-import { DynamicPricingController } from './dynamic-pricing.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from "@nestjs/common";
+import { DynamicPricingService } from "./dynamic-pricing.service";
+import { DynamicPricingController } from "./dynamic-pricing.controller";
+import { PrismaModule } from "../prisma/prisma.module";
 import { PermissionsModule } from "../permissions/permissions.module";
 
 @Module({

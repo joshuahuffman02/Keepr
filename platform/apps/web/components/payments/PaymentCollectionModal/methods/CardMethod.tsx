@@ -133,19 +133,10 @@ function CardPaymentForm({
 
       {/* Action buttons */}
       <div className="flex justify-end gap-2 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onCancel}
-          disabled={processing}
-        >
+        <Button type="button" variant="outline" onClick={onCancel} disabled={processing}>
           Cancel
         </Button>
-        <Button
-          type="submit"
-          disabled={!stripe || processing}
-          className="min-w-[120px]"
-        >
+        <Button type="submit" disabled={!stripe || processing} className="min-w-[120px]">
           {processing ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

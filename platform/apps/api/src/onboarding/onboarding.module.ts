@@ -7,7 +7,11 @@ import { OnboardingService } from "./onboarding.service";
 import { OnboardingController } from "./onboarding.controller";
 import { OnboardingTokenGateService } from "./onboarding-token-gate.service";
 import { OnboardingGoLiveCheckService } from "./onboarding-go-live-check.service";
-import { OnboardingAiImportService, DocumentClassifierService, OnboardingAiImportController } from "./ai-import";
+import {
+  OnboardingAiImportService,
+  DocumentClassifierService,
+  OnboardingAiImportController,
+} from "./ai-import";
 
 @Module({
   imports: [PrismaModule, EmailModule, forwardRef(() => PaymentsModule)],
@@ -20,6 +24,11 @@ import { OnboardingAiImportService, DocumentClassifierService, OnboardingAiImpor
     OnboardingAiImportService,
     DocumentClassifierService,
   ],
-  exports: [OnboardingService, OnboardingTokenGateService, OnboardingAiImportService, OnboardingGoLiveCheckService],
+  exports: [
+    OnboardingService,
+    OnboardingTokenGateService,
+    OnboardingAiImportService,
+    OnboardingGoLiveCheckService,
+  ],
 })
 export class OnboardingModule {}

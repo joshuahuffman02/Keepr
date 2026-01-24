@@ -17,7 +17,8 @@ export default function StoreHoursPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) setCampgroundId(stored);
   }, []);
 
@@ -30,7 +31,11 @@ export default function StoreHoursPage() {
         setOpenHour(cg.storeOpenHour ?? "");
         setCloseHour(cg.storeCloseHour ?? "");
       } catch (err) {
-        toast({ title: "Error", description: "Failed to load store hours", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: "Failed to load store hours",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
@@ -44,7 +49,7 @@ export default function StoreHoursPage() {
     try {
       await apiClient.updateStoreHours(campgroundId, {
         storeOpenHour: openHour === "" ? undefined : Number(openHour),
-        storeCloseHour: closeHour === "" ? undefined : Number(closeHour)
+        storeCloseHour: closeHour === "" ? undefined : Number(closeHour),
       });
       toast({ title: "Saved", description: "Store hours updated." });
     } catch (err) {
@@ -56,57 +61,62 @@ export default function StoreHoursPage() {
 
   return (
     <div className="space-y-6">
-        <Breadcrumbs
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "Settings", href: "/dashboard/settings" },
-            { label: "Store Hours" }
-          ]}
-        />
-        <div className="max-w-2xl">
-          <Card>
-        <CardHeader>
-          <CardTitle>Store Hours</CardTitle>
-          <CardDescription>Set opening and closing hours (0-23 local time).</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {loading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
-          ) : !campgroundId ? (
-            <p className="text-sm text-muted-foreground">Select a campground to edit store hours.</p>
-          ) : (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-muted-foreground">Open Hour (0-23)</label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={23}
-                    value={openHour}
-                    onChange={(e) => setOpenHour(e.target.value === "" ? "" : Number(e.target.value))}
-                  />
+      <Breadcrumbs
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "Settings", href: "/dashboard/settings" },
+          { label: "Store Hours" },
+        ]}
+      />
+      <div className="max-w-2xl">
+        <Card>
+          <CardHeader>
+            <CardTitle>Store Hours</CardTitle>
+            <CardDescription>Set opening and closing hours (0-23 local time).</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            ) : !campgroundId ? (
+              <p className="text-sm text-muted-foreground">
+                Select a campground to edit store hours.
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Open Hour (0-23)</label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={23}
+                      value={openHour}
+                      onChange={(e) =>
+                        setOpenHour(e.target.value === "" ? "" : Number(e.target.value))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Close Hour (0-23)</label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={23}
+                      value={closeHour}
+                      onChange={(e) =>
+                        setCloseHour(e.target.value === "" ? "" : Number(e.target.value))
+                      }
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm text-muted-foreground">Close Hour (0-23)</label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={23}
-                    value={closeHour}
-                    onChange={(e) => setCloseHour(e.target.value === "" ? "" : Number(e.target.value))}
-                  />
-                </div>
-              </div>
-              <Button onClick={save} disabled={saving}>
-                {saving ? "Saving..." : "Save"}
-              </Button>
-            </>
-          )}
-        </CardContent>
-          </Card>
-        </div>
+                <Button onClick={save} disabled={saving}>
+                  {saving ? "Saving..." : "Save"}
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
+    </div>
   );
 }
-

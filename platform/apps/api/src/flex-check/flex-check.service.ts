@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { isRecord } from '../utils/type-guards';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { isRecord } from "../utils/type-guards";
 import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
@@ -37,7 +37,7 @@ const parseFlexCheckPricing = (value: unknown): FlexCheckPricing | null => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -107,13 +107,13 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     const policy = await this.getPolicy(reservation.campgroundId);
 
     if (!policy.earlyCheckInEnabled) {
-      throw new BadRequestException('Early check-in is not enabled for this property');
+      throw new BadRequestException("Early check-in is not enabled for this property");
     }
 
     // Calculate hours before standard check-in
@@ -125,7 +125,7 @@ export class FlexCheckService {
 
     if (policy.earlyCheckInMinHours && hoursEarly > policy.earlyCheckInMinHours) {
       throw new BadRequestException(
-        `Early check-in requests cannot exceed ${policy.earlyCheckInMinHours} hours before standard check-in`
+        `Early check-in requests cannot exceed ${policy.earlyCheckInMinHours} hours before standard check-in`,
       );
     }
 
@@ -133,11 +133,11 @@ export class FlexCheckService {
     let charge = 0;
     if (policy.earlyCheckInPricing) {
       const pricing = parseFlexCheckPricing(policy.earlyCheckInPricing);
-      if (pricing?.type === 'flat') {
+      if (pricing?.type === "flat") {
         charge = pricing.amount;
-      } else if (pricing?.type === 'hourly') {
+      } else if (pricing?.type === "hourly") {
         charge = Math.ceil(hoursEarly) * pricing.amountPerHour;
-      } else if (pricing?.type === 'percentage') {
+      } else if (pricing?.type === "percentage") {
         // Would need to calculate based on nightly rate
         charge = 0; // Simplified for now
       }
@@ -160,8 +160,8 @@ export class FlexCheckService {
       approved: autoApprove,
       charge,
       message: autoApprove
-        ? 'Early check-in approved automatically'
-        : 'Early check-in request submitted for approval',
+        ? "Early check-in approved automatically"
+        : "Early check-in request submitted for approval",
     };
   }
 
@@ -171,11 +171,11 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     if (!reservation.earlyCheckInRequested) {
-      throw new BadRequestException('No early check-in request found');
+      throw new BadRequestException("No early check-in request found");
     }
 
     // Charge is stored on reservation; ledger integration would be added here for full accounting
@@ -191,7 +191,7 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     return this.prisma.reservation.update({
@@ -212,13 +212,13 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     const policy = await this.getPolicy(reservation.campgroundId);
 
     if (!policy.lateCheckoutEnabled) {
-      throw new BadRequestException('Late checkout is not enabled for this property');
+      throw new BadRequestException("Late checkout is not enabled for this property");
     }
 
     // Calculate hours after standard checkout
@@ -230,7 +230,7 @@ export class FlexCheckService {
 
     if (policy.lateCheckoutMaxHours && hoursLate > policy.lateCheckoutMaxHours) {
       throw new BadRequestException(
-        `Late checkout requests cannot exceed ${policy.lateCheckoutMaxHours} hours after standard checkout`
+        `Late checkout requests cannot exceed ${policy.lateCheckoutMaxHours} hours after standard checkout`,
       );
     }
 
@@ -239,24 +239,22 @@ export class FlexCheckService {
       where: {
         siteId: reservation.siteId,
         arrivalDate: departureDate,
-        status: { in: ['confirmed', 'pending'] },
+        status: { in: ["confirmed", "pending"] },
         id: { not: reservationId },
       },
     });
 
     if (conflictingReservation) {
-      throw new BadRequestException(
-        'Late checkout not available - incoming guest on same day'
-      );
+      throw new BadRequestException("Late checkout not available - incoming guest on same day");
     }
 
     // Calculate charge based on pricing policy
     let charge = 0;
     if (policy.lateCheckoutPricing) {
       const pricing = parseFlexCheckPricing(policy.lateCheckoutPricing);
-      if (pricing?.type === 'flat') {
+      if (pricing?.type === "flat") {
         charge = pricing.amount;
-      } else if (pricing?.type === 'hourly') {
+      } else if (pricing?.type === "hourly") {
         charge = Math.ceil(hoursLate) * pricing.amountPerHour;
       }
     }
@@ -278,8 +276,8 @@ export class FlexCheckService {
       approved: autoApprove,
       charge,
       message: autoApprove
-        ? 'Late checkout approved automatically'
-        : 'Late checkout request submitted for approval',
+        ? "Late checkout approved automatically"
+        : "Late checkout request submitted for approval",
     };
   }
 
@@ -289,11 +287,11 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     if (!reservation.lateCheckoutRequested) {
-      throw new BadRequestException('No late checkout request found');
+      throw new BadRequestException("No late checkout request found");
     }
 
     // Charge is stored on reservation; ledger integration would be added here for full accounting
@@ -309,7 +307,7 @@ export class FlexCheckService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     return this.prisma.reservation.update({
@@ -349,7 +347,7 @@ export class FlexCheckService {
     });
 
     return {
-      earlyCheckIn: earlyCheckInRequests.map(r => ({
+      earlyCheckIn: earlyCheckInRequests.map((r) => ({
         reservationId: r.id,
         guestName: `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`,
         siteName: r.Site.name,
@@ -357,7 +355,7 @@ export class FlexCheckService {
         arrivalDate: r.arrivalDate,
         proposedCharge: r.earlyCheckInCharge,
       })),
-      lateCheckout: lateCheckoutRequests.map(r => ({
+      lateCheckout: lateCheckoutRequests.map((r) => ({
         reservationId: r.id,
         guestName: `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`,
         siteName: r.Site.name,

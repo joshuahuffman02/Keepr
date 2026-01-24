@@ -52,21 +52,15 @@ export function ConfirmDialog({
               <AlertTriangle className="h-6 w-6 text-status-error-text" />
             </div>
           )}
-          <AlertDialogTitle
-            className={variant === "destructive" ? "text-center" : ""}
-          >
+          <AlertDialogTitle className={variant === "destructive" ? "text-center" : ""}>
             {title}
           </AlertDialogTitle>
-          <AlertDialogDescription
-            className={variant === "destructive" ? "text-center" : ""}
-          >
+          <AlertDialogDescription className={variant === "destructive" ? "text-center" : ""}>
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>
-            {cancelLabel}
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>{cancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isPending}

@@ -9,11 +9,11 @@
  * Usage: node scripts/generate-prisma-enums.js
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const SCHEMA_PATH = path.join(__dirname, '../platform/apps/api/prisma/schema.prisma');
-const OUTPUT_PATH = path.join(__dirname, '../platform/apps/api/src/types/prisma.d.ts');
+const SCHEMA_PATH = path.join(__dirname, "../platform/apps/api/prisma/schema.prisma");
+const OUTPUT_PATH = path.join(__dirname, "../platform/apps/api/src/types/prisma.d.ts");
 
 function parseEnumsFromSchema(schemaContent) {
   const enums = [];
@@ -26,10 +26,10 @@ function parseEnumsFromSchema(schemaContent) {
 
     // Parse enum values (one per line, ignore comments)
     const values = enumBody
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line && !line.startsWith('//') && !line.startsWith('@@'))
-      .map(line => line.replace(/\/\/.*$/, '').trim()); // Remove inline comments
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("//") && !line.startsWith("@@"))
+      .map((line) => line.replace(/\/\/.*$/, "").trim()); // Remove inline comments
 
     if (values.length > 0) {
       enums.push({ name: enumName, values });
@@ -41,18 +41,18 @@ function parseEnumsFromSchema(schemaContent) {
 
 function generateEnumDeclaration(enumDef) {
   const typeEntries = enumDef.values
-    .map(value => `    readonly ${JSON.stringify(value)}: ${JSON.stringify(value)};`)
-    .join('\n');
+    .map((value) => `    readonly ${JSON.stringify(value)}: ${JSON.stringify(value)};`)
+    .join("\n");
 
   const valueEntries = enumDef.values
-    .map(value => `    ${JSON.stringify(value)}: ${JSON.stringify(value)},`)
-    .join('\n');
+    .map((value) => `    ${JSON.stringify(value)}: ${JSON.stringify(value)},`)
+    .join("\n");
 
   return `  export const ${enumDef.name}: {\n${typeEntries}\n  } = {\n${valueEntries}\n  };\n\n  export type ${enumDef.name} = (typeof ${enumDef.name})[keyof typeof ${enumDef.name}];`;
 }
 
 function generatePrismaDeclarations(enums) {
-  const enumDeclarations = enums.map(generateEnumDeclaration).join('\n\n');
+  const enumDeclarations = enums.map(generateEnumDeclaration).join("\n\n");
 
   return `/**
  * AUTO-GENERATED FILE - DO NOT EDIT MANUALLY
@@ -82,14 +82,14 @@ ${enumDeclarations}
 }
 
 function main() {
-  console.log('Reading Prisma schema...');
-  const schemaContent = fs.readFileSync(SCHEMA_PATH, 'utf-8');
+  console.log("Reading Prisma schema...");
+  const schemaContent = fs.readFileSync(SCHEMA_PATH, "utf-8");
 
-  console.log('Parsing enums...');
+  console.log("Parsing enums...");
   const enums = parseEnumsFromSchema(schemaContent);
   console.log(`Found ${enums.length} enums`);
 
-  console.log('Generating TypeScript declarations...');
+  console.log("Generating TypeScript declarations...");
   const declarations = generatePrismaDeclarations(enums);
 
   // Ensure output directory exists

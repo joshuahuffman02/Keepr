@@ -8,12 +8,12 @@ import {
   Delete,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { GroupsService } from './groups.service';
-import { JwtAuthGuard } from '../auth/guards';
+} from "@nestjs/common";
+import { GroupsService } from "./groups.service";
+import { JwtAuthGuard } from "../auth/guards";
 
 @UseGuards(JwtAuthGuard)
-@Controller('groups')
+@Controller("groups")
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
@@ -33,18 +33,18 @@ export class GroupsController {
   }
 
   @Get()
-  findAll(@Query('tenantId') tenantId: string) {
+  findAll(@Query("tenantId") tenantId: string) {
     return this.groupsService.findAll(tenantId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.groupsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body()
     updateGroupDto: {
       sharedPayment?: boolean;
@@ -56,9 +56,8 @@ export class GroupsController {
     return this.groupsService.update(id, updateGroupDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.groupsService.remove(id);
   }
 }
-

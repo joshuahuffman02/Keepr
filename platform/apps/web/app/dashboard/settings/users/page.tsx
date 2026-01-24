@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
@@ -17,7 +23,14 @@ import { Loader2, Shield, Trash2, Users } from "lucide-react";
 import { HelpAnchor } from "@/components/help/HelpAnchor";
 import { StaggeredItem } from "@/components/ui/staggered-list";
 
-type Role = "owner" | "manager" | "front_desk" | "maintenance" | "finance" | "marketing" | "readonly";
+type Role =
+  | "owner"
+  | "manager"
+  | "front_desk"
+  | "maintenance"
+  | "finance"
+  | "marketing"
+  | "readonly";
 
 type Member = {
   id: string;
@@ -42,7 +55,7 @@ const roleLabels: Record<Role, string> = {
   maintenance: "Maintenance",
   finance: "Finance",
   marketing: "Marketing",
-  readonly: "Read-only"
+  readonly: "Read-only",
 };
 
 const isRole = (value: string): value is Role =>
@@ -99,7 +112,7 @@ export default function UsersPage() {
   const membersQuery = useQuery<Member[]>({
     queryKey: ["campground-members", campgroundId],
     queryFn: () => apiClient.getCampgroundMembers(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const addMember = useMutation({
@@ -112,7 +125,12 @@ export default function UsersPage() {
       inviteForm.reset();
       toast({ title: "Member added", description: "User invited/added to this campground." });
     },
-    onError: (err: Error) => toast({ title: "Failed to add member", description: err.message || "Unable to add member. Please check the email and try again", variant: "destructive" })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to add member",
+        description: err.message || "Unable to add member. Please check the email and try again",
+        variant: "destructive",
+      }),
   });
 
   const updateRole = useMutation({
@@ -124,7 +142,12 @@ export default function UsersPage() {
       qc.invalidateQueries({ queryKey: ["campground-members", campgroundId] });
       toast({ title: "Role updated" });
     },
-    onError: (err: Error) => toast({ title: "Failed to update role", description: err.message || "Unable to update member role. Please try again", variant: "destructive" })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to update role",
+        description: err.message || "Unable to update member role. Please try again",
+        variant: "destructive",
+      }),
   });
 
   const removeMember = useMutation({
@@ -136,7 +159,12 @@ export default function UsersPage() {
       qc.invalidateQueries({ queryKey: ["campground-members", campgroundId] });
       toast({ title: "Member removed" });
     },
-    onError: (err: Error) => toast({ title: "Failed to remove member", description: err.message || "Unable to remove member. Ensure at least one owner remains", variant: "destructive" })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to remove member",
+        description: err.message || "Unable to remove member. Ensure at least one owner remains",
+        variant: "destructive",
+      }),
   });
 
   const members = membersQuery.data ?? [];
@@ -151,7 +179,13 @@ export default function UsersPage() {
       qc.invalidateQueries({ queryKey: ["campground-members", campgroundId] });
       toast({ title: "Invite resent" });
     },
-    onError: (err: Error) => toast({ title: "Failed to resend invite", description: err.message || "Unable to resend invitation. Please verify the email and try again", variant: "destructive" })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to resend invite",
+        description:
+          err.message || "Unable to resend invitation. Please verify the email and try again",
+        variant: "destructive",
+      }),
   });
 
   const createOnboardingInvite = useMutation({
@@ -171,9 +205,17 @@ export default function UsersPage() {
       const link = `${base}/onboarding/${res.token}`;
       setOnboardingLink(link);
       onboardingForm.reset({ email: "", expiresInHours: 72 });
-      toast({ title: "Onboarding invite sent", description: "Share the link with the new campground contact." });
+      toast({
+        title: "Onboarding invite sent",
+        description: "Share the link with the new campground contact.",
+      });
     },
-    onError: (err: Error) => toast({ title: "Failed to send onboarding invite", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to send onboarding invite",
+        description: err.message,
+        variant: "destructive",
+      }),
   });
 
   return (
@@ -199,10 +241,15 @@ export default function UsersPage() {
               <Shield className="h-4 w-4 text-emerald-600" />
               Invite or add a member
             </CardTitle>
-            <CardDescription>Creates the user if the email is new, then assigns the role for this campground.</CardDescription>
+            <CardDescription>
+              Creates the user if the email is new, then assigns the role for this campground.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={inviteForm.handleSubmit((data) => addMember.mutate(data))} className="space-y-3">
+            <form
+              onSubmit={inviteForm.handleSubmit((data) => addMember.mutate(data))}
+              className="space-y-3"
+            >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <FormField
                   label="Email"
@@ -266,10 +313,15 @@ export default function UsersPage() {
               <Shield className="h-4 w-4 text-emerald-600" />
               Onboarding invite (campground setup)
             </CardTitle>
-            <CardDescription>Send the guided onboarding link to the campground owner/manager.</CardDescription>
+            <CardDescription>
+              Send the guided onboarding link to the campground owner/manager.
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={onboardingForm.handleSubmit((data) => createOnboardingInvite.mutate(data))} className="space-y-3">
+            <form
+              onSubmit={onboardingForm.handleSubmit((data) => createOnboardingInvite.mutate(data))}
+              className="space-y-3"
+            >
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <FormField
                   label="Recipient email"
@@ -308,7 +360,10 @@ export default function UsersPage() {
                     onFocus={(e) => e.target.select()}
                     className="flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm"
                   />
-                  <p className="text-xs text-muted-foreground">Share this link with the campground to start setup. A new resend generates a fresh link.</p>
+                  <p className="text-xs text-muted-foreground">
+                    Share this link with the campground to start setup. A new resend generates a
+                    fresh link.
+                  </p>
                 </div>
               )}
             </form>
@@ -327,75 +382,94 @@ export default function UsersPage() {
                 Loading members...
               </div>
             ) : !membersQuery.data || membersQuery.data.length === 0 ? (
-              <div className="text-sm text-muted-foreground">No members yet. Invite your first teammate above.</div>
+              <div className="text-sm text-muted-foreground">
+                No members yet. Invite your first teammate above.
+              </div>
             ) : (
               <div className="space-y-3">
                 {members.map((member, index) => {
                   const invitePending = !!member.lastInviteSentAt && !member.lastInviteRedeemedAt;
                   return (
                     <StaggeredItem key={member.id} delay={index * 0.05} variant="fadeUp">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border px-4 py-3 gap-3">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{member.user.firstName} {member.user.lastName}</span>
-                          <Badge variant="secondary">{roleLabels[member.role] || member.role}</Badge>
-                          {!member.user.isActive && (
-                            <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">Inactive</Badge>
-                          )}
-                          {invitePending && (
-                            <Badge variant="outline" className="text-sky-700 border-sky-200 bg-sky-50">Invite pending</Badge>
+                      <div className="flex flex-col md:flex-row md:items-center justify-between rounded-lg border px-4 py-3 gap-3">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {member.user.firstName} {member.user.lastName}
+                            </span>
+                            <Badge variant="secondary">
+                              {roleLabels[member.role] || member.role}
+                            </Badge>
+                            {!member.user.isActive && (
+                              <Badge
+                                variant="outline"
+                                className="text-amber-700 border-amber-200 bg-amber-50"
+                              >
+                                Inactive
+                              </Badge>
+                            )}
+                            {invitePending && (
+                              <Badge
+                                variant="outline"
+                                className="text-sky-700 border-sky-200 bg-sky-50"
+                              >
+                                Invite pending
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="text-sm text-muted-foreground">{member.user.email}</div>
+                          {invitePending && member.lastInviteSentAt && (
+                            <div className="text-xs text-muted-foreground">
+                              Sent {new Date(member.lastInviteSentAt).toLocaleDateString()}{" "}
+                              {member.inviteExpiresAt
+                                ? `(expires ${new Date(member.inviteExpiresAt).toLocaleDateString()})`
+                                : ""}
+                            </div>
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground">{member.user.email}</div>
-                        {invitePending && member.lastInviteSentAt && (
-                          <div className="text-xs text-muted-foreground">
-                            Sent {new Date(member.lastInviteSentAt).toLocaleDateString()} {member.inviteExpiresAt ? `(expires ${new Date(member.inviteExpiresAt).toLocaleDateString()})` : ""}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Select
-                          value={member.role}
-                          onValueChange={(val) => {
-                            if (isRole(val)) {
-                              updateRole.mutate({ membershipId: member.id, role: val });
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="w-44">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(roleLabels).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {invitePending && (
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => resendInvite.mutate(member.id)}
-                            disabled={resendInvite.isPending}
+                        <div className="flex items-center gap-3">
+                          <Select
+                            value={member.role}
+                            onValueChange={(val) => {
+                              if (isRole(val)) {
+                                updateRole.mutate({ membershipId: member.id, role: val });
+                              }
+                            }}
                           >
-                            {resendInvite.isPending ? "Resending..." : "Resend invite"}
+                            <SelectTrigger className="w-44">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(roleLabels).map(([value, label]) => (
+                                <SelectItem key={value} value={value}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {invitePending && (
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => resendInvite.mutate(member.id)}
+                              disabled={resendInvite.isPending}
+                            >
+                              {resendInvite.isPending ? "Resending..." : "Resend invite"}
+                            </Button>
+                          )}
+                          <Separator orientation="vertical" className="hidden md:block h-6" />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label="Delete"
+                            className="text-rose-600 hover:text-rose-700"
+                            onClick={() => removeMember.mutate(member.id)}
+                            disabled={removeMember.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
                           </Button>
-                        )}
-                        <Separator orientation="vertical" className="hidden md:block h-6" />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label="Delete"
-                          className="text-rose-600 hover:text-rose-700"
-                          onClick={() => removeMember.mutate(member.id)}
-                          disabled={removeMember.isPending}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        </div>
                       </div>
-                    </div>
                     </StaggeredItem>
                   );
                 })}

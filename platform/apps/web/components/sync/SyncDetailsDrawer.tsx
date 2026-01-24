@@ -21,7 +21,8 @@ interface SyncDetailsDrawerProps {
 }
 
 export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps) {
-  const { status, manualSync, clearQueue, retryConflict, discardConflict, refresh } = useSyncStatus();
+  const { status, manualSync, clearQueue, retryConflict, discardConflict, refresh } =
+    useSyncStatus();
   const [syncing, setSyncing] = useState(false);
 
   const handleManualSync = async () => {
@@ -75,9 +76,7 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Sync Status</SheetTitle>
-          <SheetDescription>
-            View and manage offline sync queue
-          </SheetDescription>
+          <SheetDescription>View and manage offline sync queue</SheetDescription>
         </SheetHeader>
 
         <div className="mt-6 space-y-6">
@@ -106,8 +105,18 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
             >
               {syncing || status.isSyncing ? (
                 <>
-                  <svg className="h-4 w-4 mr-2 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56" strokeLinecap="round" strokeLinejoin="round" />
+                  <svg
+                    className="h-4 w-4 mr-2 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      d="M21 12a9 9 0 1 1-6.219-8.56"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                   Syncing...
                 </>
@@ -165,7 +174,9 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
 
                     {queue.conflicts > 0 && (
                       <div className="pt-2 border-t border-border">
-                        <div className="text-xs font-medium text-foreground mb-2">Conflicts require attention:</div>
+                        <div className="text-xs font-medium text-foreground mb-2">
+                          Conflicts require attention:
+                        </div>
                         <div className="flex gap-2">
                           <Button
                             size="sm"
@@ -173,16 +184,16 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
                             onClick={() => {
                               // For now, we'll retry all conflicts in the queue
                               // In a real implementation, you'd need item IDs
-                              window.dispatchEvent(new CustomEvent("campreserv:retry-conflicts", { detail: { queueKey: queue.key } }));
+                              window.dispatchEvent(
+                                new CustomEvent("campreserv:retry-conflicts", {
+                                  detail: { queueKey: queue.key },
+                                }),
+                              );
                             }}
                           >
                             Retry All
                           </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => clearQueue(queue.key)}
-                          >
+                          <Button size="sm" variant="outline" onClick={() => clearQueue(queue.key)}>
                             Discard All
                           </Button>
                         </div>
@@ -200,9 +211,7 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
                 <Check className="h-10 w-10 text-emerald-600" />
               </div>
               <div className="text-sm font-medium text-foreground">All caught up!</div>
-              <div className="text-xs text-muted-foreground mt-1">
-                No pending changes to sync
-              </div>
+              <div className="text-xs text-muted-foreground mt-1">No pending changes to sync</div>
             </div>
           )}
 
@@ -210,8 +219,18 @@ export function SyncDetailsDrawer({ open, onOpenChange }: SyncDetailsDrawerProps
           {!status.isOnline && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
               <div className="flex items-start gap-2">
-                <svg className="h-5 w-5 text-amber-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" strokeLinecap="round" strokeLinejoin="round" />
+                <svg
+                  className="h-5 w-5 text-amber-600 flex-shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                   <path d="M12 9v4M12 17h.01" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 <div className="text-sm text-amber-900">

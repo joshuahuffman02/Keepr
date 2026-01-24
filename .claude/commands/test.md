@@ -13,26 +13,31 @@ $ARGUMENTS
 ### API Tests
 
 **All API tests:**
+
 ```bash
 pnpm test:api
 ```
 
 **Smoke tests only (fast):**
+
 ```bash
 pnpm --dir platform/apps/api test:smoke
 ```
 
 **Specific test file:**
+
 ```bash
 pnpm test:api:path platform/apps/api/src/__tests__/[test-file].spec.ts
 ```
 
 **Watch mode:**
+
 ```bash
 pnpm --dir platform/apps/api test:watch
 ```
 
 **With coverage:**
+
 ```bash
 pnpm --dir platform/apps/api test:cov
 ```
@@ -40,16 +45,19 @@ pnpm --dir platform/apps/api test:cov
 ### Web Tests
 
 **Unit tests (Vitest):**
+
 ```bash
 pnpm --dir platform/apps/web test
 ```
 
 **With UI:**
+
 ```bash
 pnpm --dir platform/apps/web test:ui
 ```
 
 **E2E tests (Playwright):**
+
 ```bash
 pnpm --dir platform/apps/web test:e2e
 ```
@@ -68,8 +76,9 @@ pnpm ci:sdk
 ## Writing Tests
 
 ### API Test Pattern
+
 ```typescript
-describe('FeatureController', () => {
+describe("FeatureController", () => {
   let app: INestApplication;
 
   beforeAll(async () => {
@@ -81,15 +90,14 @@ describe('FeatureController', () => {
     await app.init();
   });
 
-  it('should do something', async () => {
-    const response = await request(app.getHttpServer())
-      .get('/endpoint')
-      .expect(200);
+  it("should do something", async () => {
+    const response = await request(app.getHttpServer()).get("/endpoint").expect(200);
   });
 });
 ```
 
 ### Web Test Pattern
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 
@@ -104,6 +112,7 @@ describe('Component', () => {
 ## CI Pipeline
 
 Full CI check:
+
 ```bash
 pnpm ci
 ```

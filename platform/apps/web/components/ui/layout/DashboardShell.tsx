@@ -127,7 +127,15 @@ type NavSection = {
 
 const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
   const stroke = active ? "hsl(var(--action-primary))" : "hsl(var(--muted-foreground))";
-  const common = { width: 20, height: 20, strokeWidth: 1.6, stroke, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } satisfies SVGProps<SVGSVGElement>;
+  const common = {
+    width: 20,
+    height: 20,
+    strokeWidth: 1.6,
+    stroke,
+    fill: "none",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+  } satisfies SVGProps<SVGSVGElement>;
   switch (name) {
     case "dashboard":
       return (
@@ -341,11 +349,19 @@ export interface DashboardShellProps {
   density?: DashboardDensity;
 }
 
-export function DashboardShell({ children, className, title, subtitle, density = "normal" }: DashboardShellProps) {
+export function DashboardShell({
+  children,
+  className,
+  title,
+  subtitle,
+  density = "normal",
+}: DashboardShellProps) {
   const { data: session } = useSession();
   const { data: whoami } = useWhoami();
   const { setSelectedCampground } = useCampground();
-  const [campgrounds, setCampgrounds] = useState<{ id: string; name: string; organizationId?: string }[]>([]);
+  const [campgrounds, setCampgrounds] = useState<
+    { id: string; name: string; organizationId?: string }[]
+  >([]);
   const [campgroundsLoading, setCampgroundsLoading] = useState(true);
   const [campgroundsError, setCampgroundsError] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | "">("");
@@ -380,7 +396,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Handle drag end for reordering pinned pages
@@ -398,7 +414,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
         }
       }
     },
-    [pinnedPages, reorderPages]
+    [pinnedPages, reorderPages],
   );
 
   // Sync collapsed state from server
@@ -416,26 +432,22 @@ export function DashboardShell({ children, className, title, subtitle, density =
   const hasCampgroundAccess = memberships.length > 0;
   const platformRole = whoami?.user?.platformRole ?? null;
   const supportAllowed =
-    whoami?.allowed?.supportRead || whoami?.allowed?.supportAssign || whoami?.allowed?.supportAnalytics;
+    whoami?.allowed?.supportRead ||
+    whoami?.allowed?.supportAssign ||
+    whoami?.allowed?.supportAnalytics;
   const allowSupport = !!supportAllowed && (platformRole ? true : hasCampgroundAccess);
-  const allowOps = (whoami?.allowed?.operationsWrite ?? false) && (platformRole ? true : hasCampgroundAccess);
+  const allowOps =
+    (whoami?.allowed?.operationsWrite ?? false) && (platformRole ? true : hasCampgroundAccess);
 
   // Role-based visibility for nav sections
   const allowed = whoami?.allowed;
   // Check for manager-level or higher permissions (financeRead, reportsRead, or any write permission)
   const isManager = Boolean(
-    platformRole ||
-    allowed?.financeRead ||
-    allowed?.reportsRead ||
-    allowed?.usersWrite ||
-    allowOps
+    platformRole || allowed?.financeRead || allowed?.reportsRead || allowed?.usersWrite || allowOps,
   );
   // Check for admin-level permissions (settings access)
   const isAdmin = Boolean(
-    platformRole ||
-    allowed?.settingsWrite ||
-    allowed?.usersWrite ||
-    allowed?.pricingWrite
+    platformRole || allowed?.settingsWrite || allowed?.usersWrite || allowed?.pricingWrite,
   );
 
   // Sync API token from session to localStorage
@@ -463,7 +475,9 @@ export function DashboardShell({ children, className, title, subtitle, density =
       if (stored) setSelected(stored);
       if (storedOrg) setSelectedOrg(storedOrg);
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
-      const headers: Record<string, string> = authToken ? { Authorization: `Bearer ${authToken}` } : {};
+      const headers: Record<string, string> = authToken
+        ? { Authorization: `Bearer ${authToken}` }
+        : {};
       const resp = await fetch(`${apiBase}/campgrounds`, { headers });
       if (!resp.ok) {
         throw new Error(`Failed to load campgrounds: ${resp.status}`);
@@ -471,12 +485,9 @@ export function DashboardShell({ children, className, title, subtitle, density =
       const data = await resp.json();
       if (Array.isArray(data)) {
         // If the user has memberships, only show those campgrounds.
-        const membershipIds =
-          whoami?.user?.memberships?.map((m) => m.campgroundId) ?? [];
+        const membershipIds = whoami?.user?.memberships?.map((m) => m.campgroundId) ?? [];
         const filtered =
-          membershipIds.length > 0
-            ? data.filter((cg) => membershipIds.includes(cg.id))
-            : data;
+          membershipIds.length > 0 ? data.filter((cg) => membershipIds.includes(cg.id)) : data;
 
         setCampgrounds(filtered);
 
@@ -541,8 +552,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
     if (!selected) return;
     localStorage.setItem("campreserv:selectedCampground", selected);
     // Sync with CampgroundContext so other components can access it
-    const campground = campgrounds.find(c => c.id === selected);
-    setSelectedCampground(campground ? { id: campground.id, name: campground.name } : { id: selected });
+    const campground = campgrounds.find((c) => c.id === selected);
+    setSelectedCampground(
+      campground ? { id: campground.id, name: campground.name } : { id: selected },
+    );
   }, [selected, campgrounds, setSelectedCampground]);
   useEffect(() => {
     if (!selectedOrg) return;
@@ -556,36 +569,76 @@ export function DashboardShell({ children, className, title, subtitle, density =
   const cgReservationsPath = selected ? `/campgrounds/${selected}/reservations` : "/reservations";
   const cgMapPath = selected ? `/campgrounds/${selected}/map` : "/campgrounds";
   // Operations items for top bar quick actions (moved from sidebar)
-  const operationsItems = useMemo<NavItem[]>(() => [
-    { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
-    { label: "New Booking", href: "/booking", icon: "plus" },
-    { label: "POS", href: "/pos", icon: "payments" },
-    { label: "Waitlist", href: "/waitlist", icon: "clock" },
-    { label: "Maintenance", href: "/maintenance", icon: "wrench" },
-    { label: "Housekeeping", href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds", icon: "wrench" }
-  ], [selected]);
+  const operationsItems = useMemo<NavItem[]>(
+    () => [
+      { label: "Check In/Out", href: "/check-in-out", icon: "reservation" },
+      { label: "New Booking", href: "/booking", icon: "plus" },
+      { label: "POS", href: "/pos", icon: "payments" },
+      { label: "Waitlist", href: "/waitlist", icon: "clock" },
+      { label: "Maintenance", href: "/maintenance", icon: "wrench" },
+      {
+        label: "Housekeeping",
+        href: selected ? `/campgrounds/${selected}/housekeeping` : "/campgrounds",
+        icon: "wrench",
+      },
+    ],
+    [selected],
+  );
 
   const navSections = useMemo(() => {
     // PRIMARY - Core daily operations (no accordion, always visible)
     const primaryItems: NavItem[] = [
       { label: "Dashboard", href: "/dashboard", icon: "dashboard", dataTour: "dashboard-link" },
       { label: "Calendar", href: "/calendar", icon: "calendar", dataTour: "calendar-link" },
-      { label: "Site Map", href: cgMapPath, icon: "camp", tooltip: "View and manage the campground map" },
-      { label: "Reservations", href: cgReservationsPath, icon: "reservation", dataTour: "reservations-link" },
+      {
+        label: "Site Map",
+        href: cgMapPath,
+        icon: "camp",
+        tooltip: "View and manage the campground map",
+      },
+      {
+        label: "Reservations",
+        href: cgReservationsPath,
+        icon: "reservation",
+        dataTour: "reservations-link",
+      },
       { label: "Guests", href: "/guests", icon: "guest", dataTour: "guests-link" },
-      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages, dataTour: "messages-link" },
+      {
+        label: "Messages",
+        href: "/messages",
+        icon: "message",
+        badge: unreadMessages,
+        dataTour: "messages-link",
+      },
       { label: "Reports", href: "/reports", icon: "reports", dataTour: "reports-link" },
-      { label: "Gamification", href: "/gamification", icon: "trophy", tooltip: "Staff leaderboards and rewards", dataTour: "gamification-link" }
+      {
+        label: "Gamification",
+        href: "/gamification",
+        icon: "trophy",
+        tooltip: "Staff leaderboards and rewards",
+        dataTour: "gamification-link",
+      },
     ];
 
     // Add Management link for managers (simplified - links to hub page)
     if (isManager) {
-      primaryItems.push({ label: "Management", href: "/dashboard/management", icon: "wrench", tooltip: "Inventory, finance, and operations" });
+      primaryItems.push({
+        label: "Management",
+        href: "/dashboard/management",
+        icon: "wrench",
+        tooltip: "Inventory, finance, and operations",
+      });
     }
 
     // Add Settings link for admins (simplified - links to hub page)
     if (isAdmin) {
-      primaryItems.push({ label: "Settings", href: "/dashboard/settings", icon: "policy", tooltip: "All settings and configuration", dataTour: "settings-link" });
+      primaryItems.push({
+        label: "Settings",
+        href: "/dashboard/settings",
+        icon: "policy",
+        tooltip: "All settings and configuration",
+        dataTour: "settings-link",
+      });
     }
 
     // NOTE: Operations items moved to top bar
@@ -596,8 +649,8 @@ export function DashboardShell({ children, className, title, subtitle, density =
         heading: "Primary",
         items: primaryItems,
         collapsible: false,
-        defaultOpen: true
-      }
+        defaultOpen: true,
+      },
     ];
 
     return sections;
@@ -609,14 +662,22 @@ export function DashboardShell({ children, className, title, subtitle, density =
       { label: "New Booking", href: "/booking", icon: "plus" },
       { label: "Calendar", href: "/calendar", icon: "calendar" },
       { label: "POS", href: "/pos", icon: "payments" },
-      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages }
+      { label: "Messages", href: "/messages", icon: "message", badge: unreadMessages },
     ];
 
     if (allowOps && selected) {
       items.push(
         { label: "Timeclock", href: `/campgrounds/${selected}/staff/timeclock`, icon: "clock" },
-        { label: "Shift Approvals", href: `/campgrounds/${selected}/staff/approvals`, icon: "users" },
-        { label: "Override Requests", href: `/campgrounds/${selected}/staff/overrides`, icon: "alert" }
+        {
+          label: "Shift Approvals",
+          href: `/campgrounds/${selected}/staff/approvals`,
+          icon: "users",
+        },
+        {
+          label: "Override Requests",
+          href: `/campgrounds/${selected}/staff/overrides`,
+          icon: "alert",
+        },
       );
     }
 
@@ -626,7 +687,8 @@ export function DashboardShell({ children, className, title, subtitle, density =
   const toggleSection = useCallback(
     (heading: string) => {
       setOpenSections((prev) => {
-        const current = prev[heading] ?? navSections.find((s) => s.heading === heading)?.defaultOpen ?? false;
+        const current =
+          prev[heading] ?? navSections.find((s) => s.heading === heading)?.defaultOpen ?? false;
         const next: Record<string, boolean> = {};
         navSections.forEach((section) => {
           next[section.heading] = section.heading === heading ? !current : false;
@@ -634,7 +696,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
         return next;
       });
     },
-    [navSections]
+    [navSections],
   );
 
   // Flatten all nav items for lookup
@@ -656,19 +718,17 @@ export function DashboardShell({ children, className, title, subtitle, density =
 
   // Build favorites items from pinned pages (from hook)
   const favoritesItems = useMemo(() => {
-    const savedReports = typeof window === "undefined"
-      ? []
-      : listSavedReports(selected || null);
+    const savedReports = typeof window === "undefined" ? [] : listSavedReports(selected || null);
     const savedReportMap = new Map(
       savedReports.map((report) => [
         buildReportHrefV2({
           tab: report.tab,
           subTab: report.subTab ?? null,
           dateRange: report.dateRange,
-          filters: report.filters
+          filters: report.filters,
         }),
-        report
-      ])
+        report,
+      ]),
     );
     const titleCase = (value: string) =>
       value.replace(/-/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
@@ -678,81 +738,92 @@ export function DashboardShell({ children, className, title, subtitle, density =
       return titleCase(decodeURIComponent(last));
     };
 
-    return pinnedPages
-      .map((href) => {
-        // First check allNavItems for exact match
-        const navItem = allNavItems.get(href);
-        if (navItem) return navItem;
+    return pinnedPages.map((href) => {
+      // First check allNavItems for exact match
+      const navItem = allNavItems.get(href);
+      if (navItem) return navItem;
 
-        // Then check page registry for the page definition
-        const pageDef = allPages.find((p) => p.href === href);
-        if (pageDef) {
-          return {
-            label: pageDef.label,
-            href: pageDef.href,
-            icon: pageDef.icon,
-            tooltip: pageDef.description,
-          };
-        }
-
-        const savedReport = savedReportMap.get(href);
-        if (savedReport) {
-          return {
-            label: savedReport.name,
-            href,
-            icon: "reports",
-            tooltip: savedReport.description ?? "Saved report"
-          };
-        }
-
+      // Then check page registry for the page definition
+      const pageDef = allPages.find((p) => p.href === href);
+      if (pageDef) {
         return {
-          label: formatFallbackLabel(href),
-          href,
-          icon: "star",
-          tooltip: href
+          label: pageDef.label,
+          href: pageDef.href,
+          icon: pageDef.icon,
+          tooltip: pageDef.description,
         };
-      });
+      }
+
+      const savedReport = savedReportMap.get(href);
+      if (savedReport) {
+        return {
+          label: savedReport.name,
+          href,
+          icon: "reports",
+          tooltip: savedReport.description ?? "Saved report",
+        };
+      }
+
+      return {
+        label: formatFallbackLabel(href),
+        href,
+        icon: "star",
+        tooltip: href,
+      };
+    });
   }, [pinnedPages, allNavItems, allPages, selected]);
 
-  const toCommandItem = useCallback((item: NavItem, subtitle?: string): CommandItem => ({
-    id: item.href,
-    label: item.label,
-    href: item.href,
-    subtitle: subtitle ?? item.tooltip ?? item.href
-  }), []);
+  const toCommandItem = useCallback(
+    (item: NavItem, subtitle?: string): CommandItem => ({
+      id: item.href,
+      label: item.label,
+      href: item.href,
+      subtitle: subtitle ?? item.tooltip ?? item.href,
+    }),
+    [],
+  );
 
   const navigationCommandItems = useMemo(
     () => navSections.flatMap((section) => section.items.map((item) => toCommandItem(item))),
-    [navSections, toCommandItem]
+    [navSections, toCommandItem],
   );
 
   const actionCommandItems = useMemo(
     () => operationsItems.map((item) => toCommandItem(item, "Quick action")),
-    [operationsItems, toCommandItem]
+    [operationsItems, toCommandItem],
   );
 
   const favoriteCommandItems = useMemo(
     () => favoritesItems.map((item) => toCommandItem(item, "Pinned")),
-    [favoritesItems, toCommandItem]
+    [favoritesItems, toCommandItem],
   );
 
   // Build command items from all pages for search
   const allPagesCommandItems = useMemo(
-    () => allPages.map((page) => ({
-      id: page.href,
-      label: page.label,
-      href: page.href,
-      subtitle: page.description,
-    })),
-    [allPages]
+    () =>
+      allPages.map((page) => ({
+        id: page.href,
+        label: page.label,
+        href: page.href,
+        subtitle: page.description,
+      })),
+    [allPages],
   );
 
-  const PinButton = ({ pinned, onClick }: { pinned: boolean; onClick: (e: React.MouseEvent) => void }) => (
+  const PinButton = ({
+    pinned,
+    onClick,
+  }: {
+    pinned: boolean;
+    onClick: (e: React.MouseEvent) => void;
+  }) => (
     <button
       type="button"
       className={cn(
         "ml-2 inline-flex h-7 w-7 items-center justify-center rounded border text-muted-foreground hover:text-foreground transition-colors",
-        pinned ? "border-amber-200 bg-amber-50 text-amber-700" : "border-border bg-muted/60 hover:bg-muted"
+        pinned
+          ? "border-amber-200 bg-amber-50 text-amber-700"
+          : "border-border bg-muted/60 hover:bg-muted",
       )}
       aria-label={pinned ? "Unpin from menu" : "Pin to menu"}
       title={pinned ? "Unpin from menu" : "Pin to menu"}
@@ -771,20 +842,20 @@ export function DashboardShell({ children, className, title, subtitle, density =
   );
 
   // Sortable favorite item component for drag-and-drop reordering
-  const SortableFavoriteItem = ({ item, isActive, isCollapsed, showPin }: {
+  const SortableFavoriteItem = ({
+    item,
+    isActive,
+    isCollapsed,
+    showPin,
+  }: {
     item: NavItem;
     isActive: boolean;
     isCollapsed: boolean;
     showPin: boolean;
   }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-      isDragging,
-    } = useSortable({ id: item.href });
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+      id: item.href,
+    });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -798,7 +869,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
           className={cn(
             "flex items-center justify-between rounded-xl px-3 h-11 text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors",
             isActive && "bg-muted text-foreground font-semibold",
-            isDragging && "z-50"
+            isDragging && "z-50",
           )}
           href={item.href}
           aria-current={isActive ? "page" : undefined}
@@ -887,20 +958,20 @@ export function DashboardShell({ children, className, title, subtitle, density =
       <div
         className={cn(
           "fixed inset-0 z-40 md:hidden transition",
-          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
+          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
       >
         <div
           className={cn(
             "absolute inset-0 bg-black/20 backdrop-blur-sm transition-opacity",
-            mobileNavOpen ? "opacity-100" : "opacity-0"
+            mobileNavOpen ? "opacity-100" : "opacity-0",
           )}
           onClick={() => setMobileNavOpen(false)}
         />
         <div
           className={cn(
             "absolute top-0 left-0 h-full w-[78vw] max-w-sm bg-card text-foreground border-r border-border shadow-2xl transition-transform duration-200 ease-out",
-            mobileNavOpen ? "translate-x-0" : "-translate-x-full"
+            mobileNavOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <div className="px-4 py-4 border-b border-border flex items-center justify-between">
@@ -913,14 +984,25 @@ export function DashboardShell({ children, className, title, subtitle, density =
               className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               aria-label="Close navigation"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M6 18 18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
           <div className="h-full overflow-y-auto px-4 py-5 space-y-5">
             <div className="space-y-2">
-              <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Menu</div>
+              <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+                Menu
+              </div>
               {favoritesItems.length === 0 ? (
                 <div className="px-3 py-4 text-sm text-muted-foreground">
                   No pages pinned yet. Use "Customize Menu" below to add pages.
@@ -929,7 +1011,8 @@ export function DashboardShell({ children, className, title, subtitle, density =
                 <div className="space-y-2">
                   {favoritesItems.map((item) => {
                     const baseHref = item.href.split(/[?#]/)[0];
-                    const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
+                    const isActive =
+                      currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                     return (
                       <Link
                         key={`m-fav-${item.href}`}
@@ -940,7 +1023,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
                           "flex items-center gap-3 rounded-xl px-3 h-11 text-[15px] font-medium transition-colors",
                           isActive
                             ? "bg-muted text-foreground font-semibold"
-                            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground",
                         )}
                         onClick={() => setMobileNavOpen(false)}
                       >
@@ -983,10 +1066,15 @@ export function DashboardShell({ children, className, title, subtitle, density =
         <aside
           className={cn(
             "hidden md:flex md:flex-col border-r border-border bg-card transition-all h-[calc(100vh-3.5rem)] sticky top-14",
-            collapsed ? "w-[72px] items-center" : "w-[280px]"
+            collapsed ? "w-[72px] items-center" : "w-[280px]",
           )}
         >
-          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-4" : "justify-end p-4")}>
+          <div
+            className={cn(
+              "w-full border-b border-border flex items-center",
+              collapsed ? "justify-center p-4" : "justify-end p-4",
+            )}
+          >
             <button
               className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               onClick={() => {
@@ -996,7 +1084,16 @@ export function DashboardShell({ children, className, title, subtitle, density =
               }}
               aria-label="Toggle sidebar"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 {collapsed ? <path d="M10 6l6 6-6 6" /> : <path d="M14 6l-6 6 6 6" />}
               </svg>
             </button>
@@ -1047,7 +1144,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
                     "rounded px-2 py-1 border text-xs transition-colors",
                     pinEditMode
                       ? "border-emerald-200 text-emerald-700 bg-emerald-50"
-                      : "border-border text-muted-foreground bg-muted/60 hover:bg-muted"
+                      : "border-border text-muted-foreground bg-muted/60 hover:bg-muted",
                   )}
                   onClick={() => setPinEditMode((v) => !v)}
                   aria-pressed={pinEditMode}
@@ -1066,7 +1163,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
               {favoritesItems.length === 0 && !collapsed && (
                 <div className="px-3 py-4 text-sm text-muted-foreground">
                   No pages pinned yet.{" "}
-                  <Link href="/all-pages" className="text-emerald-600 hover:text-emerald-700 hover:underline">
+                  <Link
+                    href="/all-pages"
+                    className="text-emerald-600 hover:text-emerald-700 hover:underline"
+                  >
                     Add pages
                   </Link>
                 </div>
@@ -1077,14 +1177,12 @@ export function DashboardShell({ children, className, title, subtitle, density =
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
                 >
-                  <SortableContext
-                    items={pinnedPages}
-                    strategy={verticalListSortingStrategy}
-                  >
+                  <SortableContext items={pinnedPages} strategy={verticalListSortingStrategy}>
                     <div className="space-y-2">
                       {favoritesItems.map((item) => {
                         const baseHref = item.href.split(/[?#]/)[0];
-                        const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
+                        const isActive =
+                          currentPath === baseHref || currentPath.startsWith(baseHref + "/");
                         return (
                           <SortableFavoriteItem
                             key={`fav-${item.href}`}
@@ -1100,8 +1198,6 @@ export function DashboardShell({ children, className, title, subtitle, density =
                 </DndContext>
               )}
             </div>
-
-
 
             {/* All Pages link */}
             {!collapsed && (
@@ -1130,10 +1226,12 @@ export function DashboardShell({ children, className, title, subtitle, density =
         </aside>
         <main className={cn("flex-1 min-w-0", className)}>
           <ErrorBoundary>
-            <div className={cn(
-              "mx-auto px-6 py-6 space-y-4",
-              density === "full" ? "max-w-none" : "max-w-7xl"
-            )}>
+            <div
+              className={cn(
+                "mx-auto px-6 py-6 space-y-4",
+                density === "full" ? "max-w-none" : "max-w-7xl",
+              )}
+            >
               {title && <PageHeader title={title} subtitle={subtitle} className="mb-6" />}
               {children}
             </div>

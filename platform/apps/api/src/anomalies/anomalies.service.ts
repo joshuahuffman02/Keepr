@@ -37,9 +37,9 @@ interface MetricStats {
 
 // Z-score thresholds for anomaly detection
 const SEVERITY_THRESHOLDS = {
-  low: 1.5,      // 1.5 standard deviations
-  medium: 2.0,   // 2.0 standard deviations
-  high: 2.5,     // 2.5 standard deviations
+  low: 1.5, // 1.5 standard deviations
+  medium: 2.0, // 2.0 standard deviations
+  high: 2.5, // 2.5 standard deviations
   critical: 3.0, // 3.0 standard deviations
 };
 
@@ -58,26 +58,21 @@ export class AnomaliesService {
 
     try {
       // Run all checks in parallel
-      const [
-        occupancyAlerts,
-        revenueAlerts,
-        cancellationAlerts,
-        bookingAlerts,
-        adrAlerts,
-      ] = await Promise.all([
-        this.checkOccupancy(campgroundId),
-        this.checkRevenue(campgroundId),
-        this.checkCancellations(campgroundId),
-        this.checkBookingVolume(campgroundId),
-        this.checkADR(campgroundId),
-      ]);
+      const [occupancyAlerts, revenueAlerts, cancellationAlerts, bookingAlerts, adrAlerts] =
+        await Promise.all([
+          this.checkOccupancy(campgroundId),
+          this.checkRevenue(campgroundId),
+          this.checkCancellations(campgroundId),
+          this.checkBookingVolume(campgroundId),
+          this.checkADR(campgroundId),
+        ]);
 
       alerts.push(
         ...occupancyAlerts,
         ...revenueAlerts,
         ...cancellationAlerts,
         ...bookingAlerts,
-        ...adrAlerts
+        ...adrAlerts,
       );
     } catch (error) {
       this.logger.error(`Anomaly check failed for ${campgroundId}:`, error);

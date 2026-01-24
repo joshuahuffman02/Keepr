@@ -68,9 +68,8 @@ export class RevenueIntelligenceService {
 
     const totalRevenue = currentPeriod._sum.totalAmount || 0;
     const previousRevenue = previousPeriod._sum.totalAmount || 0;
-    const yoyGrowth = previousRevenue > 0
-      ? ((totalRevenue - previousRevenue) / previousRevenue) * 100
-      : null;
+    const yoyGrowth =
+      previousRevenue > 0 ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 : null;
 
     return {
       totalRevenue,
@@ -130,7 +129,7 @@ export class RevenueIntelligenceService {
       const type = res.Site?.siteType || "unknown";
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
 
       if (!byType[type]) {
@@ -143,13 +142,15 @@ export class RevenueIntelligenceService {
       totalRevenue += res.totalAmount || 0;
     }
 
-    return Object.entries(byType).map(([type, data]) => ({
-      type,
-      revenue: data.revenue,
-      reservations: data.count,
-      percentage: totalRevenue > 0 ? (data.revenue / totalRevenue) * 100 : 0,
-      adr: data.totalNights > 0 ? data.revenue / data.totalNights : 0,
-    })).sort((a, b) => b.revenue - a.revenue);
+    return Object.entries(byType)
+      .map(([type, data]) => ({
+        type,
+        revenue: data.revenue,
+        reservations: data.count,
+        percentage: totalRevenue > 0 ? (data.revenue / totalRevenue) * 100 : 0,
+        adr: data.totalNights > 0 ? data.revenue / data.totalNights : 0,
+      }))
+      .sort((a, b) => b.revenue - a.revenue);
   }
 
   /**
@@ -178,7 +179,7 @@ export class RevenueIntelligenceService {
       const monthKey = res.createdAt.toISOString().slice(0, 7); // YYYY-MM
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
 
       if (!byMonth[monthKey]) {

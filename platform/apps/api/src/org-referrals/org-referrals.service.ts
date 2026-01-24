@@ -15,7 +15,7 @@ export class OrgReferralsService {
   async getOrCreateReferralCode(organizationId: string): Promise<string> {
     const org = await this.prisma.organization.findUnique({
       where: { id: organizationId },
-      select: { referralCode: true, name: true }
+      select: { referralCode: true, name: true },
     });
 
     if (!org) {
@@ -39,7 +39,7 @@ export class OrgReferralsService {
 
     await this.prisma.organization.update({
       where: { id: organizationId },
-      data: { referralCode: code }
+      data: { referralCode: code },
     });
 
     return code;
@@ -51,7 +51,7 @@ export class OrgReferralsService {
   async getReferralStats(organizationId: string) {
     const org = await this.prisma.organization.findUnique({
       where: { id: organizationId },
-      select: { referralCode: true, referralCredits: true }
+      select: { referralCode: true, referralCredits: true },
     });
 
     if (!org) {
@@ -65,14 +65,14 @@ export class OrgReferralsService {
     const referrals = await this.prisma.orgReferral.groupBy({
       by: ["status"],
       where: { referrerOrgId: organizationId },
-      _count: { status: true }
+      _count: { status: true },
     });
 
     const counts: Record<OrgReferralStatus, number> = {
       clicked: 0,
       signed_up: 0,
       converted: 0,
-      credited: 0
+      credited: 0,
     };
 
     for (const r of referrals) {
@@ -83,8 +83,8 @@ export class OrgReferralsService {
     const pendingReferrals = await this.prisma.orgReferral.count({
       where: {
         referrerOrgId: organizationId,
-        status: OrgReferralStatus.converted
-      }
+        status: OrgReferralStatus.converted,
+      },
     });
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keeprstay.com";
@@ -97,8 +97,8 @@ export class OrgReferralsService {
         totalSignups: counts.signed_up + counts.converted + counts.credited,
         totalConversions: counts.converted + counts.credited,
         pendingCredits: pendingReferrals * (CREDIT_AMOUNT_CENTS / 100),
-        earnedCredits: org.referralCredits / 100
-      }
+        earnedCredits: org.referralCredits / 100,
+      },
     };
   }
 
@@ -120,9 +120,9 @@ export class OrgReferralsService {
         creditedAt: true,
         createdAt: true,
         Organization_OrgReferral_referredOrgIdToOrganization: {
-          select: { name: true }
-        }
-      }
+          select: { name: true },
+        },
+      },
     });
 
     return referrals.map((r) => ({
@@ -132,7 +132,7 @@ export class OrgReferralsService {
       status: r.status,
       creditAmount: r.creditAmountCents / 100,
       createdAt: r.clickedAt.toISOString(),
-      convertedAt: r.convertedAt?.toISOString()
+      convertedAt: r.convertedAt?.toISOString(),
     }));
   }
 
@@ -147,10 +147,10 @@ export class OrgReferralsService {
       utmCampaign?: string;
       ipAddress?: string;
       userAgent?: string;
-    }
+    },
   ) {
     const referrerOrg = await this.prisma.organization.findFirst({
-      where: { referralCode }
+      where: { referralCode },
     });
 
     if (!referrerOrg) {
@@ -166,7 +166,7 @@ export class OrgReferralsService {
         status: OrgReferralStatus.clicked,
         ...metadata,
         updatedAt: new Date(),
-      }
+      },
     });
 
     return { id: referral.id, referralCode };
@@ -180,15 +180,15 @@ export class OrgReferralsService {
     const referral = await this.prisma.orgReferral.findFirst({
       where: {
         referralCode,
-        status: OrgReferralStatus.clicked
+        status: OrgReferralStatus.clicked,
       },
-      orderBy: { clickedAt: "desc" }
+      orderBy: { clickedAt: "desc" },
     });
 
     if (!referral) {
       // Create a new referral entry if no click was tracked
       const referrerOrg = await this.prisma.organization.findFirst({
-        where: { referralCode }
+        where: { referralCode },
       });
 
       if (!referrerOrg) {
@@ -205,7 +205,7 @@ export class OrgReferralsService {
           status: OrgReferralStatus.signed_up,
           signedUpAt: new Date(),
           updatedAt: new Date(),
-        }
+        },
       });
     } else {
       // Update existing click record
@@ -217,7 +217,7 @@ export class OrgReferralsService {
           status: OrgReferralStatus.signed_up,
           signedUpAt: new Date(),
           updatedAt: new Date(),
-        }
+        },
       });
     }
 
@@ -231,8 +231,8 @@ export class OrgReferralsService {
     const referral = await this.prisma.orgReferral.findFirst({
       where: {
         referredOrgId,
-        status: OrgReferralStatus.signed_up
-      }
+        status: OrgReferralStatus.signed_up,
+      },
     });
 
     if (!referral) {
@@ -246,7 +246,7 @@ export class OrgReferralsService {
         status: OrgReferralStatus.converted,
         convertedAt: new Date(),
         updatedAt: new Date(),
-      }
+      },
     });
 
     return { converted: true, referralId: referral.id };
@@ -262,8 +262,8 @@ export class OrgReferralsService {
         status: true,
         referrerOrgId: true,
         referredOrgId: true,
-        creditAmountCents: true
-      }
+        creditAmountCents: true,
+      },
     });
 
     if (!referral || referral.status !== OrgReferralStatus.converted) {
@@ -276,8 +276,8 @@ export class OrgReferralsService {
       this.prisma.organization.update({
         where: { id: referral.referrerOrgId },
         data: {
-          referralCredits: { increment: referral.creditAmountCents }
-        }
+          referralCredits: { increment: referral.creditAmountCents },
+        },
       }),
       // Credit to referred (if exists)
       ...(referral.referredOrgId
@@ -285,9 +285,9 @@ export class OrgReferralsService {
             this.prisma.organization.update({
               where: { id: referral.referredOrgId },
               data: {
-                referralCredits: { increment: referral.creditAmountCents }
-              }
-            })
+                referralCredits: { increment: referral.creditAmountCents },
+              },
+            }),
           ]
         : []),
       // Mark referral as credited
@@ -297,8 +297,8 @@ export class OrgReferralsService {
           status: OrgReferralStatus.credited,
           creditedAt: new Date(),
           updatedAt: new Date(),
-        }
-      })
+        },
+      }),
     ]);
 
     return { success: true, creditAmount: referral.creditAmountCents / 100 };

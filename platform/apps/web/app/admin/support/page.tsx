@@ -6,7 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -59,7 +65,7 @@ const statusColor: Record<string, string> = {
   triage: "bg-status-warning/15 text-status-warning border-status-warning/30",
   in_progress: "bg-status-info/15 text-status-info border-status-info/30",
   resolved: "bg-muted text-muted-foreground border-border",
-  closed: "bg-muted text-muted-foreground border-border"
+  closed: "bg-muted text-muted-foreground border-border",
 };
 
 const STATUS_FILTERS: Array<"all" | "new" | "triage" | "in_progress" | "resolved" | "closed"> = [
@@ -68,7 +74,7 @@ const STATUS_FILTERS: Array<"all" | "new" | "triage" | "in_progress" | "resolved
   "triage",
   "in_progress",
   "resolved",
-  "closed"
+  "closed",
 ];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -140,7 +146,7 @@ export default function SupportAdminPage() {
         const base = process.env.NEXT_PUBLIC_API_BASE || "";
         const res = await fetch(`${base}/campgrounds/${campgroundId}/members`, {
           credentials: "include",
-          headers: getAuthHeaders()
+          headers: getAuthHeaders(),
         });
         if (!res.ok) throw new Error(`Failed to load members (${res.status})`);
         const data = await res.json();
@@ -166,7 +172,9 @@ export default function SupportAdminPage() {
     const viewerRegion = user?.platformRegion ?? user?.region ?? null;
     const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
     const campgroundAllowed =
-      !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
+      !campgroundId ||
+      platformRole ||
+      user?.memberships?.some((m) => m.campgroundId === campgroundId);
 
     if (!allowSupport || !regionAllowed || !campgroundAllowed) {
       setReports([]);
@@ -183,7 +191,7 @@ export default function SupportAdminPage() {
         const qs = parts.length ? `?${parts.join("&")}` : "";
         const res = await fetch(`${base}/support/reports${qs}`, {
           credentials: "include",
-          headers: getAuthHeaders()
+          headers: getAuthHeaders(),
         });
         if (!res.ok) throw new Error(`Failed to load reports (${res.status})`);
         const data = await res.json();
@@ -204,7 +212,9 @@ export default function SupportAdminPage() {
     const viewerRegion = user?.platformRegion ?? user?.region ?? null;
     const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
     const campgroundAllowed =
-      !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
+      !campgroundId ||
+      platformRole ||
+      user?.memberships?.some((m) => m.campgroundId === campgroundId);
 
     if (!allowSupport || !regionAllowed || !campgroundAllowed) {
       setStaff([]);
@@ -222,7 +232,7 @@ export default function SupportAdminPage() {
         const qs = parts.length ? `?${parts.join("&")}` : "";
         const res = await fetch(`${base}/support/reports/staff/directory${qs}`, {
           credentials: "include",
-          headers: getAuthHeaders()
+          headers: getAuthHeaders(),
         });
         if (!res.ok) throw new Error(`Failed to load staff (${res.status})`);
         const data = await res.json();
@@ -242,13 +252,17 @@ export default function SupportAdminPage() {
   const newCount = reports.filter((r) => r.status === "new").length;
   const triageCount = reports.filter((r) => r.status === "triage").length;
   const inProgressCount = reports.filter((r) => r.status === "in_progress").length;
-  const resolvedCount = reports.filter((r) => r.status === "resolved" || r.status === "closed").length;
+  const resolvedCount = reports.filter(
+    (r) => r.status === "resolved" || r.status === "closed",
+  ).length;
 
   // Permission checks
   const user = whoami?.user;
   const regionAllowed = regionFilter === "all" || !user?.region || user?.region === regionFilter;
   const campgroundAllowed =
-    !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
+    !campgroundId ||
+    platformRole ||
+    user?.memberships?.some((m) => m.campgroundId === campgroundId);
   const canMutate = !!whoami && regionAllowed && campgroundAllowed && allowSupport;
   const canReadSupport = !!whoami && allowSupport && regionAllowed && campgroundAllowed;
   const openReports = reports.filter((r) => r.status !== "closed").length;
@@ -258,7 +272,10 @@ export default function SupportAdminPage() {
     .filter((r) => statusFilter === "all" || r.status === statusFilter)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const selected = useMemo(() => reports.find((r) => r.id === selectedId) || null, [reports, selectedId]);
+  const selected = useMemo(
+    () => reports.find((r) => r.id === selectedId) || null,
+    [reports, selectedId],
+  );
 
   if (!whoamiLoading && !allowSupport) {
     return (
@@ -273,7 +290,11 @@ export default function SupportAdminPage() {
 
   const updateStatus = async (id: string, status: string) => {
     if (!canMutate) {
-      toast({ title: "Out of scope", description: "You cannot update reports for this scope.", variant: "destructive" });
+      toast({
+        title: "Out of scope",
+        description: "You cannot update reports for this scope.",
+        variant: "destructive",
+      });
       return;
     }
     try {
@@ -282,19 +303,27 @@ export default function SupportAdminPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         credentials: "include",
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error(`Failed to update (${res.status})`);
       setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
       toast({ title: "Updated", description: `Status set to ${status}` });
     } catch (err: unknown) {
-      toast({ title: "Update failed", description: getErrorMessage(err, "Try again"), variant: "destructive" });
+      toast({
+        title: "Update failed",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      });
     }
   };
 
   const updateAssignee = async (id: string, assigneeId: string | null) => {
     if (!canMutate) {
-      toast({ title: "Out of scope", description: "You cannot reassign for this scope.", variant: "destructive" });
+      toast({
+        title: "Out of scope",
+        description: "You cannot reassign for this scope.",
+        variant: "destructive",
+      });
       return;
     }
     try {
@@ -303,7 +332,7 @@ export default function SupportAdminPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         credentials: "include",
-        body: JSON.stringify({ assigneeId })
+        body: JSON.stringify({ assigneeId }),
       });
       if (!res.ok) throw new Error(`Failed to update (${res.status})`);
       const member = staff.find((s) => s.id === assigneeId);
@@ -311,29 +340,38 @@ export default function SupportAdminPage() {
         prev.map((r) =>
           r.id === id
             ? {
-              ...r,
-              assignee: assigneeId
-                ? {
-                  id: assigneeId,
-                  email: member?.email || session?.user?.email || r.assignee?.email || "",
-                  firstName: member?.firstName ?? r.assignee?.firstName,
-                  lastName: member?.lastName ?? r.assignee?.lastName
-                }
-                : undefined
-            }
-            : r
-        )
+                ...r,
+                assignee: assigneeId
+                  ? {
+                      id: assigneeId,
+                      email: member?.email || session?.user?.email || r.assignee?.email || "",
+                      firstName: member?.firstName ?? r.assignee?.firstName,
+                      lastName: member?.lastName ?? r.assignee?.lastName,
+                    }
+                  : undefined,
+              }
+            : r,
+        ),
       );
-      toast({ title: assigneeId ? "Assigned" : "Unassigned", description: assigneeId ? "Assigned to user" : "Cleared" });
+      toast({
+        title: assigneeId ? "Assigned" : "Unassigned",
+        description: assigneeId ? "Assigned to user" : "Cleared",
+      });
     } catch (err: unknown) {
-      toast({ title: "Update failed", description: getErrorMessage(err, "Try again"), variant: "destructive" });
+      toast({
+        title: "Update failed",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      });
     }
   };
 
   return (
     <div className="w-full">
-      <div className="flex w-full flex-col gap-5 px-4 md:px-8 py-6 pb-24 md:pb-10" id="support-queue">
-
+      <div
+        className="flex w-full flex-col gap-5 px-4 md:px-8 py-6 pb-24 md:pb-10"
+        id="support-queue"
+      >
         {/* Header & Actions */}
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
@@ -341,7 +379,9 @@ export default function SupportAdminPage() {
               Support Desk <span className="text-[11px] text-indigo-600">Internal & Public</span>
             </div>
             <h1 className="mt-2 text-2xl font-semibold text-foreground">Support Reports</h1>
-            <p className="text-sm text-muted-foreground">Manage internal issues and public tickets in one place.</p>
+            <p className="text-sm text-muted-foreground">
+              Manage internal issues and public tickets in one place.
+            </p>
           </div>
 
           <div className="flex flex-col gap-2 items-end">
@@ -384,12 +424,22 @@ export default function SupportAdminPage() {
                 ))}
               </div>
 
-              <Button variant="secondary" size="sm" onClick={() => location.reload()} className="h-9">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => location.reload()}
+                className="h-9"
+              >
                 Refresh
               </Button>
             </div>
             <div className="text-xs text-muted-foreground">
-              Scope: {whoamiLoading ? "Loading..." : user ? `Region ${user.region ?? "Any"} • Campgrounds ${user.memberships?.length || 0}` : "Unavailable"}
+              Scope:{" "}
+              {whoamiLoading
+                ? "Loading..."
+                : user
+                  ? `Region ${user.region ?? "Any"} • Campgrounds ${user.memberships?.length || 0}`
+                  : "Unavailable"}
             </div>
           </div>
         </div>
@@ -432,8 +482,12 @@ export default function SupportAdminPage() {
             Scope fetch failed: {getErrorMessage(whoamiError, "Unknown error")}
           </div>
         )}
-        {loading && <div className="p-12 text-center text-muted-foreground">Loading reports...</div>}
-        {error && <div className="p-4 text-rose-600 bg-rose-50 rounded border border-rose-100">{error}</div>}
+        {loading && (
+          <div className="p-12 text-center text-muted-foreground">Loading reports...</div>
+        )}
+        {error && (
+          <div className="p-4 text-rose-600 bg-rose-50 rounded border border-rose-100">{error}</div>
+        )}
 
         {!loading && !error && filtered.length === 0 && (
           <div className="p-12 text-center text-muted-foreground bg-card rounded-lg border border-border border-dashed">
@@ -448,55 +502,104 @@ export default function SupportAdminPage() {
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Source</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground w-1/3">Description</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Author</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Assignee</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Created</th>
-                    <th className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Source
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground w-1/3">
+                      Description
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Author
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Assignee
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Created
+                    </th>
+                    <th className="px-4 py-3 text-end text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filtered.map((r) => (
                     <tr key={r.id} className="bg-card hover:bg-muted transition-colors">
                       <td className="px-4 py-3 align-top">
-                        <Badge className={`${statusColor[r.status] || "bg-muted text-muted-foreground"} border shadow-none font-medium capitalize`}>
+                        <Badge
+                          className={`${statusColor[r.status] || "bg-muted text-muted-foreground"} border shadow-none font-medium capitalize`}
+                        >
                           {r.status.replace("_", " ")}
                         </Badge>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <div className="flex flex-col gap-0.5">
                           {r.campground?.id === "global" ? (
-                            <Badge variant="outline" className="w-fit border-indigo-200 bg-indigo-50 text-indigo-700">Ticket</Badge>
+                            <Badge
+                              variant="outline"
+                              className="w-fit border-indigo-200 bg-indigo-50 text-indigo-700"
+                            >
+                              Ticket
+                            </Badge>
                           ) : (
-                            <Badge variant="outline" className="w-fit border-border text-muted-foreground">Report</Badge>
+                            <Badge
+                              variant="outline"
+                              className="w-fit border-border text-muted-foreground"
+                            >
+                              Report
+                            </Badge>
                           )}
                           <span className="text-[10px] text-muted-foreground font-medium truncate max-w-[120px]">
-                            {r.campground?.id === "global" ? "Global Feedback" : r.campground?.name || "Unknown"}
+                            {r.campground?.id === "global"
+                              ? "Global Feedback"
+                              : r.campground?.name || "Unknown"}
                           </span>
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <div className="space-y-1">
-                          <div className="text-sm font-medium text-foreground line-clamp-2" title={r.description}>{r.description}</div>
-                          {r.steps && <div className="text-xs text-muted-foreground line-clamp-1">Steps: {r.steps}</div>}
-                          {r.path && <code className="text-[10px] text-muted-foreground bg-muted px-1 py-0.5 rounded">{r.path}</code>}
+                          <div
+                            className="text-sm font-medium text-foreground line-clamp-2"
+                            title={r.description}
+                          >
+                            {r.description}
+                          </div>
+                          {r.steps && (
+                            <div className="text-xs text-muted-foreground line-clamp-1">
+                              Steps: {r.steps}
+                            </div>
+                          )}
+                          {r.path && (
+                            <code className="text-[10px] text-muted-foreground bg-muted px-1 py-0.5 rounded">
+                              {r.path}
+                            </code>
+                          )}
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         <div className="flex flex-col">
                           <span className="text-sm text-foreground font-medium">
-                            {r.author?.firstName ? `${r.author.firstName} ${r.author.lastName || ""}` : "Guest/Anon"}
+                            {r.author?.firstName
+                              ? `${r.author.firstName} ${r.author.lastName || ""}`
+                              : "Guest/Anon"}
                           </span>
-                          <span className="text-xs text-muted-foreground">{r.author?.email || r.contactEmail || "—"}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {r.author?.email || r.contactEmail || "—"}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-3 align-top">
                         {r.assignee ? (
                           <div className="flex items-center gap-2">
                             <div className="h-6 w-6 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-muted-foreground">
-                              {(r.assignee.firstName?.[0] || r.assignee.email?.[0] || "?").toUpperCase()}
+                              {(
+                                r.assignee.firstName?.[0] ||
+                                r.assignee.email?.[0] ||
+                                "?"
+                              ).toUpperCase()}
                             </div>
                             <div className="flex flex-col">
                               <span className="text-xs font-medium text-foreground">
@@ -510,10 +613,20 @@ export default function SupportAdminPage() {
                       </td>
                       <td className="px-4 py-3 align-top text-xs text-muted-foreground whitespace-nowrap">
                         {new Date(r.createdAt).toLocaleDateString()}
-                        <div className="text-[10px]">{new Date(r.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        <div className="text-[10px]">
+                          {new Date(r.createdAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </div>
                       </td>
                       <td className="px-4 py-3 align-top text-end">
-                        <Button size="sm" variant="ghost" className="h-8 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50" onClick={() => setSelectedId(r.id)}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50"
+                          onClick={() => setSelectedId(r.id)}
+                        >
                           Review
                         </Button>
                       </td>
@@ -530,53 +643,96 @@ export default function SupportAdminPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2 mb-1">
-                        <Badge className={`${statusColor[r.status] || "bg-gray-100 text-gray-700"} text-[10px] uppercase`}>
+                        <Badge
+                          className={`${statusColor[r.status] || "bg-gray-100 text-gray-700"} text-[10px] uppercase`}
+                        >
                           {r.status.replace("_", " ")}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">{new Date(r.createdAt).toLocaleDateString()}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(r.createdAt).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="text-sm font-semibold text-foreground line-clamp-2">{r.description}</span>
+                      <span className="text-sm font-semibold text-foreground line-clamp-2">
+                        {r.description}
+                      </span>
                     </div>
                   </div>
 
                   <div className="text-xs text-muted-foreground grid grid-cols-2 gap-2 border-t border-b border-border py-2">
                     <div>
-                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Source</span>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                        Source
+                      </span>
                       {r.campground?.name || "Global"}
                     </div>
                     <div>
-                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">Author</span>
+                      <span className="text-muted-foreground block text-[10px] uppercase font-bold">
+                        Author
+                      </span>
                       {r.author?.email || r.contactEmail || "Anon"}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-xs text-muted-foreground">
-                      {r.assignee ? `Assigned to ${r.assignee.firstName || r.assignee.email}` : "Unassigned"}
+                      {r.assignee
+                        ? `Assigned to ${r.assignee.firstName || r.assignee.email}`
+                        : "Unassigned"}
                     </span>
-                    <Button size="sm" variant="outline" className="h-8" onClick={() => setSelectedId(r.id)}>Details</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8"
+                      onClick={() => setSelectedId(r.id)}
+                    >
+                      Details
+                    </Button>
                   </div>
                 </Card>
               ))}
             </div>
           </>
         )}
-
       </div>
 
       <MobileQuickActionsBar
         active="tasks"
         items={[
-          { key: "tasks", label: "Tasks", href: "#support-queue", icon: <ClipboardList className="h-4 w-4" />, badge: openReports },
-          { key: "messages", label: "Messages", href: "/messages", icon: <MessageSquare className="h-4 w-4" /> },
-          { key: "checklists", label: "Checklists", href: "/operations#checklists", icon: <ClipboardCheck className="h-4 w-4" /> },
-          { key: "ops-health", label: "Ops health", href: "/operations#ops-health", icon: <HeartPulse className="h-4 w-4" />, badge: triagePending },
+          {
+            key: "tasks",
+            label: "Tasks",
+            href: "#support-queue",
+            icon: <ClipboardList className="h-4 w-4" />,
+            badge: openReports,
+          },
+          {
+            key: "messages",
+            label: "Messages",
+            href: "/messages",
+            icon: <MessageSquare className="h-4 w-4" />,
+          },
+          {
+            key: "checklists",
+            label: "Checklists",
+            href: "/operations#checklists",
+            icon: <ClipboardCheck className="h-4 w-4" />,
+          },
+          {
+            key: "ops-health",
+            label: "Ops health",
+            href: "/operations#ops-health",
+            icon: <HeartPulse className="h-4 w-4" />,
+            badge: triagePending,
+          },
         ]}
       />
 
       {/* Details Modal */}
       {selected && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-end z-50" onClick={() => setSelectedId(null)}>
+        <div
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm flex justify-end z-50"
+          onClick={() => setSelectedId(null)}
+        >
           <div
             className="w-full max-w-lg bg-card h-full shadow-2xl border-l border-border overflow-y-auto animate-in slide-in-from-right duration-200"
             onClick={(e) => e.stopPropagation()}
@@ -584,20 +740,32 @@ export default function SupportAdminPage() {
             <div className="p-5 border-b border-border flex items-center justify-between sticky top-0 bg-card z-10">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge className={`${statusColor[selected.status]} shadow-none`}>{selected.status}</Badge>
+                  <Badge className={`${statusColor[selected.status]} shadow-none`}>
+                    {selected.status}
+                  </Badge>
                   <span className="text-xs text-muted-foreground">#{selected.id.slice(0, 8)}</span>
                 </div>
-                <div className="text-base font-bold text-foreground line-clamp-2">{selected.description}</div>
+                <div className="text-base font-bold text-foreground line-clamp-2">
+                  {selected.description}
+                </div>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => setSelectedId(null)}>Close</Button>
+              <Button size="sm" variant="ghost" onClick={() => setSelectedId(null)}>
+                Close
+              </Button>
             </div>
 
             <div className="p-5 space-y-6">
               {/* Actions */}
               <div className="flex flex-col gap-4 p-4 bg-muted rounded-lg border border-border">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground uppercase">Status</label>
-                  <Select value={selected.status} onValueChange={(v) => updateStatus(selected.id, v)} disabled={!canMutate}>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">
+                    Status
+                  </label>
+                  <Select
+                    value={selected.status}
+                    onValueChange={(v) => updateStatus(selected.id, v)}
+                    disabled={!canMutate}
+                  >
                     <SelectTrigger className="bg-card">
                       <SelectValue />
                     </SelectTrigger>
@@ -612,11 +780,15 @@ export default function SupportAdminPage() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-muted-foreground uppercase">Assignee</label>
+                  <label className="text-xs font-semibold text-muted-foreground uppercase">
+                    Assignee
+                  </label>
                   <div className="flex gap-2">
                     <Select
                       value={selected.assignee?.id || "unassigned"}
-                      onValueChange={(v) => updateAssignee(selected.id, v === "unassigned" ? null : v)}
+                      onValueChange={(v) =>
+                        updateAssignee(selected.id, v === "unassigned" ? null : v)
+                      }
                       disabled={!canMutate}
                     >
                       <SelectTrigger className="bg-card flex-1">
@@ -626,7 +798,9 @@ export default function SupportAdminPage() {
                         <SelectItem value="unassigned">Unassigned</SelectItem>
                         {staff.map((s) => (
                           <SelectItem key={s.id} value={s.id}>
-                            {(s.firstName || s.lastName) ? `${s.firstName ?? ""} ${s.lastName ?? ""}` : s.email}
+                            {s.firstName || s.lastName
+                              ? `${s.firstName ?? ""} ${s.lastName ?? ""}`
+                              : s.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -657,24 +831,58 @@ export default function SupportAdminPage() {
 
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">Author</span>
+                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">
+                      Author
+                    </span>
                     <div className="text-foreground">{selected.author?.email || "Anonymous"}</div>
-                    {selected.contactEmail && <div className="text-muted-foreground text-xs">{selected.contactEmail}</div>}
+                    {selected.contactEmail && (
+                      <div className="text-muted-foreground text-xs">{selected.contactEmail}</div>
+                    )}
                   </div>
                   <div>
-                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">Source</span>
+                    <span className="block text-xs text-muted-foreground font-medium uppercase mb-1">
+                      Source
+                    </span>
                     <div className="text-foreground">{selected.campground?.name || "Global"}</div>
-                    {selected.path && <div className="text-muted-foreground text-xs truncate" title={selected.path}>{selected.path}</div>}
+                    {selected.path && (
+                      <div className="text-muted-foreground text-xs truncate" title={selected.path}>
+                        {selected.path}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="border-t border-border pt-4">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Technical Context</h3>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                    Technical Context
+                  </h3>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs text-muted-foreground">
-                    {selected.userAgent && <><dt className="font-medium text-foreground">Browser:</dt><dd className="truncate" title={selected.userAgent}>{selected.userAgent}</dd></>}
-                    {selected.language && <><dt className="font-medium text-foreground">Language:</dt><dd>{selected.language}</dd></>}
-                    {selected.timezone && <><dt className="font-medium text-foreground">Timezone:</dt><dd>{selected.timezone}</dd></>}
-                    {selected.roleFilter && <><dt className="font-medium text-foreground">Role:</dt><dd>{selected.roleFilter}</dd></>}
+                    {selected.userAgent && (
+                      <>
+                        <dt className="font-medium text-foreground">Browser:</dt>
+                        <dd className="truncate" title={selected.userAgent}>
+                          {selected.userAgent}
+                        </dd>
+                      </>
+                    )}
+                    {selected.language && (
+                      <>
+                        <dt className="font-medium text-foreground">Language:</dt>
+                        <dd>{selected.language}</dd>
+                      </>
+                    )}
+                    {selected.timezone && (
+                      <>
+                        <dt className="font-medium text-foreground">Timezone:</dt>
+                        <dd>{selected.timezone}</dd>
+                      </>
+                    )}
+                    {selected.roleFilter && (
+                      <>
+                        <dt className="font-medium text-foreground">Role:</dt>
+                        <dd>{selected.roleFilter}</dd>
+                      </>
+                    )}
                   </dl>
                 </div>
               </div>

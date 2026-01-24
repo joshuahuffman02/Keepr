@@ -28,7 +28,7 @@ describe("Incidents list", () => {
     const result = await service.list("test-cg");
     expect(result).toEqual([]);
     expect(prismaStub.incident.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({ where: { campgroundId: "test-cg" } })
+      expect.objectContaining({ where: { campgroundId: "test-cg" } }),
     );
   });
 });
@@ -85,10 +85,16 @@ describe("IncidentsService core flows", () => {
   });
 
   it("attaches evidence when incident exists", async () => {
-    await service.addEvidence(baseIncident.id, { type: EvidenceType.photo, url: "http://example.com/pic.jpg" });
+    await service.addEvidence(baseIncident.id, {
+      type: EvidenceType.photo,
+      url: "http://example.com/pic.jpg",
+    });
     expect(prismaMock.incidentEvidence.create).toHaveBeenCalledWith(
       expect.objectContaining({
-        data: expect.objectContaining({ incidentId: baseIncident.id, url: "http://example.com/pic.jpg" }),
+        data: expect.objectContaining({
+          incidentId: baseIncident.id,
+          url: "http://example.com/pic.jpg",
+        }),
       }),
     );
   });

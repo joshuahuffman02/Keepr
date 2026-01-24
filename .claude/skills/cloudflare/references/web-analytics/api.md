@@ -19,12 +19,9 @@ curl -X POST https://api.cloudflare.com/client/v4/graphql \
 ```graphql
 query {
   viewer {
-    accounts(filter: {accountTag: "YOUR_ACCOUNT_ID"}) {
+    accounts(filter: { accountTag: "YOUR_ACCOUNT_ID" }) {
       rumPageloadEventsAdaptiveGroups(
-        filter: {
-          date_geq: "2024-01-01"
-          date_lt: "2024-01-31"
-        }
+        filter: { date_geq: "2024-01-01", date_lt: "2024-01-31" }
         limit: 100
       ) {
         dimensions {
@@ -49,4 +46,5 @@ query {
 query {
   viewer {
     accounts(filter: {accountTag: "YOUR_ACCOUNT_ID"}) {
-    
+
+```

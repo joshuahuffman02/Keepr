@@ -21,7 +21,7 @@ export class PortfoliosController {
   select(
     @Body() body: { portfolioId: string; parkId?: string },
     @Headers("x-portfolio-id") portfolioHeader?: string,
-    @Headers("x-park-id") parkHeader?: string
+    @Headers("x-park-id") parkHeader?: string,
   ) {
     const portfolioId = body?.portfolioId || portfolioHeader;
     const parkId = body?.parkId || parkHeader;
@@ -36,4 +36,3 @@ export class PortfoliosController {
     return this.portfolios.report(id).routing;
   }
 }
-

@@ -103,7 +103,8 @@ export default function NotificationsPage() {
       return;
     }
 
-    apiClient.getNotificationTriggers(id)
+    apiClient
+      .getNotificationTriggers(id)
       .then((data) => {
         setTriggers(data);
         setLoading(false);
@@ -120,9 +121,7 @@ export default function NotificationsPage() {
       await apiClient.updateNotificationTrigger(trigger.id, {
         enabled: !trigger.enabled,
       });
-      setTriggers(triggers.map((t) =>
-        t.id === trigger.id ? { ...t, enabled: !t.enabled } : t
-      ));
+      setTriggers(triggers.map((t) => (t.id === trigger.id ? { ...t, enabled: !t.enabled } : t)));
     } catch (err) {
       console.error("Failed to update trigger:", err);
     } finally {
@@ -153,9 +152,7 @@ export default function NotificationsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure automated notification triggers
-          </p>
+          <p className="text-muted-foreground mt-1">Configure automated notification triggers</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -169,9 +166,7 @@ export default function NotificationsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure automated notification triggers
-          </p>
+          <p className="text-muted-foreground mt-1">Configure automated notification triggers</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -189,9 +184,7 @@ export default function NotificationsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Notifications</h2>
-          <p className="text-muted-foreground mt-1">
-            Configure automated notification triggers
-          </p>
+          <p className="text-muted-foreground mt-1">Configure automated notification triggers</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -213,8 +206,8 @@ export default function NotificationsPage() {
       <Alert className="bg-purple-50 border-purple-200">
         <Zap className="h-4 w-4 text-purple-500" />
         <AlertDescription className="text-purple-800">
-          Notification triggers automatically send emails or SMS when events occur.
-          Connect a template to customize the message, or use the default system message.
+          Notification triggers automatically send emails or SMS when events occur. Connect a
+          template to customize the message, or use the default system message.
         </AlertDescription>
       </Alert>
 
@@ -274,8 +267,8 @@ export default function NotificationsPage() {
               No notification triggers yet
             </h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Set up automatic notifications for booking confirmations, check-in
-              reminders, payment receipts, and more.
+              Set up automatic notifications for booking confirmations, check-in reminders, payment
+              receipts, and more.
             </p>
             <Button asChild>
               <Link href="/dashboard/settings/notification-triggers">
@@ -288,9 +281,7 @@ export default function NotificationsPage() {
       ) : (
         <Card>
           <CardHeader className="py-3 px-4 bg-muted/60 border-b">
-            <CardTitle className="text-sm font-medium">
-              All Triggers ({triggers.length})
-            </CardTitle>
+            <CardTitle className="text-sm font-medium">All Triggers ({triggers.length})</CardTitle>
           </CardHeader>
           <CardContent className="p-0 divide-y">
             {triggers.map((trigger) => {
@@ -306,9 +297,13 @@ export default function NotificationsPage() {
                       onCheckedChange={() => handleToggle(trigger)}
                       disabled={updating === trigger.id}
                     />
-                    <div className={`p-2 rounded-lg ${
-                      trigger.enabled ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"
-                    }`}>
+                    <div
+                      className={`p-2 rounded-lg ${
+                        trigger.enabled
+                          ? "bg-status-success/15 text-status-success"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
                       <Icon className="h-4 w-4" />
                     </div>
                     <div>
@@ -397,30 +392,30 @@ export default function NotificationsPage() {
                 <Mail className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="font-medium text-foreground">
-                  Customize Your Messages
-                </p>
+                <p className="font-medium text-foreground">Customize Your Messages</p>
                 <p className="text-sm text-muted-foreground">
                   Create email and SMS templates for your triggers
                 </p>
               </div>
             </div>
             <Button variant="outline" asChild>
-              <Link href="/dashboard/settings/central/system/templates">
-                Manage Templates
-              </Link>
+              <Link href="/dashboard/settings/central/system/templates">Manage Templates</Link>
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Delete Trigger Confirmation */}
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Trigger</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this notification trigger? This action cannot be undone.
+              Are you sure you want to delete this notification trigger? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

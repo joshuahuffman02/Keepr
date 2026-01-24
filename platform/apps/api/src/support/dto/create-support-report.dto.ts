@@ -59,4 +59,3 @@ export class CreateSupportReportDto {
   @IsString()
   ownershipRole?: string;
 }
-

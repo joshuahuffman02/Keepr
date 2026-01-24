@@ -230,7 +230,9 @@ export default function AnalyticsOverviewPage() {
               <Skeleton className="h-8 w-24" />
             ) : (
               <>
-                <div className="text-2xl font-bold">{sessionStats?.totalSessions.toLocaleString() || 0}</div>
+                <div className="text-2xl font-bold">
+                  {sessionStats?.totalSessions.toLocaleString() || 0}
+                </div>
                 <p className="text-xs text-muted-foreground">Last 30 days</p>
               </>
             )}
@@ -331,10 +333,10 @@ export default function AnalyticsOverviewPage() {
                         {index + 1}
                       </div>
                       <div>
-                        <p className="font-medium capitalize">{feature.feature.replace(/_/g, " ")}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {feature.uniqueUsers} users
+                        <p className="font-medium capitalize">
+                          {feature.feature.replace(/_/g, " ")}
                         </p>
+                        <p className="text-sm text-muted-foreground">{feature.uniqueUsers} users</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -377,27 +379,31 @@ export default function AnalyticsOverviewPage() {
               <div className="space-y-4">
                 {/* Funnel visualization */}
                 <div className="space-y-2">
-                  {["Page View", "Availability Check", "Add to Cart", "Start Checkout", "Complete"].map(
-                    (step, index) => {
-                      const rate = bookingFunnel.stepCompletionRates[index] || 0;
-                      return (
-                        <div key={step} className="flex items-center gap-3">
-                          <div className="w-32 text-sm">{step}</div>
-                          <div className="flex-1">
-                            <div className="h-8 rounded bg-muted">
-                              <div
-                                className="h-full rounded bg-primary transition-all"
-                                style={{ width: `${rate * 100}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-16 text-right text-sm font-medium">
-                            {formatPercent(rate)}
+                  {[
+                    "Page View",
+                    "Availability Check",
+                    "Add to Cart",
+                    "Start Checkout",
+                    "Complete",
+                  ].map((step, index) => {
+                    const rate = bookingFunnel.stepCompletionRates[index] || 0;
+                    return (
+                      <div key={step} className="flex items-center gap-3">
+                        <div className="w-32 text-sm">{step}</div>
+                        <div className="flex-1">
+                          <div className="h-8 rounded bg-muted">
+                            <div
+                              className="h-full rounded bg-primary transition-all"
+                              style={{ width: `${rate * 100}%` }}
+                            />
                           </div>
                         </div>
-                      );
-                    }
-                  )}
+                        <div className="w-16 text-right text-sm font-medium">
+                          {formatPercent(rate)}
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
 
                 {/* Summary stats */}
@@ -417,9 +423,7 @@ export default function AnalyticsOverviewPage() {
                 </div>
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-8">
-                No funnel data available
-              </p>
+              <p className="text-center text-muted-foreground py-8">No funnel data available</p>
             )}
           </CardContent>
         </Card>
@@ -457,9 +461,7 @@ export default function AnalyticsOverviewPage() {
                 })}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-8">
-                No device data available
-              </p>
+              <p className="text-center text-muted-foreground py-8">No device data available</p>
             )}
           </CardContent>
         </Card>
@@ -502,9 +504,7 @@ export default function AnalyticsOverviewPage() {
                 })}
               </div>
             ) : (
-              <p className="text-center text-muted-foreground py-8">
-                No user data available
-              </p>
+              <p className="text-center text-muted-foreground py-8">No user data available</p>
             )}
           </CardContent>
         </Card>

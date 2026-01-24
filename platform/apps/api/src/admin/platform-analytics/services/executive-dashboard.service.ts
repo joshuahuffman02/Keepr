@@ -149,15 +149,20 @@ export class ExecutiveDashboardService {
     // Calculate metrics
     const currentRevenue = currentReservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
     const previousRevenue = previousReservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
-    const revenueChange = previousRevenue > 0 ? ((currentRevenue - previousRevenue) / previousRevenue) * 100 : 0;
+    const revenueChange =
+      previousRevenue > 0 ? ((currentRevenue - previousRevenue) / previousRevenue) * 100 : 0;
 
     const currentBookings = currentReservations.length;
     const previousBookings = previousReservations.length;
-    const bookingsChange = previousBookings > 0 ? ((currentBookings - previousBookings) / previousBookings) * 100 : 0;
+    const bookingsChange =
+      previousBookings > 0 ? ((currentBookings - previousBookings) / previousBookings) * 100 : 0;
 
     const avgBookingValue = currentBookings > 0 ? currentRevenue / currentBookings : 0;
     const prevAvgBookingValue = previousBookings > 0 ? previousRevenue / previousBookings : 0;
-    const avgBookingChange = prevAvgBookingValue > 0 ? ((avgBookingValue - prevAvgBookingValue) / prevAvgBookingValue) * 100 : 0;
+    const avgBookingChange =
+      prevAvgBookingValue > 0
+        ? ((avgBookingValue - prevAvgBookingValue) / prevAvgBookingValue) * 100
+        : 0;
 
     // NPS calculation
     const calculateNps = (responses: { score: number }[]) => {
@@ -176,9 +181,11 @@ export class ExecutiveDashboardService {
 
     // Cancellation rate
     const totalBookingAttempts = currentBookings + currentCancellations;
-    const cancellationRate = totalBookingAttempts > 0 ? (currentCancellations / totalBookingAttempts) * 100 : 0;
+    const cancellationRate =
+      totalBookingAttempts > 0 ? (currentCancellations / totalBookingAttempts) * 100 : 0;
     const prevTotalAttempts = previousBookings + previousCancellations;
-    const prevCancellationRate = prevTotalAttempts > 0 ? (previousCancellations / prevTotalAttempts) * 100 : 0;
+    const prevCancellationRate =
+      prevTotalAttempts > 0 ? (previousCancellations / prevTotalAttempts) * 100 : 0;
     const cancellationChange = cancellationRate - prevCancellationRate;
 
     return [

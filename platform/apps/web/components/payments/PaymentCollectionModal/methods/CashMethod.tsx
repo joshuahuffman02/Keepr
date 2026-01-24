@@ -66,19 +66,23 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
       const amountCents = state.remainingCents;
 
       // Get reservation ID from subject - required for balance/reservation payments
-      const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
-        ? props.subject.reservationId
-        : undefined;
+      const reservationId =
+        props.subject?.type === "reservation" || props.subject?.type === "balance"
+          ? props.subject.reservationId
+          : undefined;
 
       // For reservation/balance payments, we MUST have a reservation ID
-      if ((props.subject?.type === "reservation" || props.subject?.type === "balance") && !reservationId) {
+      if (
+        (props.subject?.type === "reservation" || props.subject?.type === "balance") &&
+        !reservationId
+      ) {
         throw new Error("Missing reservation ID - cannot record payment");
       }
 
       // Record the payment in the database
       if (reservationId) {
         await apiClient.recordReservationPayment(reservationId, amountCents, [
-          { method: "cash", amountCents, note: reference }
+          { method: "cash", amountCents, note: reference },
         ]);
       }
 
@@ -124,7 +128,7 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
               onClick={() => handleQuickAmount(amount)}
               className={cn(
                 "font-medium",
-                parseFloat(amountReceived) === amount && "border-emerald-500 bg-emerald-50"
+                parseFloat(amountReceived) === amount && "border-emerald-500 bg-emerald-50",
               )}
             >
               ${amount}
@@ -136,10 +140,7 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
           variant="outline"
           size="sm"
           onClick={handleExactAmount}
-          className={cn(
-            "w-full font-medium",
-            isExactAmount && "border-emerald-500 bg-emerald-50"
-          )}
+          className={cn("w-full font-medium", isExactAmount && "border-emerald-500 bg-emerald-50")}
         >
           Exact Amount (${amountDue.toFixed(2)})
         </Button>
@@ -170,9 +171,7 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
         <div
           className={cn(
             "p-4 rounded-lg border-2",
-            canComplete
-              ? "border-emerald-500 bg-emerald-50"
-              : "border-amber-500 bg-amber-50"
+            canComplete ? "border-emerald-500 bg-emerald-50" : "border-amber-500 bg-amber-50",
           )}
         >
           <div className="flex items-center justify-between">
@@ -185,7 +184,7 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
             <span
               className={cn(
                 "text-2xl font-bold",
-                canComplete ? "text-emerald-700" : "text-amber-700"
+                canComplete ? "text-emerald-700" : "text-amber-700",
               )}
             >
               ${canComplete ? changeDue.toFixed(2) : (amountDue - receivedAmount).toFixed(2)}
@@ -195,9 +194,7 @@ export function CashMethod({ onSuccess, onError, onCancel }: CashMethodProps) {
       )}
 
       {/* Error display */}
-      {error && (
-        <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>
-      )}
+      {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}
 
       {/* Action buttons */}
       <div className="flex justify-end gap-2 pt-2">

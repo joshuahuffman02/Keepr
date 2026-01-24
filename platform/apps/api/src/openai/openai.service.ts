@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import OpenAI from 'openai';
+import { Injectable, Logger } from "@nestjs/common";
+import OpenAI from "openai";
 
 @Injectable()
 export class OpenAIService {
@@ -10,12 +10,12 @@ export class OpenAIService {
     const apiKey = process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
-      this.logger.warn('OPENAI_API_KEY not set - semantic search will not work');
+      this.logger.warn("OPENAI_API_KEY not set - semantic search will not work");
       return;
     }
 
     this.openai = new OpenAI({ apiKey });
-    this.logger.log('OpenAI service initialized');
+    this.logger.log("OpenAI service initialized");
   }
 
   /**
@@ -24,23 +24,23 @@ export class OpenAIService {
    */
   async generateEmbedding(text: string): Promise<number[]> {
     if (!this.openai) {
-      throw new Error('OpenAI API key not configured');
+      throw new Error("OpenAI API key not configured");
     }
 
     if (!text || text.trim().length === 0) {
-      throw new Error('Text cannot be empty');
+      throw new Error("Text cannot be empty");
     }
 
     try {
       const response = await this.openai.embeddings.create({
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         input: text.trim(),
-        encoding_format: 'float',
+        encoding_format: "float",
       });
 
       return response.data[0].embedding;
     } catch (error) {
-      this.logger.error('Failed to generate embedding', error);
+      this.logger.error("Failed to generate embedding", error);
       throw error;
     }
   }
@@ -50,23 +50,23 @@ export class OpenAIService {
    */
   async generateEmbeddings(texts: string[]): Promise<number[][]> {
     if (!this.openai) {
-      throw new Error('OpenAI API key not configured');
+      throw new Error("OpenAI API key not configured");
     }
 
     if (!texts || texts.length === 0) {
-      throw new Error('Texts array cannot be empty');
+      throw new Error("Texts array cannot be empty");
     }
 
     try {
       const response = await this.openai.embeddings.create({
-        model: 'text-embedding-3-small',
-        input: texts.map(t => t.trim()),
-        encoding_format: 'float',
+        model: "text-embedding-3-small",
+        input: texts.map((t) => t.trim()),
+        encoding_format: "float",
       });
 
-      return response.data.map(item => item.embedding);
+      return response.data.map((item) => item.embedding);
     } catch (error) {
-      this.logger.error('Failed to generate embeddings', error);
+      this.logger.error("Failed to generate embeddings", error);
       throw error;
     }
   }

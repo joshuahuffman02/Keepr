@@ -22,7 +22,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type SwapStatus = "pending_recipient" | "pending_manager" | "approved" | "rejected" | "declined" | "cancelled";
+type SwapStatus =
+  | "pending_recipient"
+  | "pending_manager"
+  | "approved"
+  | "rejected"
+  | "declined"
+  | "cancelled";
 
 type SwapRequest = {
   id: string;
@@ -65,13 +71,46 @@ const SPRING_CONFIG: { type: "spring"; stiffness: number; damping: number } = {
   damping: 20,
 };
 
-const STATUS_STYLES: Record<SwapStatus, { bg: string; text: string; icon: React.ReactNode; label: string }> = {
-  pending_recipient: { bg: "bg-status-warning/15", text: "text-status-warning", icon: <Clock className="w-3.5 h-3.5" />, label: "Awaiting Response" },
-  pending_manager: { bg: "bg-status-info/15", text: "text-status-info", icon: <Shield className="w-3.5 h-3.5" />, label: "Awaiting Manager" },
-  approved: { bg: "bg-status-success/15", text: "text-status-success", icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: "Approved" },
-  rejected: { bg: "bg-status-error/15", text: "text-status-error", icon: <XCircle className="w-3.5 h-3.5" />, label: "Rejected" },
-  declined: { bg: "bg-muted", text: "text-muted-foreground", icon: <XCircle className="w-3.5 h-3.5" />, label: "Declined" },
-  cancelled: { bg: "bg-muted", text: "text-muted-foreground", icon: <X className="w-3.5 h-3.5" />, label: "Cancelled" },
+const STATUS_STYLES: Record<
+  SwapStatus,
+  { bg: string; text: string; icon: React.ReactNode; label: string }
+> = {
+  pending_recipient: {
+    bg: "bg-status-warning/15",
+    text: "text-status-warning",
+    icon: <Clock className="w-3.5 h-3.5" />,
+    label: "Awaiting Response",
+  },
+  pending_manager: {
+    bg: "bg-status-info/15",
+    text: "text-status-info",
+    icon: <Shield className="w-3.5 h-3.5" />,
+    label: "Awaiting Manager",
+  },
+  approved: {
+    bg: "bg-status-success/15",
+    text: "text-status-success",
+    icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+    label: "Approved",
+  },
+  rejected: {
+    bg: "bg-status-error/15",
+    text: "text-status-error",
+    icon: <XCircle className="w-3.5 h-3.5" />,
+    label: "Rejected",
+  },
+  declined: {
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    icon: <XCircle className="w-3.5 h-3.5" />,
+    label: "Declined",
+  },
+  cancelled: {
+    bg: "bg-muted",
+    text: "text-muted-foreground",
+    icon: <X className="w-3.5 h-3.5" />,
+    label: "Cancelled",
+  },
 };
 
 export default function ShiftSwapsPage({ params }: { params: { campgroundId: string } }) {
@@ -112,7 +151,11 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
   const userId = whoami?.user?.id;
   const ownershipRoles = whoami?.user?.ownershipRoles ?? [];
   const membership = whoami?.user?.memberships?.find((m) => m.campgroundId === params.campgroundId);
-  const isManager = ownershipRoles.includes("owner") || ownershipRoles.includes("admin") || membership?.role === "owner" || membership?.role === "admin";
+  const isManager =
+    ownershipRoles.includes("owner") ||
+    ownershipRoles.includes("admin") ||
+    membership?.role === "owner" ||
+    membership?.role === "admin";
 
   const filteredSwaps = useMemo(() => {
     if (!userId) return swaps;
@@ -129,7 +172,8 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
   }, [swaps, activeTab, userId]);
 
   const pendingIncoming = useMemo(() => {
-    return swaps.filter((s) => s.recipient?.id === userId && s.status === "pending_recipient").length;
+    return swaps.filter((s) => s.recipient?.id === userId && s.status === "pending_recipient")
+      .length;
   }, [swaps, userId]);
 
   const pendingManager = useMemo(() => {
@@ -223,7 +267,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
   const managerTab: { id: SwapTab; label: string; badge?: number } = {
     id: "manager",
     label: "Manager Queue",
-    badge: pendingManager
+    badge: pendingManager,
   };
 
   const tabs: Array<{ id: SwapTab; label: string; badge?: number }> = [
@@ -292,7 +336,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                 "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
                 activeTab === tab.id
                   ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted"
+                  : "text-muted-foreground hover:bg-muted",
               )}
               aria-pressed={activeTab === tab.id}
             >
@@ -325,10 +369,10 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
               {activeTab === "incoming"
                 ? "No one has requested to swap shifts with you yet"
                 : activeTab === "outgoing"
-                ? "You haven't requested any shift swaps"
-                : activeTab === "manager"
-                ? "No swaps awaiting your approval"
-                : "No shift swap requests yet"}
+                  ? "You haven't requested any shift swaps"
+                  : activeTab === "manager"
+                    ? "No swaps awaiting your approval"
+                    : "No shift swap requests yet"}
             </p>
             <p className="text-sm text-muted-foreground mt-2">
               To request a swap, go to the schedule and click on your shift
@@ -340,7 +384,8 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
               {filteredSwaps.map((swap, idx) => {
                 const status = STATUS_STYLES[swap.status];
                 const isProcessing = processing.has(swap.id);
-                const canRespond = swap.recipient?.id === userId && swap.status === "pending_recipient";
+                const canRespond =
+                  swap.recipient?.id === userId && swap.status === "pending_recipient";
                 const canApprove = isManager && swap.status === "pending_manager";
                 const canCancel =
                   swap.requester?.id === userId &&
@@ -393,7 +438,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                         className={cn(
                           "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
                           status.bg,
-                          status.text
+                          status.text,
                         )}
                       >
                         {status.icon}
@@ -410,9 +455,12 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                             {formatDate(swap.requesterShift.shiftDate)}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            {formatTime(swap.requesterShift.startTime)} - {formatTime(swap.requesterShift.endTime)}
+                            {formatTime(swap.requesterShift.startTime)} -{" "}
+                            {formatTime(swap.requesterShift.endTime)}
                             {swap.requesterShift.role && (
-                              <span className="ml-2 text-muted-foreground">({swap.requesterShift.role})</span>
+                              <span className="ml-2 text-muted-foreground">
+                                ({swap.requesterShift.role})
+                              </span>
                             )}
                           </p>
                         </div>
@@ -437,7 +485,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                                 "bg-status-success text-white hover:bg-status-success/90",
-                                isProcessing && "opacity-50 cursor-not-allowed"
+                                isProcessing && "opacity-50 cursor-not-allowed",
                               )}
                             >
                               {isProcessing ? (
@@ -453,7 +501,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                                 "bg-muted text-foreground hover:bg-muted",
-                                isProcessing && "opacity-50 cursor-not-allowed"
+                                isProcessing && "opacity-50 cursor-not-allowed",
                               )}
                             >
                               <XCircle className="w-4 h-4" />
@@ -469,7 +517,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                                 "bg-status-success text-white hover:bg-status-success/90",
-                                isProcessing && "opacity-50 cursor-not-allowed"
+                                isProcessing && "opacity-50 cursor-not-allowed",
                               )}
                             >
                               {isProcessing ? (
@@ -485,7 +533,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                               className={cn(
                                 "flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2",
                                 "bg-status-error/15 text-status-error hover:bg-status-error/25",
-                                isProcessing && "opacity-50 cursor-not-allowed"
+                                isProcessing && "opacity-50 cursor-not-allowed",
                               )}
                             >
                               <XCircle className="w-4 h-4" />
@@ -500,7 +548,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                             className={cn(
                               "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
                               "bg-muted text-foreground hover:bg-muted",
-                              isProcessing && "opacity-50 cursor-not-allowed"
+                              isProcessing && "opacity-50 cursor-not-allowed",
                             )}
                           >
                             {isProcessing ? (
@@ -517,10 +565,14 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                     {/* Manager decision info */}
                     {swap.manager && swap.managerRespondedAt && (
                       <div className="mt-3 pt-3 border-t border-border text-sm text-muted-foreground">
-                        <span className="font-medium">{swap.manager.firstName} {swap.manager.lastName}</span>{" "}
+                        <span className="font-medium">
+                          {swap.manager.firstName} {swap.manager.lastName}
+                        </span>{" "}
                         {swap.status === "approved" ? "approved" : "rejected"} on{" "}
                         {formatDate(swap.managerRespondedAt)}
-                        {swap.managerNote && <span className="block italic mt-1">"{swap.managerNote}"</span>}
+                        {swap.managerNote && (
+                          <span className="block italic mt-1">"{swap.managerNote}"</span>
+                        )}
                       </div>
                     )}
                   </motion.div>

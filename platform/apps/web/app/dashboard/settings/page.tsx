@@ -305,201 +305,188 @@ export default function SettingsLandingPage() {
       links: category.links.filter(
         (link) =>
           link.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          link.description.toLowerCase().includes(searchQuery.toLowerCase())
+          link.description.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
     }))
     .filter((category) => category.links.length > 0 || searchQuery === "");
 
   return (
     <div className="max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Settings</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your campground configuration, pricing, communications, and security
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your campground configuration, pricing, communications, and security
+        </p>
+      </div>
+
+      {/* Theme Preferences Card */}
+      <Card className="mb-8 border border-border bg-card">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-status-success/15 text-status-success">
+              <Palette className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Appearance</CardTitle>
+              <CardDescription>Customize your theme and visual preferences</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Accent Color */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Accent Color</Label>
+            <div className="flex flex-wrap gap-2">
+              {accentColorOptions.map((option) => {
+                const isSelected = theme.accentColor === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    onClick={() => theme.setAccentColor(option.value)}
+                    title={option.label}
+                    className={cn(
+                      "relative h-10 w-10 rounded-full transition-all",
+                      option.color,
+                      isSelected ? "ring-2 ring-offset-2 ring-ring scale-110" : "hover:scale-105",
+                    )}
+                  >
+                    {isSelected && <Check className="absolute inset-0 m-auto h-5 w-5 text-white" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Accessibility Options */}
+          <div className="space-y-4 pt-4 border-t border-border">
+            <Label className="text-sm font-medium">Accessibility</Label>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Reduced Motion</p>
+                <p className="text-xs text-muted-foreground">
+                  Minimize animations for motion sensitivity
+                </p>
+              </div>
+              <Switch checked={theme.reducedMotion} onCheckedChange={theme.toggleReducedMotion} />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">High Contrast</p>
+                <p className="text-xs text-muted-foreground">
+                  Increase contrast for better visibility
+                </p>
+              </div>
+              <Switch checked={theme.highContrast} onCheckedChange={theme.toggleHighContrast} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Search Bar */}
+      <div className="mb-8">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search settings..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
+
+      {/* Tip for favorites */}
+      <div className="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+        <Star className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-sm font-medium text-amber-800">
+            Save your most-used settings to Favorites
+          </p>
+          <p className="text-sm text-amber-700 mt-1">
+            Click the star icon on any card to add it to your sidebar favorites for quick access.
           </p>
         </div>
+      </div>
 
-        {/* Theme Preferences Card */}
-        <Card className="mb-8 border border-border bg-card">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-lg bg-status-success/15 text-status-success">
-                <Palette className="h-5 w-5" />
+      {/* Settings Categories */}
+      <div className="space-y-12">
+        {filteredCategories.map((category) => {
+          const IconComponent = category.icon;
+          const iconColorClass = iconColorMap[category.color] || iconColorMap.violet;
+
+          return (
+            <div key={category.title}>
+              {/* Category Header */}
+              <div className="flex items-start gap-3 mb-4">
+                <div className={`p-2.5 rounded-lg ${iconColorClass}`}>
+                  <IconComponent className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
+                  <p className="text-sm text-muted-foreground mt-0.5">{category.description}</p>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-lg">Appearance</CardTitle>
-                <CardDescription>Customize your theme and visual preferences</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Accent Color */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium">Accent Color</Label>
-              <div className="flex flex-wrap gap-2">
-                {accentColorOptions.map((option) => {
-                  const isSelected = theme.accentColor === option.value;
+
+              {/* Settings Links Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {category.links.map((link) => {
+                  const isFavorite = favorites.includes(link.href);
                   return (
-                    <button
-                      key={option.value}
-                      onClick={() => theme.setAccentColor(option.value)}
-                      title={option.label}
-                      className={cn(
-                        "relative h-10 w-10 rounded-full transition-all",
-                        option.color,
-                        isSelected
-                          ? "ring-2 ring-offset-2 ring-ring scale-110"
-                          : "hover:scale-105"
-                      )}
-                    >
-                      {isSelected && (
-                        <Check className="absolute inset-0 m-auto h-5 w-5 text-white" />
-                      )}
-                    </button>
+                    <div key={link.href} className="relative group">
+                      <Link href={link.href} className="block">
+                        <Card className="h-full transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group-hover:bg-muted">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-center justify-between">
+                              <CardTitle className="text-base font-semibold text-foreground">
+                                {link.name}
+                              </CardTitle>
+                              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
+                            </div>
+                            <CardDescription className="text-sm line-clamp-2">
+                              {link.description}
+                            </CardDescription>
+                          </CardHeader>
+                        </Card>
+                      </Link>
+                      {/* Favorite button */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite(link.href);
+                        }}
+                        className={`absolute top-3 right-10 p-1.5 rounded-md transition-all ${
+                          isFavorite
+                            ? "text-amber-500 bg-amber-50"
+                            : "text-muted-foreground hover:text-amber-500 hover:bg-amber-50 opacity-0 group-hover:opacity-100"
+                        }`}
+                        title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                      >
+                        <Star className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
+                      </button>
+                    </div>
                   );
                 })}
               </div>
             </div>
-
-            {/* Accessibility Options */}
-            <div className="space-y-4 pt-4 border-t border-border">
-              <Label className="text-sm font-medium">Accessibility</Label>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">Reduced Motion</p>
-                  <p className="text-xs text-muted-foreground">
-                    Minimize animations for motion sensitivity
-                  </p>
-                </div>
-                <Switch
-                  checked={theme.reducedMotion}
-                  onCheckedChange={theme.toggleReducedMotion}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">High Contrast</p>
-                  <p className="text-xs text-muted-foreground">
-                    Increase contrast for better visibility
-                  </p>
-                </div>
-                <Switch
-                  checked={theme.highContrast}
-                  onCheckedChange={theme.toggleHighContrast}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search settings..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        {/* Tip for favorites */}
-        <div className="mb-8 bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-          <Star className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-amber-800">
-              Save your most-used settings to Favorites
-            </p>
-            <p className="text-sm text-amber-700 mt-1">
-              Click the star icon on any card to add it to your sidebar favorites for quick access.
-            </p>
-          </div>
-        </div>
-
-        {/* Settings Categories */}
-        <div className="space-y-12">
-          {filteredCategories.map((category) => {
-            const IconComponent = category.icon;
-            const iconColorClass = iconColorMap[category.color] || iconColorMap.violet;
-
-            return (
-              <div key={category.title}>
-                {/* Category Header */}
-                <div className="flex items-start gap-3 mb-4">
-                  <div className={`p-2.5 rounded-lg ${iconColorClass}`}>
-                    <IconComponent className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
-                    <p className="text-sm text-muted-foreground mt-0.5">{category.description}</p>
-                  </div>
-                </div>
-
-                {/* Settings Links Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {category.links.map((link) => {
-                    const isFavorite = favorites.includes(link.href);
-                    return (
-                      <div key={link.href} className="relative group">
-                        <Link href={link.href} className="block">
-                          <Card className="h-full transition-all hover:shadow-md hover:border-emerald-300 cursor-pointer group-hover:bg-muted">
-                            <CardHeader className="pb-3">
-                              <div className="flex items-center justify-between">
-                                <CardTitle className="text-base font-semibold text-foreground">
-                                  {link.name}
-                                </CardTitle>
-                                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-emerald-600 group-hover:translate-x-0.5 transition-all" />
-                              </div>
-                              <CardDescription className="text-sm line-clamp-2">
-                                {link.description}
-                              </CardDescription>
-                            </CardHeader>
-                          </Card>
-                        </Link>
-                        {/* Favorite button */}
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleFavorite(link.href);
-                          }}
-                          className={`absolute top-3 right-10 p-1.5 rounded-md transition-all ${
-                            isFavorite
-                              ? "text-amber-500 bg-amber-50"
-                              : "text-muted-foreground hover:text-amber-500 hover:bg-amber-50 opacity-0 group-hover:opacity-100"
-                          }`}
-                          title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-                        >
-                          <Star
-                            className="h-4 w-4"
-                            fill={isFavorite ? "currentColor" : "none"}
-                          />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* No Results */}
-        {filteredCategories.length === 0 && searchQuery && (
-          <div className="text-center py-12">
-            <div className="text-muted-foreground mb-2">
-              <Search className="h-12 w-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">No settings found</h3>
-            <p className="text-muted-foreground">
-              Try adjusting your search term or browse the categories above
-            </p>
-          </div>
-        )}
+          );
+        })}
       </div>
+
+      {/* No Results */}
+      {filteredCategories.length === 0 && searchQuery && (
+        <div className="text-center py-12">
+          <div className="text-muted-foreground mb-2">
+            <Search className="h-12 w-12 mx-auto" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground mb-1">No settings found</h3>
+          <p className="text-muted-foreground">
+            Try adjusting your search term or browse the categories above
+          </p>
+        </div>
+      )}
+    </div>
   );
 }

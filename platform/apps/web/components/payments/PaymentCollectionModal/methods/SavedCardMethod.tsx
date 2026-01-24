@@ -34,10 +34,7 @@ function MastercardIcon({ className }: { className?: string }) {
       <rect width="32" height="32" rx="4" fill="#000" />
       <circle cx="12" cy="16" r="7" fill="#EB001B" />
       <circle cx="20" cy="16" r="7" fill="#F79E1B" />
-      <path
-        d="M16 10.8a7 7 0 0 0 0 10.4 7 7 0 0 0 0-10.4z"
-        fill="#FF5F00"
-      />
+      <path d="M16 10.8a7 7 0 0 0 0 10.4 7 7 0 0 0 0-10.4z" fill="#FF5F00" />
     </svg>
   );
 }
@@ -142,11 +139,7 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
       )}
 
       {/* Card selection */}
-      <RadioGroup
-        value={selectedCard?.id || ""}
-        onValueChange={selectCard}
-        className="space-y-3"
-      >
+      <RadioGroup value={selectedCard?.id || ""} onValueChange={selectCard} className="space-y-3">
         {cards.map((card) => {
           const CardIcon = getCardIcon(card.brand);
           const isSelected = selectedCard?.id === card.id;
@@ -158,7 +151,7 @@ export function SavedCardMethod({ onSuccess, onError, onCancel }: SavedCardMetho
                 "flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-all",
                 isSelected
                   ? "border-emerald-500 bg-emerald-50"
-                  : "border-border hover:border-border"
+                  : "border-border hover:border-border",
               )}
               onClick={() => selectCard(card.id)}
             >

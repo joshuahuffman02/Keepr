@@ -65,9 +65,21 @@ const DEMO_STATS = {
   totalDonations: 892,
   donorCount: 634,
   topCharities: [
-    { charity: { id: "demo-1", name: "Sybil's Kids", logoUrl: null }, amountCents: 523400, count: 312 },
-    { charity: { id: "demo-2", name: "Local Veterans Foundation", logoUrl: null }, amountCents: 412300, count: 287 },
-    { charity: { id: "demo-3", name: "Campground Conservation Fund", logoUrl: null }, amountCents: 311800, count: 293 },
+    {
+      charity: { id: "demo-1", name: "Sybil's Kids", logoUrl: null },
+      amountCents: 523400,
+      count: 312,
+    },
+    {
+      charity: { id: "demo-2", name: "Local Veterans Foundation", logoUrl: null },
+      amountCents: 412300,
+      count: 287,
+    },
+    {
+      charity: { id: "demo-3", name: "Campground Conservation Fund", logoUrl: null },
+      amountCents: 311800,
+      count: 293,
+    },
   ],
 };
 
@@ -76,7 +88,10 @@ interface CharityImpactSectionProps {
   showCTA?: boolean;
 }
 
-export function CharityImpactSection({ variant = "full", showCTA = true }: CharityImpactSectionProps) {
+export function CharityImpactSection({
+  variant = "full",
+  showCTA = true,
+}: CharityImpactSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const prefersReducedMotion = useReducedMotionSafe();
@@ -90,41 +105,42 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
 
   // Use demo data if no real stats or no donations
   const useDemo = !stats || stats.totalDonations === 0;
-  const displayStats = useDemo ? {
-    totalAmountCents: DEMO_STATS.totalAmountCents,
-    totalDonations: DEMO_STATS.totalDonations,
-    donorCount: DEMO_STATS.donorCount,
-  } : stats;
+  const displayStats = useDemo
+    ? {
+        totalAmountCents: DEMO_STATS.totalAmountCents,
+        totalDonations: DEMO_STATS.totalDonations,
+        donorCount: DEMO_STATS.donorCount,
+      }
+    : stats;
 
   const animatedTotal = useAnimatedCounter(
     displayStats.totalAmountCents,
     2500,
-    isInView && !isLoading
+    isInView && !isLoading,
   );
 
   const animatedDonations = useAnimatedCounter(
     displayStats.totalDonations,
     2000,
-    isInView && !isLoading
+    isInView && !isLoading,
   );
 
-  const animatedGuests = useAnimatedCounter(
-    displayStats.donorCount,
-    1800,
-    isInView && !isLoading
-  );
+  const animatedGuests = useAnimatedCounter(displayStats.donorCount, 1800, isInView && !isLoading);
 
   // Get charities - Sybil's Kids is always first (featured)
   const allCharities = useDemo
     ? DEMO_STATS.topCharities
     : (stats?.byCharity ?? [])
-        .filter(c => c.charity)
+        .filter((c) => c.charity)
         .sort((a, b) => b.amountCents - a.amountCents)
         .slice(0, 3);
 
   // Sybil's Kids is the featured charity
-  const sybilsKids = allCharities.find(c => c.charity?.name === "Sybil's Kids") || allCharities[0];
-  const otherCharities = allCharities.filter(c => c.charity?.id !== sybilsKids?.charity?.id).slice(0, 2);
+  const sybilsKids =
+    allCharities.find((c) => c.charity?.name === "Sybil's Kids") || allCharities[0];
+  const otherCharities = allCharities
+    .filter((c) => c.charity?.id !== sybilsKids?.charity?.id)
+    .slice(0, 2);
 
   const fadeUp = prefersReducedMotion
     ? { initial: {}, animate: {}, transition: {} }
@@ -169,9 +185,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
               formatDollars(animatedTotal)
             )}
           </div>
-          <p className="text-sm text-slate-600 mt-1">
-            raised for charity
-          </p>
+          <p className="text-sm text-slate-600 mt-1">raised for charity</p>
         </motion.div>
       </motion.div>
     );
@@ -187,11 +201,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Side - Emotive Image */}
-          <motion.div
-            {...fadeIn}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative"
-          >
+          <motion.div {...fadeIn} transition={{ duration: 0.8, delay: 0.2 }} className="relative">
             <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-amber-900/10">
               <Image
                 src="https://images.unsplash.com/photo-1475483768296-6163e08872a1?w=1200&h=900&fit=crop"
@@ -257,17 +267,13 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
               </h2>
 
               <p className="text-lg text-slate-600 leading-relaxed">
-                When you book through Keepr, you're part of something bigger.
-                Together, our community is making a real difference in the lives of those who need it most.
+                When you book through Keepr, you're part of something bigger. Together, our
+                community is making a real difference in the lives of those who need it most.
               </p>
             </div>
 
             {/* Main Stat */}
-            <motion.div
-              {...fadeUp}
-              transition={{ delay: 0.5 }}
-              className="flex items-center gap-4"
-            >
+            <motion.div {...fadeUp} transition={{ delay: 0.5 }} className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-rose-500 to-amber-500">
                   {isLoading ? (
@@ -288,11 +294,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
 
             {/* Sybil's Kids - Featured Charity Card */}
             {sybilsKids && (
-              <motion.div
-                {...fadeUp}
-                transition={{ delay: 0.6 }}
-                className="relative"
-              >
+              <motion.div {...fadeUp} transition={{ delay: 0.6 }} className="relative">
                 <div className="absolute -inset-1 bg-gradient-to-r from-rose-400 to-amber-400 rounded-2xl blur-lg opacity-20" />
                 <div className="relative bg-white rounded-2xl border border-rose-100 p-6 shadow-lg">
                   <div className="flex items-start gap-4">
@@ -315,8 +317,8 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
                       </h3>
 
                       <p className="text-slate-600 text-sm mb-3">
-                        Helping children and families in need through outdoor experiences and community support.
-                        This is the default charity for all Keepr campgrounds.
+                        Helping children and families in need through outdoor experiences and
+                        community support. This is the default charity for all Keepr campgrounds.
                       </p>
 
                       <div className="flex items-center gap-4 text-sm">
@@ -324,9 +326,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
                           {formatDollars(sybilsKids.amountCents)} raised
                         </span>
                         <span className="text-slate-400">|</span>
-                        <span className="text-slate-600">
-                          {sybilsKids.count} donations
-                        </span>
+                        <span className="text-slate-600">{sybilsKids.count} donations</span>
                       </div>
                     </div>
                   </div>
@@ -364,9 +364,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
               <motion.div {...fadeUp} transition={{ delay: 0.8 }}>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 bg-gradient-to-r from-keepr-evergreen/10 to-teal-50 rounded-xl border border-keepr-evergreen/20">
                   <div className="flex-1">
-                    <p className="font-semibold text-slate-900 mb-1">
-                      Own a campground?
-                    </p>
+                    <p className="font-semibold text-slate-900 mb-1">Own a campground?</p>
                     <p className="text-sm text-slate-600">
                       Join the movement and let your guests give back too.
                     </p>

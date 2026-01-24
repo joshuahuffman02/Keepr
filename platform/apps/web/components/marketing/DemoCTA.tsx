@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 
 export function DemoCTA() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    campgroundName: '',
-    sites: '',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    campgroundName: "",
+    sites: "",
+    message: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -24,17 +24,17 @@ export function DemoCTA() {
     setError(null);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
       const response = await fetch(`${apiUrl}/public/demo-request`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit demo request');
+        throw new Error("Failed to submit demo request");
       }
 
       setSubmitted(true);
@@ -43,23 +43,27 @@ export function DemoCTA() {
       setTimeout(() => {
         setSubmitted(false);
         setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          campgroundName: '',
-          sites: '',
-          message: '',
+          name: "",
+          email: "",
+          phone: "",
+          campgroundName: "",
+          sites: "",
+          message: "",
         });
       }, 5000);
     } catch (err) {
-      setError('Something went wrong. Please try again or email us directly at sales@keeprstay.com');
-      console.error('Demo request error:', err);
+      setError(
+        "Something went wrong. Please try again or email us directly at sales@keeprstay.com",
+      );
+      console.error("Demo request error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -93,18 +97,18 @@ export function DemoCTA() {
               Ready to modernize your campground?
             </h2>
             <p className="text-lg text-white/80 mb-8">
-              See how Keepr can streamline your operations with AI-powered tools,
-              guest loyalty programs, and integrated staff scheduling.
+              See how Keepr can streamline your operations with AI-powered tools, guest loyalty
+              programs, and integrated staff scheduling.
             </p>
 
             {/* Benefits */}
             <div className="space-y-4">
               {[
-                '30-day money-back guarantee',
-                'Early access pricing locked forever',
-                'DIY setup guides included',
-                'Optional setup assistance available',
-                'Data import services available',
+                "30-day money-back guarantee",
+                "Early access pricing locked forever",
+                "DIY setup guides included",
+                "Optional setup assistance available",
+                "Data import services available",
               ].map((benefit) => (
                 <div key={benefit} className="flex items-start gap-3">
                   <CheckCircle2 className="h-6 w-6 text-keepr-clay flex-shrink-0 mt-0.5" />
@@ -117,7 +121,9 @@ export function DemoCTA() {
             <div className="mt-8 pt-8 border-t border-keepr-clay/30">
               <p className="text-white/70 text-sm mb-2">Built by campground enthusiasts</p>
               <div className="flex items-center gap-2">
-                <span className="text-white font-semibold">Limited early access spots available</span>
+                <span className="text-white font-semibold">
+                  Limited early access spots available
+                </span>
               </div>
             </div>
           </div>
@@ -134,9 +140,11 @@ export function DemoCTA() {
                   We'll be in touch within 24 hours to schedule your personalized demo.
                 </p>
                 <div className="bg-keepr-evergreen/10 border border-keepr-evergreen/20 rounded-lg p-3 text-sm text-keepr-charcoal">
-                  <strong>What happens next:</strong><br />
-                  Your request has been sent to our sales team at <strong>sales@keeprstay.com</strong>.
-                  You'll receive a confirmation email shortly, followed by a call from our onboarding specialist.
+                  <strong>What happens next:</strong>
+                  <br />
+                  Your request has been sent to our sales team at{" "}
+                  <strong>sales@keeprstay.com</strong>. You'll receive a confirmation email shortly,
+                  followed by a call from our onboarding specialist.
                 </div>
               </div>
             ) : (
@@ -149,7 +157,10 @@ export function DemoCTA() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Full Name *
                       </label>
                       <input
@@ -165,7 +176,10 @@ export function DemoCTA() {
                     </div>
 
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-foreground mb-1">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Email *
                       </label>
                       <input
@@ -182,7 +196,10 @@ export function DemoCTA() {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-foreground mb-1">
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-foreground mb-1"
+                    >
                       Phone Number
                     </label>
                     <input
@@ -197,7 +214,10 @@ export function DemoCTA() {
                   </div>
 
                   <div>
-                    <label htmlFor="campgroundName" className="block text-sm font-medium text-foreground mb-1">
+                    <label
+                      htmlFor="campgroundName"
+                      className="block text-sm font-medium text-foreground mb-1"
+                    >
                       Campground Name *
                     </label>
                     <input
@@ -213,7 +233,10 @@ export function DemoCTA() {
                   </div>
 
                   <div>
-                    <label htmlFor="sites" className="block text-sm font-medium text-foreground mb-1">
+                    <label
+                      htmlFor="sites"
+                      className="block text-sm font-medium text-foreground mb-1"
+                    >
                       Number of Sites *
                     </label>
                     <select
@@ -234,7 +257,10 @@ export function DemoCTA() {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-foreground mb-1">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-foreground mb-1"
+                    >
                       Additional Information
                     </label>
                     <textarea

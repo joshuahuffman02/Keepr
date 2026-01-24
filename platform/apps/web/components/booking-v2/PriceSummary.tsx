@@ -3,16 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Calendar,
-  Users,
-  ChevronDown,
-  ChevronUp,
-  Shield,
-  Zap,
-  MapPin,
-  Check,
-} from "lucide-react";
+import { Calendar, Users, ChevronDown, ChevronUp, Shield, Zap, MapPin, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -115,10 +106,7 @@ export function PriceSummary({
 
   return (
     <div
-      className={cn(
-        "bg-card rounded-xl border border-border shadow-lg overflow-hidden",
-        className
-      )}
+      className={cn("bg-card rounded-xl border border-border shadow-lg overflow-hidden", className)}
     >
       {/* Site class preview */}
       {(siteClassName || siteClassPhoto) && (
@@ -134,18 +122,14 @@ export function PriceSummary({
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate">
-              {siteClassName}
-            </h3>
+            <h3 className="font-semibold text-foreground truncate">{siteClassName}</h3>
             {specificSite ? (
               <p className="text-sm text-emerald-600 flex items-center gap-1">
                 <MapPin className="h-3 w-3" />
                 {specificSite.name || `Site ${specificSite.number}`}
               </p>
             ) : (
-              <p className="text-xs text-muted-foreground">
-                Site assigned at check-in
-              </p>
+              <p className="text-xs text-muted-foreground">Site assigned at check-in</p>
             )}
           </div>
         </div>
@@ -179,9 +163,7 @@ export function PriceSummary({
               {formatCurrency(baseRatePerNight)} x {nights} night
               {nights !== 1 ? "s" : ""}
             </span>
-            <span className="text-foreground">
-              {formatCurrency(baseRatePerNight * nights)}
-            </span>
+            <span className="text-foreground">{formatCurrency(baseRatePerNight * nights)}</span>
           </div>
 
           {/* Line items (fees, taxes) */}
@@ -210,24 +192,17 @@ export function PriceSummary({
                   >
                     <div className="space-y-2 pt-2 pl-4 border-l-2 border-border">
                       {lineItems.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex justify-between text-sm"
-                        >
+                        <div key={idx} className="flex justify-between text-sm">
                           <span
                             className={cn(
-                              item.isDiscount
-                                ? "text-emerald-600"
-                                : "text-muted-foreground"
+                              item.isDiscount ? "text-emerald-600" : "text-muted-foreground",
                             )}
                           >
                             {item.label}
                           </span>
                           <span
                             className={cn(
-                              item.isDiscount
-                                ? "text-emerald-600"
-                                : "text-muted-foreground"
+                              item.isDiscount ? "text-emerald-600" : "text-muted-foreground",
                             )}
                           >
                             {item.isDiscount ? "-" : ""}
@@ -245,12 +220,8 @@ export function PriceSummary({
           {/* Charity donation */}
           {charityName && charityAmount && charityAmount > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-rose-600">
-                Round up for {charityName}
-              </span>
-              <span className="text-rose-600">
-                {formatCurrency(charityAmount)}
-              </span>
+              <span className="text-rose-600">Round up for {charityName}</span>
+              <span className="text-rose-600">{formatCurrency(charityAmount)}</span>
             </div>
           )}
 
@@ -296,9 +267,7 @@ export function PriceSummary({
           <div className="flex items-start gap-2 p-3 bg-emerald-50 rounded-lg text-sm">
             <Check className="h-4 w-4 text-emerald-600 mt-0.5 flex-shrink-0" />
             <div>
-              <span className="font-medium text-emerald-800">
-                Free cancellation
-              </span>
+              <span className="font-medium text-emerald-800">Free cancellation</span>
               <p className="text-emerald-700">
                 Cancel before {freeCancellationUntil} for a full refund
               </p>
@@ -321,12 +290,7 @@ export function PriceSummaryPlaceholder({
   className?: string;
 }) {
   return (
-    <div
-      className={cn(
-        "bg-card rounded-xl border border-border shadow-lg p-6",
-        className
-      )}
-    >
+    <div className={cn("bg-card rounded-xl border border-border shadow-lg p-6", className)}>
       <div className="text-center space-y-4">
         <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto">
           <Calendar className="h-6 w-6 text-muted-foreground" />

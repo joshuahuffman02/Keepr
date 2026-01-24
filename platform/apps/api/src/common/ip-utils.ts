@@ -108,9 +108,7 @@ export function extractClientIp(options: ExtractClientIpOptions): string | null 
 
   // Try x-forwarded-for first (from trusted proxy)
   if (forwardedFor) {
-    const headerValue = Array.isArray(forwardedFor)
-      ? forwardedFor[0]
-      : forwardedFor;
+    const headerValue = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
 
     if (headerValue) {
       // Take only the first (leftmost) IP, which is the original client

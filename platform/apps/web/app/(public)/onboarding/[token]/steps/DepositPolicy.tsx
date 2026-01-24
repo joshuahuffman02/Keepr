@@ -68,7 +68,7 @@ export function DepositPolicy({
 }: DepositPolicyProps) {
   const prefersReducedMotion = useReducedMotion();
   const [selected, setSelected] = useState<DepositPolicyData["strategy"]>(
-    initialData?.strategy || "percent"
+    initialData?.strategy || "percent",
   );
   const [saving, setSaving] = useState(false);
 
@@ -104,12 +104,8 @@ export function DepositPolicy({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 mb-4">
             <Shield className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            How should deposits work?
-          </h2>
-          <p className="text-slate-400">
-            Choose how much to collect when guests book
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">How should deposits work?</h2>
+          <p className="text-slate-400">Choose how much to collect when guests book</p>
         </motion.div>
 
         {/* Policy options */}
@@ -131,7 +127,7 @@ export function DepositPolicy({
                   "relative w-full p-5 rounded-xl border-2 text-left transition-all",
                   isSelected
                     ? "border-emerald-500 bg-emerald-500/10"
-                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                 )}
               >
                 {/* Recommended badge */}
@@ -146,14 +142,11 @@ export function DepositPolicy({
                   <div
                     className={cn(
                       "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
-                      isSelected ? "bg-emerald-500/20" : "bg-slate-700"
+                      isSelected ? "bg-emerald-500/20" : "bg-slate-700",
                     )}
                   >
                     <Icon
-                      className={cn(
-                        "w-6 h-6",
-                        isSelected ? "text-emerald-400" : "text-slate-400"
-                      )}
+                      className={cn("w-6 h-6", isSelected ? "text-emerald-400" : "text-slate-400")}
                     />
                   </div>
 
@@ -163,7 +156,7 @@ export function DepositPolicy({
                       <h3
                         className={cn(
                           "font-semibold text-lg",
-                          isSelected ? "text-emerald-400" : "text-white"
+                          isSelected ? "text-emerald-400" : "text-white",
                         )}
                       >
                         {policy.title}
@@ -173,19 +166,13 @@ export function DepositPolicy({
                       <div
                         className={cn(
                           "w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-                          isSelected
-                            ? "border-emerald-500 bg-emerald-500"
-                            : "border-slate-600"
+                          isSelected ? "border-emerald-500 bg-emerald-500" : "border-slate-600",
                         )}
                       >
                         {isSelected && (
                           <motion.div
-                            initial={
-                              prefersReducedMotion ? {} : { scale: 0 }
-                            }
-                            animate={
-                              prefersReducedMotion ? {} : { scale: 1 }
-                            }
+                            initial={prefersReducedMotion ? {} : { scale: 0 }}
+                            animate={prefersReducedMotion ? {} : { scale: 1 }}
                             transition={SPRING_CONFIG}
                           >
                             <Check className="w-4 h-4 text-white" />
@@ -215,11 +202,9 @@ export function DepositPolicy({
           className="bg-slate-800/30 border border-slate-700 rounded-lg p-4"
         >
           <p className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              You can customize this later.
-            </span>{" "}
-            Set different deposit rules per site type, add cancellation fees,
-            and more in your dashboard settings.
+            <span className="text-slate-300 font-medium">You can customize this later.</span> Set
+            different deposit rules per site type, add cancellation fees, and more in your dashboard
+            settings.
           </p>
         </motion.div>
 
@@ -236,7 +221,7 @@ export function DepositPolicy({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

@@ -9,6 +9,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PermissionsModule],
   controllers: [StoredValueController],
   providers: [StoredValueService, IdempotencyService],
-  exports: [StoredValueService]
+  exports: [StoredValueService],
 })
 export class StoredValueModule {}

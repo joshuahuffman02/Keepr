@@ -66,7 +66,9 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
   const [isIssueDialogOpen, setIsIssueDialogOpen] = useState(false);
   const [isCheckBalanceDialogOpen, setIsCheckBalanceDialogOpen] = useState(false);
   const [checkCode, setCheckCode] = useState("");
-  const [checkedBalance, setCheckedBalance] = useState<{ balance: number; code: string } | null>(null);
+  const [checkedBalance, setCheckedBalance] = useState<{ balance: number; code: string } | null>(
+    null,
+  );
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Issue form state
@@ -90,10 +92,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
 
   // Issue gift card mutation
   const issueMutation = useMutation({
-    mutationFn: (payload: {
-      amountCents: number;
-      code?: string;
-    }) =>
+    mutationFn: (payload: { amountCents: number; code?: string }) =>
       apiClient.issueStoredValue({
         tenantId: campgroundId,
         amountCents: payload.amountCents,
@@ -133,9 +132,10 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
   const filteredCards = useMemo(() => {
     if (!searchTerm) return giftCards;
     const term = searchTerm.toLowerCase();
-    return giftCards.filter((card) =>
-      card.codes?.some((c) => c.code.toLowerCase().includes(term)) ||
-      card.id.toLowerCase().includes(term)
+    return giftCards.filter(
+      (card) =>
+        card.codes?.some((c) => c.code.toLowerCase().includes(term)) ||
+        card.id.toLowerCase().includes(term),
     );
   }, [giftCards, searchTerm]);
 
@@ -185,12 +185,15 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
   const handleCheckBalance = async () => {
     if (!checkCode.trim()) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000"}/stored-value/code/${checkCode.trim()}/balance`, {
-        headers: {
-          Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : ""}`,
-          "x-campground-id": campgroundId,
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000"}/stored-value/code/${checkCode.trim()}/balance`,
+        {
+          headers: {
+            Authorization: `Bearer ${typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : ""}`,
+            "x-campground-id": campgroundId,
+          },
         },
-      });
+      );
       if (!res.ok) throw new Error("Card not found");
       const data = await res.json();
       setCheckedBalance({ balance: data.balance, code: checkCode });
@@ -288,7 +291,9 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                 </div>
                 {checkedBalance && (
                   <div className="p-4 bg-status-success-bg rounded-lg border border-status-success-border motion-safe:animate-in motion-safe:fade-in">
-                    <p className="text-sm text-status-success-text">Balance for {checkedBalance.code}:</p>
+                    <p className="text-sm text-status-success-text">
+                      Balance for {checkedBalance.code}:
+                    </p>
                     <p className="text-3xl font-bold text-status-success-text mt-1">
                       {formatCurrency(checkedBalance.balance)}
                     </p>
@@ -299,9 +304,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                 <Button variant="outline" onClick={() => setIsCheckBalanceDialogOpen(false)}>
                   Close
                 </Button>
-                <Button onClick={handleCheckBalance}>
-                  Check Balance
-                </Button>
+                <Button onClick={handleCheckBalance}>Check Balance</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -371,7 +374,9 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                   <div className="p-4 bg-status-info-bg rounded-xl border border-status-info-border motion-safe:animate-in motion-safe:fade-in">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-status-info-text font-medium">Gift Card Preview</p>
+                        <p className="text-xs text-status-info-text font-medium">
+                          Gift Card Preview
+                        </p>
                         <p className="text-2xl font-bold text-foreground mt-1">
                           {formatCurrency(Math.round(parseFloat(issueAmount || "0") * 100))}
                         </p>
@@ -446,22 +451,20 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                     key={card.id}
                     className={cn(
                       "overflow-hidden transition-all hover:shadow-md",
-                      !isActive && "opacity-60"
+                      !isActive && "opacity-60",
                     )}
                   >
                     <div className="flex items-center p-4 gap-4">
                       <div
                         className={cn(
                           "w-12 h-12 rounded-xl flex items-center justify-center",
-                          isActive
-                            ? "bg-status-success"
-                            : "bg-muted"
+                          isActive ? "bg-status-success" : "bg-muted",
                         )}
                       >
                         <Gift
                           className={cn(
                             "w-6 h-6",
-                            isActive ? "text-status-success-foreground" : "text-muted-foreground"
+                            isActive ? "text-status-success-foreground" : "text-muted-foreground",
                           )}
                         />
                       </div>
@@ -488,10 +491,12 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className={cn(
-                          "text-lg font-bold",
-                          isActive ? "text-status-success-text" : "text-muted-foreground"
-                        )}>
+                        <p
+                          className={cn(
+                            "text-lg font-bold",
+                            isActive ? "text-status-success-text" : "text-muted-foreground",
+                          )}
+                        >
                           {formatCurrency(card.balanceCents)}
                         </p>
                         <Badge
@@ -500,7 +505,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                             "text-xs",
                             isActive
                               ? "border-status-success-border text-status-success-text bg-status-success-bg"
-                              : "border-border text-muted-foreground"
+                              : "border-border text-muted-foreground",
                           )}
                         >
                           {isActive ? "Active" : "Used"}
@@ -541,7 +546,7 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                     <div
                       className={cn(
                         "w-8 h-8 rounded-full flex items-center justify-center",
-                        isCredit ? "bg-status-success-bg" : "bg-status-warning-bg"
+                        isCredit ? "bg-status-success-bg" : "bg-status-warning-bg",
                       )}
                     >
                       {isCredit ? (
@@ -563,10 +568,11 @@ export function GiftCardsManagement({ campgroundId }: GiftCardsManagementProps) 
                       <p
                         className={cn(
                           "font-medium",
-                          isCredit ? "text-status-success-text" : "text-status-warning-text"
+                          isCredit ? "text-status-success-text" : "text-status-warning-text",
                         )}
                       >
-                        {isCredit ? "+" : ""}{formatCurrency(Math.abs(entry.amountCents))}
+                        {isCredit ? "+" : ""}
+                        {formatCurrency(Math.abs(entry.amountCents))}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         Bal: {formatCurrency(entry.afterBalanceCents ?? 0)}

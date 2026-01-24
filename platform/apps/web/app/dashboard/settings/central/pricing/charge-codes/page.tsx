@@ -70,77 +70,84 @@ export default function ChargeCodesPage() {
     const emptyProducts: Product[] = [];
     const emptyLedger: LedgerSummaryEntry[] = [];
     const emptyCategories: ProductCategory[] = [];
-    const productsPromise: Promise<Product[]> = apiClient.getProducts(id).catch(() => emptyProducts);
-    const ledgerPromise: Promise<LedgerSummaryEntry[]> = apiClient.getLedgerSummary(id, {}).catch(() => emptyLedger);
-    const categoriesPromise: Promise<ProductCategory[]> =
-      apiClient.getProductCategories(id).catch(() => emptyCategories);
-    Promise.all([productsPromise, ledgerPromise, categoriesPromise]).then(([products, ledgerSummary, categories]) => {
-      const codesMap = new Map<string, ChargeCode>();
-      const categoryById = new Map(categories.map((category) => [category.id, category.name]));
+    const productsPromise: Promise<Product[]> = apiClient
+      .getProducts(id)
+      .catch(() => emptyProducts);
+    const ledgerPromise: Promise<LedgerSummaryEntry[]> = apiClient
+      .getLedgerSummary(id, {})
+      .catch(() => emptyLedger);
+    const categoriesPromise: Promise<ProductCategory[]> = apiClient
+      .getProductCategories(id)
+      .catch(() => emptyCategories);
+    Promise.all([productsPromise, ledgerPromise, categoriesPromise]).then(
+      ([products, ledgerSummary, categories]) => {
+        const codesMap = new Map<string, ChargeCode>();
+        const categoryById = new Map(categories.map((category) => [category.id, category.name]));
 
-      // Add system charge codes
-      SYSTEM_CHARGE_CODES.forEach((sc) => {
-        codesMap.set(sc.code, {
-          id: `system-${sc.code}`,
-          code: sc.code,
-          name: sc.name,
-          category: sc.category,
-          source: "system",
-          usageCount: 0,
-          isActive: true,
+        // Add system charge codes
+        SYSTEM_CHARGE_CODES.forEach((sc) => {
+          codesMap.set(sc.code, {
+            id: `system-${sc.code}`,
+            code: sc.code,
+            name: sc.name,
+            category: sc.category,
+            source: "system",
+            usageCount: 0,
+            isActive: true,
+          });
         });
-      });
 
-      // Add GL codes from products
-      const productList = products;
-      productList.forEach((product) => {
-        if (product.glCode) {
-          const existing = codesMap.get(product.glCode);
-          if (existing) {
-            existing.usageCount += 1;
-          } else {
-            codesMap.set(product.glCode, {
-              id: `product-${product.id}`,
-              code: product.glCode,
-              name: product.name || product.glCode,
-              category: product.categoryId ? categoryById.get(product.categoryId) || "Store" : "Store",
-              source: "product",
-              usageCount: 1,
-              isActive: product.isActive !== false,
-            });
+        // Add GL codes from products
+        const productList = products;
+        productList.forEach((product) => {
+          if (product.glCode) {
+            const existing = codesMap.get(product.glCode);
+            if (existing) {
+              existing.usageCount += 1;
+            } else {
+              codesMap.set(product.glCode, {
+                id: `product-${product.id}`,
+                code: product.glCode,
+                name: product.name || product.glCode,
+                category: product.categoryId
+                  ? categoryById.get(product.categoryId) || "Store"
+                  : "Store",
+                source: "product",
+                usageCount: 1,
+                isActive: product.isActive !== false,
+              });
+            }
           }
-        }
-      });
+        });
 
-      // Add GL codes from ledger entries
-      const summaryList = Array.isArray(ledgerSummary) ? ledgerSummary : [];
-      summaryList.forEach((entry: { glCode: string; netCents: number }) => {
-        if (entry.glCode && entry.glCode !== "Unassigned") {
-          const existing = codesMap.get(entry.glCode);
-          if (existing) {
-            existing.usageCount += 1;
-          } else {
-            codesMap.set(entry.glCode, {
-              id: `ledger-${entry.glCode}`,
-              code: entry.glCode,
-              name: entry.glCode,
-              category: "Ledger",
-              source: "ledger",
-              usageCount: 1,
-              isActive: true,
-            });
+        // Add GL codes from ledger entries
+        const summaryList = Array.isArray(ledgerSummary) ? ledgerSummary : [];
+        summaryList.forEach((entry: { glCode: string; netCents: number }) => {
+          if (entry.glCode && entry.glCode !== "Unassigned") {
+            const existing = codesMap.get(entry.glCode);
+            if (existing) {
+              existing.usageCount += 1;
+            } else {
+              codesMap.set(entry.glCode, {
+                id: `ledger-${entry.glCode}`,
+                code: entry.glCode,
+                name: entry.glCode,
+                category: "Ledger",
+                source: "ledger",
+                usageCount: 1,
+                isActive: true,
+              });
+            }
           }
-        }
-      });
+        });
 
-      // Convert map to array and sort by code
-      const codes = Array.from(codesMap.values()).sort((a, b) =>
-        a.code.localeCompare(b.code)
-      );
+        // Convert map to array and sort by code
+        const codes = Array.from(codesMap.values()).sort((a, b) => a.code.localeCompare(b.code));
 
-      setChargeCodes(codes);
-      setLoading(false);
-    });
+        setChargeCodes(codes);
+        setLoading(false);
+      },
+    );
   }, []);
 
   const columns = [
@@ -152,9 +159,7 @@ export default function ChargeCodesPage() {
           <div className="p-2 rounded-lg bg-muted">
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </div>
-          <code className="px-2 py-1 rounded bg-muted font-mono text-sm">
-            {item.code}
-          </code>
+          <code className="px-2 py-1 rounded bg-muted font-mono text-sm">{item.code}</code>
         </div>
       ),
     },
@@ -178,19 +183,19 @@ export default function ChargeCodesPage() {
             item.source === "system"
               ? "bg-purple-50 text-purple-700 border-purple-200"
               : item.source === "product"
-              ? "bg-status-info/15 text-status-info border-blue-200"
-              : item.source === "ledger"
-              ? "bg-status-warning/15 text-status-warning border-amber-200"
-              : "bg-muted text-foreground"
+                ? "bg-status-info/15 text-status-info border-blue-200"
+                : item.source === "ledger"
+                  ? "bg-status-warning/15 text-status-warning border-amber-200"
+                  : "bg-muted text-foreground"
           }
         >
           {item.source === "system"
             ? "System"
             : item.source === "product"
-            ? "Product"
-            : item.source === "ledger"
-            ? "Ledger"
-            : "Other"}
+              ? "Product"
+              : item.source === "ledger"
+                ? "Ledger"
+                : "Other"}
         </Badge>
       ),
     },
@@ -278,9 +283,9 @@ export default function ChargeCodesPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Charge codes (also called GL codes) categorize different types of revenue for
-          reporting and accounting. Each transaction is associated with a charge code.
-          Codes are pulled from products, fees, and ledger entries.
+          Charge codes (also called GL codes) categorize different types of revenue for reporting
+          and accounting. Each transaction is associated with a charge code. Codes are pulled from
+          products, fees, and ledger entries.
         </AlertDescription>
       </Alert>
 
@@ -338,9 +343,7 @@ export default function ChargeCodesPage() {
                 <Receipt className="h-5 w-5 text-status-success" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {chargeCodes.length}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{chargeCodes.length}</p>
                 <p className="text-sm text-muted-foreground">Total</p>
               </div>
             </div>
@@ -368,9 +371,7 @@ export default function ChargeCodesPage() {
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                {item.isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
+              <DropdownMenuItem>{item.isActive ? "Deactivate" : "Activate"}</DropdownMenuItem>
               {item.source !== "system" && (
                 <>
                   <DropdownMenuSeparator />

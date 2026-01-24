@@ -4,7 +4,11 @@ import React, { Suspense } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../ui/dialog";
 import { Button } from "../../ui/button";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { PaymentCollectionModalProps, PaymentMethodType, PAYMENT_METHOD_INFO } from "./context/types";
+import {
+  PaymentCollectionModalProps,
+  PaymentMethodType,
+  PAYMENT_METHOD_INFO,
+} from "./context/types";
 import { PaymentProvider, usePaymentContext } from "./context/PaymentContext";
 import { MethodSelector } from "./components/MethodSelector";
 import { PaymentSummary, PaymentSummaryInline } from "./components/PaymentSummary";
@@ -87,9 +91,7 @@ function PaymentModalContent() {
             )}
             <div>
               <DialogTitle>{getStepTitle()}</DialogTitle>
-              {step !== "processing" && step !== "success" && (
-                <PaymentSummaryInline />
-              )}
+              {step !== "processing" && step !== "success" && <PaymentSummaryInline />}
             </div>
           </div>
         </DialogHeader>
@@ -118,16 +120,11 @@ function PaymentModalContent() {
 
               {/* Split tender manager (shows applied payments) */}
               {props.enableSplitTender !== false && (
-                <SplitTenderManager
-                  onAddPayment={() => {}}
-                  disabled={loading}
-                />
+                <SplitTenderManager onAddPayment={() => {}} disabled={loading} />
               )}
 
               {/* Promo code input */}
-              {props.enablePromoCode !== false && (
-                <PromoCodeInput disabled={loading} />
-              )}
+              {props.enablePromoCode !== false && <PromoCodeInput disabled={loading} />}
 
               {/* Payment method selector */}
               <MethodSelector disabled={loading} />
@@ -136,9 +133,7 @@ function PaymentModalContent() {
               <FeeEstimate />
 
               {/* Charity round-up */}
-              {props.enableCharityRoundUp !== false && (
-                <CharityRoundUp disabled={loading} />
-              )}
+              {props.enableCharityRoundUp !== false && <CharityRoundUp disabled={loading} />}
 
               {/* Payment summary */}
               <PaymentSummary />
@@ -230,9 +225,7 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
     return (
       <div className="p-6 border border-border rounded-lg bg-muted">
         <div className="text-center space-y-4">
-          <p className="text-muted-foreground">
-            {methodInfo.label} payment component coming soon
-          </p>
+          <p className="text-muted-foreground">{methodInfo.label} payment component coming soon</p>
           <p className="text-sm text-muted-foreground">{methodInfo.description}</p>
           <Button variant="outline" onClick={handleCancel}>
             Back
@@ -246,18 +239,10 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
   return (
     <Suspense fallback={LoadingFallback}>
       {method === "card" && (
-        <CardMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <CardMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "saved_card" && (
-        <SavedCardMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <SavedCardMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "apple_pay" && (
         <WalletPayMethod
@@ -276,39 +261,19 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
         />
       )}
       {method === "ach" && (
-        <ACHMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <ACHMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "terminal" && (
-        <TerminalMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <TerminalMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "cash" && (
-        <CashMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <CashMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "check" && (
-        <CheckMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <CheckMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "folio" && (
-        <FolioMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <FolioMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "guest_wallet" && (
         <GuestWalletMethod
@@ -318,11 +283,7 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
         />
       )}
       {method === "gift_card" && (
-        <GiftCardMethod
-          onSuccess={handleSuccess}
-          onError={handleError}
-          onCancel={handleCancel}
-        />
+        <GiftCardMethod onSuccess={handleSuccess} onError={handleError} onCancel={handleCancel} />
       )}
       {method === "deposit_hold" && (
         <DepositHoldMethod
@@ -339,9 +300,7 @@ function PaymentMethodRenderer({ method }: PaymentMethodRendererProps) {
         />
       )}
       {/* Link method - show placeholder for now */}
-      {method === "link" && (
-        <PlaceholderComponent />
-      )}
+      {method === "link" && <PlaceholderComponent />}
     </Suspense>
   );
 }

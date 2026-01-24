@@ -39,7 +39,13 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 import { Switch } from "../../components/ui/switch";
 import { Badge } from "../../components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
@@ -89,7 +95,7 @@ export default function CalendarPage() {
 
   const searchFilteredSiteIds = useMemo(
     () => new Set(reservations.map((res) => res.siteId)),
-    [reservations]
+    [reservations],
   );
 
   const visibleSites = useMemo(() => {
@@ -97,11 +103,14 @@ export default function CalendarPage() {
     return typeFilteredSites.filter((site) => searchFilteredSiteIds.has(site.id));
   }, [typeFilteredSites, state.guestSearch, searchFilteredSiteIds]);
 
-  const visibleSiteIds = useMemo(() => new Set(visibleSites.map((site) => site.id)), [visibleSites]);
+  const visibleSiteIds = useMemo(
+    () => new Set(visibleSites.map((site) => site.id)),
+    [visibleSites],
+  );
 
   const visibleReservations = useMemo(
     () => reservations.filter((res) => (res.siteId ? visibleSiteIds.has(res.siteId) : false)),
-    [reservations, visibleSiteIds]
+    [reservations, visibleSiteIds],
   );
 
   // Get blackouts and group by site
@@ -131,7 +140,13 @@ export default function CalendarPage() {
       const email = (guest.email ?? "").toLowerCase();
       const phone = (guest.phone ?? "").toLowerCase();
       const fullName = `${first} ${last}`.trim();
-      if (!first.includes(search) && !last.includes(search) && !email.includes(search) && !phone.includes(search) && !fullName.includes(search)) {
+      if (
+        !first.includes(search) &&
+        !last.includes(search) &&
+        !email.includes(search) &&
+        !phone.includes(search) &&
+        !fullName.includes(search)
+      ) {
         continue;
       }
       count += 1;
@@ -146,7 +161,9 @@ export default function CalendarPage() {
   const selectedReservation = useMemo(() => {
     if (!state.selectedReservationId) return null;
     const allReservations = queries.reservations.data ?? [];
-    return allReservations.find((reservation) => reservation.id === state.selectedReservationId) ?? null;
+    return (
+      allReservations.find((reservation) => reservation.id === state.selectedReservationId) ?? null
+    );
   }, [state.selectedReservationId, queries.reservations.data]);
 
   // Count reservations by status for filter chips - stable reference
@@ -157,7 +174,7 @@ export default function CalendarPage() {
       checked_in: 0,
       pending: 0,
       cancelled: 0,
-      checked_out: 0
+      checked_out: 0,
     };
     for (const res of allRes) {
       const status = res.status ?? "pending";
@@ -193,7 +210,11 @@ export default function CalendarPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target;
       if (target instanceof HTMLElement) {
-        if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        if (
+          target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable
+        ) {
           if (e.key === "Escape" && target instanceof HTMLInputElement) {
             target.blur();
             return;
@@ -274,12 +295,16 @@ export default function CalendarPage() {
 
   const arrivalsToday = useMemo(() => {
     if (!todayKey) return 0;
-    return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.arrivalDate)) === todayKey).length;
+    return visibleReservations.filter(
+      (res) => formatLocalDateInput(toLocalDate(res.arrivalDate)) === todayKey,
+    ).length;
   }, [visibleReservations, todayKey]);
 
   const departuresToday = useMemo(() => {
     if (!todayKey) return 0;
-    return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.departureDate)) === todayKey).length;
+    return visibleReservations.filter(
+      (res) => formatLocalDateInput(toLocalDate(res.departureDate)) === todayKey,
+    ).length;
   }, [visibleReservations, todayKey]);
 
   const occupiedToday = useMemo(() => {
@@ -293,8 +318,12 @@ export default function CalendarPage() {
 
   const availableToday = Math.max(0, visibleSites.length - occupiedToday);
 
-  const maintenanceCount = Array.isArray(queries.maintenance.data) ? queries.maintenance.data.length : 0;
-  const housekeepingCount = Array.isArray(queries.housekeeping.data) ? queries.housekeeping.data.length : 0;
+  const maintenanceCount = Array.isArray(queries.maintenance.data)
+    ? queries.maintenance.data.length
+    : 0;
+  const housekeepingCount = Array.isArray(queries.housekeeping.data)
+    ? queries.housekeeping.data.length
+    : 0;
 
   const handlePrev = useCallback(() => {
     const d = parseLocalDateInput(state.startDate);
@@ -311,7 +340,10 @@ export default function CalendarPage() {
   const bookingDraft = state.reservationDraft;
 
   const hasFilters = Boolean(
-    state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
+    state.guestSearch ||
+    state.statusFilter !== "all" ||
+    state.siteTypeFilter !== "all" ||
+    state.arrivalsNowOnly,
   );
 
   const activeFilterCount =
@@ -325,7 +357,7 @@ export default function CalendarPage() {
     const params = new URLSearchParams({
       siteId: bookingDraft.siteId,
       arrivalDate: bookingDraft.arrival,
-      departureDate: bookingDraft.departure
+      departureDate: bookingDraft.departure,
     });
     router.push(`/booking?${params.toString()}`);
   }, [bookingDraft, router]);
@@ -337,11 +369,14 @@ export default function CalendarPage() {
     actions.setArrivalsNowOnly(false);
   }, [actions]);
 
-  const handleCloseReservationDialog = useCallback((open: boolean) => {
-    if (!open) {
-      actions.setSelectedReservationId(null);
-    }
-  }, [actions]);
+  const handleCloseReservationDialog = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        actions.setSelectedReservationId(null);
+      }
+    },
+    [actions],
+  );
 
   return (
     <DashboardShell density="full">
@@ -349,22 +384,22 @@ export default function CalendarPage() {
         <Breadcrumbs
           items={[
             { label: "Dashboard", href: "/dashboard" },
-            { label: "Calendar", href: "/calendar" }
+            { label: "Calendar", href: "/calendar" },
           ]}
         />
 
         <PageHeader
           eyebrow="Reservations"
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
                 <CalendarDays className="h-5 w-5" />
               </span>
               <span>Booking Calendar</span>
             </span>
-          )}
+          }
           subtitle="Drag across dates to build a stay. Release to preview pricing and availability."
-          actions={(
+          actions={
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex items-center bg-card rounded-xl border border-border p-1">
                 {DAY_RANGES.map((range) => (
@@ -374,7 +409,9 @@ export default function CalendarPage() {
                     size="sm"
                     className={cn(
                       "h-8 px-3 text-[11px] font-semibold",
-                      state.dayCount === range ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
+                      state.dayCount === range
+                        ? "bg-status-success/10 text-status-success"
+                        : "text-muted-foreground",
                     )}
                     onClick={() => actions.setDayCount(range)}
                     aria-pressed={state.dayCount === range}
@@ -430,16 +467,16 @@ export default function CalendarPage() {
                       size="sm"
                       className={cn(
                         "h-8 px-2.5 gap-1.5",
-                        density === mode ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
+                        density === mode
+                          ? "bg-status-success/10 text-status-success"
+                          : "text-muted-foreground",
                       )}
                       onClick={() => setDensity(mode)}
                       title={`${label} view`}
                       aria-pressed={density === mode}
                     >
                       <Icon className="h-4 w-4" />
-                      <span className="text-[11px] font-semibold hidden sm:inline">
-                        {label}
-                      </span>
+                      <span className="text-[11px] font-semibold hidden sm:inline">{label}</span>
                     </Button>
                   );
                 })}
@@ -471,7 +508,7 @@ export default function CalendarPage() {
                 </div>
               ) : null}
             </div>
-          )}
+          }
         />
 
         <Card className="border-border shadow-sm">
@@ -544,7 +581,10 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground">
-              <Switch checked={state.arrivalsNowOnly} onCheckedChange={actions.setArrivalsNowOnly} />
+              <Switch
+                checked={state.arrivalsNowOnly}
+                onCheckedChange={actions.setArrivalsNowOnly}
+              />
               <span>Arrivals today</span>
             </div>
 
@@ -559,7 +599,10 @@ export default function CalendarPage() {
                 </span>
               ) : null}
               <span>
-                {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
+                {state.guestSearch ||
+                state.statusFilter !== "all" ||
+                state.siteTypeFilter !== "all" ||
+                state.arrivalsNowOnly
                   ? `${visibleReservations.length} stays match filters`
                   : `${visibleReservations.length} stays in view`}
               </span>
@@ -578,18 +621,27 @@ export default function CalendarPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
                     <div className="text-xs font-medium text-primary">Draft booking</div>
-                    <div className="text-sm font-semibold text-foreground">{bookingDraft.siteName}</div>
+                    <div className="text-sm font-semibold text-foreground">
+                      {bookingDraft.siteName}
+                    </div>
                     <div className="text-xs text-muted-foreground">
-                      {bookingDraft.arrival} → {bookingDraft.departure} · {bookingDraft.nights} nights
+                      {bookingDraft.arrival} → {bookingDraft.departure} · {bookingDraft.nights}{" "}
+                      nights
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="text-xl font-black text-foreground">${(bookingDraft.total / 100).toFixed(2)}</div>
+                    <div className="text-xl font-black text-foreground">
+                      ${(bookingDraft.total / 100).toFixed(2)}
+                    </div>
                     <Button className="gap-2" onClick={handleBookNow}>
                       Continue booking
                       <ArrowRight className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => actions.setReservationDraft(null)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => actions.setReservationDraft(null)}
+                    >
                       Clear
                     </Button>
                   </div>
@@ -602,10 +654,30 @@ export default function CalendarPage() {
             )}
 
             <div className="grid gap-4 md:grid-cols-4">
-              <StatCard label="Occupied tonight" value={`${occupiedToday}`} sub={`${availableToday} open sites`} icon={<Users className="h-4 w-4" />} />
-              <StatCard label="Arrivals today" value={`${arrivalsToday}`} sub={`${departuresToday} departures`} icon={<CalendarCheck className="h-4 w-4" />} />
-              <StatCard label="Maintenance" value={`${maintenanceCount}`} sub="Open tickets" icon={<Wrench className="h-4 w-4" />} />
-              <StatCard label="Housekeeping" value={`${housekeepingCount}`} sub="Active tasks" icon={<Sparkles className="h-4 w-4" />} />
+              <StatCard
+                label="Occupied tonight"
+                value={`${occupiedToday}`}
+                sub={`${availableToday} open sites`}
+                icon={<Users className="h-4 w-4" />}
+              />
+              <StatCard
+                label="Arrivals today"
+                value={`${arrivalsToday}`}
+                sub={`${departuresToday} departures`}
+                icon={<CalendarCheck className="h-4 w-4" />}
+              />
+              <StatCard
+                label="Maintenance"
+                value={`${maintenanceCount}`}
+                sub="Open tickets"
+                icon={<Wrench className="h-4 w-4" />}
+              />
+              <StatCard
+                label="Housekeeping"
+                value={`${housekeepingCount}`}
+                sub="Active tasks"
+                icon={<Sparkles className="h-4 w-4" />}
+              />
             </div>
 
             <Card className="border-border shadow-sm">
@@ -678,7 +750,8 @@ export default function CalendarPage() {
             <ShortcutItem keys={["?"]} desc="Show this help" />
           </div>
           <div className="text-xs text-muted-foreground border-t pt-3">
-            Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">Esc</kbd> to close
+            Press <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">Esc</kbd> to
+            close
           </div>
         </DialogContent>
       </Dialog>
@@ -691,15 +764,22 @@ function ReservationDetailContent({
   reservation,
   selectedCampground,
   onClose,
-  router
+  router,
 }: {
-  reservation: NonNullable<ReturnType<typeof useCalendarData>["queries"]["reservations"]["data"]>[number];
+  reservation: NonNullable<
+    ReturnType<typeof useCalendarData>["queries"]["reservations"]["data"]
+  >[number];
   selectedCampground: string | null;
   onClose: () => void;
   router: ReturnType<typeof useRouter>;
 }) {
-  const guestName = `${reservation.guest?.primaryFirstName ?? ""} ${reservation.guest?.primaryLastName ?? ""}`.trim() || "Guest";
-  const nights = Math.ceil((new Date(reservation.departureDate).getTime() - new Date(reservation.arrivalDate).getTime()) / (1000 * 60 * 60 * 24));
+  const guestName =
+    `${reservation.guest?.primaryFirstName ?? ""} ${reservation.guest?.primaryLastName ?? ""}`.trim() ||
+    "Guest";
+  const nights = Math.ceil(
+    (new Date(reservation.departureDate).getTime() - new Date(reservation.arrivalDate).getTime()) /
+      (1000 * 60 * 60 * 24),
+  );
   const total = reservation.totalAmount ?? 0;
   const paid = reservation.paidAmount ?? 0;
   const balance = total - paid;
@@ -709,7 +789,7 @@ function ReservationDetailContent({
     checked_in: "bg-status-info/15 text-status-info border-status-info/30",
     checked_out: "bg-muted text-muted-foreground border-border",
     cancelled: "bg-status-error/15 text-status-error border-status-error/30",
-    pending: "bg-status-warning/15 text-status-warning border-status-warning/30"
+    pending: "bg-status-warning/15 text-status-warning border-status-warning/30",
   };
 
   const statusIcons: Record<string, React.ReactNode> = {
@@ -717,7 +797,7 @@ function ReservationDetailContent({
     checked_in: <Clock className="h-3.5 w-3.5" />,
     checked_out: <LogOut className="h-3.5 w-3.5" />,
     cancelled: <XCircle className="h-3.5 w-3.5" />,
-    pending: <Clock className="h-3.5 w-3.5" />
+    pending: <Clock className="h-3.5 w-3.5" />,
   };
 
   const status = reservation.status ?? "pending";
@@ -730,7 +810,12 @@ function ReservationDetailContent({
             <User className="h-5 w-5 text-muted-foreground/70" />
             <span>{guestName}</span>
           </div>
-          <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium", statusColors[status] ?? statusColors.pending)}>
+          <div
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium",
+              statusColors[status] ?? statusColors.pending,
+            )}
+          >
             {statusIcons[status] ?? statusIcons.pending}
             <span className="capitalize">{status.replace(/_/g, " ")}</span>
           </div>
@@ -746,13 +831,15 @@ function ReservationDetailContent({
               {reservation.site?.name ?? reservation.site?.siteNumber ?? "Unassigned"}
             </div>
             <div className="text-sm text-muted-foreground">
-              {format(new Date(reservation.arrivalDate), "MMM d")} → {format(new Date(reservation.departureDate), "MMM d, yyyy")} • {nights} night{nights !== 1 ? "s" : ""}
+              {format(new Date(reservation.arrivalDate), "MMM d")} →{" "}
+              {format(new Date(reservation.departureDate), "MMM d, yyyy")} • {nights} night
+              {nights !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
 
         {/* Contact Info */}
-        {(reservation.guest?.email || reservation.guest?.phone) ? (
+        {reservation.guest?.email || reservation.guest?.phone ? (
           <div className="space-y-2">
             {reservation.guest?.email ? (
               <div className="flex items-center gap-3 text-sm">
@@ -776,7 +863,9 @@ function ReservationDetailContent({
             <div className="flex items-center justify-between">
               <span className="font-medium text-foreground">${(total / 100).toFixed(2)}</span>
               {balance > 0 ? (
-                <span className="text-xs font-medium text-status-warning">${(balance / 100).toFixed(2)} due</span>
+                <span className="text-xs font-medium text-status-warning">
+                  ${(balance / 100).toFixed(2)} due
+                </span>
               ) : paid > 0 ? (
                 <span className="text-xs font-medium text-status-success">Paid in full</span>
               ) : null}
@@ -870,7 +959,10 @@ function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
       <span className="text-muted-foreground">{desc}</span>
       <div className="flex gap-1">
         {keys.map((k) => (
-          <kbd key={k} className="px-2 py-1 bg-muted rounded text-xs font-mono text-foreground shadow-sm border border-border">
+          <kbd
+            key={k}
+            className="px-2 py-1 bg-muted rounded text-xs font-mono text-foreground shadow-sm border border-border"
+          >
             {k}
           </kbd>
         ))}

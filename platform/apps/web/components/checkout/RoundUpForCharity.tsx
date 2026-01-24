@@ -145,11 +145,12 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
     return null;
   }
 
-  const currentDonationCents = donationType === "roundup"
-    ? (roundUp?.donationAmountCents || 0)
-    : donationType === "custom"
-      ? customAmountCents
-      : 0;
+  const currentDonationCents =
+    donationType === "roundup"
+      ? roundUp?.donationAmountCents || 0
+      : donationType === "custom"
+        ? customAmountCents
+        : 0;
   const newTotal = ((totalCents + currentDonationCents) / 100).toFixed(2);
 
   return (
@@ -188,9 +189,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
         {/* No Donation Option */}
         <label
           className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-            donationType === "none"
-              ? "border-border bg-muted"
-              : "border-border hover:border-border"
+            donationType === "none" ? "border-border bg-muted" : "border-border hover:border-border"
           }`}
         >
           <input
@@ -221,7 +220,10 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
             />
             <div className="flex-1">
               <span className="text-sm text-foreground">
-                Round up to <span className="font-semibold">${(roundUp.roundedAmountCents / 100).toFixed(2)}</span>
+                Round up to{" "}
+                <span className="font-semibold">
+                  ${(roundUp.roundedAmountCents / 100).toFixed(2)}
+                </span>
               </span>
               <span className="ml-2 text-sm text-pink-600 font-medium">
                 (+${(roundUp.donationAmountCents / 100).toFixed(2)} donation)
@@ -233,9 +235,7 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
         {/* Custom Amount Option */}
         <div
           className={`rounded-lg border-2 transition-all ${
-            donationType === "custom"
-              ? "border-pink-500 bg-pink-50"
-              : "border-border"
+            donationType === "custom" ? "border-pink-500 bg-pink-50" : "border-border"
           }`}
         >
           <label
@@ -296,7 +296,10 @@ export function RoundUpForCharity({ campgroundId, totalCents, onChange }: RoundU
         {donationType !== "none" && currentDonationCents > 0 && (
           <div className="flex items-center justify-between pt-3 border-t border-border">
             <span className="text-sm text-muted-foreground">
-              Donation: <span className="font-semibold text-pink-600">${(currentDonationCents / 100).toFixed(2)}</span>
+              Donation:{" "}
+              <span className="font-semibold text-pink-600">
+                ${(currentDonationCents / 100).toFixed(2)}
+              </span>
             </span>
             <span className="text-sm text-muted-foreground">
               New total: <span className="font-medium text-foreground">${newTotal}</span>
@@ -396,11 +399,12 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
     return null;
   }
 
-  const currentAmount = donationType === "roundup"
-    ? (roundUp?.donationAmountCents || 0)
-    : donationType === "custom"
-      ? customAmountCents
-      : 0;
+  const currentAmount =
+    donationType === "roundup"
+      ? roundUp?.donationAmountCents || 0
+      : donationType === "custom"
+        ? customAmountCents
+        : 0;
 
   return (
     <div className="space-y-2">
@@ -413,11 +417,17 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
             className="w-4 h-4 rounded border-border text-pink-600 focus:ring-pink-500"
           />
           <div className="flex items-center gap-2 text-sm">
-            <Heart className={`h-4 w-4 ${donationType !== "none" ? "text-pink-500 fill-current" : "text-muted-foreground"}`} />
+            <Heart
+              className={`h-4 w-4 ${donationType !== "none" ? "text-pink-500 fill-current" : "text-muted-foreground"}`}
+            />
             <span className="text-foreground">
               {roundUp && roundUp.donationAmountCents > 0 ? (
                 <>
-                  Round up <span className="font-medium text-pink-600">${(roundUp.donationAmountCents / 100).toFixed(2)}</span> for{" "}
+                  Round up{" "}
+                  <span className="font-medium text-pink-600">
+                    ${(roundUp.donationAmountCents / 100).toFixed(2)}
+                  </span>{" "}
+                  for{" "}
                 </>
               ) : (
                 <>Donate to </>
@@ -455,7 +465,9 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
             </button>
           ))}
           <div className="relative">
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">$</span>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+              $
+            </span>
             <input
               type="number"
               min="0"
@@ -474,7 +486,9 @@ export function RoundUpInline({ campgroundId, totalCents, onChange }: RoundUpFor
 
       {donationType !== "none" && currentAmount > 0 && (
         <p className="text-xs text-muted-foreground pl-7">
-          Adding <span className="font-medium text-pink-600">${(currentAmount / 100).toFixed(2)}</span> donation
+          Adding{" "}
+          <span className="font-medium text-pink-600">${(currentAmount / 100).toFixed(2)}</span>{" "}
+          donation
         </p>
       )}
     </div>

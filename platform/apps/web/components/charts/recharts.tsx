@@ -46,7 +46,7 @@ const withRecharts = (exportName: RechartsComponentName) =>
       Wrapped.displayName = `Recharts${exportName}`;
       return Wrapped;
     },
-    { ssr: false }
+    { ssr: false },
   );
 
 export const PieChart = withRecharts("PieChart");

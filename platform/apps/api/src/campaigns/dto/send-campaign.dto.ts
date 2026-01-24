@@ -9,4 +9,3 @@ export class SendCampaignDto {
   @IsString()
   batchPerMinute?: string | null;
 }
-

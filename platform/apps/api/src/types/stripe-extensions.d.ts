@@ -18,13 +18,13 @@ declare module "stripe" {
       createUsageRecord(
         id: string,
         params: { quantity: number; timestamp?: number; action?: "increment" | "set" },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): Promise<Stripe.Response<Stripe.UsageRecord>>;
 
       listUsageRecordSummaries(
         id: string,
         params?: { limit?: number; starting_after?: string; ending_before?: string },
-        options?: RequestOptions
+        options?: RequestOptions,
       ): ApiListPromise<Stripe.UsageRecordSummary>;
     }
 

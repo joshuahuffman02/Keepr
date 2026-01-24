@@ -6,9 +6,10 @@ Use this prompt with an AI agent to generate 50+ SEO-optimized blog posts for th
 
 ## Context
 
-You are writing blog posts for **Keepr** (campreserv.com), a modern campground management software platform. 
+You are writing blog posts for **Keepr** (campreserv.com), a modern campground management software platform.
 
 **Target Audiences:**
+
 1. **Campground owners/operators** - looking to improve operations, increase bookings, and modernize their business
 2. **Potential customers** - searching for campground software solutions
 3. **Campers/RVers** - searching for camping tips (helps with SEO/awareness)
@@ -105,17 +106,21 @@ You are writing blog posts for **Keepr** (campreserv.com), a modern campground m
 **Word Count:** 1,200-2,000 words
 
 ## Introduction
+
 [Hook the reader, state the problem, preview the solution]
 
 ## [Main Content Sections with H2/H3 headers]
+
 - Use bullet points and numbered lists for scannability
 - Include practical, actionable advice
 - Add relevant statistics when possible
 
 ## Key Takeaways
+
 [3-5 bullet point summary]
 
 ## Conclusion
+
 [Call to action - often soft mention of how Keepr helps]
 ```
 
@@ -124,18 +129,23 @@ You are writing blog posts for **Keepr** (campreserv.com), a modern campground m
 ## Important Guidelines
 
 ### 1. Avoid Hard Selling
+
 Focus on providing value. Mention Keepr naturally only 1-2 times per post as a helpful solution, not a sales pitch.
 
 ### 2. Use Real Examples
+
 Include specific scenarios campground owners face. Make it relatable.
 
 ### 3. Make It Actionable
+
 Every post should give readers something they can implement today.
 
 ### 4. Include Internal Linking Placeholders
+
 Mark where posts should link to each other: `[LINK: related-post-title]`
 
 ### 5. SEO Best Practices
+
 - Target keyword in title, first paragraph, and 2-3 times in body
 - Use semantic variations of keywords
 - Include questions people actually search for
@@ -144,9 +154,11 @@ Mark where posts should link to each other: `[LINK: related-post-title]`
 ### 6. Suggested CTAs
 
 **For owner-focused posts:**
+
 > "Want to simplify your campground operations? See how Keepr can help."
 
 **For camper-focused posts:**
+
 > "Find your next campsite at campreserv.com"
 
 ---
@@ -154,12 +166,14 @@ Mark where posts should link to each other: `[LINK: related-post-title]`
 ## Deliverable
 
 Create all 55+ blog posts in markdown format, organized by category. Each post should be:
+
 - Publish-ready with proper formatting
 - Include all SEO elements (title, meta description, keywords)
 - Have a natural brand mention (not salesy)
 - Be 1,200-2,000 words each
 
 ### File Structure Suggestion:
+
 ```
 /content/blog/
 ├── operations/
@@ -182,6 +196,7 @@ Create all 55+ blog posts in markdown format, organized by category. Each post s
 ## Additional Topic Ideas (Optional Expansion)
 
 Feel free to add more posts on these topics:
+
 - Case studies / success stories format
 - "X vs Y" comparison posts (great for SEO)
 - "Complete Guide to..." long-form content

@@ -15,11 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import {
-  PAGE_REGISTRY,
-  type PageDefinition,
-  getPagesByCategory,
-} from "@/lib/page-registry";
+import { PAGE_REGISTRY, type PageDefinition, getPagesByCategory } from "@/lib/page-registry";
 import { ROLE_DEFAULT_MENUS, type UserRole, inferRoleFromPermissions } from "@/lib/default-menus";
 import {
   DndContext,
@@ -66,15 +62,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   admin: "Admin",
 };
 
-function SortableMenuItem({
-  page,
-  onUnpin,
-}: {
-  page: PageDefinition;
-  onUnpin: () => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: page.href });
+function SortableMenuItem({ page, onUnpin }: { page: PageDefinition; onUnpin: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: page.href,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -87,7 +78,7 @@ function SortableMenuItem({
       style={style}
       className={cn(
         "flex items-center gap-3 bg-slate-800/50 rounded-lg px-3 py-2.5 group",
-        isDragging && "opacity-50 ring-2 ring-emerald-500"
+        isDragging && "opacity-50 ring-2 ring-emerald-500",
       )}
     >
       <button
@@ -130,13 +121,13 @@ function PageCard({
         "border bg-slate-800/30 hover:bg-slate-800/50",
         isPinned
           ? "border-emerald-500/50 bg-emerald-500/10"
-          : "border-slate-700 hover:border-slate-600"
+          : "border-slate-700 hover:border-slate-600",
       )}
     >
       <div
         className={cn(
           "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
-          isPinned ? "bg-emerald-500/20" : "bg-slate-700/50"
+          isPinned ? "bg-emerald-500/20" : "bg-slate-700/50",
         )}
       >
         {isPinned ? (
@@ -168,7 +159,7 @@ export function MenuSetup({
   // Start with role defaults if no pins provided
   const defaultPins = ROLE_DEFAULT_MENUS[role] || ROLE_DEFAULT_MENUS.manager;
   const [pinnedPages, setPinnedPages] = useState<string[]>(
-    initialPinned.length > 0 ? initialPinned : defaultPins
+    initialPinned.length > 0 ? initialPinned : defaultPins,
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -200,7 +191,7 @@ export function MenuSetup({
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
   const handleDragEnd = useCallback(
@@ -216,7 +207,7 @@ export function MenuSetup({
         onChange(newOrder);
       }
     },
-    [pinnedPages, onChange]
+    [pinnedPages, onChange],
   );
 
   const togglePin = useCallback(
@@ -230,7 +221,7 @@ export function MenuSetup({
       setPinnedPages(newPinned);
       onChange(newPinned);
     },
-    [pinnedPages, onChange]
+    [pinnedPages, onChange],
   );
 
   const handleContinue = () => {
@@ -260,12 +251,8 @@ export function MenuSetup({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/20 mb-4">
             <LayoutDashboard className="w-8 h-8 text-purple-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Personalize Your Dashboard
-          </h2>
-          <p className="text-slate-400">
-            Choose which pages appear in your sidebar menu
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Personalize Your Dashboard</h2>
+          <p className="text-slate-400">Choose which pages appear in your sidebar menu</p>
         </motion.div>
 
         {/* Info box */}
@@ -277,9 +264,9 @@ export function MenuSetup({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">Your menu, your way:</span>{" "}
-            We've pre-selected pages based on your role. Add, remove, and reorder
-            to match how you work. You can always change this later.
+            <span className="text-slate-300 font-medium">Your menu, your way:</span> We've
+            pre-selected pages based on your role. Add, remove, and reorder to match how you work.
+            You can always change this later.
           </div>
         </motion.div>
 
@@ -319,10 +306,7 @@ export function MenuSetup({
                   collisionDetection={closestCenter}
                   onDragEnd={handleDragEnd}
                 >
-                  <SortableContext
-                    items={pinnedPages}
-                    strategy={verticalListSortingStrategy}
-                  >
+                  <SortableContext items={pinnedPages} strategy={verticalListSortingStrategy}>
                     <div className="space-y-2">
                       {pinnedPageObjects.map((page) => (
                         <SortableMenuItem
@@ -345,9 +329,7 @@ export function MenuSetup({
             transition={{ delay: 0.25 }}
             className="space-y-3"
           >
-            <h3 className="text-sm font-medium text-slate-300">
-              All Pages
-            </h3>
+            <h3 className="text-sm font-medium text-slate-300">All Pages</h3>
 
             {/* Search */}
             <div className="relative">
@@ -371,7 +353,7 @@ export function MenuSetup({
                   "px-2.5 py-1 rounded-full text-xs transition-colors",
                   !selectedCategory
                     ? "bg-emerald-500/20 text-emerald-300"
-                    : "bg-slate-800 text-slate-400 hover:text-slate-300"
+                    : "bg-slate-800 text-slate-400 hover:text-slate-300",
                 )}
               >
                 All
@@ -387,7 +369,7 @@ export function MenuSetup({
                     "px-2.5 py-1 rounded-full text-xs transition-colors",
                     selectedCategory === cat
                       ? "bg-emerald-500/20 text-emerald-300"
-                      : "bg-slate-800 text-slate-400 hover:text-slate-300"
+                      : "bg-slate-800 text-slate-400 hover:text-slate-300",
                   )}
                 >
                   {CATEGORY_LABELS[cat]}
@@ -423,7 +405,7 @@ export function MenuSetup({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             Save & Continue

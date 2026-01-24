@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { TaskType, SiteType, TaskState, type Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { TaskType, SiteType, TaskState, type Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { TasksService } from '../tasks/tasks.service';
+import { TasksService } from "../tasks/tasks.service";
 
 @Injectable()
 export class HousekeepingService {
@@ -44,7 +44,10 @@ export class HousekeepingService {
     });
   }
 
-  async findAllTemplates(campgroundId: string, filters?: { taskType?: TaskType; siteType?: SiteType; isActive?: boolean }) {
+  async findAllTemplates(
+    campgroundId: string,
+    filters?: { taskType?: TaskType; siteType?: SiteType; isActive?: boolean },
+  ) {
     return this.prisma.cleaningTaskTemplate.findMany({
       where: {
         campgroundId,
@@ -52,26 +55,29 @@ export class HousekeepingService {
         siteType: filters?.siteType,
         isActive: filters?.isActive,
       },
-      orderBy: [{ taskType: 'asc' }, { priority: 'asc' }],
+      orderBy: [{ taskType: "asc" }, { priority: "asc" }],
     });
   }
 
   async findTemplateById(id: string) {
     const template = await this.prisma.cleaningTaskTemplate.findUnique({ where: { id } });
-    if (!template) throw new NotFoundException('Template not found');
+    if (!template) throw new NotFoundException("Template not found");
     return template;
   }
 
-  async updateTemplate(id: string, data: Partial<{
-    name: string;
-    estimatedMinutes: number;
-    checklist: Prisma.InputJsonValue;
-    suppliesNeeded: Prisma.InputJsonValue;
-    priority: number;
-    slaMinutes: number;
-    requiresInspection: boolean;
-    isActive: boolean;
-  }>) {
+  async updateTemplate(
+    id: string,
+    data: Partial<{
+      name: string;
+      estimatedMinutes: number;
+      checklist: Prisma.InputJsonValue;
+      suppliesNeeded: Prisma.InputJsonValue;
+      priority: number;
+      slaMinutes: number;
+      requiresInspection: boolean;
+      isActive: boolean;
+    }>,
+  ) {
     return this.prisma.cleaningTaskTemplate.update({
       where: { id },
       data,
@@ -82,7 +88,7 @@ export class HousekeepingService {
     const existing = await this.prisma.cleaningTaskTemplate.findUnique({ where: { id } });
 
     if (!existing) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     return this.prisma.cleaningTaskTemplate.delete({ where: { id } });
@@ -119,7 +125,7 @@ export class HousekeepingService {
         other_CleaningZone: true,
         CleaningZone: true,
       },
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
     });
   }
 
@@ -128,17 +134,20 @@ export class HousekeepingService {
       where: { id },
       include: { other_CleaningZone: true, CleaningZone: true },
     });
-    if (!zone) throw new NotFoundException('Zone not found');
+    if (!zone) throw new NotFoundException("Zone not found");
     return zone;
   }
 
-  async updateZone(id: string, data: Partial<{
-    name: string;
-    zoneType: string;
-    parentZoneId: string;
-    primaryTeamId: string;
-    color: string;
-  }>) {
+  async updateZone(
+    id: string,
+    data: Partial<{
+      name: string;
+      zoneType: string;
+      parentZoneId: string;
+      primaryTeamId: string;
+      color: string;
+    }>,
+  ) {
     return this.prisma.cleaningZone.update({
       where: { id },
       data,
@@ -149,7 +158,7 @@ export class HousekeepingService {
     const existing = await this.prisma.cleaningZone.findUnique({ where: { id } });
 
     if (!existing) {
-      throw new NotFoundException('Zone not found');
+      throw new NotFoundException("Zone not found");
     }
 
     return this.prisma.cleaningZone.delete({ where: { id } });
@@ -175,7 +184,7 @@ export class HousekeepingService {
         SiteClass: true,
         StructureAttributes: true,
       },
-      orderBy: [{ zone: 'asc' }, { siteNumber: 'asc' }],
+      orderBy: [{ zone: "asc" }, { siteNumber: "asc" }],
     });
   }
 
@@ -238,7 +247,7 @@ export class HousekeepingService {
     });
 
     // Update site housekeeping status
-    await this.updateSiteHousekeepingStatus(data.siteId, 'cleaning_in_progress');
+    await this.updateSiteHousekeepingStatus(data.siteId, "cleaning_in_progress");
 
     return task;
   }
@@ -259,7 +268,7 @@ export class HousekeepingService {
           gte: startOfDay,
           lte: endOfDay,
         },
-        status: { in: ['confirmed', 'checked_in'] },
+        status: { in: ["confirmed", "checked_in"] },
       },
       include: {
         Site: true,
@@ -275,7 +284,7 @@ export class HousekeepingService {
           gte: startOfDay,
           lte: endOfDay,
         },
-        status: { in: ['confirmed', 'pending'] },
+        status: { in: ["confirmed", "pending"] },
       },
       include: {
         Site: true,
@@ -289,7 +298,7 @@ export class HousekeepingService {
         campgroundId,
         arrivalDate: { lt: startOfDay },
         departureDate: { gt: endOfDay },
-        status: 'checked_in',
+        status: "checked_in",
       },
       include: {
         Site: true,
@@ -297,25 +306,23 @@ export class HousekeepingService {
     });
 
     // Calculate turnovers (checkout followed by checkin on same site)
-    const checkoutSiteIds = new Set(checkouts.map(r => r.siteId));
-    const checkinSiteIds = new Set(checkins.map(r => r.siteId));
-    const turnovers = [...checkoutSiteIds].filter(id => checkinSiteIds.has(id));
+    const checkoutSiteIds = new Set(checkouts.map((r) => r.siteId));
+    const checkinSiteIds = new Set(checkins.map((r) => r.siteId));
+    const turnovers = [...checkoutSiteIds].filter((id) => checkinSiteIds.has(id));
 
     // Identify priority units (early arrivals, VIPs)
-    const priorityCheckins = checkins.filter(r =>
-      r.earlyCheckInApproved || r.Guest?.vip
-    );
+    const priorityCheckins = checkins.filter((r) => r.earlyCheckInApproved || r.Guest?.vip);
 
     return {
-      date: date.toISOString().split('T')[0],
-      expectedCheckouts: checkouts.map(r => ({
+      date: date.toISOString().split("T")[0],
+      expectedCheckouts: checkouts.map((r) => ({
         reservationId: r.id,
         siteId: r.siteId,
         siteName: r.Site.name,
         guestName: `${r.Guest?.primaryFirstName ?? ""} ${r.Guest?.primaryLastName ?? ""}`.trim(),
         checkoutTime: r.lateCheckoutRequested ?? undefined,
       })),
-      expectedCheckins: checkins.map(r => ({
+      expectedCheckins: checkins.map((r) => ({
         reservationId: r.id,
         siteId: r.siteId,
         siteName: r.Site.name,
@@ -325,7 +332,7 @@ export class HousekeepingService {
       })),
       stayoverServices: stayovers.length,
       totalTurnovers: turnovers.length,
-      priorityUnits: priorityCheckins.map(r => r.siteId),
+      priorityUnits: priorityCheckins.map((r) => r.siteId),
       summary: {
         checkouts: checkouts.length,
         checkins: checkins.length,
@@ -355,17 +362,20 @@ export class HousekeepingService {
       },
     });
 
-    const workload: Record<string, { total: number; completed: number; inProgress: number; pending: number }> = {};
+    const workload: Record<
+      string,
+      { total: number; completed: number; inProgress: number; pending: number }
+    > = {};
 
     for (const task of tasks) {
-      const userId = task.assignedToUserId || 'unassigned';
+      const userId = task.assignedToUserId || "unassigned";
       if (!workload[userId]) {
         workload[userId] = { total: 0, completed: 0, inProgress: 0, pending: 0 };
       }
       workload[userId].total++;
-      if (task.state === 'done') workload[userId].completed++;
-      else if (task.state === 'in_progress') workload[userId].inProgress++;
-      else if (task.state === 'pending') workload[userId].pending++;
+      if (task.state === "done") workload[userId].completed++;
+      else if (task.state === "in_progress") workload[userId].inProgress++;
+      else if (task.state === "pending") workload[userId].pending++;
     }
 
     return workload;

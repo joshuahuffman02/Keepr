@@ -104,22 +104,22 @@ Pursuant to [STATE CODE SECTION], [Campground Name] is providing notice of a dat
 
 ### Entity Information
 
-| | |
-|---|---|
-| Company Name | [Campground Name] |
-| Address | [Address] |
-| Contact Person | [Name, Title] |
-| Phone | [Number] |
-| Email | [Email] |
+|                |                   |
+| -------------- | ----------------- |
+| Company Name   | [Campground Name] |
+| Address        | [Address]         |
+| Contact Person | [Name, Title]     |
+| Phone          | [Number]          |
+| Email          | [Email]           |
 
 ### Incident Details
 
-| | |
-|---|---|
-| Date of Discovery | [DATE] |
-| Date of Incident | [DATE RANGE] |
-| Type of Incident | [e.g., Unauthorized system access] |
-| Number of [STATE] Residents Affected | [NUMBER] |
+|                                      |                                    |
+| ------------------------------------ | ---------------------------------- |
+| Date of Discovery                    | [DATE]                             |
+| Date of Incident                     | [DATE RANGE]                       |
+| Type of Incident                     | [e.g., Unauthorized system access] |
+| Number of [STATE] Residents Affected | [NUMBER]                           |
 
 ### Information Affected
 
@@ -169,21 +169,21 @@ We are notifying you of a potential security incident affecting payment card dat
 
 ### Merchant Information
 
-| | |
-|---|---|
-| Merchant Name | [Campground Name] |
-| Merchant ID | [MID] |
-| DBA Name | [If different] |
-| Contact | [Name, Phone, Email] |
+|               |                      |
+| ------------- | -------------------- |
+| Merchant Name | [Campground Name]    |
+| Merchant ID   | [MID]                |
+| DBA Name      | [If different]       |
+| Contact       | [Name, Phone, Email] |
 
 ### Incident Summary
 
-| | |
-|---|---|
-| Discovery Date | [DATE] |
-| Incident Date Range | [DATES] |
-| Estimated Cards Affected | [NUMBER] |
-| Card Brands Affected | [ ] Visa [ ] Mastercard [ ] Amex [ ] Discover |
+|                          |                                               |
+| ------------------------ | --------------------------------------------- |
+| Discovery Date           | [DATE]                                        |
+| Incident Date Range      | [DATES]                                       |
+| Estimated Cards Affected | [NUMBER]                                      |
+| Card Brands Affected     | [ ] Visa [ ] Mastercard [ ] Amex [ ] Discover |
 
 ### Incident Description
 
@@ -210,23 +210,23 @@ We will provide updates as our investigation progresses. Please contact [NAME] a
 
 ### Incident Report
 
-| Field | Details |
-|-------|---------|
-| Report Date | |
-| Incident ID | |
-| Reported By | |
+| Field          | Details                                  |
+| -------------- | ---------------------------------------- |
+| Report Date    |                                          |
+| Incident ID    |                                          |
+| Reported By    |                                          |
 | Severity Level | [ ] Critical [ ] High [ ] Medium [ ] Low |
 
 ### Incident Timeline
 
-| Date/Time | Event |
-|-----------|-------|
-| | Incident began |
-| | Incident discovered |
-| | Containment started |
-| | Containment completed |
-| | Eradication completed |
-| | Recovery completed |
+| Date/Time | Event                 |
+| --------- | --------------------- |
+|           | Incident began        |
+|           | Incident discovered   |
+|           | Containment started   |
+|           | Containment completed |
+|           | Eradication completed |
+|           | Recovery completed    |
 
 ### Description
 
@@ -235,16 +235,16 @@ We will provide updates as our investigation progresses. Please contact [NAME] a
 ### Systems Affected
 
 | System | Impact |
-|--------|--------|
-| | |
-| | |
+| ------ | ------ |
+|        |        |
+|        |        |
 
 ### Data Affected
 
 | Data Type | Volume | Sensitivity |
-|-----------|--------|-------------|
-| | | |
-| | | |
+| --------- | ------ | ----------- |
+|           |        |             |
+|           |        |             |
 
 ### Root Cause
 
@@ -253,25 +253,25 @@ We will provide updates as our investigation progresses. Please contact [NAME] a
 ### Response Actions
 
 | Action | Responsible | Status |
-|--------|-------------|--------|
-| | | |
-| | | |
+| ------ | ----------- | ------ |
+|        |             |        |
+|        |             |        |
 
 ### Notifications Made
 
-| Party | Date | Method |
-|-------|------|--------|
-| Customers | | |
-| Regulators | | |
-| Law Enforcement | | |
-| Insurance | | |
+| Party           | Date | Method |
+| --------------- | ---- | ------ |
+| Customers       |      |        |
+| Regulators      |      |        |
+| Law Enforcement |      |        |
+| Insurance       |      |        |
 
 ### Remediation
 
 | Improvement | Status | Due Date |
-|-------------|--------|----------|
-| | | |
-| | | |
+| ----------- | ------ | -------- |
+|             |        |          |
+|             |        |          |
 
 ### Lessons Learned
 
@@ -279,16 +279,16 @@ We will provide updates as our investigation progresses. Please contact [NAME] a
 
 ### Estimated Costs
 
-| Category | Amount |
-|----------|--------|
-| Investigation | $ |
-| Remediation | $ |
-| Legal | $ |
-| Notification | $ |
-| Credit Monitoring | $ |
-| Other | $ |
-| **Total** | $ |
+| Category          | Amount |
+| ----------------- | ------ |
+| Investigation     | $      |
+| Remediation       | $      |
+| Legal             | $      |
+| Notification      | $      |
+| Credit Monitoring | $      |
+| Other             | $      |
+| **Total**         | $      |
 
 ---
 
-*Keep all breach documentation for minimum 7 years. Consult legal counsel before sending any external notifications.*
+_Keep all breach documentation for minimum 7 years. Consult legal counsel before sending any external notifications._

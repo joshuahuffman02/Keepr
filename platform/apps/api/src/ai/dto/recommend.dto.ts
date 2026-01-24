@@ -15,5 +15,3 @@ export class RecommendDto {
   @MaxLength(200)
   intent?: string;
 }
-
-

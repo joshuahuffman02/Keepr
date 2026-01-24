@@ -29,11 +29,41 @@ export class AnomalyDetectionService {
 
   // Anomaly detection configurations
   private readonly configs: AnomalyConfig[] = [
-    { metric: "bookings_completed", type: "booking_drop", thresholdPercent: 40, minSampleSize: 7, severity: "critical" },
-    { metric: "error_count", type: "error_spike", thresholdPercent: 100, minSampleSize: 7, severity: "warning" },
-    { metric: "abandonment_rate", type: "abandonment_increase", thresholdPercent: 30, minSampleSize: 7, severity: "warning" },
-    { metric: "page_views", type: "traffic_spike", thresholdPercent: 200, minSampleSize: 7, severity: "info" },
-    { metric: "revenue_cents", type: "revenue_drop", thresholdPercent: 50, minSampleSize: 7, severity: "critical" },
+    {
+      metric: "bookings_completed",
+      type: "booking_drop",
+      thresholdPercent: 40,
+      minSampleSize: 7,
+      severity: "critical",
+    },
+    {
+      metric: "error_count",
+      type: "error_spike",
+      thresholdPercent: 100,
+      minSampleSize: 7,
+      severity: "warning",
+    },
+    {
+      metric: "abandonment_rate",
+      type: "abandonment_increase",
+      thresholdPercent: 30,
+      minSampleSize: 7,
+      severity: "warning",
+    },
+    {
+      metric: "page_views",
+      type: "traffic_spike",
+      thresholdPercent: 200,
+      minSampleSize: 7,
+      severity: "info",
+    },
+    {
+      metric: "revenue_cents",
+      type: "revenue_drop",
+      thresholdPercent: 50,
+      minSampleSize: 7,
+      severity: "critical",
+    },
   ];
 
   constructor(private readonly prisma: PrismaService) {}
@@ -95,7 +125,7 @@ export class AnomalyDetectionService {
     campgroundId: string,
     config: AnomalyConfig,
     since: Date,
-    today: Date
+    today: Date,
   ): Promise<{
     type: string;
     severity: string;
@@ -148,7 +178,7 @@ export class AnomalyDetectionService {
     campgroundId: string,
     metric: string,
     since: Date,
-    until: Date
+    until: Date,
   ): Promise<number[]> {
     switch (metric) {
       case "bookings_completed":
@@ -166,7 +196,11 @@ export class AnomalyDetectionService {
     }
   }
 
-  private async getBookingHistory(campgroundId: string, since: Date, until: Date): Promise<number[]> {
+  private async getBookingHistory(
+    campgroundId: string,
+    since: Date,
+    until: Date,
+  ): Promise<number[]> {
     const rows = await this.prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
       SELECT DATE_TRUNC('day', "occurredAt") as date, COUNT(*)::bigint as count
       FROM "AnalyticsEvent"
@@ -194,8 +228,14 @@ export class AnomalyDetectionService {
     return this.fillDateGaps(rows, since, until);
   }
 
-  private async getAbandonmentHistory(campgroundId: string, since: Date, until: Date): Promise<number[]> {
-    const rows = await this.prisma.$queryRaw<Array<{ date: Date; starts: bigint; abandons: bigint }>>`
+  private async getAbandonmentHistory(
+    campgroundId: string,
+    since: Date,
+    until: Date,
+  ): Promise<number[]> {
+    const rows = await this.prisma.$queryRaw<
+      Array<{ date: Date; starts: bigint; abandons: bigint }>
+    >`
       SELECT
         DATE_TRUNC('day', "occurredAt") as date,
         SUM(CASE WHEN "eventName" = 'reservation_start' THEN 1 ELSE 0 END)::bigint as starts,
@@ -216,7 +256,11 @@ export class AnomalyDetectionService {
     });
   }
 
-  private async getPageViewHistory(campgroundId: string, since: Date, until: Date): Promise<number[]> {
+  private async getPageViewHistory(
+    campgroundId: string,
+    since: Date,
+    until: Date,
+  ): Promise<number[]> {
     const rows = await this.prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
       SELECT DATE_TRUNC('day', "occurredAt") as date, COUNT(*)::bigint as count
       FROM "AnalyticsEvent"
@@ -230,7 +274,11 @@ export class AnomalyDetectionService {
     return this.fillDateGaps(rows, since, until);
   }
 
-  private async getRevenueHistory(campgroundId: string, since: Date, until: Date): Promise<number[]> {
+  private async getRevenueHistory(
+    campgroundId: string,
+    since: Date,
+    until: Date,
+  ): Promise<number[]> {
     const rows = await this.prisma.$queryRaw<Array<{ date: Date; total: bigint }>>`
       SELECT DATE_TRUNC('day', "paidAt") as date, SUM("amountCents")::bigint as total
       FROM "Payment"
@@ -250,10 +298,12 @@ export class AnomalyDetectionService {
   private fillDateGaps(
     rows: Array<{ date: Date; count: bigint }>,
     since: Date,
-    until: Date
+    until: Date,
   ): number[] {
     const result: number[] = [];
-    const valueMap = new Map(rows.map((r) => [r.date.toISOString().split("T")[0], Number(r.count)]));
+    const valueMap = new Map(
+      rows.map((r) => [r.date.toISOString().split("T")[0], Number(r.count)]),
+    );
 
     const current = new Date(since);
     while (current < until) {
@@ -308,7 +358,7 @@ export class AnomalyDetectionService {
       expectedValue: number;
       actualValue: number;
       deviation: number;
-    }
+    },
   ) {
     // Check if we already have an unacknowledged anomaly of this type in the last 24 hours
     const recentAnomaly = await this.prisma.analyticsAnomaly.findFirst({
@@ -353,8 +403,8 @@ export class AnomalyDetectionService {
 
     this.logger.log(
       `Anomaly detected for campground ${campgroundId}: ${anomaly.type} ` +
-      `(${anomaly.metric}: expected ${anomaly.expectedValue.toFixed(2)}, ` +
-      `got ${anomaly.actualValue.toFixed(2)}, deviation ${anomaly.deviation.toFixed(1)}%)`
+        `(${anomaly.metric}: expected ${anomaly.expectedValue.toFixed(2)}, ` +
+        `got ${anomaly.actualValue.toFixed(2)}, deviation ${anomaly.deviation.toFixed(1)}%)`,
     );
   }
 

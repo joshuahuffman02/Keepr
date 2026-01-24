@@ -9,6 +9,7 @@ paths:
 ## Schema Changes
 
 1. **After modifying schema.prisma, always run:**
+
    ```bash
    pnpm --dir platform/apps/api prisma:generate
    ```
@@ -27,6 +28,7 @@ paths:
 ## Model Conventions
 
 1. **Always include these fields:**
+
    ```prisma
    id          String   @id @default(cuid())
    createdAt   DateTime @default(now())
@@ -34,6 +36,7 @@ paths:
    ```
 
 2. **Multi-tenant models need:**
+
    ```prisma
    campgroundId String
    campground   Campground @relation(fields: [campgroundId], references: [id])
@@ -49,11 +52,15 @@ paths:
 ## Query Patterns
 
 1. **Always scope by campgroundId:**
+
    ```typescript
-   where: { id, campgroundId }
+   where: {
+     (id, campgroundId);
+   }
    ```
 
 2. **Null check after findUnique:**
+
    ```typescript
    const record = await this.prisma.model.findUnique({ where: { id } });
    if (!record) throw new NotFoundException();
@@ -68,8 +75,8 @@ paths:
 
 ## Common Error Codes
 
-| Code | Meaning | HTTP Status |
-|------|---------|-------------|
-| P2002 | Unique constraint violation | 409 Conflict |
-| P2025 | Record not found | 404 Not Found |
-| P2003 | Foreign key constraint | 400 Bad Request |
+| Code  | Meaning                     | HTTP Status     |
+| ----- | --------------------------- | --------------- |
+| P2002 | Unique constraint violation | 409 Conflict    |
+| P2025 | Record not found            | 404 Not Found   |
+| P2003 | Foreign key constraint      | 400 Bad Request |

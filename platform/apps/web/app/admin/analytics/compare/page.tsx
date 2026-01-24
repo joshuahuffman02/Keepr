@@ -53,7 +53,7 @@ const getMockComparisonData = (period1: string, period2: string): ComparisonMetr
   },
   {
     label: "Average Daily Rate",
-    period1Value: 85.50,
+    period1Value: 85.5,
     period2Value: 78.25,
     change: 7.25,
     changePercent: 9.3,
@@ -62,9 +62,9 @@ const getMockComparisonData = (period1: string, period2: string): ComparisonMetr
   },
   {
     label: "RevPAN",
-    period1Value: 62.30,
-    period2Value: 55.80,
-    change: 6.50,
+    period1Value: 62.3,
+    period2Value: 55.8,
+    change: 6.5,
     changePercent: 11.6,
     format: "currency",
     category: "revenue",
@@ -255,7 +255,9 @@ export default function ComparisonPage() {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">Compare performance across different time periods</p>
+          <p className="text-muted-foreground mt-1">
+            Compare performance across different time periods
+          </p>
         </div>
       </div>
 
@@ -264,7 +266,9 @@ export default function ComparisonPage() {
         <CardContent className="p-6">
           <div className="flex items-center gap-6">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Period 1 (Baseline)</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Period 1 (Baseline)
+              </label>
               <select
                 value={period1}
                 onChange={(e) => setPeriod1(e.target.value)}
@@ -281,7 +285,9 @@ export default function ComparisonPage() {
               <ArrowRight className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-muted-foreground mb-2">Period 2 (Compare To)</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">
+                Period 2 (Compare To)
+              </label>
               <select
                 value={period2}
                 onChange={(e) => setPeriod2(e.target.value)}
@@ -327,7 +333,9 @@ export default function ComparisonPage() {
             <div className="flex items-center gap-3">
               <Minus className="h-8 w-8 text-muted-foreground" />
               <div>
-                <p className="text-2xl font-bold text-foreground">{data.length - improvements - declines}</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {data.length - improvements - declines}
+                </p>
                 <p className="text-sm text-muted-foreground">Unchanged</p>
               </div>
             </div>
@@ -369,18 +377,32 @@ export default function ComparisonPage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Metric</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">{period1Label}</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">{period2Label}</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Change</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">% Change</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Metric
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                      {period1Label}
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                      {period2Label}
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Change
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                      % Change
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {metrics.map((metric, idx) => {
                     const isPositiveGood = metric.label !== "Cancellation Rate";
-                    const isPositive = isPositiveGood ? metric.changePercent > 0 : metric.changePercent < 0;
-                    const isNegative = isPositiveGood ? metric.changePercent < 0 : metric.changePercent > 0;
+                    const isPositive = isPositiveGood
+                      ? metric.changePercent > 0
+                      : metric.changePercent < 0;
+                    const isNegative = isPositiveGood
+                      ? metric.changePercent < 0
+                      : metric.changePercent > 0;
 
                     return (
                       <tr key={metric.label} className={idx % 2 === 0 ? "bg-muted" : ""}>
@@ -391,13 +413,15 @@ export default function ComparisonPage() {
                         <td className="py-3 px-4 text-sm text-right text-foreground">
                           {formatValue(metric.period2Value, metric.format)}
                         </td>
-                        <td className={`py-3 px-4 text-sm text-right font-medium ${isPositive ? "text-green-600" : isNegative ? "text-red-600" : "text-muted-foreground"}`}>
+                        <td
+                          className={`py-3 px-4 text-sm text-right font-medium ${isPositive ? "text-green-600" : isNegative ? "text-red-600" : "text-muted-foreground"}`}
+                        >
                           {metric.change > 0 ? "+" : ""}
                           {metric.format === "currency"
                             ? `$${Math.abs(metric.change).toLocaleString()}`
                             : metric.format === "percentage"
-                            ? `${metric.change.toFixed(1)}%`
-                            : metric.change.toLocaleString()}
+                              ? `${metric.change.toFixed(1)}%`
+                              : metric.change.toLocaleString()}
                         </td>
                         <td className="py-3 px-4 text-sm text-right">
                           <div className="flex items-center justify-end gap-1">
@@ -408,8 +432,17 @@ export default function ComparisonPage() {
                             ) : (
                               <Minus className="h-4 w-4 text-muted-foreground" />
                             )}
-                            <span className={isPositive ? "text-green-600" : isNegative ? "text-red-600" : "text-muted-foreground"}>
-                              {metric.changePercent > 0 ? "+" : ""}{metric.changePercent.toFixed(1)}%
+                            <span
+                              className={
+                                isPositive
+                                  ? "text-green-600"
+                                  : isNegative
+                                    ? "text-red-600"
+                                    : "text-muted-foreground"
+                              }
+                            >
+                              {metric.changePercent > 0 ? "+" : ""}
+                              {metric.changePercent.toFixed(1)}%
                             </span>
                           </div>
                         </td>
@@ -433,31 +466,35 @@ export default function ComparisonPage() {
             <div className="p-4 bg-card rounded-lg border border-border">
               <p className="text-sm text-blue-800">
                 <strong>Revenue Growth:</strong> Total revenue increased by{" "}
-                {data.find((m) => m.label === "Total Revenue")?.changePercent.toFixed(1)}%, driven by both
-                higher ADR (+{data.find((m) => m.label === "Average Daily Rate")?.changePercent.toFixed(1)}%) and
-                more bookings (+{data.find((m) => m.label === "Total Reservations")?.changePercent.toFixed(1)}%).
+                {data.find((m) => m.label === "Total Revenue")?.changePercent.toFixed(1)}%, driven
+                by both higher ADR (+
+                {data.find((m) => m.label === "Average Daily Rate")?.changePercent.toFixed(1)}%) and
+                more bookings (+
+                {data.find((m) => m.label === "Total Reservations")?.changePercent.toFixed(1)}%).
               </p>
             </div>
             <div className="p-4 bg-card rounded-lg border border-border">
               <p className="text-sm text-blue-800">
                 <strong>Guest Loyalty:</strong> Repeat guest rate improved by{" "}
-                {data.find((m) => m.label === "Repeat Guest Rate")?.changePercent.toFixed(1)}% while NPS
-                increased by {data.find((m) => m.label === "NPS Score")?.change} points, indicating stronger
-                guest satisfaction.
+                {data.find((m) => m.label === "Repeat Guest Rate")?.changePercent.toFixed(1)}% while
+                NPS increased by {data.find((m) => m.label === "NPS Score")?.change} points,
+                indicating stronger guest satisfaction.
               </p>
             </div>
             <div className="p-4 bg-card rounded-lg border border-border">
               <p className="text-sm text-blue-800">
                 <strong>Operational Efficiency:</strong> Cancellation rate dropped by{" "}
-                {Math.abs(data.find((m) => m.label === "Cancellation Rate")?.changePercent || 0).toFixed(1)}%,
-                reducing lost revenue and improving planning.
+                {Math.abs(
+                  data.find((m) => m.label === "Cancellation Rate")?.changePercent || 0,
+                ).toFixed(1)}
+                %, reducing lost revenue and improving planning.
               </p>
             </div>
             <div className="p-4 bg-card rounded-lg border border-border">
               <p className="text-sm text-blue-800">
                 <strong>Booking Behavior:</strong> Average lead time increased to{" "}
-                {data.find((m) => m.label === "Avg Lead Time")?.period1Value.toFixed(1)} days, allowing for
-                better resource planning.
+                {data.find((m) => m.label === "Avg Lead Time")?.period1Value.toFixed(1)} days,
+                allowing for better resource planning.
               </p>
             </div>
           </div>

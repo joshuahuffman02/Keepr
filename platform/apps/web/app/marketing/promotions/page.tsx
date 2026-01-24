@@ -4,11 +4,24 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Badge } from "../../../components/ui/badge";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
 
 const channelUsage = [
   { channel: "Direct", redemptions: 124, revenue: "$18,400", avgDiscount: "12%", share: "38%" },
@@ -37,16 +50,60 @@ const liftSummary = {
 };
 
 const abResults = [
-  { test: "Autumn push", variant: "Control", conversion: "2.5%", revenuePerBooking: "$412", lift: "—" },
-  { test: "Autumn push", variant: "Variant B (15% off)", conversion: "2.7%", revenuePerBooking: "$397", lift: "+8%", winner: true },
-  { test: "Winter kickoff", variant: "Control", conversion: "2.2%", revenuePerBooking: "$388", lift: "—" },
-  { test: "Winter kickoff", variant: "Variant A (BOGO night)", conversion: "2.6%", revenuePerBooking: "$401", lift: "+12%", winner: true },
+  {
+    test: "Autumn push",
+    variant: "Control",
+    conversion: "2.5%",
+    revenuePerBooking: "$412",
+    lift: "—",
+  },
+  {
+    test: "Autumn push",
+    variant: "Variant B (15% off)",
+    conversion: "2.7%",
+    revenuePerBooking: "$397",
+    lift: "+8%",
+    winner: true,
+  },
+  {
+    test: "Winter kickoff",
+    variant: "Control",
+    conversion: "2.2%",
+    revenuePerBooking: "$388",
+    lift: "—",
+  },
+  {
+    test: "Winter kickoff",
+    variant: "Variant A (BOGO night)",
+    conversion: "2.6%",
+    revenuePerBooking: "$401",
+    lift: "+12%",
+    winner: true,
+  },
 ];
 
 const optimizerTests = [
-  { name: "Winter kickoff", variant: "B: 12% off email-first", conversion: "2.7%", revenuePerBooking: "$392", lift: "+11%" },
-  { name: "Autumn push", variant: "B: 15% off w/ min nights", conversion: "2.7%", revenuePerBooking: "$397", lift: "+8%" },
-  { name: "Weekday fill", variant: "B: 1 night free (Sun–Thu)", conversion: "2.3%", revenuePerBooking: "$376", lift: "+6%" },
+  {
+    name: "Winter kickoff",
+    variant: "B: 12% off email-first",
+    conversion: "2.7%",
+    revenuePerBooking: "$392",
+    lift: "+11%",
+  },
+  {
+    name: "Autumn push",
+    variant: "B: 15% off w/ min nights",
+    conversion: "2.7%",
+    revenuePerBooking: "$397",
+    lift: "+8%",
+  },
+  {
+    name: "Weekday fill",
+    variant: "B: 1 night free (Sun–Thu)",
+    conversion: "2.3%",
+    revenuePerBooking: "$376",
+    lift: "+6%",
+  },
 ];
 
 const optimizerNextStep = {
@@ -147,7 +204,10 @@ export default function PromotionsPage() {
   const [copyState, setCopyState] = useState<"idle" | "copied">("idle");
   const [lastAction, setLastAction] = useState("Ready to process payouts and exports.");
 
-  const generatedLink = useMemo(() => buildReferralLink(baseUrl, campaign, refCode), [baseUrl, campaign, refCode]);
+  const generatedLink = useMemo(
+    () => buildReferralLink(baseUrl, campaign, refCode),
+    [baseUrl, campaign, refCode],
+  );
 
   const handleCopy = async () => {
     try {
@@ -161,7 +221,9 @@ export default function PromotionsPage() {
 
   const markBatchPaid = () => {
     setReferrals((rows) =>
-      rows.map((row) => (row.status === "approved" || row.status === "pending" ? { ...row, status: "paid" } : row)),
+      rows.map((row) =>
+        row.status === "approved" || row.status === "pending" ? { ...row, status: "paid" } : row,
+      ),
     );
     setLastAction("Marked current batch as paid.");
   };
@@ -187,21 +249,27 @@ export default function PromotionsPage() {
               <CardTitle>Promotions & discounts</CardTitle>
               <Badge variant="secondary">Beta</Badge>
             </div>
-            <CardDescription>Manage promo codes, keep them synced with booking, and review performance snapshots.</CardDescription>
+            <CardDescription>
+              Manage promo codes, keep them synced with booking, and review performance snapshots.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-sm text-muted-foreground">
-              Create percentage or flat promos, set validity windows and usage caps, and toggle availability without code changes.
+              Create percentage or flat promos, set validity windows and usage caps, and toggle
+              availability without code changes.
             </div>
             <div className="text-xs text-muted-foreground">
-              Promotions apply to admin and public booking flows; OTA-safe pricing is respected by hold/blackout logic.
+              Promotions apply to admin and public booking flows; OTA-safe pricing is respected by
+              hold/blackout logic.
             </div>
             <div className="flex flex-wrap gap-2">
               <Link href="/settings/promotions">
                 <Button size="sm">Open Promotions settings</Button>
               </Link>
               <Link href="/reports/marketing/booking-sources">
-                <Button size="sm" variant="outline">View channel mix</Button>
+                <Button size="sm" variant="outline">
+                  View channel mix
+                </Button>
               </Link>
             </div>
           </CardContent>
@@ -213,7 +281,9 @@ export default function PromotionsPage() {
               <CardTitle>Promo optimizer</CardTitle>
               <Badge variant="secondary">Beta</Badge>
             </div>
-            <CardDescription>Compact readout of promo experiments plus a next-step suggestion.</CardDescription>
+            <CardDescription>
+              Compact readout of promo experiments plus a next-step suggestion.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="rounded-lg border border-border">
@@ -249,7 +319,9 @@ export default function PromotionsPage() {
                   <li key={item}>{item}</li>
                 ))}
               </ul>
-              <div className="text-[11px] text-emerald-800/80 mt-2">These recommendations are suggestions only. No changes are applied automatically.</div>
+              <div className="text-[11px] text-emerald-800/80 mt-2">
+                These recommendations are suggestions only. No changes are applied automatically.
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -278,7 +350,9 @@ export default function PromotionsPage() {
                       <TableCell className="text-right">{row.redemptions}</TableCell>
                       <TableCell className="text-right">{row.revenue}</TableCell>
                       <TableCell className="text-right">{row.avgDiscount}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">{row.share}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {row.share}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -307,7 +381,9 @@ export default function PromotionsPage() {
                       <TableCell className="font-medium">{row.date}</TableCell>
                       <TableCell className="text-right">{row.redemptions}</TableCell>
                       <TableCell className="text-right">{row.revenue}</TableCell>
-                      <TableCell className="text-right text-muted-foreground">{row.topChannel}</TableCell>
+                      <TableCell className="text-right text-muted-foreground">
+                        {row.topChannel}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -334,7 +410,9 @@ export default function PromotionsPage() {
                 <div>
                   <div className="text-xs text-muted-foreground">Bookings vs baseline</div>
                   <div className="text-lg font-semibold">{liftSummary.promoBookings}</div>
-                  <div className="text-xs text-muted-foreground">Baseline {liftSummary.baselineBookings}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Baseline {liftSummary.baselineBookings}
+                  </div>
                 </div>
                 <span className="text-sm text-emerald-600">+{bookingLift} incremental</span>
               </div>
@@ -377,7 +455,9 @@ export default function PromotionsPage() {
                       </TableCell>
                       <TableCell className="text-right">{row.conversion}</TableCell>
                       <TableCell className="text-right">{row.revenuePerBooking}</TableCell>
-                      <TableCell className={`text-right ${row.lift.startsWith("+") ? "text-emerald-600" : "text-muted-foreground"}`}>
+                      <TableCell
+                        className={`text-right ${row.lift.startsWith("+") ? "text-emerald-600" : "text-muted-foreground"}`}
+                      >
                         {row.lift}
                       </TableCell>
                     </TableRow>
@@ -394,7 +474,9 @@ export default function PromotionsPage() {
               <CardTitle>Referrals & affiliates</CardTitle>
               <Badge variant="secondary">Beta</Badge>
             </div>
-            <CardDescription>Generate referral links with tracking params and manage payouts/exports.</CardDescription>
+            <CardDescription>
+              Generate referral links with tracking params and manage payouts/exports.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-3">
@@ -406,7 +488,9 @@ export default function PromotionsPage() {
                   onChange={(event) => setBaseUrl(event.target.value)}
                   placeholder="https://keeprstay.com/book"
                 />
-                <p className="text-xs text-muted-foreground">Use a public booking or landing page.</p>
+                <p className="text-xs text-muted-foreground">
+                  Use a public booking or landing page.
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="campaign">Campaign</Label>
@@ -426,7 +510,9 @@ export default function PromotionsPage() {
                   onChange={(event) => setRefCode(event.target.value)}
                   placeholder="AFF-123"
                 />
-                <p className="text-xs text-muted-foreground">Appended as ref plus affiliate code.</p>
+                <p className="text-xs text-muted-foreground">
+                  Appended as ref plus affiliate code.
+                </p>
               </div>
             </div>
 
@@ -435,7 +521,8 @@ export default function PromotionsPage() {
                 <div className="text-xs font-semibold text-foreground">Generated link</div>
                 <div className="break-all text-xs text-foreground">{generatedLink}</div>
                 <div className="text-[11px] text-muted-foreground">
-                  Tracking params auto-append: utm_source=affiliate, utm_medium=referral, utm_campaign, and ref={refCode || "campref"}.
+                  Tracking params auto-append: utm_source=affiliate, utm_medium=referral,
+                  utm_campaign, and ref={refCode || "campref"}.
                 </div>
               </div>
               <div className="flex gap-2">
@@ -473,7 +560,9 @@ export default function PromotionsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Referral performance</CardTitle>
-            <CardDescription>Track affiliate performance and validate tracking and payouts.</CardDescription>
+            <CardDescription>
+              Track affiliate performance and validate tracking and payouts.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Table>
@@ -497,16 +586,26 @@ export default function PromotionsPage() {
                       <div className="text-xs text-muted-foreground">{row.id}</div>
                     </TableCell>
                     <TableCell className="text-sm text-foreground">{row.code}</TableCell>
-                    <TableCell className="text-right text-sm text-foreground">{row.clicks}</TableCell>
-                    <TableCell className="text-right text-sm text-foreground">{row.signups}</TableCell>
-                    <TableCell className="text-right text-sm text-foreground">{row.bookings}</TableCell>
-                    <TableCell className="text-right text-sm text-foreground">{row.revenue}</TableCell>
+                    <TableCell className="text-right text-sm text-foreground">
+                      {row.clicks}
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-foreground">
+                      {row.signups}
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-foreground">
+                      {row.bookings}
+                    </TableCell>
+                    <TableCell className="text-right text-sm text-foreground">
+                      {row.revenue}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={statusStyles[row.status]}>
                         {row.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{row.lastActivity}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {row.lastActivity}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

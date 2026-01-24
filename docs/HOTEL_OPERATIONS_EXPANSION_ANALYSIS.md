@@ -10,6 +10,7 @@
 This document analyzes the existing Campreserv codebase and proposes a comprehensive plan for expanding the campground management system to support **hotel-level operations** for hybrid properties. The goal is enabling properties that combine RV sites, cabins, lodge rooms, and glamping units under a single management platform.
 
 **Key Findings:**
+
 - Current data model has a solid foundation with `SiteType` enum and `SiteClass` abstraction
 - Existing housekeeping infrastructure (Phase 2) provides a starting point but needs significant expansion
 - Booking flow makes RV-centric assumptions that need generalization
@@ -32,6 +33,7 @@ Organization (tenant)
 ```
 
 **SiteType Enum (Current):**
+
 ```prisma
 enum SiteType {
   rv        # RV sites with hookups
@@ -56,6 +58,7 @@ enum SiteType {
 | `accessible` | Boolean | ADA compliance |
 
 **Assessment:** The current model is RV-centric. Fields like `rigMaxLength`, `pullThrough`, and hookup booleans are irrelevant for hotel rooms. The model lacks hotel-specific concepts like:
+
 - Floor/building location
 - Bed configurations
 - Room views
@@ -65,6 +68,7 @@ enum SiteType {
 ### 1.2 Booking Flow Assumptions
 
 **Current Booking Path:**
+
 1. Search availability with optional `rigType` and `rigLength`
 2. `isRigCompatible()` filters sites based on:
    - If rigType is tent/cabin → returns ALL sites (no filtering)
@@ -73,6 +77,7 @@ enum SiteType {
 4. Create reservation with occupancy validation
 
 **Critical Assumptions:**
+
 1. **Binary rig compatibility:** Either you're an RV (constrained) or you're not (unconstrained)
 2. **No bed-based availability:** No concept of "need 2 queen beds" filtering
 3. **No room feature requirements:** Can't search for "rooms with balcony"
@@ -83,6 +88,7 @@ enum SiteType {
 ### 1.3 Existing Cleaning/Maintenance Workflows
 
 **Phase 2 Task System (Current):**
+
 ```prisma
 model Task {
   type        TaskType    // turnover, inspection, other
@@ -97,6 +103,7 @@ model Task {
 ```
 
 **What Exists:**
+
 - Kanban-style housekeeping dashboard (`/housekeeping/page.tsx`)
 - Task state management with SLA tracking
 - Automatic site-ready marking when turnover complete
@@ -105,6 +112,7 @@ model Task {
 - Housekeeping report generation
 
 **What's Missing for Hotel Operations:**
+
 - Detailed room status state machine (occupied-dirty vs vacant-dirty)
 - Inspection pass/fail workflows
 - Cleaning type differentiation (turnover vs deep clean vs touch-up)
@@ -114,23 +122,27 @@ model Task {
 - Mobile-optimized staff interface
 
 **File References:**
+
 - `platform/apps/api/src/tasks/tasks.service.ts`
 - `platform/apps/web/app/campgrounds/[campgroundId]/housekeeping/page.tsx`
 
 ### 1.4 Multi-Tenant Architecture
 
 **Implementation Pattern:**
+
 - `Organization` → owns multiple `Campground` entities
 - `CampgroundMembership` links users to properties with roles
 - `ScopeGuard` validates user access to requested campgroundId
 - All entities include `campgroundId` foreign key for isolation
 
 **User Roles:**
+
 ```
 owner | manager | front_desk | maintenance | finance | marketing | readonly
 ```
 
 **Key Feature:** Users can have different roles at different properties, enabling:
+
 - Hotel chain staff with varying permissions across properties
 - Regional managers overseeing multiple locations
 - Corporate reporting across the organization
@@ -143,9 +155,10 @@ owner | manager | front_desk | maintenance | finance | marketing | readonly
 
 ### 2.1 Proposed Accommodation Category System
 
-**Design Principle:** Separate *category* (what it is) from *attributes* (what features it has).
+**Design Principle:** Separate _category_ (what it is) from _attributes_ (what features it has).
 
 #### New AccommodationType Enum
+
 ```prisma
 enum AccommodationType {
   // Outdoor/Camping
@@ -179,6 +192,7 @@ enum AccommodationType {
 ### 2.2 Universal vs Type-Specific Attributes
 
 #### Universal Attributes (All Types)
+
 ```prisma
 model Accommodation {
   // Identity
@@ -224,6 +238,7 @@ model Accommodation {
 ```
 
 #### RV-Specific Attributes
+
 ```prisma
 model RvSiteAttributes {
   accommodationId   String   @id
@@ -256,6 +271,7 @@ model RvSiteAttributes {
 ```
 
 #### Structure-Specific Attributes (Cabins, Cottages, Yurts, etc.)
+
 ```prisma
 model StructureAttributes {
   accommodationId   String   @id
@@ -291,6 +307,7 @@ model StructureAttributes {
 ```
 
 #### Hotel Room Specific Attributes
+
 ```prisma
 model HotelRoomAttributes {
   accommodationId    String   @id
@@ -364,6 +381,7 @@ model AccommodationClass {
 4. **No Code Changes Required:** Booking flow uses universal attributes; type-specific logic is opt-in
 
 **Example: Adding "Floating Cabin" Type**
+
 ```sql
 -- 1. Extend enum
 ALTER TYPE "AccommodationType" ADD VALUE 'floating_cabin';
@@ -426,6 +444,7 @@ CREATE TABLE "FloatingCabinAttributes" (
 ```
 
 **Schema:**
+
 ```prisma
 enum HousekeepingStatus {
   // Vacant states
@@ -466,6 +485,7 @@ enum CleaningTaskType {
 ```
 
 **Task Template System:**
+
 ```prisma
 model CleaningTaskTemplate {
   id              String   @id
@@ -491,6 +511,7 @@ model CleaningTaskTemplate {
 ### 3.3 Staff Assignment and Workload Balancing
 
 **Zone/Building Model:**
+
 ```prisma
 model CleaningZone {
   id              String   @id
@@ -517,6 +538,7 @@ model AccommodationZoneAssignment {
 ```
 
 **Workload Balancing Service:**
+
 ```typescript
 interface WorkloadBalancer {
   // Calculate optimal task distribution
@@ -525,25 +547,21 @@ interface WorkloadBalancer {
     campgroundId: string,
     options: {
       respectZones: boolean;
-      balanceByTime: boolean;    // vs by task count
+      balanceByTime: boolean; // vs by task count
       prioritizeSLAs: boolean;
-    }
+    },
   ): Promise<TaskAssignment[]>;
 
   // Real-time rebalancing
-  rebalanceAfterCompletion(
-    completedTaskId: string
-  ): Promise<void>;
+  rebalanceAfterCompletion(completedTaskId: string): Promise<void>;
 
   // Metrics
-  getStaffWorkloadMetrics(
-    date: Date,
-    campgroundId: string
-  ): Promise<StaffWorkloadReport>;
+  getStaffWorkloadMetrics(date: Date, campgroundId: string): Promise<StaffWorkloadReport>;
 }
 ```
 
 **Assignment Algorithm Factors:**
+
 1. Staff availability (shift hours)
 2. Zone assignment preferences
 3. Travel time between units (for outdoor properties)
@@ -554,6 +572,7 @@ interface WorkloadBalancer {
 ### 3.4 Scheduling Integration
 
 **Checkout/Checkin Coordination:**
+
 ```prisma
 model DailyHousekeepingSchedule {
   id              String   @id
@@ -579,13 +598,11 @@ model DailyHousekeepingSchedule {
 ```
 
 **Early Arrival Handling:**
+
 ```typescript
 interface EarlyArrivalWorkflow {
   // Guest requests early arrival
-  requestEarlyArrival(
-    reservationId: string,
-    requestedTime: string
-  ): Promise<EarlyArrivalStatus>;
+  requestEarlyArrival(reservationId: string, requestedTime: string): Promise<EarlyArrivalStatus>;
 
   // System checks room status
   // Returns: guaranteed, likely, unlikely, unavailable
@@ -637,6 +654,7 @@ interface EarlyArrivalWorkflow {
 ```
 
 **API Surface for Mobile:**
+
 ```typescript
 // Staff task endpoints
 GET    /staff/me/tasks/today
@@ -653,6 +671,7 @@ WS     /staff/me/tasks/subscribe  // New task notifications
 ### 3.6 Inspection Checklists
 
 **Configurable Checklist System:**
+
 ```prisma
 model InspectionChecklist {
   id                String   @id
@@ -681,6 +700,7 @@ model InspectionChecklist {
 ```
 
 **Inspection Result:**
+
 ```prisma
 model InspectionResult {
   id              String   @id
@@ -706,6 +726,7 @@ model InspectionResult {
 ### 3.7 Maintenance Issue Handoff
 
 **Issue Discovery Workflow:**
+
 ```
 Staff finds issue during cleaning
            │
@@ -739,6 +760,7 @@ Staff finds issue during cleaning
 ```
 
 **Schema Extension:**
+
 ```prisma
 // Extend MaintenanceTicket
 model MaintenanceTicket {
@@ -760,6 +782,7 @@ model MaintenanceTicket {
 ### 3.8 Manager Dashboard
 
 **Daily Board View:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
 │  HOUSEKEEPING DASHBOARD - December 20, 2024                         │
@@ -793,6 +816,7 @@ model MaintenanceTicket {
 ```
 
 **Productivity Metrics:**
+
 ```typescript
 interface HousekeepingMetrics {
   // Per-staff metrics
@@ -800,10 +824,13 @@ interface HousekeepingMetrics {
     staffId: string;
     tasksCompleted: number;
     averageMinutesPerTask: number;
-    byAccommodationType: Record<AccommodationType, {
-      count: number;
-      avgMinutes: number;
-    }>;
+    byAccommodationType: Record<
+      AccommodationType,
+      {
+        count: number;
+        avgMinutes: number;
+      }
+    >;
     slaBreachRate: number;
     inspectionPassRate: number;
   }[];
@@ -811,12 +838,12 @@ interface HousekeepingMetrics {
   // Property-wide metrics
   dailyTurnovers: number;
   averageTurnoverTime: number;
-  roomsReadyByCheckIn: number;  // % ready before arrival
-  guestWaitInstances: number;   // Times guest waited for room
+  roomsReadyByCheckIn: number; // % ready before arrival
+  guestWaitInstances: number; // Times guest waited for room
 
   // Trends
   weekOverWeekChange: {
-    productivity: number;  // % change
+    productivity: number; // % change
     slaBreaches: number;
     guestWaits: number;
   };
@@ -829,21 +856,22 @@ interface HousekeepingMetrics {
 
 ### 4.1 Current vs Required Capabilities
 
-| Capability | Current State | Required for Hotels |
-|------------|---------------|---------------------|
-| Room blocking | `SiteHold` model exists | [OK] Adequate, extend for reasons |
-| Out-of-order | `MaintenanceTicket.outOfOrder` | [OK] Adequate |
-| Early check-in | Not implemented | [GAP] Need pricing + workflow |
-| Late checkout | Not implemented | [GAP] Need pricing + workflow |
-| Room moves | Not implemented | [GAP] Need mid-stay transfer flow |
-| Multi-room booking | Separate reservations | [GAP] Need linked group booking |
-| Room preferences | Not implemented | [GAP] Need preference matching |
-| Walk-in handling | Basic booking | [PARTIAL] Needs optimization UI |
-| Key/access codes | `SmartLock` + `AccessGrant` | [OK] Foundation exists |
+| Capability         | Current State                  | Required for Hotels               |
+| ------------------ | ------------------------------ | --------------------------------- |
+| Room blocking      | `SiteHold` model exists        | [OK] Adequate, extend for reasons |
+| Out-of-order       | `MaintenanceTicket.outOfOrder` | [OK] Adequate                     |
+| Early check-in     | Not implemented                | [GAP] Need pricing + workflow     |
+| Late checkout      | Not implemented                | [GAP] Need pricing + workflow     |
+| Room moves         | Not implemented                | [GAP] Need mid-stay transfer flow |
+| Multi-room booking | Separate reservations          | [GAP] Need linked group booking   |
+| Room preferences   | Not implemented                | [GAP] Need preference matching    |
+| Walk-in handling   | Basic booking                  | [PARTIAL] Needs optimization UI   |
+| Key/access codes   | `SmartLock` + `AccessGrant`    | [OK] Foundation exists            |
 
 ### 4.2 Room Blocking and Out-of-Order Management
 
 **Enhanced Hold System:**
+
 ```prisma
 model AccommodationHold {
   id              String   @id
@@ -883,6 +911,7 @@ model AccommodationHold {
 ### 4.3 Early Check-in / Late Checkout
 
 **Pricing Configuration:**
+
 ```prisma
 model FlexCheckPolicy {
   id              String   @id
@@ -907,14 +936,15 @@ model FlexCheckPolicy {
 ```
 
 **Workflow:**
+
 ```typescript
 interface FlexCheckService {
   // Guest requests early check-in
   requestEarlyCheckIn(
     reservationId: string,
-    requestedTime: string
+    requestedTime: string,
   ): Promise<{
-    status: 'approved' | 'pending' | 'unavailable';
+    status: "approved" | "pending" | "unavailable";
     additionalCharge?: number;
     roomReadyTime?: string;
   }>;
@@ -929,11 +959,11 @@ interface FlexCheckService {
   // Late checkout
   requestLateCheckout(
     reservationId: string,
-    requestedTime: string
+    requestedTime: string,
   ): Promise<{
-    status: 'approved' | 'pending' | 'unavailable';
+    status: "approved" | "pending" | "unavailable";
     additionalCharge?: number;
-    conflictingArrival?: string;  // Next guest arrival time
+    conflictingArrival?: string; // Next guest arrival time
   }>;
 }
 ```
@@ -941,6 +971,7 @@ interface FlexCheckService {
 ### 4.4 Room Moves and Upgrades Mid-Stay
 
 **Room Move Workflow:**
+
 ```prisma
 model RoomMoveRequest {
   id                String   @id
@@ -976,26 +1007,27 @@ model RoomMoveRequest {
 ```
 
 **Upgrade Logic:**
+
 ```typescript
 interface RoomMoveService {
   // Find available upgrades
-  getAvailableUpgrades(
-    reservationId: string
-  ): Promise<{
-    accommodation: Accommodation;
-    upgradeType: 'same_class' | 'better_class' | 'premium';
-    priceDifference: number;
-    features: string[];  // What they gain
-  }[]>;
+  getAvailableUpgrades(reservationId: string): Promise<
+    {
+      accommodation: Accommodation;
+      upgradeType: "same_class" | "better_class" | "premium";
+      priceDifference: number;
+      features: string[]; // What they gain
+    }[]
+  >;
 
   // Execute move
   executeRoomMove(
     moveRequestId: string,
     options: {
       transferAccessCodes: boolean;
-      createCleaningTask: boolean;  // For vacated room
+      createCleaningTask: boolean; // For vacated room
       notifyGuest: boolean;
-    }
+    },
   ): Promise<void>;
 }
 ```
@@ -1003,6 +1035,7 @@ interface RoomMoveService {
 ### 4.5 Multi-Room Bookings
 
 **Group Booking Model:**
+
 ```prisma
 model GroupBooking {
   id              String   @id
@@ -1042,14 +1075,13 @@ model GroupBooking {
 ```
 
 **Room Assignment Optimization:**
+
 ```typescript
 interface GroupAssignmentService {
   // Auto-assign rooms based on preferences
-  optimizeGroupAssignment(
-    groupBookingId: string
-  ): Promise<{
+  optimizeGroupAssignment(groupBookingId: string): Promise<{
     assignments: { reservationId: string; accommodationId: string }[];
-    preferencesMetScore: number;  // 0-100
+    preferencesMetScore: number; // 0-100
     unmetPreferences: string[];
   }>;
 
@@ -1057,7 +1089,7 @@ interface GroupAssignmentService {
   reassignGroupRoom(
     groupBookingId: string,
     reservationId: string,
-    newAccommodationId: string
+    newAccommodationId: string,
   ): Promise<void>;
 
   // Check availability for adjacent rooms
@@ -1065,7 +1097,7 @@ interface GroupAssignmentService {
     campgroundId: string,
     arrivalDate: Date,
     departureDate: Date,
-    roomCount: number
+    roomCount: number,
   ): Promise<AdjacentRoomSet[]>;
 }
 ```
@@ -1073,6 +1105,7 @@ interface GroupAssignmentService {
 ### 4.6 Walk-in Reservations
 
 **Walk-in Optimization UI:**
+
 ```typescript
 interface WalkInService {
   // Get optimal room suggestions
@@ -1084,14 +1117,14 @@ interface WalkInService {
       maxPrice?: number;
       accommodationType?: AccommodationType;
       accessible?: boolean;
-    }
+    },
   ): Promise<{
     recommendations: {
       accommodation: Accommodation;
-      reason: string;  // "Best value", "Ready now", "Premium upgrade"
+      reason: string; // "Best value", "Ready now", "Premium upgrade"
       price: number;
       readyStatus: HousekeepingStatus;
-      readyIn?: number;  // Minutes until ready
+      readyIn?: number; // Minutes until ready
     }[];
 
     soldOut: boolean;
@@ -1102,7 +1135,7 @@ interface WalkInService {
   createWalkInReservation(
     accommodationId: string,
     guestInfo: GuestInfo,
-    paymentMethod: string
+    paymentMethod: string,
   ): Promise<Reservation>;
 }
 ```
@@ -1112,6 +1145,7 @@ interface WalkInService {
 **Current State:** `SmartLock` and `AccessGrant` models exist.
 
 **Extensions Needed:**
+
 ```prisma
 model AccessCodePolicy {
   id              String   @id
@@ -1179,12 +1213,14 @@ model AccessGrant {
 | `AccessCodePolicy` | Key/code generation rules |
 
 **Enum Extensions:**
+
 - `AccommodationType` - Expanded from SiteType
 - `HousekeepingStatus` - Full state machine
 - `CleaningTaskType` - Task categorization
 - `HoldType` - Reasons for blocking
 
 **Field Additions:**
+
 - `Reservation.groupBookingId` - Link to group
 - `Reservation.earlyCheckInApproved/lateCheckoutApproved`
 - `MaintenanceTicket.discoveredByTaskId`
@@ -1234,18 +1270,21 @@ platform/apps/api/src/
 ### 5.3 Modifications to Existing Services
 
 **ReservationsService:**
+
 - Add `groupBookingId` handling
 - Integrate flex-check validation
 - Support room move reservations
 - Enhanced availability for hotel room attributes
 
 **AvailabilityEngine:**
+
 - Extend search filters for bed configuration
 - Add room feature filtering
 - Support adjacent/connecting room searches
 - Priority scoring for walk-ins
 
 **TasksService:**
+
 - Integrate with CleaningTaskTemplate
 - Enhanced checklist validation
 - Photo upload handling
@@ -1254,6 +1293,7 @@ platform/apps/api/src/
 ### 5.4 API Surface for Staff Mobile Apps
 
 **Core Endpoints:**
+
 ```typescript
 // Authentication
 POST   /auth/staff/login          // Staff-specific login (PIN option)
@@ -1277,6 +1317,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ```
 
 **Mobile App Requirements:**
+
 - Offline capability for checklist completion
 - Photo compression before upload
 - Push notification integration
@@ -1286,16 +1327,17 @@ WS     /staff/me/subscribe        // Task assignments, updates
 
 **Events to Broadcast:**
 
-| Event | Channel | Consumers |
-|-------|---------|-----------|
-| `room.status.changed` | `housekeeping:{campgroundId}` | Dashboard, staff app |
-| `task.assigned` | `staff:{userId}` | Staff mobile app |
-| `task.sla.warning` | `housekeeping:{campgroundId}` | Dashboard, manager |
-| `room.ready` | `reservations:{reservationId}` | Guest notification |
-| `early.arrival.requested` | `front-desk:{campgroundId}` | Front desk staff |
-| `maintenance.issue.created` | `maintenance:{campgroundId}` | Maintenance team |
+| Event                       | Channel                        | Consumers            |
+| --------------------------- | ------------------------------ | -------------------- |
+| `room.status.changed`       | `housekeeping:{campgroundId}`  | Dashboard, staff app |
+| `task.assigned`             | `staff:{userId}`               | Staff mobile app     |
+| `task.sla.warning`          | `housekeeping:{campgroundId}`  | Dashboard, manager   |
+| `room.ready`                | `reservations:{reservationId}` | Guest notification   |
+| `early.arrival.requested`   | `front-desk:{campgroundId}`    | Front desk staff     |
+| `maintenance.issue.created` | `maintenance:{campgroundId}`   | Maintenance team     |
 
 **Implementation:**
+
 - WebSocket gateway using Socket.IO
 - Redis pub/sub for multi-instance distribution
 - Event-driven architecture with NestJS EventEmitter
@@ -1309,6 +1351,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Establish accommodation model and basic hotel room support without breaking existing functionality.
 
 **Deliverables:**
+
 1. **Schema Migration**
    - Add `AccommodationType` enum
    - Create attribute extension tables
@@ -1333,6 +1376,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Full housekeeping management for hotel-style operations.
 
 **Deliverables:**
+
 1. **Task Templates & Checklists**
    - Configurable cleaning task templates
    - Inspection checklists by accommodation type
@@ -1361,6 +1405,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Hotel-level room operations features.
 
 **Deliverables:**
+
 1. **Early Check-in / Late Checkout**
    - Policy configuration
    - Request workflow
@@ -1385,6 +1430,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Multi-room booking coordination.
 
 **Deliverables:**
+
 1. **Group Booking Model**
    - Create group with room count
    - Link multiple reservations
@@ -1407,6 +1453,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Automated key/code management.
 
 **Deliverables:**
+
 1. **Code Generation Policies**
    - Per-property configuration
    - Multiple format support
@@ -1429,6 +1476,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Goal:** Operational intelligence.
 
 **Deliverables:**
+
 1. **Housekeeping Analytics**
    - Staff productivity dashboards
    - Cleaning time trends
@@ -1452,6 +1500,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ### Decision 1: Accommodation Model Strategy
 
 **Options:**
+
 1. **Extend Site Model** - Add fields to existing Site, use discriminator pattern
 2. **New Accommodation Model** - Parallel model with migration path
 3. **Rename and Extend** - Rename Site → Accommodation, extend in place
@@ -1459,6 +1508,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 **Recommendation:** Option 2 (New Accommodation Model) for cleaner separation
 
 **Trade-offs:**
+
 - Option 1: Less migration risk, but cluttered model
 - Option 2: Clean model, more migration work
 - Option 3: Moderate approach, but breaking changes
@@ -1468,6 +1518,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ### Decision 2: Mobile App Technology
 
 **Options:**
+
 1. **Progressive Web App (PWA)** - Single codebase, works offline
 2. **React Native** - Native feel, existing Expo setup in project
 3. **Native iOS/Android** - Best performance, highest cost
@@ -1479,6 +1530,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ### Decision 3: Real-Time Infrastructure
 
 **Options:**
+
 1. **Socket.IO with Redis** - Mature, well-supported
 2. **Server-Sent Events (SSE)** - Simpler, one-directional
 3. **Firebase/Pusher** - Managed service, less control
@@ -1490,6 +1542,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ### Decision 4: Housekeeping Scheduling Algorithm
 
 **Options:**
+
 1. **Simple Round-Robin** - Even distribution, no optimization
 2. **Zone-Based Priority** - Assign by building/area
 3. **Constraint-Based Optimization** - Consider SLAs, travel time, skills
@@ -1502,6 +1555,7 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ### Decision 5: Backward Compatibility Period
 
 **Options:**
+
 1. **Hard Cutover** - All properties migrate at once
 2. **Feature Flags** - New features opt-in per property
 3. **Parallel Systems** - Run old and new during transition
@@ -1515,20 +1569,24 @@ WS     /staff/me/subscribe        // Task assignments, updates
 ## Appendix A: File Reference Summary
 
 **Core Schema:**
+
 - `/platform/apps/api/prisma/schema.prisma`
 
 **Existing Services to Modify:**
+
 - `/platform/apps/api/src/reservations/reservations.service.ts`
 - `/platform/apps/api/src/tasks/tasks.service.ts`
 - `/platform/apps/api/src/sites/sites.service.ts`
 - `/platform/apps/api/src/maintenance/maintenance.service.ts`
 
 **Existing UI to Extend:**
+
 - `/platform/apps/web/app/campgrounds/[campgroundId]/housekeeping/page.tsx`
 - `/platform/apps/web/app/booking-lab/page.tsx`
 - `/platform/apps/web/app/booking/v2/page.tsx`
 
 **Documentation:**
+
 - `/platform/docs/` - API documentation
 - `/AGENTS.md` - Agent guidelines
 
@@ -1536,20 +1594,20 @@ WS     /staff/me/subscribe        // Task assignments, updates
 
 ## Appendix B: Glossary
 
-| Term | Definition |
-|------|------------|
+| Term          | Definition                                             |
+| ------------- | ------------------------------------------------------ |
 | Accommodation | Generic term for any bookable unit (site, room, cabin) |
-| Turnover | Cleaning process between guest stays |
-| Stayover | Cleaning service during guest's stay |
-| DND | Do Not Disturb status |
-| OOO | Out of Order (maintenance issue) |
-| OOI | Out of Inventory (offline/seasonal) |
-| SLA | Service Level Agreement (time target) |
-| Zone | Geographic grouping of accommodations |
-| Flex-check | Early check-in or late checkout |
-| Group Booking | Multiple linked reservations |
-| Master Folio | Central bill for group bookings |
+| Turnover      | Cleaning process between guest stays                   |
+| Stayover      | Cleaning service during guest's stay                   |
+| DND           | Do Not Disturb status                                  |
+| OOO           | Out of Order (maintenance issue)                       |
+| OOI           | Out of Inventory (offline/seasonal)                    |
+| SLA           | Service Level Agreement (time target)                  |
+| Zone          | Geographic grouping of accommodations                  |
+| Flex-check    | Early check-in or late checkout                        |
+| Group Booking | Multiple linked reservations                           |
+| Master Folio  | Central bill for group bookings                        |
 
 ---
 
-*Document prepared for Campreserv hotel operations expansion project.*
+_Document prepared for Campreserv hotel operations expansion project._

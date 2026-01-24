@@ -9,13 +9,13 @@ describe("Backup/DR readiness endpoints", () => {
   const providerMock: jest.Mocked<BackupProvider> = {
     healthCheck: jest.fn(),
     getLatestBackup: jest.fn(),
-    runRestoreDrill: jest.fn()
+    runRestoreDrill: jest.fn(),
   };
 
   const prismaStub = {
     privacySetting: {
-      findUnique: jest.fn()
-    }
+      findUnique: jest.fn(),
+    },
   };
 
   beforeAll(async () => {
@@ -24,13 +24,13 @@ describe("Backup/DR readiness endpoints", () => {
         BackupService,
         {
           provide: PrismaService,
-          useValue: prismaStub
+          useValue: prismaStub,
         },
         {
           provide: BackupProvider,
-          useValue: providerMock
-        }
-      ]
+          useValue: providerMock,
+        },
+      ],
     }).compile();
     service = moduleRef.get(BackupService);
   });
@@ -39,18 +39,18 @@ describe("Backup/DR readiness endpoints", () => {
     jest.clearAllMocks();
     prismaStub.privacySetting.findUnique.mockResolvedValue({
       campgroundId,
-      backupRetentionDays: 14
+      backupRetentionDays: 14,
     });
     providerMock.healthCheck.mockResolvedValue({ ok: true, message: "ok" });
     providerMock.getLatestBackup.mockResolvedValue({
       lastBackupAt: new Date().toISOString(),
       location: "s3://test-bucket/snap",
-      verifiedAt: new Date().toISOString()
+      verifiedAt: new Date().toISOString(),
     });
     providerMock.runRestoreDrill.mockResolvedValue({
       ok: true,
       verifiedAt: new Date().toISOString(),
-      message: "restore verified"
+      message: "restore verified",
     });
   });
 
@@ -72,11 +72,11 @@ describe("Backup/DR readiness endpoints", () => {
     providerMock.getLatestBackup.mockResolvedValueOnce({
       lastBackupAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days ago
       location: "s3://test-bucket/snap",
-      verifiedAt: new Date().toISOString()
+      verifiedAt: new Date().toISOString(),
     });
     prismaStub.privacySetting.findUnique.mockResolvedValueOnce({
       campgroundId,
-      backupRetentionDays: 10
+      backupRetentionDays: 10,
     });
 
     const res = await service.getStatus(campgroundId);
@@ -102,16 +102,18 @@ describe("Backup/DR readiness endpoints", () => {
     providerMock.getLatestBackup.mockResolvedValueOnce({
       lastBackupAt: null,
       location: null,
-      verifiedAt: null
+      verifiedAt: null,
     });
-    await expect(service.getStatus(campgroundId)).rejects.toThrow("No backup record found for campground");
+    await expect(service.getStatus(campgroundId)).rejects.toThrow(
+      "No backup record found for campground",
+    );
   });
 
   it("fails restore when provider fails", async () => {
     providerMock.runRestoreDrill.mockResolvedValueOnce({
       ok: false,
       verifiedAt: null,
-      message: "restore failed"
+      message: "restore failed",
     });
     await expect(service.simulateRestore(campgroundId)).rejects.toThrow("restore failed");
   });

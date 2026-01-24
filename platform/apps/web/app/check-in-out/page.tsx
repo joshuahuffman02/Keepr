@@ -23,7 +23,7 @@ import {
   Users,
   UserCheck,
   Home,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { PageHeader } from "@/components/ui/layout/PageHeader";
@@ -32,12 +32,31 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { PaymentCollectionModal } from "@/components/payments/PaymentCollectionModal";
@@ -74,7 +93,7 @@ const getGuestName = (guest: Reservation["guest"]) =>
   guest ? `${guest.primaryFirstName} ${guest.primaryLastName}`.trim() : "Guest";
 
 const hasGuestContact = (
-  guest: Reservation["guest"]
+  guest: Reservation["guest"],
 ): guest is { id: string; email: string; primaryFirstName: string; primaryLastName: string } =>
   Boolean(guest && typeof guest.id === "string" && typeof guest.email === "string");
 
@@ -142,7 +161,7 @@ export default function CheckInOutPage() {
   const reservationsQuery = useQuery<Reservation[]>({
     queryKey: ["reservations", campgroundId],
     queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const checkInMutation = useMutation({
@@ -151,14 +170,17 @@ export default function CheckInOutPage() {
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
       toast({ title: "Guest checked in" });
     },
-    onError: () => toast({ title: "Failed to check in", description: "Unable to check in guest. Verify payment status and try again", variant: "destructive" })
+    onError: () =>
+      toast({
+        title: "Failed to check in",
+        description: "Unable to check in guest. Verify payment status and try again",
+        variant: "destructive",
+      }),
   });
 
   const bulkCheckInMutation = useMutation({
     mutationFn: async (ids: string[]) => {
-      const results = await Promise.allSettled(
-        ids.map((id) => apiClient.checkInReservation(id))
-      );
+      const results = await Promise.allSettled(ids.map((id) => apiClient.checkInReservation(id)));
       return results;
     },
     onSuccess: (results) => {
@@ -172,14 +194,18 @@ export default function CheckInOutPage() {
         toast({
           title: `${successCount} checked in, ${failCount} failed`,
           description: "Some check-ins could not be completed",
-          variant: "destructive"
+          variant: "destructive",
         });
       }
       setSelectedIds(new Set());
     },
     onError: () => {
-      toast({ title: "Bulk check-in failed", description: "Unable to process multiple check-ins. Try checking in guests individually", variant: "destructive" });
-    }
+      toast({
+        title: "Bulk check-in failed",
+        description: "Unable to process multiple check-ins. Try checking in guests individually",
+        variant: "destructive",
+      });
+    },
   });
 
   const checkOutMutation = useMutation({
@@ -189,20 +215,25 @@ export default function CheckInOutPage() {
       toast({ title: "Guest checked out" });
       setIsPaymentOpen(false);
     },
-    onError: () => toast({ title: "Failed to check out", description: "Unable to check out guest. Ensure all charges are settled and try again", variant: "destructive" })
+    onError: () =>
+      toast({
+        title: "Failed to check out",
+        description: "Unable to check out guest. Ensure all charges are settled and try again",
+        variant: "destructive",
+      }),
   });
 
   const paymentMutation = useMutation({
     mutationFn: (data: { id: string; amount: number; method: OfflinePaymentMethod }) =>
       apiClient.recordReservationPayment(data.id, data.amount, [
-        { method: data.method, amountCents: data.amount }
+        { method: data.method, amountCents: data.amount },
       ]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
       toast({ title: "Payment recorded" });
       setIsPaymentOpen(false);
     },
-    onError: () => toast({ title: "Payment failed", variant: "destructive" })
+    onError: () => toast({ title: "Payment failed", variant: "destructive" }),
   });
 
   const reservations = reservationsQuery.data ?? [];
@@ -211,22 +242,24 @@ export default function CheckInOutPage() {
   // This avoids timezone issues when comparing dates stored in the database
   const isSameLocalDate = (isoDateStr: string, targetDate: string) => {
     // Extract just the date portion (YYYY-MM-DD) from the ISO string
-    const datePart = isoDateStr.split('T')[0];
+    const datePart = isoDateStr.split("T")[0];
     return datePart === targetDate;
   };
 
   // Arrivals: exclude cancelled, checked_in, and checked_out (only show pending arrivals)
-  const arrivals = reservations.filter((r) =>
-    r.status !== "cancelled" &&
-    r.status !== "checked_in" &&
-    r.status !== "checked_out" &&
-    isSameLocalDate(r.arrivalDate, date)
+  const arrivals = reservations.filter(
+    (r) =>
+      r.status !== "cancelled" &&
+      r.status !== "checked_in" &&
+      r.status !== "checked_out" &&
+      isSameLocalDate(r.arrivalDate, date),
   );
   // Departures: exclude cancelled and checked_out (only show pending departures)
-  const departures = reservations.filter((r) =>
-    r.status !== "cancelled" &&
-    r.status !== "checked_out" &&
-    isSameLocalDate(r.departureDate, date)
+  const departures = reservations.filter(
+    (r) =>
+      r.status !== "cancelled" &&
+      r.status !== "checked_out" &&
+      isSameLocalDate(r.departureDate, date),
   );
   const onsite = reservations.filter((r) => r.status === "checked_in");
   const arrivalsWithBalance = arrivals.filter((r) => (r.balanceAmount ?? 0) > 0);
@@ -324,8 +357,7 @@ export default function CheckInOutPage() {
   }, [filteredList, tab]);
 
   const selectedCount = selectedIds.size;
-  const isAllSelected = filteredList.length > 0 &&
-    filteredList.every((r) => selectedIds.has(r.id));
+  const isAllSelected = filteredList.length > 0 && filteredList.every((r) => selectedIds.has(r.id));
 
   const toggleSelectAll = () => {
     if (isAllSelected) {
@@ -354,8 +386,8 @@ export default function CheckInOutPage() {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     // Only check in those that are eligible
-    const eligibleIds = ids.filter(id => {
-      const res = filteredList.find(r => r.id === id);
+    const eligibleIds = ids.filter((id) => {
+      const res = filteredList.find((r) => r.id === id);
       return res && res.status !== "checked_in";
     });
     if (eligibleIds.length === 0) return;
@@ -366,17 +398,17 @@ export default function CheckInOutPage() {
     const ids = Array.from(selectedIds);
     if (ids.length === 0) return;
     // Only check out those that are checked in
-    const eligibleIds = ids.filter(id => {
-      const res = filteredList.find(r => r.id === id);
+    const eligibleIds = ids.filter((id) => {
+      const res = filteredList.find((r) => r.id === id);
       return res && res.status === "checked_in";
     });
     if (eligibleIds.length === 0) return;
 
     const results = await Promise.allSettled(
-      eligibleIds.map(id => apiClient.checkOutReservation(id))
+      eligibleIds.map((id) => apiClient.checkOutReservation(id)),
     );
-    const successCount = results.filter(r => r.status === "fulfilled").length;
-    const failCount = results.filter(r => r.status === "rejected").length;
+    const successCount = results.filter((r) => r.status === "fulfilled").length;
+    const failCount = results.filter((r) => r.status === "rejected").length;
 
     queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
     if (failCount === 0) {
@@ -397,15 +429,17 @@ export default function CheckInOutPage() {
 
   const handleSendBulkMessage = async () => {
     const selectedGuests = filteredList
-      .filter(r => selectedIds.has(r.id))
+      .filter((r) => selectedIds.has(r.id))
       .flatMap((r) => {
         if (!hasGuestContact(r.guest)) return [];
-        return [{
-          id: r.guest.id,
-          email: r.guest.email,
-          name: getGuestName(r.guest),
-          reservationId: r.id
-        }];
+        return [
+          {
+            id: r.guest.id,
+            email: r.guest.email,
+            name: getGuestName(r.guest),
+            reservationId: r.id,
+          },
+        ];
       });
 
     // For now, just show a toast. In production this would call the messaging API
@@ -418,7 +452,9 @@ export default function CheckInOutPage() {
   };
 
   const formatMoney = (cents?: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((cents ?? 0) / 100);
+    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+      (cents ?? 0) / 100,
+    );
 
   // Open old dialog for arrivals (allows cash/check recording inline)
   const openPayment = (res: Reservation) => {
@@ -450,16 +486,16 @@ export default function CheckInOutPage() {
         {/* Header */}
         <PageHeader
           eyebrow={`Front desk · ${dateLabel}`}
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-success/15 text-status-success">
                 <UserCheck className="h-5 w-5" />
               </span>
               <span>Arrivals & Departures</span>
             </span>
-          )}
+          }
           subtitle="Guide guests through arrivals, departures, and onsite needs in one command center."
-          actions={(
+          actions={
             <>
               <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -474,7 +510,7 @@ export default function CheckInOutPage() {
                 Today
               </Button>
             </>
-          )}
+          }
         />
 
         {/* Summary strip */}
@@ -502,7 +538,9 @@ export default function CheckInOutPage() {
           />
           <SummaryCard
             label="Outstanding balance"
-            value={formatMoney(arrivals.concat(departures).reduce((sum, r) => sum + (r.balanceAmount ?? 0), 0))}
+            value={formatMoney(
+              arrivals.concat(departures).reduce((sum, r) => sum + (r.balanceAmount ?? 0), 0),
+            )}
             icon={<CreditCard className="h-4 w-4" />}
             onClick={handleOutstandingClick}
             highlight={statusFilter === "balance"}
@@ -534,42 +572,92 @@ export default function CheckInOutPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
                   <ArrowUpDown className="h-4 w-4" />
-                  Sort: {sortBy === "name" ? "Name" : sortBy === "site" ? "Site" : sortBy === "balance" ? "Balance" : "Date"}
+                  Sort:{" "}
+                  {sortBy === "name"
+                    ? "Name"
+                    : sortBy === "site"
+                      ? "Site"
+                      : sortBy === "balance"
+                        ? "Balance"
+                        : "Date"}
                   <ChevronDown className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => { setSortBy("name"); setSortDir("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("name");
+                    setSortDir("asc");
+                  }}
+                >
                   Name (A-Z)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("name"); setSortDir("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("name");
+                    setSortDir("desc");
+                  }}
+                >
                   Name (Z-A)
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { setSortBy("site"); setSortDir("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("site");
+                    setSortDir("asc");
+                  }}
+                >
                   Site (A-Z)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("site"); setSortDir("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("site");
+                    setSortDir("desc");
+                  }}
+                >
                   Site (Z-A)
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { setSortBy("balance"); setSortDir("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("balance");
+                    setSortDir("desc");
+                  }}
+                >
                   Balance (High-Low)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("balance"); setSortDir("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("balance");
+                    setSortDir("asc");
+                  }}
+                >
                   Balance (Low-High)
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => { setSortBy("date"); setSortDir("asc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("date");
+                    setSortDir("asc");
+                  }}
+                >
                   Date (Earliest)
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => { setSortBy("date"); setSortDir("desc"); }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortBy("date");
+                    setSortDir("desc");
+                  }}
+                >
                   Date (Latest)
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Select value={statusFilter} onValueChange={(v: typeof statusFilter) => setStatusFilter(v)}>
+            <Select
+              value={statusFilter}
+              onValueChange={(v: typeof statusFilter) => setStatusFilter(v)}
+            >
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Filter" />
               </SelectTrigger>
@@ -591,7 +679,10 @@ export default function CheckInOutPage() {
               <TabsList>
                 <TabsTrigger value="onsite" className="gap-1">
                   On Site
-                  <Badge variant="secondary" className="ml-1 bg-status-success/15 text-status-success">
+                  <Badge
+                    variant="secondary"
+                    className="ml-1 bg-status-success/15 text-status-success"
+                  >
                     {onsite.length}
                   </Badge>
                 </TabsTrigger>
@@ -616,11 +707,7 @@ export default function CheckInOutPage() {
         {filteredList.length > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-card border border-border rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
-              <Checkbox
-                checked={isAllSelected}
-                onCheckedChange={toggleSelectAll}
-                id="select-all"
-              />
+              <Checkbox checked={isAllSelected} onCheckedChange={toggleSelectAll} id="select-all" />
               <Label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
                 Select all ({filteredList.length})
               </Label>
@@ -665,11 +752,7 @@ export default function CheckInOutPage() {
                   </Button>
                 )}
                 {(tab === "onsite" || tab === "departures") && (
-                  <Button
-                    onClick={handleBulkCheckOut}
-                    size="sm"
-                    className="gap-2"
-                  >
+                  <Button onClick={handleBulkCheckOut} size="sm" className="gap-2">
                     <LogOut className="h-4 w-4" />
                     Check Out
                   </Button>
@@ -691,175 +774,222 @@ export default function CheckInOutPage() {
               const needsPayment = (res.balanceAmount ?? 0) > 0;
               const needsSite = !res.siteId;
               const hasIssues = needsPayment || needsSite;
-              const readinessLabel = tab === "departures" ? "Ready to check out" : "Ready to check in";
+              const readinessLabel =
+                tab === "departures" ? "Ready to check out" : "Ready to check in";
 
               return (
                 <Card
                   key={res.id}
                   className={cn(
                     "overflow-hidden border border-l-4 bg-card shadow-sm transition-colors",
-                    hasIssues ? "border-amber-200 border-l-amber-400" : "border-border border-l-border",
-                    isSelected && "ring-2 ring-emerald-200"
+                    hasIssues
+                      ? "border-amber-200 border-l-amber-400"
+                      : "border-border border-l-border",
+                    isSelected && "ring-2 ring-emerald-200",
                   )}
                 >
                   <div className="p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="pt-1">
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => toggleSelect(res.id)}
-                      />
-                    </div>
-                    <div
-                      className={`p-3 rounded-full ${
-                        tab === "onsite"
-                          ? "bg-status-success/15 text-status-success"
-                          : tab === "arrivals"
-                          ? res.status === "checked_in"
+                    <div className="flex items-start gap-3">
+                      <div className="pt-1">
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleSelect(res.id)}
+                        />
+                      </div>
+                      <div
+                        className={`p-3 rounded-full ${
+                          tab === "onsite"
                             ? "bg-status-success/15 text-status-success"
-                            : "bg-status-info/15 text-status-info"
-                          : res.status === "checked_out"
-                          ? "bg-muted text-muted-foreground"
-                          : "bg-status-warning/15 text-status-warning"
-                      }`}
-                    >
-                      {tab === "onsite" ? <Home className="h-5 w-5" /> : tab === "arrivals" ? (res.status === "checked_in" ? <CheckCircle className="h-5 w-5" /> : <Clock className="h-5 w-5" />) : <LogOut className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-semibold text-lg text-foreground">
-                          {getGuestName(res.guest)}
-                        </h3>
-                        {needsPayment && (
-                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
-                            Balance Due
-                          </Badge>
-                        )}
-                        {needsSite && (
-                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
-                            Assign site
-                          </Badge>
-                        )}
-                        {!needsPayment && !needsSite && tab !== "onsite" && (
-                          <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-emerald-200 bg-emerald-50 text-emerald-700">
-                            {readinessLabel}
-                          </Badge>
+                            : tab === "arrivals"
+                              ? res.status === "checked_in"
+                                ? "bg-status-success/15 text-status-success"
+                                : "bg-status-info/15 text-status-info"
+                              : res.status === "checked_out"
+                                ? "bg-muted text-muted-foreground"
+                                : "bg-status-warning/15 text-status-warning"
+                        }`}
+                      >
+                        {tab === "onsite" ? (
+                          <Home className="h-5 w-5" />
+                        ) : tab === "arrivals" ? (
+                          res.status === "checked_in" ? (
+                            <CheckCircle className="h-5 w-5" />
+                          ) : (
+                            <Clock className="h-5 w-5" />
+                          )
+                        ) : (
+                          <LogOut className="h-5 w-5" />
                         )}
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
-                        <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
-                        <span>•</span>
-                        <span>
-                          {res.adults ?? 0} adults{typeof res.children === "number" ? `, ${res.children} children` : ""}
-                        </span>
-                        {res.nights ? (
-                          <>
-                            <span>•</span>
-                            <span>{res.nights} nights</span>
-                          </>
-                        ) : null}
-                        {tab === "departures" && (
-                          <>
-                            <span>•</span>
-                            <span>Arrived {new Date(res.arrivalDate).toLocaleDateString()}</span>
-                          </>
-                        )}
-                        {tab === "onsite" && (
-                          <>
-                            <span>•</span>
-                            <span>Departs {new Date(res.departureDate).toLocaleDateString()}</span>
-                          </>
-                        )}
-                      </div>
-                      {res.notes ? (
-                        <p className="text-sm text-amber-700 mt-2 bg-amber-50 p-2 rounded border border-amber-100 inline-block">Note: {res.notes}</p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-3 min-w-[200px]">
-                    <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Balance</div>
-                      <div className={`font-bold ${(res.balanceAmount ?? 0) > 0 ? "text-amber-700" : "text-emerald-700"}`}>
-                        {formatMoney(res.balanceAmount)}
-                      </div>
-                    </div>
-
-                    {tab === "arrivals" ? (
-                      res.status === "checked_in" ? (
-                        <Button disabled variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Checked In
-                        </Button>
-                      ) : (
-                        <div className="flex flex-wrap gap-2 justify-end">
-                          {!res.siteId && (
-                            <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50">
-                              Assign Site
-                            </Button>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="font-semibold text-lg text-foreground">
+                            {getGuestName(res.guest)}
+                          </h3>
+                          {needsPayment && (
+                            <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
+                              Balance Due
+                            </Badge>
                           )}
+                          {needsSite && (
+                            <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-amber-200 bg-amber-50 text-amber-700">
+                              Assign site
+                            </Badge>
+                          )}
+                          {!needsPayment && !needsSite && tab !== "onsite" && (
+                            <Badge className="h-5 px-1.5 text-[10px] uppercase tracking-wider border border-emerald-200 bg-emerald-50 text-emerald-700">
+                              {readinessLabel}
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mt-1">
+                          <Badge variant="outline">{res.site?.name || "Unassigned"}</Badge>
+                          <span>•</span>
+                          <span>
+                            {res.adults ?? 0} adults
+                            {typeof res.children === "number" ? `, ${res.children} children` : ""}
+                          </span>
+                          {res.nights ? (
+                            <>
+                              <span>•</span>
+                              <span>{res.nights} nights</span>
+                            </>
+                          ) : null}
+                          {tab === "departures" && (
+                            <>
+                              <span>•</span>
+                              <span>Arrived {new Date(res.arrivalDate).toLocaleDateString()}</span>
+                            </>
+                          )}
+                          {tab === "onsite" && (
+                            <>
+                              <span>•</span>
+                              <span>
+                                Departs {new Date(res.departureDate).toLocaleDateString()}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {res.notes ? (
+                          <p className="text-sm text-amber-700 mt-2 bg-amber-50 p-2 rounded border border-amber-100 inline-block">
+                            Note: {res.notes}
+                          </p>
+                        ) : null}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-3 min-w-[200px]">
+                      <div className="text-right">
+                        <div className="text-xs text-muted-foreground">Balance</div>
+                        <div
+                          className={`font-bold ${(res.balanceAmount ?? 0) > 0 ? "text-amber-700" : "text-emerald-700"}`}
+                        >
+                          {formatMoney(res.balanceAmount)}
+                        </div>
+                      </div>
+
+                      {tab === "arrivals" ? (
+                        res.status === "checked_in" ? (
+                          <Button
+                            disabled
+                            variant="outline"
+                            className="text-emerald-600 border-emerald-200 bg-emerald-50"
+                          >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Checked In
+                          </Button>
+                        ) : (
+                          <div className="flex flex-wrap gap-2 justify-end">
+                            {!res.siteId && (
+                              <Button
+                                variant="outline"
+                                className="text-amber-700 border-amber-200 hover:bg-amber-50"
+                              >
+                                Assign Site
+                              </Button>
+                            )}
+                            {(res.balanceAmount ?? 0) > 0 && (
+                              <Button
+                                variant="outline"
+                                className="text-amber-700 border-amber-200 hover:bg-amber-50"
+                                onClick={() => openPayment(res)}
+                              >
+                                <CreditCard className="h-4 w-4 mr-2" />
+                                Pay Balance
+                              </Button>
+                            )}
+                            <Button
+                              onClick={() => checkInMutation.mutate(res.id)}
+                              disabled={checkInMutation.isPending}
+                              className={
+                                (res.balanceAmount ?? 0) > 0
+                                  ? "bg-amber-600 hover:bg-amber-700"
+                                  : "bg-emerald-600 hover:bg-emerald-700"
+                              }
+                            >
+                              {checkInMutation.isPending
+                                ? "Checking..."
+                                : (res.balanceAmount ?? 0) > 0
+                                  ? "Check In Anyway"
+                                  : "Check In"}
+                            </Button>
+                          </div>
+                        )
+                      ) : tab === "onsite" ? (
+                        <div className="flex flex-wrap gap-2 justify-end">
+                          <Link href={`/reservations/${res.id}`}>
+                            <Button variant="outline" size="sm">
+                              View Details
+                            </Button>
+                          </Link>
                           {(res.balanceAmount ?? 0) > 0 && (
                             <Button
                               variant="outline"
                               className="text-amber-700 border-amber-200 hover:bg-amber-50"
-                              onClick={() => openPayment(res)}
+                              onClick={() => openUnifiedPayment(res, false)}
                             >
-                              <CreditCard className="h-4 w-4 mr-2" />
-                              Pay Balance
+                              Settle Balance
                             </Button>
                           )}
                           <Button
-                            onClick={() => checkInMutation.mutate(res.id)}
-                            disabled={checkInMutation.isPending}
-                            className={(res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : "bg-emerald-600 hover:bg-emerald-700"}
+                            onClick={() => handlePayAndCheckout(res)}
+                            disabled={checkOutMutation.isPending}
+                            className={
+                              (res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""
+                            }
                           >
-                            {checkInMutation.isPending ? "Checking..." : (res.balanceAmount ?? 0) > 0 ? "Check In Anyway" : "Check In"}
+                            {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
                           </Button>
                         </div>
-                      )
-                    ) : tab === "onsite" ? (
-                      <div className="flex flex-wrap gap-2 justify-end">
-                        <Link href={`/reservations/${res.id}`}>
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
-                        </Link>
-                        {(res.balanceAmount ?? 0) > 0 && (
-                          <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50" onClick={() => openUnifiedPayment(res, false)}>
-                            Settle Balance
-                          </Button>
-                        )}
-                        <Button
-                          onClick={() => handlePayAndCheckout(res)}
-                          disabled={checkOutMutation.isPending}
-                          className={(res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""}
-                        >
-                          {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
+                      ) : res.status === "checked_out" ? (
+                        <Button disabled variant="outline" className="bg-muted">
+                          Checked Out
                         </Button>
-                      </div>
-                    ) : res.status === "checked_out" ? (
-                      <Button disabled variant="outline" className="bg-muted">
-                        Checked Out
-                      </Button>
-                    ) : (
-                      <div className="flex flex-wrap gap-2 justify-end">
-                        {(res.balanceAmount ?? 0) > 0 && (
-                          <Button variant="outline" className="text-amber-700 border-amber-200 hover:bg-amber-50" onClick={() => openUnifiedPayment(res, false)}>
-                            Settle Balance
+                      ) : (
+                        <div className="flex flex-wrap gap-2 justify-end">
+                          {(res.balanceAmount ?? 0) > 0 && (
+                            <Button
+                              variant="outline"
+                              className="text-amber-700 border-amber-200 hover:bg-amber-50"
+                              onClick={() => openUnifiedPayment(res, false)}
+                            >
+                              Settle Balance
+                            </Button>
+                          )}
+                          <Button
+                            onClick={() => handlePayAndCheckout(res)}
+                            disabled={checkOutMutation.isPending}
+                            className={
+                              (res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""
+                            }
+                          >
+                            {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
                           </Button>
-                        )}
-                        <Button
-                          onClick={() => handlePayAndCheckout(res)}
-                          disabled={checkOutMutation.isPending}
-                          className={(res.balanceAmount ?? 0) > 0 ? "bg-amber-600 hover:bg-amber-700" : ""}
-                        >
-                          {(res.balanceAmount ?? 0) > 0 ? "Pay & Check Out" : "Check Out"}
-                        </Button>
-                      </div>
-                    )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </Card>
+                </Card>
               );
             })
           )}
@@ -867,9 +997,24 @@ export default function CheckInOutPage() {
 
         {/* Tips / shortcuts */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <HintCard title="Send pre-arrival" description="Bulk message guests about gate codes and quiet hours." icon={<MessageCircle className="h-4 w-4" />} href="/messages" />
-          <HintCard title="Assign sites faster" description="Jump to operations board to place unassigned reservations." icon={<Tag className="h-4 w-4" />} href="/operations" />
-          <HintCard title="Collect balances" description="See all open balances in repeat charges." icon={<CreditCard className="h-4 w-4" />} href="/billing/repeat-charges" />
+          <HintCard
+            title="Send pre-arrival"
+            description="Bulk message guests about gate codes and quiet hours."
+            icon={<MessageCircle className="h-4 w-4" />}
+            href="/messages"
+          />
+          <HintCard
+            title="Assign sites faster"
+            description="Jump to operations board to place unassigned reservations."
+            icon={<Tag className="h-4 w-4" />}
+            href="/operations"
+          />
+          <HintCard
+            title="Collect balances"
+            description="See all open balances in repeat charges."
+            icon={<CreditCard className="h-4 w-4" />}
+            href="/billing/repeat-charges"
+          />
         </div>
       </div>
 
@@ -879,8 +1024,11 @@ export default function CheckInOutPage() {
           <DialogHeader>
             <DialogTitle>Collect Outstanding Balance</DialogTitle>
             <DialogDescription>
-              {getGuestName(selectedReservation?.guest)} owes {formatMoney(selectedReservation?.balanceAmount)}.
-              {tab === "arrivals" ? " Collect payment before or during check-in." : " Record payment to proceed with checkout."}
+              {getGuestName(selectedReservation?.guest)} owes{" "}
+              {formatMoney(selectedReservation?.balanceAmount)}.
+              {tab === "arrivals"
+                ? " Collect payment before or during check-in."
+                : " Record payment to proceed with checkout."}
             </DialogDescription>
           </DialogHeader>
 
@@ -888,11 +1036,15 @@ export default function CheckInOutPage() {
             <div className="grid gap-2">
               <Label>Payment Amount</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
                 <Input
                   type="number"
                   value={(paymentAmount ?? 0) / 100}
-                  onChange={(e) => setPaymentAmount(Math.round(parseFloat(e.target.value || "0") * 100))}
+                  onChange={(e) =>
+                    setPaymentAmount(Math.round(parseFloat(e.target.value || "0") * 100))
+                  }
                   className="pl-7"
                 />
               </div>
@@ -952,24 +1104,31 @@ export default function CheckInOutPage() {
             ) : (
               <>
                 <Button
-                  onClick={() => selectedReservation && paymentMutation.mutate({
-                    id: selectedReservation.id,
-                    amount: paymentAmount,
-                    method: paymentMethod
-                  })}
+                  onClick={() =>
+                    selectedReservation &&
+                    paymentMutation.mutate({
+                      id: selectedReservation.id,
+                      amount: paymentAmount,
+                      method: paymentMethod,
+                    })
+                  }
                   disabled={paymentMutation.isPending}
                   variant="outline"
                 >
-                  {paymentMutation.isPending ? "Processing..." : `Record ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)} Payment`}
+                  {paymentMutation.isPending
+                    ? "Processing..."
+                    : `Record ${paymentMethod.charAt(0).toUpperCase() + paymentMethod.slice(1)} Payment`}
                 </Button>
                 {tab === "arrivals" && selectedReservation?.status !== "checked_in" && (
                   <Button
                     onClick={async () => {
                       if (!selectedReservation) return;
                       try {
-                        await apiClient.recordReservationPayment(selectedReservation.id, paymentAmount, [
-                          { method: paymentMethod, amountCents: paymentAmount }
-                        ]);
+                        await apiClient.recordReservationPayment(
+                          selectedReservation.id,
+                          paymentAmount,
+                          [{ method: paymentMethod, amountCents: paymentAmount }],
+                        );
                         await apiClient.checkInReservation(selectedReservation.id);
                         queryClient.invalidateQueries({ queryKey: ["reservations", campgroundId] });
                         toast({ title: "Payment recorded and guest checked in" });
@@ -1005,14 +1164,12 @@ export default function CheckInOutPage() {
           context="staff_checkin"
           guestId={selectedReservation.guest?.id}
           guestEmail={selectedReservation.guest?.email}
-          guestName={`${selectedReservation.guest?.primaryFirstName || ''} ${selectedReservation.guest?.primaryLastName || ''}`.trim()}
+          guestName={`${selectedReservation.guest?.primaryFirstName || ""} ${selectedReservation.guest?.primaryLastName || ""}`.trim()}
           enableSplitTender={true}
           enableCharityRoundUp={true}
           // Show Check In/Out button in success view if applicable
           checkInOutLabel={
-            checkInAfterPayment ? "Check In" :
-            checkOutAfterPayment ? "Check Out" :
-            undefined
+            checkInAfterPayment ? "Check In" : checkOutAfterPayment ? "Check Out" : undefined
           }
           onSuccess={async (result) => {
             setIsStripePaymentOpen(false);
@@ -1032,7 +1189,9 @@ export default function CheckInOutPage() {
                 toast({ title: "Payment successful but check-out failed", variant: "destructive" });
               }
             } else {
-              toast({ title: `Payment of $${(result.totalPaidCents / 100).toFixed(2)} successful` });
+              toast({
+                title: `Payment of $${(result.totalPaidCents / 100).toFixed(2)} successful`,
+              });
             }
             setCheckInAfterPayment(false);
             setCheckOutAfterPayment(false);
@@ -1053,7 +1212,8 @@ export default function CheckInOutPage() {
               ) : (
                 <Mail className="h-5 w-5 text-blue-600" />
               )}
-              Send {messageType === "sms" ? "SMS" : "Email"} to {selectedCount} Guest{selectedCount !== 1 ? "s" : ""}
+              Send {messageType === "sms" ? "SMS" : "Email"} to {selectedCount} Guest
+              {selectedCount !== 1 ? "s" : ""}
             </DialogTitle>
             <DialogDescription>
               Use personalization tags to customize each message automatically.
@@ -1081,7 +1241,7 @@ export default function CheckInOutPage() {
                     key={tag}
                     type="button"
                     className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md bg-status-info/15 text-status-info hover:bg-status-info/10 border border-status-info/30 transition-colors"
-                    onClick={() => setMessageBody(prev => prev + tag)}
+                    onClick={() => setMessageBody((prev) => prev + tag)}
                   >
                     {label}
                     <span className="opacity-60 font-mono text-[10px]">{tag}</span>
@@ -1104,16 +1264,19 @@ export default function CheckInOutPage() {
             <div className="grid gap-2">
               <Label>Message</Label>
               <Textarea
-                placeholder={messageType === "sms"
-                  ? "e.g., Hi {first_name}! Just a reminder that checkout is at 11am tomorrow. Thanks for staying with us!"
-                  : "e.g., Hi {first_name}, we hope you're enjoying your stay at site {site_name}!"}
+                placeholder={
+                  messageType === "sms"
+                    ? "e.g., Hi {first_name}! Just a reminder that checkout is at 11am tomorrow. Thanks for staying with us!"
+                    : "e.g., Hi {first_name}, we hope you're enjoying your stay at site {site_name}!"
+                }
                 value={messageBody}
                 onChange={(e) => setMessageBody(e.target.value)}
                 rows={4}
               />
               {messageType === "sms" && (
                 <p className="text-xs text-muted-foreground">
-                  {messageBody.length}/160 characters {messageBody.length > 160 && "(will be split into multiple messages)"}
+                  {messageBody.length}/160 characters{" "}
+                  {messageBody.length > 160 && "(will be split into multiple messages)"}
                 </p>
               )}
             </div>
@@ -1127,20 +1290,32 @@ export default function CheckInOutPage() {
                 </Label>
                 <div className="p-3 rounded-lg bg-muted border border-border text-sm text-foreground">
                   {(() => {
-                    const firstSelected = filteredList.find(r => selectedIds.has(r.id));
+                    const firstSelected = filteredList.find((r) => selectedIds.has(r.id));
                     if (!firstSelected) return messageBody;
-                    const arrivalDate = firstSelected.arrivalDate ? format(new Date(firstSelected.arrivalDate), "MMM d") : "";
-                    const departureDate = firstSelected.departureDate ? format(new Date(firstSelected.departureDate), "MMM d") : "";
-                    const nights = firstSelected.arrivalDate && firstSelected.departureDate
-                      ? Math.ceil((new Date(firstSelected.departureDate).getTime() - new Date(firstSelected.arrivalDate).getTime()) / (1000 * 60 * 60 * 24))
-                      : 0;
+                    const arrivalDate = firstSelected.arrivalDate
+                      ? format(new Date(firstSelected.arrivalDate), "MMM d")
+                      : "";
+                    const departureDate = firstSelected.departureDate
+                      ? format(new Date(firstSelected.departureDate), "MMM d")
+                      : "";
+                    const nights =
+                      firstSelected.arrivalDate && firstSelected.departureDate
+                        ? Math.ceil(
+                            (new Date(firstSelected.departureDate).getTime() -
+                              new Date(firstSelected.arrivalDate).getTime()) /
+                              (1000 * 60 * 60 * 24),
+                          )
+                        : 0;
                     return messageBody
                       .replace(/{first_name}/g, firstSelected.guest?.primaryFirstName || "Guest")
                       .replace(/{last_name}/g, firstSelected.guest?.primaryLastName || "")
                       .replace(/{site_name}/g, firstSelected.site?.name || "your site")
                       .replace(/{arrival_date}/g, arrivalDate)
                       .replace(/{departure_date}/g, departureDate)
-                      .replace(/{balance}/g, `$${((firstSelected.balanceAmount || 0) / 100).toFixed(2)}`)
+                      .replace(
+                        /{balance}/g,
+                        `$${((firstSelected.balanceAmount || 0) / 100).toFixed(2)}`,
+                      )
                       .replace(/{nights}/g, String(nights));
                   })()}
                 </div>
@@ -1155,7 +1330,11 @@ export default function CheckInOutPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setMessageBody("Hi {first_name}! Welcome to your stay at site {site_name}. Check-in starts at 3pm. Need help? Reply to this message!")}
+                  onClick={() =>
+                    setMessageBody(
+                      "Hi {first_name}! Welcome to your stay at site {site_name}. Check-in starts at 3pm. Need help? Reply to this message!",
+                    )
+                  }
                 >
                   Welcome
                 </Button>
@@ -1163,7 +1342,11 @@ export default function CheckInOutPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setMessageBody("Hi {first_name}, reminder: Checkout is at 11am on {departure_date}. Please return keys to the office. Thanks for staying with us!")}
+                  onClick={() =>
+                    setMessageBody(
+                      "Hi {first_name}, reminder: Checkout is at 11am on {departure_date}. Please return keys to the office. Thanks for staying with us!",
+                    )
+                  }
                 >
                   Checkout Reminder
                 </Button>
@@ -1171,7 +1354,11 @@ export default function CheckInOutPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setMessageBody("Hi {first_name}, weather alert for site {site_name}: Please secure outdoor items and be prepared for incoming weather. Stay safe!")}
+                  onClick={() =>
+                    setMessageBody(
+                      "Hi {first_name}, weather alert for site {site_name}: Please secure outdoor items and be prepared for incoming weather. Stay safe!",
+                    )
+                  }
                 >
                   Weather Alert
                 </Button>
@@ -1179,7 +1366,11 @@ export default function CheckInOutPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setMessageBody("Hi {first_name}! Pool hours today: 9am-9pm. Don't forget your towel!")}
+                  onClick={() =>
+                    setMessageBody(
+                      "Hi {first_name}! Pool hours today: 9am-9pm. Don't forget your towel!",
+                    )
+                  }
                 >
                   Pool Hours
                 </Button>
@@ -1187,7 +1378,11 @@ export default function CheckInOutPage() {
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setMessageBody("Hi {first_name}, just a reminder that your current balance is {balance}. Please stop by the office if you have any questions!")}
+                  onClick={() =>
+                    setMessageBody(
+                      "Hi {first_name}, just a reminder that your current balance is {balance}. Please stop by the office if you have any questions!",
+                    )
+                  }
                 >
                   Balance Reminder
                 </Button>
@@ -1204,7 +1399,11 @@ export default function CheckInOutPage() {
               disabled={!messageBody.trim() || (messageType === "email" && !messageSubject.trim())}
               className="gap-2"
             >
-              {messageType === "sms" ? <MessageSquare className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+              {messageType === "sms" ? (
+                <MessageSquare className="h-4 w-4" />
+              ) : (
+                <Mail className="h-4 w-4" />
+              )}
               Send {messageType === "sms" ? "SMS" : "Email"}
             </Button>
           </DialogFooter>
@@ -1214,7 +1413,21 @@ export default function CheckInOutPage() {
   );
 }
 
-function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: string; value: string | number; icon: React.ReactNode; href?: string; onClick?: () => void; highlight?: boolean }) {
+function SummaryCard({
+  label,
+  value,
+  icon,
+  href,
+  onClick,
+  highlight,
+}: {
+  label: string;
+  value: string | number;
+  icon: React.ReactNode;
+  href?: string;
+  onClick?: () => void;
+  highlight?: boolean;
+}) {
   const content = (
     <div
       className={cn(
@@ -1222,32 +1435,37 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
         "group-hover:-translate-y-0.5 group-hover:shadow-md",
         highlight
           ? "border-emerald-200 bg-emerald-50"
-          : "border-border bg-card group-hover:border-muted-foreground/30"
+          : "border-border bg-card group-hover:border-muted-foreground/30",
       )}
     >
       <div className="flex items-center gap-3">
-        <span className={cn(
-          "rounded-lg p-2",
-          highlight ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground"
-        )}>
+        <span
+          className={cn(
+            "rounded-lg p-2",
+            highlight ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground",
+          )}
+        >
           {icon}
         </span>
         <div>
-          <div className={cn(
-            "text-xs font-semibold tracking-wide",
-            highlight ? "text-emerald-700" : "text-muted-foreground"
-          )}>
+          <div
+            className={cn(
+              "text-xs font-semibold tracking-wide",
+              highlight ? "text-emerald-700" : "text-muted-foreground",
+            )}
+          >
             {label}
           </div>
-          <div className={cn(
-            "text-xl font-bold",
-            highlight ? "text-emerald-700" : "text-foreground"
-          )}>
+          <div
+            className={cn("text-xl font-bold", highlight ? "text-emerald-700" : "text-foreground")}
+          >
             {value}
           </div>
         </div>
       </div>
-      <ArrowRight className={cn("h-4 w-4", highlight ? "text-emerald-400" : "text-muted-foreground")} />
+      <ArrowRight
+        className={cn("h-4 w-4", highlight ? "text-emerald-400" : "text-muted-foreground")}
+      />
     </div>
   );
   if (href) {
@@ -1271,9 +1489,22 @@ function SummaryCard({ label, value, icon, href, onClick, highlight }: { label: 
   return content;
 }
 
-function HintCard({ title, description, icon, href }: { title: string; description: string; icon: React.ReactNode; href: string }) {
+function HintCard({
+  title,
+  description,
+  icon,
+  href,
+}: {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  href: string;
+}) {
   return (
-    <Link href={href} className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm hover:border-status-success/40 hover:shadow-md transition">
+    <Link
+      href={href}
+      className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm hover:border-status-success/40 hover:shadow-md transition"
+    >
       <span className="rounded-md bg-status-success/10 p-2 text-status-success">{icon}</span>
       <div>
         <div className="text-sm font-semibold text-foreground">{title}</div>

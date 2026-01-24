@@ -10,18 +10,24 @@ describe("resolvePoints", () => {
   });
 
   it("jitter-falls back when coordinates are missing", () => {
-    const result = resolvePoints([
-      { id: "a", value: 1 },
-      { id: "b", value: 2 }
-    ], center, 0.001);
+    const result = resolvePoints(
+      [
+        { id: "a", value: 1 },
+        { id: "b", value: 2 },
+      ],
+      center,
+      0.001,
+    );
     expect(result[0].latitude).not.toBeNaN();
     expect(result[0].longitude).not.toBeNaN();
     expect(result[0].latitude).not.toEqual(center.latitude); // jitter applied
   });
 
   it("filters out non-finite coordinates", () => {
-    const result = resolvePoints([{ id: "a", latitude: Number.NaN, longitude: Number.NaN, value: 1 }], center);
+    const result = resolvePoints(
+      [{ id: "a", latitude: Number.NaN, longitude: Number.NaN, value: 1 }],
+      center,
+    );
     expect(result.length).toBe(0);
   });
 });
-

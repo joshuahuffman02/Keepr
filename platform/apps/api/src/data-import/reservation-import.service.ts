@@ -143,33 +143,84 @@ export class ReservationImportService {
 
   // Target fields with aliases for auto-mapping
   static readonly targetFields = [
-    { name: "firstName", aliases: ["first_name", "firstname", "first", "guest_first_name", "primary_first"] },
-    { name: "lastName", aliases: ["last_name", "lastname", "last", "guest_last_name", "primary_last", "surname"] },
+    {
+      name: "firstName",
+      aliases: ["first_name", "firstname", "first", "guest_first_name", "primary_first"],
+    },
+    {
+      name: "lastName",
+      aliases: ["last_name", "lastname", "last", "guest_last_name", "primary_last", "surname"],
+    },
     { name: "email", aliases: ["email_address", "guest_email", "primary_email", "e-mail"] },
-    { name: "phone", aliases: ["phone_number", "telephone", "guest_phone", "primary_phone", "mobile", "cell"] },
-    { name: "arrivalDate", aliases: ["arrival", "check_in", "checkin", "check_in_date", "start_date", "arrive"] },
-    { name: "departureDate", aliases: ["departure", "check_out", "checkout", "check_out_date", "end_date", "depart"] },
-    { name: "siteNumber", aliases: ["site_number", "site_num", "site_id", "site", "spot", "site_#", "site#", "unit"] },
+    {
+      name: "phone",
+      aliases: ["phone_number", "telephone", "guest_phone", "primary_phone", "mobile", "cell"],
+    },
+    {
+      name: "arrivalDate",
+      aliases: ["arrival", "check_in", "checkin", "check_in_date", "start_date", "arrive"],
+    },
+    {
+      name: "departureDate",
+      aliases: ["departure", "check_out", "checkout", "check_out_date", "end_date", "depart"],
+    },
+    {
+      name: "siteNumber",
+      aliases: ["site_number", "site_num", "site_id", "site", "spot", "site_#", "site#", "unit"],
+    },
     { name: "siteName", aliases: ["site_name", "sitename", "spot_name"] },
-    { name: "siteClass", aliases: ["site_class", "site_type", "category", "class", "type", "accommodation_type"] },
-    { name: "totalAmount", aliases: ["total", "total_amount", "amount", "price", "total_price", "reservation_total", "grand_total"] },
-    { name: "paidAmount", aliases: ["paid", "paid_amount", "amount_paid", "payments", "collected"] },
+    {
+      name: "siteClass",
+      aliases: ["site_class", "site_type", "category", "class", "type", "accommodation_type"],
+    },
+    {
+      name: "totalAmount",
+      aliases: [
+        "total",
+        "total_amount",
+        "amount",
+        "price",
+        "total_price",
+        "reservation_total",
+        "grand_total",
+      ],
+    },
+    {
+      name: "paidAmount",
+      aliases: ["paid", "paid_amount", "amount_paid", "payments", "collected"],
+    },
     { name: "adults", aliases: ["adult_count", "num_adults", "adult_guests", "adults_count"] },
-    { name: "children", aliases: ["child_count", "num_children", "kids", "children_count", "minors"] },
-    { name: "confirmationNumber", aliases: ["confirmation", "confirmation_number", "conf_number", "conf_#", "booking_id", "reservation_id", "res_id"] },
+    {
+      name: "children",
+      aliases: ["child_count", "num_children", "kids", "children_count", "minors"],
+    },
+    {
+      name: "confirmationNumber",
+      aliases: [
+        "confirmation",
+        "confirmation_number",
+        "conf_number",
+        "conf_#",
+        "booking_id",
+        "reservation_id",
+        "res_id",
+      ],
+    },
     { name: "status", aliases: ["reservation_status", "booking_status", "state"] },
     { name: "notes", aliases: ["note", "comments", "remarks", "special_requests", "guest_notes"] },
   ];
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly csvParser: CsvParserService
+    private readonly csvParser: CsvParserService,
   ) {}
 
   /**
    * Get suggested field mappings for reservation import
    */
-  suggestMappings(headers: string[]): Array<{ sourceField: string; suggestedTarget: string; confidence: number }> {
+  suggestMappings(
+    headers: string[],
+  ): Array<{ sourceField: string; suggestedTarget: string; confidence: number }> {
     return this.csvParser.suggestFieldMappings(headers, ReservationImportService.targetFields);
   }
 
@@ -178,7 +229,7 @@ export class ReservationImportService {
    */
   async parseAndDetectColumns(
     csvContent: string,
-    campgroundId: string
+    campgroundId: string,
   ): Promise<{
     headers: string[];
     suggestedMapping: Record<string, string>;
@@ -203,7 +254,7 @@ export class ReservationImportService {
     return {
       headers: parseResult.headers,
       suggestedMapping,
-      sampleRows: parseResult.rows.slice(0, 5).map(r => this.normalizeRowData(r.data)),
+      sampleRows: parseResult.rows.slice(0, 5).map((r) => this.normalizeRowData(r.data)),
       totalRows: parseResult.rows.length,
     };
   }
@@ -214,7 +265,7 @@ export class ReservationImportService {
   async previewImport(
     campgroundId: string,
     csvContent: string,
-    mapping: ReservationImportColumnMapping
+    mapping: ReservationImportColumnMapping,
   ): Promise<ReservationImportPreview> {
     // Verify campground exists
     const campground = await this.prisma.campground.findUnique({
@@ -258,10 +309,10 @@ export class ReservationImportService {
 
     // OPTIMIZATION: Batch prefetch data to avoid N+1 queries
     // 1. Get date range for all reservations
-    const allArrivalDates = parsedRows.map(p => p.stay.arrivalDate);
-    const allDepartureDates = parsedRows.map(p => p.stay.departureDate);
-    const minArrival = new Date(Math.min(...allArrivalDates.map(d => d.getTime())));
-    const maxDeparture = new Date(Math.max(...allDepartureDates.map(d => d.getTime())));
+    const allArrivalDates = parsedRows.map((p) => p.stay.arrivalDate);
+    const allDepartureDates = parsedRows.map((p) => p.stay.departureDate);
+    const minArrival = new Date(Math.min(...allArrivalDates.map((d) => d.getTime())));
+    const maxDeparture = new Date(Math.max(...allDepartureDates.map((d) => d.getTime())));
 
     // 2. Prefetch all potentially conflicting reservations in one query
     const conflictingReservations = await this.prisma.reservation.findMany({
@@ -276,39 +327,54 @@ export class ReservationImportService {
 
     // 3. Prefetch all potential guest matches by email
     const allEmails = parsedRows
-      .map(p => p.guest.email?.toLowerCase())
+      .map((p) => p.guest.email?.toLowerCase())
       .filter((e): e is string => !!e);
 
-    const existingGuestsByEmail = allEmails.length > 0
-      ? await this.prisma.guest.findMany({
-          where: { Reservation: { some: { campgroundId } }, email: { in: allEmails } },
-          select: { id: true, email: true, primaryFirstName: true, primaryLastName: true, phone: true },
-        })
-      : [];
+    const existingGuestsByEmail =
+      allEmails.length > 0
+        ? await this.prisma.guest.findMany({
+            where: { Reservation: { some: { campgroundId } }, email: { in: allEmails } },
+            select: {
+              id: true,
+              email: true,
+              primaryFirstName: true,
+              primaryLastName: true,
+              phone: true,
+            },
+          })
+        : [];
 
     // 4. Prefetch site classes with default rates for pricing
     const siteClassesWithRates = await this.prisma.siteClass.findMany({
       where: { campgroundId, isActive: true },
       select: { id: true, name: true, defaultRate: true },
     });
-    const siteClassRateMap = new Map(siteClassesWithRates.map(sc => [sc.id, sc.defaultRate]));
+    const siteClassRateMap = new Map(siteClassesWithRates.map((sc) => [sc.id, sc.defaultRate]));
 
     // 5. Build lookup maps for O(1) access
-    const guestEmailMap = new Map(existingGuestsByEmail.map(g => [g.email?.toLowerCase(), g]));
-    const siteIdToClassId = new Map(sites.map(s => [s.id, s.siteClassId]));
+    const guestEmailMap = new Map(existingGuestsByEmail.map((g) => [g.email?.toLowerCase(), g]));
+    const siteIdToClassId = new Map(sites.map((s) => [s.id, s.siteClassId]));
 
     // Helper to check site availability using prefetched data
-    const checkSiteAvailabilityBatch = (siteId: string, arrivalDate: Date, departureDate: Date): string | undefined => {
-      const conflict = conflictingReservations.find(r =>
-        r.siteId === siteId &&
-        r.arrivalDate < departureDate &&
-        r.departureDate > arrivalDate
+    const checkSiteAvailabilityBatch = (
+      siteId: string,
+      arrivalDate: Date,
+      departureDate: Date,
+    ): string | undefined => {
+      const conflict = conflictingReservations.find(
+        (r) =>
+          r.siteId === siteId && r.arrivalDate < departureDate && r.departureDate > arrivalDate,
       );
       return conflict ? "Site has overlapping reservation" : undefined;
     };
 
     // Helper to match guest using prefetched data
-    const matchGuestBatch = (guestData: { firstName: string; lastName: string; email?: string; phone?: string }): GuestMatchResult => {
+    const matchGuestBatch = (guestData: {
+      firstName: string;
+      lastName: string;
+      email?: string;
+      phone?: string;
+    }): GuestMatchResult => {
       if (guestData.email) {
         const existing = guestEmailMap.get(guestData.email.toLowerCase());
         if (existing) {
@@ -331,10 +397,12 @@ export class ReservationImportService {
       siteClassId: string | null,
       arrivalDate: Date,
       departureDate: Date,
-      csvTotalCents: number
+      csvTotalCents: number,
     ): PricingComparison => {
       let calculatedTotalCents = 0;
-      const nights = Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24));
+      const nights = Math.ceil(
+        (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
+      );
 
       if (siteId) {
         const classId = siteIdToClassId.get(siteId);
@@ -348,7 +416,8 @@ export class ReservationImportService {
       }
 
       const difference = csvTotalCents - calculatedTotalCents;
-      const differencePercent = calculatedTotalCents > 0 ? Math.abs(difference / calculatedTotalCents * 100) : 0;
+      const differencePercent =
+        calculatedTotalCents > 0 ? Math.abs((difference / calculatedTotalCents) * 100) : 0;
 
       return {
         csvTotalCents,
@@ -369,7 +438,7 @@ export class ReservationImportService {
         parsed.siteIdentifier,
         parsed.stay.arrivalDate,
         parsed.stay.departureDate,
-        checkSiteAvailabilityBatch
+        checkSiteAvailabilityBatch,
       );
 
       // Guest matching (uses prefetched guest data)
@@ -381,7 +450,7 @@ export class ReservationImportService {
         siteMatch.suggestedSiteClassId || null,
         parsed.stay.arrivalDate,
         parsed.stay.departureDate,
-        parsed.pricing.totalAmountCents || 0
+        parsed.pricing.totalAmountCents || 0,
       );
 
       matchResults.push({
@@ -398,8 +467,12 @@ export class ReservationImportService {
     const summary = {
       totalRows: parsedRows.length,
       validRows: parsedRows.filter((r) => r.errors.length === 0).length,
-      sitesMatched: matchResults.filter((m) => m.site.matchType === "exact_number" || m.site.matchType === "exact_name").length,
-      sitesNeedSelection: matchResults.filter((m) => m.site.matchType === "class_assignment" || m.site.matchType === "manual_required").length,
+      sitesMatched: matchResults.filter(
+        (m) => m.site.matchType === "exact_number" || m.site.matchType === "exact_name",
+      ).length,
+      sitesNeedSelection: matchResults.filter(
+        (m) => m.site.matchType === "class_assignment" || m.site.matchType === "manual_required",
+      ).length,
       guestsFound: matchResults.filter((m) => m.guest.matchType === "existing").length,
       guestsToCreate: matchResults.filter((m) => m.guest.matchType === "will_create").length,
       hasConflicts: matchResults.filter((m) => m.site.conflict).length,
@@ -415,7 +488,7 @@ export class ReservationImportService {
   async executeImport(
     campgroundId: string,
     parsedRows: ParsedReservationRow[],
-    executeRows: ReservationImportExecuteRow[]
+    executeRows: ReservationImportExecuteRow[],
   ): Promise<ReservationImportResult> {
     const result: ReservationImportResult = {
       success: true,
@@ -434,16 +507,14 @@ export class ReservationImportService {
       },
       select: { id: true, siteClassId: true },
     });
-    const activeSiteClassMap = new Map(
-      activeSites.map((site) => [site.id, site.siteClassId])
-    );
+    const activeSiteClassMap = new Map(activeSites.map((site) => [site.id, site.siteClassId]));
 
     const siteClassRates = await this.prisma.siteClass.findMany({
       where: { campgroundId, isActive: true },
       select: { id: true, defaultRate: true },
     });
     const siteClassRateMap = new Map(
-      siteClassRates.map((siteClass) => [siteClass.id, siteClass.defaultRate])
+      siteClassRates.map((siteClass) => [siteClass.id, siteClass.defaultRate]),
     );
 
     const createdGuestByEmail = new Map<string, string>();
@@ -452,19 +523,12 @@ export class ReservationImportService {
       Array<{ arrivalDate: Date; departureDate: Date }>
     >();
 
-    const conflictMap = new Map<
-      string,
-      Array<{ arrivalDate: Date; departureDate: Date }>
-    >();
+    const conflictMap = new Map<string, Array<{ arrivalDate: Date; departureDate: Date }>>();
     if (parsedRows.length > 0) {
       const allArrivalDates = parsedRows.map((p) => p.stay.arrivalDate);
       const allDepartureDates = parsedRows.map((p) => p.stay.departureDate);
-      const minArrival = new Date(
-        Math.min(...allArrivalDates.map((d) => d.getTime()))
-      );
-      const maxDeparture = new Date(
-        Math.max(...allDepartureDates.map((d) => d.getTime()))
-      );
+      const minArrival = new Date(Math.min(...allArrivalDates.map((d) => d.getTime())));
+      const maxDeparture = new Date(Math.max(...allDepartureDates.map((d) => d.getTime())));
 
       const conflictingReservations = await this.prisma.reservation.findMany({
         where: {
@@ -501,7 +565,7 @@ export class ReservationImportService {
     const getSystemPricingTotal = (
       siteId: string,
       siteClassId: string | null | undefined,
-      nights: number
+      nights: number,
     ) => {
       const resolvedClassId = siteClassId ?? activeSiteClassMap.get(siteId) ?? null;
       if (!resolvedClassId) return null;
@@ -554,7 +618,10 @@ export class ReservationImportService {
         }
 
         if (!guestId) {
-          result.errors.push({ rowIndex: execRow.rowIndex, error: "No guest ID or guest data provided" });
+          result.errors.push({
+            rowIndex: execRow.rowIndex,
+            error: "No guest ID or guest data provided",
+          });
           continue;
         }
 
@@ -566,12 +633,18 @@ export class ReservationImportService {
         const hasActiveSite = activeSiteClassMap.has(execRow.siteId);
         const activeSiteClassId = activeSiteClassMap.get(execRow.siteId) ?? null;
         if (!hasActiveSite) {
-          result.errors.push({ rowIndex: execRow.rowIndex, error: "Selected site is inactive or unavailable" });
+          result.errors.push({
+            rowIndex: execRow.rowIndex,
+            error: "Selected site is inactive or unavailable",
+          });
           continue;
         }
 
         if (hasConflict(execRow.siteId, parsed.stay.arrivalDate, parsed.stay.departureDate)) {
-          result.errors.push({ rowIndex: execRow.rowIndex, error: "Site has overlapping reservation" });
+          result.errors.push({
+            rowIndex: execRow.rowIndex,
+            error: "Site has overlapping reservation",
+          });
           continue;
         }
 
@@ -581,21 +654,26 @@ export class ReservationImportService {
           totalAmountCents = execRow.manualTotalOverrideCents;
         } else if (execRow.useSystemPricing) {
           const msPerDay = 1000 * 60 * 60 * 24;
-          const nights = parsed.stay.nights > 0
-            ? parsed.stay.nights
-            : Math.max(
-                1,
-                Math.ceil(
-                  (parsed.stay.departureDate.getTime() - parsed.stay.arrivalDate.getTime()) / msPerDay
-                )
-              );
+          const nights =
+            parsed.stay.nights > 0
+              ? parsed.stay.nights
+              : Math.max(
+                  1,
+                  Math.ceil(
+                    (parsed.stay.departureDate.getTime() - parsed.stay.arrivalDate.getTime()) /
+                      msPerDay,
+                  ),
+                );
           const systemTotal = getSystemPricingTotal(
             execRow.siteId,
             execRow.siteClassId ?? activeSiteClassId,
-            nights
+            nights,
           );
           if (systemTotal === null) {
-            result.errors.push({ rowIndex: execRow.rowIndex, error: "System pricing unavailable for selected site" });
+            result.errors.push({
+              rowIndex: execRow.rowIndex,
+              error: "System pricing unavailable for selected site",
+            });
             continue;
           }
           totalAmountCents = systemTotal;
@@ -605,7 +683,8 @@ export class ReservationImportService {
         const balanceAmountCents = totalAmountCents - paidAmountCents;
 
         // Determine status
-        let status: "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled" = "confirmed";
+        let status: "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled" =
+          "confirmed";
         const csvStatus = parsed.meta.status?.toLowerCase();
         if (csvStatus) {
           if (csvStatus.includes("cancel")) status = "cancelled";
@@ -629,7 +708,9 @@ export class ReservationImportService {
             paidAmount: paidAmountCents,
             balanceAmount: balanceAmountCents,
             status,
-            notes: parsed.meta.notes || `Imported from CSV. Original confirmation: ${parsed.meta.confirmationNumber || "N/A"}`,
+            notes:
+              parsed.meta.notes ||
+              `Imported from CSV. Original confirmation: ${parsed.meta.confirmationNumber || "N/A"}`,
             bookedAt: new Date(),
           },
         });
@@ -674,7 +755,7 @@ export class ReservationImportService {
   private parseRow(
     rowIndex: number,
     row: Record<string, string>,
-    mapping: ReservationImportColumnMapping
+    mapping: ReservationImportColumnMapping,
   ): ParsedReservationRow {
     const errors: string[] = [];
 
@@ -691,9 +772,10 @@ export class ReservationImportService {
       errors.push("Departure must be after arrival");
     }
 
-    const nights = arrivalDate && departureDate
-      ? Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24))
-      : 0;
+    const nights =
+      arrivalDate && departureDate
+        ? Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
 
     // Parse guest info
     const firstName = (row[mapping.firstName || ""] || "").trim() || "Guest";
@@ -726,9 +808,10 @@ export class ReservationImportService {
       pricing: {
         totalAmountCents,
         paidAmountCents,
-        balanceCents: totalAmountCents !== undefined && paidAmountCents !== undefined
-          ? totalAmountCents - paidAmountCents
-          : undefined,
+        balanceCents:
+          totalAmountCents !== undefined && paidAmountCents !== undefined
+            ? totalAmountCents - paidAmountCents
+            : undefined,
       },
       meta: {
         confirmationNumber: (row[mapping.confirmationNumber || ""] || "").trim() || undefined,
@@ -802,12 +885,12 @@ export class ReservationImportService {
     identifier: { siteNumber?: string; siteName?: string; siteClassName?: string },
     arrivalDate: Date,
     departureDate: Date,
-    campgroundId: string
+    campgroundId: string,
   ): Promise<SiteMatchResult> {
     // Priority 1: Exact match by site number
     if (identifier.siteNumber) {
       const site = sites.find(
-        (s) => s.siteNumber?.toLowerCase() === identifier.siteNumber?.toLowerCase()
+        (s) => s.siteNumber?.toLowerCase() === identifier.siteNumber?.toLowerCase(),
       );
       if (site) {
         const conflict = await this.checkSiteAvailability(site.id, arrivalDate, departureDate);
@@ -823,8 +906,8 @@ export class ReservationImportService {
 
     // Priority 2: Match by site name
     if (identifier.siteName) {
-      const site = sites.find(
-        (s) => s.name?.toLowerCase().includes(identifier.siteName!.toLowerCase())
+      const site = sites.find((s) =>
+        s.name?.toLowerCase().includes(identifier.siteName!.toLowerCase()),
       );
       if (site) {
         const conflict = await this.checkSiteAvailability(site.id, arrivalDate, departureDate);
@@ -840,15 +923,15 @@ export class ReservationImportService {
 
     // Priority 3: Match by site class name
     if (identifier.siteClassName) {
-      const siteClass = siteClasses.find(
-        (sc) => sc.name?.toLowerCase().includes(identifier.siteClassName!.toLowerCase())
+      const siteClass = siteClasses.find((sc) =>
+        sc.name?.toLowerCase().includes(identifier.siteClassName!.toLowerCase()),
       );
       if (siteClass) {
         const availableSites = await this.getAvailableSitesInClass(
           siteClass.id,
           arrivalDate,
           departureDate,
-          campgroundId
+          campgroundId,
         );
         return {
           matchType: "class_assignment",
@@ -881,12 +964,12 @@ export class ReservationImportService {
     identifier: { siteNumber?: string; siteName?: string; siteClassName?: string },
     arrivalDate: Date,
     departureDate: Date,
-    checkAvailability: (siteId: string, arrival: Date, departure: Date) => string | undefined
+    checkAvailability: (siteId: string, arrival: Date, departure: Date) => string | undefined,
   ): SiteMatchResult {
     // Priority 1: Exact match by site number
     if (identifier.siteNumber) {
       const site = sites.find(
-        (s) => s.siteNumber?.toLowerCase() === identifier.siteNumber?.toLowerCase()
+        (s) => s.siteNumber?.toLowerCase() === identifier.siteNumber?.toLowerCase(),
       );
       if (site) {
         const conflict = checkAvailability(site.id, arrivalDate, departureDate);
@@ -902,8 +985,8 @@ export class ReservationImportService {
 
     // Priority 2: Match by site name
     if (identifier.siteName) {
-      const site = sites.find(
-        (s) => s.name?.toLowerCase().includes(identifier.siteName!.toLowerCase())
+      const site = sites.find((s) =>
+        s.name?.toLowerCase().includes(identifier.siteName!.toLowerCase()),
       );
       if (site) {
         const conflict = checkAvailability(site.id, arrivalDate, departureDate);
@@ -919,15 +1002,15 @@ export class ReservationImportService {
 
     // Priority 3: Match by site class name
     if (identifier.siteClassName) {
-      const siteClass = siteClasses.find(
-        (sc) => sc.name?.toLowerCase().includes(identifier.siteClassName!.toLowerCase())
+      const siteClass = siteClasses.find((sc) =>
+        sc.name?.toLowerCase().includes(identifier.siteClassName!.toLowerCase()),
       );
       if (siteClass) {
         // Find available sites in this class using prefetched data
-        const sitesInClass = sites.filter(s => s.siteClassId === siteClass.id);
+        const sitesInClass = sites.filter((s) => s.siteClassId === siteClass.id);
         const availableSites = sitesInClass
-          .filter(s => !checkAvailability(s.id, arrivalDate, departureDate))
-          .map(s => ({ id: s.id, name: s.name, siteNumber: s.siteNumber }));
+          .filter((s) => !checkAvailability(s.id, arrivalDate, departureDate))
+          .map((s) => ({ id: s.id, name: s.name, siteNumber: s.siteNumber }));
 
         return {
           matchType: "class_assignment",
@@ -953,7 +1036,7 @@ export class ReservationImportService {
 
   private async matchGuest(
     campgroundId: string,
-    guestData: { firstName: string; lastName: string; email?: string; phone?: string }
+    guestData: { firstName: string; lastName: string; email?: string; phone?: string },
   ): Promise<GuestMatchResult> {
     // Match by email
     if (guestData.email) {
@@ -999,7 +1082,7 @@ export class ReservationImportService {
   private async checkSiteAvailability(
     siteId: string,
     arrivalDate: Date,
-    departureDate: Date
+    departureDate: Date,
   ): Promise<string | undefined> {
     const conflict = await this.prisma.reservation.findFirst({
       where: {
@@ -1017,7 +1100,7 @@ export class ReservationImportService {
     siteClassId: string,
     arrivalDate: Date,
     departureDate: Date,
-    campgroundId: string
+    campgroundId: string,
   ): Promise<Array<{ id: string; name: string; siteNumber: string }>> {
     const sites = await this.prisma.site.findMany({
       where: {
@@ -1047,21 +1130,21 @@ export class ReservationImportService {
     siteClassId: string | null,
     arrivalDate: Date,
     departureDate: Date,
-    csvTotalCents: number
+    csvTotalCents: number,
   ): Promise<PricingComparison> {
     // For now, use a simple calculation based on site class default rate
     // In production, this would call the full pricing evaluation service
     let calculatedTotalCents = 0;
 
     try {
-        if (siteId) {
-          const site = await this.prisma.site.findUnique({
-            where: { id: siteId },
-            include: { SiteClass: true },
-          });
+      if (siteId) {
+        const site = await this.prisma.site.findUnique({
+          where: { id: siteId },
+          include: { SiteClass: true },
+        });
         if (site?.SiteClass?.defaultRate) {
           const nights = Math.ceil(
-            (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
+            (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
           );
           calculatedTotalCents = site.SiteClass.defaultRate * nights;
         }
@@ -1071,7 +1154,7 @@ export class ReservationImportService {
         });
         if (siteClass?.defaultRate) {
           const nights = Math.ceil(
-            (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
+            (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
           );
           calculatedTotalCents = siteClass.defaultRate * nights;
         }
@@ -1081,9 +1164,8 @@ export class ReservationImportService {
     }
 
     const difference = csvTotalCents - calculatedTotalCents;
-    const differencePercent = calculatedTotalCents > 0
-      ? (difference / calculatedTotalCents) * 100
-      : 0;
+    const differencePercent =
+      calculatedTotalCents > 0 ? (difference / calculatedTotalCents) * 100 : 0;
 
     return {
       csvTotalCents,

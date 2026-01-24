@@ -54,11 +54,7 @@ const STORAGE_KEY_DEFAULT = "campreserv:achievements";
  * unlockOnce("first-booking", ACHIEVEMENTS.FIRST_BOOKING);
  */
 export function useAchievement(options: UseAchievementOptions = {}): UseAchievementReturn {
-  const {
-    duration = 3000,
-    storageKey = STORAGE_KEY_DEFAULT,
-    persist = true,
-  } = options;
+  const { duration = 3000, storageKey = STORAGE_KEY_DEFAULT, persist = true } = options;
 
   const [isShowing, setIsShowing] = useState(false);
   const [currentAchievement, setCurrentAchievement] = useState<AchievementData | null>(null);
@@ -82,15 +78,18 @@ export function useAchievement(options: UseAchievementOptions = {}): UseAchievem
   }, [storageKey, persist]);
 
   // Save unlocked achievements to storage
-  const saveUnlocked = useCallback((ids: Set<string>) => {
-    if (typeof window === "undefined" || !persist) return;
+  const saveUnlocked = useCallback(
+    (ids: Set<string>) => {
+      if (typeof window === "undefined" || !persist) return;
 
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(Array.from(ids)));
-    } catch {
-      // Ignore storage errors
-    }
-  }, [storageKey, persist]);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(Array.from(ids)));
+      } catch {
+        // Ignore storage errors
+      }
+    },
+    [storageKey, persist],
+  );
 
   const celebrate = useCallback((achievement: AchievementData) => {
     setCurrentAchievement(achievement);
@@ -103,25 +102,31 @@ export function useAchievement(options: UseAchievementOptions = {}): UseAchievem
     setTimeout(() => setCurrentAchievement(null), 200);
   }, []);
 
-  const isUnlocked = useCallback((achievementId: string) => {
-    return unlockedIds.has(achievementId);
-  }, [unlockedIds]);
+  const isUnlocked = useCallback(
+    (achievementId: string) => {
+      return unlockedIds.has(achievementId);
+    },
+    [unlockedIds],
+  );
 
-  const unlockOnce = useCallback((achievementId: string, achievement: AchievementData): boolean => {
-    if (unlockedIds.has(achievementId)) {
-      return false; // Already unlocked
-    }
+  const unlockOnce = useCallback(
+    (achievementId: string, achievement: AchievementData): boolean => {
+      if (unlockedIds.has(achievementId)) {
+        return false; // Already unlocked
+      }
 
-    // Mark as unlocked
-    const newUnlocked = new Set(unlockedIds);
-    newUnlocked.add(achievementId);
-    setUnlockedIds(newUnlocked);
-    saveUnlocked(newUnlocked);
+      // Mark as unlocked
+      const newUnlocked = new Set(unlockedIds);
+      newUnlocked.add(achievementId);
+      setUnlockedIds(newUnlocked);
+      saveUnlocked(newUnlocked);
 
-    // Show celebration
-    celebrate(achievement);
-    return true;
-  }, [unlockedIds, celebrate, saveUnlocked]);
+      // Show celebration
+      celebrate(achievement);
+      return true;
+    },
+    [unlockedIds, celebrate, saveUnlocked],
+  );
 
   const getUnlocked = useCallback(() => {
     return Array.from(unlockedIds);

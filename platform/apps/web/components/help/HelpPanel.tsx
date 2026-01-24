@@ -5,7 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getAllTopics, getContextTopics, searchTopics, getPopularTopics } from "@/lib/help";
 import type { HelpTopic } from "@/content/help/topics";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
@@ -103,42 +110,45 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
   }, [roleFilter]);
 
   // AI search when static results are insufficient
-  const fetchAiHelp = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim() || searchQuery.length < 3) {
-      setAiResponse(null);
-      return;
-    }
-
-    setAiLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/ai/support/help-search`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}`,
-        },
-        body: JSON.stringify({
-          query: searchQuery,
-          context: pathname || "/",
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setAiResponse(data.answer || null);
-      } else {
-        // Fallback response when AI endpoint doesn't exist
-        setAiResponse(
-          "I couldn't find a specific answer for that. Try browsing the topics below or submit a support ticket for personalized help."
-        );
+  const fetchAiHelp = useCallback(
+    async (searchQuery: string) => {
+      if (!searchQuery.trim() || searchQuery.length < 3) {
+        setAiResponse(null);
+        return;
       }
-    } catch (err) {
-      console.error("AI search error:", err);
-      setAiResponse(null);
-    } finally {
-      setAiLoading(false);
-    }
-  }, [pathname]);
+
+      setAiLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/ai/support/help-search`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}`,
+          },
+          body: JSON.stringify({
+            query: searchQuery,
+            context: pathname || "/",
+          }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setAiResponse(data.answer || null);
+        } else {
+          // Fallback response when AI endpoint doesn't exist
+          setAiResponse(
+            "I couldn't find a specific answer for that. Try browsing the topics below or submit a support ticket for personalized help.",
+          );
+        }
+      } catch (err) {
+        console.error("AI search error:", err);
+        setAiResponse(null);
+      } finally {
+        setAiLoading(false);
+      }
+    },
+    [pathname],
+  );
 
   // Trigger AI search when static results < 3 (with debounce)
   useEffect(() => {
@@ -171,32 +181,48 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
   }, [query, roleFilter, fetchAiHelp]);
 
   const roleFilterTopics = useCallback(
-    (topics: HelpTopic[]) => (roleFilter ? topics.filter((t) => !t.roles || t.roles.includes(roleFilter)) : topics),
-    [roleFilter]
+    (topics: HelpTopic[]) =>
+      roleFilter ? topics.filter((t) => !t.roles || t.roles.includes(roleFilter)) : topics,
+    [roleFilter],
   );
 
-  const contextTopics = useMemo(() => roleFilterTopics(getContextTopics(pathname || "/")), [pathname, roleFilterTopics]);
-  const searchResults = useMemo(() => roleFilterTopics(query ? searchTopics(query, 50) : []), [query, roleFilterTopics]);
+  const contextTopics = useMemo(
+    () => roleFilterTopics(getContextTopics(pathname || "/")),
+    [pathname, roleFilterTopics],
+  );
+  const searchResults = useMemo(
+    () => roleFilterTopics(query ? searchTopics(query, 50) : []),
+    [query, roleFilterTopics],
+  );
   const popular = useMemo(() => roleFilterTopics(getPopularTopics(6)), [roleFilterTopics]);
 
-  const taskShortcuts = useMemo(() => (contextTopics.length ? contextTopics.slice(0, 3) : popular.slice(0, 3)), [contextTopics, popular]);
+  const taskShortcuts = useMemo(
+    () => (contextTopics.length ? contextTopics.slice(0, 3) : popular.slice(0, 3)),
+    [contextTopics, popular],
+  );
 
   const emptyState = query && searchResults.length === 0;
 
   const allTopics = useMemo(() => roleFilterTopics(getAllTopics()), [roleFilterTopics]);
 
-  const pinnedTopics = useMemo(() => allTopics.filter((t) => pinnedIds.includes(t.id)), [allTopics, pinnedIds]);
+  const pinnedTopics = useMemo(
+    () => allTopics.filter((t) => pinnedIds.includes(t.id)),
+    [allTopics, pinnedIds],
+  );
   const recentTopics = useMemo(
-    () => recentIds
-      .map((id) => allTopics.find((t) => t.id === id))
-      .filter((topic): topic is HelpTopic => Boolean(topic)),
-    [recentIds, allTopics]
+    () =>
+      recentIds
+        .map((id) => allTopics.find((t) => t.id === id))
+        .filter((topic): topic is HelpTopic => Boolean(topic)),
+    [recentIds, allTopics],
   );
 
   const visibleTopics = query ? searchResults : contextTopics.length ? contextTopics : popular;
 
   const togglePin = (id: string) => {
-    setPinnedIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [id, ...prev].slice(0, 12)));
+    setPinnedIds((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [id, ...prev].slice(0, 12),
+    );
   };
 
   const recordRecent = (id: string) => {
@@ -233,7 +259,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       viewport: { width: window.innerWidth, height: window.innerHeight },
       selectedCampground: localStorage.getItem("campreserv:selectedCampground") || null,
-      now: new Date().toISOString()
+      now: new Date().toISOString(),
     };
   };
 
@@ -243,24 +269,28 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
     const contact = reportEmail.trim();
 
     if (!description) {
-      toast({ title: "Add a short description", description: "Tell us what went wrong.", variant: "destructive" });
+      toast({
+        title: "Add a short description",
+        description: "Tell us what went wrong.",
+        variant: "destructive",
+      });
       return;
     }
 
     const nameParts = [whoami?.user?.firstName, whoami?.user?.lastName].filter(
-      (part): part is string => Boolean(part)
+      (part): part is string => Boolean(part),
     );
     const displayName = nameParts.length > 0 ? nameParts.join(" ") : null;
 
     const submitter: TicketSubmitter = {
       id: whoami?.user?.id ?? null,
       name: displayName ?? whoami?.user?.email ?? null,
-      email: whoami?.user?.email ?? null
+      email: whoami?.user?.email ?? null,
     };
 
     const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const platform = typeof navigator !== "undefined" ? navigator.platform ?? null : null;
-    const language = typeof navigator !== "undefined" ? navigator.language ?? null : null;
+    const platform = typeof navigator !== "undefined" ? (navigator.platform ?? null) : null;
+    const language = typeof navigator !== "undefined" ? (navigator.language ?? null) : null;
 
     const detectDeviceType = (userAgent: string): DeviceType => {
       const lower = userAgent.toLowerCase();
@@ -272,7 +302,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
 
     const notesParts = [
       steps ? `Steps/details:\n${steps}` : null,
-      contact ? `Contact: ${contact}` : null
+      contact ? `Contact: ${contact}` : null,
     ].filter(Boolean);
 
     const payload = {
@@ -287,22 +317,25 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         userAgent: ua,
         platform,
         language,
-        deviceType
+        deviceType,
       },
       extra: {
         source: "help-panel",
         contact: contact || undefined,
-        context: collectContext()
-      }
+        context: collectContext(),
+      },
     };
 
     try {
       await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
-      toast({ title: "Thanks! Issue submitted", description: "We captured page and browser context." });
+      toast({
+        title: "Thanks! Issue submitted",
+        description: "We captured page and browser context.",
+      });
       setIsReportOpen(false);
       setReportDescription("");
       setReportSteps("");
@@ -311,7 +344,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
       toast({
         title: "Could not submit",
         description: err instanceof Error ? err.message : "Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -320,10 +353,15 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
     const isPinned = pinnedIds.includes(topic.id);
     const fb = feedback[topic.id];
     return (
-      <div key={topic.id} className="border border-border rounded-lg p-3 hover:border-emerald-500 transition-colors">
+      <div
+        key={topic.id}
+        className="border border-border rounded-lg p-3 hover:border-emerald-500 transition-colors"
+      >
         <div className="flex items-center justify-between gap-2">
           <div className="text-sm font-semibold text-foreground">{topic.title}</div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{topic.category}</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+            {topic.category}
+          </span>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{topic.summary}</p>
         <ul className="mt-2 space-y-1 text-xs text-muted-foreground list-disc list-inside">
@@ -333,7 +371,10 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         </ul>
         <div className="mt-2 flex flex-wrap gap-1">
           {topic.tags.slice(0, 4).map((tag) => (
-            <span key={tag} className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
+            <span
+              key={tag}
+              className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded"
+            >
               {tag}
             </span>
           ))}
@@ -385,7 +426,9 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         </div>
         {fb && (
           <div className="mt-2 text-[11px] text-muted-foreground">
-            {fb.helpful ? "Thanks! We’ll keep this handy." : "Thanks for the flag. We’ll tune this guide."}
+            {fb.helpful
+              ? "Thanks! We’ll keep this handy."
+              : "Thanks for the flag. We’ll tune this guide."}
           </div>
         )}
       </div>
@@ -393,8 +436,14 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
   };
 
   return (
-    <div className={`fixed inset-0 z-50 transition-pointer-events ${open ? "pointer-events-auto" : "pointer-events-none"}`} aria-hidden={!open}>
-      <div className={`absolute inset-0 bg-muted/40 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
+    <div
+      className={`fixed inset-0 z-50 transition-pointer-events ${open ? "pointer-events-auto" : "pointer-events-none"}`}
+      aria-hidden={!open}
+    >
+      <div
+        className={`absolute inset-0 bg-muted/40 backdrop-blur-sm transition-opacity ${open ? "opacity-100" : "opacity-0"}`}
+        onClick={onClose}
+      />
 
       <div
         className={`absolute top-0 right-0 h-full w-full max-w-xl bg-card shadow-2xl border-l border-border flex flex-col transform transition-transform ${
@@ -410,7 +459,11 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
               Contextual tips for <span className="font-medium">{pathname || "/"}</span>
             </p>
           </div>
-          <button onClick={onClose} className="p-2 rounded-full hover:bg-muted text-muted-foreground" aria-label="Close help">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-muted text-muted-foreground"
+            aria-label="Close help"
+          >
             <CloseIcon />
           </button>
         </div>
@@ -432,22 +485,29 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
             <span className="font-semibold text-muted-foreground">Context</span>
             <span className="rounded-full bg-muted px-2 py-0.5">{pathname || "/"}</span>
             <span className="text-muted-foreground">|</span>
-            <Link href="/dashboard/help" className="text-emerald-600 font-semibold hover:text-emerald-700">
+            <Link
+              href="/dashboard/help"
+              className="text-emerald-600 font-semibold hover:text-emerald-700"
+            >
               Open full help
             </Link>
             <span className="text-muted-foreground">|</span>
             <span className="font-semibold text-muted-foreground">Role</span>
-            {["owner", "manager", "frontdesk", "maintenance", "finance", "marketing"].map((role) => (
-              <button
-                key={role}
-                onClick={() => setRoleFilter(roleFilter === role ? null : role)}
-                className={`px-2 py-0.5 rounded-full border text-[11px] ${
-                  roleFilter === role ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "border-border text-muted-foreground hover:bg-muted"
-                }`}
-              >
-                {role}
-              </button>
-            ))}
+            {["owner", "manager", "frontdesk", "maintenance", "finance", "marketing"].map(
+              (role) => (
+                <button
+                  key={role}
+                  onClick={() => setRoleFilter(roleFilter === role ? null : role)}
+                  className={`px-2 py-0.5 rounded-full border text-[11px] ${
+                    roleFilter === role
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "border-border text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  {role}
+                </button>
+              ),
+            )}
           </div>
           <div className="flex flex-wrap gap-2 text-[11px]">
             <span className="font-semibold text-muted-foreground">Tasks</span>
@@ -472,14 +532,18 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           {pinnedTopics.length > 0 && !query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Pinned</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Pinned
+              </div>
               <div className="grid grid-cols-1 gap-3">{pinnedTopics.map(renderTopic)}</div>
             </section>
           )}
 
           {recentTopics.length > 0 && !query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Recently viewed</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Recently viewed
+              </div>
               <div className="grid grid-cols-1 gap-3">{recentTopics.map(renderTopic)}</div>
             </section>
           )}
@@ -516,34 +580,45 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
 
           {emptyState && !aiLoading && !aiResponse && (
             <div className="text-sm text-muted-foreground">
-              No results for <span className="font-semibold">"{query}"</span>. Try a different keyword or browse below.
+              No results for <span className="font-semibold">"{query}"</span>. Try a different
+              keyword or browse below.
             </div>
           )}
 
           {!query && contextTopics.length > 0 && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Relevant to this page</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Relevant to this page
+              </div>
               <div className="grid grid-cols-1 gap-3">{contextTopics.map(renderTopic)}</div>
             </section>
           )}
 
           {query && searchResults.length > 0 && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Search results</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Search results
+              </div>
               <div className="grid grid-cols-1 gap-3">{searchResults.map(renderTopic)}</div>
             </section>
           )}
 
           {!query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Popular</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">{popular.map(renderTopic)}</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Popular
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {popular.map(renderTopic)}
+              </div>
             </section>
           )}
 
           {!query && (
             <section>
-              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">Browse all</div>
+              <div className="text-xs uppercase font-semibold text-muted-foreground mb-2">
+                Browse all
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {allTopics.map((topic) => (
                   <Link
@@ -552,7 +627,9 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                     onClick={() => recordRecent(topic.id)}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:border-emerald-500 text-sm text-foreground"
                   >
-                    <span className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded">{topic.category}</span>
+                    <span className="text-[11px] px-2 py-0.5 bg-muted text-muted-foreground rounded">
+                      {topic.category}
+                    </span>
                     <span className="truncate">{topic.title}</span>
                   </Link>
                 ))}
@@ -564,7 +641,9 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Report an issue</DialogTitle>
-              <DialogDescription>We’ll capture page and browser context automatically.</DialogDescription>
+              <DialogDescription>
+                We’ll capture page and browser context automatically.
+              </DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1">
@@ -577,7 +656,9 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-foreground">Steps or details (optional)</label>
+                <label className="text-sm font-medium text-foreground">
+                  Steps or details (optional)
+                </label>
                 <Textarea
                   value={reportSteps}
                   onChange={(e) => setReportSteps(e.target.value)}
@@ -595,7 +676,8 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                We’ll send page URL, browser info, timezone, viewport, role filter, pinned/recent topics, and selected campground to help troubleshoot.
+                We’ll send page URL, browser info, timezone, viewport, role filter, pinned/recent
+                topics, and selected campground to help troubleshoot.
               </p>
             </div>
             <DialogFooter className="flex justify-end gap-2">
@@ -647,7 +729,13 @@ function CopyIcon() {
 
 function PinIcon({ filled }: { filled?: boolean }) {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill={filled ? "currentColor" : "none"} strokeWidth="2">
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      fill={filled ? "currentColor" : "none"}
+      strokeWidth="2"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 17v5M9 3h6l-1 7h-4zM7 10h10" />
     </svg>
   );

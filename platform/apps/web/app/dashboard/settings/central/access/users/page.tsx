@@ -76,12 +76,14 @@ export default function UsersPage() {
       return;
     }
 
-    apiClient.getCampgroundMembers(id)
+    apiClient
+      .getCampgroundMembers(id)
       .then((members: CampgroundMember[]) => {
         const mappedUsers: User[] = members.map((member) => ({
           id: member.id,
           name: member.user
-            ? `${member.user.firstName || ""} ${member.user.lastName || ""}`.trim() || member.user.email
+            ? `${member.user.firstName || ""} ${member.user.lastName || ""}`.trim() ||
+              member.user.email
             : "Pending",
           email: member.user?.email || "",
           role: member.role,
@@ -168,8 +170,8 @@ export default function UsersPage() {
             item.isPending
               ? "bg-status-warning/15 text-status-warning"
               : item.isActive
-              ? "bg-status-success/15 text-status-success"
-              : "bg-muted text-muted-foreground"
+                ? "bg-status-success/15 text-status-success"
+                : "bg-muted text-muted-foreground",
           )}
         >
           {item.isPending ? "Pending" : item.isActive ? "Active" : "Inactive"}
@@ -183,9 +185,7 @@ export default function UsersPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Users</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage staff accounts and access permissions
-          </p>
+          <p className="text-muted-foreground mt-1">Manage staff accounts and access permissions</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -199,9 +199,7 @@ export default function UsersPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Users</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage staff accounts and access permissions
-          </p>
+          <p className="text-muted-foreground mt-1">Manage staff accounts and access permissions</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -218,9 +216,7 @@ export default function UsersPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Users</h2>
-          <p className="text-muted-foreground mt-1">
-            Manage staff accounts and access permissions
-          </p>
+          <p className="text-muted-foreground mt-1">Manage staff accounts and access permissions</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -231,8 +227,8 @@ export default function UsersPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Users are assigned roles that control their access level. Configure roles
-          in the Roles section to customize permissions.
+          Users are assigned roles that control their access level. Configure roles in the Roles
+          section to customize permissions.
         </AlertDescription>
       </Alert>
 
@@ -266,9 +262,7 @@ export default function UsersPage() {
                 <Shield className="h-4 w-4 mr-2" />
                 Change Role
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                {item.isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
+              <DropdownMenuItem>{item.isActive ? "Deactivate" : "Activate"}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />

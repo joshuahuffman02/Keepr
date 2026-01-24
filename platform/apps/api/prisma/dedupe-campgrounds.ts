@@ -9,7 +9,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -41,7 +41,7 @@ async function main() {
       where: {
         isExternal: true,
         name: group.name,
-        state: group.state
+        state: group.state,
       },
       select: {
         id: true,
@@ -50,19 +50,20 @@ async function main() {
         city: true,
         heroImageUrl: true,
         latitude: true,
-        amenities: true
-      }
+        amenities: true,
+      },
     });
 
     if (campgrounds.length <= 1) continue;
 
     // Calculate quality score for each
-    const scored = campgrounds.map(cg => ({
+    const scored = campgrounds.map((cg) => ({
       ...cg,
-      score: (cg.heroImageUrl ? 10 : 0) +  // Image is most valuable
-             (cg.latitude ? 5 : 0) +        // Coords are important
-             (cg.city ? 2 : 0) +            // City is nice to have
-             (cg.amenities?.length || 0)    // More amenities = better
+      score:
+        (cg.heroImageUrl ? 10 : 0) + // Image is most valuable
+        (cg.latitude ? 5 : 0) + // Coords are important
+        (cg.city ? 2 : 0) + // City is nice to have
+        (cg.amenities?.length || 0), // More amenities = better
     }));
 
     // Sort by score descending - keep the best one
@@ -71,7 +72,9 @@ async function main() {
     const keeper = scored[0];
     const toDelete = scored.slice(1);
 
-    console.log(`[${group.name}] in ${group.state || 'NULL'}: keeping ${keeper.id} (score ${keeper.score}), deleting ${toDelete.length} dupes`);
+    console.log(
+      `[${group.name}] in ${group.state || "NULL"}: keeping ${keeper.id} (score ${keeper.score}), deleting ${toDelete.length} dupes`,
+    );
 
     // Delete the duplicates
     for (const dupe of toDelete) {

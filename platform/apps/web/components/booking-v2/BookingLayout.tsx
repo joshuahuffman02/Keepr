@@ -15,12 +15,7 @@ interface BookingLayoutProps {
  * Two-column booking layout with sticky sidebar on desktop.
  * On mobile, sidebar content moves to a sticky bottom bar.
  */
-export function BookingLayout({
-  children,
-  sidebar,
-  footer,
-  className,
-}: BookingLayoutProps) {
+export function BookingLayout({ children, sidebar, footer, className }: BookingLayoutProps) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -54,11 +49,7 @@ export function BookingLayout({
       </div>
 
       {/* Mobile sticky footer */}
-      {footer && (
-        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-          {footer}
-        </div>
-      )}
+      {footer && <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">{footer}</div>}
 
       {/* Spacer for mobile footer */}
       {footer && <div className="lg:hidden h-24" />}
@@ -82,19 +73,12 @@ export function BookingCard({
 }) {
   return (
     <div
-      className={cn(
-        "bg-card rounded-xl border border-border shadow-sm overflow-hidden",
-        className
-      )}
+      className={cn("bg-card rounded-xl border border-border shadow-sm overflow-hidden", className)}
     >
       {(title || description) && (
         <div className="px-5 py-4 border-b border-border">
-          {title && (
-            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-          )}
-          {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
-          )}
+          {title && <h2 className="text-lg font-semibold text-foreground">{title}</h2>}
+          {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
         </div>
       )}
       <div className="p-5">{children}</div>

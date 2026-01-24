@@ -29,4 +29,3 @@ export class CreateTemplateDto {
   @IsString()
   textBody?: string;
 }
-

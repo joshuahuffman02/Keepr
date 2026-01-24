@@ -5,7 +5,7 @@ import {
   DepositScheduleEntrySchema,
   DepositTierSchema,
   DepositSeasonSchema,
-  DepositScopeRuleSchema
+  DepositScopeRuleSchema,
 } from "./deposits.types";
 export * from "./deposits";
 export * from "./format";
@@ -27,7 +27,7 @@ export type {
   DepositScheduleEntry,
   DepositTier,
   DepositSeason,
-  DepositScopeRule
+  DepositScopeRule,
 } from "./deposits.types";
 
 export const NpsScheduleEntrySchema = z.object({
@@ -37,7 +37,7 @@ export const NpsScheduleEntrySchema = z.object({
   offset: z.number().int(),
   unit: z.enum(["hours", "days"]),
   templateId: z.string().nullish(),
-  enabled: z.boolean().default(true)
+  enabled: z.boolean().default(true),
 });
 export type NpsScheduleEntry = z.infer<typeof NpsScheduleEntrySchema>;
 
@@ -119,7 +119,15 @@ export const CampgroundSchema = z.object({
   taxId: z.string().optional().nullable(),
   taxIdName: z.string().optional().default("Tax ID"),
   depositRule: z
-    .enum(["none", "full", "half", "first_night", "first_night_fees", "percentage", "percentage_50"])
+    .enum([
+      "none",
+      "full",
+      "half",
+      "first_night",
+      "first_night_fees",
+      "percentage",
+      "percentage_50",
+    ])
     .nullish(),
   depositPercentage: z.number().int().min(0).max(100).nullish(),
   depositConfig: DepositConfigSchema.nullish(),
@@ -147,7 +155,7 @@ export const CampgroundSchema = z.object({
   reviewScore: numberish(z.number().optional()).nullish(),
   reviewCount: z.number().int().optional().default(0),
   reviewSources: z.record(z.unknown()).optional().nullable(),
-  reviewsUpdatedAt: z.string().nullish()
+  reviewsUpdatedAt: z.string().nullish(),
 });
 export type Campground = z.infer<typeof CampgroundSchema>;
 
@@ -165,15 +173,39 @@ export const FormTemplateSchema = z.object({
   autoAttachMode: z.enum(["manual", "all_bookings", "site_classes"]).default("manual").optional(),
   siteClassIds: z.array(z.string()).default([]).optional(),
   // Display settings
-  showAt: z.array(z.enum(["during_booking", "at_checkin", "after_booking", "on_demand"])).default(["during_booking"]).optional(),
+  showAt: z
+    .array(z.enum(["during_booking", "at_checkin", "after_booking", "on_demand"]))
+    .default(["during_booking"])
+    .optional(),
   isRequired: z.boolean().default(true).optional(),
   allowSkipWithNote: z.boolean().default(false).optional(),
   // Conditional display rules
-  displayConditions: z.array(z.object({
-    field: z.enum(["pets", "adults", "children", "rigType", "siteClassId", "addOns", "stayLength"]),
-    operator: z.enum(["equals", "not_equals", "greater_than", "less_than", "in", "not_in", "contains"]),
-    value: z.union([z.string(), z.number(), z.array(z.string())])
-  })).default([]).optional(),
+  displayConditions: z
+    .array(
+      z.object({
+        field: z.enum([
+          "pets",
+          "adults",
+          "children",
+          "rigType",
+          "siteClassId",
+          "addOns",
+          "stayLength",
+        ]),
+        operator: z.enum([
+          "equals",
+          "not_equals",
+          "greater_than",
+          "less_than",
+          "in",
+          "not_in",
+          "contains",
+        ]),
+        value: z.union([z.string(), z.number(), z.array(z.string())]),
+      }),
+    )
+    .default([])
+    .optional(),
   conditionLogic: z.enum(["all", "any"]).default("all").optional(),
   // Validity settings
   validityDays: z.number().int().nullish(),
@@ -181,7 +213,7 @@ export const FormTemplateSchema = z.object({
   sendReminder: z.boolean().default(false).optional(),
   reminderDaysBefore: z.number().int().default(1).optional(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 export type FormTemplate = z.infer<typeof FormTemplateSchema>;
 
@@ -202,8 +234,8 @@ export const FormSubmissionSchema = z.object({
     type: true,
     isRequired: true,
     allowSkipWithNote: true,
-    showAt: true
-  }).optional()
+    showAt: true,
+  }).optional(),
 });
 export type FormSubmission = z.infer<typeof FormSubmissionSchema>;
 
@@ -240,7 +272,7 @@ export const SiteClassSchema = z.object({
   photos: z.array(z.string()).optional(),
   photoAttributions: z.unknown().optional().nullable(),
   policyVersion: z.string().nullish(),
-  isActive: z.boolean().optional().default(true)
+  isActive: z.boolean().optional().default(true),
 });
 export type SiteClass = z.infer<typeof SiteClassSchema>;
 
@@ -271,7 +303,7 @@ export const SiteSchema = z.object({
   status: z.string().nullish(),
   housekeepingStatus: z.string().optional().default("clean"),
   latitude: numberish(z.number().optional()),
-  longitude: numberish(z.number().optional())
+  longitude: numberish(z.number().optional()),
 });
 export type Site = z.infer<typeof SiteSchema>;
 
@@ -301,23 +333,33 @@ export const GuestSchema = z.object({
   notes: z.string().nullish(),
   preferences: z.record(z.unknown()).optional().nullable(),
   insights: z.record(z.unknown()).optional().nullable(),
-  loyaltyProfile: z.object({
-    tier: z.string(),
-    pointsBalance: z.number()
-  }).optional().nullable(),
-  reservations: z.array(z.object({
-    id: z.string().optional(),
-    campgroundId: z.string().optional(),
-    arrivalDate: z.string().optional(),
-    departureDate: z.string().or(z.date()).optional(),
-    status: z.string().optional(),
-    site: z.object({
-      id: z.string(),
-      name: z.string(),
-      siteNumber: z.string().optional().nullable(),
-      siteClassId: z.string().nullable()
-    }).optional().nullable()
-  })).optional()
+  loyaltyProfile: z
+    .object({
+      tier: z.string(),
+      pointsBalance: z.number(),
+    })
+    .optional()
+    .nullable(),
+  reservations: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        campgroundId: z.string().optional(),
+        arrivalDate: z.string().optional(),
+        departureDate: z.string().or(z.date()).optional(),
+        status: z.string().optional(),
+        site: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+            siteNumber: z.string().optional().nullable(),
+            siteClassId: z.string().nullable(),
+          })
+          .optional()
+          .nullable(),
+      }),
+    )
+    .optional(),
 });
 export type Guest = z.infer<typeof GuestSchema>;
 
@@ -380,27 +422,34 @@ export const ReservationSchema = z.object({
       name: z.string().optional().nullable(),
       siteNumber: z.string().optional().nullable(),
       siteType: z.string().optional().nullable(),
-      siteClass: z.object({
-        id: z.string(),
-        name: z.string()
-      }).optional().nullable()
+      siteClass: z
+        .object({
+          id: z.string(),
+          name: z.string(),
+        })
+        .optional()
+        .nullable(),
     })
     .optional(),
-  payments: z.array(z.object({
-    id: z.string(),
-    campgroundId: z.string(),
-    reservationId: z.string(),
-    amountCents: z.number().int(),
-    method: z.string(),
-    direction: z.enum(["charge", "refund"]),
-    note: z.string().nullish(),
-    createdAt: z.string()
-  })).optional()
+  payments: z
+    .array(
+      z.object({
+        id: z.string(),
+        campgroundId: z.string(),
+        reservationId: z.string(),
+        amountCents: z.number().int(),
+        method: z.string(),
+        direction: z.enum(["charge", "refund"]),
+        note: z.string().nullish(),
+        createdAt: z.string(),
+      }),
+    )
+    .optional(),
 });
 export type Reservation = z.infer<typeof ReservationSchema>;
 
 export const CreateOrganizationSchema = z.object({
-  name: z.string().min(1)
+  name: z.string().min(1),
 });
 export type CreateOrganizationDto = z.infer<typeof CreateOrganizationSchema>;
 
@@ -435,7 +484,7 @@ export const CreateCampgroundSchema = z.object({
   npsAutoSendEnabled: z.boolean().optional(),
   npsSendHour: z.number().int().optional(),
   reviewScore: z.number().optional(),
-  reviewCount: z.number().optional()
+  reviewCount: z.number().optional(),
 });
 export type CreateCampgroundDto = z.infer<typeof CreateCampgroundSchema>;
 
@@ -453,7 +502,7 @@ export const CreateSiteSchema = z.object({
   hookupsPower: z.boolean().optional(),
   hookupsWater: z.boolean().optional(),
   hookupsSewer: z.boolean().optional(),
-  isActive: z.boolean().default(true)
+  isActive: z.boolean().default(true),
 });
 export type CreateSiteDto = z.infer<typeof CreateSiteSchema>;
 
@@ -463,61 +512,62 @@ export const CreateGuestSchema = z.object({
   email: z.string().optional(),
   phone: z.string().optional(),
   notes: z.string().optional(),
-  tags: z.array(z.string()).optional()
+  tags: z.array(z.string()).optional(),
 });
 export type CreateGuestDto = z.infer<typeof CreateGuestSchema>;
 
-export const CreateReservationSchema = z.object({
-  campgroundId: z.string().cuid(),
-  siteId: z.string().cuid().optional(),
-  siteClassId: z.string().cuid().optional(),
-  siteLocked: z.boolean().optional(),
-  guestId: z.string().cuid(),
-  arrivalDate: z.string(),
-  departureDate: z.string(),
-  adults: z.number().int().nonnegative(),
-  children: z.number().int().nonnegative().default(0),
-  totalAmount: z.number().nonnegative(),
-  status: ReservationSchema.shape.status,
-  paidAmount: z.number().nonnegative().optional(),
-  balanceAmount: z.number().nonnegative().optional(),
-  paymentStatus: z.string().optional(),
-  baseSubtotal: z.number().nonnegative().optional(),
-  feesAmount: z.number().nonnegative().optional(),
-  taxesAmount: z.number().nonnegative().optional(),
-  discountsAmount: z.number().nonnegative().optional(),
-  promoCode: z.string().optional(),
-  source: z.string().optional(),
-  policyVersion: z.string().optional(),
-  checkInWindowStart: z.string().optional(),
-  checkInWindowEnd: z.string().optional(),
-  vehiclePlate: z.string().optional(),
-  vehicleState: z.string().optional(),
-  rigType: z.string().optional(),
-  rigLength: z.number().int().optional(),
-  rvType: z.string().optional(),
-  stayReasonPreset: z.string().optional(),
-  stayReasonOther: z.string().optional(),
-  referralCode: z.string().optional(),
-  referralProgramId: z.string().optional(),
-  referralSource: z.string().optional(),
-  referralChannel: z.string().optional(),
-  holdId: z.string().cuid().optional(),
-  paymentMethod: z.string().optional(),
-  transactionId: z.string().optional(),
-  paymentNotes: z.string().optional(),
-  pets: z.number().int().optional(),
-  createdBy: z.string().optional(),
-  updatedBy: z.string().optional(),
-  checkInAt: z.string().optional(),
-  checkOutAt: z.string().optional(),
-  notes: z.string().optional(),
-  seasonalRateId: z.string().cuid().optional(),
-  pricingType: z.enum(["transient", "seasonal"]).optional()
-}).refine(
-  (data) => data.siteId || data.siteClassId,
-  { message: "Either siteId or siteClassId must be provided" }
-);
+export const CreateReservationSchema = z
+  .object({
+    campgroundId: z.string().cuid(),
+    siteId: z.string().cuid().optional(),
+    siteClassId: z.string().cuid().optional(),
+    siteLocked: z.boolean().optional(),
+    guestId: z.string().cuid(),
+    arrivalDate: z.string(),
+    departureDate: z.string(),
+    adults: z.number().int().nonnegative(),
+    children: z.number().int().nonnegative().default(0),
+    totalAmount: z.number().nonnegative(),
+    status: ReservationSchema.shape.status,
+    paidAmount: z.number().nonnegative().optional(),
+    balanceAmount: z.number().nonnegative().optional(),
+    paymentStatus: z.string().optional(),
+    baseSubtotal: z.number().nonnegative().optional(),
+    feesAmount: z.number().nonnegative().optional(),
+    taxesAmount: z.number().nonnegative().optional(),
+    discountsAmount: z.number().nonnegative().optional(),
+    promoCode: z.string().optional(),
+    source: z.string().optional(),
+    policyVersion: z.string().optional(),
+    checkInWindowStart: z.string().optional(),
+    checkInWindowEnd: z.string().optional(),
+    vehiclePlate: z.string().optional(),
+    vehicleState: z.string().optional(),
+    rigType: z.string().optional(),
+    rigLength: z.number().int().optional(),
+    rvType: z.string().optional(),
+    stayReasonPreset: z.string().optional(),
+    stayReasonOther: z.string().optional(),
+    referralCode: z.string().optional(),
+    referralProgramId: z.string().optional(),
+    referralSource: z.string().optional(),
+    referralChannel: z.string().optional(),
+    holdId: z.string().cuid().optional(),
+    paymentMethod: z.string().optional(),
+    transactionId: z.string().optional(),
+    paymentNotes: z.string().optional(),
+    pets: z.number().int().optional(),
+    createdBy: z.string().optional(),
+    updatedBy: z.string().optional(),
+    checkInAt: z.string().optional(),
+    checkOutAt: z.string().optional(),
+    notes: z.string().optional(),
+    seasonalRateId: z.string().cuid().optional(),
+    pricingType: z.enum(["transient", "seasonal"]).optional(),
+  })
+  .refine((data) => data.siteId || data.siteClassId, {
+    message: "Either siteId or siteClassId must be provided",
+  });
 export type CreateReservationDto = z.infer<typeof CreateReservationSchema>;
 
 // Maintenance
@@ -538,13 +588,13 @@ export const MaintenanceSchema = z.object({
   siteName: z.string().nullish().optional(),
   siteNumber: z.string().nullish().optional(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type Maintenance = z.infer<typeof MaintenanceSchema>;
 export const CreateMaintenanceSchema = MaintenanceSchema.omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateMaintenanceDto = z.infer<typeof CreateMaintenanceSchema>;
 
@@ -561,7 +611,7 @@ export const PricingRuleSchema = z.object({
   percentAdjust: numberish(z.number().optional().nullable()),
   flatAdjust: z.number().int().optional().nullable(),
   minNights: z.number().int().optional().nullable(),
-  isActive: z.boolean().optional().default(true)
+  isActive: z.boolean().optional().default(true),
 });
 export type PricingRule = z.infer<typeof PricingRuleSchema>;
 export const CreatePricingRuleSchema = PricingRuleSchema.omit({ id: true });
@@ -572,7 +622,7 @@ export const AppliedPricingRuleSchema = z.object({
   id: z.string(),
   name: z.string(),
   type: z.string(),
-  adjustmentCents: z.number().int()
+  adjustmentCents: z.number().int(),
 });
 export type AppliedPricingRule = z.infer<typeof AppliedPricingRuleSchema>;
 
@@ -587,7 +637,7 @@ export const QuoteSchema = z.object({
   pricingRuleVersion: z.string().optional(),
   taxExemptionEligible: z.boolean().optional(),
   requiresWaiver: z.boolean().optional(),
-  waiverText: z.string().optional().nullable()
+  waiverText: z.string().optional().nullable(),
 });
 export type Quote = z.infer<typeof QuoteSchema>;
 
@@ -600,7 +650,7 @@ export const PaymentSchema = z.object({
   method: z.string(),
   direction: z.enum(["charge", "refund"]),
   note: z.string().nullish(),
-  createdAt: z.string()
+  createdAt: z.string(),
 });
 export type Payment = z.infer<typeof PaymentSchema>;
 
@@ -614,7 +664,7 @@ export const LedgerEntrySchema = z.object({
   amountCents: z.number().int(),
   direction: z.enum(["debit", "credit"]),
   occurredAt: z.string(),
-  createdAt: z.string()
+  createdAt: z.string(),
 });
 export type LedgerEntry = z.infer<typeof LedgerEntrySchema>;
 
@@ -626,7 +676,7 @@ export const UserRoleSchema = z.enum([
   "maintenance",
   "finance",
   "marketing",
-  "readonly"
+  "readonly",
 ]);
 export type UserRole = z.infer<typeof UserRoleSchema>;
 
@@ -637,7 +687,7 @@ export const UserSchema = z.object({
   lastName: z.string().min(1),
   isActive: z.boolean().default(true),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type User = z.infer<typeof UserSchema>;
 
@@ -646,7 +696,7 @@ export const CampgroundMembershipSchema = z.object({
   userId: z.string().cuid(),
   campgroundId: z.string().cuid(),
   role: UserRoleSchema,
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 export type CampgroundMembership = z.infer<typeof CampgroundMembershipSchema>;
 
@@ -654,17 +704,12 @@ export const CreateUserSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   firstName: z.string().min(1),
-  lastName: z.string().min(1)
+  lastName: z.string().min(1),
 });
 export type CreateUserDto = z.infer<typeof CreateUserSchema>;
 
 // Organization
-export const SubscriptionTierSchema = z.enum([
-  "free",
-  "starter",
-  "professional",
-  "enterprise"
-]);
+export const SubscriptionTierSchema = z.enum(["free", "starter", "professional", "enterprise"]);
 export type SubscriptionTier = z.infer<typeof SubscriptionTierSchema>;
 
 export const OrganizationSchema = z.object({
@@ -686,7 +731,7 @@ export const OrganizationSchema = z.object({
   trialEndsAt: z.string().nullish(),
 
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type Organization = z.infer<typeof OrganizationSchema>;
 
@@ -698,7 +743,7 @@ export const EventTypeSchema = z.enum([
   "holiday",
   "recurring",
   "ongoing",
-  "themed"
+  "themed",
 ]);
 export type EventType = z.infer<typeof EventTypeSchema>;
 
@@ -746,7 +791,7 @@ const eventShape = {
   parentEventId: z.string().cuid().nullish(),
 
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 };
 
 const EventBaseSchema = z.object(eventShape);
@@ -755,8 +800,8 @@ export type Event = EventBase & { children?: Event[] };
 
 export const EventSchema: z.ZodType<Event> = z.lazy(() =>
   EventBaseSchema.extend({
-    children: z.array(EventSchema).optional()
-  })
+    children: z.array(EventSchema).optional(),
+  }),
 );
 
 export const CreateEventSchema = z.object(eventShape).omit({
@@ -766,7 +811,7 @@ export const CreateEventSchema = z.object(eventShape).omit({
   cancelledAt: true,
   cancellationReason: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateEventDto = z.infer<typeof CreateEventSchema>;
 
@@ -780,22 +825,19 @@ export const ProductCategorySchema = z.object({
   sortOrder: z.number().int().optional(),
   isActive: z.boolean().optional().default(true),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type ProductCategory = z.infer<typeof ProductCategorySchema>;
 
 export const CreateProductCategorySchema = ProductCategorySchema.omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateProductCategoryDto = z.infer<typeof CreateProductCategorySchema>;
 
 // Helper to transform empty strings to null for optional URL fields
-const optionalUrl = z.preprocess(
-  (val) => (val === "" ? null : val),
-  z.string().url().nullish()
-);
+const optionalUrl = z.preprocess((val) => (val === "" ? null : val), z.string().url().nullish());
 
 export const ProductSchema = z.object({
   id: z.string().cuid(),
@@ -818,14 +860,14 @@ export const ProductSchema = z.object({
   glCode: z.string().nullish(),
   isActive: z.boolean().nullish().default(true),
   createdAt: z.string().nullish(),
-  updatedAt: z.string().nullish()
+  updatedAt: z.string().nullish(),
 });
 export type Product = z.infer<typeof ProductSchema>;
 
 export const CreateProductSchema = ProductSchema.omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateProductDto = z.infer<typeof CreateProductSchema>;
 
@@ -840,14 +882,14 @@ export const AddOnSchema = z.object({
   glCode: z.string().nullish(),
   isActive: z.boolean().optional().default(true),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type AddOn = z.infer<typeof AddOnSchema>;
 
 export const CreateAddOnSchema = AddOnSchema.omit({
   id: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateAddOnDto = z.infer<typeof CreateAddOnSchema>;
 
@@ -864,12 +906,14 @@ export const StoreLocationSchema = z.object({
   sortOrder: z.number().int().optional().default(0),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  _count: z.object({
-    terminals: z.number().optional(),
-    locationInventory: z.number().optional(),
-    priceOverrides: z.number().optional(),
-    fulfillmentOrders: z.number().optional(),
-  }).optional(),
+  _count: z
+    .object({
+      terminals: z.number().optional(),
+      locationInventory: z.number().optional(),
+      priceOverrides: z.number().optional(),
+      fulfillmentOrders: z.number().optional(),
+    })
+    .optional(),
 });
 export type StoreLocation = z.infer<typeof StoreLocationSchema>;
 
@@ -921,21 +965,27 @@ export const InventoryMovementSchema = z.object({
   notes: z.string().nullish(),
   actorUserId: z.string().cuid(),
   createdAt: z.string().optional(),
-  product: z.object({
-    id: z.string(),
-    name: z.string(),
-    sku: z.string().nullish(),
-  }).optional(),
-  location: z.object({
-    id: z.string(),
-    name: z.string(),
-    code: z.string().nullish(),
-  }).nullish(),
-  actor: z.object({
-    id: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-  }).optional(),
+  product: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      sku: z.string().nullish(),
+    })
+    .optional(),
+  location: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      code: z.string().nullish(),
+    })
+    .nullish(),
+  actor: z
+    .object({
+      id: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .optional(),
 });
 export type InventoryMovement = z.infer<typeof InventoryMovementSchema>;
 
@@ -945,12 +995,14 @@ export const InventoryTransferItemSchema = z.object({
   transferId: z.string().cuid(),
   productId: z.string().cuid(),
   qty: z.number().int().positive(),
-  product: z.object({
-    id: z.string(),
-    name: z.string(),
-    sku: z.string().nullish(),
-    priceCents: z.number().optional(),
-  }).optional(),
+  product: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      sku: z.string().nullish(),
+      priceCents: z.number().optional(),
+    })
+    .optional(),
 });
 export type InventoryTransferItem = z.infer<typeof InventoryTransferItemSchema>;
 
@@ -969,45 +1021,59 @@ export const InventoryTransferSchema = z.object({
   completedAt: z.string().nullish(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  fromLocation: z.object({
-    id: z.string(),
-    name: z.string(),
-    code: z.string().nullish(),
-  }).optional(),
-  toLocation: z.object({
-    id: z.string(),
-    name: z.string(),
-    code: z.string().nullish(),
-  }).optional(),
-  requestedBy: z.object({
-    id: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-  }).optional(),
-  approvedBy: z.object({
-    id: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-  }).nullish(),
-  completedBy: z.object({
-    id: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-  }).nullish(),
+  fromLocation: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      code: z.string().nullish(),
+    })
+    .optional(),
+  toLocation: z
+    .object({
+      id: z.string(),
+      name: z.string(),
+      code: z.string().nullish(),
+    })
+    .optional(),
+  requestedBy: z
+    .object({
+      id: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .optional(),
+  approvedBy: z
+    .object({
+      id: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .nullish(),
+  completedBy: z
+    .object({
+      id: z.string(),
+      firstName: z.string(),
+      lastName: z.string(),
+    })
+    .nullish(),
   items: z.array(InventoryTransferItemSchema).optional(),
-  _count: z.object({
-    items: z.number().optional(),
-  }).optional(),
+  _count: z
+    .object({
+      items: z.number().optional(),
+    })
+    .optional(),
 });
 export type InventoryTransfer = z.infer<typeof InventoryTransferSchema>;
 
 export const CreateInventoryTransferSchema = z.object({
   fromLocationId: z.string().cuid(),
   toLocationId: z.string().cuid(),
-  items: z.array(z.object({
-    productId: z.string().cuid(),
-    qty: z.number().int().positive(),
-  })),
+  items: z.array(
+    z.object({
+      productId: z.string().cuid(),
+      qty: z.number().int().positive(),
+    }),
+  ),
   notes: z.string().optional(),
 });
 export type CreateInventoryTransferDto = z.infer<typeof CreateInventoryTransferSchema>;
@@ -1023,7 +1089,7 @@ export const BlackoutDateSchema = z.object({
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
   // Use passthrough to accept extra fields from API
-  site: SiteSchema.passthrough().optional().nullable()
+  site: SiteSchema.passthrough().optional().nullable(),
 });
 export type BlackoutDate = z.infer<typeof BlackoutDateSchema>;
 
@@ -1031,7 +1097,7 @@ export const CreateBlackoutDateSchema = BlackoutDateSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-  site: true
+  site: true,
 });
 export type CreateBlackoutDateDto = z.infer<typeof CreateBlackoutDateSchema>;
 
@@ -1044,7 +1110,9 @@ export const WaitlistEntrySchema = z.object({
   siteTypeId: z.string().cuid().optional().nullable(),
   arrivalDate: z.string().nullable().optional(),
   departureDate: z.string().nullable().optional(),
-  status: z.enum(["active", "offered", "converted", "fulfilled", "expired", "cancelled"]).default("active"),
+  status: z
+    .enum(["active", "offered", "converted", "fulfilled", "expired", "cancelled"])
+    .default("active"),
   type: z.enum(["regular", "seasonal"]).default("regular"),
   contactName: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
@@ -1061,17 +1129,26 @@ export const WaitlistEntrySchema = z.object({
   convertedAt: z.string().nullable().optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
-  guest: z.object({
-    primaryFirstName: z.string().nullable().optional(),
-    primaryLastName: z.string().nullable().optional(),
-    email: z.string().nullable().optional()
-  }).nullable().optional(),
-  site: z.object({
-    siteNumber: z.string()
-  }).nullable().optional(),
-  siteClass: z.object({
-    name: z.string()
-  }).nullable().optional()
+  guest: z
+    .object({
+      primaryFirstName: z.string().nullable().optional(),
+      primaryLastName: z.string().nullable().optional(),
+      email: z.string().nullable().optional(),
+    })
+    .nullable()
+    .optional(),
+  site: z
+    .object({
+      siteNumber: z.string(),
+    })
+    .nullable()
+    .optional(),
+  siteClass: z
+    .object({
+      name: z.string(),
+    })
+    .nullable()
+    .optional(),
 });
 export type WaitlistEntry = z.infer<typeof WaitlistEntrySchema>;
 
@@ -1079,7 +1156,7 @@ export const CreateWaitlistEntrySchema = WaitlistEntrySchema.omit({
   id: true,
   status: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
 });
 export type CreateWaitlistEntryDto = z.infer<typeof CreateWaitlistEntrySchema>;
 
@@ -1101,7 +1178,7 @@ export const CommunicationSchema = z.object({
   toAddress: z.string().nullish(),
   fromAddress: z.string().nullish(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type Communication = z.infer<typeof CommunicationSchema>;
 
@@ -1117,7 +1194,7 @@ export const CommunicationTemplateSchema = z.object({
   approvedAt: z.string().nullish(),
   auditLog: z.record(z.unknown()).optional().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 export type CommunicationTemplate = z.infer<typeof CommunicationTemplateSchema>;
 
@@ -1134,7 +1211,7 @@ export const CommunicationPlaybookSchema = z.object({
   throttlePerMinute: z.number().int().nullish(),
   routingAssigneeId: z.string().nullish(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 export type CommunicationPlaybook = z.infer<typeof CommunicationPlaybookSchema>;
 
@@ -1150,7 +1227,7 @@ export const CommunicationPlaybookJobSchema = z.object({
   lastError: z.string().nullish(),
   metadata: z.record(z.unknown()).optional().nullable(),
   createdAt: z.string(),
-  updatedAt: z.string()
+  updatedAt: z.string(),
 });
 export type CommunicationPlaybookJob = z.infer<typeof CommunicationPlaybookJobSchema>;
 
@@ -1159,7 +1236,7 @@ export const CreateCommunicationSchema = CommunicationSchema.omit({
   createdAt: true,
   updatedAt: true,
   preview: true,
-  status: true
+  status: true,
 });
 export type CreateCommunicationDto = z.infer<typeof CreateCommunicationSchema>;
 
@@ -1177,7 +1254,7 @@ export const NpsSurveySchema = z.object({
   activeFrom: z.string().nullable().optional(),
   activeTo: z.string().nullable().optional(),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type NpsSurvey = z.infer<typeof NpsSurveySchema>;
 
@@ -1194,7 +1271,7 @@ export const NpsInviteSchema = z.object({
   sentAt: z.string().nullable().optional(),
   openedAt: z.string().nullable().optional(),
   respondedAt: z.string().nullable().optional(),
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 export type NpsInvite = z.infer<typeof NpsInviteSchema>;
 
@@ -1209,7 +1286,7 @@ export const NpsResponseSchema = z.object({
   comment: z.string().nullable().optional(),
   tags: z.array(z.string()).optional(),
   sentiment: z.string().nullable().optional(),
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 export type NpsResponse = z.infer<typeof NpsResponseSchema>;
 
@@ -1228,7 +1305,7 @@ export const NpsMetricsSchema = z.object({
   toReachAverage: z.number().nullable().optional(),
   toReachWorldClass: z.number().nullable().optional(),
   isAboveAverage: z.boolean().nullable().optional(),
-  isWorldClass: z.boolean().optional()
+  isWorldClass: z.boolean().optional(),
 });
 export type NpsMetrics = z.infer<typeof NpsMetricsSchema>;
 
@@ -1246,7 +1323,7 @@ export const ReviewSchema = z.object({
   status: z.enum(["pending", "approved", "rejected", "removed"]),
   exposure: z.enum(["private", "public"]),
   createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  updatedAt: z.string().optional(),
 });
 export type Review = z.infer<typeof ReviewSchema>;
 
@@ -1260,7 +1337,7 @@ export const ReviewRequestSchema = z.object({
   token: z.string(),
   expiresAt: z.string().nullable().optional(),
   sentAt: z.string().nullable().optional(),
-  respondedAt: z.string().nullable().optional()
+  respondedAt: z.string().nullable().optional(),
 });
 export type ReviewRequest = z.infer<typeof ReviewRequestSchema>;
 
@@ -1271,7 +1348,7 @@ export const ReviewModerationSchema = z.object({
   reasons: z.array(z.string()).optional(),
   decidedBy: z.string().nullable().optional(),
   decidedAt: z.string().nullable().optional(),
-  notes: z.string().nullable().optional()
+  notes: z.string().nullable().optional(),
 });
 export type ReviewModeration = z.infer<typeof ReviewModerationSchema>;
 
@@ -1281,7 +1358,7 @@ export const ReviewReplySchema = z.object({
   authorType: z.string(),
   authorId: z.string().nullable().optional(),
   body: z.string(),
-  createdAt: z.string().optional()
+  createdAt: z.string().optional(),
 });
 export type ReviewReply = z.infer<typeof ReviewReplySchema>;
 

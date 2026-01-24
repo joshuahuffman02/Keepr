@@ -25,6 +25,7 @@ app/
 ## Server vs Client Components
 
 ### Server Components (Default)
+
 ```tsx
 // No "use client" directive
 // Can directly access DB, fetch data, use secrets
@@ -36,6 +37,7 @@ export default async function Page() {
 ```
 
 ### Client Components
+
 ```tsx
 "use client";
 
@@ -49,11 +51,12 @@ import { useState } from "react";
 
 export function Counter() {
   const [count, setCount] = useState(0);
-  return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
+  return <button onClick={() => setCount((c) => c + 1)}>{count}</button>;
 }
 ```
 
 ### Composition Pattern
+
 ```tsx
 // Server component with client interactivity
 import { ClientButton } from "./ClientButton";
@@ -72,21 +75,23 @@ export default async function Page() {
 ## Data Fetching
 
 ### Server Components
+
 ```tsx
 // Direct fetch (cached by default)
 async function getData() {
-  const res = await fetch('https://api.example.com/data');
+  const res = await fetch("https://api.example.com/data");
   return res.json();
 }
 
 // Opt out of caching
-const res = await fetch(url, { cache: 'no-store' });
+const res = await fetch(url, { cache: "no-store" });
 
 // Revalidate every hour
 const res = await fetch(url, { next: { revalidate: 3600 } });
 ```
 
 ### Client Components
+
 ```tsx
 "use client";
 
@@ -104,30 +109,25 @@ export function ReservationList() {
 ## Routing
 
 ### Dynamic Routes
+
 ```
 app/reservations/[id]/page.tsx  → /reservations/123
 app/[...slug]/page.tsx          → /any/path/here
 ```
 
 ### Route Groups
+
 ```
 app/(marketing)/       # Groups routes without affecting URL
 app/(dashboard)/       # Separate layout for dashboard
 ```
 
 ### Layouts
+
 ```tsx
 // app/dashboard/layout.tsx
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <DashboardShell>
-      {children}
-    </DashboardShell>
-  );
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  return <DashboardShell>{children}</DashboardShell>;
 }
 ```
 
@@ -167,6 +167,7 @@ export async function generateMetadata({ params }) {
 ## Common Patterns
 
 ### Loading States
+
 ```tsx
 // app/dashboard/loading.tsx
 export default function Loading() {
@@ -175,17 +176,12 @@ export default function Loading() {
 ```
 
 ### Error Handling
+
 ```tsx
 // app/dashboard/error.tsx
 "use client";
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error;
-  reset: () => void;
-}) {
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div>
       <h2>Something went wrong!</h2>
@@ -196,6 +192,7 @@ export default function Error({
 ```
 
 ### Not Found
+
 ```tsx
 // app/not-found.tsx
 export default function NotFound() {

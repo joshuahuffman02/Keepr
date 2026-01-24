@@ -23,7 +23,10 @@ export class AbandonedCartService {
     return Number.isFinite(d.valueOf()) ? d.toISOString() : new Date().toISOString();
   }
 
-  private deriveChannel(email?: string | null, phone?: string | null): AbandonedCartEntry["channel"] {
+  private deriveChannel(
+    email?: string | null,
+    phone?: string | null,
+  ): AbandonedCartEntry["channel"] {
     if (email) return "email";
     if (phone) return "sms";
     return "unknown";
@@ -37,7 +40,8 @@ export class AbandonedCartService {
     const existing = this.queue.find(
       (entry) =>
         entry.campgroundId === payload.campgroundId &&
-        ((payload.email && entry.email === payload.email) || (payload.phone && entry.phone === payload.phone)),
+        ((payload.email && entry.email === payload.email) ||
+          (payload.phone && entry.phone === payload.phone)),
     );
 
     if (existing) {
@@ -70,7 +74,9 @@ export class AbandonedCartService {
   }
 
   list(campgroundId?: string) {
-    const filtered = campgroundId ? this.queue.filter((q) => q.campgroundId === campgroundId) : this.queue;
+    const filtered = campgroundId
+      ? this.queue.filter((q) => q.campgroundId === campgroundId)
+      : this.queue;
     return filtered.sort((a, b) => b.lastActivityAt.localeCompare(a.lastActivityAt));
   }
 
@@ -83,4 +89,3 @@ export class AbandonedCartService {
     return entry;
   }
 }
-

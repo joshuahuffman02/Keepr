@@ -35,7 +35,7 @@ async function checkBudgets() {
   const totalJsBytes = await sumSizes(chunkFiles);
 
   console.log(
-    `Checking bundle budgets (total <= ${config.maxTotalJs} bytes, route <= ${config.maxRouteJs} bytes)...`
+    `Checking bundle budgets (total <= ${config.maxTotalJs} bytes, route <= ${config.maxRouteJs} bytes)...`,
   );
 
   const failures = [];
@@ -53,7 +53,9 @@ async function checkBudgets() {
     }
     const routeSize = await sumSizes(chunks.map(chunkPath));
     if (routeSize > config.maxRouteJs) {
-      failures.push(`Route ${route} JS ${routeSize} bytes exceeds per-route budget ${config.maxRouteJs}`);
+      failures.push(
+        `Route ${route} JS ${routeSize} bytes exceeds per-route budget ${config.maxRouteJs}`,
+      );
     }
   }
 
@@ -71,4 +73,3 @@ checkBudgets().catch((err) => {
   console.error("Failed to run performance budgets:", err);
   process.exit(1);
 });
-

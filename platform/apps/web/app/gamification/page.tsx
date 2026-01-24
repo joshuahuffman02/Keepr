@@ -275,20 +275,13 @@ function XpToast({
 
           {xp > 0 && (
             <>
-              <div className="text-sm opacity-90">
-                {categoryLabels[category] || category}
-              </div>
-              {reason && (
-                <div className="text-xs opacity-75 mt-1">{reason}</div>
-              )}
+              <div className="text-sm opacity-90">{categoryLabels[category] || category}</div>
+              {reason && <div className="text-xs opacity-75 mt-1">{reason}</div>}
             </>
           )}
         </div>
 
-        <button
-          onClick={onClose}
-          className="p-1 hover:bg-card/20 rounded transition-colors"
-        >
+        <button onClick={onClose} className="p-1 hover:bg-card/20 rounded transition-colors">
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -322,7 +315,12 @@ function XpToastContainer({
 }
 
 // Animated circular progress ring
-function ProgressRing({ progress, size = 180, strokeWidth = 12, children }: {
+function ProgressRing({
+  progress,
+  size = 180,
+  strokeWidth = 12,
+  children,
+}: {
   progress: number;
   size?: number;
   strokeWidth?: number;
@@ -365,15 +363,21 @@ function ProgressRing({ progress, size = 180, strokeWidth = 12, children }: {
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        {children}
-      </div>
+      <div className="absolute inset-0 flex items-center justify-center">{children}</div>
     </div>
   );
 }
 
 // Animated XP counter
-function AnimatedNumber({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
+function AnimatedNumber({
+  value,
+  prefix = "",
+  suffix = "",
+}: {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+}) {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
@@ -395,7 +399,13 @@ function AnimatedNumber({ value, prefix = "", suffix = "" }: { value: number; pr
     return () => clearInterval(timer);
   }, [value]);
 
-  return <span>{prefix}{displayValue.toLocaleString()}{suffix}</span>;
+  return (
+    <span>
+      {prefix}
+      {displayValue.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 // Podium component for top 3
@@ -408,7 +418,7 @@ function Podium({ leaderboard }: { leaderboard: LeaderboardEntry[] }) {
   const icons = [
     <Medal key="2" className="w-6 h-6 text-muted-foreground" />,
     <Crown key="1" className="w-8 h-8 text-status-warning" />,
-    <Medal key="3" className="w-5 h-5 text-status-warning-text" />
+    <Medal key="3" className="w-5 h-5 text-status-warning-text" />,
   ];
 
   if (top3.length === 0) return null;
@@ -419,15 +429,19 @@ function Podium({ leaderboard }: { leaderboard: LeaderboardEntry[] }) {
         if (!person) return null;
         return (
           <div key={person.userId} className="flex flex-col items-center">
-              <div className="mb-2 text-center">
-                {icons[idx]}
-                <div className="w-16 h-16 rounded-full bg-muted border-4 border-card shadow-lg flex items-center justify-center text-2xl font-bold text-status-success mx-auto mb-2">
-                  {person.name?.charAt(0) || "?"}
-                </div>
-                <div className="font-semibold text-foreground text-sm truncate max-w-[80px]">{person.name}</div>
+            <div className="mb-2 text-center">
+              {icons[idx]}
+              <div className="w-16 h-16 rounded-full bg-muted border-4 border-card shadow-lg flex items-center justify-center text-2xl font-bold text-status-success mx-auto mb-2">
+                {person.name?.charAt(0) || "?"}
+              </div>
+              <div className="font-semibold text-foreground text-sm truncate max-w-[80px]">
+                {person.name}
+              </div>
               <div className="text-xs text-muted-foreground">{person.xp.toLocaleString()} XP</div>
             </div>
-            <div className={`w-20 ${heights[idx]} ${colors[idx]} rounded-t-lg flex items-center justify-center shadow-md`}>
+            <div
+              className={`w-20 ${heights[idx]} ${colors[idx]} rounded-t-lg flex items-center justify-center shadow-md`}
+            >
               <span className="font-bold text-white text-lg drop-shadow">{positions[idx]}</span>
             </div>
           </div>
@@ -443,14 +457,20 @@ function StreakDisplay({ recentEvents }: { recentEvents: XpEvent[] }) {
   const weekAgo = new Date();
   weekAgo.setDate(weekAgo.getDate() - 7);
   const weeklyXp = recentEvents
-    .filter(e => new Date(e.createdAt) >= weekAgo)
+    .filter((e) => new Date(e.createdAt) >= weekAgo)
     .reduce((sum, e) => sum + e.xp, 0);
   const hasStreak = weeklyXp > 0;
 
   return (
-    <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${hasStreak ? "bg-status-warning-bg border border-status-warning-border" : "bg-muted border border-border"}`}>
-      <Flame className={`w-5 h-5 ${hasStreak ? "text-status-warning animate-pulse" : "text-muted-foreground"}`} />
-      <span className={`font-semibold ${hasStreak ? "text-status-warning-text" : "text-muted-foreground"}`}>
+    <div
+      className={`flex items-center gap-2 px-4 py-2 rounded-full ${hasStreak ? "bg-status-warning-bg border border-status-warning-border" : "bg-muted border border-border"}`}
+    >
+      <Flame
+        className={`w-5 h-5 ${hasStreak ? "text-status-warning animate-pulse" : "text-muted-foreground"}`}
+      />
+      <span
+        className={`font-semibold ${hasStreak ? "text-status-warning-text" : "text-muted-foreground"}`}
+      >
         {hasStreak ? `${weeklyXp} XP this week!` : "Start your streak!"}
       </span>
     </div>
@@ -464,19 +484,32 @@ function XpEventRow({ event }: { event: XpEvent }) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-border last:border-0 hover:bg-muted/50 transition-colors px-2 rounded">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? "bg-status-success-bg" : "bg-status-warning-bg"}`}>
-          {isPositive ? <TrendingUp className="w-5 h-5 text-status-success" /> : <Zap className="w-5 h-5 text-status-warning" />}
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center ${isPositive ? "bg-status-success-bg" : "bg-status-warning-bg"}`}
+        >
+          {isPositive ? (
+            <TrendingUp className="w-5 h-5 text-status-success" />
+          ) : (
+            <Zap className="w-5 h-5 text-status-warning" />
+          )}
         </div>
         <div>
-          <div className="font-medium text-foreground text-sm">{categoryLabels[event.category] || event.category}</div>
-          <div className="text-xs text-muted-foreground">{event.reason || "Activity completed"}</div>
+          <div className="font-medium text-foreground text-sm">
+            {categoryLabels[event.category] || event.category}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {event.reason || "Activity completed"}
+          </div>
         </div>
       </div>
       <div className="text-right">
         <div className={`font-bold ${isPositive ? "text-status-success" : "text-status-warning"}`}>
-          {isPositive ? "+" : ""}{event.xp} XP
+          {isPositive ? "+" : ""}
+          {event.xp} XP
         </div>
-        <div className="text-xs text-muted-foreground">{new Date(event.createdAt).toLocaleDateString()}</div>
+        <div className="text-xs text-muted-foreground">
+          {new Date(event.createdAt).toLocaleDateString()}
+        </div>
       </div>
     </div>
   );
@@ -490,9 +523,10 @@ export default function GamificationDashboardPage() {
   const [windowKey, setWindowKey] = useState<"weekly" | "monthly" | "all">("weekly");
   const prevLevelRef = useRef<number | null>(null);
   const [isRechartsLoaded, setIsRechartsLoaded] = useState(false);
-  const charts = PieChart && Pie && Cell && ResponsiveContainer && Tooltip
-    ? { PieChart, Pie, Cell, ResponsiveContainer, Tooltip }
-    : null;
+  const charts =
+    PieChart && Pie && Cell && ResponsiveContainer && Tooltip
+      ? { PieChart, Pie, Cell, ResponsiveContainer, Tooltip }
+      : null;
 
   // Load recharts library
   useEffect(() => {
@@ -501,10 +535,15 @@ export default function GamificationDashboardPage() {
 
   // Level up modal state
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
-  const [levelUpData, setLevelUpData] = useState<{ level: number; title: string }>({ level: 1, title: "Rookie" });
+  const [levelUpData, setLevelUpData] = useState<{ level: number; title: string }>({
+    level: 1,
+    title: "Rookie",
+  });
 
   // XP toasts state
-  const [xpToasts, setXpToasts] = useState<Array<{ id: string; xp: number; category: string; reason?: string }>>([]);
+  const [xpToasts, setXpToasts] = useState<
+    Array<{ id: string; xp: number; category: string; reason?: string }>
+  >([]);
 
   const addXpToast = useCallback((xp: number, category: string, reason?: string) => {
     const id = `toast-${Date.now()}-${Math.random()}`;
@@ -523,7 +562,11 @@ export default function GamificationDashboardPage() {
   }, []);
 
   // Fetch dashboard data
-  const { data: dashboard, isLoading: dashboardLoading, error: dashboardError } = useQuery<GamificationDashboard>({
+  const {
+    data: dashboard,
+    isLoading: dashboardLoading,
+    error: dashboardError,
+  } = useQuery<GamificationDashboard>({
     queryKey: ["gamification-dashboard", campgroundId],
     queryFn: async () => {
       console.log("[Gamification] Fetching dashboard for campground:", campgroundId);
@@ -574,7 +617,9 @@ export default function GamificationDashboardPage() {
   const currentLevel = dashboard?.level?.level ?? 1;
   const levelTitle = LEVEL_TITLES[currentLevel] || "Champion";
   const totalXp = dashboard?.balance?.totalXp ?? 0;
-  const progressPercent = dashboard?.level ? Math.round((dashboard.level.progressToNext || 0) * 100) : 0;
+  const progressPercent = dashboard?.level
+    ? Math.round((dashboard.level.progressToNext || 0) * 100)
+    : 0;
   const xpRemaining = dashboard?.level?.nextMinXp ? dashboard.level.nextMinXp - totalXp : 0;
   const recentEvents: XpEvent[] = dashboard?.recentEvents ?? [];
 
@@ -600,17 +645,29 @@ export default function GamificationDashboardPage() {
 
   // Debug logging
   useEffect(() => {
-    console.log("[Gamification] State:", JSON.stringify({
-      isHydrated,
-      campgroundId: campgroundId || "NONE",
-      dashboardLoading,
-      whoamiLoading,
-      isLoading,
-      loadingTimedOut,
-      dashboardError: dashboardError?.message || null,
-      whoamiError: whoamiError?.message || null,
-    }));
-  }, [isHydrated, campgroundId, dashboardLoading, whoamiLoading, isLoading, loadingTimedOut, dashboardError, whoamiError]);
+    console.log(
+      "[Gamification] State:",
+      JSON.stringify({
+        isHydrated,
+        campgroundId: campgroundId || "NONE",
+        dashboardLoading,
+        whoamiLoading,
+        isLoading,
+        loadingTimedOut,
+        dashboardError: dashboardError?.message || null,
+        whoamiError: whoamiError?.message || null,
+      }),
+    );
+  }, [
+    isHydrated,
+    campgroundId,
+    dashboardLoading,
+    whoamiLoading,
+    isLoading,
+    loadingTimedOut,
+    dashboardError,
+    whoamiError,
+  ]);
 
   if (isLoading && !loadingTimedOut) {
     return (
@@ -640,7 +697,7 @@ export default function GamificationDashboardPage() {
           <p className="text-xs text-muted-foreground mb-4">
             {getErrorMessage(
               dashboardError,
-              getErrorMessage(whoamiError, loadingTimedOut ? "Request timeout" : "Unknown error")
+              getErrorMessage(whoamiError, loadingTimedOut ? "Request timeout" : "Unknown error"),
             )}
           </p>
           <Button onClick={() => window.location.reload()} variant="outline">
@@ -810,7 +867,7 @@ export default function GamificationDashboardPage() {
                               backgroundColor: "white",
                               border: "1px solid #e2e8f0",
                               borderRadius: "8px",
-                              boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)"
+                              boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                             }}
                           />
                         </charts.PieChart>
@@ -818,7 +875,10 @@ export default function GamificationDashboardPage() {
                       <div className="flex flex-wrap justify-center gap-3 mt-2">
                         {categoryData.map((cat) => (
                           <div key={cat.name} className="flex items-center gap-2 text-sm">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: cat.color }}
+                            />
                             <span className="text-muted-foreground">{cat.name}</span>
                             <span className="font-medium text-foreground">{cat.value}</span>
                           </div>
@@ -919,7 +979,11 @@ export default function GamificationDashboardPage() {
                         size="sm"
                         variant={windowKey === key ? "default" : "outline"}
                         onClick={() => setWindowKey(key)}
-                        className={windowKey === key ? "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover" : ""}
+                        className={
+                          windowKey === key
+                            ? "bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+                            : ""
+                        }
                       >
                         {key === "all" ? "All-time" : key === "monthly" ? "Monthly" : "Weekly"}
                       </Button>
@@ -948,27 +1012,40 @@ export default function GamificationDashboardPage() {
                         `}
                       >
                         <div className="flex items-center gap-4">
-                          <div className={`
+                          <div
+                            className={`
                             w-10 h-10 rounded-full flex items-center justify-center font-bold
-                            ${isTop3
-                              ? row.rank === 1 ? "bg-status-warning text-status-warning-foreground"
-                                : row.rank === 2 ? "bg-muted text-foreground"
-                                : "bg-status-warning/80 text-status-warning-foreground"
-                              : "bg-muted text-muted-foreground"
+                            ${
+                              isTop3
+                                ? row.rank === 1
+                                  ? "bg-status-warning text-status-warning-foreground"
+                                  : row.rank === 2
+                                    ? "bg-muted text-foreground"
+                                    : "bg-status-warning/80 text-status-warning-foreground"
+                                : "bg-muted text-muted-foreground"
                             }
-                          `}>
+                          `}
+                          >
                             {isTop3 ? ["", "🥇", "🥈", "🥉"][row.rank] : row.rank}
                           </div>
                           <div>
                             <div className="font-semibold text-foreground flex items-center gap-2">
                               {row.name}
-                              {isViewer && <Badge className="bg-status-success/15 text-status-success text-xs">You</Badge>}
+                              {isViewer && (
+                                <Badge className="bg-status-success/15 text-status-success text-xs">
+                                  You
+                                </Badge>
+                              )}
                             </div>
-                            <div className="text-sm text-muted-foreground">{row.role || "Staff"}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {row.role || "Staff"}
+                            </div>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-lg text-status-success">+{row.xp.toLocaleString()}</div>
+                          <div className="font-bold text-lg text-status-success">
+                            +{row.xp.toLocaleString()}
+                          </div>
                           <div className="text-xs text-muted-foreground">XP</div>
                         </div>
                       </div>
@@ -1020,7 +1097,9 @@ export default function GamificationDashboardPage() {
               <Sparkles className="w-5 h-5 text-status-warning" />
               How to Earn XP
             </CardTitle>
-            <CardDescription>Complete these activities to level up and climb the leaderboard</CardDescription>
+            <CardDescription>
+              Complete these activities to level up and climb the leaderboard
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1031,7 +1110,9 @@ export default function GamificationDashboardPage() {
                 <div>
                   <div className="font-semibold text-foreground">Check-ins</div>
                   <div className="text-sm text-muted-foreground">Check guests in smoothly</div>
-                  <div className="text-xs text-status-success-text font-medium mt-1">+5 to +25 XP</div>
+                  <div className="text-xs text-status-success-text font-medium mt-1">
+                    +5 to +25 XP
+                  </div>
                 </div>
               </div>
 
@@ -1052,8 +1133,12 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Maintenance</div>
-                  <div className="text-sm text-muted-foreground">Complete maintenance work orders</div>
-                  <div className="text-xs text-status-warning-text font-medium mt-1">+10 to +40 XP</div>
+                  <div className="text-sm text-muted-foreground">
+                    Complete maintenance work orders
+                  </div>
+                  <div className="text-xs text-status-warning-text font-medium mt-1">
+                    +10 to +40 XP
+                  </div>
                 </div>
               </div>
 
@@ -1063,7 +1148,9 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Quality Reservations</div>
-                  <div className="text-sm text-muted-foreground">Complete reservations with all details</div>
+                  <div className="text-sm text-muted-foreground">
+                    Complete reservations with all details
+                  </div>
                   <div className="text-xs text-status-info-text font-medium mt-1">+5 to +20 XP</div>
                 </div>
               </div>
@@ -1075,7 +1162,9 @@ export default function GamificationDashboardPage() {
                 <div>
                   <div className="font-semibold text-foreground">Checklists</div>
                   <div className="text-sm text-muted-foreground">Complete daily checklists</div>
-                  <div className="text-xs text-status-success-text font-medium mt-1">+2 to +10 XP</div>
+                  <div className="text-xs text-status-success-text font-medium mt-1">
+                    +2 to +10 XP
+                  </div>
                 </div>
               </div>
 
@@ -1085,8 +1174,12 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Review Mentions</div>
-                  <div className="text-sm text-muted-foreground">Get mentioned positively in guest reviews</div>
-                  <div className="text-xs text-status-info-text font-medium mt-1">+15 to +50 XP</div>
+                  <div className="text-sm text-muted-foreground">
+                    Get mentioned positively in guest reviews
+                  </div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">
+                    +15 to +50 XP
+                  </div>
                 </div>
               </div>
 
@@ -1096,8 +1189,12 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">On-time Assignments</div>
-                  <div className="text-sm text-muted-foreground">Complete assignments before deadline</div>
-                  <div className="text-xs text-status-warning-text font-medium mt-1">+5 to +20 XP</div>
+                  <div className="text-sm text-muted-foreground">
+                    Complete assignments before deadline
+                  </div>
+                  <div className="text-xs text-status-warning-text font-medium mt-1">
+                    +5 to +20 XP
+                  </div>
                 </div>
               </div>
 
@@ -1107,7 +1204,9 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Team Assists</div>
-                  <div className="text-sm text-muted-foreground">Help teammates with their tasks</div>
+                  <div className="text-sm text-muted-foreground">
+                    Help teammates with their tasks
+                  </div>
                   <div className="text-xs text-status-info-text font-medium mt-1">+5 to +20 XP</div>
                 </div>
               </div>
@@ -1118,8 +1217,12 @@ export default function GamificationDashboardPage() {
                 </div>
                 <div>
                   <div className="font-semibold text-foreground">Merit Awards</div>
-                  <div className="text-sm text-muted-foreground">Receive recognition from managers</div>
-                  <div className="text-xs text-status-info-text font-medium mt-1">+5 to +100 XP</div>
+                  <div className="text-sm text-muted-foreground">
+                    Receive recognition from managers
+                  </div>
+                  <div className="text-xs text-status-info-text font-medium mt-1">
+                    +5 to +100 XP
+                  </div>
                 </div>
               </div>
             </div>
@@ -1138,8 +1241,8 @@ export default function GamificationDashboardPage() {
                       parseInt(level) === currentLevel
                         ? "bg-status-success-bg border-status-success-border text-status-success-text font-semibold"
                         : parseInt(level) < currentLevel
-                        ? "bg-muted border-border text-muted-foreground"
-                        : "bg-card border-border text-muted-foreground"
+                          ? "bg-muted border-border text-muted-foreground"
+                          : "bg-card border-border text-muted-foreground"
                     }`}
                   >
                     <span className="font-medium">Lvl {level}:</span> {title}
@@ -1147,7 +1250,8 @@ export default function GamificationDashboardPage() {
                 ))}
               </div>
               <p className="text-sm text-muted-foreground mt-4">
-                Each level requires progressively more XP. Keep earning to unlock new titles and climb the leaderboard!
+                Each level requires progressively more XP. Keep earning to unlock new titles and
+                climb the leaderboard!
               </p>
             </div>
           </CardContent>

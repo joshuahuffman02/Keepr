@@ -2,7 +2,7 @@ import { Prisma, PrismaClient, ReservationStatus, SiteType } from "@prisma/clien
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -64,18 +64,79 @@ const weightedRandomState = () => {
 };
 
 const FIRST_NAMES = [
-  "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
-  "William", "Barbara", "David", "Elizabeth", "Richard", "Susan", "Joseph", "Jessica",
-  "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Lisa", "Daniel", "Nancy",
-  "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra", "Donald", "Ashley",
-  "Steven", "Kimberly", "Paul", "Emily", "Andrew", "Donna", "Joshua", "Michelle"
+  "James",
+  "Mary",
+  "John",
+  "Patricia",
+  "Robert",
+  "Jennifer",
+  "Michael",
+  "Linda",
+  "William",
+  "Barbara",
+  "David",
+  "Elizabeth",
+  "Richard",
+  "Susan",
+  "Joseph",
+  "Jessica",
+  "Thomas",
+  "Sarah",
+  "Charles",
+  "Karen",
+  "Christopher",
+  "Lisa",
+  "Daniel",
+  "Nancy",
+  "Matthew",
+  "Betty",
+  "Anthony",
+  "Margaret",
+  "Mark",
+  "Sandra",
+  "Donald",
+  "Ashley",
+  "Steven",
+  "Kimberly",
+  "Paul",
+  "Emily",
+  "Andrew",
+  "Donna",
+  "Joshua",
+  "Michelle",
 ];
 
 const LAST_NAMES = [
-  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson"
+  "Smith",
+  "Johnson",
+  "Williams",
+  "Brown",
+  "Jones",
+  "Garcia",
+  "Miller",
+  "Davis",
+  "Rodriguez",
+  "Martinez",
+  "Hernandez",
+  "Lopez",
+  "Gonzalez",
+  "Wilson",
+  "Anderson",
+  "Thomas",
+  "Taylor",
+  "Moore",
+  "Jackson",
+  "Martin",
+  "Lee",
+  "Perez",
+  "Thompson",
+  "White",
+  "Harris",
+  "Sanchez",
+  "Clark",
+  "Ramirez",
+  "Lewis",
+  "Robinson",
 ];
 
 const CITIES_BY_STATE: Record<string, string[]> = {
@@ -113,10 +174,27 @@ const RIG_TYPES = [
 ];
 
 const SITE_AMENITIES = {
-  rv: ["50 amp", "30 amp", "Water hookup", "Sewer hookup", "WiFi", "Cable TV", "Fire pit", "Picnic table"],
+  rv: [
+    "50 amp",
+    "30 amp",
+    "Water hookup",
+    "Sewer hookup",
+    "WiFi",
+    "Cable TV",
+    "Fire pit",
+    "Picnic table",
+  ],
   tent: ["Fire pit", "Picnic table", "Near restrooms", "Shade trees", "Lantern hook"],
   cabin: ["AC", "Heat", "Kitchenette", "Private bathroom", "Linens", "WiFi", "Porch swing"],
-  glamping: ["Queen bed", "AC", "Mini fridge", "Private deck", "Outdoor shower", "Fire pit", "WiFi"],
+  glamping: [
+    "Queen bed",
+    "AC",
+    "Mini fridge",
+    "Private deck",
+    "Outdoor shower",
+    "Fire pit",
+    "WiFi",
+  ],
 };
 
 async function seedSites() {
@@ -211,7 +289,9 @@ async function seedGuests(count: number) {
       country: "US",
       postalCode: String(10000 + Math.floor(Math.random() * 89999)),
       rigType: rigInfo?.type || null,
-      rigLength: rigInfo ? Math.floor(rigInfo.length[0] + Math.random() * (rigInfo.length[1] - rigInfo.length[0])) : null,
+      rigLength: rigInfo
+        ? Math.floor(rigInfo.length[0] + Math.random() * (rigInfo.length[1] - rigInfo.length[0]))
+        : null,
       marketingOptIn: Math.random() > 0.4,
       repeatStays: Math.floor(Math.random() * 5),
       vip: Math.random() > 0.9,
@@ -259,9 +339,12 @@ async function seedReservations(sites: SeedSite[], guests: SeedGuest[]) {
     // Length of stay
     let nights: number;
     const stayRand = Math.random();
-    if (stayRand < 0.4) nights = 2 + Math.floor(Math.random() * 3); // 2-4 nights (40%)
-    else if (stayRand < 0.7) nights = 5 + Math.floor(Math.random() * 3); // 5-7 nights (30%)
-    else if (stayRand < 0.9) nights = 7 + Math.floor(Math.random() * 7); // 7-14 nights (20%)
+    if (stayRand < 0.4)
+      nights = 2 + Math.floor(Math.random() * 3); // 2-4 nights (40%)
+    else if (stayRand < 0.7)
+      nights = 5 + Math.floor(Math.random() * 3); // 5-7 nights (30%)
+    else if (stayRand < 0.9)
+      nights = 7 + Math.floor(Math.random() * 7); // 7-14 nights (20%)
     else nights = 14 + Math.floor(Math.random() * 16); // 14-30 nights (10%)
 
     const departureDate = new Date(arrivalDate);
@@ -280,11 +363,20 @@ async function seedReservations(sites: SeedSite[], guests: SeedGuest[]) {
     // Pricing based on site type
     let nightlyRate: number;
     switch (site.siteType) {
-      case "rv": nightlyRate = 45 + Math.floor(Math.random() * 25); break;
-      case "tent": nightlyRate = 25 + Math.floor(Math.random() * 15); break;
-      case "cabin": nightlyRate = 95 + Math.floor(Math.random() * 55); break;
-      case "glamping": nightlyRate = 120 + Math.floor(Math.random() * 60); break;
-      default: nightlyRate = 50;
+      case "rv":
+        nightlyRate = 45 + Math.floor(Math.random() * 25);
+        break;
+      case "tent":
+        nightlyRate = 25 + Math.floor(Math.random() * 15);
+        break;
+      case "cabin":
+        nightlyRate = 95 + Math.floor(Math.random() * 55);
+        break;
+      case "glamping":
+        nightlyRate = 120 + Math.floor(Math.random() * 60);
+        break;
+      default:
+        nightlyRate = 50;
     }
 
     const baseSubtotal = nightlyRate * nights * 100; // cents
@@ -293,9 +385,12 @@ async function seedReservations(sites: SeedSite[], guests: SeedGuest[]) {
     const feesAmount = Math.round(baseSubtotal * 0.05); // 5% fees
     const totalAmount = baseSubtotal + taxesAmount + feesAmount;
 
-    const paidAmount = status === "cancelled" ? 0 :
-      status === "checked_out" ? totalAmount :
-      Math.round(totalAmount * (0.5 + Math.random() * 0.5));
+    const paidAmount =
+      status === "cancelled"
+        ? 0
+        : status === "checked_out"
+          ? totalAmount
+          : Math.round(totalAmount * (0.5 + Math.random() * 0.5));
 
     // Lead time (days between booking and arrival)
     const leadTimeDays = Math.floor(Math.random() * 60) + 1;
@@ -313,7 +408,10 @@ async function seedReservations(sites: SeedSite[], guests: SeedGuest[]) {
     let source = "website";
     for (let j = 0; j < sources.length; j++) {
       sourceRand -= sourceWeights[j];
-      if (sourceRand <= 0) { source = sources[j]; break; }
+      if (sourceRand <= 0) {
+        source = sources[j];
+        break;
+      }
     }
 
     reservations.push({
@@ -371,21 +469,31 @@ async function seedNps(reservations: SeedReservation[]) {
   });
 
   // Get checked_out reservations for NPS responses
-  const completedReservations = reservations.filter(r => r.status === "checked_out");
+  const completedReservations = reservations.filter((r) => r.status === "checked_out");
   const respondingReservations = completedReservations.filter(() => Math.random() > 0.6); // 40% response rate
 
-  const responses = respondingReservations.map(res => {
+  const responses = respondingReservations.map((res) => {
     // Score distribution: 60% promoters, 25% passives, 15% detractors
     let score: number;
     const rand = Math.random();
-    if (rand < 0.15) score = Math.floor(Math.random() * 7); // 0-6 detractors
-    else if (rand < 0.4) score = 7 + Math.floor(Math.random() * 2); // 7-8 passives
+    if (rand < 0.15)
+      score = Math.floor(Math.random() * 7); // 0-6 detractors
+    else if (rand < 0.4)
+      score = 7 + Math.floor(Math.random() * 2); // 7-8 passives
     else score = 9 + Math.floor(Math.random() * 2); // 9-10 promoters
 
     const comments: Record<number, string[]> = {
-      10: ["Amazing stay! Will definitely come back.", "Best campground we've ever stayed at!", "Perfect in every way."],
+      10: [
+        "Amazing stay! Will definitely come back.",
+        "Best campground we've ever stayed at!",
+        "Perfect in every way.",
+      ],
       9: ["Great experience overall.", "Really enjoyed our stay.", "Would highly recommend."],
-      8: ["Nice campground, good facilities.", "Pleasant stay with minor issues.", "Good value for money."],
+      8: [
+        "Nice campground, good facilities.",
+        "Pleasant stay with minor issues.",
+        "Good value for money.",
+      ],
       7: ["Decent stay, some room for improvement.", "Okay experience.", "Met our basic needs."],
       6: ["Below expectations.", "Some issues with cleanliness.", "Staff could be more helpful."],
       5: ["Mediocre experience.", "Wouldn't stay again.", "Too noisy at night."],
@@ -420,13 +528,25 @@ async function seedNps(reservations: SeedReservation[]) {
 async function seedReviews(reservations: SeedReservation[]) {
   console.log("Seeding reviews...");
 
-  const completedReservations = reservations.filter(r => r.status === "checked_out");
+  const completedReservations = reservations.filter((r) => r.status === "checked_out");
   const reviewingReservations = completedReservations.filter(() => Math.random() > 0.75); // 25% review rate
 
   const reviewTitles: Record<number, string[]> = {
-    5: ["Perfect getaway!", "Exceeded expectations", "Will be back!", "Hidden gem", "Wonderful experience"],
+    5: [
+      "Perfect getaway!",
+      "Exceeded expectations",
+      "Will be back!",
+      "Hidden gem",
+      "Wonderful experience",
+    ],
     4: ["Great stay", "Really enjoyed it", "Nice campground", "Good experience", "Solid choice"],
-    3: ["Decent campground", "Average stay", "Met expectations", "Okay experience", "Nothing special"],
+    3: [
+      "Decent campground",
+      "Average stay",
+      "Met expectations",
+      "Okay experience",
+      "Nothing special",
+    ],
     2: ["Disappointing", "Below average", "Not impressed", "Needs improvement", "Won't return"],
     1: ["Terrible", "Awful experience", "Stay away", "Complete disaster", "Worst ever"],
   };
@@ -459,7 +579,7 @@ async function seedReviews(reservations: SeedReservation[]) {
     ],
   };
 
-  const reviews = reviewingReservations.map(res => {
+  const reviews = reviewingReservations.map((res) => {
     // Rating distribution
     let rating: number;
     const rand = Math.random();
@@ -529,7 +649,6 @@ async function main() {
     console.log(`  Sites: ${sites.length}`);
     console.log(`  Guests: ${guests.length}`);
     console.log(`  Reservations: ${reservations.length}`);
-
   } catch (error) {
     console.error("Error seeding data:", error);
     process.exit(1);

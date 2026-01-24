@@ -7,12 +7,12 @@
 
 ## Training Overview
 
-| Field | Details |
-|-------|---------|
-| Training Year | |
-| Training Date(s) | |
-| Trainer | |
-| Training Method | [ ] In-person [ ] Online [ ] Video [ ] Combined |
+| Field            | Details                                         |
+| ---------------- | ----------------------------------------------- |
+| Training Year    |                                                 |
+| Training Date(s) |                                                 |
+| Trainer          |                                                 |
+| Training Method  | [ ] In-person [ ] Online [ ] Video [ ] Combined |
 
 ---
 
@@ -20,14 +20,14 @@
 
 ### 1. Password Security (15 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Why passwords matter | | |
-| [ ] Creating strong passwords | | |
-| [ ] Using password managers | | |
-| [ ] Never sharing passwords | | |
-| [ ] Recognizing password reset scams | | |
-| [ ] Multi-factor authentication (MFA) | | |
+| Topic                                 | Covered | Notes |
+| ------------------------------------- | ------- | ----- |
+| [ ] Why passwords matter              |         |       |
+| [ ] Creating strong passwords         |         |       |
+| [ ] Using password managers           |         |       |
+| [ ] Never sharing passwords           |         |       |
+| [ ] Recognizing password reset scams  |         |       |
+| [ ] Multi-factor authentication (MFA) |         |       |
 
 **Key Message:** Your password is the first line of defense. Treat it like your house key.
 
@@ -35,17 +35,18 @@
 
 ### 2. Phishing & Email Security (20 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] What is phishing? | | |
-| [ ] Recognizing suspicious emails | | |
-| [ ] Checking sender addresses | | |
-| [ ] Hovering over links before clicking | | |
-| [ ] Reporting suspicious emails | | |
-| [ ] Business email compromise | | |
-| [ ] Spear phishing (targeted attacks) | | |
+| Topic                                   | Covered | Notes |
+| --------------------------------------- | ------- | ----- |
+| [ ] What is phishing?                   |         |       |
+| [ ] Recognizing suspicious emails       |         |       |
+| [ ] Checking sender addresses           |         |       |
+| [ ] Hovering over links before clicking |         |       |
+| [ ] Reporting suspicious emails         |         |       |
+| [ ] Business email compromise           |         |       |
+| [ ] Spear phishing (targeted attacks)   |         |       |
 
 **Red Flags to Watch For:**
+
 - Urgent or threatening language
 - Unexpected attachments
 - Requests for passwords or personal info
@@ -58,14 +59,14 @@
 
 ### 3. Physical Security (10 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Locking workstations when away | | |
-| [ ] Securing laptops and devices | | |
-| [ ] Visitor policies | | |
-| [ ] Tailgating prevention | | |
-| [ ] Clean desk policy | | |
-| [ ] Secure document disposal | | |
+| Topic                              | Covered | Notes |
+| ---------------------------------- | ------- | ----- |
+| [ ] Locking workstations when away |         |       |
+| [ ] Securing laptops and devices   |         |       |
+| [ ] Visitor policies               |         |       |
+| [ ] Tailgating prevention          |         |       |
+| [ ] Clean desk policy              |         |       |
+| [ ] Secure document disposal       |         |       |
 
 **Key Message:** Physical access = digital access. Lock it up.
 
@@ -73,16 +74,17 @@
 
 ### 4. Data Protection (15 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] What is PII (Personal Identifiable Information)? | | |
-| [ ] Customer data we handle | | |
-| [ ] Proper data handling procedures | | |
-| [ ] Never emailing sensitive data unencrypted | | |
-| [ ] Data retention and deletion | | |
-| [ ] Safe file sharing practices | | |
+| Topic                                                | Covered | Notes |
+| ---------------------------------------------------- | ------- | ----- |
+| [ ] What is PII (Personal Identifiable Information)? |         |       |
+| [ ] Customer data we handle                          |         |       |
+| [ ] Proper data handling procedures                  |         |       |
+| [ ] Never emailing sensitive data unencrypted        |         |       |
+| [ ] Data retention and deletion                      |         |       |
+| [ ] Safe file sharing practices                      |         |       |
 
 **Examples of Sensitive Data:**
+
 - Customer names + credit cards
 - Employee Social Security Numbers
 - Reservation details with contact info
@@ -92,15 +94,16 @@
 
 ### 5. Social Engineering (15 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] What is social engineering? | | |
-| [ ] Phone pretexting (fake callers) | | |
-| [ ] In-person manipulation | | |
-| [ ] Verify before trusting | | |
-| [ ] When to say "I need to verify that" | | |
+| Topic                                   | Covered | Notes |
+| --------------------------------------- | ------- | ----- |
+| [ ] What is social engineering?         |         |       |
+| [ ] Phone pretexting (fake callers)     |         |       |
+| [ ] In-person manipulation              |         |       |
+| [ ] Verify before trusting              |         |       |
+| [ ] When to say "I need to verify that" |         |       |
 
 **Common Scenarios:**
+
 - "I'm from IT and need your password"
 - "The owner asked me to pick up the deposit"
 - "I'm a vendor and need system access"
@@ -111,13 +114,13 @@
 
 ### 6. Mobile Device Security (10 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Screen locks and PINs | | |
-| [ ] Public WiFi risks | | |
-| [ ] Lost/stolen device procedures | | |
-| [ ] App permissions | | |
-| [ ] Separating personal and work data | | |
+| Topic                                 | Covered | Notes |
+| ------------------------------------- | ------- | ----- |
+| [ ] Screen locks and PINs             |         |       |
+| [ ] Public WiFi risks                 |         |       |
+| [ ] Lost/stolen device procedures     |         |       |
+| [ ] App permissions                   |         |       |
+| [ ] Separating personal and work data |         |       |
 
 **Key Message:** Your phone has access to email and systems. Protect it like a computer.
 
@@ -125,15 +128,16 @@
 
 ### 7. Incident Reporting (10 minutes)
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] What to report | | |
-| [ ] How to report (who to contact) | | |
-| [ ] When to report (immediately!) | | |
-| [ ] No punishment for reporting | | |
-| [ ] Examples of incidents | | |
+| Topic                              | Covered | Notes |
+| ---------------------------------- | ------- | ----- |
+| [ ] What to report                 |         |       |
+| [ ] How to report (who to contact) |         |       |
+| [ ] When to report (immediately!)  |         |       |
+| [ ] No punishment for reporting    |         |       |
+| [ ] Examples of incidents          |         |       |
 
 **Report Immediately:**
+
 - Clicked a suspicious link
 - Lost a device
 - Saw someone suspicious
@@ -146,13 +150,13 @@
 
 ### 8. Company Policies Review (10 minutes)
 
-| Policy | Reviewed | Location |
-|--------|----------|----------|
-| [ ] Password Policy | | |
-| [ ] Acceptable Use Policy | | |
-| [ ] Data Retention Policy | | |
-| [ ] Incident Response Plan | | |
-| [ ] Privacy Policy | | |
+| Policy                     | Reviewed | Location |
+| -------------------------- | -------- | -------- |
+| [ ] Password Policy        |          |          |
+| [ ] Acceptable Use Policy  |          |          |
+| [ ] Data Retention Policy  |          |          |
+| [ ] Incident Response Plan |          |          |
+| [ ] Privacy Policy         |          |          |
 
 ---
 
@@ -160,30 +164,30 @@
 
 ### For Managers
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Access review responsibilities | | |
-| [ ] Offboarding procedures | | |
-| [ ] Incident escalation | | |
-| [ ] Team security compliance | | |
+| Topic                              | Covered | Notes |
+| ---------------------------------- | ------- | ----- |
+| [ ] Access review responsibilities |         |       |
+| [ ] Offboarding procedures         |         |       |
+| [ ] Incident escalation            |         |       |
+| [ ] Team security compliance       |         |       |
 
 ### For Front Desk/Reservations
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Handling customer data requests | | |
-| [ ] Phone verification procedures | | |
-| [ ] PCI compliance basics | | |
-| [ ] Secure payment handling | | |
+| Topic                               | Covered | Notes |
+| ----------------------------------- | ------- | ----- |
+| [ ] Handling customer data requests |         |       |
+| [ ] Phone verification procedures   |         |       |
+| [ ] PCI compliance basics           |         |       |
+| [ ] Secure payment handling         |         |       |
 
 ### For IT/Technical Staff
 
-| Topic | Covered | Notes |
-|-------|---------|-------|
-| [ ] Patch management | | |
-| [ ] Log monitoring | | |
-| [ ] Backup procedures | | |
-| [ ] Vendor access controls | | |
+| Topic                      | Covered | Notes |
+| -------------------------- | ------- | ----- |
+| [ ] Patch management       |         |       |
+| [ ] Log monitoring         |         |       |
+| [ ] Backup procedures      |         |       |
+| [ ] Vendor access controls |         |       |
 
 ---
 
@@ -202,34 +206,34 @@
 ## Training Completion Record
 
 | Employee Name | Date Completed | Quiz Score | Signature |
-|---------------|----------------|------------|-----------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| ------------- | -------------- | ---------- | --------- |
+|               |                |            |           |
+|               |                |            |           |
+|               |                |            |           |
+|               |                |            |           |
+|               |                |            |           |
 
 ---
 
 ## Annual Training Schedule
 
-| Quarter | Activity |
-|---------|----------|
-| Q1 | Full security awareness training |
-| Q2 | Phishing simulation test |
-| Q3 | Policy review reminder |
-| Q4 | Year-end refresher + new threats |
+| Quarter | Activity                         |
+| ------- | -------------------------------- |
+| Q1      | Full security awareness training |
+| Q2      | Phishing simulation test         |
+| Q3      | Policy review reminder           |
+| Q4      | Year-end refresher + new threats |
 
 ---
 
 ## Free Training Resources
 
-| Resource | Link |
-|----------|------|
-| CISA Cybersecurity Training | cisa.gov/cybersecurity-training-exercises |
-| FTC Cybersecurity for Small Business | ftc.gov/cybersecurity |
-| KnowBe4 Free Tools | knowbe4.com/free-security-awareness-tools |
-| Google Phishing Quiz | phishingquiz.withgoogle.com |
+| Resource                             | Link                                      |
+| ------------------------------------ | ----------------------------------------- |
+| CISA Cybersecurity Training          | cisa.gov/cybersecurity-training-exercises |
+| FTC Cybersecurity for Small Business | ftc.gov/cybersecurity                     |
+| KnowBe4 Free Tools                   | knowbe4.com/free-security-awareness-tools |
+| Google Phishing Quiz                 | phishingquiz.withgoogle.com               |
 
 ---
 
@@ -237,12 +241,12 @@
 
 **Training Completed By:**
 
-Name: ________________________
+Name: **********\_\_\_\_**********
 
-Signature: ________________________
+Signature: **********\_\_\_\_**********
 
-Date: ________________________
+Date: **********\_\_\_\_**********
 
 ---
 
-*Training records should be retained for 3 years. Schedule refresher training for any employees who do not pass the assessment.*
+_Training records should be retained for 3 years. Schedule refresher training for any employees who do not pass the assessment._

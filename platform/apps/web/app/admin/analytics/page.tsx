@@ -193,11 +193,13 @@ export default function AnalyticsOverviewPage() {
         const trendsData: TrendsResponse = await trendsRes.json();
         const monthlyTrends = trendsData.monthlyTrends;
         if (monthlyTrends && Array.isArray(monthlyTrends)) {
-          setRevenueTrends(monthlyTrends.map((t) => ({
-            month: t.month ?? t.period ?? "",
-            revenue: t.revenue || t.totalRevenue || 0,
-            reservations: t.reservations || t.bookings || 0,
-          })));
+          setRevenueTrends(
+            monthlyTrends.map((t) => ({
+              month: t.month ?? t.period ?? "",
+              revenue: t.revenue || t.totalRevenue || 0,
+              reservations: t.reservations || t.bookings || 0,
+            })),
+          );
         }
       }
 
@@ -205,17 +207,21 @@ export default function AnalyticsOverviewPage() {
       if (accommodationsRes.ok) {
         const accData: AccommodationsResponse = await accommodationsRes.json();
         if (accData.distribution && Array.isArray(accData.distribution)) {
-          setAccommodationMix(accData.distribution.map((item) => ({
-            name: item.type || item.name || "Unknown",
-            value: Math.round(item.percentage || item.value || 0),
-            color: getAccommodationColor(item.type ?? item.name),
-          })));
+          setAccommodationMix(
+            accData.distribution.map((item) => ({
+              name: item.type || item.name || "Unknown",
+              value: Math.round(item.percentage || item.value || 0),
+              color: getAccommodationColor(item.type ?? item.name),
+            })),
+          );
         } else if (accData.byType && Array.isArray(accData.byType)) {
-          setAccommodationMix(accData.byType.map((item) => ({
-            name: item.type || item.name || "Unknown",
-            value: Math.round(item.percentage || item.value || 0),
-            color: getAccommodationColor(item.type ?? item.name),
-          })));
+          setAccommodationMix(
+            accData.byType.map((item) => ({
+              name: item.type || item.name || "Unknown",
+              value: Math.round(item.percentage || item.value || 0),
+              color: getAccommodationColor(item.type ?? item.name),
+            })),
+          );
         }
       }
 
@@ -223,12 +229,14 @@ export default function AnalyticsOverviewPage() {
       if (benchmarksRes.ok) {
         const benchData: BenchmarksResponse = await benchmarksRes.json();
         if (benchData.topPerformers && Array.isArray(benchData.topPerformers)) {
-          setTopCampgrounds(benchData.topPerformers.slice(0, 5).map((c) => ({
-            name: c.name || c.campgroundName || "Unknown",
-            state: c.state || c.location?.state || "—",
-            revenue: c.revenue || c.totalRevenue || 0,
-            reservations: c.reservations || c.bookings || 0,
-          })));
+          setTopCampgrounds(
+            benchData.topPerformers.slice(0, 5).map((c) => ({
+              name: c.name || c.campgroundName || "Unknown",
+              state: c.state || c.location?.state || "—",
+              revenue: c.revenue || c.totalRevenue || 0,
+              reservations: c.reservations || c.bookings || 0,
+            })),
+          );
         }
       }
     } catch (error) {
@@ -287,8 +295,8 @@ export default function AnalyticsOverviewPage() {
               anomalies.some((a: { severity: string }) => a.severity === "critical")
                 ? "Critical issues require immediate attention."
                 : suggestions.length > 0
-                ? "Focus on the lowest-performing properties to improve platform health."
-                : "Platform metrics are within normal ranges."
+                  ? "Focus on the lowest-performing properties to improve platform health."
+                  : "Platform metrics are within normal ranges."
             }`
           : "Platform performance is healthy. No critical anomalies detected and guest satisfaction metrics are stable.";
 
@@ -301,7 +309,7 @@ export default function AnalyticsOverviewPage() {
       }
       if (suggestions[0]?.suggestions?.[0]) {
         recommendations.push(
-          `${suggestions[0].campgroundName}: ${suggestions[0].suggestions[0].title}`
+          `${suggestions[0].campgroundName}: ${suggestions[0].suggestions[0].title}`,
         );
       }
 
@@ -342,9 +350,7 @@ export default function AnalyticsOverviewPage() {
               </Badge>
             )}
           </div>
-          <p className="text-muted-foreground mt-1">
-            Platform-wide analytics and insights
-          </p>
+          <p className="text-muted-foreground mt-1">Platform-wide analytics and insights</p>
         </div>
         <div className="flex items-center gap-3">
           <DateRangePicker value={dateRange} onChange={setDateRange} />
@@ -360,7 +366,7 @@ export default function AnalyticsOverviewPage() {
           <Button
             size="sm"
             className="bg-blue-600 hover:bg-blue-700"
-            onClick={() => window.location.href = "/admin/analytics/export"}
+            onClick={() => (window.location.href = "/admin/analytics/export")}
           >
             <Download className="h-4 w-4 mr-2" />
             Export
@@ -500,9 +506,7 @@ export default function AnalyticsOverviewPage() {
               title="Revenue Trends"
               description="Monthly revenue over time"
               data={revenueTrends}
-              dataKeys={[
-                { key: "revenue", color: "#3b82f6", name: "Revenue" },
-              ]}
+              dataKeys={[{ key: "revenue", color: "#3b82f6", name: "Revenue" }]}
               xAxisKey="month"
               type="area"
               height={300}
@@ -515,7 +519,9 @@ export default function AnalyticsOverviewPage() {
               <div className="text-center">
                 <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                 <p className="text-muted-foreground">No revenue data available yet</p>
-                <p className="text-sm text-muted-foreground mt-1">Revenue trends will appear once you have bookings</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Revenue trends will appear once you have bookings
+                </p>
               </div>
             </div>
           )}
@@ -534,7 +540,9 @@ export default function AnalyticsOverviewPage() {
             <div className="text-center">
               <Building2 className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
               <p className="text-muted-foreground">No accommodation data yet</p>
-              <p className="text-sm text-muted-foreground mt-1">Distribution will appear with bookings</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Distribution will appear with bookings
+              </p>
             </div>
           </div>
         )}
@@ -568,7 +576,10 @@ export default function AnalyticsOverviewPage() {
       ) : (
         <div className="bg-muted/50 border border-border rounded-lg p-6">
           <h3 className="text-lg font-semibold text-foreground mb-2">Top Performing Campgrounds</h3>
-          <p className="text-muted-foreground">No campground performance data available yet. Rankings will appear once you have active campgrounds with bookings.</p>
+          <p className="text-muted-foreground">
+            No campground performance data available yet. Rankings will appear once you have active
+            campgrounds with bookings.
+          </p>
         </div>
       )}
 

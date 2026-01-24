@@ -8,13 +8,13 @@ import {
   Delete,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { TaskType, TaskState, SlaStatus } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/guards';
+} from "@nestjs/common";
+import { TasksService } from "./tasks.service";
+import { TaskType, TaskState, SlaStatus } from "@prisma/client";
+import { JwtAuthGuard } from "../auth/guards";
 
 @UseGuards(JwtAuthGuard)
-@Controller('tasks')
+@Controller("tasks")
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
@@ -41,12 +41,12 @@ export class TasksController {
 
   @Get()
   findAll(
-    @Query('tenantId') tenantId: string,
-    @Query('siteId') siteId?: string,
-    @Query('state') state?: TaskState,
-    @Query('slaStatus') slaStatus?: SlaStatus,
-    @Query('type') type?: TaskType,
-    @Query('assignedToUserId') assignedToUserId?: string,
+    @Query("tenantId") tenantId: string,
+    @Query("siteId") siteId?: string,
+    @Query("state") state?: TaskState,
+    @Query("slaStatus") slaStatus?: SlaStatus,
+    @Query("type") type?: TaskType,
+    @Query("assignedToUserId") assignedToUserId?: string,
   ) {
     return this.tasksService.findAll(tenantId, {
       siteId,
@@ -57,14 +57,14 @@ export class TasksController {
     });
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
+  @Get(":id")
+  findOne(@Param("id") id: string) {
     return this.tasksService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch(":id")
   update(
-    @Param('id') id: string,
+    @Param("id") id: string,
     @Body()
     updateTaskDto: {
       state?: TaskState;
@@ -80,8 +80,8 @@ export class TasksController {
     return this.tasksService.update(id, updateTaskDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete(":id")
+  remove(@Param("id") id: string) {
     return this.tasksService.remove(id);
   }
 }

@@ -62,8 +62,14 @@ describe("shift calculations", () => {
       prisma.staffShift.findUnique.mockResolvedValue({
         id: "shift-1",
         StaffTimeEntry: [
-          { clockInAt: new Date("2024-01-01T10:00:00Z"), clockOutAt: new Date("2024-01-01T12:00:00Z") },
-          { clockInAt: new Date("2024-01-01T13:00:00Z"), clockOutAt: new Date("2024-01-01T14:30:00Z") },
+          {
+            clockInAt: new Date("2024-01-01T10:00:00Z"),
+            clockOutAt: new Date("2024-01-01T12:00:00Z"),
+          },
+          {
+            clockInAt: new Date("2024-01-01T13:00:00Z"),
+            clockOutAt: new Date("2024-01-01T14:30:00Z"),
+          },
         ],
       });
       prisma.shiftApproval.create.mockResolvedValue({ id: "approval-1" });
@@ -74,7 +80,7 @@ describe("shift calculations", () => {
       expect(result.minutes).toBe(210); // 3.5 hours * 60
       expect(prisma.shiftApproval.create).toHaveBeenCalled();
       expect(prisma.staffTimeEntry.updateMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { shiftId: "shift-1" } })
+        expect.objectContaining({ where: { shiftId: "shift-1" } }),
       );
     } finally {
       await close();

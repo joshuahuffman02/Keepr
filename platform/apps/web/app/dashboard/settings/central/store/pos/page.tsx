@@ -10,9 +10,7 @@ export default function POSPage() {
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">POS Settings</h2>
-        <p className="text-muted-foreground mt-1">
-          Configure point-of-sale system settings
-        </p>
+        <p className="text-muted-foreground mt-1">Configure point-of-sale system settings</p>
       </div>
 
       <div className="grid gap-4">

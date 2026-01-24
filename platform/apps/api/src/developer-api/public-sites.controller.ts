@@ -10,36 +10,55 @@ import type { ApiPrincipal } from "./types";
 
 class CreateSiteBody {
   @ApiProperty({ description: "Name of the site" })
-  @IsString() @IsNotEmpty() name!: string;
+  @IsString()
+  @IsNotEmpty()
+  name!: string;
 
   @ApiProperty({ description: "Site number/identifier" })
-  @IsString() @IsNotEmpty() siteNumber!: string;
+  @IsString()
+  @IsNotEmpty()
+  siteNumber!: string;
 
   @ApiProperty({ description: "Type of site (e.g. 'rv', 'tent', 'cabin')" })
-  @IsString() @IsNotEmpty() siteType!: string;
+  @IsString()
+  @IsNotEmpty()
+  siteType!: string;
 
   @ApiProperty({ description: "Maximum occupancy" })
-  @IsNumber() maxOccupancy!: number;
+  @IsNumber()
+  maxOccupancy!: number;
 
   @ApiProperty({ description: "Max rig length in feet", required: false, nullable: true })
-  @IsNumber() @IsOptional() rigMaxLength?: number | null;
+  @IsNumber()
+  @IsOptional()
+  rigMaxLength?: number | null;
 }
 
 class UpdateSiteBody {
   @ApiProperty({ description: "Name of the site", required: false })
-  @IsString() @IsOptional() name?: string;
+  @IsString()
+  @IsOptional()
+  name?: string;
 
   @ApiProperty({ description: "Site number/identifier", required: false })
-  @IsString() @IsOptional() siteNumber?: string;
+  @IsString()
+  @IsOptional()
+  siteNumber?: string;
 
   @ApiProperty({ description: "Type of site", required: false })
-  @IsString() @IsOptional() siteType?: string;
+  @IsString()
+  @IsOptional()
+  siteType?: string;
 
   @ApiProperty({ description: "Maximum occupancy", required: false })
-  @IsNumber() @IsOptional() maxOccupancy?: number;
+  @IsNumber()
+  @IsOptional()
+  maxOccupancy?: number;
 
   @ApiProperty({ description: "Max rig length in feet", required: false, nullable: true })
-  @IsNumber() @IsOptional() rigMaxLength?: number | null;
+  @IsNumber()
+  @IsOptional()
+  rigMaxLength?: number | null;
 }
 
 type ApiRequest = Request & { apiPrincipal: ApiPrincipal };
@@ -48,7 +67,7 @@ type ApiRequest = Request & { apiPrincipal: ApiPrincipal };
 @Controller("developer/sites")
 @UseGuards(ApiTokenGuard, ApiScopeGuard)
 export class PublicSitesController {
-  constructor(private readonly api: PublicApiService) { }
+  constructor(private readonly api: PublicApiService) {}
 
   @Get()
   @ApiScopes("sites:read")

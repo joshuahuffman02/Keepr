@@ -7,6 +7,6 @@ import { OrgReferralsController } from "./org-referrals.controller";
   imports: [PrismaModule],
   controllers: [OrgReferralsController],
   providers: [OrgReferralsService],
-  exports: [OrgReferralsService]
+  exports: [OrgReferralsService],
 })
 export class OrgReferralsModule {}

@@ -1,13 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  UseGuards
-} from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, UseGuards } from "@nestjs/common";
 import { EarlyAccessService } from "./early-access.service";
-import { EnrollEarlyAccessDto, EarlyAccessTierType, EarlyAccessSignupDto } from "./dto/enroll-early-access.dto";
+import {
+  EnrollEarlyAccessDto,
+  EarlyAccessTierType,
+  EarlyAccessSignupDto,
+} from "./dto/enroll-early-access.dto";
 import { JwtAuthGuard, Roles, RolesGuard } from "../auth/guards";
 import { UserRole } from "@prisma/client";
 
@@ -39,13 +36,13 @@ export class EarlyAccessController {
   async getStatus() {
     const [isActive, enrolledCount] = await Promise.all([
       this.earlyAccess.isProgramActive(),
-      this.earlyAccess.getEnrolledCount()
+      this.earlyAccess.getEnrolledCount(),
     ]);
 
     return {
       isActive,
       enrolledCount,
-      totalSpots: 45 // 5 + 15 + 25
+      totalSpots: 45, // 5 + 15 + 25
     };
   }
 

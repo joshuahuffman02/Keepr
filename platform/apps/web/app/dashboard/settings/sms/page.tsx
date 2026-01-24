@@ -20,7 +20,7 @@ import {
   EyeOff,
   Loader2,
   Info,
-  Building2
+  Building2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -41,9 +41,8 @@ export default function SmsSettingsPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined"
-      ? localStorage.getItem("campreserv:selectedCampground")
-      : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) setCampgroundId(stored);
   }, []);
 
@@ -51,7 +50,7 @@ export default function SmsSettingsPage() {
   const settingsQuery = useQuery({
     queryKey: ["sms-settings", campgroundId],
     queryFn: () => apiClient.getSmsSettings(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Form state
@@ -84,8 +83,8 @@ export default function SmsSettingsPage() {
       return apiClient.updateSmsSettings(campgroundId, {
         // Only set smsEnabled if they have their own account (otherwise platform handles it)
         smsEnabled: useOwnAccount ? true : undefined,
-        twilioAccountSid: useOwnAccount ? (twilioAccountSid || null) : null,
-        twilioAuthToken: useOwnAccount ? (twilioAuthToken || undefined) : null,
+        twilioAccountSid: useOwnAccount ? twilioAccountSid || null : null,
+        twilioAuthToken: useOwnAccount ? twilioAuthToken || undefined : null,
         twilioFromNumber: twilioFromNumber || null,
         smsWelcomeMessage: smsWelcomeMessage || null,
       });
@@ -102,9 +101,9 @@ export default function SmsSettingsPage() {
       toast({
         title: "Save failed",
         description: getErrorMessage(err, "Please try again."),
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Check configuration status
@@ -114,7 +113,9 @@ export default function SmsSettingsPage() {
   if (!campgroundId) {
     return (
       <div className="max-w-4xl">
-        <div className="p-6 text-muted-foreground">Select or create a campground to manage SMS settings.</div>
+        <div className="p-6 text-muted-foreground">
+          Select or create a campground to manage SMS settings.
+        </div>
       </div>
     );
   }
@@ -173,8 +174,16 @@ export default function SmsSettingsPage() {
         <CardHeader>
           <CardTitle>Assigned Phone Number</CardTitle>
           <CardDescription>
-            The Twilio phone number this campground will use for SMS.
-            Buy numbers in your <a href="https://console.twilio.com/us1/develop/phone-numbers/manage/incoming" target="_blank" rel="noopener noreferrer" className="text-emerald-600 hover:underline">Twilio Console</a>.
+            The Twilio phone number this campground will use for SMS. Buy numbers in your{" "}
+            <a
+              href="https://console.twilio.com/us1/develop/phone-numbers/manage/incoming"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-600 hover:underline"
+            >
+              Twilio Console
+            </a>
+            .
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -198,9 +207,7 @@ export default function SmsSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Message Settings</CardTitle>
-          <CardDescription>
-            Customize SMS behavior for this campground.
-          </CardDescription>
+          <CardDescription>Customize SMS behavior for this campground.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -225,9 +232,7 @@ export default function SmsSettingsPage() {
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="space-y-2">
-              <p className="text-sm font-medium text-blue-900">
-                SMS Billing
-              </p>
+              <p className="text-sm font-medium text-blue-900">SMS Billing</p>
               <p className="text-sm text-blue-700">
                 SMS usage is tracked per campground. You'll see SMS charges on your monthly invoice
                 based on messages sent and received (~$0.0079/message for US numbers).
@@ -250,10 +255,7 @@ export default function SmsSettingsPage() {
                 Optionally use your own Twilio account instead of the platform's.
               </CardDescription>
             </div>
-            <Switch
-              checked={useOwnAccount}
-              onCheckedChange={setUseOwnAccount}
-            />
+            <Switch checked={useOwnAccount} onCheckedChange={setUseOwnAccount} />
           </div>
         </CardHeader>
         {useOwnAccount && (
@@ -261,7 +263,8 @@ export default function SmsSettingsPage() {
             <div className="flex items-start gap-2 text-amber-700 bg-amber-50 rounded-lg p-3">
               <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
               <p className="text-sm">
-                With your own Twilio account, SMS costs are billed directly by Twilio to you, not through Campreserv.
+                With your own Twilio account, SMS costs are billed directly by Twilio to you, not
+                through Campreserv.
               </p>
             </div>
 
@@ -318,16 +321,10 @@ export default function SmsSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-between items-center pt-4 border-t">
-        <Link
-          href="/messages"
-          className="text-sm text-muted-foreground hover:text-emerald-600"
-        >
+        <Link href="/messages" className="text-sm text-muted-foreground hover:text-emerald-600">
           Go to Messages
         </Link>
-        <Button
-          onClick={() => saveMutation.mutate()}
-          disabled={saveMutation.isPending}
-        >
+        <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />

@@ -12,7 +12,16 @@ type SignatureType =
 type DeliveryChannel = "email" | "sms" | "email_and_sms";
 type SignatureMethod = "digital" | "paper" | "waived";
 
-const SIGNATURE_TYPES: SignatureType[] = ["long_term_stay", "seasonal", "monthly", "park_rules", "deposit", "waiver", "coi", "other"];
+const SIGNATURE_TYPES: SignatureType[] = [
+  "long_term_stay",
+  "seasonal",
+  "monthly",
+  "park_rules",
+  "deposit",
+  "waiver",
+  "coi",
+  "other",
+];
 const DELIVERY_CHANNELS: DeliveryChannel[] = ["email", "sms", "email_and_sms"];
 const SIGNATURE_METHODS: SignatureMethod[] = ["digital", "paper", "waived"];
 

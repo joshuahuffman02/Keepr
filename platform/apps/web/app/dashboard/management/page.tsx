@@ -239,7 +239,7 @@ export default function ManagementLandingPage() {
       links: category.links.filter(
         (link) =>
           link.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          link.description.toLowerCase().includes(searchQuery.toLowerCase())
+          link.description.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
     }))
     .filter((category) => category.links.length > 0 || searchQuery === "");
@@ -336,10 +336,7 @@ export default function ManagementLandingPage() {
                           }`}
                           title={isFavorite ? "Remove from favorites" : "Add to favorites"}
                         >
-                          <Star
-                            className="h-4 w-4"
-                            fill={isFavorite ? "currentColor" : "none"}
-                          />
+                          <Star className="h-4 w-4" fill={isFavorite ? "currentColor" : "none"} />
                         </button>
                       </div>
                     );

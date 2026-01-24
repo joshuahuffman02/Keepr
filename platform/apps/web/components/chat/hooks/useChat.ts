@@ -104,7 +104,11 @@ const isActionRequired = (value: unknown): value is ActionRequired => {
   if (!isRecord(value)) return false;
   const type = value.type;
   if (type !== "confirmation" && type !== "form" && type !== "selection") return false;
-  return typeof value.actionId === "string" && typeof value.title === "string" && typeof value.description === "string";
+  return (
+    typeof value.actionId === "string" &&
+    typeof value.title === "string" &&
+    typeof value.description === "string"
+  );
 };
 
 const toSendMessageResponse = (value: unknown): SendMessageResponse => {
@@ -123,7 +127,9 @@ const toSendMessageResponse = (value: unknown): SendMessageResponse => {
     role: "assistant",
     content,
     toolCalls: Array.isArray(value.toolCalls) ? value.toolCalls.filter(isToolCall) : undefined,
-    toolResults: Array.isArray(value.toolResults) ? value.toolResults.filter(isToolResult) : undefined,
+    toolResults: Array.isArray(value.toolResults)
+      ? value.toolResults.filter(isToolResult)
+      : undefined,
     actionRequired: isActionRequired(value.actionRequired) ? value.actionRequired : undefined,
     createdAt: getString(value.createdAt) ?? new Date().toISOString(),
     visibility: getVisibility(value.visibility),
@@ -362,13 +368,11 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
     },
     onSuccess: (data, variables) => {
       const toolCallId = `tool_${Date.now()}`;
-      const resultPayload =
-        data.result ??
-        {
-          success: data.success,
-          message: data.message,
-          prevalidateFailed: data.prevalidateFailed,
-        };
+      const resultPayload = data.result ?? {
+        success: data.success,
+        message: data.message,
+        prevalidateFailed: data.prevalidateFailed,
+      };
       const assistantMessage: ChatMessage = {
         id: `tool_${Date.now()}`,
         conversationId: conversationId || "",
@@ -499,7 +503,10 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
   });
 
   const sendMessage = useCallback(
-    (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
+    (
+      message: string,
+      options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility },
+    ) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if (!trimmed && (!attachments || attachments.length === 0)) return;
@@ -509,35 +516,35 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
         visibility: options?.visibility,
       });
     },
-    [sendMessageMutation]
+    [sendMessageMutation],
   );
 
   const executeAction = useCallback(
     (actionId: string, optionId: string) => {
       executeActionMutation.mutate({ actionId, optionId });
     },
-    [executeActionMutation]
+    [executeActionMutation],
   );
 
   const executeTool = useCallback(
     (tool: string, args?: Record<string, unknown>) => {
       executeToolMutation.mutate({ tool, args });
     },
-    [executeToolMutation]
+    [executeToolMutation],
   );
 
   const submitFeedback = useCallback(
     (messageId: string, value: "up" | "down") => {
       feedbackMutation.mutate({ messageId, value });
     },
-    [feedbackMutation]
+    [feedbackMutation],
   );
 
   const regenerateMessage = useCallback(
     (messageId: string) => {
       regenerateMutation.mutate(messageId);
     },
-    [regenerateMutation]
+    [regenerateMutation],
   );
 
   const clearMessages = useCallback(() => {
@@ -562,7 +569,7 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
       setMessages(mapped);
       setIsTyping(false);
     },
-    [conversationId]
+    [conversationId],
   );
 
   const setActiveConversation = useCallback((id: string | null) => {

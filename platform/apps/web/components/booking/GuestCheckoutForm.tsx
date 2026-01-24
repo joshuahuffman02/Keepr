@@ -27,14 +27,16 @@ export function GuestCheckoutForm({
   onSubmit,
   onSignIn,
   isLoading = false,
-  className
+  className,
 }: GuestCheckoutFormProps) {
   const prefersReducedMotion = useReducedMotion();
   const [showSignIn, setShowSignIn] = useState(false);
 
   const form = useFormValidation(
     {
-      firstName: { rules: [validators.required("First name is required"), validators.maxLength(50)] },
+      firstName: {
+        rules: [validators.required("First name is required"), validators.maxLength(50)],
+      },
       lastName: { rules: [validators.required("Last name is required"), validators.maxLength(50)] },
       email: { rules: [validators.required("Email is required"), validators.email()] },
       phone: { rules: [validators.required("Phone is required"), validators.phone()] },
@@ -46,7 +48,7 @@ export function GuestCheckoutForm({
       email: "",
       phone: "",
       zipCode: "",
-    }
+    },
   );
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -71,9 +73,7 @@ export function GuestCheckoutForm({
       {/* Header with guest checkout as primary */}
       <div className="text-center space-y-2">
         <h2 className="text-xl font-bold text-foreground">Almost there!</h2>
-        <p className="text-sm text-muted-foreground">
-          Complete your booking in under a minute
-        </p>
+        <p className="text-sm text-muted-foreground">Complete your booking in under a minute</p>
       </div>
 
       {/* Trust badges */}
@@ -121,12 +121,7 @@ export function GuestCheckoutForm({
         />
 
         {/* Phone with auto-formatting */}
-        <PhoneFormField
-          label="Phone"
-          name="phone"
-          required
-          {...form.getFieldProps("phone")}
-        />
+        <PhoneFormField label="Phone" name="phone" required {...form.getFieldProps("phone")} />
 
         {/* ZIP code */}
         <ValidatedFormField
@@ -147,8 +142,19 @@ export function GuestCheckoutForm({
           {isLoading ? (
             <span className="flex items-center gap-2">
               <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
               Processing...
             </span>
@@ -196,9 +202,7 @@ export function GuestCheckoutForm({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
           >
-            <p className="text-sm font-medium text-foreground mb-2">
-              Benefits of signing in:
-            </p>
+            <p className="text-sm font-medium text-foreground mb-2">Benefits of signing in:</p>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li className="flex items-center gap-2">
                 <span className="text-emerald-500">&#10003;</span>
@@ -213,12 +217,7 @@ export function GuestCheckoutForm({
                 Earn loyalty rewards
               </li>
             </ul>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full mt-3"
-              onClick={onSignIn}
-            >
+            <Button type="button" variant="outline" className="w-full mt-3" onClick={onSignIn}>
               <User className="h-4 w-4 mr-2" />
               Sign In
             </Button>
@@ -230,13 +229,7 @@ export function GuestCheckoutForm({
 }
 
 // Compact version for step forms
-export function GuestInfoSummary({
-  guest,
-  onEdit
-}: {
-  guest: GuestInfo;
-  onEdit?: () => void;
-}) {
+export function GuestInfoSummary({ guest, onEdit }: { guest: GuestInfo; onEdit?: () => void }) {
   return (
     <div className="p-4 bg-muted rounded-lg">
       <div className="flex items-center justify-between mb-3">

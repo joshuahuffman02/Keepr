@@ -39,7 +39,7 @@ export class MenuConfigService {
     data: {
       pinnedPages?: string[];
       sidebarCollapsed?: boolean;
-    }
+    },
   ) {
     return this.prisma.userMenuConfig.upsert({
       where: { userId },
@@ -109,7 +109,7 @@ export class MenuConfigService {
     data: {
       pinnedPages: string[];
       sidebarCollapsed?: boolean;
-    }
+    },
   ) {
     // Only migrate if not already migrated
     const existing = await this.prisma.userMenuConfig.findUnique({

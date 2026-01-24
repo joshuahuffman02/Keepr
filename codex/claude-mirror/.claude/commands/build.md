@@ -9,6 +9,7 @@ Build the monorepo in the correct dependency order.
 ## Build Order
 
 The build must follow this order:
+
 1. **Shared** (types/schemas used by both)
 2. **API** (depends on shared)
 3. **Web** (depends on shared)
@@ -18,11 +19,13 @@ The build must follow this order:
 $ARGUMENTS
 
 ### Full Build
+
 ```bash
 pnpm build
 ```
 
 This runs:
+
 ```bash
 pnpm build:shared && pnpm build:api && pnpm build:web
 ```
@@ -30,16 +33,19 @@ pnpm build:shared && pnpm build:api && pnpm build:web
 ### Individual Builds
 
 **Shared only:**
+
 ```bash
 pnpm build:shared
 ```
 
 **API only (includes Prisma generate):**
+
 ```bash
 pnpm build:api
 ```
 
 **Web only:**
+
 ```bash
 pnpm build:web
 ```
@@ -65,21 +71,25 @@ ls platform/apps/web/.next/
 ## Common Build Errors
 
 ### Module not found: @campreserv/shared
+
 ```bash
 pnpm build:shared
 ```
 
 ### Prisma client missing
+
 ```bash
 pnpm --dir platform/apps/api prisma:generate
 ```
 
 ### Type errors in shared types
+
 Check `platform/packages/shared/src/index.ts` for Zod schema issues.
 
 ## CI Build
 
 For CI environments:
+
 ```bash
 pnpm ci
 ```

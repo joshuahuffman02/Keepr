@@ -1,6 +1,19 @@
-import { Body, Controller, Get, Param, Post, Req, UseGuards, UnauthorizedException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
-import { TriggerPosSyncDto, UpsertPosProviderDto, ValidatePosProviderDto } from "./pos-provider.dto";
+import {
+  TriggerPosSyncDto,
+  UpsertPosProviderDto,
+  ValidatePosProviderDto,
+} from "./pos-provider.dto";
 import { PosProviderService } from "./pos-provider.service";
 import type { Request } from "express";
 
@@ -28,14 +41,22 @@ export class PosProviderController {
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/config")
-  configure(@Param("provider") provider: string, @Body() dto: UpsertPosProviderDto, @Req() req: AuthRequest) {
+  configure(
+    @Param("provider") provider: string,
+    @Body() dto: UpsertPosProviderDto,
+    @Req() req: AuthRequest,
+  ) {
     const campgroundId = this.requireCampgroundId(req);
     return this.service.upsertIntegration(campgroundId, provider, dto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/validate")
-  validate(@Param("provider") provider: string, @Body() dto: ValidatePosProviderDto, @Req() req: AuthRequest) {
+  validate(
+    @Param("provider") provider: string,
+    @Body() dto: ValidatePosProviderDto,
+    @Req() req: AuthRequest,
+  ) {
     const campgroundId = this.requireCampgroundId(req);
     return this.service.validateCredentials(campgroundId, provider, dto);
   }
@@ -49,7 +70,11 @@ export class PosProviderController {
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/sync")
-  triggerSync(@Param("provider") provider: string, @Body() dto: TriggerPosSyncDto, @Req() req: AuthRequest) {
+  triggerSync(
+    @Param("provider") provider: string,
+    @Body() dto: TriggerPosSyncDto,
+    @Req() req: AuthRequest,
+  ) {
     const campgroundId = this.requireCampgroundId(req);
     return this.service.syncIntegration(campgroundId, provider, dto.target);
   }
@@ -59,7 +84,7 @@ export class PosProviderController {
     @Param("provider") provider: string,
     @Param("campgroundId") campgroundId: string,
     @Body() body: unknown,
-    @Req() req: WebhookRequest
+    @Req() req: WebhookRequest,
   ) {
     const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(body ?? {});
     return this.service.handleWebhook(provider, campgroundId, body, req.headers, rawBody);

@@ -38,7 +38,7 @@ export class MenuConfigController {
   @Patch()
   async updateConfig(
     @Req() req: AuthenticatedRequest,
-    @Body() body: { pinnedPages?: string[]; sidebarCollapsed?: boolean }
+    @Body() body: { pinnedPages?: string[]; sidebarCollapsed?: boolean },
   ) {
     const userId = req.user.id;
     return this.menuConfig.updateConfig(userId, body);
@@ -49,10 +49,7 @@ export class MenuConfigController {
    */
   @Post("pin")
   @HttpCode(HttpStatus.OK)
-  async pinPage(
-    @Req() req: AuthenticatedRequest,
-    @Body() body: { href: string }
-  ) {
+  async pinPage(@Req() req: AuthenticatedRequest, @Body() body: { href: string }) {
     const userId = req.user.id;
     return this.menuConfig.pinPage(userId, body.href);
   }
@@ -61,10 +58,7 @@ export class MenuConfigController {
    * Unpin a page from sidebar
    */
   @Delete("pin/:href")
-  async unpinPage(
-    @Req() req: AuthenticatedRequest,
-    @Param("href") href: string
-  ) {
+  async unpinPage(@Req() req: AuthenticatedRequest, @Param("href") href: string) {
     const userId = req.user.id;
     // URL decode the href parameter
     const decodedHref = decodeURIComponent(href);
@@ -76,10 +70,7 @@ export class MenuConfigController {
    */
   @Post("reorder")
   @HttpCode(HttpStatus.OK)
-  async reorderPages(
-    @Req() req: AuthenticatedRequest,
-    @Body() body: { pinnedPages: string[] }
-  ) {
+  async reorderPages(@Req() req: AuthenticatedRequest, @Body() body: { pinnedPages: string[] }) {
     const userId = req.user.id;
     return this.menuConfig.reorderPages(userId, body.pinnedPages);
   }
@@ -91,7 +82,7 @@ export class MenuConfigController {
   @HttpCode(HttpStatus.OK)
   async migrateFromLocal(
     @Req() req: AuthenticatedRequest,
-    @Body() body: { pinnedPages: string[]; sidebarCollapsed?: boolean }
+    @Body() body: { pinnedPages: string[]; sidebarCollapsed?: boolean },
   ) {
     const userId = req.user.id;
     return this.menuConfig.migrateFromLocal(userId, body);

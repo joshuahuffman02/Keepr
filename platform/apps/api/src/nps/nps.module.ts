@@ -9,7 +9,6 @@ import { SupportModule } from "../support/support.module";
   imports: [EmailModule, SupportModule],
   controllers: [NpsController],
   providers: [NpsService],
-  exports: [NpsService]
+  exports: [NpsService],
 })
-export class NpsModule { }
-
+export class NpsModule {}

@@ -65,15 +65,19 @@ export class RateLimitService {
     if (this.ipHits.size > this.maxMapSize) {
       const toRemove = this.ipHits.size - this.maxMapSize;
       const keys = Array.from(this.ipHits.keys()).slice(0, toRemove);
-      keys.forEach(k => this.ipHits.delete(k));
-      this.logger.warn(`IP rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`);
+      keys.forEach((k) => this.ipHits.delete(k));
+      this.logger.warn(
+        `IP rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`,
+      );
     }
 
     if (this.orgHits.size > this.maxMapSize) {
       const toRemove = this.orgHits.size - this.maxMapSize;
       const keys = Array.from(this.orgHits.keys()).slice(0, toRemove);
-      keys.forEach(k => this.orgHits.delete(k));
-      this.logger.warn(`Org rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`);
+      keys.forEach((k) => this.orgHits.delete(k));
+      this.logger.warn(
+        `Org rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`,
+      );
     }
   }
 
@@ -99,4 +103,3 @@ export class RateLimitService {
     bucket.set(key, arr);
   }
 }
-

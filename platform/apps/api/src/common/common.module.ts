@@ -14,22 +14,12 @@ import { PrismaModule } from "../prisma/prisma.module";
 @Global()
 @Module({
   imports: [PrismaModule],
-  providers: [
-    ApiVersionMiddleware,
-    RateLimitTiersService,
-    RateLimitGuard,
-  ],
-  exports: [
-    ApiVersionMiddleware,
-    RateLimitTiersService,
-    RateLimitGuard,
-  ],
+  providers: [ApiVersionMiddleware, RateLimitTiersService, RateLimitGuard],
+  exports: [ApiVersionMiddleware, RateLimitTiersService, RateLimitGuard],
 })
 export class CommonModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     // Apply API versioning middleware to all v1 routes
-    consumer
-      .apply(ApiVersionMiddleware)
-      .forRoutes("v1/*");
+    consumer.apply(ApiVersionMiddleware).forRoutes("v1/*");
   }
 }

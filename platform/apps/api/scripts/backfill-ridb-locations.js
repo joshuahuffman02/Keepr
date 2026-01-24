@@ -52,10 +52,9 @@ async function main() {
   for (const camp of campgrounds) {
     try {
       // Fetch facility from RIDB
-      const res = await fetch(
-        `${RIDB_BASE_URL}/facilities/${camp.seededDataSourceId}?full=true`,
-        { headers: { apikey: apiKey } }
-      );
+      const res = await fetch(`${RIDB_BASE_URL}/facilities/${camp.seededDataSourceId}?full=true`, {
+        headers: { apikey: apiKey },
+      });
 
       if (!res.ok) {
         console.log(`  Skip ${camp.name}: RIDB returned ${res.status}`);

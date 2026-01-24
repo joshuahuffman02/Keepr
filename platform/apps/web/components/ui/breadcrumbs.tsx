@@ -41,7 +41,7 @@ export function Breadcrumbs({
     : items;
 
   // Normalize items to have both label/name and href/path
-  const normalizedItems = allItems.map(item => ({
+  const normalizedItems = allItems.map((item) => ({
     label: item.label || item.name || "",
     name: item.name || item.label || "",
     href: item.href || item.path,
@@ -56,7 +56,11 @@ export function Breadcrumbs({
           aria-label="Breadcrumb"
           className={cn("flex items-center text-sm text-muted-foreground", className)}
         >
-          <ol className="flex items-center gap-1 flex-wrap" itemScope itemType="https://schema.org/BreadcrumbList">
+          <ol
+            className="flex items-center gap-1 flex-wrap"
+            itemScope
+            itemType="https://schema.org/BreadcrumbList"
+          >
             {normalizedItems.map((item, index) => {
               const isLast = index === normalizedItems.length - 1;
               const isFirst = index === 0;
@@ -86,9 +90,7 @@ export function Breadcrumbs({
                       className="hover:text-action-primary transition-colors flex items-center gap-1"
                       itemProp="item"
                     >
-                      {isFirst && showHome && (
-                        <Home className="h-4 w-4" aria-hidden="true" />
-                      )}
+                      {isFirst && showHome && <Home className="h-4 w-4" aria-hidden="true" />}
                       <span itemProp="name" className="truncate max-w-[150px]">
                         {item.label}
                       </span>
@@ -106,13 +108,19 @@ export function Breadcrumbs({
 
   // Simple breadcrumbs without SEO
   return (
-    <nav aria-label="Breadcrumb" className={cn("flex flex-wrap items-center gap-1 text-sm text-muted-foreground", className)}>
+    <nav
+      aria-label="Breadcrumb"
+      className={cn("flex flex-wrap items-center gap-1 text-sm text-muted-foreground", className)}
+    >
       {normalizedItems.map((item, idx) => {
         const isLast = idx === normalizedItems.length - 1;
         return (
           <span key={`${item.label}-${idx}`} className="flex items-center gap-2">
             {item.href && !isLast ? (
-              <Link href={item.href} className="hover:text-foreground font-medium transition-colors">
+              <Link
+                href={item.href}
+                className="hover:text-foreground font-medium transition-colors"
+              >
                 {item.label}
               </Link>
             ) : (
@@ -158,9 +166,7 @@ export function getCampgroundBreadcrumbs(campground: {
   state?: string | null;
   city?: string | null;
 }): BreadcrumbItem[] {
-  const items: BreadcrumbItem[] = [
-    { name: "Browse Campgrounds", path: "/browse" },
-  ];
+  const items: BreadcrumbItem[] = [{ name: "Browse Campgrounds", path: "/browse" }];
 
   if (campground.state) {
     const stateSlug = campground.state.toLowerCase().replace(/\s+/g, "-");
@@ -190,10 +196,7 @@ export function getCampgroundBreadcrumbs(campground: {
  * Generate breadcrumb items for dashboard pages
  */
 export function getDashboardBreadcrumbs(
-  sections: Array<{ name: string; path: string }>
+  sections: Array<{ name: string; path: string }>,
 ): BreadcrumbItem[] {
-  return [
-    { name: "Dashboard", path: "/dashboard" },
-    ...sections,
-  ];
+  return [{ name: "Dashboard", path: "/dashboard" }, ...sections];
 }

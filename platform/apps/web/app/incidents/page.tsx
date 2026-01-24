@@ -54,12 +54,42 @@ type IncidentReport = Exclude<Awaited<ReturnType<typeof apiClient.getIncidentRep
 
 // Incident type configuration
 const incidentTypes = [
-  { value: "injury", label: "Injury", icon: <Stethoscope className="h-5 w-5" />, color: "text-red-600" },
-  { value: "property_damage", label: "Property Damage", icon: <Wrench className="h-5 w-5" />, color: "text-orange-600" },
-  { value: "safety", label: "Safety Issue", icon: <AlertTriangle className="h-5 w-5" />, color: "text-yellow-600" },
-  { value: "near_miss", label: "Near Miss", icon: <Eye className="h-5 w-5" />, color: "text-blue-600" },
-  { value: "environmental", label: "Environmental", icon: <Leaf className="h-5 w-5" />, color: "text-green-600" },
-  { value: "other", label: "Other", icon: <ClipboardList className="h-5 w-5" />, color: "text-muted-foreground" },
+  {
+    value: "injury",
+    label: "Injury",
+    icon: <Stethoscope className="h-5 w-5" />,
+    color: "text-red-600",
+  },
+  {
+    value: "property_damage",
+    label: "Property Damage",
+    icon: <Wrench className="h-5 w-5" />,
+    color: "text-orange-600",
+  },
+  {
+    value: "safety",
+    label: "Safety Issue",
+    icon: <AlertTriangle className="h-5 w-5" />,
+    color: "text-yellow-600",
+  },
+  {
+    value: "near_miss",
+    label: "Near Miss",
+    icon: <Eye className="h-5 w-5" />,
+    color: "text-blue-600",
+  },
+  {
+    value: "environmental",
+    label: "Environmental",
+    icon: <Leaf className="h-5 w-5" />,
+    color: "text-green-600",
+  },
+  {
+    value: "other",
+    label: "Other",
+    icon: <ClipboardList className="h-5 w-5" />,
+    color: "text-muted-foreground",
+  },
 ];
 
 // Severity configuration
@@ -72,10 +102,26 @@ const severityConfig: Record<string, { color: string; bgColor: string; label: st
 
 // Status configuration
 const statusConfig: Record<string, { color: string; bgColor: string; icon: React.ReactNode }> = {
-  open: { color: "text-amber-700", bgColor: "bg-amber-100", icon: <AlertTriangle className="h-3 w-3" /> },
-  investigating: { color: "text-blue-700", bgColor: "bg-blue-100", icon: <Search className="h-3 w-3" /> },
-  resolved: { color: "text-emerald-700", bgColor: "bg-emerald-100", icon: <CheckCircle2 className="h-3 w-3" /> },
-  closed: { color: "text-foreground", bgColor: "bg-muted", icon: <CheckCircle2 className="h-3 w-3" /> },
+  open: {
+    color: "text-amber-700",
+    bgColor: "bg-amber-100",
+    icon: <AlertTriangle className="h-3 w-3" />,
+  },
+  investigating: {
+    color: "text-blue-700",
+    bgColor: "bg-blue-100",
+    icon: <Search className="h-3 w-3" />,
+  },
+  resolved: {
+    color: "text-emerald-700",
+    bgColor: "bg-emerald-100",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
+  closed: {
+    color: "text-foreground",
+    bgColor: "bg-muted",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
 };
 
 export default function IncidentsPage() {
@@ -115,32 +161,47 @@ export default function IncidentsPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Selected display names
-  const selectedGuest = useMemo(() => guests.find(g => g.id === form.guestId), [guests, form.guestId]);
-  const selectedReservation = useMemo(() => reservations.find(r => r.id === form.reservationId), [reservations, form.reservationId]);
+  const selectedGuest = useMemo(
+    () => guests.find((g) => g.id === form.guestId),
+    [guests, form.guestId],
+  );
+  const selectedReservation = useMemo(
+    () => reservations.find((r) => r.id === form.reservationId),
+    [reservations, form.reservationId],
+  );
 
   // Filtered lists
   const filteredGuests = useMemo(() => {
     if (!guestSearch.trim()) return guests.slice(0, 10);
     const q = guestSearch.toLowerCase();
-    return guests.filter(g => {
-      const name = `${g.primaryFirstName || ""} ${g.primaryLastName || ""}`.toLowerCase();
-      return name.includes(q) || (g.email || "").toLowerCase().includes(q);
-    }).slice(0, 10);
+    return guests
+      .filter((g) => {
+        const name = `${g.primaryFirstName || ""} ${g.primaryLastName || ""}`.toLowerCase();
+        return name.includes(q) || (g.email || "").toLowerCase().includes(q);
+      })
+      .slice(0, 10);
   }, [guests, guestSearch]);
 
   const filteredReservations = useMemo(() => {
     if (!reservationSearch.trim()) return reservations.slice(0, 10);
     const q = reservationSearch.toLowerCase();
-    return reservations.filter(r => {
-      const guestName = `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.toLowerCase();
-      const siteName = (r.site?.name || "").toLowerCase();
-      return guestName.includes(q) || siteName.includes(q) || r.id.toLowerCase().includes(q);
-    }).slice(0, 10);
+    return reservations
+      .filter((r) => {
+        const guestName =
+          `${r.guest?.primaryFirstName || ""} ${r.guest?.primaryLastName || ""}`.toLowerCase();
+        const siteName = (r.site?.name || "").toLowerCase();
+        return guestName.includes(q) || siteName.includes(q) || r.id.toLowerCase().includes(q);
+      })
+      .slice(0, 10);
   }, [reservations, reservationSearch]);
 
   // Stats calculations
-  const openIncidents = incidents.filter(i => i.status === 'open' || i.status === 'investigating').length;
-  const highPriorityIncidents = incidents.filter(i => i.severity === 'critical' || i.severity === 'high').length;
+  const openIncidents = incidents.filter(
+    (i) => i.status === "open" || i.status === "investigating",
+  ).length;
+  const highPriorityIncidents = incidents.filter(
+    (i) => i.severity === "critical" || i.severity === "high",
+  ).length;
 
   useEffect(() => {
     const bootstrap = async () => {
@@ -155,7 +216,7 @@ export default function IncidentsPage() {
           const [list, guestList, resList] = await Promise.all([
             apiClient.listIncidents(cg.id),
             apiClient.getGuests().catch(() => emptyGuests),
-            apiClient.getReservations(cg.id).catch(() => emptyReservations)
+            apiClient.getReservations(cg.id).catch(() => emptyReservations),
           ]);
           setIncidents(list);
           setGuests(guestList);
@@ -238,7 +299,9 @@ export default function IncidentsPage() {
     if (!selectedIncidentId) return;
     setActionLoading("close");
     try {
-      const updated = await apiClient.closeIncident(selectedIncidentId, { resolutionNotes: "Closed from UI" });
+      const updated = await apiClient.closeIncident(selectedIncidentId, {
+        resolutionNotes: "Closed from UI",
+      });
       setIncidents((prev) => prev.map((i) => (i.id === updated.id ? updated : i)));
     } finally {
       setActionLoading(null);
@@ -275,7 +338,8 @@ export default function IncidentsPage() {
     }
   };
 
-  const getTypeConfig = (type: string) => incidentTypes.find(t => t.value === type) || incidentTypes[5];
+  const getTypeConfig = (type: string) =>
+    incidentTypes.find((t) => t.value === type) || incidentTypes[5];
 
   if (loading) {
     return (
@@ -399,13 +463,24 @@ export default function IncidentsPage() {
                         "flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 transition-all text-sm font-medium text-left",
                         form.type === type.value
                           ? "border-emerald-500 bg-emerald-50"
-                          : "border-border hover:border-muted-foreground/30 hover:bg-muted/50"
+                          : "border-border hover:border-muted-foreground/30 hover:bg-muted/50",
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
                     >
-                      <span className={cn(form.type === type.value ? type.color : "text-muted-foreground")}>{type.icon}</span>
-                      <span className={cn("flex-1", form.type === type.value ? "text-emerald-700" : "text-foreground")}>
+                      <span
+                        className={cn(
+                          form.type === type.value ? type.color : "text-muted-foreground",
+                        )}
+                      >
+                        {type.icon}
+                      </span>
+                      <span
+                        className={cn(
+                          "flex-1",
+                          form.type === type.value ? "text-emerald-700" : "text-foreground",
+                        )}
+                      >
                         {type.label}
                       </span>
                       {form.type === type.value && (
@@ -418,8 +493,13 @@ export default function IncidentsPage() {
 
               {/* Severity */}
               <div className="space-y-2">
-                <Label htmlFor="severity" className="text-foreground">Severity Level</Label>
-                <Select value={form.severity} onValueChange={(value) => setForm({ ...form, severity: value })}>
+                <Label htmlFor="severity" className="text-foreground">
+                  Severity Level
+                </Label>
+                <Select
+                  value={form.severity}
+                  onValueChange={(value) => setForm({ ...form, severity: value })}
+                >
                   <SelectTrigger id="severity" className="bg-background border-border">
                     <SelectValue placeholder="Select severity level" />
                   </SelectTrigger>
@@ -439,7 +519,9 @@ export default function IncidentsPage() {
               {/* Notes */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="notes" className="text-foreground">Description</Label>
+                  <Label htmlFor="notes" className="text-foreground">
+                    Description
+                  </Label>
                   <span className="text-xs text-muted-foreground">{form.notes.length}/500</span>
                 </div>
                 <Textarea
@@ -463,7 +545,11 @@ export default function IncidentsPage() {
                   <input
                     type="text"
                     placeholder="Search by guest name or site..."
-                    value={form.reservationId ? `${selectedReservation?.guest?.primaryFirstName || ""} ${selectedReservation?.guest?.primaryLastName || ""} (${selectedReservation?.site?.name || "Site"})` : reservationSearch}
+                    value={
+                      form.reservationId
+                        ? `${selectedReservation?.guest?.primaryFirstName || ""} ${selectedReservation?.guest?.primaryLastName || ""} (${selectedReservation?.site?.name || "Site"})`
+                        : reservationSearch
+                    }
                     onChange={(e) => {
                       setReservationSearch(e.target.value);
                       setForm({ ...form, reservationId: "" });
@@ -475,7 +561,10 @@ export default function IncidentsPage() {
                   {form.reservationId && (
                     <button
                       type="button"
-                      onClick={() => { setForm({ ...form, reservationId: "" }); setReservationSearch(""); }}
+                      onClick={() => {
+                        setForm({ ...form, reservationId: "" });
+                        setReservationSearch("");
+                      }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <X className="h-4 w-4" />
@@ -491,22 +580,35 @@ export default function IncidentsPage() {
                       transition={SPRING_CONFIG}
                       className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
                     >
-                      {filteredReservations.length > 0 ? filteredReservations.map(r => (
-                        <button
-                          key={r.id}
-                          type="button"
-                          onClick={() => {
-                            setForm({ ...form, reservationId: r.id, guestId: r.guest?.id || form.guestId });
-                            setShowReservationDropdown(false);
-                            setReservationSearch("");
-                          }}
-                          className="w-full px-3 py-2.5 text-left hover:bg-muted text-foreground text-sm border-b border-border last:border-b-0 transition-colors"
-                        >
-                          <div className="font-medium">{r.guest?.primaryFirstName} {r.guest?.primaryLastName}</div>
-                          <div className="text-xs text-muted-foreground">{r.site?.name} · {r.arrivalDate?.slice(0, 10)} → {r.departureDate?.slice(0, 10)}</div>
-                        </button>
-                      )) : (
-                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">No reservations found</div>
+                      {filteredReservations.length > 0 ? (
+                        filteredReservations.map((r) => (
+                          <button
+                            key={r.id}
+                            type="button"
+                            onClick={() => {
+                              setForm({
+                                ...form,
+                                reservationId: r.id,
+                                guestId: r.guest?.id || form.guestId,
+                              });
+                              setShowReservationDropdown(false);
+                              setReservationSearch("");
+                            }}
+                            className="w-full px-3 py-2.5 text-left hover:bg-muted text-foreground text-sm border-b border-border last:border-b-0 transition-colors"
+                          >
+                            <div className="font-medium">
+                              {r.guest?.primaryFirstName} {r.guest?.primaryLastName}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {r.site?.name} · {r.arrivalDate?.slice(0, 10)} →{" "}
+                              {r.departureDate?.slice(0, 10)}
+                            </div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                          No reservations found
+                        </div>
                       )}
                     </motion.div>
                   )}
@@ -524,7 +626,11 @@ export default function IncidentsPage() {
                   <input
                     type="text"
                     placeholder="Search by name or email..."
-                    value={form.guestId ? `${selectedGuest?.primaryFirstName || ""} ${selectedGuest?.primaryLastName || ""}` : guestSearch}
+                    value={
+                      form.guestId
+                        ? `${selectedGuest?.primaryFirstName || ""} ${selectedGuest?.primaryLastName || ""}`
+                        : guestSearch
+                    }
                     onChange={(e) => {
                       setGuestSearch(e.target.value);
                       setForm({ ...form, guestId: "" });
@@ -536,7 +642,10 @@ export default function IncidentsPage() {
                   {form.guestId && (
                     <button
                       type="button"
-                      onClick={() => { setForm({ ...form, guestId: "" }); setGuestSearch(""); }}
+                      onClick={() => {
+                        setForm({ ...form, guestId: "" });
+                        setGuestSearch("");
+                      }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <X className="h-4 w-4" />
@@ -552,22 +661,28 @@ export default function IncidentsPage() {
                       transition={SPRING_CONFIG}
                       className="absolute z-10 w-full mt-1 bg-popover border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
                     >
-                      {filteredGuests.length > 0 ? filteredGuests.map(g => (
-                        <button
-                          key={g.id}
-                          type="button"
-                          onClick={() => {
-                            setForm({ ...form, guestId: g.id });
-                            setShowGuestDropdown(false);
-                            setGuestSearch("");
-                          }}
-                          className="w-full px-3 py-2.5 text-left hover:bg-muted text-foreground text-sm border-b border-border last:border-b-0 transition-colors"
-                        >
-                          <div className="font-medium">{g.primaryFirstName} {g.primaryLastName}</div>
-                          <div className="text-xs text-muted-foreground">{g.email}</div>
-                        </button>
-                      )) : (
-                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">No guests found</div>
+                      {filteredGuests.length > 0 ? (
+                        filteredGuests.map((g) => (
+                          <button
+                            key={g.id}
+                            type="button"
+                            onClick={() => {
+                              setForm({ ...form, guestId: g.id });
+                              setShowGuestDropdown(false);
+                              setGuestSearch("");
+                            }}
+                            className="w-full px-3 py-2.5 text-left hover:bg-muted text-foreground text-sm border-b border-border last:border-b-0 transition-colors"
+                          >
+                            <div className="font-medium">
+                              {g.primaryFirstName} {g.primaryLastName}
+                            </div>
+                            <div className="text-xs text-muted-foreground">{g.email}</div>
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-3 py-4 text-sm text-muted-foreground text-center">
+                          No guests found
+                        </div>
                       )}
                     </motion.div>
                   )}
@@ -606,10 +721,16 @@ export default function IncidentsPage() {
             <CardContent className="space-y-4">
               {/* Incident Selector */}
               <div className="space-y-2">
-                <Label htmlFor="select-incident" className="text-foreground">Select Incident</Label>
+                <Label htmlFor="select-incident" className="text-foreground">
+                  Select Incident
+                </Label>
                 <Select value={selectedIncidentId} onValueChange={setSelectedIncidentId}>
                   <SelectTrigger id="select-incident" className="bg-background border-border">
-                    <SelectValue placeholder={incidents.length ? "Select incident to manage" : "No incidents yet"} />
+                    <SelectValue
+                      placeholder={
+                        incidents.length ? "Select incident to manage" : "No incidents yet"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {incidents.map((i) => {
@@ -618,7 +739,7 @@ export default function IncidentsPage() {
                         <SelectItem key={i.id} value={i.id}>
                           <span className="flex items-center gap-2">
                             <span className={typeConfig.color}>{typeConfig.icon}</span>
-                            <span className="capitalize">{i.type.replace('_', ' ')}</span>
+                            <span className="capitalize">{i.type.replace("_", " ")}</span>
                             <span className="text-muted-foreground">·</span>
                             <span className="text-muted-foreground capitalize">{i.status}</span>
                           </span>
@@ -648,7 +769,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || !evidenceUrl || actionLoading === "evidence"}
                     className="gap-2 shrink-0"
                   >
-                    {actionLoading === "evidence" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
+                    {actionLoading === "evidence" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Camera className="h-4 w-4" />
+                    )}
                     <span className="hidden sm:inline">Upload</span>
                   </Button>
                 </div>
@@ -670,7 +795,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || !claimId || actionLoading === "claim"}
                     className="gap-2 shrink-0"
                   >
-                    {actionLoading === "claim" ? <Loader2 className="h-4 w-4 animate-spin" /> : <LinkIcon className="h-4 w-4" />}
+                    {actionLoading === "claim" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <LinkIcon className="h-4 w-4" />
+                    )}
                     <span className="hidden sm:inline">Link</span>
                   </Button>
                 </div>
@@ -692,7 +821,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || !reminderAt || actionLoading === "reminder"}
                     className="gap-2 shrink-0"
                   >
-                    {actionLoading === "reminder" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Clock className="h-4 w-4" />}
+                    {actionLoading === "reminder" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Clock className="h-4 w-4" />
+                    )}
                     <span className="hidden sm:inline">Set</span>
                   </Button>
                 </div>
@@ -714,7 +847,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || !taskTitle || actionLoading === "task"}
                     className="gap-2 shrink-0"
                   >
-                    {actionLoading === "task" ? <Loader2 className="h-4 w-4 animate-spin" /> : <ListTodo className="h-4 w-4" />}
+                    {actionLoading === "task" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <ListTodo className="h-4 w-4" />
+                    )}
                     <span className="hidden sm:inline">Add</span>
                   </Button>
                 </div>
@@ -741,7 +878,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || !coiUrl || actionLoading === "coi"}
                     className="flex-1 gap-2"
                   >
-                    {actionLoading === "coi" ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
+                    {actionLoading === "coi" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <FileText className="h-4 w-4" />
+                    )}
                     Attach COI
                   </Button>
                   <Button
@@ -750,7 +891,11 @@ export default function IncidentsPage() {
                     disabled={!selectedIncidentId || actionLoading === "close"}
                     className="flex-1 gap-2"
                   >
-                    {actionLoading === "close" ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
+                    {actionLoading === "close" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4" />
+                    )}
                     Close Incident
                   </Button>
                 </div>
@@ -820,19 +965,30 @@ export default function IncidentsPage() {
                             "border-2 rounded-xl p-4 cursor-pointer transition-all",
                             isSelected
                               ? "border-emerald-500 bg-emerald-50/50 shadow-md"
-                              : "border-border hover:border-muted-foreground/30 hover:bg-muted/30"
+                              : "border-border hover:border-muted-foreground/30 hover:bg-muted/30",
                           )}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-3 flex-1">
-                              <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center", typeConfig.color, "bg-muted")}>{typeConfig.icon}</div>
+                              <div
+                                className={cn(
+                                  "h-10 w-10 rounded-lg flex items-center justify-center",
+                                  typeConfig.color,
+                                  "bg-muted",
+                                )}
+                              >
+                                {typeConfig.icon}
+                              </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <span className="font-semibold text-foreground capitalize">
-                                    {incident.type.replace('_', ' ')}
+                                    {incident.type.replace("_", " ")}
                                   </span>
                                   {severity && (
-                                    <Badge variant="outline" className={cn("text-xs", severity.bgColor, severity.color)}>
+                                    <Badge
+                                      variant="outline"
+                                      className={cn("text-xs", severity.bgColor, severity.color)}
+                                    >
                                       {severity.label}
                                     </Badge>
                                   )}
@@ -859,13 +1015,18 @@ export default function IncidentsPage() {
                               </div>
                             </div>
                             <div className="flex flex-col items-end gap-2">
-                              <Badge variant="outline" className={cn("text-xs flex items-center gap-1", status.bgColor, status.color)}>
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  "text-xs flex items-center gap-1",
+                                  status.bgColor,
+                                  status.color,
+                                )}
+                              >
                                 {status.icon}
                                 <span className="capitalize">{incident.status}</span>
                               </Badge>
-                              {isSelected && (
-                                <ChevronRight className="h-4 w-4 text-emerald-500" />
-                              )}
+                              {isSelected && <ChevronRight className="h-4 w-4 text-emerald-500" />}
                             </div>
                           </div>
                         </motion.div>
@@ -934,9 +1095,16 @@ export default function IncidentsPage() {
                       <h4 className="font-semibold text-foreground mb-2">By Status</h4>
                       <div className="space-y-2">
                         {report.byStatus.map((status) => (
-                          <div key={status.status} className="flex items-center justify-between text-sm">
-                            <span className="capitalize text-muted-foreground">{status.status}</span>
-                            <span className="font-medium text-foreground">{status._count._all}</span>
+                          <div
+                            key={status.status}
+                            className="flex items-center justify-between text-sm"
+                          >
+                            <span className="capitalize text-muted-foreground">
+                              {status.status}
+                            </span>
+                            <span className="font-medium text-foreground">
+                              {status._count._all}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -947,12 +1115,19 @@ export default function IncidentsPage() {
                         {report.byType.map((item) => {
                           const typeConfig = getTypeConfig(item.type);
                           return (
-                            <div key={item.type} className="flex items-center justify-between text-sm">
+                            <div
+                              key={item.type}
+                              className="flex items-center justify-between text-sm"
+                            >
                               <span className="flex items-center gap-2">
                                 <span className={typeConfig.color}>{typeConfig.icon}</span>
-                                <span className="capitalize text-muted-foreground">{item.type.replace('_', ' ')}</span>
+                                <span className="capitalize text-muted-foreground">
+                                  {item.type.replace("_", " ")}
+                                </span>
                               </span>
-                              <span className="font-medium text-foreground">{item._count._all}</span>
+                              <span className="font-medium text-foreground">
+                                {item._count._all}
+                              </span>
                             </div>
                           );
                         })}

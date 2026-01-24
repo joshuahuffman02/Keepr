@@ -25,26 +25,31 @@ Acquiring new guests is expensive. Keeping existing ones coming back is where re
 ## Retention Strategies
 
 ### 1. Capture Contact Information
+
 - Email at every booking
 - Mobile number for texts
 - Mailing address for select marketing
 
 ### 2. Follow Up After Every Stay
+
 - Thank you email within 24 hours
 - Review request 3-5 days after
 - "See you next time" sentiment
 
 ### 3. Stay in Touch
+
 - Monthly newsletter with updates
 - Early access to event bookings
 - Seasonal promotions for past guests
 
 ### 4. Recognize Returning Guests
+
 - Note in their record
 - Welcome back greeting at check-in
 - Small gesture (upgrade, gift)
 
 ### 5. Loyalty Program
+
 - Points or stays toward rewards
 - Exclusive benefits for members
 - Status recognition
@@ -69,4 +74,4 @@ Acquiring new guests is expensive. Keeping existing ones coming back is where re
 
 ---
 
-*Keepr tracks guest history so you can recognize returning guests and personalize their experience. [Build loyalty at campreserv.com](https://campreserv.com)*
+_Keepr tracks guest history so you can recognize returning guests and personalize their experience. [Build loyalty at campreserv.com](https://campreserv.com)_

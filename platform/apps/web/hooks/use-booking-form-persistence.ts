@@ -94,13 +94,9 @@ interface UseBookingFormPersistenceReturn {
 }
 
 export function useBookingFormPersistence(
-  options: UseBookingFormPersistenceOptions = {}
+  options: UseBookingFormPersistenceOptions = {},
 ): UseBookingFormPersistenceReturn {
-  const {
-    storageKey = STORAGE_KEY,
-    expiryDuration = EXPIRY_DURATION_MS,
-    onRestore,
-  } = options;
+  const { storageKey = STORAGE_KEY, expiryDuration = EXPIRY_DURATION_MS, onRestore } = options;
 
   const [restoredData, setRestoredData] = useState<Partial<BookingFormData> | null>(null);
   const [isExpired, setIsExpired] = useState(false);
@@ -159,7 +155,7 @@ export function useBookingFormPersistence(
         console.warn("[BookingFormPersistence] Failed to save data:", error);
       }
     },
-    [storageKey, expiryDuration]
+    [storageKey, expiryDuration],
   );
 
   const clearFormData = useCallback(() => {
@@ -187,10 +183,7 @@ export function useBookingFormPersistence(
 /**
  * Utility to create a debounced save function for auto-saving
  */
-export function createDebouncedSave(
-  saveFn: (data: Partial<BookingFormData>) => void,
-  delay = 500
-) {
+export function createDebouncedSave(saveFn: (data: Partial<BookingFormData>) => void, delay = 500) {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
   return (data: Partial<BookingFormData>) => {

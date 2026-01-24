@@ -74,4 +74,8 @@ export type {
   CardBrand,
 } from "./context/types";
 
-export { PAYMENT_METHOD_INFO, getAvailablePaymentMethods, calculateProcessingFee } from "./context/types";
+export {
+  PAYMENT_METHOD_INFO,
+  getAvailablePaymentMethods,
+  calculateProcessingFee,
+} from "./context/types";

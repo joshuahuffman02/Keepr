@@ -5,11 +5,13 @@ This guide shows how to add visual keyboard hints to buttons and UI elements thr
 ## Using the KeyboardHint Component
 
 ### Import
+
 ```typescript
-import { KeyboardHint } from '@/components/ui/keyboard-hint';
+import { KeyboardHint } from "@/components/ui/keyboard-hint";
 ```
 
 ### Example 1: Search Button with Hint
+
 ```tsx
 <button className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg">
   <SearchIcon />
@@ -21,6 +23,7 @@ import { KeyboardHint } from '@/components/ui/keyboard-hint';
 Result: `[Search Icon] Search [⌘][K]`
 
 ### Example 2: New Booking Button
+
 ```tsx
 <button className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg">
   <PlusIcon />
@@ -30,6 +33,7 @@ Result: `[Search Icon] Search [⌘][K]`
 ```
 
 ### Example 3: Navigation Menu Items
+
 ```tsx
 <Link href="/dashboard" className="flex items-center justify-between px-3 py-2">
   <div className="flex items-center gap-2">
@@ -41,6 +45,7 @@ Result: `[Search Icon] Search [⌘][K]`
 ```
 
 ### Example 4: Modal Close Button
+
 ```tsx
 <div className="modal-footer">
   <button className="btn-secondary">
@@ -53,7 +58,9 @@ Result: `[Search Icon] Search [⌘][K]`
 ## Specific UI Locations to Add Hints
 
 ### 1. AdminTopBar Search Button (Already Done)
+
 Location: `/components/ui/layout/AdminTopBar.tsx`
+
 ```tsx
 <button className="...">
   <SearchIcon />
@@ -63,9 +70,11 @@ Location: `/components/ui/layout/AdminTopBar.tsx`
 ```
 
 ### 2. Sidebar Navigation Items
+
 Location: `/components/ui/layout/DashboardShell.tsx`
 
 Update navigation items to show hints:
+
 ```tsx
 const navigationWithHints = [
   { label: "Dashboard", href: "/dashboard", icon: "dashboard", keys: ["g", "d"] },
@@ -79,6 +88,7 @@ const navigationWithHints = [
 ```
 
 Then in the render:
+
 ```tsx
 <Link href={item.href} className="flex items-center justify-between">
   <span className="flex items-center gap-2">
@@ -86,19 +96,20 @@ Then in the render:
     {item.label}
   </span>
   {!collapsed && item.keys && (
-    <KeyboardHint keys={item.keys} className="opacity-0 group-hover:opacity-70 transition-opacity" />
+    <KeyboardHint
+      keys={item.keys}
+      className="opacity-0 group-hover:opacity-70 transition-opacity"
+    />
   )}
 </Link>
 ```
 
 ### 3. New Booking Button
+
 Location: Anywhere the "New Booking" button appears
 
 ```tsx
-<button
-  onClick={() => router.push('/booking')}
-  className="btn-primary flex items-center gap-2"
->
+<button onClick={() => router.push("/booking")} className="btn-primary flex items-center gap-2">
   <PlusIcon className="h-4 w-4" />
   <span>New Booking</span>
   <KeyboardHint keys={["cmd", "n"]} className="ml-2 opacity-70" />
@@ -106,14 +117,11 @@ Location: Anywhere the "New Booking" button appears
 ```
 
 ### 4. Help Button
+
 Location: `/components/ui/layout/AdminTopBar.tsx`
 
 ```tsx
-<button
-  onClick={() => setIsHelpPanelOpen(true)}
-  title="Help & Support"
-  className="relative group"
->
+<button onClick={() => setIsHelpPanelOpen(true)} title="Help & Support" className="relative group">
   <HelpIcon />
   <span className="sr-only">Help</span>
   <div className="absolute bottom-full mb-2 hidden group-hover:block">
@@ -123,6 +131,7 @@ Location: `/components/ui/layout/AdminTopBar.tsx`
 ```
 
 ### 5. Search Results
+
 When showing search results, you can add hints:
 
 ```tsx
@@ -142,17 +151,21 @@ When showing search results, you can add hints:
 ## Best Practices
 
 ### 1. Don't Overuse
+
 Only show hints for:
+
 - Primary actions (search, new booking, etc.)
 - Navigation shortcuts
 - Modal/dialog actions (close, submit)
 
 ### 2. Hide on Mobile
+
 ```tsx
 <KeyboardHint keys={["cmd", "k"]} className="hidden md:inline-flex" />
 ```
 
 ### 3. Show on Hover for Secondary Actions
+
 ```tsx
 <button className="group">
   <span>Action</span>
@@ -164,12 +177,11 @@ Only show hints for:
 ```
 
 ### 4. Tooltip Alternative
+
 For buttons with just an icon, use a tooltip:
+
 ```tsx
-<button
-  title="New Booking (⌘N)"
-  className="p-2 rounded-lg hover:bg-slate-100"
->
+<button title="New Booking (⌘N)" className="p-2 rounded-lg hover:bg-slate-100">
   <PlusIcon />
 </button>
 ```
@@ -183,22 +195,19 @@ For buttons with just an icon, use a tooltip:
 ## Styling Tips
 
 ### Subtle Hints
+
 ```tsx
-<KeyboardHint
-  keys={["cmd", "k"]}
-  className="opacity-60 hover:opacity-100 transition-opacity"
-/>
+<KeyboardHint keys={["cmd", "k"]} className="opacity-60 hover:opacity-100 transition-opacity" />
 ```
 
 ### Colored Backgrounds
+
 ```tsx
-<KeyboardHint
-  keys={["escape"]}
-  className="bg-red-50 border-red-200 text-red-700"
-/>
+<KeyboardHint keys={["escape"]} className="bg-red-50 border-red-200 text-red-700" />
 ```
 
 ### Dark Mode
+
 ```tsx
 <KeyboardHint
   keys={["g", "d"]}
@@ -209,15 +218,15 @@ For buttons with just an icon, use a tooltip:
 ## Example: Complete Button with All Features
 
 ```tsx
-import { KeyboardHint } from '@/components/ui/keyboard-hint';
-import { Plus } from 'lucide-react';
+import { KeyboardHint } from "@/components/ui/keyboard-hint";
+import { Plus } from "lucide-react";
 
 function NewBookingButton() {
   const router = useRouter();
 
   return (
     <button
-      onClick={() => router.push('/booking')}
+      onClick={() => router.push("/booking")}
       className="group relative inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors shadow-sm"
       aria-label="Create new booking (Cmd+N)"
     >
@@ -234,6 +243,7 @@ function NewBookingButton() {
 ```
 
 This creates a button that:
+
 - Has an icon
 - Shows clear text
 - Displays keyboard hint on desktop only

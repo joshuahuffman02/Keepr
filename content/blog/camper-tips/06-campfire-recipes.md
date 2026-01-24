@@ -17,18 +17,21 @@ There's something magical about campfire cooking. Food just tastes better outdoo
 ## Breakfast
 
 ### Campfire Scrambled Eggs
+
 - Crack eggs into a bowl, whisk
 - Cook in cast iron with butter
 - Add cheese, salt, pepper
 - Serve with toast or tortillas
 
 ### Foil Packet Breakfast
+
 - Dice potatoes, onions, peppers
 - Add diced ham or bacon
 - Wrap in foil with butter, salt, pepper
 - Place near coals 15-20 minutes
 
 ### Campfire French Toast
+
 - Beat eggs with milk, cinnamon
 - Dip bread slices
 - Cook on greased cast iron
@@ -39,16 +42,19 @@ There's something magical about campfire cooking. Food just tastes better outdoo
 ## Lunch and Snacks
 
 ### Grilled Cheese
+
 - Butter bread on outside
 - Add cheese (and extras if desired)
 - Cook in foil packet or cast iron
 
 ### Campfire Hot Dogs
+
 - Skewer on roasting stick
 - Cook over flames, rotating
 - Serve with all the fixings
 
 ### Walking Tacos
+
 - Individual chip bags
 - Add taco meat, toppings
 - Eat right from the bag!
@@ -58,25 +64,30 @@ There's something magical about campfire cooking. Food just tastes better outdoo
 ## Dinner
 
 ### Foil Packet Dinners
+
 **Classic Hobo Packets:**
+
 - Ground beef patty
 - Sliced potatoes, carrots, onions
 - Salt, pepper, butter
 - Wrap tightly, cook on coals 30-40 min
 
 **Chicken Fajita Packets:**
+
 - Sliced chicken breast
 - Bell peppers, onions
 - Fajita seasoning
 - Wrap in foil, cook 25-30 min
 
 ### Campfire Chili
+
 - Brown ground beef in Dutch oven
 - Add canned beans, tomatoes
 - Add chili seasoning
 - Simmer over fire 30+ min
 
 ### Cast Iron Pizza
+
 - Pre-made pizza dough
 - Press into greased cast iron
 - Add sauce, cheese, toppings
@@ -87,23 +98,27 @@ There's something magical about campfire cooking. Food just tastes better outdoo
 ## Dessert
 
 ### Classic S'mores
+
 - Graham cracker base
 - Toasted marshmallow
 - Chocolate square
 - Sandwich and enjoy!
 
 ### S'mores Variations
+
 - Peanut butter cups instead of chocolate
 - Nutella spread
 - Caramel sauce
 - Different cookies (Oreos, etc.)
 
 ### Campfire Banana Boats
+
 - Slice banana lengthwise (leave skin)
 - Fill with chocolate chips, marshmallows
 - Wrap in foil, heat until melted
 
 ### Dutch Oven Cobbler
+
 - Canned pie filling in Dutch oven
 - Top with cake mix, butter pats
 - Cover and cook on coals 30-45 min
@@ -129,4 +144,4 @@ There's something magical about campfire cooking. Food just tastes better outdoo
 
 ---
 
-*Find campgrounds with great fire pits at [campreserv.com](https://campreserv.com)*
+_Find campgrounds with great fire pits at [campreserv.com](https://campreserv.com)_

@@ -119,7 +119,10 @@ export class RustAuthClientService implements OnModuleInit, OnModuleDestroy {
       const data = HashPasswordResponseSchema.parse(json);
       return data.hash;
     } catch (error) {
-      this.logger.warn("Rust hash failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust hash failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return this.localHashPassword(password, cost);
     }
@@ -154,7 +157,10 @@ export class RustAuthClientService implements OnModuleInit, OnModuleDestroy {
       const data = VerifyPasswordResponseSchema.parse(json);
       return data.valid;
     } catch (error) {
-      this.logger.warn("Rust verify failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust verify failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return this.localVerifyPassword(password, hash);
     }

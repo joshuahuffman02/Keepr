@@ -22,25 +22,25 @@ import { SecurityEventsService } from "./security-events.service";
  */
 @Global()
 @Module({
-    providers: [
-        CsrfService,
-        CsrfGuard,
-        AccountLockoutService,
-        PasswordBreachService,
-        TotpService,
-        PiiEncryptionService,
-        RedisRateLimitService,
-        SecurityEventsService,
-    ],
-    exports: [
-        CsrfService,
-        CsrfGuard,
-        AccountLockoutService,
-        PasswordBreachService,
-        TotpService,
-        PiiEncryptionService,
-        RedisRateLimitService,
-        SecurityEventsService,
-    ],
+  providers: [
+    CsrfService,
+    CsrfGuard,
+    AccountLockoutService,
+    PasswordBreachService,
+    TotpService,
+    PiiEncryptionService,
+    RedisRateLimitService,
+    SecurityEventsService,
+  ],
+  exports: [
+    CsrfService,
+    CsrfGuard,
+    AccountLockoutService,
+    PasswordBreachService,
+    TotpService,
+    PiiEncryptionService,
+    RedisRateLimitService,
+    SecurityEventsService,
+  ],
 })
 export class SecurityModule {}

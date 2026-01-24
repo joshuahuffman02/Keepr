@@ -42,7 +42,7 @@ export function SiteClassPhotoUpload({
         onPhotosChange([...photos, ...newPhotos]);
       }
     },
-    [photos, onPhotosChange, maxPhotos, maxSizeMB]
+    [photos, onPhotosChange, maxPhotos, maxSizeMB],
   );
 
   const handleDrop = useCallback(
@@ -50,7 +50,7 @@ export function SiteClassPhotoUpload({
       e.preventDefault();
       handleFiles(e.dataTransfer.files);
     },
-    [handleFiles]
+    [handleFiles],
   );
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -108,7 +108,7 @@ export function SiteClassPhotoUpload({
           onClick={() => inputRef.current?.click()}
           className={cn(
             "relative flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed transition-colors cursor-pointer",
-            "border-border bg-muted/30 hover:border-border hover:bg-muted/50"
+            "border-border bg-muted/30 hover:border-border hover:bg-muted/50",
           )}
         >
           <input

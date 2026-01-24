@@ -12,6 +12,7 @@
 > "Don't add features, add intelligence to existing features."
 
 Three Pillars:
+
 1. **AI-Native, Not AI-Bolted** - Every feature asks "how can AI make this better?"
 2. **Delightfully Simple, Quietly Powerful** - Hide complexity
 3. **Ecosystem, Not Just Software** - Platform others build on
@@ -23,6 +24,7 @@ Three Pillars:
 Use **ultrathink** for all architecture decisions and AI feature design.
 
 For each task:
+
 1. Mark it `[IN PROGRESS]` when starting
 2. Research thoroughly - understand existing code, consider patterns
 3. Log findings to **Findings Log**
@@ -31,12 +33,14 @@ For each task:
 6. Ask **"Next? (y/n)"** before proceeding
 
 **AI Development Guidelines:**
+
 - Prefer Claude API for conversational/generative tasks
 - Consider cost implications (tokens add up)
 - Build with graceful degradation (works without AI, better with)
 - User always has manual override option
 
 **Reference Skills:**
+
 - `nestjs-api` for backend patterns
 - `ui-development` for frontend
 - `prisma-database` for data models
@@ -48,15 +52,18 @@ For each task:
 Before any V2 work, V1 must be solid.
 
 ### 0.1 Critical Bug Fixes (From Audit)
+
 - [x] Payment amount not updating on online booking - FIXED
 - [x] Multi-tenant scope guards on 14 controllers - FIXED
 
 ### 0.2 Complete Stubbed Features
+
 - [x] **Wallet/Gift Card UI** - DONE: Already fully implemented (backend controller, service, frontend API client, PaymentContext loading, GuestWalletMethod UI)
 - [x] **OTA Integrations** - DONE: Full implementation exists (channels, mappings, iCal import/export, webhooks, monitoring). Provider HTTP calls stubbed awaiting credentials.
 - [x] **Multi-currency FX** - DONE: OpenExchangeRates integration with hourly cron, graceful degradation to manual rates
 
 ### 0.3 Infrastructure Upgrades
+
 - [x] **Redis Migration** - DONE: All critical services now use Redis with graceful fallback
   - [x] Session storage - Already uses RedisService
   - [x] Rate limiting state - RedisRateLimitService already complete
@@ -77,6 +84,7 @@ Before any V2 work, V1 must be solid.
   - [x] Synthetic checks for critical paths - SyntheticChecksService with 5-min cron
 
 ### 0.4 Seasonal Auto-Scheduler
+
 - [x] **Cron job for past_due status** - DONE: Daily at 1:00 AM, also sends overdue notification emails
 - [x] **Payment reminder notifications** - DONE:
   - Weekly reminders (Mondays 9 AM) for payments due within 7 days
@@ -93,23 +101,27 @@ Before any V2 work, V1 must be solid.
 **Goal**: "Find me a pet-friendly RV site next weekend under $50/night"
 
 #### 1.1.1 Architecture Design
+
 - [x] **Define search intent schema** - DONE: SearchIntent interface with dates, site type, amenities, price, guests, hookups, accessibility, etc.
 - [x] **Choose approach**: Option A (Claude API parses query -> structured search params -> existing availability API)
 - [x] **Design fallback** - DONE: fallbackParse() uses regex for dates, keywords, price extraction
 
 #### 1.1.2 Backend Implementation
+
 - [x] **Create NL Search endpoint** - POST /public/campgrounds/:slug/search (30 req/min rate limit)
 - [x] **Claude integration** - AiNaturalSearchService uses AiProviderService with structured output
 - [x] **Map to existing search** - Uses getPublicAvailability API to fetch available sites
 - [x] **Return ranked results** - Site scoring algorithm with matchReasons explanation
 
 #### 1.1.3 Frontend Implementation
+
 - [x] **Search bar component** - NaturalLanguageSearch.tsx added to DateStep on booking page
 - [x] **Typeahead suggestions** - Example queries shown on focus
 - [x] **Results display** - Shows AI interpretation, match scores, amenity badges
 - [x] **"Apply & View Sites"** - One-click to apply intent and proceed to site selection
 
 #### 1.1.4 Testing & Polish
+
 - [x] **Test edge cases** - DONE: AiEdgeCasesService handles vague queries, impossible requests, typos with fuzzy matching
 - [x] **Measure latency** - DONE: AiCostTrackingService tracks latency with p50/p90/p95/p99 percentiles
 - [x] **Cost monitoring** - DONE: Full cost tracking by feature, model, campground with budget alerts
@@ -121,18 +133,21 @@ Before any V2 work, V1 must be solid.
 **Goal**: Auto-draft replies, sentiment flagging on guest messages
 
 #### 1.2.1 Sentiment Analysis - DONE
+
 - [x] **Analyze incoming messages** - AiSentimentService with Claude API + fallback
 - [x] **Tag urgency** - Urgency levels (low/normal/high/critical), intent detection
 - [x] **Dashboard indicators** - SentimentBadge, SentimentScore, SentimentSummary components
 - [x] **Webhook integration** - Auto-analyzes Twilio SMS and Postmark email inbound
 
 #### 1.2.2 Auto-Draft Replies - EXISTING
+
 - [x] **Generate draft responses** - AiReplyAssistService already exists
 - [x] **Context-aware** - AiAutoReplyService with reservation context
 - [x] **Tone matching** - AI-powered via AiProviderService
 - [x] **Template library** - AutopilotConfig manages templates
 
 #### 1.2.3 Smart Compose - DONE
+
 - [x] **Inline suggestions** - AiSmartComposeService with local phrase matching + AI completion
 - [x] **Grammar/tone check** - checkGrammarAndTone() with AI-powered analysis
 - [x] **Quick replies** - getQuickReplies() with context-aware templates
@@ -144,17 +159,20 @@ Before any V2 work, V1 must be solid.
 **Goal**: "Revenue down 15% vs last year - here's why"
 
 #### 1.3.1 Anomaly Narratives - EXISTING
+
 - [x] **Generate explanations** - AiAnomalyDetectionService generates AI explanations with context
 - [x] **Suggest actions** - suggestedAction field with AI-powered recommendations
 - [ ] **Compare to benchmarks** - Would need external data sources (deferred)
 
 #### 1.3.2 Morning Briefing - DONE
+
 - [x] **Daily AI summary** - AiMorningBriefingService generates comprehensive briefing
 - [x] **Arrivals preview** - Special requests, VIPs, guest counts
 - [x] **Weather impact** - Integrates weather alerts if available
 - [x] **Cron email delivery** - Daily at 7 AM with beautiful HTML email
 
 #### 1.3.3 Proactive Alerts - DONE
+
 - [x] **Opportunity alerts** - Detects high demand periods, gap nights, last-minute availability
 - [x] **Maintenance reminders** - High-priority overdue tickets
 - [x] **Revenue potential** - Shows estimated revenue for each opportunity
@@ -167,12 +185,14 @@ Before any V2 work, V1 must be solid.
 **Goal**: "Show me revenue by site type last quarter"
 
 #### 1.4.1 Natural Language Queries - DONE
+
 - [x] **Parse report requests** - AiReportQueryService parses NL to ReportQueryInput
 - [x] **Map to report registry** - Uses existing 135+ report templates from registry
 - [x] **Fallback parser** - Rule-based fallback when AI fails
 - [ ] **Custom aggregations** - Would require SQL generation (deferred for safety)
 
 #### 1.4.2 Report Narratives - DONE
+
 - [x] **Summarize reports** - generateNarrative() creates key takeaways
 - [x] **Key findings** - Extracts bullet point insights from data
 - [x] **Recommendations** - AI suggests actions when appropriate
@@ -185,16 +205,19 @@ Before any V2 work, V1 must be solid.
 **Goal**: AI writes subject lines, suggests send times
 
 #### 1.5.1 Subject Line Generator - DONE
+
 - [x] **Generate options** - AiCampaignService.generateSubjectLines() returns 5 options with tone/reasoning
 - [x] **A/B test suggestions** - generateAbTest() creates test variations with hypothesis
 - [ ] **Performance learning** - Track opens, improve over time (deferred - needs email tracking data)
 
 #### 1.5.2 Send Time Optimization - DONE
+
 - [x] **Campaign type rules** - Industry best practices by campaign type (promotional, newsletter, seasonal, etc.)
 - [x] **Suggested alternatives** - Provides recommended + 3 alternative times with reasoning
 - [x] **Send time insights** - General tips for email timing
 
 #### 1.5.3 Content Suggestions - DONE
+
 - [x] **Draft email body** - generateContent() creates headline, body, CTA with template variables
 - [x] **Content improvement** - improveContent() with goals: clarity, urgency, warmth, brevity, persuasion
 - [ ] **Image suggestions** - Would require media library API (deferred)
@@ -208,6 +231,7 @@ Before any V2 work, V1 must be solid.
 **Goal**: Airline-style revenue optimization interface
 
 #### 2.1.1 Backend Infrastructure - DONE
+
 - [x] **AiYieldService** - Unified yield metrics service with cron snapshots
 - [x] **Occupancy snapshots** - Daily recording at 11:59 PM, backfill support
 - [x] **Yield metrics** - Today + period metrics, ADR, RevPAN, YoY comparison
@@ -216,6 +240,7 @@ Before any V2 work, V1 must be solid.
 - [x] **API endpoints** - /yield/dashboard, /yield/metrics, /yield/forecast, /yield/trend
 
 #### 2.1.2 Frontend Dashboard - DONE
+
 - [x] **Revenue command center** - Yield Command Center page at /ai/yield
 - [x] **Occupancy gauges** - Today, 7-day, and 30-day projections with progress bars
 - [x] **Pricing recommendations** - Top 4 recommendations with impact display
@@ -224,6 +249,7 @@ Before any V2 work, V1 must be solid.
 - [x] **Forecast calendar** - 14-day forecast grid with occupancy levels
 
 #### 2.1.3 Enhancements
+
 - [x] **Real-time WebSocket updates** - DONE: Yield events integrated with RealtimeGateway
 - [x] **Price elasticity display** - DONE: Price sensitivity API + Yield dashboard integration
 - [x] **Competitor comparison** - DONE: Full Competitive Intelligence system implemented
@@ -235,17 +261,20 @@ Before any V2 work, V1 must be solid.
 **Goal**: ML-based 90-day occupancy forecast
 
 #### 2.2.1 Data Pipeline - DONE
+
 - [x] **Feature engineering** - Historical snapshots analysis, seasonality extraction, day-of-week patterns
 - [x] **Holiday detection** - US Federal holidays with demand boost factors
 - [x] **Historical analysis** - Up to 2 years of snapshot data with caching
 
 #### 2.2.2 Model Development - DONE
+
 - [x] **Choose approach** - Statistical ML (exponential smoothing + pattern matching, no heavy frameworks)
 - [x] **Seasonality factors** - Monthly patterns extracted from historical data or industry defaults
 - [x] **Day-of-week factors** - Weekend vs weekday demand patterns
 - [x] **Confidence intervals** - Variance-based intervals that widen with forecast distance
 
 #### 2.2.3 Integration - DONE
+
 - [x] **Daily forecast refresh** - Cron job at 2 AM clears cache and pre-warms forecasts
 - [x] **API endpoints** - GET /demand/forecast, /demand/heatmap, /demand/insights, /demand/analysis
 - [x] **Dashboard integration** - Demand heatmap calendar at /ai/demand with interactive day selection
@@ -257,17 +286,20 @@ Before any V2 work, V1 must be solid.
 **Goal**: Upgrade from rules to ML-driven pricing
 
 #### 2.3.1 ML Pricing Model - DONE
+
 - [x] **Define objective** - RevPAN optimization with elasticity analysis
 - [x] **Price sensitivity analysis** - Historical price elasticity calculation with optimal range
 - [x] **Demand curve estimation** - Price point analysis from booking history
 
 #### 2.3.2 Autopilot Mode - DONE
+
 - [x] **Automated adjustments** - Auto-applies recommendations within guardrails
 - [x] **Guard rails** - Max adjustment %, confidence threshold (70%), blocks large decreases
 - [x] **Human override** - All recommendations visible, can be dismissed
 - [x] **Audit log** - All actions logged via AiAutonomousActionService
 
 #### 2.3.3 A/B Testing - DONE
+
 - [x] **Price experiments** - AiPriceExperiment model with control/test site groups
 - [x] **Statistical significance** - Z-test with p-value < 0.05 threshold
 - [x] **Auto-winner selection** - Optional auto-apply when significance reached
@@ -279,12 +311,14 @@ Before any V2 work, V1 must be solid.
 **Goal**: Track competitor pricing, market positioning
 
 #### 2.4.1 Rate Shopping
+
 - [x] **Legal considerations** - DONE: Manual entry only, no scraping. ToS compliance built-in.
 - [x] **Competitor list** - DONE: Competitor model with CRUD operations
 - [x] **Rate collection** - DONE: CompetitorRate model with date/site_class tracking
 - [x] **Comparison dashboard** - DONE: /ai/competitors page with comparison tabs
 
 #### 2.4.2 Rate Parity Alerts
+
 - [x] **OTA vs direct** - DONE: RateParityAlert model with OTA_UNDERCUT type
 - [x] **Competitor undercutting** - DONE: COMPETITOR_UNDERCUT alert with threshold detection
 - [x] **Positioning insights** - DONE: Market position analysis (cheapest, average, premium)
@@ -296,23 +330,27 @@ Before any V2 work, V1 must be solid.
 ### 3.1 Developer Platform - DONE (Core)
 
 #### 3.1.1 Public REST API
+
 - [x] **OAuth2 implementation** - DONE: OAuth2Service with authorization_code, client_credentials, PKCE support
 - [x] **API versioning** - DONE: ApiVersionMiddleware with /v1/ prefix, X-API-Version header
 - [x] **Rate limiting tiers** - DONE: RateLimitTiersService with free/standard/enterprise (1K/10K/100K per day)
 - [x] **OpenAPI 3.1 spec** - DONE: SwaggerConfig with auto-generation, /api-docs endpoint
 
 #### 3.1.2 GraphQL Endpoint
+
 - [ ] **Schema design** - Deferred: Significant new implementation
 - [ ] **Query complexity limits** - Deferred
 - [ ] **Subscriptions** - Real-time already available via WebSocket gateway
 
 #### 3.1.3 Developer Portal - DONE
+
 - [x] **Documentation site** - DONE: /developers page with tabs (Overview, Quickstart, Auth, Webhooks, SDKs)
 - [ ] **Sandbox environment** - Deferred: Test data seeding available
 - [x] **API key management** - DONE: OAuthClient model with client_id/secret
 - [x] **Usage dashboard** - DONE: Rate limit tracking per client
 
 #### 3.1.4 TypeScript SDK
+
 - [x] **Type-safe client** - EXISTING: @campreserv/sdk package in monorepo
 - [x] **Error handling** - EXISTING: SDK includes error handling
 - [x] **NPM package** - EXISTING: Available as workspace package
@@ -322,13 +360,15 @@ Before any V2 work, V1 must be solid.
 ### 3.2 Webhook 2.0 - DONE
 
 #### 3.2.1 Enhanced Webhooks
+
 - [x] **HMAC signatures** - DONE: WebhookSecurityService with HMAC-SHA256, replay attack prevention
 - [x] **Retry with backoff** - DONE: WebhookDeliveryService with 1s/10s/60s backoff, dead letter queue
 - [x] **Event filtering** - DONE: Webhook subscriptions filter by event type
 - [x] **Delivery logs** - DONE: WebhookLogsService with 30-day retention, statistics
 
 #### 3.2.2 Event Catalog
-- [x] **Document all events** - DONE: event-catalog.ts with all event types (reservation.*, payment.*, guest.*, etc.)
+
+- [x] **Document all events** - DONE: event-catalog.ts with all event types (reservation._, payment._, guest.\*, etc.)
 - [x] **Payload schemas** - DONE: JSON Schema for each event type
 - [x] **Testing tool** - DONE: POST /webhooks/test endpoint to send test events
 
@@ -337,12 +377,14 @@ Before any V2 work, V1 must be solid.
 ### 3.3 Integration Marketplace (v1) - DONE (Framework)
 
 #### 3.3.1 Curated Integrations
+
 - [x] **Accounting** - DONE: QuickBooks stub provider, Xero definition seeded
 - [x] **Email Marketing** - DONE: Mailchimp, Klaviyo definitions seeded
 - [x] **Smart Locks** - DONE: August, Yale, RemoteLock definitions seeded
 - [x] **Insurance** - DONE: Integration definitions seeded (provider connections pending)
 
 #### 3.3.2 Integration Framework
+
 - [x] **OAuth connection flow** - DONE: IntegrationFrameworkService with startOAuthFlow/handleCallback
 - [x] **Data sync** - DONE: MarketplaceSyncLog model, sync triggers defined
 - [x] **Error handling** - DONE: Connection status, error tracking, retry logic
@@ -352,98 +394,99 @@ Before any V2 work, V1 must be solid.
 
 ## Findings Log
 
-| Date | Task | Finding | Impact | Notes |
-|------|------|---------|--------|-------|
-| 2024-12-29 | Wallet/Gift Card UI | Already complete | None | Backend: GuestWalletController + Service. Frontend: apiClient methods, PaymentContext, GuestWalletMethod.tsx |
-| 2024-12-29 | OTA Integrations | API-ready, providers stubbed | None | Full channel/mapping/webhook/iCal/monitoring implementation. Only provider HTTP calls await credentials. |
-| 2024-12-29 | Multi-currency FX | Implemented | Medium | OpenExchangeRates integration. Hourly cron refresh. Endpoints: GET /status, POST /refresh. Env: OPEN_EXCHANGE_RATES_API_KEY |
-| 2024-12-29 | Redis Migration | Mostly already done | Low | RedisService, LockService, RedisRateLimitService were complete. Only AccountLockoutService needed migration (now done). |
-| 2024-12-29 | WebSockets | Fully implemented | High | RealtimeGateway + RealtimeService (global module). Integrated with ReservationsService. Frontend useRealtime hook created. |
-| 2024-12-29 | Seasonal Scheduler | Enhanced | Medium | Added EmailService, payment reminder emails (weekly + urgent), past-due notifications. Scheduler was already partially implemented. |
-| 2024-12-29 | NL Search | Full implementation | High | AiNaturalSearchService with Claude API parsing, fallback regex, site scoring. Frontend component with animated results. |
-| 2024-12-29 | Sentiment Analysis | Full implementation | High | AiSentimentService with Claude API analysis, webhook integration, SentimentBadge components. Urgency/intent detection. |
-| 2024-12-29 | Dashboard Insights | Mostly existing | Medium | AiInsightsService, AiAnomalyDetectionService, AiDashboardService already comprehensive. Added AiMorningBriefingService for daily email. |
-| 2024-12-29 | AI Reports | Full implementation | High | AiReportQueryService parses NL queries to report params using 135+ template registry. Generates narratives with findings/recommendations. |
-| 2024-12-29 | Campaign AI | Full implementation | High | AiCampaignService with subject line generation, content drafting, send time optimization, content improvement, A/B test generation. |
-| 2024-12-29 | Yield Dashboard | Full implementation | High | AiYieldService + Yield Command Center UI. Daily snapshots, yield metrics (ADR, RevPAN, YoY), forecasts, trend charts, recommendations grid. |
-| 2024-12-29 | Demand Forecasting | Full implementation | High | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holidays. 90-day forecasts with confidence intervals. Heatmap calendar UI. |
-| 2024-12-29 | Dynamic Pricing 2.0 | Full implementation | High | Price sensitivity analysis, autopilot mode with guardrails, A/B testing with statistical significance. AiPriceExperiment model. |
-| 2024-12-29 | AI Testing Infrastructure | Full implementation | Medium | AiEdgeCasesService for vague queries/typos, AiCostTrackingService with p50/p90/p95/p99 latency tracking. |
-| 2024-12-29 | Revenue at Risk | Full implementation | Medium | Integrated into morning briefing with high-risk arrivals (no deposit, unpaid balance) and suggested actions. |
-| 2024-12-29 | Real-time Yield | Full implementation | High | WebSocket events for yield metrics, recommendations, forecasts. useYieldUpdates() hook on frontend. |
-| 2024-12-29 | Observability Wiring | Full implementation | High | AlertSinksService (PagerDuty/Slack), PrometheusService (/metrics), SyntheticChecksService (5-min cron). |
-| 2024-12-29 | Competitive Intelligence | Full implementation | High | Competitor/CompetitorRate/RateParityAlert models. Market position, rate parity detection. /ai/competitors UI. |
-| 2024-12-29 | Developer Platform | Full implementation | High | OAuth2Service (auth code, client creds, PKCE), ApiVersionMiddleware, RateLimitTiersService, SwaggerConfig. |
-| 2024-12-29 | Webhook 2.0 | Full implementation | High | WebhookSecurityService (HMAC), WebhookDeliveryService (retry), WebhookLogsService, event-catalog.ts. |
-| 2024-12-29 | Integration Marketplace | Full implementation | High | IntegrationFrameworkService (OAuth), CredentialEncryptionService (AES-256-GCM), IntegrationRegistry. |
-| 2024-12-29 | Job Queues | Full implementation | High | BullQueueService with Redis persistence and memory fallback. Email, webhook, report, sync processors. /admin/queues endpoints. |
-| 2024-12-29 | Price Elasticity | Full implementation | Medium | getPriceSensitivity() API client. Integrated into Yield dashboard with elasticity score, optimal price range, booking distribution. |
-| 2024-12-29 | Smart Compose | Full implementation | Medium | AiSmartComposeService with local phrase matching (20+ common phrases) and AI completion fallback. Grammar/tone check, quick replies. |
-| 2024-12-29 | Developer Portal | Full implementation | High | Enhanced /developers page with 5 tabbed sections, code examples, copy functionality. Links to API key management and OpenAPI spec. |
+| Date       | Task                      | Finding                      | Impact | Notes                                                                                                                                                   |
+| ---------- | ------------------------- | ---------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2024-12-29 | Wallet/Gift Card UI       | Already complete             | None   | Backend: GuestWalletController + Service. Frontend: apiClient methods, PaymentContext, GuestWalletMethod.tsx                                            |
+| 2024-12-29 | OTA Integrations          | API-ready, providers stubbed | None   | Full channel/mapping/webhook/iCal/monitoring implementation. Only provider HTTP calls await credentials.                                                |
+| 2024-12-29 | Multi-currency FX         | Implemented                  | Medium | OpenExchangeRates integration. Hourly cron refresh. Endpoints: GET /status, POST /refresh. Env: OPEN_EXCHANGE_RATES_API_KEY                             |
+| 2024-12-29 | Redis Migration           | Mostly already done          | Low    | RedisService, LockService, RedisRateLimitService were complete. Only AccountLockoutService needed migration (now done).                                 |
+| 2024-12-29 | WebSockets                | Fully implemented            | High   | RealtimeGateway + RealtimeService (global module). Integrated with ReservationsService. Frontend useRealtime hook created.                              |
+| 2024-12-29 | Seasonal Scheduler        | Enhanced                     | Medium | Added EmailService, payment reminder emails (weekly + urgent), past-due notifications. Scheduler was already partially implemented.                     |
+| 2024-12-29 | NL Search                 | Full implementation          | High   | AiNaturalSearchService with Claude API parsing, fallback regex, site scoring. Frontend component with animated results.                                 |
+| 2024-12-29 | Sentiment Analysis        | Full implementation          | High   | AiSentimentService with Claude API analysis, webhook integration, SentimentBadge components. Urgency/intent detection.                                  |
+| 2024-12-29 | Dashboard Insights        | Mostly existing              | Medium | AiInsightsService, AiAnomalyDetectionService, AiDashboardService already comprehensive. Added AiMorningBriefingService for daily email.                 |
+| 2024-12-29 | AI Reports                | Full implementation          | High   | AiReportQueryService parses NL queries to report params using 135+ template registry. Generates narratives with findings/recommendations.               |
+| 2024-12-29 | Campaign AI               | Full implementation          | High   | AiCampaignService with subject line generation, content drafting, send time optimization, content improvement, A/B test generation.                     |
+| 2024-12-29 | Yield Dashboard           | Full implementation          | High   | AiYieldService + Yield Command Center UI. Daily snapshots, yield metrics (ADR, RevPAN, YoY), forecasts, trend charts, recommendations grid.             |
+| 2024-12-29 | Demand Forecasting        | Full implementation          | High   | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holidays. 90-day forecasts with confidence intervals. Heatmap calendar UI. |
+| 2024-12-29 | Dynamic Pricing 2.0       | Full implementation          | High   | Price sensitivity analysis, autopilot mode with guardrails, A/B testing with statistical significance. AiPriceExperiment model.                         |
+| 2024-12-29 | AI Testing Infrastructure | Full implementation          | Medium | AiEdgeCasesService for vague queries/typos, AiCostTrackingService with p50/p90/p95/p99 latency tracking.                                                |
+| 2024-12-29 | Revenue at Risk           | Full implementation          | Medium | Integrated into morning briefing with high-risk arrivals (no deposit, unpaid balance) and suggested actions.                                            |
+| 2024-12-29 | Real-time Yield           | Full implementation          | High   | WebSocket events for yield metrics, recommendations, forecasts. useYieldUpdates() hook on frontend.                                                     |
+| 2024-12-29 | Observability Wiring      | Full implementation          | High   | AlertSinksService (PagerDuty/Slack), PrometheusService (/metrics), SyntheticChecksService (5-min cron).                                                 |
+| 2024-12-29 | Competitive Intelligence  | Full implementation          | High   | Competitor/CompetitorRate/RateParityAlert models. Market position, rate parity detection. /ai/competitors UI.                                           |
+| 2024-12-29 | Developer Platform        | Full implementation          | High   | OAuth2Service (auth code, client creds, PKCE), ApiVersionMiddleware, RateLimitTiersService, SwaggerConfig.                                              |
+| 2024-12-29 | Webhook 2.0               | Full implementation          | High   | WebhookSecurityService (HMAC), WebhookDeliveryService (retry), WebhookLogsService, event-catalog.ts.                                                    |
+| 2024-12-29 | Integration Marketplace   | Full implementation          | High   | IntegrationFrameworkService (OAuth), CredentialEncryptionService (AES-256-GCM), IntegrationRegistry.                                                    |
+| 2024-12-29 | Job Queues                | Full implementation          | High   | BullQueueService with Redis persistence and memory fallback. Email, webhook, report, sync processors. /admin/queues endpoints.                          |
+| 2024-12-29 | Price Elasticity          | Full implementation          | Medium | getPriceSensitivity() API client. Integrated into Yield dashboard with elasticity score, optimal price range, booking distribution.                     |
+| 2024-12-29 | Smart Compose             | Full implementation          | Medium | AiSmartComposeService with local phrase matching (20+ common phrases) and AI completion fallback. Grammar/tone check, quick replies.                    |
+| 2024-12-29 | Developer Portal          | Full implementation          | High   | Enhanced /developers page with 5 tabbed sections, code examples, copy functionality. Links to API key management and OpenAPI spec.                      |
 
 ---
 
 ## AI Feature Decisions
 
-| Feature | Approach | AI Provider | Cost Model | Status |
-|---------|----------|-------------|------------|--------|
-| Natural Language Search | Query parsing | Claude API | Per query | DONE |
-| Message Sentiment | Classification | Claude API | Per message | DONE |
-| Reply Drafts | Generation | Claude API | Per draft | EXISTING |
-| Dashboard Insights | Analysis | Claude API | Daily batch | DONE |
-| Report Queries | Parsing | Claude API | Per query | DONE |
-| Campaign Content | Generation | Claude API | Per generation | DONE |
-| Yield Metrics | Aggregation | None (DB queries) | Free | DONE |
-| Demand Forecasting | Statistical ML | None (pattern matching) | Free | DONE |
-| Dynamic Pricing | Optimization | Custom ML | Training cost | DONE |
-| Competitive Intelligence | Rate comparison | None (manual input) | Free | DONE |
-| Developer Platform | OAuth2/OpenAPI | None | Free | DONE |
-| Webhook 2.0 | Event delivery | None | Free | DONE |
-| Integration Marketplace | OAuth framework | None | Free | DONE |
-| Job Queues | Background processing | None | Free | DONE |
-| Price Elasticity | Statistical analysis | None | Free | DONE |
-| Smart Compose | Local + AI completion | Claude API | Per completion | DONE |
+| Feature                  | Approach              | AI Provider             | Cost Model     | Status   |
+| ------------------------ | --------------------- | ----------------------- | -------------- | -------- |
+| Natural Language Search  | Query parsing         | Claude API              | Per query      | DONE     |
+| Message Sentiment        | Classification        | Claude API              | Per message    | DONE     |
+| Reply Drafts             | Generation            | Claude API              | Per draft      | EXISTING |
+| Dashboard Insights       | Analysis              | Claude API              | Daily batch    | DONE     |
+| Report Queries           | Parsing               | Claude API              | Per query      | DONE     |
+| Campaign Content         | Generation            | Claude API              | Per generation | DONE     |
+| Yield Metrics            | Aggregation           | None (DB queries)       | Free           | DONE     |
+| Demand Forecasting       | Statistical ML        | None (pattern matching) | Free           | DONE     |
+| Dynamic Pricing          | Optimization          | Custom ML               | Training cost  | DONE     |
+| Competitive Intelligence | Rate comparison       | None (manual input)     | Free           | DONE     |
+| Developer Platform       | OAuth2/OpenAPI        | None                    | Free           | DONE     |
+| Webhook 2.0              | Event delivery        | None                    | Free           | DONE     |
+| Integration Marketplace  | OAuth framework       | None                    | Free           | DONE     |
+| Job Queues               | Background processing | None                    | Free           | DONE     |
+| Price Elasticity         | Statistical analysis  | None                    | Free           | DONE     |
+| Smart Compose            | Local + AI completion | Claude API              | Per completion | DONE     |
 
 ---
 
 ## Progress Log
 
-| Date | Phase | Task | Summary |
-|------|-------|------|---------|
-| 2024-12-29 | 1.1 | Natural Language Search | Complete AI-powered search with Claude API parsing, fallback regex, site scoring algorithm, frontend component |
-| 2024-12-29 | 1.2 | AI-Enhanced Messaging | Sentiment analysis with urgency/intent detection, webhook integration, SentimentBadge components. Auto-reply already existed. |
-| 2024-12-29 | 1.3 | AI Dashboard Insights | Morning briefing service with cron email, opportunity detection, arrivals preview. Anomaly narratives already existed. |
-| 2024-12-29 | 1.4 | AI-Enhanced Reports | NL query parsing with 135+ report templates, narrative generation with findings/recommendations, suggested queries. |
-| 2024-12-29 | 1.5 | Campaign AI | Subject line generator with A/B testing, send time optimization, content drafting and improvement. Full API endpoints. |
-| 2024-12-29 | 2.1 | Yield Dashboard | Full implementation: AiYieldService + Yield Command Center UI. KPIs (occupancy, ADR, RevPAN), forecasts, trend charts, recommendations. |
-| 2024-12-29 | 2.2 | Demand Forecasting | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holiday detection. 90-day forecasts with confidence intervals. Heatmap calendar at /ai/demand. |
-| 2024-12-29 | 2.3 | Dynamic Pricing 2.0 | Price sensitivity analysis with elasticity, autopilot mode with guardrails (max %, confidence, block decreases), A/B testing framework with statistical significance. |
-| 2024-12-29 | 2.4 | Competitive Intelligence | Competitor/CompetitorRate/RateParityAlert models. CRUD endpoints, market position analysis, rate parity detection. /ai/competitors frontend. |
-| 2024-12-29 | 0.3 | Observability Wiring | AlertSinksService (PagerDuty/Slack with rate limiting), PrometheusService (/metrics endpoint), SyntheticChecksService (5-min health checks). |
-| 2024-12-29 | 3.1 | Developer Platform | OAuth2Service with authorization_code, client_credentials, PKCE. ApiVersionMiddleware, RateLimitTiersService (free/standard/enterprise), SwaggerConfig. |
-| 2024-12-29 | 3.2 | Webhook 2.0 | WebhookSecurityService (HMAC-SHA256, replay prevention), WebhookDeliveryService (retry with backoff), WebhookLogsService (30-day retention), event-catalog.ts. |
-| 2024-12-29 | 3.3 | Integration Marketplace | IntegrationFrameworkService (OAuth flows), CredentialEncryptionService (AES-256-GCM), IntegrationRegistryService. QuickBooks stub provider, seed data for 7 integrations. |
-| 2024-12-29 | 0.3 | Job Queues (BullMQ) | QueueModule with BullQueueService (Redis persistence, memory fallback). Processors for email, webhook, report, sync. Admin endpoints at /admin/queues. |
-| 2024-12-29 | 2.1 | Price Elasticity | getPriceSensitivity() API client method. Integrated into Yield dashboard with elasticity score, optimal price range, and booking distribution chart. |
-| 2024-12-29 | 1.2 | Smart Compose | AiSmartComposeService with getInlineCompletion(), checkGrammarAndTone(), getQuickReplies(). Local phrase matching for fast completions + AI fallback. |
-| 2024-12-29 | 3.1 | Developer Portal | Enhanced /developers page with tabbed interface (Overview, Quickstart, Auth, Webhooks, SDKs). Code examples with copy functionality. |
+| Date       | Phase | Task                     | Summary                                                                                                                                                                     |
+| ---------- | ----- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2024-12-29 | 1.1   | Natural Language Search  | Complete AI-powered search with Claude API parsing, fallback regex, site scoring algorithm, frontend component                                                              |
+| 2024-12-29 | 1.2   | AI-Enhanced Messaging    | Sentiment analysis with urgency/intent detection, webhook integration, SentimentBadge components. Auto-reply already existed.                                               |
+| 2024-12-29 | 1.3   | AI Dashboard Insights    | Morning briefing service with cron email, opportunity detection, arrivals preview. Anomaly narratives already existed.                                                      |
+| 2024-12-29 | 1.4   | AI-Enhanced Reports      | NL query parsing with 135+ report templates, narrative generation with findings/recommendations, suggested queries.                                                         |
+| 2024-12-29 | 1.5   | Campaign AI              | Subject line generator with A/B testing, send time optimization, content drafting and improvement. Full API endpoints.                                                      |
+| 2024-12-29 | 2.1   | Yield Dashboard          | Full implementation: AiYieldService + Yield Command Center UI. KPIs (occupancy, ADR, RevPAN), forecasts, trend charts, recommendations.                                     |
+| 2024-12-29 | 2.2   | Demand Forecasting       | AiDemandForecastService with ML-style forecasting. Seasonality, day-of-week, holiday detection. 90-day forecasts with confidence intervals. Heatmap calendar at /ai/demand. |
+| 2024-12-29 | 2.3   | Dynamic Pricing 2.0      | Price sensitivity analysis with elasticity, autopilot mode with guardrails (max %, confidence, block decreases), A/B testing framework with statistical significance.       |
+| 2024-12-29 | 2.4   | Competitive Intelligence | Competitor/CompetitorRate/RateParityAlert models. CRUD endpoints, market position analysis, rate parity detection. /ai/competitors frontend.                                |
+| 2024-12-29 | 0.3   | Observability Wiring     | AlertSinksService (PagerDuty/Slack with rate limiting), PrometheusService (/metrics endpoint), SyntheticChecksService (5-min health checks).                                |
+| 2024-12-29 | 3.1   | Developer Platform       | OAuth2Service with authorization_code, client_credentials, PKCE. ApiVersionMiddleware, RateLimitTiersService (free/standard/enterprise), SwaggerConfig.                     |
+| 2024-12-29 | 3.2   | Webhook 2.0              | WebhookSecurityService (HMAC-SHA256, replay prevention), WebhookDeliveryService (retry with backoff), WebhookLogsService (30-day retention), event-catalog.ts.              |
+| 2024-12-29 | 3.3   | Integration Marketplace  | IntegrationFrameworkService (OAuth flows), CredentialEncryptionService (AES-256-GCM), IntegrationRegistryService. QuickBooks stub provider, seed data for 7 integrations.   |
+| 2024-12-29 | 0.3   | Job Queues (BullMQ)      | QueueModule with BullQueueService (Redis persistence, memory fallback). Processors for email, webhook, report, sync. Admin endpoints at /admin/queues.                      |
+| 2024-12-29 | 2.1   | Price Elasticity         | getPriceSensitivity() API client method. Integrated into Yield dashboard with elasticity score, optimal price range, and booking distribution chart.                        |
+| 2024-12-29 | 1.2   | Smart Compose            | AiSmartComposeService with getInlineCompletion(), checkGrammarAndTone(), getQuickReplies(). Local phrase matching for fast completions + AI fallback.                       |
+| 2024-12-29 | 3.1   | Developer Portal         | Enhanced /developers page with tabbed interface (Overview, Quickstart, Auth, Webhooks, SDKs). Code examples with copy functionality.                                        |
 
 ---
 
 ## Open Questions for Josh
 
-| Question | Context | Decision |
-|----------|---------|----------|
-| AI pricing model | Include in base or charge extra? | Pending |
-| Claude vs OpenAI | For conversational features | Pending |
-| QuickBooks priority | For Phase 3 integrations | Pending |
-| Mobile app strategy | PWA vs native for V2? | Pending |
+| Question            | Context                          | Decision |
+| ------------------- | -------------------------------- | -------- |
+| AI pricing model    | Include in base or charge extra? | Pending  |
+| Claude vs OpenAI    | For conversational features      | Pending  |
+| QuickBooks priority | For Phase 3 integrations         | Pending  |
+| Mobile app strategy | PWA vs native for V2?            | Pending  |
 
 ---
 
 ## Session Notes
 
 **How to Start:**
+
 ```
 Read AUTONOMOUS_TASKS_V2.md and work through tasks in order.
 Use ultrathink for all AI feature design and architecture decisions.
@@ -452,4 +495,4 @@ Ask y/n before each task. Show implementation approach before coding.
 ```
 
 **Key Principle:**
-The goal isn't 50 new features. It's making existing features *intelligent*.
+The goal isn't 50 new features. It's making existing features _intelligent_.

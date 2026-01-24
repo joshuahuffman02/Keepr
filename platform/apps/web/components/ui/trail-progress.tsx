@@ -33,10 +33,7 @@ export function TrailProgress({
   return (
     <div className={cn("w-full", className)}>
       <div
-        className={cn(
-          "relative w-full overflow-hidden rounded-full bg-muted",
-          sizeClasses[size]
-        )}
+        className={cn("relative w-full overflow-hidden rounded-full bg-muted", sizeClasses[size])}
       >
         {/* Trail markers */}
         <div className="absolute inset-0 flex justify-between px-1">
@@ -51,9 +48,7 @@ export function TrailProgress({
 
         {/* Progress fill */}
         {indeterminate ? (
-          <div
-            className="absolute inset-0 bg-action-primary/30 animate-pulse"
-          />
+          <div className="absolute inset-0 bg-action-primary/30 animate-pulse" />
         ) : (
           <div
             className="h-full bg-action-primary transition-all duration-300 ease-out rounded-full"
@@ -116,18 +111,15 @@ export function TrailProgressSteps({
           const isCurrent = index === currentStep;
 
           return (
-            <div
-              key={index}
-              className="relative flex flex-col items-center"
-            >
+            <div key={index} className="relative flex flex-col items-center">
               <div
                 className={cn(
                   "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 z-10",
                   isComplete
                     ? "bg-action-primary border-action-primary text-action-primary-foreground"
                     : isCurrent
-                    ? "bg-card border-action-primary text-action-primary"
-                    : "bg-card border-border text-muted-foreground"
+                      ? "bg-card border-action-primary text-action-primary"
+                      : "bg-card border-border text-muted-foreground",
                 )}
               >
                 {isComplete ? (
@@ -145,9 +137,7 @@ export function TrailProgressSteps({
               <span
                 className={cn(
                   "mt-2 text-xs font-medium text-center max-w-[80px]",
-                  isComplete || isCurrent
-                    ? "text-foreground"
-                    : "text-muted-foreground"
+                  isComplete || isCurrent ? "text-foreground" : "text-muted-foreground",
                 )}
               >
                 {checkpoint.label}

@@ -10,7 +10,7 @@ Track Core Web Vitals to identify slow-loading elements:
 // 2. Dashboard → Core Web Vitals → LCP section
 // 3. Debug View shows top 5 problematic elements
 // 4. Use element CSS selector in browser console:
-document.querySelector('.hero-image') // Example element
+document.querySelector(".hero-image"); // Example element
 // 5. Optimize identified elements (lazy loading, compression, etc.)
 ```
 
@@ -49,4 +49,4 @@ Filter by:
 → Mobile traffic from US
 ```
 
-### 5. 
+### 5.

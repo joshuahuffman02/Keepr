@@ -6,11 +6,7 @@ import {
   ConflictException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
-import {
-  CampgroundClaimStatus,
-  ClaimVerificationMethod,
-  Prisma,
-} from "@prisma/client";
+import { CampgroundClaimStatus, ClaimVerificationMethod, Prisma } from "@prisma/client";
 import { randomBytes, randomUUID } from "crypto";
 
 /**
@@ -89,7 +85,7 @@ export class ClaimsService {
 
     if (!campground.seededDataSource) {
       throw new BadRequestException(
-        "This campground was not seeded from external data and cannot be claimed"
+        "This campground was not seeded from external data and cannot be claimed",
       );
     }
 
@@ -98,9 +94,7 @@ export class ClaimsService {
     }
 
     if (campground.claimStatus === CampgroundClaimStatus.claim_pending) {
-      throw new ConflictException(
-        "A claim is already pending for this campground"
-      );
+      throw new ConflictException("A claim is already pending for this campground");
     }
 
     // Check for existing pending claims by this user
@@ -113,17 +107,13 @@ export class ClaimsService {
     });
 
     if (existingClaim) {
-      throw new ConflictException(
-        "You already have a pending claim for this campground"
-      );
+      throw new ConflictException("You already have a pending claim for this campground");
     }
 
     // Generate verification code
     const verificationCode = this.generateVerificationCode();
     const verificationExpiry = new Date();
-    verificationExpiry.setMinutes(
-      verificationExpiry.getMinutes() + this.CODE_EXPIRY_MINUTES
-    );
+    verificationExpiry.setMinutes(verificationExpiry.getMinutes() + this.CODE_EXPIRY_MINUTES);
 
     // Create claim and update campground status in transaction
     const claim = await this.prisma.$transaction(async (tx) => {
@@ -164,9 +154,7 @@ export class ClaimsService {
     // Send verification code based on method
     await this.sendVerificationCode(claim, dto.verificationMethod);
 
-    this.logger.log(
-      `Claim submitted for campground ${dto.campgroundId} by user ${userId}`
-    );
+    this.logger.log(`Claim submitted for campground ${dto.campgroundId} by user ${userId}`);
 
     return {
       id: claim.id,
@@ -207,28 +195,19 @@ export class ClaimsService {
     }
 
     if (claim.status !== "pending") {
-      throw new BadRequestException(
-        `Claim is already ${claim.status}, cannot verify`
-      );
+      throw new BadRequestException(`Claim is already ${claim.status}, cannot verify`);
     }
 
     // Check verification attempts
-    if (
-      claim.verificationAttempts >= this.MAX_VERIFICATION_ATTEMPTS
-    ) {
+    if (claim.verificationAttempts >= this.MAX_VERIFICATION_ATTEMPTS) {
       throw new BadRequestException(
-        "Maximum verification attempts exceeded. Please submit a new claim."
+        "Maximum verification attempts exceeded. Please submit a new claim.",
       );
     }
 
     // Check code expiry
-    if (
-      claim.verificationExpiry &&
-      new Date() > claim.verificationExpiry
-    ) {
-      throw new BadRequestException(
-        "Verification code has expired. Please request a new code."
-      );
+    if (claim.verificationExpiry && new Date() > claim.verificationExpiry) {
+      throw new BadRequestException("Verification code has expired. Please request a new code.");
     }
 
     // Check code match
@@ -258,9 +237,7 @@ export class ClaimsService {
       },
     });
 
-    this.logger.log(
-      `Claim ${dto.claimId} verified for campground ${claim.campgroundId}`
-    );
+    this.logger.log(`Claim ${dto.claimId} verified for campground ${claim.campgroundId}`);
 
     return {
       id: updatedClaim.id,
@@ -338,7 +315,7 @@ export class ClaimsService {
   async approveClaim(
     adminUserId: string,
     claimId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<ClaimDetails> {
     const claim = await this.prisma.campgroundClaim.findUnique({
       where: { id: claimId },
@@ -352,9 +329,7 @@ export class ClaimsService {
     }
 
     if (claim.status !== "verified" && claim.status !== "pending") {
-      throw new BadRequestException(
-        `Claim status is ${claim.status}, cannot approve`
-      );
+      throw new BadRequestException(`Claim status is ${claim.status}, cannot approve`);
     }
 
     // Transfer campground to the claimant's organization
@@ -390,7 +365,7 @@ export class ClaimsService {
     });
 
     this.logger.log(
-      `Claim ${claimId} approved by admin ${adminUserId}, campground transferred to org ${organizationId}`
+      `Claim ${claimId} approved by admin ${adminUserId}, campground transferred to org ${organizationId}`,
     );
 
     return {
@@ -413,11 +388,7 @@ export class ClaimsService {
   /**
    * Admin: Reject a claim
    */
-  async rejectClaim(
-    adminUserId: string,
-    claimId: string,
-    reason: string
-  ): Promise<ClaimDetails> {
+  async rejectClaim(adminUserId: string, claimId: string, reason: string): Promise<ClaimDetails> {
     const claim = await this.prisma.campgroundClaim.findUnique({
       where: { id: claimId },
       include: {
@@ -430,9 +401,7 @@ export class ClaimsService {
     }
 
     if (claim.status === "approved" || claim.status === "rejected") {
-      throw new BadRequestException(
-        `Claim has already been ${claim.status}`
-      );
+      throw new BadRequestException(`Claim has already been ${claim.status}`);
     }
 
     const updatedClaim = await this.prisma.$transaction(async (tx) => {
@@ -465,9 +434,7 @@ export class ClaimsService {
       return updated;
     });
 
-    this.logger.log(
-      `Claim ${claimId} rejected by admin ${adminUserId}: ${reason}`
-    );
+    this.logger.log(`Claim ${claimId} rejected by admin ${adminUserId}: ${reason}`);
 
     return {
       id: updatedClaim.id,
@@ -629,7 +596,7 @@ export class ClaimsService {
    */
   private async sendVerificationCode(
     claim: { claimantEmail: string; claimantPhone: string | null; verificationCode: string | null },
-    method: ClaimVerificationMethod
+    method: ClaimVerificationMethod,
   ): Promise<void> {
     const code = claim.verificationCode;
     if (!code) return;
@@ -637,36 +604,28 @@ export class ClaimsService {
     // TODO: Integrate with actual email/SMS services
     switch (method) {
       case ClaimVerificationMethod.email:
-        this.logger.log(
-          `[TODO] Send email verification code ${code} to ${claim.claimantEmail}`
-        );
+        this.logger.log(`[TODO] Send email verification code ${code} to ${claim.claimantEmail}`);
         // await this.emailService.sendClaimVerification(claim.contactEmail, code);
         break;
 
       case ClaimVerificationMethod.phone:
         this.logger.log(
-          `[TODO] Send SMS verification code ${code} to ${claim.claimantPhone ?? ""}`
+          `[TODO] Send SMS verification code ${code} to ${claim.claimantPhone ?? ""}`,
         );
         // await this.smsService.sendClaimVerification(claim.contactPhone, code);
         break;
 
       case ClaimVerificationMethod.document:
-        this.logger.log(
-          `[TODO] Document verification requested for claim - no code sent`
-        );
+        this.logger.log(`[TODO] Document verification requested for claim - no code sent`);
         // Document verification doesn't use a code
         break;
 
       case ClaimVerificationMethod.domain:
-        this.logger.log(
-          `[TODO] Domain verification - instruct user to add TXT record`
-        );
+        this.logger.log(`[TODO] Domain verification - instruct user to add TXT record`);
         break;
 
       case ClaimVerificationMethod.manual:
-        this.logger.log(
-          `[TODO] Manual verification - admin will review`
-        );
+        this.logger.log(`[TODO] Manual verification - admin will review`);
         break;
     }
   }

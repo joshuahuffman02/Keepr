@@ -5,7 +5,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { DashboardShell } from "../../../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import { Checkbox } from "../../../../../components/ui/checkbox";
@@ -109,10 +115,7 @@ type DiscountForm = Omit<Discount, "id" | "isActive">;
 type IncentiveForm = Omit<Incentive, "id" | "isActive">;
 
 const isBillingFrequency = (value: string): value is BillingFrequency =>
-  value === "monthly" ||
-  value === "quarterly" ||
-  value === "semi_annual" ||
-  value === "seasonal";
+  value === "monthly" || value === "quarterly" || value === "semi_annual" || value === "seasonal";
 
 const isDiscountCondition = (value: string): value is DiscountCondition =>
   value === "metered_utilities" ||
@@ -330,7 +333,7 @@ export default function RateCardsPage() {
     queryFn: async () => {
       const response = await fetch(
         `/api/seasonals/campground/${campgroundId}/rate-cards?seasonYear=${selectedYear}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
       if (!response.ok) throw new Error("Failed to fetch rate cards");
       return response.json();
@@ -469,14 +472,22 @@ export default function RateCardsPage() {
         ) : rateCards.length === 0 ? (
           <Card className="p-12 text-center">
             <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-foreground">No rate cards for {selectedYear}</h3>
+            <h3 className="text-lg font-medium text-foreground">
+              No rate cards for {selectedYear}
+            </h3>
             <p className="text-sm text-muted-foreground mt-1 mb-4">
               Create a rate card to define pricing for seasonal guests
             </p>
-            <Button onClick={() => {
-              setNewRateCard({ ...newRateCard, seasonYear: selectedYear, name: `${selectedYear} Season` });
-              setShowCreateModal(true);
-            }}>
+            <Button
+              onClick={() => {
+                setNewRateCard({
+                  ...newRateCard,
+                  seasonYear: selectedYear,
+                  name: `${selectedYear} Season`,
+                });
+                setShowCreateModal(true);
+              }}
+            >
               <Plus className="h-4 w-4 mr-1" />
               Create Rate Card
             </Button>
@@ -490,9 +501,7 @@ export default function RateCardsPage() {
                     <div>
                       <CardTitle className="text-lg flex items-center gap-2">
                         {rateCard.name}
-                        {rateCard.isDefault && (
-                          <Badge className="bg-blue-500">Default</Badge>
-                        )}
+                        {rateCard.isDefault && <Badge className="bg-blue-500">Default</Badge>}
                         {!rateCard.isActive && (
                           <Badge variant="outline" className="text-muted-foreground">
                             Inactive
@@ -549,29 +558,33 @@ export default function RateCardsPage() {
                       </Button>
                     </div>
                     <div className="space-y-1">
-                      {rateCard.discounts.filter((d) => d.isActive).map((discount) => (
-                        <div
-                          key={discount.id}
-                          className="flex items-center justify-between p-2 bg-emerald-50 rounded text-sm"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Check className="h-3 w-3 text-emerald-600" />
-                            <span>{discount.name}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {conditionLabels[discount.conditionType]}
-                            </Badge>
+                      {rateCard.discounts
+                        .filter((d) => d.isActive)
+                        .map((discount) => (
+                          <div
+                            key={discount.id}
+                            className="flex items-center justify-between p-2 bg-emerald-50 rounded text-sm"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Check className="h-3 w-3 text-emerald-600" />
+                              <span>{discount.name}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {conditionLabels[discount.conditionType]}
+                              </Badge>
+                            </div>
+                            <span className="font-medium text-emerald-700">
+                              {discount.discountType === "percentage"
+                                ? `-${discount.discountAmount}%`
+                                : discount.discountType === "per_month"
+                                  ? `-$${discount.discountAmount}/mo`
+                                  : `-$${discount.discountAmount}`}
+                            </span>
                           </div>
-                          <span className="font-medium text-emerald-700">
-                            {discount.discountType === "percentage"
-                              ? `-${discount.discountAmount}%`
-                              : discount.discountType === "per_month"
-                              ? `-$${discount.discountAmount}/mo`
-                              : `-$${discount.discountAmount}`}
-                          </span>
-                        </div>
-                      ))}
+                        ))}
                       {rateCard.discounts.filter((d) => d.isActive).length === 0 && (
-                        <p className="text-sm text-muted-foreground italic">No discounts configured</p>
+                        <p className="text-sm text-muted-foreground italic">
+                          No discounts configured
+                        </p>
                       )}
                     </div>
                   </div>
@@ -596,25 +609,30 @@ export default function RateCardsPage() {
                       </Button>
                     </div>
                     <div className="space-y-1">
-                      {rateCard.incentives.filter((i) => i.isActive).map((incentive) => (
-                        <div
-                          key={incentive.id}
-                          className="flex items-center justify-between p-2 bg-amber-50 rounded text-sm"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Gift className="h-3 w-3 text-amber-600" />
-                            <span>{incentive.name}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {conditionLabels[incentive.conditionType]}
-                            </Badge>
+                      {rateCard.incentives
+                        .filter((i) => i.isActive)
+                        .map((incentive) => (
+                          <div
+                            key={incentive.id}
+                            className="flex items-center justify-between p-2 bg-amber-50 rounded text-sm"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Gift className="h-3 w-3 text-amber-600" />
+                              <span>{incentive.name}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {conditionLabels[incentive.conditionType]}
+                              </Badge>
+                            </div>
+                            <span className="font-medium text-amber-700">
+                              ${incentive.incentiveValue}{" "}
+                              {incentiveTypeLabels[incentive.incentiveType]}
+                            </span>
                           </div>
-                          <span className="font-medium text-amber-700">
-                            ${incentive.incentiveValue} {incentiveTypeLabels[incentive.incentiveType]}
-                          </span>
-                        </div>
-                      ))}
+                        ))}
                       {rateCard.incentives.filter((i) => i.isActive).length === 0 && (
-                        <p className="text-sm text-muted-foreground italic">No incentives configured</p>
+                        <p className="text-sm text-muted-foreground italic">
+                          No incentives configured
+                        </p>
                       )}
                     </div>
                   </div>
@@ -638,11 +656,11 @@ export default function RateCardsPage() {
                         />
                         Pay in Full
                       </label>
-                      <Select
-                        value={previewPaymentMethod}
-                        onValueChange={setPreviewPaymentMethod}
-                      >
-                        <SelectTrigger className="h-8 w-[100px] text-xs" aria-label="Payment method">
+                      <Select value={previewPaymentMethod} onValueChange={setPreviewPaymentMethod}>
+                        <SelectTrigger
+                          className="h-8 w-[100px] text-xs"
+                          aria-label="Payment method"
+                        >
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -672,7 +690,12 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Create Rate Card</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowCreateModal(false)} aria-label="Close rate card form">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowCreateModal(false)}
+                  aria-label="Close rate card form"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
@@ -768,7 +791,9 @@ export default function RateCardsPage() {
                   <Textarea
                     id="rate-card-description"
                     value={newRateCard.description}
-                    onChange={(e) => setNewRateCard({ ...newRateCard, description: e.target.value })}
+                    onChange={(e) =>
+                      setNewRateCard({ ...newRateCard, description: e.target.value })
+                    }
                     placeholder="Includes water, sewer, WiFi..."
                     rows={2}
                   />
@@ -778,7 +803,9 @@ export default function RateCardsPage() {
                   <Checkbox
                     id="isDefault"
                     checked={newRateCard.isDefault}
-                    onCheckedChange={(checked) => setNewRateCard({ ...newRateCard, isDefault: Boolean(checked) })}
+                    onCheckedChange={(checked) =>
+                      setNewRateCard({ ...newRateCard, isDefault: Boolean(checked) })
+                    }
                     aria-label="Set as default rate card"
                   />
                   <Label htmlFor="isDefault" className="cursor-pointer">
@@ -787,7 +814,11 @@ export default function RateCardsPage() {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => setShowCreateModal(false)}>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowCreateModal(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -809,7 +840,12 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-md mx-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Add Discount</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowDiscountModal(false)} aria-label="Close discount form">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowDiscountModal(false)}
+                  aria-label="Close discount form"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
@@ -914,7 +950,9 @@ export default function RateCardsPage() {
                   <Checkbox
                     id="stackable"
                     checked={newDiscount.stackable}
-                    onCheckedChange={(checked) => setNewDiscount({ ...newDiscount, stackable: Boolean(checked) })}
+                    onCheckedChange={(checked) =>
+                      setNewDiscount({ ...newDiscount, stackable: Boolean(checked) })
+                    }
                     aria-label="Stackable discount"
                   />
                   <Label htmlFor="stackable" className="cursor-pointer">
@@ -923,7 +961,11 @@ export default function RateCardsPage() {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => setShowDiscountModal(false)}>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowDiscountModal(false)}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -945,7 +987,12 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-md mx-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Add Incentive</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowIncentiveModal(false)} aria-label="Close incentive form">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowIncentiveModal(false)}
+                  aria-label="Close incentive form"
+                >
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
@@ -1029,7 +1076,11 @@ export default function RateCardsPage() {
                 </div>
 
                 <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => setShowIncentiveModal(false)}>
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setShowIncentiveModal(false)}
+                  >
                     Cancel
                   </Button>
                   <Button

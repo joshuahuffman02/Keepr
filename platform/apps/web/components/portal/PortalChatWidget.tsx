@@ -77,17 +77,14 @@ export function PortalChatWidget() {
 
         // Sort by arrival date
         const sortedReservations = [...reservations].sort(
-          (a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime()
+          (a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime(),
         );
 
         // Find current stay (checked in or date overlap)
         const currentStay = sortedReservations.find((r) => {
           const arrival = new Date(r.arrivalDate);
           const departure = new Date(r.departureDate);
-          return (
-            r.status === "checked_in" ||
-            (arrival <= now && departure >= now)
-          );
+          return r.status === "checked_in" || (arrival <= now && departure >= now);
         });
 
         // Or find next upcoming reservation

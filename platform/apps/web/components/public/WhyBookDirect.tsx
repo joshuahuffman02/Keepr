@@ -40,11 +40,7 @@ interface WhyBookDirectProps {
   variant?: "full" | "compact";
 }
 
-export function WhyBookDirect({
-  className,
-  campgroundName,
-  variant = "full",
-}: WhyBookDirectProps) {
+export function WhyBookDirect({ className, campgroundName, variant = "full" }: WhyBookDirectProps) {
   if (variant === "compact") {
     return (
       <div className={cn("bg-keepr-evergreen/10 rounded-xl p-4", className)}>
@@ -84,7 +80,7 @@ export function WhyBookDirect({
               <div
                 className={cn(
                   "w-10 h-10 rounded-lg flex items-center justify-center mb-4",
-                  benefit.iconBg
+                  benefit.iconBg,
                 )}
               >
                 <benefit.icon className={cn("h-5 w-5", benefit.iconColor)} />

@@ -85,7 +85,9 @@ export async function middleware(req: NextRequest) {
   }
 
   // Only guard protected prefixes
-  const isProtected = PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const isProtected = PROTECTED_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
   if (!isProtected) {
     return NextResponse.next();
   }

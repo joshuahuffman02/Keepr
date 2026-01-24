@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -25,7 +32,12 @@ interface SaveReportDialogProps {
   onSaved?: (report: SavedReport) => void;
 }
 
-export function SaveReportDialog({ open, onOpenChange, reportConfig, onSaved }: SaveReportDialogProps) {
+export function SaveReportDialog({
+  open,
+  onOpenChange,
+  reportConfig,
+  onSaved,
+}: SaveReportDialogProps) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -74,7 +86,8 @@ export function SaveReportDialog({ open, onOpenChange, reportConfig, onSaved }: 
             Save Report Configuration
           </DialogTitle>
           <DialogDescription>
-            Save the current report settings including filters, date range, and grouping for quick access later.
+            Save the current report settings including filters, date range, and grouping for quick
+            access later.
           </DialogDescription>
         </DialogHeader>
 
@@ -112,7 +125,8 @@ export function SaveReportDialog({ open, onOpenChange, reportConfig, onSaved }: 
                 {reportConfig.subTab && <span> / {reportConfig.subTab}</span>}
               </div>
               <div>
-                <span className="font-medium">Date Range:</span> {reportConfig.dateRange.start} → {reportConfig.dateRange.end}
+                <span className="font-medium">Date Range:</span> {reportConfig.dateRange.start} →{" "}
+                {reportConfig.dateRange.end}
               </div>
               {reportConfig.filters.status !== "all" && (
                 <div>
@@ -137,10 +151,7 @@ export function SaveReportDialog({ open, onOpenChange, reportConfig, onSaved }: 
           <Button variant="outline" onClick={() => handleOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!name.trim() || isSaving}
-          >
+          <Button onClick={handleSave} disabled={!name.trim() || isSaving}>
             <Save className="h-4 w-4 mr-2" />
             Save Report
           </Button>

@@ -15,19 +15,19 @@ export default function SocialPlannerWeekly() {
   const qc = useQueryClient();
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
   const weeklyQuery = useQuery({
     queryKey: ["social-weekly", campgroundId],
     queryFn: () => apiClient.generateWeeklySocialIdeas(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const regenerate = useMutation({
     mutationFn: () => apiClient.generateWeeklySocialIdeas(campgroundId!),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-weekly", campgroundId] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-weekly", campgroundId] }),
   });
 
   const addIdeaToCalendar = useMutation({
@@ -39,9 +39,9 @@ export default function SocialPlannerWeekly() {
         status: "draft",
         category: idea.type || "promo",
         caption: idea.idea,
-        ideaParkingLot: true
+        ideaParkingLot: true,
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] }),
   });
 
   const weekly = weeklyQuery.data;
@@ -61,14 +61,21 @@ export default function SocialPlannerWeekly() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Weekly ideas</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Weekly ideas
+          </p>
           <h1 className="text-2xl font-bold text-foreground">Auto-generated Monday bundles</h1>
-          <p className="text-muted-foreground">Three posts + cadence tailored to your park style without external AI.</p>
+          <p className="text-muted-foreground">
+            Three posts + cadence tailored to your park style without external AI.
+          </p>
         </div>
         <Button
           variant="secondary"
@@ -122,7 +129,9 @@ export default function SocialPlannerWeekly() {
           </Card>
         </div>
       ) : (
-        <div className="text-sm text-muted-foreground">Generate a bundle to see this week's ideas.</div>
+        <div className="text-sm text-muted-foreground">
+          Generate a bundle to see this week's ideas.
+        </div>
       )}
     </DashboardShell>
   );

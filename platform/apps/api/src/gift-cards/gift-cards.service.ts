@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { StoredValueStatus } from "@prisma/client";
 import { StoredValueService } from "../stored-value/stored-value.service";
@@ -40,7 +45,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 export class GiftCardsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly storedValue: StoredValueService
+    private readonly storedValue: StoredValueService,
   ) {}
 
   /**
@@ -58,29 +63,43 @@ export class GiftCardsService {
     return this.loadCard(code);
   }
 
-  async redeemAgainstBooking(code: string, amountCents: number, bookingId: string, actor?: GiftCardActor) {
+  async redeemAgainstBooking(
+    code: string,
+    amountCents: number,
+    bookingId: string,
+    actor?: GiftCardActor,
+  ) {
     if (!code) throw new BadRequestException("Gift card code is required to process redemption");
-    if (!amountCents || amountCents <= 0) throw new BadRequestException("Redemption amount must be greater than zero");
+    if (!amountCents || amountCents <= 0)
+      throw new BadRequestException("Redemption amount must be greater than zero");
     if (!actor?.campgroundId) {
       throw new BadRequestException("campground context required");
     }
 
     const card = await this.loadCard(code);
-    if (!card) throw new NotFoundException("Gift card or store credit not found. Please verify the code and try again");
-    if (card.balanceCents < amountCents) throw new BadRequestException(`Gift card has insufficient balance. Available: $${(card.balanceCents / 100).toFixed(2)}, Required: $${(amountCents / 100).toFixed(2)}`);
+    if (!card)
+      throw new NotFoundException(
+        "Gift card or store credit not found. Please verify the code and try again",
+      );
+    if (card.balanceCents < amountCents)
+      throw new BadRequestException(
+        `Gift card has insufficient balance. Available: $${(card.balanceCents / 100).toFixed(2)}, Required: $${(amountCents / 100).toFixed(2)}`,
+      );
 
     // Wrap everything in a transaction: redeem stored value + create payment + update reservation + post ledger entries
     return this.prisma.$transaction(async (tx) => {
       // 1. Lock the reservation to prevent concurrent modifications
-      const [lockedReservation] = await tx.$queryRaw<Array<{
-        id: string;
-        campgroundId: string;
-        guestId: string;
-        siteId: string;
-        paidAmount: number | null;
-        totalAmount: number;
-        status: string;
-      }>>`
+      const [lockedReservation] = await tx.$queryRaw<
+        Array<{
+          id: string;
+          campgroundId: string;
+          guestId: string;
+          siteId: string;
+          paidAmount: number | null;
+          totalAmount: number;
+          status: string;
+        }>
+      >`
         SELECT id, "campgroundId", "guestId", "siteId", "paidAmount", "totalAmount", status
         FROM "Reservation"
         WHERE id = ${bookingId}
@@ -100,10 +119,10 @@ export class GiftCardsService {
           redeemCampgroundId: actor?.campgroundId ?? undefined,
           referenceType: "reservation",
           referenceId: bookingId,
-          channel: "booking"
+          channel: "booking",
         },
         undefined,
-        actor
+        actor,
       );
       const redeemedBalanceCents =
         isRecord(redeemResult) && typeof redeemResult.balanceCents === "number"
@@ -122,8 +141,8 @@ export class GiftCardsService {
         where: { id: bookingId },
         data: {
           paidAmount: newPaid,
-          ...paymentFields
-        }
+          ...paymentFields,
+        },
       });
 
       // 6. Create Payment record
@@ -137,14 +156,14 @@ export class GiftCardsService {
           method: "gift_card",
           direction: "charge",
           note: `Gift card redemption: ${code}`,
-          capturedAt: new Date()
-        }
+          capturedAt: new Date(),
+        },
       });
 
       // 7. Get site info for GL codes
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { SiteClass: true }
+        include: { SiteClass: true },
       });
 
       const revenueGl = site?.SiteClass?.glCode ?? "REVENUE_UNMAPPED";
@@ -163,7 +182,7 @@ export class GiftCardsService {
           amountCents,
           direction: "debit",
           externalRef: paymentRef,
-          dedupeKey: `res:${bookingId}:gift-card:${paymentRef}:debit`
+          dedupeKey: `res:${bookingId}:gift-card:${paymentRef}:debit`,
         },
         {
           campgroundId: lockedReservation.campgroundId,
@@ -174,8 +193,8 @@ export class GiftCardsService {
           amountCents,
           direction: "credit",
           externalRef: paymentRef,
-          dedupeKey: `res:${bookingId}:gift-card:${paymentRef}:credit`
-        }
+          dedupeKey: `res:${bookingId}:gift-card:${paymentRef}:credit`,
+        },
       ];
 
       await postBalancedLedgerEntries(tx, ledgerEntries);
@@ -187,18 +206,23 @@ export class GiftCardsService {
         channel: "booking",
         referenceId: bookingId,
         reservationPaidAmount: newPaid,
-        reservationBalance: newBalance
+        reservationBalance: newBalance,
       };
     });
   }
 
-  async redeemAgainstPosOrder(code: string, amountCents: number, orderId: string, actor?: GiftCardActor) {
+  async redeemAgainstPosOrder(
+    code: string,
+    amountCents: number,
+    orderId: string,
+    actor?: GiftCardActor,
+  ) {
     if (!actor?.campgroundId) {
       throw new BadRequestException("campground context required");
     }
     const order = await this.prisma.storeOrder.findUnique({
       where: { id: orderId },
-      select: { id: true, campgroundId: true }
+      select: { id: true, campgroundId: true },
     });
     if (!order) throw new NotFoundException("Order not found");
     if (order.campgroundId !== actor.campgroundId) {
@@ -211,14 +235,21 @@ export class GiftCardsService {
     code: string,
     amountCents: number,
     context: { channel: RedemptionChannel; referenceId: string },
-    actor?: GiftCardActor
+    actor?: GiftCardActor,
   ) {
     if (!code) throw new BadRequestException("Gift card code is required to process purchase");
-    if (!amountCents || amountCents <= 0) throw new BadRequestException("Purchase amount must be greater than zero");
+    if (!amountCents || amountCents <= 0)
+      throw new BadRequestException("Purchase amount must be greater than zero");
 
     const card = await this.loadCard(code);
-    if (!card) throw new NotFoundException("Gift card or store credit not found. Please verify the code and try again");
-    if (card.balanceCents < amountCents) throw new BadRequestException(`Gift card has insufficient balance. Available: $${(card.balanceCents / 100).toFixed(2)}, Required: $${(amountCents / 100).toFixed(2)}`);
+    if (!card)
+      throw new NotFoundException(
+        "Gift card or store credit not found. Please verify the code and try again",
+      );
+    if (card.balanceCents < amountCents)
+      throw new BadRequestException(
+        `Gift card has insufficient balance. Available: $${(card.balanceCents / 100).toFixed(2)}, Required: $${(amountCents / 100).toFixed(2)}`,
+      );
 
     const result = await this.storedValue.redeem(
       {
@@ -228,10 +259,10 @@ export class GiftCardsService {
         redeemCampgroundId: actor?.campgroundId ?? undefined,
         referenceType: context.channel === "booking" ? "reservation" : "pos_order",
         referenceId: context.referenceId,
-        channel: context.channel
+        channel: context.channel,
       },
       undefined,
-      actor
+      actor,
     );
 
     return {
@@ -242,7 +273,7 @@ export class GiftCardsService {
           : card.balanceCents - amountCents,
       redeemedCents: amountCents,
       channel: context.channel,
-      referenceId: context.referenceId
+      referenceId: context.referenceId,
     };
   }
 
@@ -251,8 +282,8 @@ export class GiftCardsService {
     const storedValueCode = await this.prisma.storedValueCode.findUnique({
       where: { code },
       include: {
-        StoredValueAccount: true
-      }
+        StoredValueAccount: true,
+      },
     });
 
     if (
@@ -261,14 +292,15 @@ export class GiftCardsService {
       storedValueCode.StoredValueAccount.status === StoredValueStatus.active
     ) {
       const { balanceCents } = await this.storedValue.balanceByAccount(storedValueCode.accountId);
-      const kind = storedValueCode.StoredValueAccount.type === "gift" ? "gift_card" : "store_credit";
+      const kind =
+        storedValueCode.StoredValueAccount.type === "gift" ? "gift_card" : "store_credit";
 
       return {
         code,
         balanceCents,
         currency: storedValueCode.StoredValueAccount.currency,
         kind,
-        accountId: storedValueCode.accountId
+        accountId: storedValueCode.accountId,
       };
     }
 
@@ -286,19 +318,19 @@ export class GiftCardsService {
       return {
         balanceAmount,
         paymentStatus: "unpaid",
-        paymentStatusAt: null
+        paymentStatusAt: null,
       };
     } else if (balanceAmount <= 0) {
       return {
         balanceAmount: 0,
         paymentStatus: "paid",
-        paymentStatusAt: new Date()
+        paymentStatusAt: new Date(),
       };
     } else {
       return {
         balanceAmount,
         paymentStatus: "partial",
-        paymentStatusAt: new Date()
+        paymentStatusAt: new Date(),
       };
     }
   }

@@ -1,5 +1,12 @@
 import { Type } from "class-transformer";
-import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString, ValidateNested } from "class-validator";
+import {
+  IsArray,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from "class-validator";
 
 export class MapShapeDto {
   @IsOptional()

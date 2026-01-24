@@ -5,5 +5,3 @@ export type PermissionDescriptor = { resource: string; action: string };
 
 export const RequirePermission = (descriptor: PermissionDescriptor) =>
   SetMetadata(PERMISSION_KEY, descriptor);
-
-

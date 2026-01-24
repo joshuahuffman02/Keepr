@@ -112,23 +112,110 @@ const siteClassDefs = [
 
 // Guest names for realistic data
 const firstNames = [
-  "Sarah", "Michael", "Emily", "James", "Jennifer", "David", "Amanda", "Robert",
-  "Jessica", "William", "Ashley", "Christopher", "Nicole", "Matthew", "Stephanie",
-  "Daniel", "Elizabeth", "Andrew", "Michelle", "Joshua", "Lisa", "Anthony", "Karen",
-  "Mark", "Patricia", "Steven", "Linda", "Paul", "Barbara", "Kevin", "Nancy",
-  "Brian", "Betty", "George", "Margaret", "Edward", "Sandra", "Ronald", "Dorothy",
-  "Timothy", "Kimberly", "Jason", "Donna", "Jeffrey", "Carol", "Ryan", "Ruth",
-  "Jacob", "Sharon", "Gary", "Helen",
+  "Sarah",
+  "Michael",
+  "Emily",
+  "James",
+  "Jennifer",
+  "David",
+  "Amanda",
+  "Robert",
+  "Jessica",
+  "William",
+  "Ashley",
+  "Christopher",
+  "Nicole",
+  "Matthew",
+  "Stephanie",
+  "Daniel",
+  "Elizabeth",
+  "Andrew",
+  "Michelle",
+  "Joshua",
+  "Lisa",
+  "Anthony",
+  "Karen",
+  "Mark",
+  "Patricia",
+  "Steven",
+  "Linda",
+  "Paul",
+  "Barbara",
+  "Kevin",
+  "Nancy",
+  "Brian",
+  "Betty",
+  "George",
+  "Margaret",
+  "Edward",
+  "Sandra",
+  "Ronald",
+  "Dorothy",
+  "Timothy",
+  "Kimberly",
+  "Jason",
+  "Donna",
+  "Jeffrey",
+  "Carol",
+  "Ryan",
+  "Ruth",
+  "Jacob",
+  "Sharon",
+  "Gary",
+  "Helen",
 ];
 
 const lastNames = [
-  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
-  "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill", "Flores",
-  "Green", "Adams", "Nelson", "Baker", "Hall", "Rivera", "Campbell", "Mitchell",
-  "Carter", "Roberts",
+  "Smith",
+  "Johnson",
+  "Williams",
+  "Brown",
+  "Jones",
+  "Garcia",
+  "Miller",
+  "Davis",
+  "Rodriguez",
+  "Martinez",
+  "Hernandez",
+  "Lopez",
+  "Gonzalez",
+  "Wilson",
+  "Anderson",
+  "Thomas",
+  "Taylor",
+  "Moore",
+  "Jackson",
+  "Martin",
+  "Lee",
+  "Perez",
+  "Thompson",
+  "White",
+  "Harris",
+  "Sanchez",
+  "Clark",
+  "Ramirez",
+  "Lewis",
+  "Robinson",
+  "Walker",
+  "Young",
+  "Allen",
+  "King",
+  "Wright",
+  "Scott",
+  "Torres",
+  "Nguyen",
+  "Hill",
+  "Flores",
+  "Green",
+  "Adams",
+  "Nelson",
+  "Baker",
+  "Hall",
+  "Rivera",
+  "Campbell",
+  "Mitchell",
+  "Carter",
+  "Roberts",
 ];
 
 const cities = [
@@ -281,10 +368,10 @@ async function main() {
         classDef.type === SiteType.rv
           ? "RV"
           : classDef.type === SiteType.tent
-          ? "T"
-          : classDef.type === SiteType.cabin
-          ? "C"
-          : "G";
+            ? "T"
+            : classDef.type === SiteType.cabin
+              ? "C"
+              : "G";
 
       await prisma.site.create({
         data: {
@@ -316,10 +403,10 @@ async function main() {
       loyaltyPoints >= 3000
         ? "Gold"
         : loyaltyPoints >= 1500
-        ? "Silver"
-        : loyaltyPoints >= 500
-        ? "Bronze"
-        : "Member";
+          ? "Silver"
+          : loyaltyPoints >= 500
+            ? "Bronze"
+            : "Member";
 
     const guest = await prisma.guest.create({
       data: {
@@ -335,10 +422,7 @@ async function main() {
         loyaltyTier,
         totalStays: randomBetween(1, 15),
         totalSpentCents: randomBetween(50000, 500000),
-        notes:
-          loyaltyPoints >= 3000
-            ? "VIP guest - always ensure best site available"
-            : undefined,
+        notes: loyaltyPoints >= 3000 ? "VIP guest - always ensure best site available" : undefined,
       },
     });
 
@@ -394,7 +478,8 @@ async function main() {
           status: pick(statuses),
           totalAmountCents: totalAmount,
           balanceAmountCents: 0,
-          stayType: nights >= 28 ? StayType.monthly : nights >= 7 ? StayType.weekly : StayType.nightly,
+          stayType:
+            nights >= 28 ? StayType.monthly : nights >= 7 ? StayType.weekly : StayType.nightly,
           source: pick(["direct", "direct", "phone", "walk_in"]),
           confirmationCode: `CE${String(reservationCount + 1000).padStart(6, "0")}`,
         },

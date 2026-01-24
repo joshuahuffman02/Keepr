@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, ForbiddenException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+  ForbiddenException,
+} from "@nestjs/common";
 import { GuestsService } from "./guests.service";
 import { CreateGuestDto } from "./dto/create-guest.dto";
 import { JwtAuthGuard } from "../auth/guards";
@@ -12,7 +23,7 @@ import type { AuthUser } from "../auth/auth.types";
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller("guests")
 export class GuestsController {
-  constructor(private readonly guests: GuestsService) { }
+  constructor(private readonly guests: GuestsService) {}
 
   /**
    * Verify the authenticated user has access to the specified campground.
@@ -20,8 +31,8 @@ export class GuestsController {
    */
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser | null): void {
     // Platform staff can access any campground
-    const isPlatformStaff = user?.platformRole === 'platform_admin' ||
-                            user?.platformRole === 'support_agent';
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" || user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
@@ -38,7 +49,7 @@ export class GuestsController {
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
     @Query("search") search?: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // Require campgroundId to prevent cross-tenant data access
     if (!campgroundId) {
@@ -50,7 +61,7 @@ export class GuestsController {
     return this.guests.findAllByCampground(campgroundId, {
       limit: limit ? parseInt(limit, 10) : undefined,
       offset: offset ? parseInt(offset, 10) : undefined,
-      search
+      search,
     });
   }
 
@@ -58,7 +69,7 @@ export class GuestsController {
   findOne(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId?: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // When campgroundId provided, verify user has access to that campground
     if (campgroundId) {
@@ -71,7 +82,7 @@ export class GuestsController {
   create(
     @Body() body: CreateGuestDto,
     @Query("campgroundId") campgroundId?: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // SECURITY: Verify user has access to the campground if specified
     if (campgroundId) {
@@ -85,7 +96,7 @@ export class GuestsController {
     @Param("id") id: string,
     @Body() body: Partial<CreateGuestDto>,
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest modification
     if (!campgroundId) {
@@ -100,7 +111,7 @@ export class GuestsController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest deletion
     if (!campgroundId) {
@@ -115,7 +126,7 @@ export class GuestsController {
   merge(
     @Body() body: { primaryId: string; secondaryId: string },
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: AuthUser | null
+    @CurrentUser() user?: AuthUser | null,
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest merging
     if (!campgroundId) {
@@ -125,7 +136,7 @@ export class GuestsController {
     this.assertCampgroundAccess(campgroundId, user);
     return this.guests.merge(body.primaryId, body.secondaryId, {
       actorId: user?.id,
-      campgroundId
+      campgroundId,
     });
   }
 }

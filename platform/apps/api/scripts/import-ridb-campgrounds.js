@@ -138,9 +138,7 @@ async function fetchFacilities(apiKey, offset, state) {
 // Transform RIDB facility to our Campground format
 function transformFacility(facility, organizationId) {
   const address = facility.FACILITYADDRESS?.[0];
-  const photos =
-    facility.MEDIA?.filter((m) => m.MediaType === "Image").map((m) => m.URL) ||
-    [];
+  const photos = facility.MEDIA?.filter((m) => m.MediaType === "Image").map((m) => m.URL) || [];
   const heroImage = photos[0] || null;
 
   return {
@@ -196,9 +194,7 @@ async function importCampgrounds() {
   const apiKey = process.env.RIDB_API_KEY;
   if (!apiKey) {
     console.error("Error: RIDB_API_KEY environment variable is required");
-    console.error(
-      "Usage: RIDB_API_KEY=your-key node scripts/import-ridb-campgrounds.js"
-    );
+    console.error("Usage: RIDB_API_KEY=your-key node scripts/import-ridb-campgrounds.js");
     process.exit(1);
   }
 
@@ -266,9 +262,7 @@ async function importCampgrounds() {
       const data = transformFacility(facility, orgId);
 
       if (dryRun) {
-        console.log(
-          `  [DRY RUN] Would import: ${data.name} (${facility.FacilityID})`
-        );
+        console.log(`  [DRY RUN] Would import: ${data.name} (${facility.FacilityID})`);
       } else {
         // Check if already imported
         const existing = await prisma.campground.findFirst({
@@ -320,9 +314,7 @@ async function importCampgrounds() {
           const data = transformFacility(facility, orgId);
 
           if (dryRun) {
-            console.log(
-              `  [DRY RUN] Would import: ${data.name} (${facility.FacilityID})`
-            );
+            console.log(`  [DRY RUN] Would import: ${data.name} (${facility.FacilityID})`);
           } else {
             const existing = await prisma.campground.findFirst({
               where: {
@@ -351,10 +343,7 @@ async function importCampgrounds() {
 
           imported++;
         } catch (err) {
-          console.error(
-            `  Error importing ${facility.FacilityName}:`,
-            err.message
-          );
+          console.error(`  Error importing ${facility.FacilityName}:`, err.message);
           errors++;
         }
       }

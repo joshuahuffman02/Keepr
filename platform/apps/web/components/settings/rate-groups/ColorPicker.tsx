@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -74,7 +70,7 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
             "ring-1 ring-border transition-all duration-150",
             "hover:scale-110 hover:ring-2 hover:ring-ring/40",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-            className
+            className,
           )}
           style={{ backgroundColor: value }}
           aria-label={`Color: ${value}. Click to change.`}
@@ -98,15 +94,13 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
                     className={cn(
                       "h-8 w-8 rounded-lg transition-all duration-150",
                       "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-ring",
-                      isSelected && "ring-2 ring-offset-2 ring-ring"
+                      isSelected && "ring-2 ring-offset-2 ring-ring",
                     )}
                     style={{ backgroundColor: color }}
                     aria-label={`Select color ${color}`}
                     aria-pressed={isSelected}
                   >
-                    {isSelected && (
-                      <Check className="h-4 w-4 text-white mx-auto drop-shadow" />
-                    )}
+                    {isSelected && <Check className="h-4 w-4 text-white mx-auto drop-shadow" />}
                   </button>
                 );
               })}
@@ -115,7 +109,10 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
 
           {/* Custom Color Input */}
           <div>
-            <Label htmlFor="custom-color" className="text-xs text-muted-foreground uppercase tracking-wider">
+            <Label
+              htmlFor="custom-color"
+              className="text-xs text-muted-foreground uppercase tracking-wider"
+            >
               Custom Color
             </Label>
             <div className="flex items-center gap-2 mt-2">

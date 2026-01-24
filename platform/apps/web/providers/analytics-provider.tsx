@@ -74,7 +74,8 @@ export function AnalyticsProvider({ children, disabled = false }: AnalyticsProvi
 
   // Check if this is an admin page
   useEffect(() => {
-    isAdminRef.current = pathname?.startsWith("/dashboard") || pathname?.startsWith("/campgrounds") || false;
+    isAdminRef.current =
+      pathname?.startsWith("/dashboard") || pathname?.startsWith("/campgrounds") || false;
   }, [pathname]);
 
   // Track page views on navigation
@@ -112,10 +113,7 @@ export function AnalyticsProvider({ children, disabled = false }: AnalyticsProvi
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      analytics.trackError(
-        event.reason?.message || String(event.reason),
-        "unhandled_rejection"
-      );
+      analytics.trackError(event.reason?.message || String(event.reason), "unhandled_rejection");
     };
 
     window.addEventListener("error", handleError);
@@ -131,11 +129,7 @@ export function AnalyticsProvider({ children, disabled = false }: AnalyticsProvi
     return <>{children}</>;
   }
 
-  return (
-    <AnalyticsContext.Provider value={analytics}>
-      {children}
-    </AnalyticsContext.Provider>
-  );
+  return <AnalyticsContext.Provider value={analytics}>{children}</AnalyticsContext.Provider>;
 }
 
 /**
@@ -144,7 +138,7 @@ export function AnalyticsProvider({ children, disabled = false }: AnalyticsProvi
 export function withFeatureTracking<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   featureName: string,
-  subFeature?: string
+  subFeature?: string,
 ) {
   const WithFeatureTracking = (props: P) => {
     const analytics = useAnalyticsContext();
@@ -186,7 +180,7 @@ export function useTrackAction() {
     (actionType: string, actionTarget?: string, metadata?: Record<string, unknown>) => {
       analytics.trackAction({ actionType, actionTarget, metadata });
     },
-    [analytics]
+    [analytics],
   );
 }
 
@@ -200,7 +194,7 @@ export function useTrackSearch() {
     (query: string, resultsCount?: number) => {
       analytics.trackSearch(query, resultsCount);
     },
-    [analytics]
+    [analytics],
   );
 }
 
@@ -223,7 +217,7 @@ export function useFeatureTracking(featureName: string, subFeature?: string) {
       });
       startTimeRef.current = Date.now();
     },
-    [analytics, featureName, subFeature]
+    [analytics, featureName, subFeature],
   );
 
   const trackFailure = useCallback(
@@ -238,7 +232,7 @@ export function useFeatureTracking(featureName: string, subFeature?: string) {
       });
       startTimeRef.current = Date.now();
     },
-    [analytics, featureName, subFeature]
+    [analytics, featureName, subFeature],
   );
 
   const reset = useCallback(() => {
@@ -258,28 +252,28 @@ export function useFunnelTracking(funnelName: string) {
     (stepName?: string) => {
       analytics.startFunnel(funnelName, stepName);
     },
-    [analytics, funnelName]
+    [analytics, funnelName],
   );
 
   const advance = useCallback(
     (stepName?: string, metadata?: Record<string, unknown>) => {
       analytics.advanceFunnel(funnelName, stepName, metadata);
     },
-    [analytics, funnelName]
+    [analytics, funnelName],
   );
 
   const complete = useCallback(
     (metadata?: Record<string, unknown>) => {
       analytics.completeFunnel(funnelName, metadata);
     },
-    [analytics, funnelName]
+    [analytics, funnelName],
   );
 
   const abandon = useCallback(
     (reason?: string) => {
       analytics.abandonFunnel(funnelName, reason);
     },
-    [analytics, funnelName]
+    [analytics, funnelName],
   );
 
   return { start, advance, complete, abandon };

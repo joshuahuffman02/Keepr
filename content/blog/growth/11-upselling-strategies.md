@@ -17,29 +17,34 @@ The nightly rate is just the beginning. Smart campgrounds generate significant a
 ## Popular Add-On Categories
 
 ### Campfire Essentials
+
 - Firewood bundles ($7-12)
 - Fire starters ($3-5)
 - S'mores kits ($5-8)
 
 ### Equipment Rentals
+
 - Kayaks/canoes ($25-50/hour or day)
 - Bikes ($10-20/hour)
 - Golf carts ($50-100/day)
 - Fishing equipment ($15-25)
 
 ### Convenience Items
+
 - Ice bags ($3-5)
 - Camping chairs ($10-15 rental)
 - Tarps/awnings
 - Extension cords
 
 ### Experience Upgrades
+
 - Premium site selection ($10-25)
 - Early check-in/late checkout ($15-25)
 - Pet fees ($5-15/night)
 - Extra vehicle parking
 
 ### Food and Beverage
+
 - Bagged ice
 - Soft drinks and snacks
 - Local products (honey, syrup)
@@ -50,12 +55,15 @@ The nightly rate is just the beginning. Smart campgrounds generate significant a
 ## Upselling Techniques
 
 ### At Booking
+
 > "Would you like to add firewood to your reservation? We'll have it waiting at your site."
 
 ### At Check-In
+
 > "Our golf carts are a great way to explore the campground. Would you like to reserve one for your stay?"
 
 ### On-Site Signage
+
 - Clear pricing at store/office
 - At popular spots (boat launch, trails)
 - Site-level menus for delivery items
@@ -80,4 +88,4 @@ The nightly rate is just the beginning. Smart campgrounds generate significant a
 
 ---
 
-*Keepr includes add-on management so guests can purchase extras at booking or during their stay. [Boost revenue at campreserv.com](https://campreserv.com)*
+_Keepr includes add-on management so guests can purchase extras at booking or during their stay. [Boost revenue at campreserv.com](https://campreserv.com)_

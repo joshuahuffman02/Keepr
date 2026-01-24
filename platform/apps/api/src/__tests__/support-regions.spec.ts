@@ -18,11 +18,12 @@ describe("Support regions & directory", () => {
   const userA = "user-a"; // region north
   const userB = "user-b"; // region south
   const adminUser = "admin-user";
-  const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+  const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null;
   const expressApp = express();
   const buildRequest = (
     user: AuthUser,
-    query: Record<string, string | string[] | undefined> = {}
+    query: Record<string, string | string[] | undefined> = {},
   ): Request & { user: AuthUser } => {
     const req: Request & { user: AuthUser } = Object.create(expressApp.request);
     Object.defineProperty(req, "user", { value: user, writable: true, configurable: true });
@@ -32,26 +33,41 @@ describe("Support regions & directory", () => {
   };
 
   beforeAll(async () => {
-    const reports: Array<{ id: string; campgroundId: string | null; rawContext: { region?: string | null }; createdAt: Date; updatedAt: Date; status: string }> = [];
+    const reports: Array<{
+      id: string;
+      campgroundId: string | null;
+      rawContext: { region?: string | null };
+      createdAt: Date;
+      updatedAt: Date;
+      status: string;
+    }> = [];
     const staffDirectory = [
-      { id: adminUser, email: 'admin@test.com', firstName: 'Admin', lastName: 'User', region: 'north' },
-      { id: userA, email: 'a@test.com', firstName: 'A', lastName: 'North', region: 'north' },
-      { id: userB, email: 'b@test.com', firstName: 'B', lastName: 'South', region: 'south' },
+      {
+        id: adminUser,
+        email: "admin@test.com",
+        firstName: "Admin",
+        lastName: "User",
+        region: "north",
+      },
+      { id: userA, email: "a@test.com", firstName: "A", lastName: "North", region: "north" },
+      { id: userB, email: "b@test.com", firstName: "B", lastName: "South", region: "south" },
     ];
     const supportStub = {
-      create: jest.fn((dto: { description: string; campgroundId?: string | null; region?: string | null }) => {
-        const report = {
-          id: `support-${reports.length + 1}`,
-          description: dto.description,
-          campgroundId: dto.campgroundId ?? null,
-          rawContext: { region: dto.region ?? null },
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          status: "new",
-        };
-        reports.unshift(report);
-        return report;
-      }),
+      create: jest.fn(
+        (dto: { description: string; campgroundId?: string | null; region?: string | null }) => {
+          const report = {
+            id: `support-${reports.length + 1}`,
+            description: dto.description,
+            campgroundId: dto.campgroundId ?? null,
+            rawContext: { region: dto.region ?? null },
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            status: "new",
+          };
+          reports.unshift(report);
+          return report;
+        },
+      ),
       findAll: jest.fn((args: { region?: string | null; campgroundId?: string | null }) => {
         return reports.filter((report) => {
           if (args.campgroundId && report.campgroundId !== args.campgroundId) return false;
@@ -59,22 +75,28 @@ describe("Support regions & directory", () => {
           return true;
         });
       }),
-      update: jest.fn((
-        id: string,
-        dto: { assigneeId?: string | null; status?: string | null },
-        _actorId?: string,
-        actorRegion?: string | null
-      ) => {
-        const report = reports.find((row) => row.id === id);
-        if (!report) return null;
-        if (report.rawContext?.region && actorRegion && report.rawContext.region !== actorRegion) {
-          throw new ForbiddenException("Forbidden by region scope");
-        }
-        if (dto.status) {
-          report.status = dto.status;
-        }
-        return report;
-      }),
+      update: jest.fn(
+        (
+          id: string,
+          dto: { assigneeId?: string | null; status?: string | null },
+          _actorId?: string,
+          actorRegion?: string | null,
+        ) => {
+          const report = reports.find((row) => row.id === id);
+          if (!report) return null;
+          if (
+            report.rawContext?.region &&
+            actorRegion &&
+            report.rawContext.region !== actorRegion
+          ) {
+            throw new ForbiddenException("Forbidden by region scope");
+          }
+          if (dto.status) {
+            report.status = dto.status;
+          }
+          return report;
+        },
+      ),
       staffDirectory: jest.fn((args: { region?: string | null }) => {
         if (!args.region) return staffDirectory;
         return staffDirectory.filter((row) => row.region === args.region);
@@ -103,50 +125,58 @@ describe("Support regions & directory", () => {
     await moduleRef.close();
   });
 
-  it('filters reports by region and blocks cross-region assignment', async () => {
+  it("filters reports by region and blocks cross-region assignment", async () => {
     const adminReq = buildRequest(
       buildAuthUser({
-        id: 'admin-user',
-        role: 'owner',
-        region: 'north',
-        memberships: [buildAuthMembership({ campgroundId, role: 'owner' })],
-      })
+        id: "admin-user",
+        role: "owner",
+        region: "north",
+        memberships: [buildAuthMembership({ campgroundId, role: "owner" })],
+      }),
     );
 
     // create two reports in different regions
     const rNorth = await controller.create(
-      { description: 'north issue', region: 'north', campgroundId, pinnedIds: [], recentIds: [] },
-      adminReq
+      { description: "north issue", region: "north", campgroundId, pinnedIds: [], recentIds: [] },
+      adminReq,
     );
     const rSouth = await controller.create(
-      { description: 'south issue', region: 'south', campgroundId, pinnedIds: [], recentIds: [] },
-      adminReq
+      { description: "south issue", region: "south", campgroundId, pinnedIds: [], recentIds: [] },
+      adminReq,
     );
 
-    const listNorth = await controller.list(buildRequest(adminReq.user, { region: 'north' }));
+    const listNorth = await controller.list(buildRequest(adminReq.user, { region: "north" }));
     const listRows = Array.isArray(listNorth) ? listNorth : [];
-    expect(listRows.some((row) => isRecord(row) && typeof row.id === 'string' && row.id === rNorth.id)).toBe(true);
-    expect(listRows.some((row) => isRecord(row) && typeof row.id === 'string' && row.id === rSouth.id)).toBe(false);
+    expect(
+      listRows.some((row) => isRecord(row) && typeof row.id === "string" && row.id === rNorth.id),
+    ).toBe(true);
+    expect(
+      listRows.some((row) => isRecord(row) && typeof row.id === "string" && row.id === rSouth.id),
+    ).toBe(false);
 
     // attempt cross-region assignment should 403
-    await expect(controller.update(rSouth.id, { assigneeId: userA }, adminReq)).rejects.toThrow("Forbidden by region scope");
+    await expect(controller.update(rSouth.id, { assigneeId: userA }, adminReq)).rejects.toThrow(
+      "Forbidden by region scope",
+    );
   });
 
-  it('returns staff directory filtered by region', async () => {
+  it("returns staff directory filtered by region", async () => {
     const adminReq = buildRequest(
       buildAuthUser({
-        id: 'admin-user',
-        role: 'owner',
-        region: 'north',
-        memberships: [buildAuthMembership({ campgroundId, role: 'owner' })],
-      })
+        id: "admin-user",
+        role: "owner",
+        region: "north",
+        memberships: [buildAuthMembership({ campgroundId, role: "owner" })],
+      }),
     );
     const all = await controller.staffDirectory(adminReq);
     expect(all.length).toBeGreaterThanOrEqual(2);
-    const northOnly = await controller.staffDirectory(buildRequest(adminReq.user, { region: 'north' }));
+    const northOnly = await controller.staffDirectory(
+      buildRequest(adminReq.user, { region: "north" }),
+    );
     expect(northOnly.length).toBeGreaterThanOrEqual(1);
     expect(
-      Array.isArray(northOnly) && northOnly.some((row) => isRecord(row) && row.region === 'south')
+      Array.isArray(northOnly) && northOnly.some((row) => isRecord(row) && row.region === "south"),
     ).toBe(false);
   });
 });

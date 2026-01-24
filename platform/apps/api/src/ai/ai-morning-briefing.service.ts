@@ -102,7 +102,7 @@ export class AiMorningBriefingService {
     private readonly insightsService: AiInsightsService,
     private readonly configService: AiAutopilotConfigService,
     private readonly noShowService: AiNoShowPredictionService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -151,7 +151,7 @@ export class AiMorningBriefingService {
       date: today.toLocaleDateString("en-US", {
         month: "long",
         day: "numeric",
-        year: "numeric"
+        year: "numeric",
       }),
       dayOfWeek: today.toLocaleDateString("en-US", { weekday: "long" }),
       summary: {
@@ -176,7 +176,7 @@ export class AiMorningBriefingService {
   private async getArrivals(
     campgroundId: string,
     today: Date,
-    tomorrow: Date
+    tomorrow: Date,
   ): Promise<ArrivingGuest[]> {
     const reservations = await this.prisma.reservation.findMany({
       where: {
@@ -196,7 +196,9 @@ export class AiMorningBriefingService {
         r.rigType,
         r.rigLength ? `${r.rigLength}ft` : undefined,
         r.vehiclePlate ? `Plate ${r.vehiclePlate}` : undefined,
-      ].filter(Boolean).join(" ");
+      ]
+        .filter(Boolean)
+        .join(" ");
       return {
         guestName: `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`,
         siteName: r.Site?.name || "Unassigned",
@@ -213,7 +215,7 @@ export class AiMorningBriefingService {
   private async getDepartures(
     campgroundId: string,
     today: Date,
-    tomorrow: Date
+    tomorrow: Date,
   ): Promise<{ guestName: string; siteName: string; checkoutTime?: string }[]> {
     const reservations = await this.prisma.reservation.findMany({
       where: {
@@ -236,7 +238,7 @@ export class AiMorningBriefingService {
 
   private async getOccupancy(
     campgroundId: string,
-    date: Date
+    date: Date,
   ): Promise<{ percent: number; occupied: number; total: number }> {
     const totalSites = await this.prisma.site.count({
       where: { campgroundId, status: "active" },
@@ -259,7 +261,7 @@ export class AiMorningBriefingService {
   }
 
   private async getPendingPayments(
-    campgroundId: string
+    campgroundId: string,
   ): Promise<{ count: number; totalCents: number }> {
     const pending = await this.prisma.reservation.aggregate({
       where: {
@@ -356,7 +358,7 @@ export class AiMorningBriefingService {
   private async getRevenueAtRisk(
     campgroundId: string,
     today: Date,
-    tomorrow: Date
+    tomorrow: Date,
   ): Promise<RevenueAtRisk> {
     try {
       // First, ensure we have up-to-date risk calculations for today's arrivals
@@ -457,7 +459,7 @@ export class AiMorningBriefingService {
       // Calculate total revenue at risk (unpaid balance of high-risk reservations)
       const totalRevenueAtRiskCents = highRiskArrivals.reduce(
         (sum, arrival) => sum + arrival.totalAmountCents,
-        0
+        0,
       );
 
       return {
@@ -524,7 +526,7 @@ export class AiMorningBriefingService {
 
   private async detectOpportunities(
     campgroundId: string,
-    lookAheadDate: Date
+    lookAheadDate: Date,
   ): Promise<MorningBriefing["opportunities"]> {
     const opportunities: MorningBriefing["opportunities"] = [];
 
@@ -560,7 +562,8 @@ export class AiMorningBriefingService {
       opportunities.push({
         type: "gap_fill",
         title: `${gapNights} Gap Night${gapNights > 1 ? "s" : ""} Available`,
-        description: "Consider offering discounted rates for single-night gaps to maximize revenue.",
+        description:
+          "Consider offering discounted rates for single-night gaps to maximize revenue.",
         potentialRevenue: gapNights * 8000, // Estimate $80 per gap night
       });
     }
@@ -651,9 +654,13 @@ export class AiMorningBriefingService {
 
   private generateBriefingHtml(briefing: MorningBriefing): string {
     const hasAlerts = briefing.anomalies.length > 0 || briefing.weatherAlerts.length > 0;
-    const alertBannerColor = briefing.anomalies.some(a => a.severity === "critical") ? "#dc2626" :
-                             briefing.weatherAlerts.some(w => w.severity === "emergency") ? "#dc2626" :
-                             hasAlerts ? "#f59e0b" : "#10b981";
+    const alertBannerColor = briefing.anomalies.some((a) => a.severity === "critical")
+      ? "#dc2626"
+      : briefing.weatherAlerts.some((w) => w.severity === "emergency")
+        ? "#dc2626"
+        : hasAlerts
+          ? "#f59e0b"
+          : "#10b981";
 
     return `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f8fafc;">
@@ -680,18 +687,24 @@ export class AiMorningBriefingService {
           </div>
         </div>
 
-        ${hasAlerts ? `
+        ${
+          hasAlerts
+            ? `
         <!-- Alerts Banner -->
         <div style="background: ${alertBannerColor}; border-radius: 12px; padding: 16px; margin-bottom: 24px;">
           <p style="margin: 0; color: white; font-weight: 600;">
-            ${briefing.anomalies.length > 0 ? `${briefing.anomalies.length} active alert${briefing.anomalies.length > 1 ? 's' : ''}` : ''}
-            ${briefing.anomalies.length > 0 && briefing.weatherAlerts.length > 0 ? ' | ' : ''}
-            ${briefing.weatherAlerts.length > 0 ? `${briefing.weatherAlerts.length} weather alert${briefing.weatherAlerts.length > 1 ? 's' : ''}` : ''}
+            ${briefing.anomalies.length > 0 ? `${briefing.anomalies.length} active alert${briefing.anomalies.length > 1 ? "s" : ""}` : ""}
+            ${briefing.anomalies.length > 0 && briefing.weatherAlerts.length > 0 ? " | " : ""}
+            ${briefing.weatherAlerts.length > 0 ? `${briefing.weatherAlerts.length} weather alert${briefing.weatherAlerts.length > 1 ? "s" : ""}` : ""}
           </p>
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${briefing.revenueAtRisk.totalHighRiskCount > 0 ? `
+        ${
+          briefing.revenueAtRisk.totalHighRiskCount > 0
+            ? `
         <!-- Revenue at Risk -->
         <div style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -702,9 +715,12 @@ export class AiMorningBriefingService {
             </div>
           </div>
           <p style="margin: 0 0 16px 0; font-size: 13px; color: rgba(255,255,255,0.9);">
-            ${briefing.revenueAtRisk.totalHighRiskCount} arrival${briefing.revenueAtRisk.totalHighRiskCount > 1 ? 's' : ''} today ${briefing.revenueAtRisk.totalHighRiskCount > 1 ? 'have' : 'has'} a high no-show risk. Take action to secure this revenue.
+            ${briefing.revenueAtRisk.totalHighRiskCount} arrival${briefing.revenueAtRisk.totalHighRiskCount > 1 ? "s" : ""} today ${briefing.revenueAtRisk.totalHighRiskCount > 1 ? "have" : "has"} a high no-show risk. Take action to secure this revenue.
           </p>
-          ${briefing.revenueAtRisk.highRiskArrivals.slice(0, 5).map(r => `
+          ${briefing.revenueAtRisk.highRiskArrivals
+            .slice(0, 5)
+            .map(
+              (r) => `
             <div style="background: rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; margin-bottom: 8px;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
@@ -723,81 +739,122 @@ export class AiMorningBriefingService {
               </div>
               <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.2);">
                 <p style="margin: 0; font-size: 11px; color: #fcd34d; font-weight: 500;">
-                  Suggested: ${r.suggestedActions.join(' | ')}
+                  Suggested: ${r.suggestedActions.join(" | ")}
                 </p>
-                ${r.guestPhone ? `<p style="margin: 4px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.8);">Phone: ${r.guestPhone}</p>` : ''}
+                ${r.guestPhone ? `<p style="margin: 4px 0 0 0; font-size: 11px; color: rgba(255,255,255,0.8);">Phone: ${r.guestPhone}</p>` : ""}
               </div>
             </div>
-          `).join('')}
-          ${briefing.revenueAtRisk.totalHighRiskCount > 5 ? `
+          `,
+            )
+            .join("")}
+          ${
+            briefing.revenueAtRisk.totalHighRiskCount > 5
+              ? `
             <p style="margin: 8px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.7); text-align: center;">
               + ${briefing.revenueAtRisk.totalHighRiskCount - 5} more high-risk arrivals. View all in dashboard.
             </p>
-          ` : ''}
+          `
+              : ""
+          }
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${briefing.arrivals.length > 0 ? `
+        ${
+          briefing.arrivals.length > 0
+            ? `
         <!-- Today's Arrivals -->
         <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #0f172a;">Today's Arrivals</h2>
-          ${briefing.arrivals.map(a => `
+          ${briefing.arrivals
+            .map(
+              (a) => `
             <div style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
               <div style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <p style="margin: 0; font-weight: 600; color: #0f172a;">
-                    ${a.isVip ? '<span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 8px;">VIP</span>' : ''}
+                    ${a.isVip ? '<span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-size: 10px; margin-right: 8px;">VIP</span>' : ""}
                     ${a.guestName}
                   </p>
-                  <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Site ${a.siteName} | ${a.totalGuests} guest${a.totalGuests > 1 ? 's' : ''}</p>
+                  <p style="margin: 4px 0 0 0; font-size: 13px; color: #64748b;">Site ${a.siteName} | ${a.totalGuests} guest${a.totalGuests > 1 ? "s" : ""}</p>
                 </div>
               </div>
-              ${a.specialRequests ? `<p style="margin: 8px 0 0 0; padding: 8px; background: #fef3c7; border-radius: 6px; font-size: 12px; color: #92400e;">Special Request: ${a.specialRequests}</p>` : ''}
+              ${a.specialRequests ? `<p style="margin: 8px 0 0 0; padding: 8px; background: #fef3c7; border-radius: 6px; font-size: 12px; color: #92400e;">Special Request: ${a.specialRequests}</p>` : ""}
             </div>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${briefing.insights.length > 0 ? `
+        ${
+          briefing.insights.length > 0
+            ? `
         <!-- AI Insights -->
         <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #0f172a;">AI Insights</h2>
-          ${briefing.insights.slice(0, 3).map(i => `
-            <div style="padding: 12px; background: ${i.priority === 'high' ? '#fef2f2' : i.priority === 'medium' ? '#fffbeb' : '#f0fdf4'}; border-radius: 8px; margin-bottom: 8px;">
+          ${briefing.insights
+            .slice(0, 3)
+            .map(
+              (i) => `
+            <div style="padding: 12px; background: ${i.priority === "high" ? "#fef2f2" : i.priority === "medium" ? "#fffbeb" : "#f0fdf4"}; border-radius: 8px; margin-bottom: 8px;">
               <p style="margin: 0; font-weight: 600; color: #0f172a;">${i.title}</p>
               <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">${i.summary}</p>
-              ${i.suggestedAction ? `<p style="margin: 8px 0 0 0; font-size: 12px; color: #059669; font-weight: 500;">Action: ${i.suggestedAction}</p>` : ''}
+              ${i.suggestedAction ? `<p style="margin: 8px 0 0 0; font-size: 12px; color: #059669; font-weight: 500;">Action: ${i.suggestedAction}</p>` : ""}
             </div>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${briefing.opportunities.length > 0 ? `
+        ${
+          briefing.opportunities.length > 0
+            ? `
         <!-- Revenue Opportunities -->
         <div style="background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
           <h2 style="margin: 0 0 16px 0; font-size: 18px; color: white;">Revenue Opportunities</h2>
-          ${briefing.opportunities.map(o => `
+          ${briefing.opportunities
+            .map(
+              (o) => `
             <div style="padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 8px;">
               <p style="margin: 0; font-weight: 600; color: white;">${o.title}</p>
               <p style="margin: 4px 0 0 0; font-size: 13px; color: rgba(255,255,255,0.8);">${o.description}</p>
-              ${o.potentialRevenue ? `<p style="margin: 8px 0 0 0; font-size: 14px; color: #fcd34d; font-weight: 600;">Potential: +$${(o.potentialRevenue / 100).toLocaleString()}</p>` : ''}
+              ${o.potentialRevenue ? `<p style="margin: 8px 0 0 0; font-size: 14px; color: #fcd34d; font-weight: 600;">Potential: +$${(o.potentialRevenue / 100).toLocaleString()}</p>` : ""}
             </div>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
-        ${briefing.maintenanceReminders.length > 0 ? `
+        ${
+          briefing.maintenanceReminders.length > 0
+            ? `
         <!-- Maintenance Reminders -->
         <div style="background: white; border-radius: 16px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
           <h2 style="margin: 0 0 16px 0; font-size: 18px; color: #0f172a;">Maintenance Reminders</h2>
-          ${briefing.maintenanceReminders.map(m => `
+          ${briefing.maintenanceReminders
+            .map(
+              (m) => `
             <div style="padding: 8px 0; border-bottom: 1px solid #f1f5f9;">
               <p style="margin: 0; font-size: 14px; color: #0f172a;">${m.title}</p>
-              <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">${m.siteName ? `Site ${m.siteName}` : 'General'}</p>
+              <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">${m.siteName ? `Site ${m.siteName}` : "General"}</p>
             </div>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </div>
-        ` : ''}
+        `
+            : ""
+        }
 
         <!-- Footer -->
         <div style="text-align: center; padding-top: 24px; border-top: 1px solid #e2e8f0;">

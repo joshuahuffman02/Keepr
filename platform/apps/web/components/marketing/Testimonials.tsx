@@ -1,45 +1,45 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { Rocket, Users, MessageSquare, Lightbulb } from 'lucide-react';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { Rocket, Users, MessageSquare, Lightbulb } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 const earlyAccessBenefits = [
   {
     id: 1,
     icon: Rocket,
-    title: 'Shape the Product',
+    title: "Shape the Product",
     description:
-      'As an early adopter, you get direct input on features we build. Your feedback shapes the roadmap.',
+      "As an early adopter, you get direct input on features we build. Your feedback shapes the roadmap.",
   },
   {
     id: 2,
     icon: Users,
-    title: 'Founding Community',
+    title: "Founding Community",
     description:
-      'Join a small group of forward-thinking campground owners. Network, share ideas, and grow together.',
+      "Join a small group of forward-thinking campground owners. Network, share ideas, and grow together.",
   },
   {
     id: 3,
     icon: MessageSquare,
-    title: 'Direct Access',
+    title: "Direct Access",
     description:
-      'Skip the support queue. Early access members get direct communication with our team.',
+      "Skip the support queue. Early access members get direct communication with our team.",
   },
   {
     id: 4,
     icon: Lightbulb,
-    title: 'Locked-In Pricing',
+    title: "Locked-In Pricing",
     description:
-      'Early access pricing is locked forever. As we grow and add features, your rate stays the same.',
+      "Early access pricing is locked forever. As we grow and add features, your rate stays the same.",
   },
 ];
 const EASE_OUT: "easeOut" = "easeOut";
 
 export function Testimonials() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotionSafe();
 
   const containerVariants = {
@@ -76,8 +76,8 @@ export function Testimonials() {
             Be part of something new
           </h2>
           <p className="text-lg text-muted-foreground">
-            We're building Keepr with campground owners, not just for them.
-            Early adopters get unique benefits you won't find anywhere else.
+            We're building Keepr with campground owners, not just for them. Early adopters get
+            unique benefits you won't find anywhere else.
           </p>
         </motion.div>
 
@@ -85,7 +85,7 @@ export function Testimonials() {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
+          animate={isInView ? "visible" : "hidden"}
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
         >
           {earlyAccessBenefits.map((benefit) => {

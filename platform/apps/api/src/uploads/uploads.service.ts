@@ -18,14 +18,19 @@ export class UploadsService {
     this.region = process.env.UPLOADS_S3_REGION || null;
     this.cdnBase = process.env.UPLOADS_CDN_BASE || null;
 
-    if (this.bucket && this.region && process.env.UPLOADS_S3_ACCESS_KEY && process.env.UPLOADS_S3_SECRET_KEY) {
+    if (
+      this.bucket &&
+      this.region &&
+      process.env.UPLOADS_S3_ACCESS_KEY &&
+      process.env.UPLOADS_S3_SECRET_KEY
+    ) {
       this.s3 = new S3Client({
         region: this.region,
         endpoint: process.env.UPLOADS_S3_ENDPOINT || undefined,
         credentials: {
           accessKeyId: process.env.UPLOADS_S3_ACCESS_KEY!,
-          secretAccessKey: process.env.UPLOADS_S3_SECRET_KEY!
-        }
+          secretAccessKey: process.env.UPLOADS_S3_SECRET_KEY!,
+        },
       });
     } else {
       this.s3 = null;
@@ -59,7 +64,10 @@ export class UploadsService {
       }
     }
     const endpoint = process.env.UPLOADS_S3_ENDPOINT?.toLowerCase() || "";
-    if (endpoint.includes("r2.cloudflarestorage.com") || endpoint.includes("cloudflarestorage.com")) {
+    if (
+      endpoint.includes("r2.cloudflarestorage.com") ||
+      endpoint.includes("cloudflarestorage.com")
+    ) {
       return undefined;
     }
     // SECURITY: Default to private ACL. Use signed URLs for access.
@@ -68,7 +76,11 @@ export class UploadsService {
 
   private isAclUnsupportedError(err: unknown) {
     const message = err instanceof Error ? err.message : "";
-    return message.includes("AccessControlListNotSupported") || message.includes("ACL") || message.includes("InvalidArgument");
+    return (
+      message.includes("AccessControlListNotSupported") ||
+      message.includes("ACL") ||
+      message.includes("InvalidArgument")
+    );
   }
 
   ensureEnabled() {
@@ -86,10 +98,12 @@ export class UploadsService {
       Bucket: this.bucket!,
       Key: key,
       ContentType: contentType,
-      ...(acl ? { ACL: acl } : {})
+      ...(acl ? { ACL: acl } : {}),
     });
     const uploadUrl = await getSignedUrl(this.s3!, command, { expiresIn: 300 });
-    const publicUrl = this.cdnBase ? `${this.cdnBase.replace(/\/$/, "")}/${key}` : `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`;
+    const publicUrl = this.cdnBase
+      ? `${this.cdnBase.replace(/\/$/, "")}/${key}`
+      : `https://${this.bucket}.s3.${this.region}.amazonaws.com/${key}`;
     return { uploadUrl, publicUrl, key };
   }
 
@@ -115,8 +129,13 @@ export class UploadsService {
   /**
    * Directly upload a buffer to S3 when configured; otherwise write to /tmp and return a file:// URL.
    */
-  async uploadBuffer(buffer: Buffer, opts: { contentType: string; extension?: string; prefix?: string }) {
-    const ext = (opts.extension ?? opts.contentType.split("/")[1] ?? "bin").replace(/[^a-z0-9]/gi, "") || "bin";
+  async uploadBuffer(
+    buffer: Buffer,
+    opts: { contentType: string; extension?: string; prefix?: string },
+  ) {
+    const ext =
+      (opts.extension ?? opts.contentType.split("/")[1] ?? "bin").replace(/[^a-z0-9]/gi, "") ||
+      "bin";
     const key = `${opts.prefix ?? "uploads"}/${randomUUID()}.${ext}`;
 
     if (this.s3 && this.bucket && this.region) {
@@ -127,7 +146,7 @@ export class UploadsService {
           Key: key,
           Body: buffer,
           ContentType: opts.contentType,
-          ...(acl ? { ACL: acl } : {})
+          ...(acl ? { ACL: acl } : {}),
         });
         await this.s3.send(command);
       } catch (err) {
@@ -136,7 +155,7 @@ export class UploadsService {
             Bucket: this.bucket,
             Key: key,
             Body: buffer,
-            ContentType: opts.contentType
+            ContentType: opts.contentType,
           });
           await this.s3.send(retryCommand);
         } else {

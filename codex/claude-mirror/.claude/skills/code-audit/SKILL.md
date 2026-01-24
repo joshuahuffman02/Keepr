@@ -11,6 +11,7 @@ You are a senior code auditor specializing in full-stack TypeScript applications
 ## Audit Categories
 
 Run through each category systematically. For each issue found, report:
+
 - **File**: `path/to/file.ts:lineNumber`
 - **Issue**: Brief description
 - **Code**: The problematic snippet
@@ -23,12 +24,14 @@ Run through each category systematically. For each issue found, report:
 **Goal**: Find UI state or form fields that aren't wired to API calls.
 
 **Process**:
+
 1. Find API client functions in `apps/web/lib/api-client.ts`
 2. For each function with optional parameters, find all call sites
 3. Check if optional params are being passed
 4. Look for `useState` hooks with names matching API params that aren't being used
 
 **Grep patterns**:
+
 ```bash
 # Find API client method signatures
 grep -n "async \w\+(" apps/web/lib/api-client.ts | head -50
@@ -41,11 +44,12 @@ grep -rn "apiClient\.\w\+(" --include="*.tsx" apps/web/ | head -100
 ```
 
 **Common patterns to catch**:
+
 ```typescript
 // BAD: State exists but not passed to API
 const [paymentMethod, setPaymentMethod] = useState("card");
 // ... later ...
-apiClient.recordPayment(id, amount);  // paymentMethod is never passed!
+apiClient.recordPayment(id, amount); // paymentMethod is never passed!
 
 // GOOD: State is wired to API
 apiClient.recordPayment(id, amount, [{ method: paymentMethod, amountCents: amount }]);
@@ -58,12 +62,14 @@ apiClient.recordPayment(id, amount, [{ method: paymentMethod, amountCents: amoun
 **Goal**: Find transaction issues, missing awaits, and query problems.
 
 **Process**:
+
 1. Search for nested `$transaction` calls
 2. Find functions that receive `tx` and check if they call `$transaction`
 3. Look for missing `await` on Prisma operations
 4. Check for `findUnique` without null checks
 
 **Grep patterns**:
+
 ```bash
 # Find potential nested transaction issues
 grep -rn "\$transaction" --include="*.ts" apps/api/src/
@@ -76,19 +82,20 @@ grep -rn "prisma\.\w\+\.\(create\|update\|delete\|findMany\|findUnique\)" --incl
 ```
 
 **Patterns to catch**:
+
 ```typescript
 // BAD: Nested transaction (will fail at runtime)
 await prisma.$transaction(async (tx) => {
-  await helperFunction(tx);  // If helperFunction calls tx.$transaction, ERROR!
+  await helperFunction(tx); // If helperFunction calls tx.$transaction, ERROR!
 });
 
 // BAD: Missing await
-const user = prisma.user.findUnique({ where: { id } });  // Returns Promise, not User!
-console.log(user.name);  // undefined or error
+const user = prisma.user.findUnique({ where: { id } }); // Returns Promise, not User!
+console.log(user.name); // undefined or error
 
 // BAD: No null check after findUnique
 const user = await prisma.user.findUnique({ where: { id } });
-return user.name;  // Crashes if user is null!
+return user.name; // Crashes if user is null!
 
 // GOOD: Null check
 const user = await prisma.user.findUnique({ where: { id } });
@@ -103,11 +110,13 @@ return user.name;
 **Goal**: Find broken imports, missing exports, and path issues.
 
 **Process**:
+
 1. Look for imports from `../auth/` or similar that might have wrong paths
 2. Check module imports/exports for consistency
 3. Find re-exports that might be missing
 
 **Grep patterns**:
+
 ```bash
 # Find all import statements to auth module (common problem area)
 grep -rn "from ['\"]\.\.\/auth" --include="*.ts" apps/api/src/
@@ -120,9 +129,10 @@ grep -rn "from ['\"]\.\.\/\w\+\/\w\+\." --include="*.ts" apps/api/src/ | head -3
 ```
 
 **Patterns to catch**:
+
 ```typescript
 // BAD: Import from file that doesn't exist or was moved
-import { JwtAuthGuard } from "../auth/jwt-auth.guard";  // File is actually jwt.guard.ts
+import { JwtAuthGuard } from "../auth/jwt-auth.guard"; // File is actually jwt.guard.ts
 
 // BAD: Should import from index
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -137,11 +147,13 @@ import { JwtAuthGuard } from "../auth/guards";
 **Goal**: Find unsafe type casts and missing type checks.
 
 **Process**:
+
 1. Count and audit `as any` usage
 2. Find optional chaining on required values
 3. Look for type assertions that might hide errors
 
 **Grep patterns**:
+
 ```bash
 # Count as any usage (high count = red flag)
 grep -rn "as any" --include="*.ts" --include="*.tsx" apps/ | wc -l
@@ -160,11 +172,13 @@ grep -rn "\?\.\w\+\?\.\w\+\?\." --include="*.ts" --include="*.tsx" apps/
 **Goal**: Find code that exists but is never used.
 
 **Process**:
+
 1. Find useState hooks and check if both value and setter are used
 2. Find functions defined but never called
 3. Look for commented-out code blocks
 
 **Grep patterns**:
+
 ```bash
 # Find useState declarations
 grep -rn "const \[.*,.*\] = useState" --include="*.tsx" apps/web/
@@ -180,6 +194,7 @@ grep -rn "^[[:space:]]*const \w\+ = async\|^[[:space:]]*async function\|^[[:spac
 **Goal**: Find missing error handling and empty catch blocks.
 
 **Grep patterns**:
+
 ```bash
 # Find empty catch blocks
 grep -rn "catch.*{[[:space:]]*}" --include="*.ts" --include="*.tsx" apps/
@@ -198,11 +213,13 @@ grep -rn "async \w\+.*{$" --include="*.ts" apps/api/src/
 **Goal**: Ensure frontend API calls match backend routes.
 
 **Process**:
+
 1. List all backend routes from controllers
 2. List all frontend API calls
 3. Cross-reference for mismatches
 
 **Grep patterns**:
+
 ```bash
 # Find all backend routes
 grep -rn "@\(Get\|Post\|Put\|Patch\|Delete\)(" --include="*.controller.ts" apps/api/src/

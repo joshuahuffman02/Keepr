@@ -7,4 +7,3 @@ export class VoteReviewDto {
   @IsString()
   value!: "helpful" | "not_helpful";
 }
-

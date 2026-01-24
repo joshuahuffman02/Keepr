@@ -42,7 +42,7 @@ export const CalendarGrid = memo(function CalendarGrid({
   selectionDraft,
   onSelectionComplete,
   onReservationClick,
-  density
+  density,
 }: CalendarGridProps) {
   const densityConfig = DENSITY_CONFIG[density];
   const gridRef = useRef<HTMLDivElement>(null);
@@ -53,7 +53,7 @@ export const CalendarGrid = memo(function CalendarGrid({
     startIdx: null,
     endIdx: null,
     isDragging: false,
-    pointerId: null
+    pointerId: null,
   });
   const dragRef = useRef<DragState>(dragState);
 
@@ -71,12 +71,15 @@ export const CalendarGrid = memo(function CalendarGrid({
       const grid = gridRef.current;
       if (!grid) return null;
 
-      const elements = typeof document.elementsFromPoint === "function"
-        ? document.elementsFromPoint(clientX, clientY)
-        : [document.elementFromPoint(clientX, clientY)].filter((el): el is Element => el !== null);
+      const elements =
+        typeof document.elementsFromPoint === "function"
+          ? document.elementsFromPoint(clientX, clientY)
+          : [document.elementFromPoint(clientX, clientY)].filter(
+              (el): el is Element => el !== null,
+            );
 
       const cell = elements.find(
-        (el): el is HTMLElement => el instanceof HTMLElement && el.dataset.dayIdx !== undefined
+        (el): el is HTMLElement => el instanceof HTMLElement && el.dataset.dayIdx !== undefined,
       );
 
       if (cell) {
@@ -94,14 +97,17 @@ export const CalendarGrid = memo(function CalendarGrid({
       const dayIdx = Math.min(dayCount - 1, Math.max(0, idx));
       return { dayIdx };
     },
-    [dayCount]
+    [dayCount],
   );
 
-  const updateDragEnd = useCallback((dayIdx: number) => {
-    const current = dragRef.current;
-    if (!current.isDragging || current.endIdx === dayIdx) return;
-    setDrag({ ...current, endIdx: dayIdx });
-  }, [setDrag]);
+  const updateDragEnd = useCallback(
+    (dayIdx: number) => {
+      const current = dragRef.current;
+      if (!current.isDragging || current.endIdx === dayIdx) return;
+      setDrag({ ...current, endIdx: dayIdx });
+    },
+    [setDrag],
+  );
 
   const finishDrag = useCallback(() => {
     const drag = dragRef.current;
@@ -133,28 +139,46 @@ export const CalendarGrid = memo(function CalendarGrid({
     };
   }, [finishDrag]);
 
-  const handleCellPointerDown = useCallback((siteId: string, dayIdx: number, e: React.PointerEvent) => {
-    e.preventDefault();
-    const target = e.currentTarget;
-    if (target instanceof HTMLElement && target.setPointerCapture) {
-      try {
-        target.setPointerCapture(e.pointerId);
-      } catch {
-        // ignore capture errors
+  const handleCellPointerDown = useCallback(
+    (siteId: string, dayIdx: number, e: React.PointerEvent) => {
+      e.preventDefault();
+      const target = e.currentTarget;
+      if (target instanceof HTMLElement && target.setPointerCapture) {
+        try {
+          target.setPointerCapture(e.pointerId);
+        } catch {
+          // ignore capture errors
+        }
       }
-    }
-    setDrag({ siteId, startIdx: dayIdx, endIdx: dayIdx, isDragging: true, pointerId: e.pointerId });
-  }, [setDrag]);
+      setDrag({
+        siteId,
+        startIdx: dayIdx,
+        endIdx: dayIdx,
+        isDragging: true,
+        pointerId: e.pointerId,
+      });
+    },
+    [setDrag],
+  );
 
-  const handleGridPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragRef.current.isDragging) return;
-    const target = resolveDragTarget(e.clientX, e.clientY);
-    if (!target) return;
-    updateDragEnd(target.dayIdx);
-  }, [resolveDragTarget, updateDragEnd]);
+  const handleGridPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!dragRef.current.isDragging) return;
+      const target = resolveDragTarget(e.clientX, e.clientY);
+      if (!target) return;
+      updateDragEnd(target.dayIdx);
+    },
+    [resolveDragTarget, updateDragEnd],
+  );
 
   const activeSelection = useMemo<ActiveSelection | null>(() => {
-    if (!dragState.isDragging || !dragState.siteId || dragState.startIdx === null || dragState.endIdx === null) return null;
+    if (
+      !dragState.isDragging ||
+      !dragState.siteId ||
+      dragState.startIdx === null ||
+      dragState.endIdx === null
+    )
+      return null;
     return { siteId: dragState.siteId, startIdx: dragState.startIdx, endIdx: dragState.endIdx };
   }, [dragState]);
 
@@ -203,7 +227,7 @@ export const CalendarGrid = memo(function CalendarGrid({
               key={idx}
               className={cn(
                 "px-2 py-3 text-center border-r border-border/60 last:border-r-0",
-                d.isToday && "bg-primary/10 text-primary"
+                d.isToday && "bg-primary/10 text-primary",
               )}
             >
               <div>{d.label}</div>

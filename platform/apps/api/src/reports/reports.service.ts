@@ -1,7 +1,12 @@
-import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { IntegrationExportJob, Prisma, ReferralProgram, ReservationStatus } from "@prisma/client";
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from "../prisma/prisma.service";
 import { ObservabilityService } from "../observability/observability.service";
 import { AlertingService } from "../observability/alerting.service";
 import { DashboardService } from "../dashboard/dashboard.service";
@@ -10,7 +15,13 @@ import { AuditService } from "../audit/audit.service";
 import { JobQueueService } from "../observability/job-queue.service";
 import { EmailService } from "../email/email.service";
 import { ReportDimensionSpec, ReportQueryInput, ReportRunResult, ReportSpec } from "./report.types";
-import { getReportCatalog, getReportSpec, resolveDimension, resolveFilters, resolveMetric } from "./report.registry";
+import {
+  getReportCatalog,
+  getReportSpec,
+  resolveDimension,
+  resolveFilters,
+  resolveMetric,
+} from "./report.registry";
 import * as XLSX from "xlsx";
 import { randomUUID } from "crypto";
 
@@ -60,7 +71,7 @@ const toDateValue = (value: unknown): Date | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -73,482 +84,506 @@ const toNullableJsonInput = (
 
 @Injectable()
 export class ReportsService {
-    constructor(
-      private prisma: PrismaService,
-      private readonly observability: ObservabilityService,
-      private readonly alerting: AlertingService,
-      private readonly dashboard: DashboardService,
-      private readonly uploads: UploadsService,
-      private readonly audit: AuditService,
-      private readonly jobQueue: JobQueueService,
-      private readonly email: EmailService
-    ) { }
+  constructor(
+    private prisma: PrismaService,
+    private readonly observability: ObservabilityService,
+    private readonly alerting: AlertingService,
+    private readonly dashboard: DashboardService,
+    private readonly uploads: UploadsService,
+    private readonly audit: AuditService,
+    private readonly jobQueue: JobQueueService,
+    private readonly email: EmailService,
+  ) {}
 
-    private activeRuns = 0;
-    private heavyRuns = 0;
-    private readonly queryLimit = Number(process.env.REPORT_QUERY_MAX_CONCURRENCY ?? 10);
-    private readonly heavyQueryLimit = Number(process.env.REPORT_HEAVY_MAX_CONCURRENCY ?? 2);
-    private readonly defaultCacheTtlSec = Number(process.env.REPORT_QUERY_CACHE_TTL ?? 120);
-    private readonly defaultSampleLimit = Number(process.env.REPORT_QUERY_SAMPLE_LIMIT ?? 5000);
-    private readonly exportQueueName = "reports-export";
+  private activeRuns = 0;
+  private heavyRuns = 0;
+  private readonly queryLimit = Number(process.env.REPORT_QUERY_MAX_CONCURRENCY ?? 10);
+  private readonly heavyQueryLimit = Number(process.env.REPORT_HEAVY_MAX_CONCURRENCY ?? 2);
+  private readonly defaultCacheTtlSec = Number(process.env.REPORT_QUERY_CACHE_TTL ?? 120);
+  private readonly defaultSampleLimit = Number(process.env.REPORT_QUERY_SAMPLE_LIMIT ?? 5000);
+  private readonly exportQueueName = "reports-export";
 
-    private encodeToken(payload: Record<string, unknown>): string {
-      return Buffer.from(JSON.stringify(payload)).toString("base64url");
+  private encodeToken(payload: Record<string, unknown>): string {
+    return Buffer.from(JSON.stringify(payload)).toString("base64url");
+  }
+
+  private decodeToken(token?: string): Record<string, unknown> | null {
+    if (!token) return null;
+    try {
+      const parsed = JSON.parse(Buffer.from(token, "base64url").toString());
+      return isRecord(parsed) ? parsed : null;
+    } catch (err) {
+      return null;
     }
+  }
 
-    private decodeToken(token?: string): Record<string, unknown> | null {
-      if (!token) return null;
-      try {
-        const parsed = JSON.parse(Buffer.from(token, "base64url").toString());
-        return isRecord(parsed) ? parsed : null;
-      } catch (err) {
-        return null;
-      }
+  private exportMaxRows() {
+    return Number(process.env.REPORT_EXPORT_MAX_ROWS ?? 50000);
+  }
+
+  private exportPageSize() {
+    return Number(process.env.REPORT_EXPORT_PAGE_SIZE ?? 1000);
+  }
+
+  private capacityGuardThreshold() {
+    return Number(process.env.REPORT_EXPORT_CAPACITY_GUARD ?? 150);
+  }
+
+  private capacityGuardRetryAfterSec() {
+    return Number(process.env.REPORT_EXPORT_RETRY_AFTER_SEC ?? 60);
+  }
+
+  private resolveRangeFromFilters(filters?: Record<string, unknown>) {
+    const now = new Date();
+    const range = filters?.range ?? filters?.timeRange;
+    const days = filters?.days ? Number(filters.days) : undefined;
+    if (range === "last_7_days") {
+      return { start: this.daysAgo(7), end: now, days: 7, label: range };
     }
-
-    private exportMaxRows() {
-      return Number(process.env.REPORT_EXPORT_MAX_ROWS ?? 50000);
+    if (range === "last_30_days") {
+      return { start: this.daysAgo(30), end: now, days: 30, label: range };
     }
-
-    private exportPageSize() {
-      return Number(process.env.REPORT_EXPORT_PAGE_SIZE ?? 1000);
+    if (range === "last_90_days") {
+      return { start: this.daysAgo(90), end: now, days: 90, label: range };
     }
-
-    private capacityGuardThreshold() {
-      return Number(process.env.REPORT_EXPORT_CAPACITY_GUARD ?? 150);
+    if (typeof days === "number" && days > 0) {
+      return { start: this.daysAgo(days), end: now, days, label: `last_${days}_days` };
     }
-
-    private capacityGuardRetryAfterSec() {
-      return Number(process.env.REPORT_EXPORT_RETRY_AFTER_SEC ?? 60);
+    if (filters?.startDate || filters?.endDate) {
+      const start = toDateValue(filters?.startDate);
+      const end = toDateValue(filters?.endDate) ?? now;
+      const computedDays =
+        start && end
+          ? Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000))
+          : undefined;
+      return { start, end, days: computedDays, label: "custom" };
     }
+    // default to 30d
+    return { start: this.daysAgo(30), end: now, days: 30, label: "last_30_days" };
+  }
 
-    private resolveRangeFromFilters(filters?: Record<string, unknown>) {
-      const now = new Date();
-      const range = filters?.range ?? filters?.timeRange;
-      const days = filters?.days ? Number(filters.days) : undefined;
-      if (range === "last_7_days") {
-        return { start: this.daysAgo(7), end: now, days: 7, label: range };
-      }
-      if (range === "last_30_days") {
-        return { start: this.daysAgo(30), end: now, days: 30, label: range };
-      }
-      if (range === "last_90_days") {
-        return { start: this.daysAgo(90), end: now, days: 90, label: range };
-      }
-      if (typeof days === "number" && days > 0) {
-        return { start: this.daysAgo(days), end: now, days, label: `last_${days}_days` };
-      }
-      if (filters?.startDate || filters?.endDate) {
-        const start = toDateValue(filters?.startDate);
-        const end = toDateValue(filters?.endDate) ?? now;
-        const computedDays = start && end ? Math.max(1, Math.round((end.getTime() - start.getTime()) / 86400000)) : undefined;
-        return { start, end, days: computedDays, label: "custom" };
-      }
-      // default to 30d
-      return { start: this.daysAgo(30), end: now, days: 30, label: "last_30_days" };
+  private reservationDateWhere(range?: { start?: Date; end?: Date }): Prisma.ReservationWhereInput {
+    if (!range?.start && !range?.end) return {};
+    const startDate = range.start;
+    const endDate = range.end ?? new Date();
+    return {
+      OR: [
+        { arrivalDate: { gte: startDate ?? undefined, lte: endDate ?? undefined } },
+        { departureDate: { gte: startDate ?? undefined, lte: endDate ?? undefined } },
+        { arrivalDate: { lte: startDate ?? endDate }, departureDate: { gte: endDate } },
+      ],
+    };
+  }
+
+  private async computeAttachRate(campgroundId: string, range?: { start?: Date; end?: Date }) {
+    const where: Prisma.ReservationWhereInput = {
+      campgroundId,
+      status: { notIn: [ReservationStatus.cancelled] },
+      ...this.reservationDateWhere(range),
+    };
+    const reservations = await this.prisma.reservation.findMany({
+      where,
+      select: { id: true },
+    });
+    if (!reservations.length) return 0;
+    const reservationIds = reservations.map((r) => r.id);
+    const upsells = await this.prisma.reservationUpsell.findMany({
+      where: { reservationId: { in: reservationIds } },
+      select: { reservationId: true },
+    });
+    const withUpsell = new Set(upsells.map((u) => u.reservationId)).size;
+    return Math.round((withUpsell / reservations.length) * 100);
+  }
+
+  private computeNextRun(cadence: string | undefined, from: Date = new Date()) {
+    const base = new Date(from);
+    switch ((cadence ?? "daily").toLowerCase()) {
+      case "hourly":
+        base.setHours(base.getHours() + 1);
+        return base;
+      case "weekly":
+        base.setDate(base.getDate() + 7);
+        return base;
+      case "monthly":
+        base.setMonth(base.getMonth() + 1);
+        return base;
+      case "daily":
+      default:
+        base.setDate(base.getDate() + 1);
+        return base;
     }
+  }
 
-    private reservationDateWhere(range?: { start?: Date; end?: Date }): Prisma.ReservationWhereInput {
-      if (!range?.start && !range?.end) return {};
-      const startDate = range.start;
-      const endDate = range.end ?? new Date();
-      return {
-        OR: [
-          { arrivalDate: { gte: startDate ?? undefined, lte: endDate ?? undefined } },
-          { departureDate: { gte: startDate ?? undefined, lte: endDate ?? undefined } },
-          { arrivalDate: { lte: startDate ?? endDate }, departureDate: { gte: endDate } }
-        ]
-      };
-    }
+  async getBookingSources(campgroundId: string, startDate?: string, endDate?: string) {
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().setMonth(new Date().getMonth() - 1));
+    const end = endDate ? new Date(endDate) : new Date();
 
-    private async computeAttachRate(campgroundId: string, range?: { start?: Date; end?: Date }) {
-      const where: Prisma.ReservationWhereInput = {
+    const reservations = await this.prisma.reservation.findMany({
+      where: {
         campgroundId,
-        status: { notIn: [ReservationStatus.cancelled] },
-        ...this.reservationDateWhere(range)
-      };
-      const reservations = await this.prisma.reservation.findMany({
-        where,
-        select: { id: true }
-      });
-      if (!reservations.length) return 0;
-      const reservationIds = reservations.map((r) => r.id);
-      const upsells = await this.prisma.reservationUpsell.findMany({
-        where: { reservationId: { in: reservationIds } },
-        select: { reservationId: true }
-      });
-      const withUpsell = new Set(upsells.map((u) => u.reservationId)).size;
-      return Math.round((withUpsell / reservations.length) * 100);
-    }
+        status: { not: "cancelled" },
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
+      },
+      select: {
+        id: true,
+        source: true,
+        leadTimeDays: true,
+        totalAmount: true,
+        createdAt: true,
+        arrivalDate: true,
+      },
+    });
 
-    private computeNextRun(cadence: string | undefined, from: Date = new Date()) {
-      const base = new Date(from);
-      switch ((cadence ?? "daily").toLowerCase()) {
-        case "hourly":
-          base.setHours(base.getHours() + 1);
-          return base;
-        case "weekly":
-          base.setDate(base.getDate() + 7);
-          return base;
-        case "monthly":
-          base.setMonth(base.getMonth() + 1);
-          return base;
-        case "daily":
-        default:
-          base.setDate(base.getDate() + 1);
-          return base;
+    // Aggregate by Source
+    const bySource = {
+      online: { count: 0, revenue: 0 },
+      admin: { count: 0, revenue: 0 },
+      kiosk: { count: 0, revenue: 0 },
+      phone: { count: 0, revenue: 0 },
+      walk_in: { count: 0, revenue: 0 },
+      other: { count: 0, revenue: 0 },
+    };
+
+    // Aggregate by Lead Time
+    const byLeadTime = {
+      sameDay: 0, // 0 days
+      nextDay: 0, // 1 day
+      twoDays: 0, // 2 days
+      threeToSeven: 0, // 3-7 days
+      oneToTwoWeeks: 0, // 8-14 days
+      twoToFourWeeks: 0, // 15-30 days
+      oneToThreeMonths: 0, // 31-90 days
+      threeMonthsPlus: 0, // 91+ days
+    };
+
+    let totalBookings = 0;
+    let totalRevenue = 0;
+
+    reservations.forEach((res) => {
+      totalBookings++;
+      const revenue = (res.totalAmount || 0) / 100; // Convert cents to dollars
+      totalRevenue += revenue;
+
+      // Source Aggregation
+      const source = res.source?.toLowerCase() || "other";
+      if (source.includes("online")) {
+        bySource.online.count++;
+        bySource.online.revenue += revenue;
+      } else if (source.includes("admin") || source.includes("staff")) {
+        bySource.admin.count++;
+        bySource.admin.revenue += revenue;
+      } else if (source.includes("kiosk")) {
+        bySource.kiosk.count++;
+        bySource.kiosk.revenue += revenue;
+      } else if (source.includes("phone")) {
+        bySource.phone.count++;
+        bySource.phone.revenue += revenue;
+      } else if (source.includes("walk") || source.includes("walk-in")) {
+        bySource.walk_in.count++;
+        bySource.walk_in.revenue += revenue;
+      } else {
+        bySource.other.count++;
+        bySource.other.revenue += revenue;
+      }
+
+      // Lead Time Aggregation
+      // Use stored leadTimeDays or calculate it
+      let days = res.leadTimeDays;
+      if (typeof days !== "number") {
+        const arrival = new Date(res.arrivalDate);
+        const created = new Date(res.createdAt);
+        days = Math.floor((arrival.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
+      }
+
+      // Safe guard against negative lead times (e.g. timezone issues or backdated bookings)
+      days = Math.max(0, days || 0);
+
+      if (days === 0) byLeadTime.sameDay++;
+      else if (days === 1) byLeadTime.nextDay++;
+      else if (days === 2) byLeadTime.twoDays++;
+      else if (days <= 7) byLeadTime.threeToSeven++;
+      else if (days <= 14) byLeadTime.oneToTwoWeeks++;
+      else if (days <= 30) byLeadTime.twoToFourWeeks++;
+      else if (days <= 90) byLeadTime.oneToThreeMonths++;
+      else byLeadTime.threeMonthsPlus++;
+    });
+
+    return {
+      period: { start, end },
+      totalBookings,
+      totalRevenue,
+      bySource,
+      byLeadTime,
+    };
+  }
+
+  async getGuestOrigins(campgroundId: string, startDate?: string, endDate?: string) {
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().setMonth(new Date().getMonth() - 1));
+    const end = endDate ? new Date(endDate) : new Date();
+
+    // Fetch guests via reservations to respect the date range
+    const reservations = await this.prisma.reservation.findMany({
+      where: {
+        campgroundId,
+        status: { not: "cancelled" },
+        createdAt: {
+          gte: start,
+          lte: end,
+        },
+      },
+      include: {
+        Guest: {
+          select: {
+            postalCode: true,
+            city: true,
+            state: true,
+            country: true,
+          },
+        },
+      },
+    });
+
+    const byZipCode: Record<
+      string,
+      { zipCode: string; city?: string; state?: string; count: number; revenue: number }
+    > = {};
+    const byState: Record<string, { state: string; count: number; revenue: number }> = {};
+
+    reservations.forEach((res) => {
+      const revenue = (res.totalAmount || 0) / 100;
+      const guest = res.Guest;
+      if (!guest) return;
+
+      // By Zip Code
+      if (guest.postalCode) {
+        const zip = guest.postalCode;
+        if (!byZipCode[zip]) {
+          byZipCode[zip] = {
+            zipCode: zip,
+            city: guest.city || undefined,
+            state: guest.state || undefined,
+            count: 0,
+            revenue: 0,
+          };
+        }
+        byZipCode[zip].count++;
+        byZipCode[zip].revenue += revenue;
+      }
+
+      // By State
+      if (guest.state) {
+        const state = guest.state.toUpperCase();
+        if (!byState[state]) {
+          byState[state] = { state, count: 0, revenue: 0 };
+        }
+        byState[state].count++;
+        byState[state].revenue += revenue;
+      }
+    });
+
+    const sortedZips = Object.values(byZipCode)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 50); // Top 50
+    const sortedStates = Object.values(byState).sort((a, b) => b.count - a.count);
+
+    return {
+      period: { start, end },
+      byZipCode: sortedZips,
+      byState: sortedStates,
+    };
+  }
+
+  async getReferralPerformance(campgroundId: string, startDate?: string, endDate?: string) {
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().setMonth(new Date().getMonth() - 1));
+    const end = endDate ? new Date(endDate) : new Date();
+
+    const reservations = await this.prisma.reservation.findMany({
+      where: {
+        campgroundId,
+        status: { not: "cancelled" },
+        createdAt: { gte: start, lte: end },
+        OR: [{ referralProgramId: { not: null } }, { referralCode: { not: null } }],
+      },
+      select: {
+        totalAmount: true,
+        discountsAmount: true,
+        referralProgramId: true,
+        referralCode: true,
+        referralIncentiveType: true,
+        referralIncentiveValue: true,
+        referralSource: true,
+        referralChannel: true,
+      },
+    });
+
+    const programIds = Array.from(
+      new Set(
+        reservations
+          .map((r) => r.referralProgramId)
+          .filter((id): id is string => typeof id === "string" && id.length > 0),
+      ),
+    );
+    const programMap: Record<string, ReferralProgram> = {};
+    if (programIds.length) {
+      const programs = await this.prisma.referralProgram.findMany({
+        where: { id: { in: programIds } },
+      });
+      for (const p of programs) {
+        programMap[p.id] = p;
       }
     }
 
-    async getBookingSources(campgroundId: string, startDate?: string, endDate?: string) {
-        const start = startDate ? new Date(startDate) : new Date(new Date().setMonth(new Date().getMonth() - 1));
-        const end = endDate ? new Date(endDate) : new Date();
+    type ReferralSummary = {
+      programId: string | null;
+      code: string;
+      source: string | null;
+      channel: string | null;
+      bookings: number;
+      revenueCents: number;
+      referralDiscountCents: number;
+    };
 
-        const reservations = await this.prisma.reservation.findMany({
-            where: {
-                campgroundId,
-                status: { not: 'cancelled' },
-                createdAt: {
-                    gte: start,
-                    lte: end,
-                },
-            },
-            select: {
-                id: true,
-                source: true,
-                leadTimeDays: true,
-                totalAmount: true,
-                createdAt: true,
-                arrivalDate: true,
-            },
-        });
+    const byProgram: Record<string, ReferralSummary> = {};
+    let totalRevenueCents = 0;
+    let totalReferralDiscountCents = 0;
 
-        // Aggregate by Source
-        const bySource = {
-            online: { count: 0, revenue: 0 },
-            admin: { count: 0, revenue: 0 },
-            kiosk: { count: 0, revenue: 0 },
-            phone: { count: 0, revenue: 0 },
-            walk_in: { count: 0, revenue: 0 },
-            other: { count: 0, revenue: 0 },
+    reservations.forEach((res) => {
+      const revenue = res.totalAmount || 0;
+      totalRevenueCents += revenue;
+      totalReferralDiscountCents += res.referralIncentiveValue ?? 0;
+
+      const key = res.referralProgramId || res.referralCode || "unmapped";
+      if (!byProgram[key]) {
+        const program = res.referralProgramId ? programMap[res.referralProgramId] : undefined;
+        byProgram[key] = {
+          programId: res.referralProgramId ?? null,
+          code: program?.code ?? res.referralCode ?? "unknown",
+          source: res.referralSource ?? program?.source ?? null,
+          channel: res.referralChannel ?? program?.channel ?? null,
+          bookings: 0,
+          revenueCents: 0,
+          referralDiscountCents: 0,
         };
+      }
 
-        // Aggregate by Lead Time
-        const byLeadTime = {
-            sameDay: 0, // 0 days
-            nextDay: 0, // 1 day
-            twoDays: 0, // 2 days
-            threeToSeven: 0, // 3-7 days
-            oneToTwoWeeks: 0, // 8-14 days
-            twoToFourWeeks: 0, // 15-30 days
-            oneToThreeMonths: 0, // 31-90 days
-            threeMonthsPlus: 0, // 91+ days
-        };
+      byProgram[key].bookings += 1;
+      byProgram[key].revenueCents += revenue;
+      byProgram[key].referralDiscountCents += res.referralIncentiveValue ?? 0;
+    });
 
-        let totalBookings = 0;
-        let totalRevenue = 0;
+    return {
+      period: { start, end },
+      totalBookings: reservations.length,
+      totalRevenueCents,
+      totalReferralDiscountCents,
+      programs: Object.values(byProgram),
+    };
+  }
 
-        reservations.forEach((res) => {
-            totalBookings++;
-            const revenue = (res.totalAmount || 0) / 100; // Convert cents to dollars
-            totalRevenue += revenue;
+  async getStayReasonBreakdown(campgroundId: string, startDate?: string, endDate?: string) {
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(new Date().setMonth(new Date().getMonth() - 1));
+    const end = endDate ? new Date(endDate) : new Date();
 
-            // Source Aggregation
-            const source = res.source?.toLowerCase() || 'other';
-            if (source.includes('online')) {
-                bySource.online.count++;
-                bySource.online.revenue += revenue;
-            } else if (source.includes('admin') || source.includes('staff')) {
-                bySource.admin.count++;
-                bySource.admin.revenue += revenue;
-            } else if (source.includes('kiosk')) {
-                bySource.kiosk.count++;
-                bySource.kiosk.revenue += revenue;
-            } else if (source.includes('phone')) {
-                bySource.phone.count++;
-                bySource.phone.revenue += revenue;
-            } else if (source.includes('walk') || source.includes('walk-in')) {
-                bySource.walk_in.count++;
-                bySource.walk_in.revenue += revenue;
-            } else {
-                bySource.other.count++;
-                bySource.other.revenue += revenue;
-            }
+    const reservations = await this.prisma.reservation.findMany({
+      where: {
+        campgroundId,
+        status: { not: "cancelled" },
+        createdAt: { gte: start, lte: end },
+      },
+      select: {
+        stayReasonPreset: true,
+        stayReasonOther: true,
+      },
+    });
 
-            // Lead Time Aggregation
-            // Use stored leadTimeDays or calculate it
-            let days = res.leadTimeDays;
-            if (typeof days !== 'number') {
-                const arrival = new Date(res.arrivalDate);
-                const created = new Date(res.createdAt);
-                days = Math.floor((arrival.getTime() - created.getTime()) / (1000 * 60 * 60 * 24));
-            }
+    const byReason: Record<string, { reason: string; count: number }> = {};
+    const otherReasons: string[] = [];
 
-            // Safe guard against negative lead times (e.g. timezone issues or backdated bookings)
-            days = Math.max(0, days || 0);
+    reservations.forEach((res) => {
+      const reason = res.stayReasonPreset || "unknown";
+      if (!byReason[reason]) {
+        byReason[reason] = { reason, count: 0 };
+      }
+      byReason[reason].count += 1;
+      if (reason === "other" && res.stayReasonOther) {
+        otherReasons.push(res.stayReasonOther);
+      }
+    });
 
-            if (days === 0) byLeadTime.sameDay++;
-            else if (days === 1) byLeadTime.nextDay++;
-            else if (days === 2) byLeadTime.twoDays++;
-            else if (days <= 7) byLeadTime.threeToSeven++;
-            else if (days <= 14) byLeadTime.oneToTwoWeeks++;
-            else if (days <= 30) byLeadTime.twoToFourWeeks++;
-            else if (days <= 90) byLeadTime.oneToThreeMonths++;
-            else byLeadTime.threeMonthsPlus++;
-        });
-
-        return {
-            period: { start, end },
-            totalBookings,
-            totalRevenue,
-            bySource,
-            byLeadTime,
-        };
-    }
-
-    async getGuestOrigins(campgroundId: string, startDate?: string, endDate?: string) {
-        const start = startDate ? new Date(startDate) : new Date(new Date().setMonth(new Date().getMonth() - 1));
-        const end = endDate ? new Date(endDate) : new Date();
-
-        // Fetch guests via reservations to respect the date range
-        const reservations = await this.prisma.reservation.findMany({
-            where: {
-                campgroundId,
-                status: { not: 'cancelled' },
-                createdAt: {
-                    gte: start,
-                    lte: end,
-                },
-            },
-            include: {
-                Guest: {
-                    select: {
-                        postalCode: true,
-                        city: true,
-                        state: true,
-                        country: true,
-                    },
-                },
-            },
-        });
-
-        const byZipCode: Record<string, { zipCode: string, city?: string, state?: string, count: number, revenue: number }> = {};
-        const byState: Record<string, { state: string, count: number, revenue: number }> = {};
-
-        reservations.forEach((res) => {
-            const revenue = (res.totalAmount || 0) / 100;
-            const guest = res.Guest;
-            if (!guest) return;
-
-            // By Zip Code
-            if (guest.postalCode) {
-                const zip = guest.postalCode;
-                if (!byZipCode[zip]) {
-                    byZipCode[zip] = {
-                        zipCode: zip,
-                        city: guest.city || undefined,
-                        state: guest.state || undefined,
-                        count: 0,
-                        revenue: 0
-                    };
-                }
-                byZipCode[zip].count++;
-                byZipCode[zip].revenue += revenue;
-            }
-
-            // By State
-            if (guest.state) {
-                const state = guest.state.toUpperCase();
-                if (!byState[state]) {
-                    byState[state] = { state, count: 0, revenue: 0 };
-                }
-                byState[state].count++;
-                byState[state].revenue += revenue;
-            }
-        });
-
-        const sortedZips = Object.values(byZipCode).sort((a, b) => b.count - a.count).slice(0, 50); // Top 50
-        const sortedStates = Object.values(byState).sort((a, b) => b.count - a.count);
-
-        return {
-            period: { start, end },
-            byZipCode: sortedZips,
-            byState: sortedStates,
-        };
-    }
-
-    async getReferralPerformance(campgroundId: string, startDate?: string, endDate?: string) {
-        const start = startDate ? new Date(startDate) : new Date(new Date().setMonth(new Date().getMonth() - 1));
-        const end = endDate ? new Date(endDate) : new Date();
-
-        const reservations = await this.prisma.reservation.findMany({
-            where: {
-                campgroundId,
-                status: { not: 'cancelled' },
-                createdAt: { gte: start, lte: end },
-                OR: [
-                    { referralProgramId: { not: null } },
-                    { referralCode: { not: null } }
-                ]
-            },
-            select: {
-                totalAmount: true,
-                discountsAmount: true,
-                referralProgramId: true,
-                referralCode: true,
-                referralIncentiveType: true,
-                referralIncentiveValue: true,
-                referralSource: true,
-                referralChannel: true
-            }
-        });
-
-        const programIds = Array.from(
-            new Set(
-                reservations
-                    .map((r) => r.referralProgramId)
-                    .filter((id): id is string => typeof id === "string" && id.length > 0)
-            )
-        );
-        const programMap: Record<string, ReferralProgram> = {};
-        if (programIds.length) {
-            const programs = await this.prisma.referralProgram.findMany({
-                where: { id: { in: programIds } }
-            });
-            for (const p of programs) {
-                programMap[p.id] = p;
-            }
-        }
-
-        type ReferralSummary = {
-            programId: string | null;
-            code: string;
-            source: string | null;
-            channel: string | null;
-            bookings: number;
-            revenueCents: number;
-            referralDiscountCents: number;
-        };
-
-        const byProgram: Record<string, ReferralSummary> = {};
-        let totalRevenueCents = 0;
-        let totalReferralDiscountCents = 0;
-
-        reservations.forEach((res) => {
-            const revenue = res.totalAmount || 0;
-            totalRevenueCents += revenue;
-            totalReferralDiscountCents += res.referralIncentiveValue ?? 0;
-
-            const key = res.referralProgramId || res.referralCode || "unmapped";
-            if (!byProgram[key]) {
-                const program = res.referralProgramId ? programMap[res.referralProgramId] : undefined;
-                byProgram[key] = {
-                    programId: res.referralProgramId ?? null,
-                    code: program?.code ?? res.referralCode ?? "unknown",
-                    source: res.referralSource ?? program?.source ?? null,
-                    channel: res.referralChannel ?? program?.channel ?? null,
-                    bookings: 0,
-                    revenueCents: 0,
-                    referralDiscountCents: 0
-                };
-            }
-
-            byProgram[key].bookings += 1;
-            byProgram[key].revenueCents += revenue;
-            byProgram[key].referralDiscountCents += res.referralIncentiveValue ?? 0;
-        });
-
-        return {
-            period: { start, end },
-            totalBookings: reservations.length,
-            totalRevenueCents,
-            totalReferralDiscountCents,
-            programs: Object.values(byProgram)
-        };
-    }
-
-    async getStayReasonBreakdown(campgroundId: string, startDate?: string, endDate?: string) {
-        const start = startDate ? new Date(startDate) : new Date(new Date().setMonth(new Date().getMonth() - 1));
-        const end = endDate ? new Date(endDate) : new Date();
-
-        const reservations = await this.prisma.reservation.findMany({
-            where: {
-                campgroundId,
-                status: { not: 'cancelled' },
-                createdAt: { gte: start, lte: end }
-            },
-            select: {
-                stayReasonPreset: true,
-                stayReasonOther: true
-            }
-        });
-
-        const byReason: Record<string, { reason: string; count: number }> = {};
-        const otherReasons: string[] = [];
-
-        reservations.forEach((res) => {
-            const reason = res.stayReasonPreset || "unknown";
-            if (!byReason[reason]) {
-                byReason[reason] = { reason, count: 0 };
-            }
-            byReason[reason].count += 1;
-            if (reason === "other" && res.stayReasonOther) {
-                otherReasons.push(res.stayReasonOther);
-            }
-        });
-
-        return {
-            period: { start, end },
-            breakdown: Object.values(byReason).sort((a, b) => b.count - a.count),
-            otherReasons
-        };
-    }
+    return {
+      period: { start, end },
+      breakdown: Object.values(byReason).sort((a, b) => b.count - a.count),
+      otherReasons,
+    };
+  }
 
   async listExports(campgroundId: string, limit = 10) {
     const take = Math.min(Math.max(Number(limit) || 10, 1), 50);
     const jobs = await this.prisma.integrationExportJob.findMany({
       where: { campgroundId, resource: "reports" },
       orderBy: { createdAt: "desc" },
-      take
+      take,
     });
     return jobs.map((j) => this.decorateExport(j));
   }
 
   private decorateExport(job: IntegrationExportJob) {
     const filters = toRecord(job.filters);
-    const downloadUrl = isString(filters.downloadUrl) ? filters.downloadUrl : job.location ?? null;
+    const downloadUrl = isString(filters.downloadUrl)
+      ? filters.downloadUrl
+      : (job.location ?? null);
     const summary = isRecord(filters.summary) ? filters.summary : null;
     return { ...job, downloadUrl, summary };
   }
 
   private async enforceCapacityGuard() {
     const depth = await this.prisma.integrationExportJob.count({
-      where: { resource: "reports", status: { in: ["queued", "processing"] } }
+      where: { resource: "reports", status: { in: ["queued", "processing"] } },
     });
     const threshold = this.capacityGuardThreshold();
     if (depth >= threshold) {
       const payload = { reason: "capacity_guard", queueDepth: depth, threshold };
       this.observability.recordReportResult(false, undefined, payload);
       // Fire-and-forget alert; do not block request path.
-      this.alerting.dispatch(
-        "Report export capacity guard",
-        `Queued exports=${depth} (threshold ${threshold})`,
-        "warning",
-        "reports-capacity-guard",
-        payload
-      ).catch(() => undefined);
-      const error: ServiceUnavailableException & { retryAfter?: number } = new ServiceUnavailableException({
-        message: "Report exports temporarily limited due to capacity",
-        retryAfter: this.capacityGuardRetryAfterSec(),
-        reason: "capacity_guard"
-      });
+      this.alerting
+        .dispatch(
+          "Report export capacity guard",
+          `Queued exports=${depth} (threshold ${threshold})`,
+          "warning",
+          "reports-capacity-guard",
+          payload,
+        )
+        .catch(() => undefined);
+      const error: ServiceUnavailableException & { retryAfter?: number } =
+        new ServiceUnavailableException({
+          message: "Report exports temporarily limited due to capacity",
+          retryAfter: this.capacityGuardRetryAfterSec(),
+          reason: "capacity_guard",
+        });
       error.retryAfter = this.capacityGuardRetryAfterSec();
       throw error;
     }
     return depth;
   }
 
-  async queueExport(params: { campgroundId: string; filters?: Record<string, unknown>; format?: string; requestedById?: string; emailTo?: string[] }) {
+  async queueExport(params: {
+    campgroundId: string;
+    filters?: Record<string, unknown>;
+    format?: string;
+    requestedById?: string;
+    emailTo?: string[];
+  }) {
     const { campgroundId, filters, format, requestedById, emailTo } = params;
     await this.enforceCapacityGuard();
     const exportFormat = (format ?? "csv").toLowerCase();
@@ -561,7 +596,7 @@ export class ReportsService {
         filters: filterRecord,
         format: exportFormat,
         requestedById,
-        emailTo
+        emailTo,
       });
     }
 
@@ -573,16 +608,22 @@ export class ReportsService {
         resource: "reports",
         status: "queued",
         location: exportFormat,
-        filters: toNullableJsonInput({ ...filterRecord, emailTo: emailTo ?? undefined, format: exportFormat }),
-        requestedById: requestedById ?? null
-      }
+        filters: toNullableJsonInput({
+          ...filterRecord,
+          emailTo: emailTo ?? undefined,
+          format: exportFormat,
+        }),
+        requestedById: requestedById ?? null,
+      },
     });
     this.observability.recordReportResult(true, undefined, { reason: "queued" });
 
     // Kick off processing asynchronously
-    void this.jobQueue.enqueue(this.exportQueueName, () => this.processExportJob(job.id), {
-      jobName: `${this.exportQueueName}:${campgroundId}`
-    }).catch(() => undefined);
+    void this.jobQueue
+      .enqueue(this.exportQueueName, () => this.processExportJob(job.id), {
+        jobName: `${this.exportQueueName}:${campgroundId}`,
+      })
+      .catch(() => undefined);
 
     return this.decorateExport(job);
   }
@@ -595,7 +636,7 @@ export class ReportsService {
     emailTo?: string[];
   }) {
     const existing = await this.prisma.integrationExportJob.findFirst({
-      where: { campgroundId: params.campgroundId, resource: "reports", status: "scheduled" }
+      where: { campgroundId: params.campgroundId, resource: "reports", status: "scheduled" },
     });
     if (existing) return existing;
     const filterRecord = toRecord(params.filters);
@@ -614,10 +655,10 @@ export class ReportsService {
         filters: toNullableJsonInput({
           ...filterRecord,
           emailTo: params.emailTo ?? filterRecord.emailTo,
-          recurring: { ...(recurring ?? {}), nextRunAt: nextRunAt.toISOString() }
+          recurring: { ...(recurring ?? {}), nextRunAt: nextRunAt.toISOString() },
         }),
-        requestedById: params.requestedById ?? null
-      }
+        requestedById: params.requestedById ?? null,
+      },
     });
   }
 
@@ -635,7 +676,7 @@ export class ReportsService {
       filters: previousFilters,
       format: previous.location ?? undefined,
       emailTo,
-      requestedById: requestedById ?? previous.requestedById ?? undefined
+      requestedById: requestedById ?? previous.requestedById ?? undefined,
     });
   }
 
@@ -654,7 +695,7 @@ export class ReportsService {
   async processQueuedExports() {
     const queued = await this.prisma.integrationExportJob.findMany({
       where: { resource: "reports", status: "queued" },
-      take: 25
+      take: 25,
     });
 
     let processed = 0;
@@ -664,14 +705,16 @@ export class ReportsService {
         processed += 1;
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to process export";
-        await this.prisma.integrationExportJob.update({
-          where: { id: job.id },
-          data: {
-            status: "failed",
-            completedAt: new Date(),
-            lastError: message
-          }
-        }).catch(() => undefined);
+        await this.prisma.integrationExportJob
+          .update({
+            where: { id: job.id },
+            data: {
+              status: "failed",
+              completedAt: new Date(),
+              lastError: message,
+            },
+          })
+          .catch(() => undefined);
       }
     }
 
@@ -682,7 +725,7 @@ export class ReportsService {
   async processScheduledExports() {
     const schedules = await this.prisma.integrationExportJob.findMany({
       where: { resource: "reports", status: "scheduled" },
-      take: 50
+      take: 50,
     });
     const now = new Date();
     let triggered = 0;
@@ -691,7 +734,8 @@ export class ReportsService {
       const filters = toRecord(sched.filters);
       const recurring = isRecord(filters.recurring) ? filters.recurring : undefined;
       const cadence = isString(recurring?.cadence) ? recurring.cadence : undefined;
-      const nextRunAt = toDateValue(recurring?.nextRunAt) ?? this.computeNextRun(cadence ?? "daily", now);
+      const nextRunAt =
+        toDateValue(recurring?.nextRunAt) ?? this.computeNextRun(cadence ?? "daily", now);
       if (nextRunAt > now) continue;
 
       const { recurring: _rec, ...restFilters } = filters;
@@ -703,16 +747,18 @@ export class ReportsService {
           requestedById: sched.requestedById ?? undefined,
           emailTo:
             getStringArray(filters.emailTo) ??
-            (isString(filters.emailTo) ? [filters.emailTo] : undefined)
+            (isString(filters.emailTo) ? [filters.emailTo] : undefined),
         });
       } catch (err) {
-        this.alerting.dispatch(
-          "Report export capacity guard",
-          "Scheduled export skipped due to capacity guard",
-          "warning",
-          "reports-capacity-guard",
-          { reason: "capacity_guard" }
-        ).catch(() => undefined);
+        this.alerting
+          .dispatch(
+            "Report export capacity guard",
+            "Scheduled export skipped due to capacity guard",
+            "warning",
+            "reports-capacity-guard",
+            { reason: "capacity_guard" },
+          )
+          .catch(() => undefined);
         continue;
       }
 
@@ -722,9 +768,9 @@ export class ReportsService {
         data: {
           filters: toNullableJsonInput({
             ...filters,
-            recurring: { ...(recurring ?? {}), nextRunAt: updatedNext.toISOString() }
-          })
-        }
+            recurring: { ...(recurring ?? {}), nextRunAt: updatedNext.toISOString() },
+          }),
+        },
       });
       triggered += 1;
     }
@@ -747,8 +793,8 @@ export class ReportsService {
       data: {
         status: "processing",
         startedAt: job.startedAt ?? new Date(),
-        lastError: null
-      }
+        lastError: null,
+      },
     });
 
     try {
@@ -762,7 +808,7 @@ export class ReportsService {
           paginationToken: token ?? undefined,
           pageSize: this.exportPageSize(),
           filters,
-          summary
+          summary,
         });
         pages.push(...page.rows);
         token = page.nextToken;
@@ -781,9 +827,12 @@ export class ReportsService {
       }
 
       const upload = await this.uploads.uploadBuffer(fileBuffer, {
-        contentType: exportFormat === "xlsx" ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" : "text/csv",
+        contentType:
+          exportFormat === "xlsx"
+            ? "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            : "text/csv",
         extension: exportFormat === "xlsx" ? "xlsx" : "csv",
-        prefix: "exports/reports"
+        prefix: "exports/reports",
       });
 
       const updated = await this.prisma.integrationExportJob.update({
@@ -797,9 +846,9 @@ export class ReportsService {
             downloadUrl: upload.url,
             summary,
             recordCount: pages.length,
-            format: exportFormat
-          })
-        }
+            format: exportFormat,
+          }),
+        },
       });
 
       const auditFormat = exportFormat === "json" ? "json" : "csv";
@@ -808,12 +857,11 @@ export class ReportsService {
         requestedById: job.requestedById ?? "system",
         format: auditFormat,
         filters,
-        recordCount: pages.length
+        recordCount: pages.length,
       });
 
       const recipients: string[] =
-        getStringArray(filters.emailTo) ??
-        (isString(filters.emailTo) ? [filters.emailTo] : []);
+        getStringArray(filters.emailTo) ?? (isString(filters.emailTo) ? [filters.emailTo] : []);
       const email = isString(filters.email) ? filters.email : undefined;
       if (email) recipients.push(email);
       if (recipients.length) {
@@ -821,32 +869,50 @@ export class ReportsService {
       }
 
       success = true;
-      this.observability.recordReportResult(true, Date.now() - started, { reason: "export_success", exportId: job.id, rows: pages.length, format: exportFormat });
+      this.observability.recordReportResult(true, Date.now() - started, {
+        reason: "export_success",
+        exportId: job.id,
+        rows: pages.length,
+        format: exportFormat,
+      });
       return this.decorateExport(updated);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Failed to process export";
-      await this.prisma.integrationExportJob.update({
-        where: { id: jobId },
-        data: {
-          status: "failed",
-          completedAt: new Date(),
-          lastError: message
-        }
-      }).catch(() => undefined);
-      this.observability.recordReportResult(false, Date.now() - started, { reason: "export_failed", exportId: jobId, error: message });
+      await this.prisma.integrationExportJob
+        .update({
+          where: { id: jobId },
+          data: {
+            status: "failed",
+            completedAt: new Date(),
+            lastError: message,
+          },
+        })
+        .catch(() => undefined);
+      this.observability.recordReportResult(false, Date.now() - started, {
+        reason: "export_failed",
+        exportId: jobId,
+        error: message,
+      });
       throw err;
     } finally {
       this.observability.recordJobRun({
         name: this.exportQueueName,
         durationMs: Date.now() - started,
         success,
-        queueDepth: this.jobQueue.getQueueState(this.exportQueueName)?.pending ?? 0
+        queueDepth: this.jobQueue.getQueueState(this.exportQueueName)?.pending ?? 0,
       });
     }
   }
 
-  private async sendExportEmail(recipients: string[], downloadUrl: string, campgroundId: string, summary?: ExportSummary) {
-    const uniqueRecipients = Array.from(new Set(recipients.filter((r) => typeof r === "string" && r.includes("@"))));
+  private async sendExportEmail(
+    recipients: string[],
+    downloadUrl: string,
+    campgroundId: string,
+    summary?: ExportSummary,
+  ) {
+    const uniqueRecipients = Array.from(
+      new Set(recipients.filter((r) => typeof r === "string" && r.includes("@"))),
+    );
     if (!uniqueRecipients.length) return;
 
     const summaryBlock = summary
@@ -872,9 +938,9 @@ export class ReportsService {
             <p><a href="${downloadUrl}">Download export</a></p>
             ${summaryBlock}
             <p>This link was generated automatically. If you did not request this export, you can ignore this email.</p>
-          `
-        })
-      )
+          `,
+        }),
+      ),
     );
   }
 
@@ -900,14 +966,11 @@ export class ReportsService {
         nextToken: null,
         emitted,
         remaining: 0,
-        summary: summary ?? await this.buildExportSummary(campgroundId, filters)
+        summary: summary ?? (await this.buildExportSummary(campgroundId, filters)),
       };
     }
 
-    const take = Math.min(
-      Math.max(pageSize ?? this.exportPageSize(), 1),
-      maxRows - emitted
-    );
+    const take = Math.min(Math.max(pageSize ?? this.exportPageSize(), 1), maxRows - emitted);
 
     const filterRecord = toRecord(filters);
     const range = this.resolveRangeFromFilters(filterRecord);
@@ -927,7 +990,7 @@ export class ReportsService {
         campgroundId,
         status: { not: "cancelled" },
         ...(filterWhere ?? {}),
-        ...(Object.keys(dateWhere).length ? { AND: [dateWhere] } : {})
+        ...(Object.keys(dateWhere).length ? { AND: [dateWhere] } : {}),
       },
       orderBy: { createdAt: "asc" },
       ...(lastId ? { cursor: { id: lastId }, skip: 1 } : {}),
@@ -941,8 +1004,8 @@ export class ReportsService {
         status: true,
         source: true,
         createdAt: true,
-        siteId: true
-      }
+        siteId: true,
+      },
     });
 
     const newEmitted = emitted + rows.length;
@@ -956,15 +1019,29 @@ export class ReportsService {
       nextToken,
       emitted: newEmitted,
       remaining: Math.max(0, maxRows - newEmitted),
-      summary: summary ?? await this.buildExportSummary(campgroundId, filterRecord)
+      summary: summary ?? (await this.buildExportSummary(campgroundId, filterRecord)),
     };
   }
 
-  private async buildExportSummary(campgroundId: string, filters?: Record<string, unknown>): Promise<ExportSummary> {
+  private async buildExportSummary(
+    campgroundId: string,
+    filters?: Record<string, unknown>,
+  ): Promise<ExportSummary> {
     const range = this.resolveRangeFromFilters(filters);
-    const metrics = await this.getDashboardMetrics(campgroundId, { start: range.start, end: range.end, days: range.days });
-    const sources = await this.getBookingSources(campgroundId, range.start?.toISOString(), range.end?.toISOString());
-    const attachRate = await this.computeAttachRate(campgroundId, { start: range.start, end: range.end });
+    const metrics = await this.getDashboardMetrics(campgroundId, {
+      start: range.start,
+      end: range.end,
+      days: range.days,
+    });
+    const sources = await this.getBookingSources(
+      campgroundId,
+      range.start?.toISOString(),
+      range.end?.toISOString(),
+    );
+    const attachRate = await this.computeAttachRate(campgroundId, {
+      start: range.start,
+      end: range.end,
+    });
 
     return {
       revenue: Math.round((metrics.revenue.totalCents ?? 0) / 100),
@@ -978,9 +1055,9 @@ export class ReportsService {
         ? {
             ...metrics.period,
             start: metrics.period.start?.toISOString?.() ?? metrics.period.start,
-            end: metrics.period.end?.toISOString?.() ?? metrics.period.end
+            end: metrics.period.end?.toISOString?.() ?? metrics.period.end,
           }
-        : undefined
+        : undefined,
     };
   }
 
@@ -990,12 +1067,12 @@ export class ReportsService {
 
   async getDashboardMetrics(
     campgroundId: string,
-    range: number | { start?: Date; end?: Date; days?: number } = 30
+    range: number | { start?: Date; end?: Date; days?: number } = 30,
   ) {
     // Get campground timezone for accurate "today" calculations
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { timezone: true }
+      select: { timezone: true },
     });
     const tz = campground?.timezone || "America/Chicago";
 
@@ -1007,16 +1084,21 @@ export class ReportsService {
       days = range;
       startDate = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
     } else {
-      const inferredStart = range.start ? new Date(range.start) : new Date(now.getTime() - (range.days ?? 30) * 24 * 60 * 60 * 1000);
+      const inferredStart = range.start
+        ? new Date(range.start)
+        : new Date(now.getTime() - (range.days ?? 30) * 24 * 60 * 60 * 1000);
       startDate = inferredStart;
-      const computedDays = Math.max(1, Math.round((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
+      const computedDays = Math.max(
+        1,
+        Math.round((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)),
+      );
       days = range.days ?? computedDays;
     }
 
     // Get sites for occupancy calculation
     const sites = await this.prisma.site.findMany({
       where: { campgroundId, isActive: true },
-      select: { id: true }
+      select: { id: true },
     });
     const totalSites = sites.length;
 
@@ -1024,12 +1106,12 @@ export class ReportsService {
     const reservations = await this.prisma.reservation.findMany({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled'] },
+        status: { notIn: ["cancelled"] },
         OR: [
           { arrivalDate: { gte: startDate, lte: now } },
           { departureDate: { gte: startDate, lte: now } },
-          { arrivalDate: { lte: startDate }, departureDate: { gte: now } }
-        ]
+          { arrivalDate: { lte: startDate }, departureDate: { gte: now } },
+        ],
       },
       select: {
         id: true,
@@ -1038,8 +1120,8 @@ export class ReportsService {
         totalAmount: true,
         paidAmount: true,
         status: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     // Calculate total nights and revenue
@@ -1056,13 +1138,19 @@ export class ReportsService {
     reservations.forEach((r: ReservationRangeRow) => {
       const arrival = new Date(r.arrivalDate);
       const departure = new Date(r.departureDate);
-      const nights = Math.max(1, Math.ceil((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)));
-      
+      const nights = Math.max(
+        1,
+        Math.ceil((departure.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)),
+      );
+
       // Count nights within the date range
       const effectiveStart = arrival < startDate ? startDate : arrival;
       const effectiveEnd = departure > now ? now : departure;
-      const effectiveNights = Math.max(0, Math.ceil((effectiveEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)));
-      
+      const effectiveNights = Math.max(
+        0,
+        Math.ceil((effectiveEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24)),
+      );
+
       totalNights += effectiveNights;
       totalRevenueCents += r.totalAmount || 0;
       totalRoomNights += nights;
@@ -1076,35 +1164,37 @@ export class ReportsService {
     const revparCents = availableNights > 0 ? Math.round(totalRevenueCents / availableNights) : 0;
 
     // Occupancy = Total Room Nights / Available Nights
-    const occupancyPct = availableNights > 0 ? Math.round((totalNights / availableNights) * 100) : 0;
+    const occupancyPct =
+      availableNights > 0 ? Math.round((totalNights / availableNights) * 100) : 0;
 
     // Compare to previous period
     const prevStartDate = new Date(startDate.getTime() - days * 24 * 60 * 60 * 1000);
     const prevReservations = await this.prisma.reservation.findMany({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled'] },
+        status: { notIn: ["cancelled"] },
         OR: [
           { arrivalDate: { gte: prevStartDate, lte: startDate } },
           { departureDate: { gte: prevStartDate, lte: startDate } },
-          { arrivalDate: { lte: prevStartDate }, departureDate: { gte: startDate } }
-        ]
+          { arrivalDate: { lte: prevStartDate }, departureDate: { gte: startDate } },
+        ],
       },
-      select: { totalAmount: true }
+      select: { totalAmount: true },
     });
 
     const prevRevenueCents = prevReservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
-    const revenueChangePct = prevRevenueCents > 0 
-      ? Math.round(((totalRevenueCents - prevRevenueCents) / prevRevenueCents) * 100) 
-      : 0;
+    const revenueChangePct =
+      prevRevenueCents > 0
+        ? Math.round(((totalRevenueCents - prevRevenueCents) / prevRevenueCents) * 100)
+        : 0;
 
     // Outstanding balances
     const allActive = await this.prisma.reservation.findMany({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled', 'checked_out'] }
+        status: { notIn: ["cancelled", "checked_out"] },
       },
-      select: { totalAmount: true, paidAmount: true }
+      select: { totalAmount: true, paidAmount: true },
     });
     const outstandingCents = allActive.reduce((sum, r) => {
       const balance = (r.totalAmount || 0) - (r.paidAmount || 0);
@@ -1126,26 +1216,26 @@ export class ReportsService {
     const todayArrivals = await this.prisma.reservation.count({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled'] },
-        arrivalDate: { gte: todayStartForQuery, lt: todayEndForQuery }
-      }
+        status: { notIn: ["cancelled"] },
+        arrivalDate: { gte: todayStartForQuery, lt: todayEndForQuery },
+      },
     });
 
     const todayDepartures = await this.prisma.reservation.count({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled'] },
-        departureDate: { gte: todayStartForQuery, lt: todayEndForQuery }
-      }
+        status: { notIn: ["cancelled"] },
+        departureDate: { gte: todayStartForQuery, lt: todayEndForQuery },
+      },
     });
 
     // Future bookings
     const futureBookings = await this.prisma.reservation.count({
       where: {
         campgroundId,
-        status: { notIn: ['cancelled'] },
-        arrivalDate: { gt: now }
-      }
+        status: { notIn: ["cancelled"] },
+        arrivalDate: { gt: now },
+      },
     });
 
     return {
@@ -1154,28 +1244,29 @@ export class ReportsService {
         totalCents: totalRevenueCents,
         adrCents,
         revparCents,
-        changePct: revenueChangePct
+        changePct: revenueChangePct,
       },
       occupancy: {
         pct: occupancyPct,
         totalNights,
-        availableNights
+        availableNights,
       },
       balances: {
-        outstandingCents
+        outstandingCents,
       },
       today: {
         arrivals: todayArrivals,
-        departures: todayDepartures
+        departures: todayDepartures,
       },
       futureBookings,
-      totalSites
+      totalSites,
     };
   }
 
   async getRevenueTrend(campgroundId: string, months: number = 12) {
     const now = new Date();
-    const results: Array<{ month: string; year: number; revenueCents: number; bookings: number }> = [];
+    const results: Array<{ month: string; year: number; revenueCents: number; bookings: number }> =
+      [];
 
     for (let i = months - 1; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
@@ -1185,19 +1276,19 @@ export class ReportsService {
       const reservations = await this.prisma.reservation.findMany({
         where: {
           campgroundId,
-          status: { notIn: ['cancelled'] },
-          arrivalDate: { gte: startOfMonth, lte: endOfMonth }
+          status: { notIn: ["cancelled"] },
+          arrivalDate: { gte: startOfMonth, lte: endOfMonth },
         },
-        select: { totalAmount: true }
+        select: { totalAmount: true },
       });
 
       const revenueCents = reservations.reduce((sum, r) => sum + (r.totalAmount || 0), 0);
-      
+
       results.push({
-        month: date.toLocaleDateString('en-US', { month: 'short' }),
+        month: date.toLocaleDateString("en-US", { month: "short" }),
         year: date.getFullYear(),
         revenueCents,
-        bookings: reservations.length
+        bookings: reservations.length,
       });
     }
 
@@ -1209,10 +1300,11 @@ export class ReportsService {
     now.setHours(0, 0, 0, 0);
 
     const sites = await this.prisma.site.count({
-      where: { campgroundId, isActive: true }
+      where: { campgroundId, isActive: true },
     });
 
-    const results: Array<{ date: string; occupiedSites: number; totalSites: number; pct: number }> = [];
+    const results: Array<{ date: string; occupiedSites: number; totalSites: number; pct: number }> =
+      [];
 
     for (let i = 0; i < days; i++) {
       const date = new Date(now);
@@ -1223,17 +1315,17 @@ export class ReportsService {
       const occupiedCount = await this.prisma.reservation.count({
         where: {
           campgroundId,
-          status: { notIn: ['cancelled'] },
+          status: { notIn: ["cancelled"] },
           arrivalDate: { lte: date },
-          departureDate: { gt: date }
-        }
+          departureDate: { gt: date },
+        },
       });
 
       results.push({
-        date: date.toISOString().split('T')[0],
+        date: date.toISOString().split("T")[0],
         occupiedSites: occupiedCount,
         totalSites: sites,
-        pct: sites > 0 ? Math.round((occupiedCount / sites) * 100) : 0
+        pct: sites > 0 ? Math.round((occupiedCount / sites) * 100) : 0,
       });
     }
 
@@ -1242,23 +1334,31 @@ export class ReportsService {
 
   async getTaskMetrics(campgroundId: string) {
     const pending = await this.prisma.task.count({
-      where: { tenantId: campgroundId, state: 'pending' }
+      where: { tenantId: campgroundId, state: "pending" },
     });
     const inProgress = await this.prisma.task.count({
-      where: { tenantId: campgroundId, state: 'in_progress' }
+      where: { tenantId: campgroundId, state: "in_progress" },
     });
     const breached = await this.prisma.task.count({
-      where: { tenantId: campgroundId, slaStatus: 'breached', state: { in: ['pending', 'in_progress'] } }
+      where: {
+        tenantId: campgroundId,
+        slaStatus: "breached",
+        state: { in: ["pending", "in_progress"] },
+      },
     });
     const atRisk = await this.prisma.task.count({
-      where: { tenantId: campgroundId, slaStatus: 'at_risk', state: { in: ['pending', 'in_progress'] } }
+      where: {
+        tenantId: campgroundId,
+        slaStatus: "at_risk",
+        state: { in: ["pending", "in_progress"] },
+      },
     });
     const completedToday = await this.prisma.task.count({
       where: {
         tenantId: campgroundId,
-        state: 'done',
-        updatedAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) }
-      }
+        state: "done",
+        updatedAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+      },
     });
 
     return {
@@ -1266,7 +1366,7 @@ export class ReportsService {
       inProgress,
       breached,
       atRisk,
-      completedToday
+      completedToday,
     };
   }
 
@@ -1296,35 +1396,49 @@ export class ReportsService {
     await this.withCapacityGuard(!!spec.heavy);
     try {
       const result = await this.executeReportQuery(campgroundId, spec, input);
-      this.observability.recordReportResult(true, Date.now() - started, { reportId: spec.id, rows: result.rows.length });
+      this.observability.recordReportResult(true, Date.now() - started, {
+        reportId: spec.id,
+        rows: result.rows.length,
+      });
       return result;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Report run failed";
-      this.observability.recordReportResult(false, Date.now() - started, { reportId: spec.id, error: message });
+      this.observability.recordReportResult(false, Date.now() - started, {
+        reportId: spec.id,
+        error: message,
+      });
       throw err;
     } finally {
       this.releaseCapacity(!!spec.heavy);
     }
   }
 
-  private async executeReportQuery(campgroundId: string, spec: ReportSpec, input: ReportQueryInput): Promise<ReportRunResult> {
-    const dimensions = (input.dimensions?.length ? input.dimensions : spec.defaultDimensions ?? spec.dimensions).filter((d) =>
-      spec.dimensions.includes(d)
-    );
+  private async executeReportQuery(
+    campgroundId: string,
+    spec: ReportSpec,
+    input: ReportQueryInput,
+  ): Promise<ReportRunResult> {
+    const dimensions = (
+      input.dimensions?.length ? input.dimensions : (spec.defaultDimensions ?? spec.dimensions)
+    ).filter((d) => spec.dimensions.includes(d));
     if (!dimensions.length) {
       throw new BadRequestException("At least one dimension is required");
     }
 
-    const metricDefs = spec.metrics
-      .map((m) => resolveMetric(spec.source, m))
-      .filter(Boolean);
+    const metricDefs = spec.metrics.map((m) => resolveMetric(spec.source, m)).filter(Boolean);
     if (!metricDefs.length) throw new BadRequestException("No metrics resolved for report");
 
     const range = this.resolveRange(input.timeRange ?? spec.defaultTimeRange);
     const filterRecord = input.filters ?? {};
     const take = Math.min(
-      Math.max(Math.round((spec.sampling?.limit ?? this.defaultSampleLimit) * (input.sample ? spec.sampling?.rate ?? 1 : 1)), 50),
-      20000
+      Math.max(
+        Math.round(
+          (spec.sampling?.limit ?? this.defaultSampleLimit) *
+            (input.sample ? (spec.sampling?.rate ?? 1) : 1),
+        ),
+        50,
+      ),
+      20000,
     );
 
     const rows = await this.fetchSourceRows(spec, campgroundId, filterRecord, range, take);
@@ -1332,14 +1446,15 @@ export class ReportsService {
     const pageSize = Math.min(Math.max(input.limit ?? 50, 1), 200);
     const offset = Math.max(input.offset ?? 0, 0);
     const paged = reduced.slice(offset, offset + pageSize);
-    const nextToken = reduced.length > offset + pageSize ? this.encodeToken({ offset: offset + pageSize }) : null;
+    const nextToken =
+      reduced.length > offset + pageSize ? this.encodeToken({ offset: offset + pageSize }) : null;
 
     const sampling =
       spec.sampling || input.sample
         ? {
             limit: spec.sampling?.limit ?? this.defaultSampleLimit,
             rate: spec.sampling?.rate,
-            applied: !!input.sample
+            applied: !!input.sample,
           }
         : undefined;
 
@@ -1389,12 +1504,18 @@ export class ReportsService {
     campgroundId: string,
     filters: Record<string, unknown>,
     range: { gte?: Date; lte?: Date },
-    take: number
+    take: number,
   ): Promise<Array<Record<string, unknown>>> {
     const timeField = spec.timeField ?? this.defaultTimeField(spec.source);
     switch (spec.source) {
       case "reservation": {
-        const where = this.buildWhereFromFilters("reservation", campgroundId, filters, range, timeField);
+        const where = this.buildWhereFromFilters(
+          "reservation",
+          campgroundId,
+          filters,
+          range,
+          timeField,
+        );
         const rows = await this.prisma.reservation.findMany({
           where,
           orderBy: { createdAt: "desc" },
@@ -1418,12 +1539,20 @@ export class ReportsService {
         return rows.map((r) => ({
           ...r,
           nights: this.computeNights(r.arrivalDate, r.departureDate),
-          leadTimeDays: typeof r.leadTimeDays === "number" ? r.leadTimeDays : this.computeLeadTime(r.arrivalDate, r.createdAt),
+          leadTimeDays:
+            typeof r.leadTimeDays === "number"
+              ? r.leadTimeDays
+              : this.computeLeadTime(r.arrivalDate, r.createdAt),
         }));
       }
-      case "payment":
-        {
-        const where = this.buildWhereFromFilters("payment", campgroundId, filters, range, timeField);
+      case "payment": {
+        const where = this.buildWhereFromFilters(
+          "payment",
+          campgroundId,
+          filters,
+          range,
+          timeField,
+        );
         return this.prisma.payment.findMany({
           where,
           orderBy: { createdAt: "desc" },
@@ -1437,9 +1566,8 @@ export class ReportsService {
             stripeFeeCents: true,
           },
         });
-        }
-      case "ledger":
-        {
+      }
+      case "ledger": {
         const where = this.buildWhereFromFilters("ledger", campgroundId, filters, range, timeField);
         return this.prisma.ledgerEntry.findMany({
           where,
@@ -1447,29 +1575,39 @@ export class ReportsService {
           take,
           select: { id: true, occurredAt: true, amountCents: true, glCode: true, direction: true },
         });
-        }
-      case "payout":
-        {
+      }
+      case "payout": {
         const where = this.buildWhereFromFilters("payout", campgroundId, filters, range, timeField);
         return this.prisma.payout.findMany({
           where,
           orderBy: { arrivalDate: "desc" },
           take,
-          select: { id: true, arrivalDate: true, status: true, amountCents: true, feeCents: true, currency: true },
+          select: {
+            id: true,
+            arrivalDate: true,
+            status: true,
+            amountCents: true,
+            feeCents: true,
+            currency: true,
+          },
         });
-        }
-      case "support":
-        {
-        const where = this.buildWhereFromFilters("support", campgroundId, filters, range, timeField);
+      }
+      case "support": {
+        const where = this.buildWhereFromFilters(
+          "support",
+          campgroundId,
+          filters,
+          range,
+          timeField,
+        );
         return this.prisma.supportReport.findMany({
           where,
           orderBy: { createdAt: "desc" },
           take,
           select: { id: true, createdAt: true, status: true, path: true, language: true },
         });
-        }
-      case "task":
-        {
+      }
+      case "task": {
         const where = this.buildWhereFromFilters("task", campgroundId, filters, range, timeField);
         return this.prisma.task.findMany({
           where,
@@ -1477,14 +1615,27 @@ export class ReportsService {
           take,
           select: { id: true, createdAt: true, state: true, slaStatus: true, type: true },
         });
-        }
+      }
       case "marketing": {
-        const where = this.buildWhereFromFilters("marketing", campgroundId, filters, range, timeField);
+        const where = this.buildWhereFromFilters(
+          "marketing",
+          campgroundId,
+          filters,
+          range,
+          timeField,
+        );
         const events = await this.prisma.analyticsEvent.findMany({
           where,
           orderBy: { occurredAt: "desc" },
           take,
-          select: { id: true, occurredAt: true, referrer: true, page: true, region: true, reservationId: true },
+          select: {
+            id: true,
+            occurredAt: true,
+            referrer: true,
+            page: true,
+            region: true,
+            reservationId: true,
+          },
         });
         return events.map((e) => ({
           id: e.id,
@@ -1505,12 +1656,12 @@ export class ReportsService {
             PosCartItem: {
               include: {
                 Product: {
-                  include: { ProductCategory: true }
-                }
-              }
+                  include: { ProductCategory: true },
+                },
+              },
             },
-            PosPayment: true
-          }
+            PosPayment: true,
+          },
         });
         // Flatten for item-level and payment-level analysis
         const rows: Array<Record<string, unknown>> = [];
@@ -1610,17 +1761,17 @@ export class ReportsService {
     campgroundId: string,
     filters: Record<string, unknown>,
     range: { gte?: Date; lte?: Date },
-    timeField: string
+    timeField: string,
   ): LooseWhere<ReportWhereMap[T]> {
     const allowedFilters = resolveFilters(source);
-    const base =
-      source === "task"
-        ? { tenantId: campgroundId }
-        : { campgroundId };
+    const base = source === "task" ? { tenantId: campgroundId } : { campgroundId };
 
     const where: LooseWhere<ReportWhereMap[T]> = { ...base };
     if (range.gte || range.lte) {
-      where[timeField] = { ...(range.gte ? { gte: range.gte } : {}), ...(range.lte ? { lte: range.lte } : {}) };
+      where[timeField] = {
+        ...(range.gte ? { gte: range.gte } : {}),
+        ...(range.lte ? { lte: range.lte } : {}),
+      };
     }
 
     for (const filter of allowedFilters) {
@@ -1666,7 +1817,7 @@ export class ReportsService {
     rows: Array<Record<string, unknown>>,
     spec: ReportSpec,
     dimensions: string[],
-    metrics: Array<{ id: string; field: string; aggregation: string }>
+    metrics: Array<{ id: string; field: string; aggregation: string }>,
   ) {
     const dimSpecs = dimensions.map((d) => resolveDimension(spec.source, d));
     const grouped = new Map<string, Record<string, unknown>>();
@@ -1713,8 +1864,7 @@ export class ReportsService {
                 ? value.count
                 : rows.length || 1;
           const metricValue = value[metric.id];
-          const sumValue =
-            typeof metricValue === "number" ? metricValue : Number(metricValue ?? 0);
+          const sumValue = typeof metricValue === "number" ? metricValue : Number(metricValue ?? 0);
           value[metric.id] = count ? Math.round((sumValue / count) * 100) / 100 : 0;
         });
       }
@@ -1828,39 +1978,51 @@ export class ReportsService {
   private async withCapacityGuard(isHeavy: boolean) {
     if (isHeavy) {
       if (this.heavyRuns >= this.heavyQueryLimit) {
-        const error: ServiceUnavailableException & { retryAfter?: number } = new ServiceUnavailableException({
-          message: "Report queries temporarily limited (heavy)",
-          retryAfter: this.capacityGuardRetryAfterSec(),
-          reason: "capacity_guard",
-        });
+        const error: ServiceUnavailableException & { retryAfter?: number } =
+          new ServiceUnavailableException({
+            message: "Report queries temporarily limited (heavy)",
+            retryAfter: this.capacityGuardRetryAfterSec(),
+            reason: "capacity_guard",
+          });
         error.retryAfter = this.capacityGuardRetryAfterSec();
-        this.observability.recordReportResult(false, undefined, { reason: "capacity_guard", kind: "heavy_query" });
-        this.alerting.dispatch(
-          "Report query capacity guard (heavy)",
-          `Heavy report queries at limit ${this.heavyQueryLimit}`,
-          "warning",
-          "reports-capacity-guard",
-          { reason: "capacity_guard", scope: "heavy" }
-        ).catch(() => undefined);
+        this.observability.recordReportResult(false, undefined, {
+          reason: "capacity_guard",
+          kind: "heavy_query",
+        });
+        this.alerting
+          .dispatch(
+            "Report query capacity guard (heavy)",
+            `Heavy report queries at limit ${this.heavyQueryLimit}`,
+            "warning",
+            "reports-capacity-guard",
+            { reason: "capacity_guard", scope: "heavy" },
+          )
+          .catch(() => undefined);
         throw error;
       }
       this.heavyRuns += 1;
     }
     if (this.activeRuns >= this.queryLimit) {
-      const error: ServiceUnavailableException & { retryAfter?: number } = new ServiceUnavailableException({
-        message: "Report queries temporarily limited",
-        retryAfter: this.capacityGuardRetryAfterSec(),
-        reason: "capacity_guard",
-      });
+      const error: ServiceUnavailableException & { retryAfter?: number } =
+        new ServiceUnavailableException({
+          message: "Report queries temporarily limited",
+          retryAfter: this.capacityGuardRetryAfterSec(),
+          reason: "capacity_guard",
+        });
       error.retryAfter = this.capacityGuardRetryAfterSec();
-      this.observability.recordReportResult(false, undefined, { reason: "capacity_guard", kind: "query_limit" });
-      this.alerting.dispatch(
-        "Report query capacity guard",
-        `Report queries at limit ${this.queryLimit}`,
-        "warning",
-        "reports-capacity-guard",
-        { reason: "capacity_guard", scope: "standard" }
-      ).catch(() => undefined);
+      this.observability.recordReportResult(false, undefined, {
+        reason: "capacity_guard",
+        kind: "query_limit",
+      });
+      this.alerting
+        .dispatch(
+          "Report query capacity guard",
+          `Report queries at limit ${this.queryLimit}`,
+          "warning",
+          "reports-capacity-guard",
+          { reason: "capacity_guard", scope: "standard" },
+        )
+        .catch(() => undefined);
       throw error;
     }
     this.activeRuns += 1;

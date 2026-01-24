@@ -28,17 +28,20 @@ A few questions before booking can save you from disappointment, extra costs, or
 ## About Policies
 
 ### Reservations
+
 - What is your cancellation policy?
 - Is a deposit required? How much?
 - When is the balance due?
 - Are modifications allowed?
 
 ### Check-In/Out
+
 - What are check-in and check-out times?
 - Can I request early check-in or late checkout?
 - What is the after-hours process?
 
 ### Guests
+
 - How many guests are allowed per site?
 - Are visitors permitted? At what cost?
 - What are quiet hours?
@@ -93,4 +96,4 @@ A few questions before booking can save you from disappointment, extra costs, or
 
 ---
 
-*Book with confidence at [campreserv.com](https://campreserv.com)*
+_Book with confidence at [campreserv.com](https://campreserv.com)_

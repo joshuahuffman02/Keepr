@@ -5,14 +5,17 @@ Date: 2026-01-01
 Source: https://www.cloudbeds.com/product-updates/ (AJAX list)
 
 ## Summary
+
 - Total updates parsed: 105
 - By year: 2023: 1, 2024: 32, 2025: 72
 - By type: UPDATE: 35, NEW FEATURE: 27, ENHANCEMENT: 24, NEW INTEGRATION: 13, NEW PRODUCT: 5, NEW CHANNEL: 1
 
 ## Update list (last few years)
+
 Note: Items mentioning Cloudbeds Websites are included for completeness but excluded from parity gaps.
 
 ### 2025
+
 - Dec, 2025 — ENHANCEMENT — See the reasoning behind the rates in Revenue Intelligence — We know the feeling: The system recommends a rate, but you can’t see the logic behind it. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/40710592121499-Revenue-Intelligence-Everything-You-Need-to-Know)
 - Dec, 2025 — ENHANCEMENT — View Digital Marketing Campaigns in one single, consolidated "Ads Performance" dashboard — Managed Advertising: we are streamlining how you view your advertising success with a new comprehensive dashboard that merges results from every campaign into a single, easy-to-rea... (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/9731750656283-Digital-Marketing-Performance-Dashboard)
 - Dec, 2025 — UPDATE — New CDFs for Cloudbeds Insights reporting — New CDFs available in Reservations dataset! (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/6621695765531-Report-Types-Cloudbeds-Data-Fields)
@@ -87,6 +90,7 @@ Note: Items mentioning Cloudbeds Websites are included for completeness but excl
 - Jan, 2025 — NEW FEATURE — Improvements to Monthly Statements with Cloudbeds Payments — We have made significant improvements to the Monthly Statements feature in Cloudbeds Payments, making it easier for you to reconcile payment activities, understand fees, and access... (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/31483490034459-How-to-read-your-monthly-statement-in-Cloudbeds-Payments)
 
 ### 2024
+
 - Dec, 2024 — ENHANCEMENT — Boost revenue and upsells with the new drag-and-drop Group reservations feature — We have made another improvement to the Groups module. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/27279213107739-Groups-Everything-you-need-to-know)
 - Dec, 2024 — UPDATE — Rooming Lists now available for Group Management — With this latest update, Cloudbeds is introducing the ability to upload group rooming lists in order to transform guest experiences and streamline operations. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/27230464304795-Manage-Group-Profiles#h_01JGM8ZFVGTXT03TF05HS8X88Z)
 - Dec, 2024 — UPDATE — New Housekeeping "Inspected" condition — Clean and well-maintained rooms are essential for a comfortable and welcoming experience, ensuring guests feel valued and cared for. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/216540808-Housekeeping-room-conditions)
@@ -121,6 +125,7 @@ Note: Items mentioning Cloudbeds Websites are included for completeness but excl
 - Jun, 2024 — NEW FEATURE — Introducing: Cloudbeds Amplify Reputation — With this new release, Cloudbeds properties will have a cutting-edge platform designed to seamlessly manage their online reviews with the power of AI. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/24420118911515-Cloudbeds-Amplify-Reputation)
 
 ### 2023
+
 - Nov, 2023 — NEW FEATURE — Whistle for Cloudbeds: New features — Whistle for Cloudbeds keeps bringing great features for guest communication, making it even easier for hospitality professionals to stay in touch with their guests. (https://myfrontdesk.cloudbeds.com/hc/en-us/articles/7602101112091-setup-the-guest-app)
 
 ## Gap analysis vs Campreserv (website builder excluded)
@@ -128,42 +133,52 @@ Note: Items mentioning Cloudbeds Websites are included for completeness but excl
 Summary: The Cloudbeds update stream emphasizes distribution depth, payment ops automation, guest comms integrations, and reporting maturity. Campreserv has partial coverage in many areas but lacks the automation, integration breadth, and reporting polish that shows up in Cloudbeds’ changelog.
 
 ### Revenue intelligence and pricing transparency
+
 - Cloudbeds shipped AI explainability, pace/forecast reporting, and OTA occupancy-based pricing controls.
 - Campreserv has dynamic pricing AI but no explainability or OTA occupancy-based pricing; analytics/reports are partial. `docs/feature-audit.md:128`, `docs/feature-audit.md:135`, `docs/KNOWN_LIMITATIONS.md:43`
 
 ### Digital marketing and metasearch
+
 - Cloudbeds updates include ads performance dashboards, PMax asset strength, metasearch launch, Google listing enrichments, and auto-refill for campaigns.
 - Campreserv marketing tooling is minimal; social planner is local-only and there is no metasearch/ads integration. `docs/feature-audit.md:116`, `docs/feature-audit.md:120`, `docs/KNOWN_LIMITATIONS.md:79`
 
 ### Payments operations and automation
+
 - Cloudbeds added pay-by-link, instant payouts, payment portal UX, dispute management, convenience fees, and OTA payment automation.
 - Campreserv payments, payouts, and disputes are partial; gift cards/referrals are stubbed; auto-collect has no UI. `docs/feature-audit.md:91`, `docs/feature-audit.md:93`, `docs/feature-audit.md:94`, `docs/feature-audit.md:99`, `docs/KNOWN_LIMITATIONS.md:11`, `docs/KNOWN_LIMITATIONS.md:13`
 
 ### Policies, compliance, and guest requirements
+
 - Cloudbeds introduced Smart Policies (automated deposits/cancellation fees) and flexible guest requirement enforcement for compliance.
 - Campreserv has policies/waivers UI but enforcement is partial and automated policy execution is missing. `docs/feature-audit.md:40`, `docs/feature-audit.md:41`
 
 ### Guest experience and messaging
+
 - Cloudbeds updates include OTA messaging channels, guest profile improvements, self-checkout, guest portal cancellations, QR codes, and notifications.
 - Campreserv messaging and guest portal are partial; push notifications are local-only. `docs/feature-audit.md:62`, `docs/feature-audit.md:69`, `docs/KNOWN_LIMITATIONS.md:35`
 
 ### Integrations and distribution depth
+
 - Cloudbeds shipped multiple CRS/channel/OTA integrations (SynXis, STAAH, Amadeus iHotelier, POS), plus channel closeout and rate plan mapping improvements.
 - Campreserv OTA sync and CRM sync are stubbed, integrations hub is partial, and outbound OTA push is missing. `docs/feature-audit.md:142`, `docs/feature-audit.md:145`, `docs/KNOWN_LIMITATIONS.md:22`, `docs/KNOWN_LIMITATIONS.md:24`
 
 ### Reporting and data maturity
+
 - Cloudbeds added CDFs, AI report search, export wizard, and granular reporting permissions.
 - Campreserv reports/exports are partial and unvalidated. `docs/feature-audit.md:128`, `docs/feature-audit.md:135`
 
 ### Reputation management
+
 - Cloudbeds continues expanding review sources (Booking.com, Expedia, Vrbo) and AI review responses.
 - Campreserv reviews and NPS are partial with no multi-source ingestion or sentiment tools. `docs/feature-audit.md:63`, `docs/feature-audit.md:64`
 
 ### Groups and events
+
 - Cloudbeds added group drag-and-drop, rooming lists, document attachments, and improved group check-in.
 - Campreserv group bookings and events are partial with no documented file attachments or rooming list workflows. `docs/feature-audit.md:28`, `docs/feature-audit.md:77`
 
 ### Ops and on-site workflows
+
 - Cloudbeds added housekeeping status improvements and access control integrations.
 - Campreserv housekeeping is partial and access control is stubbed. `docs/feature-audit.md:79`, `docs/KNOWN_LIMITATIONS.md:25`
 
@@ -172,12 +187,14 @@ Summary: The Cloudbeds update stream emphasizes distribution depth, payment ops 
 Goal: Minimal feature set to match the capabilities Cloudbeds has emphasized in 2023–2025 updates. This does not replace any findings above; it organizes them into an MVP parity checklist.
 
 ### Revenue intelligence and reporting
+
 - Explainable pricing AI (plain-text reasons + driver attribution).
 - Pace/forecast reporting and occupancy analytics with actionable report links.
 - Expanded data fields (CDF-style) and flexible export wizard + filter presets.
 - Reporting permissions by role.
 
 ### Distribution, OTA control, and integrations
+
 - Two-way OTA sync (availability, rates, restrictions) with channel closeouts.
 - Rate plan mapping to channel standard rates and OTA occupancy-based pricing.
 - In-app OTA modifications and cancellations (Booking.com, Airbnb).
@@ -185,6 +202,7 @@ Goal: Minimal feature set to match the capabilities Cloudbeds has emphasized in 
 - CRS/channel manager integrations (SynXis, STAAH, Amadeus iHotelier) and payment processing channels (HyperGuest, etc.).
 
 ### Payments operations
+
 - Payment portal with payouts view, instant payouts, and dispute management.
 - Pay-by-link (including group folios/house accounts) and convenience fee options.
 - Automated OTA payment timing (Booking.com/Expedia VCC support).
@@ -192,10 +210,12 @@ Goal: Minimal feature set to match the capabilities Cloudbeds has emphasized in 
 - Clear authorization status UX.
 
 ### Policies and compliance
+
 - Smart policies: automated deposits, balance collections, and cancellation fee enforcement.
 - Guest requirements enforcement by touchpoint (create, check-in, edit) with hide/optional/warn/required modes.
 
 ### Guest experience and messaging
+
 - Guest profiles with unified history and segmentation support.
 - Guest portal self-service (cancellations and self-checkout).
 - QR code support for guest apps/portals.
@@ -204,24 +224,29 @@ Goal: Minimal feature set to match the capabilities Cloudbeds has emphasized in 
 - Access control integration for digital keys (e.g., Flexipass/Webkey-style).
 
 ### Marketing and reputation
+
 - Ads performance dashboard across channels.
 - Metasearch programs and Google listing enhancements (images, rates, policies).
 - PMax asset strength guidance and campaign auto-refill.
 - Reputation aggregation across major OTAs with AI response tooling.
 
 ### Groups and events
+
 - Drag-and-drop group reservations and rooming lists.
 - Group event document attachments and improved group check-in flows.
 - Shoulder date rate-plan selection for group blocks.
 
 ### Ops and housekeeping
+
 - Housekeeping status improvements (e.g., “Inspected” state).
 
 ## Campreserv strengths to keep
+
 - Interactive site map is verified and differentiated for campground selection. `docs/feature-audit.md:34`
 - POS/store foundations are functional and can support campground retail operations. `docs/feature-audit.md:105`
 - Utilities billing exists and is campground-specific (validation still needed). `docs/feature-audit.md:99`
 
 ## Notes
+
 - The product updates page currently exposes updates from Nov 2023 onward (105 items total across 2023–2025). No older updates were present in the public list at fetch time.
 - Website builder-related updates are listed above but excluded from gap analysis per request.

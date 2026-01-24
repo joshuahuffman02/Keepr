@@ -17,6 +17,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 ## RV Camping
 
 ### Pros
+
 - **Comfort**: Real bed, climate control, bathroom
 - **Convenience**: Kitchen, storage, familiar setup
 - **Weather-proof**: Storms are no big deal
@@ -24,6 +25,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 - **Amenities**: TV, WiFi, full kitchen possible
 
 ### Cons
+
 - **Cost**: RV purchase/rental, fuel, maintenance
 - **Size limitations**: Can't go everywhere
 - **Complexity**: More to maintain and manage
@@ -35,6 +37,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 ## Tent Camping
 
 ### Pros
+
 - **Affordable**: Low equipment cost
 - **Immersive**: Closer to nature
 - **Flexible**: Go almost anywhere
@@ -42,6 +45,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 - **Portable**: Fits in any car
 
 ### Cons
+
 - **Weather dependent**: Rain/cold affects comfort
 - **Setup/takedown**: Work at each site
 - **Limited comfort**: No climate control, hard beds
@@ -52,18 +56,19 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 
 ## Cost Comparison
 
-| Item | Tent Camping | RV Camping |
-|------|-------------|------------|
-| Equipment (to start) | $300-800 | $15,000-100,000+ |
-| Rental option | Less common | $100-300/night |
-| Daily costs | Lower | Higher (fuel, fees) |
-| Site costs | $20-40 | $40-80+ |
+| Item                 | Tent Camping | RV Camping          |
+| -------------------- | ------------ | ------------------- |
+| Equipment (to start) | $300-800     | $15,000-100,000+    |
+| Rental option        | Less common  | $100-300/night      |
+| Daily costs          | Lower        | Higher (fuel, fees) |
+| Site costs           | $20-40       | $40-80+             |
 
 ---
 
 ## Lifestyle Fit
 
 ### Choose RV Camping If You:
+
 - Want consistent comfort
 - Travel for extended periods
 - Have mobility limitations
@@ -71,6 +76,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 - Travel with pets or young children
 
 ### Choose Tent Camping If You:
+
 - Seek nature immersion
 - Are budget-conscious
 - Enjoy the adventure/challenge
@@ -82,6 +88,7 @@ Choosing between RV and tent camping is a personal decision. Both offer incredib
 ## The Hybrid Approach
 
 Many campers enjoy both styles:
+
 - Tent camping for weekend adventures
 - RV for longer or family trips
 - Cabin rentals when neither fits
@@ -97,4 +104,4 @@ Many campers enjoy both styles:
 
 ---
 
-*Book RV sites, tent sites, and cabins at [campreserv.com](https://campreserv.com)*
+_Book RV sites, tent sites, and cabins at [campreserv.com](https://campreserv.com)_

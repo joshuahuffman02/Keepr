@@ -9,9 +9,22 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { apiClient } from "@/lib/api-client";
 import { useToast } from "@/components/ui/use-toast";
@@ -90,7 +103,8 @@ export default function DataImportPage() {
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) {
       setCampgroundId(stored);
     }
@@ -105,8 +119,7 @@ export default function DataImportPage() {
 
   // Detect format mutation
   const detectMutation = useMutation({
-    mutationFn: () =>
-      apiClient.detectImportFormat(campgroundId, { csvContent, entityType }),
+    mutationFn: () => apiClient.detectImportFormat(campgroundId, { csvContent, entityType }),
     onSuccess: (data) => {
       setDetectedFormat(data);
       // Initialize field mappings from suggestions
@@ -148,7 +161,12 @@ export default function DataImportPage() {
   // Execute import mutation
   const executeMutation = useMutation({
     mutationFn: () =>
-      apiClient.executeImport(campgroundId, { csvContent, entityType, fieldMappings, updateExisting }),
+      apiClient.executeImport(campgroundId, {
+        csvContent,
+        entityType,
+        fieldMappings,
+        updateExisting,
+      }),
     onSuccess: (data) => {
       setImportResult(data);
       setStep("complete");
@@ -208,9 +226,7 @@ export default function DataImportPage() {
     setFieldMappings((prev) => {
       const existing = prev.find((m) => m.sourceField === sourceField);
       if (existing) {
-        return prev.map((m) =>
-          m.sourceField === sourceField ? { ...m, targetField } : m
-        );
+        return prev.map((m) => (m.sourceField === sourceField ? { ...m, targetField } : m));
       }
       return [...prev, { sourceField, targetField }];
     });
@@ -251,9 +267,7 @@ export default function DataImportPage() {
         <Card>
           <CardHeader>
             <CardTitle>What would you like to import?</CardTitle>
-            <CardDescription>
-              Select the type of data you want to import
-            </CardDescription>
+            <CardDescription>Select the type of data you want to import</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs
@@ -302,7 +316,8 @@ export default function DataImportPage() {
                 Upload CSV File
               </CardTitle>
               <CardDescription>
-                Upload a CSV file or paste the content directly. We support exports from Campspot, NewBook, and generic CSV formats.
+                Upload a CSV file or paste the content directly. We support exports from Campspot,
+                NewBook, and generic CSV formats.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -366,8 +381,9 @@ export default function DataImportPage() {
                 <FileText className="h-4 w-4" />
                 <AlertTitle>Supported Formats</AlertTitle>
                 <AlertDescription>
-                  We automatically detect exports from <strong>Campspot</strong> and <strong>NewBook</strong>.
-                  For other systems, use our CSV template or map your columns manually.
+                  We automatically detect exports from <strong>Campspot</strong> and{" "}
+                  <strong>NewBook</strong>. For other systems, use our CSV template or map your
+                  columns manually.
                 </AlertDescription>
               </Alert>
 
@@ -398,8 +414,9 @@ export default function DataImportPage() {
                 Map Fields
               </CardTitle>
               <CardDescription>
-                We detected <Badge variant="secondary">{detectedFormat.format.toUpperCase()}</Badge> format
-                with {detectedFormat.headers.length} columns. Review and adjust the field mappings below.
+                We detected <Badge variant="secondary">{detectedFormat.format.toUpperCase()}</Badge>{" "}
+                format with {detectedFormat.headers.length} columns. Review and adjust the field
+                mappings below.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -416,7 +433,9 @@ export default function DataImportPage() {
                 <TableBody>
                   {detectedFormat.headers.map((header) => {
                     const mapping = fieldMappings.find((m) => m.sourceField === header);
-                    const suggested = detectedFormat.suggestedMappings.find((s) => s.sourceField === header);
+                    const suggested = detectedFormat.suggestedMappings.find(
+                      (s) => s.sourceField === header,
+                    );
 
                     return (
                       <TableRow key={header}>
@@ -424,7 +443,9 @@ export default function DataImportPage() {
                         <TableCell>
                           <Select
                             value={mapping?.targetField || ""}
-                            onValueChange={(v) => v ? updateMapping(header, v) : removeMapping(header)}
+                            onValueChange={(v) =>
+                              v ? updateMapping(header, v) : removeMapping(header)
+                            }
                           >
                             <SelectTrigger className="w-48">
                               <SelectValue placeholder="Select field..." />
@@ -444,20 +465,14 @@ export default function DataImportPage() {
                         </TableCell>
                         <TableCell>
                           {suggested && (
-                            <Badge
-                              variant={suggested.confidence > 0.9 ? "default" : "secondary"}
-                            >
+                            <Badge variant={suggested.confidence > 0.9 ? "default" : "secondary"}>
                               {Math.round(suggested.confidence * 100)}%
                             </Badge>
                           )}
                         </TableCell>
                         <TableCell>
                           {mapping && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeMapping(header)}
-                            >
+                            <Button variant="ghost" size="sm" onClick={() => removeMapping(header)}>
                               <XCircle className="h-4 w-4 text-muted-foreground" />
                             </Button>
                           )}
@@ -516,9 +531,7 @@ export default function DataImportPage() {
                 <CheckCircle className="h-5 w-5 text-emerald-600" />
                 Review Import
               </CardTitle>
-              <CardDescription>
-                Review the import results before committing changes
-              </CardDescription>
+              <CardDescription>Review the import results before committing changes</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Summary Stats */}
@@ -609,8 +622,8 @@ export default function DataImportPage() {
                                 row.action === "create"
                                   ? "default"
                                   : row.action === "update"
-                                  ? "secondary"
-                                  : "outline"
+                                    ? "secondary"
+                                    : "outline"
                               }
                             >
                               {row.action}
@@ -723,17 +736,15 @@ export default function DataImportPage() {
                   <CheckCircle className="h-4 w-4 text-emerald-600" />
                   <AlertTitle className="text-emerald-800">Success!</AlertTitle>
                   <AlertDescription className="text-emerald-700">
-                    Your {entityType} have been imported successfully.
-                    You can view them in the {entityType === "sites" ? "Sites" : "Guests"} section.
+                    Your {entityType} have been imported successfully. You can view them in the{" "}
+                    {entityType === "sites" ? "Sites" : "Guests"} section.
                   </AlertDescription>
                 </Alert>
               )}
 
               {/* Actions */}
               <div className="flex gap-4">
-                <Button onClick={reset}>
-                  Import More Data
-                </Button>
+                <Button onClick={reset}>Import More Data</Button>
                 <Button variant="outline" asChild>
                   <a href={entityType === "sites" ? "/dashboard/sites" : "/dashboard/guests"}>
                     View {entityType === "sites" ? "Sites" : "Guests"}

@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  UseGuards,
-  Req,
-  Headers
-} from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, UseGuards, Req, Headers } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { OrgReferralsService } from "./org-referrals.service";
 import type { Request } from "express";
@@ -43,7 +34,7 @@ export class OrgReferralsController {
 
     return {
       ...stats,
-      referrals: history
+      referrals: history,
     };
   }
 
@@ -66,7 +57,7 @@ export class OrgReferralsController {
   async trackClick(
     @Body() body: TrackClickDto,
     @Headers("user-agent") userAgent: string,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     // Extract and validate client IP to prevent spoofing via x-forwarded-for
     const ipAddress = extractClientIpFromRequest(req) || req.ip;
@@ -76,7 +67,7 @@ export class OrgReferralsController {
       utmMedium: body.utmMedium,
       utmCampaign: body.utmCampaign,
       ipAddress,
-      userAgent
+      userAgent,
     });
   }
 
@@ -85,11 +76,7 @@ export class OrgReferralsController {
    */
   @Post("public/referrals/track-signup")
   async trackSignup(@Body() body: TrackSignupDto) {
-    return this.referrals.trackSignup(
-      body.referralCode,
-      body.email,
-      body.organizationId
-    );
+    return this.referrals.trackSignup(body.referralCode, body.email, body.organizationId);
   }
 
   /**

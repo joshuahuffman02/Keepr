@@ -28,7 +28,7 @@ export function searchTopics(query: string, limit = 30): HelpTopic[] {
         topic.category,
         tags.join(" "),
         topic.steps.join(" "),
-        topic.tips?.join(" ") ?? ""
+        topic.tips?.join(" ") ?? "",
       ]
         .join(" ")
         .toLowerCase();
@@ -41,7 +41,7 @@ export function searchTopics(query: string, limit = 30): HelpTopic[] {
       // simple typo tolerance: allow small Levenshtein distance on title/tags
       const distance = Math.min(
         levenshtein(q, title.slice(0, 60)),
-        ...tags.map((t) => levenshtein(q, t))
+        ...tags.map((t) => levenshtein(q, t)),
       );
       if (q.length >= 3 && distance <= 2) {
         score += 4 - distance; // closer = higher
@@ -71,7 +71,7 @@ function levenshtein(a: string, b: string): number {
       matrix[i][j] = Math.min(
         matrix[i - 1][j] + 1,
         matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + cost
+        matrix[i - 1][j - 1] + cost,
       );
     }
   }
@@ -91,4 +91,3 @@ export function getContextTopics(pathname: string): HelpTopic[] {
   }
   return getPopularTopics();
 }
-

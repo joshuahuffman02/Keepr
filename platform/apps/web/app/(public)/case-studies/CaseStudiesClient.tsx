@@ -40,7 +40,10 @@ export default function CaseStudiesClient() {
 
       <div className="grid md:grid-cols-2 gap-6">
         {studies.map((study) => (
-          <div key={study.id} className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
+          <div
+            key={study.id}
+            className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5 text-emerald-600" />
@@ -60,7 +63,10 @@ export default function CaseStudiesClient() {
                 <MessageSquare className="h-4 w-4" /> Guest comms
               </span>
             </div>
-            <Link href="/contact" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1">
+            <Link
+              href="/contact"
+              className="text-sm font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1"
+            >
               Talk with us →
             </Link>
           </div>
@@ -70,7 +76,8 @@ export default function CaseStudiesClient() {
       <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-3">
         <h2 className="text-xl font-bold text-slate-900">Want your story featured?</h2>
         <p className="text-slate-600 text-sm">
-          We're collecting more case studies as we expand. Share your goals and we'll tailor a rollout plan for your park.
+          We're collecting more case studies as we expand. Share your goals and we'll tailor a
+          rollout plan for your park.
         </p>
         <Link
           href="/contact"

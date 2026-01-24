@@ -153,34 +153,62 @@ export default function FunnelAnalysisDashboard() {
   };
 
   // Calculate step data for visualization
-  const stepData = currentFunnel ? [
-    { name: funnelConfig.steps[0] || "Step 1", count: currentFunnel.step1, dropOff: 0 },
-    { name: funnelConfig.steps[1] || "Step 2", count: currentFunnel.step2, dropOff: currentFunnel.step1 - currentFunnel.step2 },
-    { name: funnelConfig.steps[2] || "Step 3", count: currentFunnel.step3, dropOff: currentFunnel.step2 - currentFunnel.step3 },
-    { name: funnelConfig.steps[3] || "Step 4", count: currentFunnel.step4, dropOff: currentFunnel.step3 - currentFunnel.step4 },
-    { name: funnelConfig.steps[4] || "Step 5", count: currentFunnel.step5, dropOff: currentFunnel.step4 - currentFunnel.step5 },
-    { name: funnelConfig.steps[5] || "Step 6", count: currentFunnel.step6, dropOff: currentFunnel.step5 - currentFunnel.step6 },
-  ].filter((step) => step.count > 0 || step.dropOff > 0) : [];
+  const stepData = currentFunnel
+    ? [
+        { name: funnelConfig.steps[0] || "Step 1", count: currentFunnel.step1, dropOff: 0 },
+        {
+          name: funnelConfig.steps[1] || "Step 2",
+          count: currentFunnel.step2,
+          dropOff: currentFunnel.step1 - currentFunnel.step2,
+        },
+        {
+          name: funnelConfig.steps[2] || "Step 3",
+          count: currentFunnel.step3,
+          dropOff: currentFunnel.step2 - currentFunnel.step3,
+        },
+        {
+          name: funnelConfig.steps[3] || "Step 4",
+          count: currentFunnel.step4,
+          dropOff: currentFunnel.step3 - currentFunnel.step4,
+        },
+        {
+          name: funnelConfig.steps[4] || "Step 5",
+          count: currentFunnel.step5,
+          dropOff: currentFunnel.step4 - currentFunnel.step5,
+        },
+        {
+          name: funnelConfig.steps[5] || "Step 6",
+          count: currentFunnel.step6,
+          dropOff: currentFunnel.step5 - currentFunnel.step6,
+        },
+      ].filter((step) => step.count > 0 || step.dropOff > 0)
+    : [];
 
   // Find biggest drop-off
-  const biggestDropOff = stepData.length > 0
-    ? stepData.reduce((max, step, idx) => {
-        if (idx === 0) return max;
-        const dropOffRate = stepData[idx - 1].count > 0
-          ? step.dropOff / stepData[idx - 1].count
-          : 0;
-        return dropOffRate > (max.rate || 0) ? { step: step.name, rate: dropOffRate, count: step.dropOff } : max;
-      }, { step: "", rate: 0, count: 0 })
-    : null;
+  const biggestDropOff =
+    stepData.length > 0
+      ? stepData.reduce(
+          (max, step, idx) => {
+            if (idx === 0) return max;
+            const dropOffRate =
+              stepData[idx - 1].count > 0 ? step.dropOff / stepData[idx - 1].count : 0;
+            return dropOffRate > (max.rate || 0)
+              ? { step: step.name, rate: dropOffRate, count: step.dropOff }
+              : max;
+          },
+          { step: "", rate: 0, count: 0 },
+        )
+      : null;
 
   // Summary stats
   const totalFunnels = funnelStats?.reduce((sum, f) => sum + f.totalStarted, 0) || 0;
   const totalCompleted = funnelStats?.reduce((sum, f) => sum + f.completed, 0) || 0;
   const overallConversion = totalFunnels > 0 ? totalCompleted / totalFunnels : 0;
-  const avgCompletionTime = funnelStats?.filter((f) => f.avgCompletionTimeSecs).length || 0 > 0
-    ? funnelStats!.reduce((sum, f) => sum + (f.avgCompletionTimeSecs || 0), 0) /
-      funnelStats!.filter((f) => f.avgCompletionTimeSecs).length
-    : null;
+  const avgCompletionTime =
+    funnelStats?.filter((f) => f.avgCompletionTimeSecs).length || 0 > 0
+      ? funnelStats!.reduce((sum, f) => sum + (f.avgCompletionTimeSecs || 0), 0) /
+        funnelStats!.filter((f) => f.avgCompletionTimeSecs).length
+      : null;
 
   return (
     <div className="space-y-6">
@@ -220,7 +248,9 @@ export default function FunnelAnalysisDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{totalCompleted.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              {totalFunnels > 0 ? `${((totalCompleted / totalFunnels) * 100).toFixed(1)}% completion` : "-"}
+              {totalFunnels > 0
+                ? `${((totalCompleted / totalFunnels) * 100).toFixed(1)}% completion`
+                : "-"}
             </p>
           </CardContent>
         </Card>
@@ -263,11 +293,13 @@ export default function FunnelAnalysisDashboard() {
                       {config.name}
                     </SelectItem>
                   ))}
-                  {funnelStats?.filter((f) => !FUNNEL_CONFIGS[f.funnelName]).map((f) => (
-                    <SelectItem key={f.funnelName} value={f.funnelName}>
-                      {f.funnelName}
-                    </SelectItem>
-                  ))}
+                  {funnelStats
+                    ?.filter((f) => !FUNNEL_CONFIGS[f.funnelName])
+                    .map((f) => (
+                      <SelectItem key={f.funnelName} value={f.funnelName}>
+                        {f.funnelName}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               <Select value={days} onValueChange={setDays}>
@@ -317,12 +349,15 @@ export default function FunnelAnalysisDashboard() {
 
               {/* Funnel Steps */}
               {stepData.map((step, idx) => {
-                const previousCount = idx === 0 ? currentFunnel.totalStarted : stepData[idx - 1].count;
+                const previousCount =
+                  idx === 0 ? currentFunnel.totalStarted : stepData[idx - 1].count;
                 const percentage = previousCount > 0 ? (step.count / previousCount) * 100 : 0;
-                const overallPercentage = currentFunnel.totalStarted > 0
-                  ? (step.count / currentFunnel.totalStarted) * 100
-                  : 0;
-                const dropOffPercentage = previousCount > 0 ? (step.dropOff / previousCount) * 100 : 0;
+                const overallPercentage =
+                  currentFunnel.totalStarted > 0
+                    ? (step.count / currentFunnel.totalStarted) * 100
+                    : 0;
+                const dropOffPercentage =
+                  previousCount > 0 ? (step.dropOff / previousCount) * 100 : 0;
 
                 return (
                   <div key={step.name} className="relative">
@@ -330,7 +365,9 @@ export default function FunnelAnalysisDashboard() {
                     {idx > 0 && step.dropOff > 0 && (
                       <div className="absolute -top-2 right-4 flex items-center gap-1 text-xs text-red-500">
                         <ChevronDown className="h-3 w-3" />
-                        <span>{step.dropOff} ({dropOffPercentage.toFixed(1)}% drop)</span>
+                        <span>
+                          {step.dropOff} ({dropOffPercentage.toFixed(1)}% drop)
+                        </span>
                       </div>
                     )}
 
@@ -343,7 +380,15 @@ export default function FunnelAnalysisDashboard() {
                           <span className="font-medium">{step.name}</span>
                           <div className="flex items-center gap-2">
                             <span className="text-lg font-bold">{step.count}</span>
-                            <Badge variant={percentage >= 80 ? "default" : percentage >= 50 ? "secondary" : "destructive"}>
+                            <Badge
+                              variant={
+                                percentage >= 80
+                                  ? "default"
+                                  : percentage >= 50
+                                    ? "secondary"
+                                    : "destructive"
+                              }
+                            >
                               {percentage.toFixed(0)}%
                             </Badge>
                           </div>
@@ -368,13 +413,20 @@ export default function FunnelAnalysisDashboard() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-green-800">Completed</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg font-bold text-green-800">{currentFunnel.completed}</span>
+                      <span className="text-lg font-bold text-green-800">
+                        {currentFunnel.completed}
+                      </span>
                       <Badge className="bg-green-500">
-                        {currentFunnel.conversionRate ? `${(currentFunnel.conversionRate * 100).toFixed(1)}%` : "0%"}
+                        {currentFunnel.conversionRate
+                          ? `${(currentFunnel.conversionRate * 100).toFixed(1)}%`
+                          : "0%"}
                       </Badge>
                     </div>
                   </div>
-                  <Progress value={currentFunnel.conversionRate ? currentFunnel.conversionRate * 100 : 0} className="h-2 bg-green-200" />
+                  <Progress
+                    value={currentFunnel.conversionRate ? currentFunnel.conversionRate * 100 : 0}
+                    className="h-2 bg-green-200"
+                  />
                 </div>
               </div>
 
@@ -388,7 +440,9 @@ export default function FunnelAnalysisDashboard() {
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-red-800">Abandoned</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-red-800">{currentFunnel.abandoned}</span>
+                        <span className="text-lg font-bold text-red-800">
+                          {currentFunnel.abandoned}
+                        </span>
                         <Badge variant="destructive">
                           {currentFunnel.totalStarted > 0
                             ? `${((currentFunnel.abandoned / currentFunnel.totalStarted) * 100).toFixed(1)}%`
@@ -421,8 +475,8 @@ export default function FunnelAnalysisDashboard() {
           </CardHeader>
           <CardContent>
             <p className="text-amber-700">
-              <strong>{formatPercent(biggestDropOff.rate)}</strong> of users ({biggestDropOff.count}) are dropping off at the{" "}
-              <strong>{biggestDropOff.step}</strong> step. Consider:
+              <strong>{formatPercent(biggestDropOff.rate)}</strong> of users ({biggestDropOff.count}
+              ) are dropping off at the <strong>{biggestDropOff.step}</strong> step. Consider:
             </p>
             <ul className="mt-2 space-y-1 text-sm text-amber-700 list-disc list-inside">
               <li>Simplifying this step</li>
@@ -465,7 +519,11 @@ export default function FunnelAnalysisDashboard() {
                   return (
                     <TableRow
                       key={funnel.funnelName}
-                      className={selectedFunnel === funnel.funnelName ? "bg-muted/50" : "cursor-pointer hover:bg-muted/30"}
+                      className={
+                        selectedFunnel === funnel.funnelName
+                          ? "bg-muted/50"
+                          : "cursor-pointer hover:bg-muted/30"
+                      }
                       onClick={() => setSelectedFunnel(funnel.funnelName)}
                     >
                       <TableCell className="font-medium">
@@ -479,8 +537,8 @@ export default function FunnelAnalysisDashboard() {
                             funnel.conversionRate >= 0.5
                               ? "default"
                               : funnel.conversionRate >= 0.25
-                              ? "secondary"
-                              : "destructive"
+                                ? "secondary"
+                                : "destructive"
                           }
                         >
                           {formatPercent(funnel.conversionRate)}

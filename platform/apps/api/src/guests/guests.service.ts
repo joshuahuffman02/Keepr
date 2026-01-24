@@ -12,8 +12,8 @@ const getCampgroundIdFromTags = (tags?: string[] | null) =>
 export class GuestsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
-  ) { }
+    private readonly audit: AuditService,
+  ) {}
 
   findOne(id: string, campgroundId?: string) {
     return this.prisma.guest.findFirst({
@@ -23,10 +23,10 @@ export class GuestsService {
           ? {
               OR: [
                 { Reservation: { some: { campgroundId } } },
-                { tags: { has: `campground:${campgroundId}` } }
-              ]
+                { tags: { has: `campground:${campgroundId}` } },
+              ],
             }
-          : {})
+          : {}),
       },
       include: {
         LoyaltyProfile: true,
@@ -34,10 +34,10 @@ export class GuestsService {
           orderBy: { arrivalDate: "desc" },
           ...(campgroundId ? { where: { campgroundId } } : {}),
           include: {
-            Site: { include: { SiteClass: true } }
-          }
-        }
-      }
+            Site: { include: { SiteClass: true } },
+          },
+        },
+      },
     });
   }
 
@@ -46,13 +46,17 @@ export class GuestsService {
     const offset = options?.offset ?? 0;
 
     return this.prisma.guest.findMany({
-      where: options?.search ? {
-        OR: [
-          { primaryFirstName: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
-          { primaryLastName: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
-          { email: { contains: options.search, mode: Prisma.QueryMode.insensitive } }
-        ]
-      } : undefined,
+      where: options?.search
+        ? {
+            OR: [
+              {
+                primaryFirstName: { contains: options.search, mode: Prisma.QueryMode.insensitive },
+              },
+              { primaryLastName: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
+              { email: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
+            ],
+          }
+        : undefined,
       orderBy: { primaryLastName: "asc" },
       take: limit,
       skip: offset,
@@ -64,17 +68,17 @@ export class GuestsService {
           select: {
             departureDate: true,
             Site: {
-              select: { id: true, name: true, siteNumber: true, siteClassId: true }
-            }
-          }
-        }
-      }
+              select: { id: true, name: true, siteNumber: true, siteClassId: true },
+            },
+          },
+        },
+      },
     });
   }
 
   findAllByCampground(
     campgroundId: string,
-    options?: { limit?: number; offset?: number; search?: string }
+    options?: { limit?: number; offset?: number; search?: string },
   ) {
     const limit = Math.min(options?.limit ?? 100, 500);
     const offset = options?.offset ?? 0;
@@ -84,19 +88,30 @@ export class GuestsService {
       where: {
         AND: [
           {
-            OR: [
-              { Reservation: { some: { campgroundId } } },
-              { tags: { has: campgroundTag } }
-            ]
+            OR: [{ Reservation: { some: { campgroundId } } }, { tags: { has: campgroundTag } }],
           },
-          ...(options?.search ? [{
-            OR: [
-              { primaryFirstName: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
-              { primaryLastName: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
-              { email: { contains: options.search, mode: Prisma.QueryMode.insensitive } }
-            ]
-          }] : [])
-        ]
+          ...(options?.search
+            ? [
+                {
+                  OR: [
+                    {
+                      primaryFirstName: {
+                        contains: options.search,
+                        mode: Prisma.QueryMode.insensitive,
+                      },
+                    },
+                    {
+                      primaryLastName: {
+                        contains: options.search,
+                        mode: Prisma.QueryMode.insensitive,
+                      },
+                    },
+                    { email: { contains: options.search, mode: Prisma.QueryMode.insensitive } },
+                  ],
+                },
+              ]
+            : []),
+        ],
       },
       orderBy: { primaryLastName: "asc" },
       take: limit,
@@ -110,11 +125,11 @@ export class GuestsService {
           select: {
             departureDate: true,
             Site: {
-              select: { id: true, name: true, siteNumber: true, siteClassId: true }
-            }
-          }
-        }
-      }
+              select: { id: true, name: true, siteNumber: true, siteClassId: true },
+            },
+          },
+        },
+      },
     });
   }
 
@@ -122,7 +137,9 @@ export class GuestsService {
     const { rigLength, repeatStays, tags, ...rest } = data;
     const emailNormalized = rest.email ? rest.email.trim().toLowerCase() : null;
     const phoneNormalized = rest.phone ? rest.phone.replace(/\D/g, "").slice(-10) : null;
-    const incomingTags = Array.isArray(tags) ? tags.filter((tag) => typeof tag === "string" && tag.trim()) : [];
+    const incomingTags = Array.isArray(tags)
+      ? tags.filter((tag) => typeof tag === "string" && tag.trim())
+      : [];
 
     // Extract campgroundId from tags if not provided
     const campgroundId = options?.campgroundId || getCampgroundIdFromTags(incomingTags);
@@ -132,9 +149,9 @@ export class GuestsService {
       where: {
         OR: [
           ...(emailNormalized ? [{ emailNormalized }] : []),
-          ...(phoneNormalized ? [{ phoneNormalized }] : [])
-        ]
-      }
+          ...(phoneNormalized ? [{ phoneNormalized }] : []),
+        ],
+      },
     });
     if (existing) {
       if (incomingTags.length > 0) {
@@ -142,7 +159,7 @@ export class GuestsService {
         if (nextTags.length !== (existing.tags ?? []).length) {
           const updated = await this.prisma.guest.update({
             where: { id: existing.id },
-            data: { tags: nextTags }
+            data: { tags: nextTags },
           });
 
           // Audit tag update on existing guest
@@ -154,7 +171,7 @@ export class GuestsService {
               entity: "guest",
               entityId: existing.id,
               before: { tags: existing.tags },
-              after: { tags: nextTags }
+              after: { tags: nextTags },
             });
           }
 
@@ -172,8 +189,8 @@ export class GuestsService {
         emailNormalized,
         phoneNormalized,
         rigLength: rigLength !== undefined ? Number(rigLength) : null,
-        repeatStays: repeatStays !== undefined ? Number(repeatStays) : undefined
-      }
+        repeatStays: repeatStays !== undefined ? Number(repeatStays) : undefined,
+      },
     });
 
     // Audit guest creation
@@ -190,15 +207,19 @@ export class GuestsService {
           primaryFirstName: guest.primaryFirstName,
           primaryLastName: guest.primaryLastName,
           email: guest.email,
-          phone: guest.phone
-        }
+          phone: guest.phone,
+        },
       });
     }
 
     return guest;
   }
 
-  async update(id: string, data: Partial<CreateGuestDto>, options?: { actorId?: string; campgroundId?: string }) {
+  async update(
+    id: string,
+    data: Partial<CreateGuestDto>,
+    options?: { actorId?: string; campgroundId?: string },
+  ) {
     const { rigLength, repeatStays, ...rest } = data;
     const emailNormalized = rest.email ? rest.email.trim().toLowerCase() : undefined;
     const phoneNormalized = rest.phone ? rest.phone.replace(/\D/g, "").slice(-10) : undefined;
@@ -213,13 +234,14 @@ export class GuestsService {
         ...(emailNormalized !== undefined ? { emailNormalized } : {}),
         ...(phoneNormalized !== undefined ? { phoneNormalized } : {}),
         ...(rigLength !== undefined ? { rigLength: Number(rigLength) } : {}),
-        ...(repeatStays !== undefined && repeatStays !== null ? { repeatStays: Number(repeatStays) } : {})
-      }
+        ...(repeatStays !== undefined && repeatStays !== null
+          ? { repeatStays: Number(repeatStays) }
+          : {}),
+      },
     });
 
     // Determine campgroundId from options or guest's tags
-    const campgroundId = options?.campgroundId ||
-      getCampgroundIdFromTags(before?.tags ?? null);
+    const campgroundId = options?.campgroundId || getCampgroundIdFromTags(before?.tags ?? null);
 
     // Audit guest update
     if (campgroundId && before) {
@@ -237,7 +259,7 @@ export class GuestsService {
           rigLength: before.rigLength,
           vehiclePlate: before.vehiclePlate,
           vehicleState: before.vehicleState,
-          notes: before.notes
+          notes: before.notes,
         },
         after: {
           primaryFirstName: updated.primaryFirstName,
@@ -247,8 +269,8 @@ export class GuestsService {
           rigLength: updated.rigLength,
           vehiclePlate: updated.vehiclePlate,
           vehicleState: updated.vehicleState,
-          notes: updated.notes
-        }
+          notes: updated.notes,
+        },
       });
     }
 
@@ -260,8 +282,7 @@ export class GuestsService {
     const before = await this.prisma.guest.findUnique({ where: { id } });
 
     // Determine campgroundId from options or guest's tags
-    const campgroundId = options?.campgroundId ||
-      getCampgroundIdFromTags(before?.tags ?? null);
+    const campgroundId = options?.campgroundId || getCampgroundIdFromTags(before?.tags ?? null);
 
     const deleted = await this.prisma.guest.delete({ where: { id } });
 
@@ -278,9 +299,9 @@ export class GuestsService {
           primaryFirstName: before.primaryFirstName,
           primaryLastName: before.primaryLastName,
           email: before.email,
-          phone: before.phone
+          phone: before.phone,
         },
-        after: null
+        after: null,
       });
     }
 
@@ -294,7 +315,7 @@ export class GuestsService {
   async merge(
     primaryId: string,
     secondaryId: string,
-    options?: { actorId?: string; campgroundId?: string }
+    options?: { actorId?: string; campgroundId?: string },
   ) {
     if (primaryId === secondaryId) {
       throw new BadRequestException("Cannot merge a guest with itself");
@@ -303,38 +324,37 @@ export class GuestsService {
     const [primary, secondary] = await Promise.all([
       this.prisma.guest.findUnique({
         where: { id: primaryId },
-        include: { LoyaltyProfile: true }
+        include: { LoyaltyProfile: true },
       }),
       this.prisma.guest.findUnique({
         where: { id: secondaryId },
-        include: { LoyaltyProfile: true }
-      })
+        include: { LoyaltyProfile: true },
+      }),
     ]);
 
     if (!primary) throw new NotFoundException("Primary guest not found");
     if (!secondary) throw new NotFoundException("Secondary guest not found");
 
-    const campgroundId = options?.campgroundId ||
-      getCampgroundIdFromTags(primary.tags);
+    const campgroundId = options?.campgroundId || getCampgroundIdFromTags(primary.tags);
 
     // Use a transaction to ensure data integrity
     const result = await this.prisma.$transaction(async (tx) => {
       // 1. Transfer all reservations from secondary to primary
       await tx.reservation.updateMany({
         where: { guestId: secondaryId },
-        data: { guestId: primaryId }
+        data: { guestId: primaryId },
       });
 
       // 2. Transfer all messages from secondary to primary
       await tx.message.updateMany({
         where: { guestId: secondaryId },
-        data: { guestId: primaryId }
+        data: { guestId: primaryId },
       });
 
       // 3. Transfer all equipment from secondary to primary
       await tx.guestEquipment.updateMany({
         where: { guestId: secondaryId },
-        data: { guestId: primaryId }
+        data: { guestId: primaryId },
       });
 
       // 4. Merge loyalty profiles if both exist
@@ -343,8 +363,9 @@ export class GuestsService {
         await tx.loyaltyProfile.update({
           where: { id: primary.LoyaltyProfile.id },
           data: {
-            pointsBalance: primary.LoyaltyProfile.pointsBalance + secondary.LoyaltyProfile.pointsBalance
-          }
+            pointsBalance:
+              primary.LoyaltyProfile.pointsBalance + secondary.LoyaltyProfile.pointsBalance,
+          },
         });
         // Delete secondary's loyalty profile
         await tx.loyaltyProfile.delete({ where: { id: secondary.LoyaltyProfile.id } });
@@ -352,7 +373,7 @@ export class GuestsService {
         // Transfer loyalty profile to primary
         await tx.loyaltyProfile.update({
           where: { id: secondary.LoyaltyProfile.id },
-          data: { guestId: primaryId }
+          data: { guestId: primaryId },
         });
       }
 
@@ -388,8 +409,8 @@ export class GuestsService {
           // Keep marketing opt-in if either guest had it
           marketingOptIn: primary.marketingOptIn || secondary.marketingOptIn,
           // Sum repeat stays
-          repeatStays: (primary.repeatStays || 0) + (secondary.repeatStays || 0)
-        }
+          repeatStays: (primary.repeatStays || 0) + (secondary.repeatStays || 0),
+        },
       });
 
       // 7. Delete the secondary guest
@@ -410,21 +431,21 @@ export class GuestsService {
           primaryGuest: {
             id: primary.id,
             name: `${primary.primaryFirstName} ${primary.primaryLastName}`,
-            email: primary.email
+            email: primary.email,
           },
           secondaryGuest: {
             id: secondary.id,
             name: `${secondary.primaryFirstName} ${secondary.primaryLastName}`,
-            email: secondary.email
-          }
+            email: secondary.email,
+          },
         },
         after: {
           mergedGuest: {
             id: result.id,
             name: `${result.primaryFirstName} ${result.primaryLastName}`,
-            email: result.email
-          }
-        }
+            email: result.email,
+          },
+        },
       });
     }
 

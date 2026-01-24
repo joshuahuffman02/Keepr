@@ -6,7 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 type BillingPlan = "ota_only" | "standard" | "enterprise";
@@ -64,11 +70,11 @@ export function PlatformFeeCard({
 }: PlatformFeeCardProps) {
   const [plan, setPlan] = useState<BillingPlan>(initialPlan);
   const [fee, setFee] = useState<string>(
-    initialFee !== undefined ? (initialFee / 100).toFixed(2) : ""
+    initialFee !== undefined ? (initialFee / 100).toFixed(2) : "",
   );
   const [feeMode, setFeeMode] = useState<FeeMode>(initialFeeMode);
   const [monthlyFee, setMonthlyFee] = useState<string>(
-    initialMonthlyFee !== undefined ? (initialMonthlyFee / 100).toFixed(2) : "500.00"
+    initialMonthlyFee !== undefined ? (initialMonthlyFee / 100).toFixed(2) : "500.00",
   );
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -119,9 +125,7 @@ export function PlatformFeeCard({
           <DollarSign className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           Platform Fee
         </CardTitle>
-        <CardDescription>
-          Configure the per-booking fee that supports the platform.
-        </CardDescription>
+        <CardDescription>Configure the per-booking fee that supports the platform.</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -157,7 +161,9 @@ export function PlatformFeeCard({
         <div className="space-y-2">
           <Label htmlFor="booking-fee">Fee per booking (USD)</Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              $
+            </span>
             <Input
               id="booking-fee"
               type="number"
@@ -214,7 +220,9 @@ export function PlatformFeeCard({
           <div className="space-y-2 pt-4 border-t border-border">
             <Label htmlFor="monthly-fee">Monthly subscription (USD)</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                $
+              </span>
               <Input
                 id="monthly-fee"
                 type="number"
@@ -267,7 +275,7 @@ export function PlatformFeeCard({
           disabled={disabled || isSaving}
           className={cn(
             "w-full sm:w-auto transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none",
-            showSuccess && "bg-emerald-600 hover:bg-emerald-600"
+            showSuccess && "bg-emerald-600 hover:bg-emerald-600",
           )}
         >
           {isSaving ? (
@@ -277,7 +285,10 @@ export function PlatformFeeCard({
             </>
           ) : showSuccess ? (
             <>
-              <Check className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in" aria-hidden="true" />
+              <Check
+                className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in"
+                aria-hidden="true"
+              />
               Saved!
             </>
           ) : (

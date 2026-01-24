@@ -672,13 +672,7 @@ export const EventCatalog: EventDefinition[] = [
           description: "Whether guest used self check-in",
         },
       },
-      required: [
-        "reservationId",
-        "campgroundId",
-        "guestId",
-        "siteId",
-        "checkedInAt",
-      ],
+      required: ["reservationId", "campgroundId", "guestId", "siteId", "checkedInAt"],
     },
     example: {
       reservationId: "clx1abc2d0001abcdefghijk",
@@ -782,28 +776,21 @@ export function getAllCategories(): EventCategory[] {
 /**
  * Get event definition by type
  */
-export function getEventDefinition(
-  eventType: WebhookEvent
-): EventDefinition | undefined {
+export function getEventDefinition(eventType: WebhookEvent): EventDefinition | undefined {
   return EventCatalog.find((e) => e.event === eventType);
 }
 
 /**
  * Get example payload for an event type
  */
-export function getEventExample(
-  eventType: WebhookEvent
-): Record<string, unknown> | undefined {
+export function getEventExample(eventType: WebhookEvent): Record<string, unknown> | undefined {
   return EventCatalog.find((e) => e.event === eventType)?.example;
 }
 
 /**
  * Check if an event type matches a pattern (supports wildcards)
  */
-export function matchesEventPattern(
-  eventType: WebhookEvent,
-  pattern: string
-): boolean {
+export function matchesEventPattern(eventType: WebhookEvent, pattern: string): boolean {
   if (pattern === "*") return true;
   if (pattern === eventType) return true;
 
@@ -819,9 +806,7 @@ export function matchesEventPattern(
 /**
  * Validate that event types in a subscription are valid
  */
-export function validateEventTypes(
-  eventTypes: string[]
-): { valid: boolean; invalid: string[] } {
+export function validateEventTypes(eventTypes: string[]): { valid: boolean; invalid: string[] } {
   const allEvents = getAllEventTypes();
   const invalid: string[] = [];
 

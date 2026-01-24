@@ -23,7 +23,7 @@ export function roleAllowed(setting: { enabledRoles?: UserRole[] }, role?: UserR
 
 export function resolveXpAmount(
   inputXp: number | undefined,
-  rule?: { minXp: number; maxXp: number; defaultXp: number } | null
+  rule?: { minXp: number; maxXp: number; defaultXp: number } | null,
 ) {
   const base = inputXp ?? rule?.defaultXp ?? 10;
   if (!rule) return base;
@@ -34,7 +34,7 @@ export function resolveXpAmount(
 
 export function computeLevel(
   totalXp: number,
-  levels: { level: number; minXp: number; name?: string | null }[]
+  levels: { level: number; minXp: number; name?: string | null }[],
 ): LevelProgress {
   if (!levels || levels.length === 0) {
     return { level: 1, minXp: 0, progressToNext: 0, nextLevel: null, nextMinXp: null, name: null };
@@ -55,7 +55,7 @@ export function computeLevel(
     minXp: current.minXp,
     nextLevel: next?.level ?? null,
     nextMinXp: next?.minXp ?? null,
-    progressToNext
+    progressToNext,
   };
 }
 
@@ -70,7 +70,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 
 @Injectable()
 export class GamificationService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService) {}
 
   private defaultRules = [
     { category: GamificationEventCategory.task, minXp: 5, maxXp: 25, defaultXp: 10 },
@@ -88,14 +88,14 @@ export class GamificationService {
 
   async getSettings(campgroundId: string) {
     const setting = await this.prisma.gamificationSetting.findUnique({
-      where: { campgroundId }
+      where: { campgroundId },
     });
     return setting ?? { campgroundId, enabled: false, enabledRoles: [] };
   }
 
   private async getMembership(userId: string, campgroundId: string) {
     return this.prisma.campgroundMembership.findFirst({
-      where: { userId, campgroundId }
+      where: { userId, campgroundId },
     });
   }
 
@@ -110,7 +110,7 @@ export class GamificationService {
 
   private async getLevelDefinitions(client: PrismaClientLike = this.prisma) {
     return client.levelDefinition.findMany({
-      orderBy: { minXp: "asc" }
+      orderBy: { minXp: "asc" },
     });
   }
 
@@ -129,11 +129,13 @@ export class GamificationService {
         enabled: dto.enabled ?? false,
         enabledRoles: dto.enabledRoles ?? [],
         updatedAt: new Date(),
-      }
+      },
     });
 
     if (setting.enabled) {
-      const existingRules = await this.prisma.xpRule.count({ where: { campgroundId: dto.campgroundId } });
+      const existingRules = await this.prisma.xpRule.count({
+        where: { campgroundId: dto.campgroundId },
+      });
       if (existingRules === 0) {
         await this.prisma.xpRule.createMany({
           data: this.defaultRules.map((r) => ({
@@ -163,7 +165,7 @@ export class GamificationService {
     await this.assertManager(userId, campgroundId);
     return this.prisma.xpRule.findMany({
       where: { campgroundId },
-      orderBy: { category: "asc" }
+      orderBy: { category: "asc" },
     });
   }
 
@@ -187,8 +189,8 @@ export class GamificationService {
         maxXp: dto.maxXp ?? 0,
         defaultXp: dto.defaultXp ?? 0,
         isActive: dto.isActive ?? true,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -212,25 +214,47 @@ export class GamificationService {
       this.getSettings(params.campgroundId),
       this.getMembership(params.userId, params.campgroundId),
       this.prisma.xpRule.findUnique({
-        where: { campgroundId_category: { campgroundId: params.campgroundId, category: params.category } }
-      })
+        where: {
+          campgroundId_category: { campgroundId: params.campgroundId, category: params.category },
+        },
+      }),
     ]);
 
     if (!membership) {
-      return { skipped: true, reason: "User is not a member of this campground", setting, membershipRole: null };
+      return {
+        skipped: true,
+        reason: "User is not a member of this campground",
+        setting,
+        membershipRole: null,
+      };
     }
 
     if (!setting.enabled) {
-      return { skipped: true, reason: "Gamification is disabled for this campground", setting, membershipRole: membership.role };
+      return {
+        skipped: true,
+        reason: "Gamification is disabled for this campground",
+        setting,
+        membershipRole: membership.role,
+      };
     }
 
     if (!roleAllowed(setting, membership.role)) {
-      return { skipped: true, reason: "Gamification disabled for this role", setting, membershipRole: membership.role };
+      return {
+        skipped: true,
+        reason: "Gamification disabled for this role",
+        setting,
+        membershipRole: membership.role,
+      };
     }
 
     const xpAmount = resolveXpAmount(params.xpOverride, rule);
     if (xpAmount === 0) {
-      return { skipped: true, reason: "XP resolved to zero; skipping", setting, membershipRole: membership.role };
+      return {
+        skipped: true,
+        reason: "XP resolved to zero; skipping",
+        setting,
+        membershipRole: membership.role,
+      };
     }
 
     const levels = await this.getLevelDefinitions();
@@ -250,11 +274,14 @@ export class GamificationService {
             sourceType: params.sourceType,
             sourceId: params.sourceId,
             eventKey: params.eventKey,
-            metadata: toJsonValue(params.metadata)
-          }
+            metadata: toJsonValue(params.metadata),
+          },
         });
       } catch (err: unknown) {
-        const isUniqueKey = err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002" && params.eventKey;
+        const isUniqueKey =
+          err instanceof Prisma.PrismaClientKnownRequestError &&
+          err.code === "P2002" &&
+          params.eventKey;
         if (isUniqueKey) {
           event = await tx.xpEvent.findUnique({ where: { eventKey: params.eventKey } });
         } else {
@@ -263,29 +290,36 @@ export class GamificationService {
       }
 
       if (!event) {
-        return { skipped: true, reason: "Event was not created", setting, membershipRole: membership.role };
+        return {
+          skipped: true,
+          reason: "Event was not created",
+          setting,
+          membershipRole: membership.role,
+        };
       }
 
       const balance = await tx.xpBalance.upsert({
-        where: { campgroundId_userId: { campgroundId: params.campgroundId, userId: params.userId } },
+        where: {
+          campgroundId_userId: { campgroundId: params.campgroundId, userId: params.userId },
+        },
         create: {
           id: randomUUID(),
           campgroundId: params.campgroundId,
           userId: params.userId,
           totalXp: xpAmount,
           currentLevel: 1,
-          lastEventAt: event.createdAt
+          lastEventAt: event.createdAt,
         },
         update: {
           totalXp: { increment: xpAmount },
-          lastEventAt: event.createdAt
-        }
+          lastEventAt: event.createdAt,
+        },
       });
 
       const levelInfo = computeLevel(balance.totalXp, levels);
       const updatedBalance = await tx.xpBalance.update({
         where: { id: balance.id },
-        data: { currentLevel: levelInfo.level }
+        data: { currentLevel: levelInfo.level },
       });
 
       return { event, balance: updatedBalance, level: levelInfo, ruleApplied: rule?.id };
@@ -306,14 +340,14 @@ export class GamificationService {
       sourceType: dto.sourceType ?? "manual_award",
       sourceId: dto.sourceId,
       eventKey: dto.eventKey,
-      metadata: dto.metadata
+      metadata: dto.metadata,
     });
   }
 
   async getDashboard(userId: string, campgroundId: string) {
     const [setting, membership] = await Promise.all([
       this.getSettings(campgroundId),
-      this.getMembership(userId, campgroundId)
+      this.getMembership(userId, campgroundId),
     ]);
 
     if (!membership) {
@@ -326,20 +360,20 @@ export class GamificationService {
         enabled: false,
         allowed,
         membershipRole: membership.role,
-        setting
+        setting,
       };
     }
 
     const [balance, recentEvents, levels] = await Promise.all([
       this.prisma.xpBalance.findUnique({
-        where: { campgroundId_userId: { campgroundId, userId } }
+        where: { campgroundId_userId: { campgroundId, userId } },
       }),
       this.prisma.xpEvent.findMany({
         where: { campgroundId, userId },
         orderBy: { createdAt: "desc" },
-        take: 20
+        take: 20,
       }),
-      this.getLevelDefinitions()
+      this.getLevelDefinitions(),
     ]);
 
     const totalXp = balance?.totalXp ?? 0;
@@ -358,25 +392,37 @@ export class GamificationService {
         currentLevel: level.level,
         lastEventAt: null,
         createdAt: null,
-        updatedAt: null
+        updatedAt: null,
       },
       level,
-      recentEvents
+      recentEvents,
     };
   }
 
-  async getLeaderboard(params: { campgroundId: string; viewerId: string; days?: number; limit?: number }) {
+  async getLeaderboard(params: {
+    campgroundId: string;
+    viewerId: string;
+    days?: number;
+    limit?: number;
+  }) {
     const { campgroundId, viewerId } = params;
     const days = params.days ?? 7;
     const limit = params.limit ?? 5;
-    const since = days > 0 ? (() => { const d = new Date(); d.setDate(d.getDate() - days); return d; })() : null;
+    const since =
+      days > 0
+        ? (() => {
+            const d = new Date();
+            d.setDate(d.getDate() - days);
+            return d;
+          })()
+        : null;
 
     const rows = await this.prisma.xpEvent.groupBy({
       by: ["userId"],
       where: { campgroundId, ...(since ? { createdAt: { gte: since } } : {}) },
       _sum: { xp: true },
       orderBy: { _sum: { xp: "desc" } },
-      take: limit
+      take: limit,
     });
 
     const userIds = rows.map((r) => r.userId);
@@ -389,9 +435,9 @@ export class GamificationService {
         email: true,
         CampgroundMembership: {
           where: { campgroundId },
-          select: { role: true }
-        }
-      }
+          select: { role: true },
+        },
+      },
     });
     const userMap = new Map(users.map((u) => [u.id, u]));
 
@@ -402,7 +448,7 @@ export class GamificationService {
         rank: idx + 1,
         xp: r._sum.xp ?? 0,
         name: u ? `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.email : "Unknown",
-        role: u?.CampgroundMembership?.[0]?.role ?? null
+        role: u?.CampgroundMembership?.[0]?.role ?? null,
       };
     });
 
@@ -422,15 +468,15 @@ export class GamificationService {
             firstName: true,
             lastName: true,
             email: true,
-            CampgroundMembership: { where: { campgroundId }, select: { role: true } }
-          }
+            CampgroundMembership: { where: { campgroundId }, select: { role: true } },
+          },
         });
         viewer = {
           userId: viewerId,
           rank: 0,
           xp: viewerAgg[0]._sum.xp ?? 0,
           name: u ? `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim() || u.email : "You",
-          role: u?.CampgroundMembership?.[0]?.role ?? null
+          role: u?.CampgroundMembership?.[0]?.role ?? null,
         };
       }
     }
@@ -445,11 +491,11 @@ export class GamificationService {
       by: ["category"],
       where: { campgroundId, createdAt: { gte: since } },
       _sum: { xp: true },
-      orderBy: { _sum: { xp: "desc" } }
+      orderBy: { _sum: { xp: "desc" } },
     });
     return {
       categories: categories.map((c) => ({ category: c.category, xp: c._sum.xp ?? 0 })),
-      since
+      since,
     };
   }
 }

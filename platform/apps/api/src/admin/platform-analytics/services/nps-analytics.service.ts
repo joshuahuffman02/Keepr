@@ -318,7 +318,10 @@ export class NpsAnalyticsService {
   /**
    * Get NPS by campground
    */
-  async getNpsByCampground(dateRange: DateRange, limit = 20): Promise<
+  async getNpsByCampground(
+    dateRange: DateRange,
+    limit = 20,
+  ): Promise<
     {
       campgroundId: string;
       campgroundName: string;
@@ -375,7 +378,10 @@ export class NpsAnalyticsService {
    * Get worst performing campgrounds (lowest NPS scores)
    * Includes top issues from negative feedback
    */
-  async getWorstPerformingCampgrounds(dateRange: DateRange, limit = 10): Promise<
+  async getWorstPerformingCampgrounds(
+    dateRange: DateRange,
+    limit = 10,
+  ): Promise<
     {
       campgroundId: string;
       campgroundName: string;

@@ -125,7 +125,7 @@ describe("SiteMapService", () => {
             "missing_amenities",
             "ada_required",
             "party_too_large",
-          ])
+          ]),
         );
       } finally {
         await close();

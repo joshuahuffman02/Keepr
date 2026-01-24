@@ -38,4 +38,3 @@ export class CreateNpsSurveyDto {
   @IsDateString()
   activeTo?: string;
 }
-

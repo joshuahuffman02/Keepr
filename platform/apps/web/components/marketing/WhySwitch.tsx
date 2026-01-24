@@ -1,13 +1,28 @@
-'use client';
+"use client";
 
-import { CheckCircle, ArrowRight, Sparkles, Brain, Calendar, Clock, Shield, Zap, type LucideIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import {
+  CheckCircle,
+  ArrowRight,
+  Sparkles,
+  Brain,
+  Calendar,
+  Clock,
+  Shield,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 // Core platform features
 type FeatureColor = "purple" | "blue" | "amber" | "emerald";
 
-const coreFeatures: Array<{ name: string; description: string; icon: LucideIcon; color: FeatureColor }> = [
+const coreFeatures: Array<{
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  color: FeatureColor;
+}> = [
   {
     name: "Loyalty & Gamification",
     description: "XP system, leveling up, rewards - keep guests coming back year after year",
@@ -45,10 +60,22 @@ const benefits = [
 ];
 
 const colorClasses: Record<FeatureColor, { bg: string; icon: string; border: string }> = {
-  purple: { bg: "bg-keepr-evergreen/10", icon: "text-keepr-evergreen", border: "border-keepr-evergreen/20" },
-  blue: { bg: "bg-keepr-evergreen/10", icon: "text-keepr-evergreen", border: "border-keepr-evergreen/20" },
+  purple: {
+    bg: "bg-keepr-evergreen/10",
+    icon: "text-keepr-evergreen",
+    border: "border-keepr-evergreen/20",
+  },
+  blue: {
+    bg: "bg-keepr-evergreen/10",
+    icon: "text-keepr-evergreen",
+    border: "border-keepr-evergreen/20",
+  },
   amber: { bg: "bg-keepr-clay/10", icon: "text-keepr-clay", border: "border-keepr-clay/20" },
-  emerald: { bg: "bg-keepr-evergreen/10", icon: "text-keepr-evergreen", border: "border-keepr-evergreen/20" },
+  emerald: {
+    bg: "bg-keepr-evergreen/10",
+    icon: "text-keepr-evergreen",
+    border: "border-keepr-evergreen/20",
+  },
 };
 
 export function WhySwitch() {
@@ -61,8 +88,8 @@ export function WhySwitch() {
             Why Campgrounds Choose Keepr
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            We built the platform we wished existed - modern, powerful, and designed
-            specifically for campground operations.
+            We built the platform we wished existed - modern, powerful, and designed specifically
+            for campground operations.
           </p>
         </div>
 
@@ -76,7 +103,9 @@ export function WhySwitch() {
                 key={feature.name}
                 className={`bg-card rounded-2xl p-6 border-2 ${colors.border} hover:shadow-lg transition-shadow`}
               >
-                <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${colors.bg} mb-4`}>
+                <div
+                  className={`inline-flex h-12 w-12 items-center justify-center rounded-xl ${colors.bg} mb-4`}
+                >
                   <Icon className={`h-6 w-6 ${colors.icon}`} />
                 </div>
                 <h3 className="font-bold text-foreground mb-2">{feature.name}</h3>
@@ -95,7 +124,9 @@ export function WhySwitch() {
               </div>
               <div>
                 <h3 className="font-bold text-foreground">What You Get</h3>
-                <p className="text-sm text-keepr-evergreen/80">Everything you need to run your park</p>
+                <p className="text-sm text-keepr-evergreen/80">
+                  Everything you need to run your park
+                </p>
               </div>
             </div>
             <ul className="grid md:grid-cols-2 gap-4">
@@ -114,7 +145,9 @@ export function WhySwitch() {
           <div className="inline-flex flex-col sm:flex-row items-center gap-6 p-6 bg-card rounded-2xl shadow-lg border border-border">
             <div className="text-left">
               <p className="font-semibold text-foreground">Ready to get started?</p>
-              <p className="text-sm text-muted-foreground">Try the live demo or calculate your potential savings.</p>
+              <p className="text-sm text-muted-foreground">
+                Try the live demo or calculate your potential savings.
+              </p>
             </div>
             <div className="flex gap-3">
               <Button
@@ -127,15 +160,8 @@ export function WhySwitch() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="whitespace-nowrap"
-                asChild
-              >
-                <Link href="/roi-calculator">
-                  ROI Calculator
-                </Link>
+              <Button size="lg" variant="outline" className="whitespace-nowrap" asChild>
+                <Link href="/roi-calculator">ROI Calculator</Link>
               </Button>
             </div>
           </div>

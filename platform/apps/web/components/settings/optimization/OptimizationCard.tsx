@@ -74,25 +74,20 @@ export function OptimizationCard({
     <Card
       className={cn(
         "transition-all duration-300",
-        settings.enabled
-          ? "border-status-info-border bg-status-info-bg"
-          : "border-dashed",
-        className
+        settings.enabled ? "border-status-info-border bg-status-info-bg" : "border-dashed",
+        className,
       )}
     >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
             <div
-              className={cn(
-                "p-2 rounded-lg",
-                settings.enabled ? "bg-status-info-bg" : "bg-muted"
-              )}
+              className={cn("p-2 rounded-lg", settings.enabled ? "bg-status-info-bg" : "bg-muted")}
             >
               <Sparkles
                 className={cn(
                   "h-5 w-5",
-                  settings.enabled ? "text-status-info" : "text-muted-foreground"
+                  settings.enabled ? "text-status-info" : "text-muted-foreground",
                 )}
               />
             </div>
@@ -127,8 +122,8 @@ export function OptimizationCard({
             <Shield className="h-4 w-4 text-status-info" />
             <AlertTitle className="text-foreground">You're always in control</AlertTitle>
             <AlertDescription className="text-status-info-text">
-              Optimization respects guest preferences, accessibility requirements,
-              and locked sites. Enable preview mode to review changes before they're applied.
+              Optimization respects guest preferences, accessibility requirements, and locked sites.
+              Enable preview mode to review changes before they're applied.
             </AlertDescription>
           </Alert>
 
@@ -192,7 +187,7 @@ export function OptimizationCard({
                         "px-3 py-1.5 rounded-full text-sm font-medium border transition-all",
                         isSelected
                           ? "bg-status-info-bg border-status-info-border text-status-info-text"
-                          : "bg-card border-border text-muted-foreground hover:border-border"
+                          : "bg-card border-border text-muted-foreground hover:border-border",
                       )}
                     >
                       {sc.name}
@@ -263,7 +258,9 @@ export function OptimizationCard({
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Clock className="h-4 w-4" />
               {lastRunAt ? (
-                <span>Last run: {lastRunAt.toLocaleDateString()} at {lastRunAt.toLocaleTimeString()}</span>
+                <span>
+                  Last run: {lastRunAt.toLocaleDateString()} at {lastRunAt.toLocaleTimeString()}
+                </span>
               ) : (
                 <span>Never run</span>
               )}

@@ -3,7 +3,15 @@ import { randomUUID } from "crypto";
 import { AiProviderService } from "./ai-provider.service";
 import { AiPrivacyService } from "./ai-privacy.service";
 import { AiFeatureGateService } from "./ai-feature-gate.service";
-import { AdjustmentType, AiFeatureType, MaintenancePriority, PlatformRole, PricingRuleType, PricingStackMode, UserRole } from "@prisma/client";
+import {
+  AdjustmentType,
+  AiFeatureType,
+  MaintenancePriority,
+  PlatformRole,
+  PricingRuleType,
+  PricingStackMode,
+  UserRole,
+} from "@prisma/client";
 import { PermissionsService } from "../permissions/permissions.service";
 import { AuditService } from "../audit/audit.service";
 import { PrismaService } from "../prisma/prisma.service";
@@ -22,7 +30,14 @@ import { AiDynamicPricingService } from "./ai-dynamic-pricing.service";
 import { AiDashboardService } from "./ai-dashboard.service";
 import { AiRevenueManagerService } from "./ai-revenue-manager.service";
 type PartnerMode = "staff" | "admin";
-type PersonaKey = "revenue" | "operations" | "marketing" | "accounting" | "hospitality" | "compliance" | "general";
+type PersonaKey =
+  | "revenue"
+  | "operations"
+  | "marketing"
+  | "accounting"
+  | "hospitality"
+  | "compliance"
+  | "general";
 
 export type ActionType =
   | "lookup_availability"
@@ -122,7 +137,10 @@ const isPlatformRole = (value: unknown): value is PlatformRole =>
 const toAuthMemberships = (memberships: PartnerMembership[] | undefined): AuthMembership[] => {
   if (!Array.isArray(memberships)) return [];
   return memberships
-    .filter((membership) => typeof membership.campgroundId === "string" && membership.campgroundId.length > 0)
+    .filter(
+      (membership) =>
+        typeof membership.campgroundId === "string" && membership.campgroundId.length > 0,
+    )
     .map((membership) => ({
       id: randomUUID(),
       campgroundId: membership.campgroundId ?? "",
@@ -151,7 +169,9 @@ const toAuthUser = (user: PartnerUser | null | undefined): AuthUser | null => {
   };
 };
 
-const toAnonymizationLevel = (value: string | null | undefined): "strict" | "moderate" | "minimal" => {
+const toAnonymizationLevel = (
+  value: string | null | undefined,
+): "strict" | "moderate" | "minimal" => {
   switch (value) {
     case "strict":
     case "moderate":
@@ -179,7 +199,7 @@ const ACTION_TYPE_VALUES: ActionType[] = [
   "get_pricing_recommendations",
   "get_revenue_insights",
   "get_dashboard_summary",
-  "none"
+  "none",
 ];
 
 const IMPACT_AREA_VALUES: ImpactArea[] = [
@@ -188,7 +208,7 @@ const IMPACT_AREA_VALUES: ImpactArea[] = [
   "policy",
   "revenue",
   "operations",
-  "none"
+  "none",
 ];
 
 const SENSITIVITY_VALUES: SensitivityLevel[] = ["low", "medium", "high"];
@@ -197,7 +217,7 @@ const MAINTENANCE_PRIORITY_VALUES: MaintenancePriority[] = [
   MaintenancePriority.low,
   MaintenancePriority.medium,
   MaintenancePriority.high,
-  MaintenancePriority.critical
+  MaintenancePriority.critical,
 ];
 
 const PRICING_RULE_TYPE_VALUES: PricingRuleType[] = [
@@ -205,19 +225,16 @@ const PRICING_RULE_TYPE_VALUES: PricingRuleType[] = [
   PricingRuleType.weekend,
   PricingRuleType.holiday,
   PricingRuleType.event,
-  PricingRuleType.demand
+  PricingRuleType.demand,
 ];
 
 const PRICING_STACK_MODE_VALUES: PricingStackMode[] = [
   PricingStackMode.additive,
   PricingStackMode.max,
-  PricingStackMode.override
+  PricingStackMode.override,
 ];
 
-const ADJUSTMENT_TYPE_VALUES: AdjustmentType[] = [
-  AdjustmentType.percent,
-  AdjustmentType.flat
-];
+const ADJUSTMENT_TYPE_VALUES: AdjustmentType[] = [AdjustmentType.percent, AdjustmentType.flat];
 
 const USER_ROLE_VALUES: UserRole[] = [
   UserRole.owner,
@@ -226,7 +243,7 @@ const USER_ROLE_VALUES: UserRole[] = [
   UserRole.maintenance,
   UserRole.finance,
   UserRole.marketing,
-  UserRole.readonly
+  UserRole.readonly,
 ];
 
 const parseActionType = (value: unknown): ActionType | undefined => {
@@ -292,126 +309,143 @@ type PartnerChatRequest = {
 
 type PartnerConfirmRequest = {
   campgroundId: string;
-  action: { type?: ActionType; parameters?: Record<string, unknown>; sensitivity?: SensitivityLevel; impactArea?: ImpactArea };
+  action: {
+    type?: ActionType;
+    parameters?: Record<string, unknown>;
+    sensitivity?: SensitivityLevel;
+    impactArea?: ImpactArea;
+  };
   user: PartnerUser;
 };
 
 const PERSONA_PROMPTS: Record<PersonaKey, string> = {
-  revenue: "You are the Revenue strategist. Focus on occupancy, ADR, demand signals, and pricing strategy. Explain trade-offs and highlight revenue impact.",
-  operations: "You are the Operations chief. Focus on site readiness, maintenance status, holds, and execution speed. Keep responses direct and action-oriented.",
-  marketing: "You are the Marketing advisor. Focus on demand generation, referrals, promotions, and messaging. Recommend experiments and channels.",
-  accounting: "You are the Accounting advisor. Focus on deposits, cash handling, refunds, reconciliation, and receipts. Be precise and risk-aware.",
-  hospitality: "You are the Hospitality advisor. Focus on guest experience, accessibility, and clear communication. Keep tone warm and practical.",
-  compliance: "You are the Compliance advisor. Focus on privacy, PCI, ADA, safety, and policy adherence. Be conservative and explicit about risk.",
-  general: "You are a helpful campground operations partner. Provide clear, calm guidance."
+  revenue:
+    "You are the Revenue strategist. Focus on occupancy, ADR, demand signals, and pricing strategy. Explain trade-offs and highlight revenue impact.",
+  operations:
+    "You are the Operations chief. Focus on site readiness, maintenance status, holds, and execution speed. Keep responses direct and action-oriented.",
+  marketing:
+    "You are the Marketing advisor. Focus on demand generation, referrals, promotions, and messaging. Recommend experiments and channels.",
+  accounting:
+    "You are the Accounting advisor. Focus on deposits, cash handling, refunds, reconciliation, and receipts. Be precise and risk-aware.",
+  hospitality:
+    "You are the Hospitality advisor. Focus on guest experience, accessibility, and clear communication. Keep tone warm and practical.",
+  compliance:
+    "You are the Compliance advisor. Focus on privacy, PCI, ADA, safety, and policy adherence. Be conservative and explicit about risk.",
+  general: "You are a helpful campground operations partner. Provide clear, calm guidance.",
 };
 
 const ACTION_REGISTRY: Record<
   Exclude<ActionType, "none">,
-  { resource: string; action: "read" | "write"; impactArea: ImpactArea; sensitivity: "low" | "medium" | "high"; confirmByDefault?: boolean }
+  {
+    resource: string;
+    action: "read" | "write";
+    impactArea: ImpactArea;
+    sensitivity: "low" | "medium" | "high";
+    confirmByDefault?: boolean;
+  }
 > = {
   lookup_availability: {
     resource: "reservations",
     action: "read",
     impactArea: "availability",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   create_hold: {
     resource: "holds",
     action: "write",
     impactArea: "availability",
-    sensitivity: "medium"
+    sensitivity: "medium",
   },
   block_site: {
     resource: "operations",
     action: "write",
     impactArea: "availability",
     sensitivity: "medium",
-    confirmByDefault: true
+    confirmByDefault: true,
   },
   create_maintenance_ticket: {
     resource: "operations",
     action: "write",
     impactArea: "operations",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   create_operational_task: {
     resource: "operations",
     action: "write",
     impactArea: "operations",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   update_housekeeping_status: {
     resource: "operations",
     action: "write",
     impactArea: "operations",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   generate_billing_schedule: {
     resource: "payments",
     action: "write",
     impactArea: "revenue",
     sensitivity: "medium",
-    confirmByDefault: true
+    confirmByDefault: true,
   },
   refund_reservation: {
     resource: "payments",
     action: "write",
     impactArea: "revenue",
     sensitivity: "high",
-    confirmByDefault: true
+    confirmByDefault: true,
   },
   send_guest_message: {
     resource: "communications",
     action: "write",
     impactArea: "none",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   move_reservation: {
     resource: "reservations",
     action: "write",
     impactArea: "availability",
     sensitivity: "high",
-    confirmByDefault: true
+    confirmByDefault: true,
   },
   adjust_rate: {
     resource: "pricing",
     action: "write",
     impactArea: "pricing",
     sensitivity: "high",
-    confirmByDefault: true
+    confirmByDefault: true,
   },
   // Analysis actions (read-only)
   get_yield_metrics: {
     resource: "analytics",
     action: "read",
     impactArea: "revenue",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   get_occupancy_forecast: {
     resource: "analytics",
     action: "read",
     impactArea: "availability",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   get_pricing_recommendations: {
     resource: "pricing",
     action: "read",
     impactArea: "pricing",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   get_revenue_insights: {
     resource: "analytics",
     action: "read",
     impactArea: "revenue",
-    sensitivity: "low"
+    sensitivity: "low",
   },
   get_dashboard_summary: {
     resource: "analytics",
     action: "read",
     impactArea: "none",
-    sensitivity: "low"
-  }
+    sensitivity: "low",
+  },
 };
 
 @Injectable()
@@ -436,7 +470,7 @@ export class AiPartnerService {
     private readonly yieldService: AiYieldService,
     private readonly pricingService: AiDynamicPricingService,
     private readonly dashboardService: AiDashboardService,
-    private readonly revenueManager: AiRevenueManagerService
+    private readonly revenueManager: AiRevenueManagerService,
   ) {}
 
   async chat(request: PartnerChatRequest): Promise<AiPartnerResponse> {
@@ -452,15 +486,15 @@ export class AiPartnerService {
         slug: true,
         aiAnonymizationLevel: true,
         timezone: true,
-        parkTimeZone: true
-      }
+        parkTimeZone: true,
+      },
     });
 
     if (!campground) {
       return {
         mode: "staff",
         message: "Campground not found.",
-        denials: [{ reason: "Campground not found." }]
+        denials: [{ reason: "Campground not found." }],
       };
     }
 
@@ -481,7 +515,7 @@ export class AiPartnerService {
       anonymizedText,
       historyText,
       role,
-      mode
+      mode,
     });
 
     return this.runOpenAiPartner({
@@ -499,7 +533,7 @@ export class AiPartnerService {
       sessionId,
       persona: routing.persona,
       routingReason: routing.reason,
-      routingConfidence: routing.confidence
+      routingConfidence: routing.confidence,
     });
   }
 
@@ -508,14 +542,14 @@ export class AiPartnerService {
 
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { id: true, name: true, slug: true, aiAnonymizationLevel: true }
+      select: { id: true, name: true, slug: true, aiAnonymizationLevel: true },
     });
 
     if (!campground) {
       return {
         mode: "staff",
         message: "Campground not found.",
-        denials: [{ reason: "Campground not found." }]
+        denials: [{ reason: "Campground not found." }],
       };
     }
 
@@ -526,7 +560,7 @@ export class AiPartnerService {
       return {
         mode,
         message: "No valid action to confirm.",
-        denials: [{ reason: "No valid action to confirm." }]
+        denials: [{ reason: "No valid action to confirm." }],
       };
     }
 
@@ -539,7 +573,7 @@ export class AiPartnerService {
       user: toAuthUser(user),
       campgroundId,
       resource: registry.resource,
-      action: registry.action
+      action: registry.action,
     });
 
     const baseDraft: ActionDraft = {
@@ -550,7 +584,7 @@ export class AiPartnerService {
       parameters,
       status: access.allowed ? "draft" : "denied",
       sensitivity,
-      impactArea
+      impactArea,
     };
 
     if (!access.allowed) {
@@ -558,7 +592,7 @@ export class AiPartnerService {
         mode,
         message: "You don't have permission to perform that action.",
         actionDrafts: [baseDraft],
-        denials: [{ reason: "You don't have permission to perform that action." }]
+        denials: [{ reason: "You don't have permission to perform that action." }],
       };
     }
 
@@ -566,14 +600,14 @@ export class AiPartnerService {
       campgroundId,
       actionType,
       impactArea,
-      parameters
+      parameters,
     });
 
     const draft: ActionDraft = {
       ...baseDraft,
       requiresConfirmation: false,
       impact: impact ?? undefined,
-      evidenceLinks: this.buildEvidenceLinks(actionType, parameters)
+      evidenceLinks: this.buildEvidenceLinks(actionType, parameters),
     };
 
     let executed: { action: ActionDraft; message: string } | null = null;
@@ -590,20 +624,20 @@ export class AiPartnerService {
         mode,
         message: "This action requires manual review. Use the provided links to continue.",
         actionDrafts: [draft],
-        evidenceLinks: draft.evidenceLinks
+        evidenceLinks: draft.evidenceLinks,
       };
     }
 
     const actionWithEvidence = {
       ...executed.action,
-      evidenceLinks: draft.evidenceLinks ?? executed.action.evidenceLinks
+      evidenceLinks: draft.evidenceLinks ?? executed.action.evidenceLinks,
     };
 
     return {
       mode,
       message: executed.message,
       actionDrafts: [actionWithEvidence],
-      evidenceLinks: actionWithEvidence.evidenceLinks
+      evidenceLinks: actionWithEvidence.evidenceLinks,
     };
   }
 
@@ -639,7 +673,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         systemPrompt,
         userPrompt,
         maxTokens: 120,
-        temperature: 0
+        temperature: 0,
       });
 
       const parsed = this.parseJsonBlock(response.content);
@@ -686,7 +720,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         personaPrompt,
         timeZone: params.timeZone,
         today: params.today,
-        weekday: params.weekday
+        weekday: params.weekday,
       });
 
       const userPrompt = this.buildUserPrompt({
@@ -699,7 +733,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         mode: params.mode,
         persona: params.persona,
         routingReason: params.routingReason,
-        routingConfidence: params.routingConfidence
+        routingConfidence: params.routingConfidence,
       });
 
       const toolResponse = await this.provider.getToolCompletion({
@@ -712,24 +746,28 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         tools: this.buildTools(),
         toolChoice: { type: "function", function: { name: "assistant_response" } },
         maxTokens: 700,
-        temperature: 0.2
+        temperature: 0.2,
       });
 
       const toolCall = this.pickToolCall(toolResponse.toolCalls);
       const toolArgs = toolCall ? this.parseToolArgs(toolCall.arguments) : null;
       const toolArgsRecord = isRecord(toolArgs) ? toolArgs : {};
       const rawMessageValue = toolArgsRecord.message;
-      const rawMessage = isString(rawMessageValue) && rawMessageValue.trim().length
-        ? rawMessageValue
-        : toolResponse.content;
+      const rawMessage =
+        isString(rawMessageValue) && rawMessageValue.trim().length
+          ? rawMessageValue
+          : toolResponse.content;
 
       const message = this.privacy.deanonymize(
-        rawMessage || "I can help with availability, holds, and rate guidance. What would you like to do?",
-        params.tokenMap
+        rawMessage ||
+          "I can help with availability, holds, and rate guidance. What would you like to do?",
+        params.tokenMap,
       );
 
       const questions = Array.isArray(toolArgsRecord.questions)
-        ? toolArgsRecord.questions.map((question) => this.privacy.deanonymize(String(question), params.tokenMap))
+        ? toolArgsRecord.questions.map((question) =>
+            this.privacy.deanonymize(String(question), params.tokenMap),
+          )
         : undefined;
 
       const denial = isRecord(toolArgsRecord.denial) ? toolArgsRecord.denial : null;
@@ -740,12 +778,14 @@ Request: "${params.anonymizedText}"${historyBlock}`;
           mode: params.mode,
           message,
           questions,
-          denials: [{
-            reason: this.privacy.deanonymize(denialReason, params.tokenMap),
-            guidance: denialGuidance
-              ? this.privacy.deanonymize(denialGuidance, params.tokenMap)
-              : undefined
-          }]
+          denials: [
+            {
+              reason: this.privacy.deanonymize(denialReason, params.tokenMap),
+              guidance: denialGuidance
+                ? this.privacy.deanonymize(denialGuidance, params.tokenMap)
+                : undefined,
+            },
+          ],
         };
       }
 
@@ -756,9 +796,15 @@ Request: "${params.anonymizedText}"${historyBlock}`;
       }
 
       const registry = ACTION_REGISTRY[actionType];
-      const parametersSource = actionInput && isRecord(actionInput.parameters) ? actionInput.parameters : {};
+      const parametersSource =
+        actionInput && isRecord(actionInput.parameters) ? actionInput.parameters : {};
       const parameters = this.resolveParameters(parametersSource, params.tokenMap);
-      this.applyRelativeDateDefaults(actionType, parameters, params.anonymizedText, params.timeZone);
+      this.applyRelativeDateDefaults(
+        actionType,
+        parameters,
+        params.anonymizedText,
+        params.timeZone,
+      );
       const sensitivity = parseSensitivity(actionInput?.sensitivity) ?? registry.sensitivity;
       const impactArea = parseImpactArea(actionInput?.impactArea) ?? registry.impactArea;
 
@@ -766,7 +812,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         user: toAuthUser(params.user),
         campgroundId: params.campgroundId,
         resource: registry.resource,
-        action: registry.action
+        action: registry.action,
       });
 
       const baseDraft: ActionDraft = {
@@ -777,7 +823,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         parameters,
         status: access.allowed ? "draft" : "denied",
         sensitivity,
-        impactArea
+        impactArea,
       };
 
       if (!access.allowed) {
@@ -786,7 +832,7 @@ Request: "${params.anonymizedText}"${historyBlock}`;
           message,
           questions,
           actionDrafts: [baseDraft],
-          denials: [{ reason: "You don't have permission to perform that action." }]
+          denials: [{ reason: "You don't have permission to perform that action." }],
         };
       }
 
@@ -794,20 +840,24 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         campgroundId: params.campgroundId,
         actionType,
         impactArea,
-        parameters
+        parameters,
       });
 
-      const explicitConfirmation = typeof actionInput?.requiresConfirmation === "boolean"
-        ? actionInput.requiresConfirmation
-        : undefined;
+      const explicitConfirmation =
+        typeof actionInput?.requiresConfirmation === "boolean"
+          ? actionInput.requiresConfirmation
+          : undefined;
       const confirmedDefault = registry.confirmByDefault ?? false;
-      const requiresConfirmation = (explicitConfirmation ?? confirmedDefault) || sensitivity === "high" || impact?.level === "high";
+      const requiresConfirmation =
+        (explicitConfirmation ?? confirmedDefault) ||
+        sensitivity === "high" ||
+        impact?.level === "high";
 
       const actionDraft: ActionDraft = {
         ...baseDraft,
         requiresConfirmation,
         impact: impact ?? undefined,
-        evidenceLinks: this.buildEvidenceLinks(actionType, parameters)
+        evidenceLinks: this.buildEvidenceLinks(actionType, parameters),
       };
 
       let finalMessage = message;
@@ -828,7 +878,11 @@ Request: "${params.anonymizedText}"${historyBlock}`;
             finalDraft = executed.action;
           }
         } else {
-          const executed = await this.executeWriteAction(params.campground, actionDraft, params.user);
+          const executed = await this.executeWriteAction(
+            params.campground,
+            actionDraft,
+            params.user,
+          );
           if (executed) {
             finalMessage = executed.message;
             finalDraft = executed.action;
@@ -845,14 +899,16 @@ Request: "${params.anonymizedText}"${historyBlock}`;
         message: finalMessage,
         questions,
         actionDrafts: [finalDraft],
-        confirmations: requiresConfirmation ? [{ id: finalDraft.id, prompt: confirmationPrompt }] : undefined,
-        evidenceLinks: finalDraft.evidenceLinks
+        confirmations: requiresConfirmation
+          ? [{ id: finalDraft.id, prompt: confirmationPrompt }]
+          : undefined,
+        evidenceLinks: finalDraft.evidenceLinks,
       };
     } catch (err) {
       this.logger.error("AI Partner request failed", err);
       return {
         mode: params.mode,
-        message: "The AI partner is temporarily unavailable. Please try again shortly."
+        message: "The AI partner is temporarily unavailable. Please try again shortly.",
       };
     }
   }
@@ -890,33 +946,36 @@ Request: "${params.anonymizedText}"${historyBlock}`;
                       "get_pricing_recommendations",
                       "get_revenue_insights",
                       "get_dashboard_summary",
-                      "none"
-                    ]
+                      "none",
+                    ],
                   },
                   parameters: { type: "object" },
                   sensitivity: { type: "string", enum: ["low", "medium", "high"] },
-                  impactArea: { type: "string", enum: ["availability", "pricing", "policy", "revenue", "operations", "none"] },
+                  impactArea: {
+                    type: "string",
+                    enum: ["availability", "pricing", "policy", "revenue", "operations", "none"],
+                  },
                   summary: { type: "string" },
-                  requiresConfirmation: { type: "boolean" }
+                  requiresConfirmation: { type: "boolean" },
                 },
-                required: ["type"]
+                required: ["type"],
               },
               questions: {
                 type: "array",
-                items: { type: "string" }
+                items: { type: "string" },
               },
               denial: {
                 type: "object",
                 properties: {
                   reason: { type: "string" },
-                  guidance: { type: "string" }
-                }
-              }
+                  guidance: { type: "string" },
+                },
+              },
             },
-            required: ["message", "action"]
-          }
-        }
-      }
+            required: ["message", "action"],
+          },
+        },
+      },
     ];
   }
 
@@ -1014,7 +1073,8 @@ Return your output exclusively via the assistant_response tool.`;
     const historyBlock = params.historyText ? `\n\nRecent history:\n${params.historyText}` : "";
     const routingBits: string[] = [`persona=${params.persona}`];
     if (params.routingReason) routingBits.push(`reason=${params.routingReason}`);
-    if (typeof params.routingConfidence === "number") routingBits.push(`confidence=${params.routingConfidence.toFixed(2)}`);
+    if (typeof params.routingConfidence === "number")
+      routingBits.push(`confidence=${params.routingConfidence.toFixed(2)}`);
     const routingBlock = routingBits.length ? `\nRouting: ${routingBits.join(" | ")}` : "";
     return `Campground: ${params.campgroundName}
 Campground ID: ${params.campgroundId}
@@ -1026,7 +1086,10 @@ ${routingBlock}
 User request: "${params.anonymizedText}"${historyBlock}`;
   }
 
-  private buildHistory(history: { role: "user" | "assistant"; content: string }[], level: "strict" | "moderate" | "minimal") {
+  private buildHistory(
+    history: { role: "user" | "assistant"; content: string }[],
+    level: "strict" | "moderate" | "minimal",
+  ) {
     if (!history.length) return { historyText: "", historyTokenMap: new Map<string, string>() };
     const tokenMap = new Map<string, string>();
     const lines = history.slice(-6).map((entry) => {
@@ -1044,7 +1107,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return merged;
   }
 
-  private getCampgroundTimeZone(campground: { parkTimeZone?: string | null; timezone?: string | null }) {
+  private getCampgroundTimeZone(campground: {
+    parkTimeZone?: string | null;
+    timezone?: string | null;
+  }) {
     const timeZone = campground.parkTimeZone || campground.timezone || "UTC";
     try {
       new Intl.DateTimeFormat("en-US", { timeZone }).format(new Date());
@@ -1059,7 +1125,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       timeZone,
       year: "numeric",
       month: "2-digit",
-      day: "2-digit"
+      day: "2-digit",
     }).formatToParts(date);
     const year = parts.find((part) => part.type === "year")?.value ?? "0000";
     const month = parts.find((part) => part.type === "month")?.value ?? "01";
@@ -1094,7 +1160,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       const departure = this.addDaysUtc(arrival, nights);
       return {
         arrivalDate: this.formatDateUtc(arrival),
-        departureDate: this.formatDateUtc(departure)
+        departureDate: this.formatDateUtc(departure),
       };
     };
 
@@ -1120,7 +1186,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         }
         return {
           arrivalDate: this.formatDateUtc(arrival),
-          departureDate: this.formatDateUtc(departure)
+          departureDate: this.formatDateUtc(departure),
         };
       }
 
@@ -1140,7 +1206,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       }
       return {
         arrivalDate: this.formatDateUtc(arrival),
-        departureDate: this.formatDateUtc(departure)
+        departureDate: this.formatDateUtc(departure),
       };
     }
 
@@ -1172,7 +1238,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       const departure = new Date(Date.UTC(followingYear, followingMonth - 1, 1));
       return {
         arrivalDate: this.formatDateUtc(arrival),
-        departureDate: this.formatDateUtc(departure)
+        departureDate: this.formatDateUtc(departure),
       };
     }
 
@@ -1192,7 +1258,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     actionType: ActionType,
     parameters: Record<string, unknown>,
     requestText: string,
-    timeZone: string
+    timeZone: string,
   ) {
     if (!["lookup_availability", "create_hold", "block_site"].includes(actionType)) return;
     if (parameters.arrivalDate && parameters.departureDate) return;
@@ -1204,8 +1270,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     if (!parameters.departureDate) parameters.departureDate = inferred.departureDate;
   }
 
-  private resolveUserRole(user: PartnerUser, campgroundId: string): { role: string; mode: PartnerMode } {
-    const ownershipRoles = Array.isArray(user?.ownershipRoles) ? user.ownershipRoles.filter(isString) : [];
+  private resolveUserRole(
+    user: PartnerUser,
+    campgroundId: string,
+  ): { role: string; mode: PartnerMode } {
+    const ownershipRoles = Array.isArray(user?.ownershipRoles)
+      ? user.ownershipRoles.filter(isString)
+      : [];
     if (ownershipRoles.includes("owner")) {
       return { role: "owner", mode: "admin" };
     }
@@ -1216,12 +1287,14 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
 
     const memberships = Array.isArray(user?.memberships) ? user.memberships : [];
-    const membership = memberships.find((member) => toString(member?.campgroundId) === campgroundId);
+    const membership = memberships.find(
+      (member) => toString(member?.campgroundId) === campgroundId,
+    );
     const membershipRole = parseUserRole(membership?.role);
     if (membershipRole) {
       return {
         role: membershipRole,
-        mode: isAdminRole(membershipRole) ? "admin" : "staff"
+        mode: isAdminRole(membershipRole) ? "admin" : "staff",
       };
     }
 
@@ -1268,7 +1341,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return "general";
   }
 
-  private resolveParameters(parameters: Record<string, unknown>, tokenMap: Map<string, string>): Record<string, unknown> {
+  private resolveParameters(
+    parameters: Record<string, unknown>,
+    tokenMap: Map<string, string>,
+  ): Record<string, unknown> {
     const resolved: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(parameters)) {
       resolved[key] = this.resolveValue(value, tokenMap);
@@ -1289,21 +1365,27 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return value;
   }
 
-  private async resolveSiteId(campgroundId: string, params: { siteId?: string; siteNumber?: string }) {
+  private async resolveSiteId(
+    campgroundId: string,
+    params: { siteId?: string; siteNumber?: string },
+  ) {
     if (params.siteId) return params.siteId;
     if (!params.siteNumber) return undefined;
     const site = await this.prisma.site.findFirst({
       where: { campgroundId, siteNumber: String(params.siteNumber) },
-      select: { id: true }
+      select: { id: true },
     });
     return site?.id;
   }
 
-  private async resolveSiteClass(campgroundId: string, params: { siteClassId?: string; siteClassName?: string }) {
+  private async resolveSiteClass(
+    campgroundId: string,
+    params: { siteClassId?: string; siteClassName?: string },
+  ) {
     if (params.siteClassId) {
       const siteClass = await this.prisma.siteClass.findUnique({
         where: { id: params.siteClassId },
-        select: { id: true, name: true, defaultRate: true, campgroundId: true }
+        select: { id: true, name: true, defaultRate: true, campgroundId: true },
       });
       if (!siteClass || siteClass.campgroundId !== campgroundId) return null;
       return siteClass;
@@ -1312,9 +1394,9 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     const siteClass = await this.prisma.siteClass.findFirst({
       where: {
         campgroundId,
-        name: { equals: String(params.siteClassName), mode: "insensitive" }
+        name: { equals: String(params.siteClassName), mode: "insensitive" },
       },
-      select: { id: true, name: true, defaultRate: true }
+      select: { id: true, name: true, defaultRate: true },
     });
     return siteClass ?? null;
   }
@@ -1322,7 +1404,20 @@ User request: "${params.anonymizedText}"${historyBlock}`;
   private formatFriendlyDateRange(arrivalDate: string, departureDate: string): string {
     const arrival = new Date(arrivalDate + "T12:00:00");
     const departure = new Date(departureDate + "T12:00:00");
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const arrMonth = months[arrival.getMonth()];
     const depMonth = months[departure.getMonth()];
     const arrDay = arrival.getDate();
@@ -1334,7 +1429,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return `${arrMonth} ${arrDay} - ${depMonth} ${depDay}`;
   }
 
-  private async executeReadAction(campground: { id: string; slug: string; name: string }, draft: ActionDraft) {
+  private async executeReadAction(
+    campground: { id: string; slug: string; name: string },
+    draft: ActionDraft,
+  ) {
     if (draft.actionType !== "lookup_availability") return null;
     const params = draft.parameters;
     const arrivalDate = toString(params.arrivalDate);
@@ -1352,7 +1450,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         departureDate,
         rigType,
         rigLength !== undefined ? String(rigLength) : undefined,
-        false
+        false,
       );
       const totalSites = availability.length;
       const availableCount = availability.filter((site) => site.status === "available").length;
@@ -1363,7 +1461,8 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       });
 
       const dateRange = this.formatFriendlyDateRange(arrivalDate, departureDate);
-      const occupancyPct = totalSites > 0 ? Math.round(((totalSites - availableCount) / totalSites) * 100) : 0;
+      const occupancyPct =
+        totalSites > 0 ? Math.round(((totalSites - availableCount) / totalSites) * 100) : 0;
 
       // Build a natural language breakdown
       const breakdown = Array.from(byClass.entries())
@@ -1392,8 +1491,8 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           availableCount,
           totalSites,
           occupancyPct,
-          byClass: Object.fromEntries(byClass)
-        }
+          byClass: Object.fromEntries(byClass),
+        },
       };
 
       await this.audit.record({
@@ -1402,7 +1501,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "availability",
         entityId: draft.id,
-        after: action.result ?? {}
+        after: action.result ?? {},
       });
 
       return { action, message };
@@ -1430,13 +1529,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         siteId: resolvedSiteId,
         arrivalDate,
         departureDate,
-        holdMinutes: holdMinutes ?? 30
+        holdMinutes: holdMinutes ?? 30,
       });
 
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { holdId: hold.id, expiresAt: hold.expiresAt }
+        result: { holdId: hold.id, expiresAt: hold.expiresAt },
       };
 
       await this.audit.record({
@@ -1445,12 +1544,12 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "siteHold",
         entityId: hold.id,
-        after: { siteId: resolvedSiteId, arrivalDate, departureDate }
+        after: { siteId: resolvedSiteId, arrivalDate, departureDate },
       });
 
       return {
         action,
-        message: `Hold placed on site ${siteNumber ?? resolvedSiteId} from ${arrivalDate} to ${departureDate}.`
+        message: `Hold placed on site ${siteNumber ?? resolvedSiteId} from ${arrivalDate} to ${departureDate}.`,
       };
     } catch (err) {
       this.logger.warn("Hold creation failed", err instanceof Error ? err.message : `${err}`);
@@ -1458,7 +1557,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeBlockSite(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeBlockSite(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const siteId = toString(params.siteId);
     const siteNumber = toString(params.siteNumber);
@@ -1487,7 +1590,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { ticketId: ticket.id, outOfOrderUntil: ticket.outOfOrderUntil }
+        result: { ticketId: ticket.id, outOfOrderUntil: ticket.outOfOrderUntil },
       };
 
       await this.audit.record({
@@ -1500,13 +1603,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           siteId: resolvedSiteId,
           arrivalDate,
           departureDate,
-          outOfOrder: true
-        }
+          outOfOrder: true,
+        },
       });
 
       return {
         action,
-        message: `Blocked site ${siteNumber ?? resolvedSiteId} from ${arrivalDate} to ${departureDate}.`
+        message: `Blocked site ${siteNumber ?? resolvedSiteId} from ${arrivalDate} to ${departureDate}.`,
       };
     } catch (err) {
       this.logger.warn("Block site failed", err instanceof Error ? err.message : `${err}`);
@@ -1514,7 +1617,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeMaintenanceTicket(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeMaintenanceTicket(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const siteId = toString(params.siteId);
     const siteNumber = toString(params.siteNumber);
@@ -1531,13 +1638,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         campgroundId: campground.id,
         siteId: resolvedSiteId,
         title: issue,
-        priority: resolvedPriority
+        priority: resolvedPriority,
       });
 
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { ticketId: ticket.id, status: ticket.status }
+        result: { ticketId: ticket.id, status: ticket.status },
       };
 
       await this.audit.record({
@@ -1546,20 +1653,27 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "maintenanceTicket",
         entityId: ticket.id,
-        after: { siteId: resolvedSiteId, issue, priority: resolvedPriority }
+        after: { siteId: resolvedSiteId, issue, priority: resolvedPriority },
       });
 
       return {
         action,
-        message: `Created a maintenance ticket${resolvedSiteId ? ` for site ${siteNumber ?? resolvedSiteId}` : ""}.`
+        message: `Created a maintenance ticket${resolvedSiteId ? ` for site ${siteNumber ?? resolvedSiteId}` : ""}.`,
       };
     } catch (err) {
-      this.logger.warn("Maintenance ticket create failed", err instanceof Error ? err.message : `${err}`);
+      this.logger.warn(
+        "Maintenance ticket create failed",
+        err instanceof Error ? err.message : `${err}`,
+      );
       return null;
     }
   }
 
-  private async executeOperationalTask(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeOperationalTask(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const title = toString(params.title);
     const task = toString(params.task);
@@ -1589,13 +1703,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           dueDate: dueDate ? new Date(dueDate) : undefined,
           siteId: resolvedSiteId,
         },
-        user
+        user,
       );
 
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { taskId: created.id, status: created.status }
+        result: { taskId: created.id, status: created.status },
       };
 
       await this.audit.record({
@@ -1604,20 +1718,27 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "operationalTask",
         entityId: created.id,
-        after: { title: taskTitle, type: created.type, siteId: resolvedSiteId }
+        after: { title: taskTitle, type: created.type, siteId: resolvedSiteId },
       });
 
       return {
         action,
-        message: `Created a ${created.type} task: ${created.title}.`
+        message: `Created a ${created.type} task: ${created.title}.`,
       };
     } catch (err) {
-      this.logger.warn("Operational task create failed", err instanceof Error ? err.message : `${err}`);
+      this.logger.warn(
+        "Operational task create failed",
+        err instanceof Error ? err.message : `${err}`,
+      );
       return null;
     }
   }
 
-  private async executeUpdateHousekeeping(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeUpdateHousekeeping(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const siteId = toString(params.siteId);
     const siteNumber = toString(params.siteNumber);
@@ -1628,11 +1749,15 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     if (!resolvedSiteId) return null;
 
     try {
-      const updated = await this.operations.updateSiteHousekeeping(resolvedSiteId, nextStatus, user);
+      const updated = await this.operations.updateSiteHousekeeping(
+        resolvedSiteId,
+        nextStatus,
+        user,
+      );
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { siteId: resolvedSiteId, housekeepingStatus: updated.housekeepingStatus }
+        result: { siteId: resolvedSiteId, housekeepingStatus: updated.housekeepingStatus },
       };
 
       await this.audit.record({
@@ -1641,12 +1766,12 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "site",
         entityId: resolvedSiteId,
-        after: { housekeepingStatus: updated.housekeepingStatus }
+        after: { housekeepingStatus: updated.housekeepingStatus },
       });
 
       return {
         action,
-        message: `Updated housekeeping status for site ${siteNumber ?? resolvedSiteId} to ${updated.housekeepingStatus}.`
+        message: `Updated housekeeping status for site ${siteNumber ?? resolvedSiteId} to ${updated.housekeepingStatus}.`,
       };
     } catch (err) {
       this.logger.warn("Housekeeping update failed", err instanceof Error ? err.message : `${err}`);
@@ -1654,14 +1779,18 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeGenerateBillingSchedule(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeGenerateBillingSchedule(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const reservationId = toString(draft.parameters.reservationId);
     if (!reservationId) return null;
 
     try {
       const reservation = await this.prisma.reservation.findUnique({
         where: { id: reservationId },
-        select: { campgroundId: true }
+        select: { campgroundId: true },
       });
       if (!reservation || reservation.campgroundId !== campground.id) return null;
 
@@ -1669,7 +1798,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { reservationId, chargeCount: charges.length }
+        result: { reservationId, chargeCount: charges.length },
       };
 
       await this.audit.record({
@@ -1678,20 +1807,27 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "reservation",
         entityId: reservationId,
-        after: { repeatChargeCount: charges.length }
+        after: { repeatChargeCount: charges.length },
       });
 
       return {
         action,
-        message: `Generated ${charges.length} billing installments for reservation ${reservationId}.`
+        message: `Generated ${charges.length} billing installments for reservation ${reservationId}.`,
       };
     } catch (err) {
-      this.logger.warn("Billing schedule generation failed", err instanceof Error ? err.message : `${err}`);
+      this.logger.warn(
+        "Billing schedule generation failed",
+        err instanceof Error ? err.message : `${err}`,
+      );
       return null;
     }
   }
 
-  private async executeRefundReservation(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeRefundReservation(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const reservationId = toString(params.reservationId);
     const amount = toNumber(params.amountCents);
@@ -1701,19 +1837,15 @@ User request: "${params.anonymizedText}"${historyBlock}`;
 
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { id: true, campgroundId: true }
+      select: { id: true, campgroundId: true },
     });
     if (!reservation || reservation.campgroundId !== campground.id) return null;
 
     try {
-      const updated = await this.reservations.refundPayment(
-        reservationId,
-        amount,
-        {
-          destination: destination === "wallet" ? "wallet" : "card",
-          reason: reason ?? undefined
-        }
-      );
+      const updated = await this.reservations.refundPayment(reservationId, amount, {
+        destination: destination === "wallet" ? "wallet" : "card",
+        reason: reason ?? undefined,
+      });
 
       const action: ActionDraft = {
         ...draft,
@@ -1722,8 +1854,8 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           reservationId,
           refundedCents: amount,
           paidAmount: updated.paidAmount,
-          balanceAmount: updated.balanceAmount
-        }
+          balanceAmount: updated.balanceAmount,
+        },
       };
 
       await this.audit.record({
@@ -1732,12 +1864,12 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "reservation",
         entityId: reservationId,
-        after: { refundedCents: amount, destination: destination ?? "card" }
+        after: { refundedCents: amount, destination: destination ?? "card" },
       });
 
       return {
         action,
-        message: `Recorded a ${amount} cent refund for reservation ${reservationId}. Confirm processor refund if needed.`
+        message: `Recorded a ${amount} cent refund for reservation ${reservationId}. Confirm processor refund if needed.`,
       };
     } catch (err) {
       this.logger.warn("Reservation refund failed", err instanceof Error ? err.message : `${err}`);
@@ -1745,7 +1877,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeSendGuestMessage(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeSendGuestMessage(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const guestId = toString(params.guestId);
     const reservationId = toString(params.reservationId);
@@ -1760,7 +1896,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     if (resolvedReservationId) {
       const reservation = await this.prisma.reservation.findUnique({
         where: { id: resolvedReservationId },
-        select: { campgroundId: true, guestId: true, Campground: { select: { organizationId: true } } }
+        select: {
+          campgroundId: true,
+          guestId: true,
+          Campground: { select: { organizationId: true } },
+        },
       });
       if (!reservation || reservation.campgroundId !== campground.id) return null;
       resolvedGuestId = resolvedGuestId ?? reservation.guestId;
@@ -1768,7 +1908,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     } else if (resolvedGuestId) {
       const match = await this.prisma.reservation.findFirst({
         where: { guestId: resolvedGuestId, campgroundId: campground.id },
-        select: { id: true, Campground: { select: { organizationId: true } } }
+        select: { id: true, Campground: { select: { organizationId: true } } },
       });
       if (!match) return null;
       organizationId = match.Campground?.organizationId ?? null;
@@ -1790,13 +1930,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           status: "sent",
           provider: "internal",
           updatedAt: new Date(),
-        }
+        },
       });
 
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { communicationId: communication.id }
+        result: { communicationId: communication.id },
       };
 
       await this.audit.record({
@@ -1805,12 +1945,12 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "communication",
         entityId: communication.id,
-        after: { reservationId: resolvedReservationId, guestId: resolvedGuestId }
+        after: { reservationId: resolvedReservationId, guestId: resolvedGuestId },
       });
 
       return {
         action,
-        message: "Logged an outbound guest note in the communications timeline."
+        message: "Logged an outbound guest note in the communications timeline.",
       };
     } catch (err) {
       this.logger.warn("Guest note create failed", err instanceof Error ? err.message : `${err}`);
@@ -1818,7 +1958,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeMoveReservation(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeMoveReservation(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const reservationId = toString(params.reservationId);
     const newArrivalDate = toString(params.newArrivalDate);
@@ -1833,7 +1977,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
 
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      select: { campgroundId: true }
+      select: { campgroundId: true },
     });
     if (!reservation || reservation.campgroundId !== campground.id) return null;
 
@@ -1843,7 +1987,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     const targetSiteNumber = newSiteNumber ?? siteNumber;
     const resolvedSiteId = await this.resolveSiteId(campground.id, {
       siteId: targetSiteId,
-      siteNumber: targetSiteNumber
+      siteNumber: targetSiteNumber,
     });
     if (targetSiteNumber && !resolvedSiteId) return null;
 
@@ -1868,8 +2012,8 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           reservationId,
           siteId: updated.siteId,
           arrivalDate: updated.arrivalDate,
-          departureDate: updated.departureDate
-        }
+          departureDate: updated.departureDate,
+        },
       };
 
       await this.audit.record({
@@ -1878,12 +2022,16 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "reservation",
         entityId: reservationId,
-        after: { siteId: updated.siteId, arrivalDate: updated.arrivalDate, departureDate: updated.departureDate }
+        after: {
+          siteId: updated.siteId,
+          arrivalDate: updated.arrivalDate,
+          departureDate: updated.departureDate,
+        },
       });
 
       return {
         action,
-        message: `Moved reservation ${reservationId} to site ${updated.siteId}.`
+        message: `Moved reservation ${reservationId} to site ${updated.siteId}.`,
       };
     } catch (err) {
       this.logger.warn("Move reservation failed", err instanceof Error ? err.message : `${err}`);
@@ -1891,7 +2039,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeAdjustRate(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeAdjustRate(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     const params = draft.parameters;
     const siteClassId = toString(params.siteClassId);
     const siteClassName = toString(params.siteClassName);
@@ -1907,7 +2059,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     const priority = toNumber(params.priority);
     const type = params.type;
 
-    const resolvedClass = await this.resolveSiteClass(campground.id, { siteClassId, siteClassName });
+    const resolvedClass = await this.resolveSiteClass(campground.id, {
+      siteClassId,
+      siteClassName,
+    });
     const desiredRate = newRateCents ?? null;
     let resolvedAdjustment = adjustmentValueInput ?? null;
 
@@ -1920,11 +2075,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     if (resolvedAdjustment === null) return null;
     const adjustmentValue = resolvedAdjustment;
 
-    const ruleName = name
-      ? name
-      : reason
-        ? `AI Adjustment: ${reason}`
-        : "AI Adjustment";
+    const ruleName = name ? name : reason ? `AI Adjustment: ${reason}` : "AI Adjustment";
     const dowMaskValues = Array.isArray(dowMask) ? toNumberArray(dowMask) : undefined;
 
     try {
@@ -1934,22 +2085,24 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           name: ruleName,
           type: parsePricingRuleType(type) ?? PricingRuleType.event,
           priority: priority ?? 10,
-          stackMode: parsePricingStackMode(stackMode) ?? (desiredRate !== null ? PricingStackMode.override : PricingStackMode.additive),
+          stackMode:
+            parsePricingStackMode(stackMode) ??
+            (desiredRate !== null ? PricingStackMode.override : PricingStackMode.additive),
           adjustmentType: parseAdjustmentType(adjustmentType) ?? AdjustmentType.flat,
           adjustmentValue,
           siteClassId: resolvedClass?.id ?? null,
           startDate: startDate ?? null,
           endDate: endDate ?? null,
           dowMask: dowMaskValues && dowMaskValues.length > 0 ? dowMaskValues : undefined,
-          active: true
+          active: true,
         },
-        user?.id ?? null
+        user?.id ?? null,
       );
 
       const action: ActionDraft = {
         ...draft,
         status: "executed",
-        result: { ruleId: created.id, name: created.name }
+        result: { ruleId: created.id, name: created.name },
       };
 
       await this.audit.record({
@@ -1958,12 +2111,12 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         action: "ai.partner.execute",
         entity: "pricingRuleV2",
         entityId: created.id,
-        after: { adjustmentValue: resolvedAdjustment, adjustmentType: adjustmentType ?? "flat" }
+        after: { adjustmentValue: resolvedAdjustment, adjustmentType: adjustmentType ?? "flat" },
       });
 
       return {
         action,
-        message: `Created pricing rule "${created.name}".`
+        message: `Created pricing rule "${created.name}".`,
       };
     } catch (err) {
       this.logger.warn("Adjust rate failed", err instanceof Error ? err.message : `${err}`);
@@ -1971,7 +2124,11 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
   }
 
-  private async executeWriteAction(campground: { id: string }, draft: ActionDraft, user: PartnerUser) {
+  private async executeWriteAction(
+    campground: { id: string },
+    draft: ActionDraft,
+    user: PartnerUser,
+  ) {
     if (draft.actionType === "create_hold") {
       return this.executeHold(campground, draft, user);
     }
@@ -2005,7 +2162,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     return null;
   }
 
-  private async executeAnalysisAction(campground: { id: string; slug: string; name: string }, draft: ActionDraft): Promise<{ action: ActionDraft; message: string } | null> {
+  private async executeAnalysisAction(
+    campground: { id: string; slug: string; name: string },
+    draft: ActionDraft,
+  ): Promise<{ action: ActionDraft; message: string } | null> {
     const campgroundId = campground.id;
 
     try {
@@ -2026,7 +2186,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         const message = `${status} - ${occ.toFixed(0)}% occupied, earning $${(adr / 100).toFixed(0)} avg/site. Next 7 days tracking at ${next7.toFixed(0)}% occupancy.`;
         return {
           action: { ...draft, status: "executed", impact: undefined, result: metricsResult },
-          message
+          message,
         };
       }
 
@@ -2038,10 +2198,25 @@ User request: "${params.anonymizedText}"${historyBlock}`;
 
         let peakInfo = "";
         if (forecasts.length > 0) {
-          const peak = forecasts.reduce((max, d) => (d.occupancyPct ?? 0) > (max.occupancyPct ?? 0) ? d : max);
+          const peak = forecasts.reduce((max, d) =>
+            (d.occupancyPct ?? 0) > (max.occupancyPct ?? 0) ? d : max,
+          );
           if (peak.occupancyPct > avgOccupancy + 10) {
             const peakDate = new Date(peak.date + "T12:00:00");
-            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const months = [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ];
             peakInfo = ` Busiest day looks like ${months[peakDate.getMonth()]} ${peakDate.getDate()} at ${(peak.occupancyPct ?? 0).toFixed(0)}%.`;
           }
         }
@@ -2054,16 +2229,20 @@ User request: "${params.anonymizedText}"${historyBlock}`;
         const message = `${outlook} - averaging ${avgOccupancy.toFixed(0)}% occupancy over the next ${days} days.${peakInfo}`;
         return {
           action: { ...draft, status: "executed", impact: undefined, result: forecastResult },
-          message
+          message,
         };
       }
 
       if (draft.actionType === "get_pricing_recommendations") {
-        const recommendations = await this.pricingService.getRecommendations(campgroundId, { status: "pending", limit: 5 });
+        const recommendations = await this.pricingService.getRecommendations(campgroundId, {
+          status: "pending",
+          limit: 5,
+        });
         const count = recommendations.length;
         let message: string;
         if (count === 0) {
-          message = "No pricing adjustments recommended right now. Your rates are aligned with demand.";
+          message =
+            "No pricing adjustments recommended right now. Your rates are aligned with demand.";
         } else if (count === 1) {
           const rec = recommendations[0];
           message = `1 pricing suggestion: ${rec.reasoning || "Consider adjusting rates based on current demand patterns."}`;
@@ -2071,14 +2250,22 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           message = `${count} pricing opportunities. Top suggestion: ${recommendations[0]?.reasoning || "Adjust rates for upcoming high-demand dates."}`;
         }
         return {
-          action: { ...draft, status: "executed", impact: undefined, result: { recommendations, count } },
-          message
+          action: {
+            ...draft,
+            status: "executed",
+            impact: undefined,
+            result: { recommendations, count },
+          },
+          message,
         };
       }
 
       if (draft.actionType === "get_revenue_insights") {
         const summary = await this.revenueManager.getRevenueSummary(campgroundId);
-        const insights = await this.revenueManager.getInsights(campgroundId, { status: "new", limit: 5 });
+        const insights = await this.revenueManager.getInsights(campgroundId, {
+          status: "new",
+          limit: 5,
+        });
         const totalCents = summary.totalOpportunityCents || 0;
 
         let message: string;
@@ -2090,15 +2277,20 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           message = `${insights.length} small opportunities identified. ${insights[0]?.title || "Check the AI dashboard for details."}`;
         }
         return {
-          action: { ...draft, status: "executed", impact: undefined, result: { summary, insights } },
-          message
+          action: {
+            ...draft,
+            status: "executed",
+            impact: undefined,
+            result: { summary, insights },
+          },
+          message,
         };
       }
 
       if (draft.actionType === "get_dashboard_summary") {
         const [quickStats, activity] = await Promise.all([
           this.dashboardService.getQuickStats(campgroundId),
-          this.dashboardService.getActivityFeed(campgroundId, 5)
+          this.dashboardService.getActivityFeed(campgroundId, 5),
         ]);
         const needsAttention = quickStats.needsAttention ?? 0;
         const pendingReplies = quickStats.pendingReplies ?? 0;
@@ -2119,8 +2311,13 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           message += ` AI recently handled ${activity.length} actions.`;
         }
         return {
-          action: { ...draft, status: "executed", impact: undefined, result: { quickStats, activity } },
-          message
+          action: {
+            ...draft,
+            status: "executed",
+            impact: undefined,
+            result: { quickStats, activity },
+          },
+          message,
         };
       }
 
@@ -2129,16 +2326,26 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       this.logger.error(`Analysis action ${draft.actionType} failed:`, err);
       return {
         action: { ...draft, status: "executed", result: { error: "Failed to fetch data" } },
-        message: "I couldn't retrieve that data right now. Please try again or check the dashboard directly."
+        message:
+          "I couldn't retrieve that data right now. Please try again or check the dashboard directly.",
       };
     }
   }
 
   private isAnalysisAction(actionType: ActionType): boolean {
-    return ["get_yield_metrics", "get_occupancy_forecast", "get_pricing_recommendations", "get_revenue_insights", "get_dashboard_summary"].includes(actionType);
+    return [
+      "get_yield_metrics",
+      "get_occupancy_forecast",
+      "get_pricing_recommendations",
+      "get_revenue_insights",
+      "get_dashboard_summary",
+    ].includes(actionType);
   }
 
-  private buildEvidenceLinks(actionType: ActionType, parameters: Record<string, unknown>): EvidenceLink[] {
+  private buildEvidenceLinks(
+    actionType: ActionType,
+    parameters: Record<string, unknown>,
+  ): EvidenceLink[] {
     if (actionType === "lookup_availability") {
       const params = new URLSearchParams();
       const arrivalDate = toString(parameters.arrivalDate);
@@ -2167,7 +2374,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       if (siteId) params.set("siteId", siteId);
       return [
         { label: "Maintenance", url: "/maintenance" },
-        { label: "Calendar view", url: `/calendar?${params.toString()}` }
+        { label: "Calendar view", url: `/calendar?${params.toString()}` },
       ];
     }
     if (actionType === "create_maintenance_ticket") {
@@ -2207,7 +2414,10 @@ User request: "${params.anonymizedText}"${historyBlock}`;
       return [{ label: "Yield Dashboard", url: "/ai/yield" }];
     }
     if (actionType === "get_pricing_recommendations") {
-      return [{ label: "AI Pricing", url: "/ai/yield" }, { label: "Pricing Rules", url: "/pricing" }];
+      return [
+        { label: "AI Pricing", url: "/ai/yield" },
+        { label: "Pricing Rules", url: "/pricing" },
+      ];
     }
     if (actionType === "get_revenue_insights" || actionType === "get_dashboard_summary") {
       return [{ label: "AI Command Center", url: "/ai" }];
@@ -2240,15 +2450,15 @@ User request: "${params.anonymizedText}"${historyBlock}`;
           campgroundId: params.campgroundId,
           status: { not: "cancelled" },
           departureDate: { gt: windowStart },
-          arrivalDate: { lt: windowEnd }
-        }
+          arrivalDate: { lt: windowEnd },
+        },
       }),
       this.prisma.reservation.count({
         where: {
           campgroundId: params.campgroundId,
-          createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) }
-        }
-      })
+          createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+        },
+      }),
     ]);
 
     const occupancy = siteCount > 0 ? overlappingReservations / siteCount : 0;
@@ -2269,17 +2479,18 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
 
     const summary = `Occupancy estimate: ${(occupancy * 100).toFixed(0)}% (${overlappingReservations}/${siteCount} sites) over the next ${Math.max(1, Math.round((windowEnd.getTime() - windowStart.getTime()) / (24 * 60 * 60 * 1000)))} days.`;
-    const saferAlternative = params.actionType === "adjust_rate"
-      ? "Consider a smaller rate test (e.g., +3%) or limit the change to weekends."
-      : params.actionType === "move_reservation"
-        ? "Consider a temporary hold or offer an alternate site in the same class first."
-        : undefined;
+    const saferAlternative =
+      params.actionType === "adjust_rate"
+        ? "Consider a smaller rate test (e.g., +3%) or limit the change to weekends."
+        : params.actionType === "move_reservation"
+          ? "Consider a temporary hold or offer an alternate site in the same class first."
+          : undefined;
 
     return {
       level,
       summary,
       warnings: warnings.length ? warnings : undefined,
-      saferAlternative
+      saferAlternative,
     };
   }
 }

@@ -3,12 +3,39 @@
 import { useEffect, useState, useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "../../components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "../../components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../../components/ui/alert-dialog";
 import { Badge } from "../../components/ui/badge";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Switch } from "../../components/ui/switch";
@@ -17,12 +44,45 @@ import { Checkbox } from "../../components/ui/checkbox";
 import { apiClient } from "../../lib/api-client";
 import { useToast } from "../../components/ui/use-toast";
 import {
-  FileText, Plus, Sparkles, Shield, Car, ClipboardList,
-  FileQuestion, Eye, Trash2, Edit3, PartyPopper, CheckCircle2,
-  AlertTriangle, PawPrint, Loader2, ChevronUp, Settings2,
-  ChevronDown, Type, Hash, CheckSquare, List, AlignLeft, Phone, Mail, X,
-  Calendar, Clock, Send, Users, Zap, Link2, Bell, RefreshCw, Search,
-  ScrollText, Scale, FileSignature, PenLine
+  FileText,
+  Plus,
+  Sparkles,
+  Shield,
+  Car,
+  ClipboardList,
+  FileQuestion,
+  Eye,
+  Trash2,
+  Edit3,
+  PartyPopper,
+  CheckCircle2,
+  AlertTriangle,
+  PawPrint,
+  Loader2,
+  ChevronUp,
+  Settings2,
+  ChevronDown,
+  Type,
+  Hash,
+  CheckSquare,
+  List,
+  AlignLeft,
+  Phone,
+  Mail,
+  X,
+  Calendar,
+  Clock,
+  Send,
+  Users,
+  Zap,
+  Link2,
+  Bell,
+  RefreshCw,
+  Search,
+  ScrollText,
+  Scale,
+  FileSignature,
+  PenLine,
 } from "lucide-react";
 import { Textarea } from "../../components/ui/textarea";
 import { cn } from "../../lib/utils";
@@ -67,12 +127,7 @@ const legalFormTypeValues: LegalFormType[] = [
   "legal_agreement",
 ];
 
-const showAtValues: ShowAtOption[] = [
-  "during_booking",
-  "at_checkin",
-  "after_booking",
-  "on_demand",
-];
+const showAtValues: ShowAtOption[] = ["during_booking", "at_checkin", "after_booking", "on_demand"];
 
 const conditionLogicValues: ConditionLogic[] = ["all", "any"];
 
@@ -214,7 +269,12 @@ const conditionFields: ConditionFieldOption[] = [
   { value: "adults", label: "Number of adults", type: "number" },
   { value: "children", label: "Number of children", type: "number" },
   { value: "stayLength", label: "Length of stay (nights)", type: "number" },
-  { value: "rigType", label: "Rig type", type: "select", options: ["rv", "trailer", "tent", "car", "motorcycle", "other"] },
+  {
+    value: "rigType",
+    label: "Rig type",
+    type: "select",
+    options: ["rv", "trailer", "tent", "car", "motorcycle", "other"],
+  },
   { value: "siteClassId", label: "Site type", type: "siteClass" },
   { value: "addOns", label: "Selected add-ons", type: "text" },
 ];
@@ -325,8 +385,7 @@ type MainTab = "forms" | "contracts";
 const mainTabValues: MainTab[] = ["forms", "contracts"];
 const modalTabValues: ModalTab[] = ["questions", "settings"];
 
-const isMainTab = (value: string): value is MainTab =>
-  mainTabValues.some((tab) => tab === value);
+const isMainTab = (value: string): value is MainTab => mainTabValues.some((tab) => tab === value);
 
 const isModalTab = (value: string): value is ModalTab =>
   modalTabValues.some((tab) => tab === value);
@@ -342,11 +401,17 @@ const starterTemplates: StarterTemplate[] = [
     showAt: ["during_booking", "at_checkin"],
     category: "collection",
     questions: [
-      { id: generateId(), label: "Vehicle type", type: "select", options: ["RV/Motorhome", "Travel Trailer", "Fifth Wheel", "Tent", "Car/Truck"], required: true },
+      {
+        id: generateId(),
+        label: "Vehicle type",
+        type: "select",
+        options: ["RV/Motorhome", "Travel Trailer", "Fifth Wheel", "Tent", "Car/Truck"],
+        required: true,
+      },
       { id: generateId(), label: "Vehicle length (feet)", type: "number", required: true },
       { id: generateId(), label: "License plate number", type: "text", required: true },
       { id: generateId(), label: "License plate state", type: "text", required: true },
-    ]
+    ],
   },
   {
     name: "Pet Information",
@@ -357,11 +422,22 @@ const starterTemplates: StarterTemplate[] = [
     showAt: ["at_checkin"],
     category: "collection",
     questions: [
-      { id: generateId(), label: "Pet type", type: "select", options: ["Dog", "Cat", "Other"], required: true },
+      {
+        id: generateId(),
+        label: "Pet type",
+        type: "select",
+        options: ["Dog", "Cat", "Other"],
+        required: true,
+      },
       { id: generateId(), label: "Pet breed", type: "text", required: true },
       { id: generateId(), label: "Pet name", type: "text", required: true },
-      { id: generateId(), label: "Is your pet up to date on vaccinations?", type: "checkbox", required: true },
-    ]
+      {
+        id: generateId(),
+        label: "Is your pet up to date on vaccinations?",
+        type: "checkbox",
+        required: true,
+      },
+    ],
   },
   {
     name: "Guest Intake",
@@ -374,9 +450,14 @@ const starterTemplates: StarterTemplate[] = [
     questions: [
       { id: generateId(), label: "Emergency contact name", type: "text", required: true },
       { id: generateId(), label: "Emergency contact phone", type: "phone", required: true },
-      { id: generateId(), label: "Any medical conditions we should know about?", type: "textarea", required: false },
+      {
+        id: generateId(),
+        label: "Any medical conditions we should know about?",
+        type: "textarea",
+        required: false,
+      },
       { id: generateId(), label: "Special requests or needs", type: "textarea", required: false },
-    ]
+    ],
   },
   {
     name: "Custom Form",
@@ -386,7 +467,7 @@ const starterTemplates: StarterTemplate[] = [
     autoAttachMode: "manual",
     showAt: ["on_demand"],
     category: "collection",
-    questions: []
+    questions: [],
   },
   // === Legal Document Templates ===
   {
@@ -424,8 +505,13 @@ Welcome to our campground! Please read and acknowledge the following rules:
 - Check-out time is 11:00 AM
 - Please leave your site clean and free of trash`,
     questions: [
-      { id: generateId(), label: "I have read and agree to follow the park rules and regulations", type: "checkbox", required: true },
-    ]
+      {
+        id: generateId(),
+        label: "I have read and agree to follow the park rules and regulations",
+        type: "checkbox",
+        required: true,
+      },
+    ],
   },
   {
     name: "Liability Waiver",
@@ -452,11 +538,21 @@ In the event of an emergency, I authorize the campground staff to seek emergency
 ## Insurance
 I understand that the campground does not provide insurance coverage for guests and I am responsible for my own insurance.`,
     questions: [
-      { id: generateId(), label: "I have read and understand this waiver", type: "checkbox", required: true },
-      { id: generateId(), label: "I voluntarily agree to assume all risks and release the campground from liability", type: "checkbox", required: true },
+      {
+        id: generateId(),
+        label: "I have read and understand this waiver",
+        type: "checkbox",
+        required: true,
+      },
+      {
+        id: generateId(),
+        label: "I voluntarily agree to assume all risks and release the campground from liability",
+        type: "checkbox",
+        required: true,
+      },
       { id: generateId(), label: "Emergency contact name", type: "text", required: true },
       { id: generateId(), label: "Emergency contact phone", type: "phone", required: true },
-    ]
+    ],
   },
   {
     name: "Long-Term Stay Agreement",
@@ -489,10 +585,25 @@ This agreement outlines the terms and conditions for extended stays (30+ days).
 - Either party may terminate this agreement with 30 days written notice
 - Immediate termination may occur for violation of park rules`,
     questions: [
-      { id: generateId(), label: "I agree to the payment terms outlined above", type: "checkbox", required: true },
-      { id: generateId(), label: "I agree to maintain my site according to park standards", type: "checkbox", required: true },
-      { id: generateId(), label: "I understand the termination policy", type: "checkbox", required: true },
-    ]
+      {
+        id: generateId(),
+        label: "I agree to the payment terms outlined above",
+        type: "checkbox",
+        required: true,
+      },
+      {
+        id: generateId(),
+        label: "I agree to maintain my site according to park standards",
+        type: "checkbox",
+        required: true,
+      },
+      {
+        id: generateId(),
+        label: "I understand the termination policy",
+        type: "checkbox",
+        required: true,
+      },
+    ],
   },
   {
     name: "Custom Legal Document",
@@ -504,12 +615,15 @@ This agreement outlines the terms and conditions for extended stays (30+ days).
     category: "legal",
     enforcement: "post_booking",
     documentContent: "",
-    questions: []
+    questions: [],
   },
 ];
 
 // Form type icons and config
-const typeConfig: Record<string, { icon: React.ReactNode; label: string; category: "collection" | "legal" }> = {
+const typeConfig: Record<
+  string,
+  { icon: React.ReactNode; label: string; category: "collection" | "legal" }
+> = {
   // Data collection
   waiver: { icon: <Shield className="h-4 w-4" />, label: "Waiver", category: "collection" },
   vehicle: { icon: <Car className="h-4 w-4" />, label: "Vehicle", category: "collection" },
@@ -518,18 +632,24 @@ const typeConfig: Record<string, { icon: React.ReactNode; label: string; categor
   // Legal documents
   park_rules: { icon: <ScrollText className="h-4 w-4" />, label: "Park Rules", category: "legal" },
   liability_waiver: { icon: <Scale className="h-4 w-4" />, label: "Liability", category: "legal" },
-  long_term_stay: { icon: <FileSignature className="h-4 w-4" />, label: "Long-Term", category: "legal" },
+  long_term_stay: {
+    icon: <FileSignature className="h-4 w-4" />,
+    label: "Long-Term",
+    category: "legal",
+  },
   legal_agreement: { icon: <FileText className="h-4 w-4" />, label: "Legal", category: "legal" },
 };
 
 // Legacy typeIcons for backwards compatibility
 const typeIcons: Record<string, React.ReactNode> = Object.fromEntries(
-  Object.entries(typeConfig).map(([k, v]) => [k, v.icon])
+  Object.entries(typeConfig).map(([k, v]) => [k, v.icon]),
 );
 
 const parseShowAtOptions = (value: unknown): ShowAtOption[] => {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is ShowAtOption => typeof item === "string" && isShowAtOption(item));
+  return value.filter(
+    (item): item is ShowAtOption => typeof item === "string" && isShowAtOption(item),
+  );
 };
 
 const parseDisplayConditionValue = (value: unknown): DisplayCondition["value"] | null => {
@@ -543,15 +663,19 @@ const parseDisplayConditions = (value: unknown): DisplayCondition[] => {
   if (!Array.isArray(value)) return [];
   return value.reduce<DisplayCondition[]>((acc, item) => {
     if (!isRecord(item)) return acc;
-    const field = typeof item.field === "string" && isDisplayConditionField(item.field) ? item.field : null;
-    const operator = typeof item.operator === "string" && isDisplayConditionOperator(item.operator) ? item.operator : null;
+    const field =
+      typeof item.field === "string" && isDisplayConditionField(item.field) ? item.field : null;
+    const operator =
+      typeof item.operator === "string" && isDisplayConditionOperator(item.operator)
+        ? item.operator
+        : null;
     const parsedValue = parseDisplayConditionValue(item.value);
     if (!field || !operator || parsedValue === null) return acc;
     acc.push({
       id: generateId(),
       field,
       operator,
-      value: parsedValue
+      value: parsedValue,
     });
     return acc;
   }, []);
@@ -562,7 +686,8 @@ const parseQuestions = (value: unknown): Question[] => {
   return value.reduce<Question[]>((acc, item) => {
     if (!isRecord(item)) return acc;
     const label = typeof item.label === "string" ? item.label : "";
-    const typeValue = typeof item.type === "string" && isQuestionType(item.type) ? item.type : "text";
+    const typeValue =
+      typeof item.type === "string" && isQuestionType(item.type) ? item.type : "text";
     const required = typeof item.required === "boolean" ? item.required : false;
     const options = isStringArray(item.options) ? item.options : undefined;
     acc.push({
@@ -570,7 +695,7 @@ const parseQuestions = (value: unknown): Question[] => {
       label,
       type: typeValue,
       required,
-      ...(options ? { options } : {})
+      ...(options ? { options } : {}),
     });
     return acc;
   }, []);
@@ -590,7 +715,7 @@ const toFormFields = (value: unknown): FormFields => {
       label,
       type: typeValue,
       required,
-      ...(options ? { options } : {})
+      ...(options ? { options } : {}),
     });
     return acc;
   }, []);
@@ -621,13 +746,13 @@ function mapFormToPolicy(form: FormTemplateInput, campgroundId: string) {
       displayConditions: form.displayConditions,
       conditionLogic: form.conditionLogic,
       questions: form.questions, // Store questions in policyConfig for legal docs
-    }
+    },
   };
 }
 
 // Map Policy API response to FormTemplateInput
 function mapPolicyToForm(
-  policy: PolicyTemplate
+  policy: PolicyTemplate,
 ): FormTemplateInput & { id: string; updatedAt?: string | Date; createdAt?: string | Date } {
   const config = isRecord(policy.policyConfig) ? policy.policyConfig : {};
   const showAt = parseShowAtOptions(config.showAt);
@@ -641,9 +766,11 @@ function mapPolicyToForm(
     typeof config.enforcement === "string" && isEnforcementType(config.enforcement)
       ? config.enforcement
       : "post_booking";
-  const requireSignature = typeof config.requireSignature === "boolean" ? config.requireSignature : true;
+  const requireSignature =
+    typeof config.requireSignature === "boolean" ? config.requireSignature : true;
   const isRequired = typeof config.isRequired === "boolean" ? config.isRequired : true;
-  const allowSkipWithNote = typeof config.allowSkipWithNote === "boolean" ? config.allowSkipWithNote : false;
+  const allowSkipWithNote =
+    typeof config.allowSkipWithNote === "boolean" ? config.allowSkipWithNote : false;
   const validityDays = typeof config.validityDays === "number" ? config.validityDays : null;
   const sendReminder = typeof config.sendReminder === "boolean" ? config.sendReminder : false;
   const reminderDaysBefore =
@@ -658,7 +785,11 @@ function mapPolicyToForm(
     documentContent: policy.content || "",
     questions,
     isActive: policy.isActive ?? true,
-    autoAttachMode: policy.autoSend ? "all_bookings" : (policy.siteClassId ? "site_classes" : "manual"),
+    autoAttachMode: policy.autoSend
+      ? "all_bookings"
+      : policy.siteClassId
+        ? "site_classes"
+        : "manual",
     siteClassIds: policy.siteClassId ? [policy.siteClassId] : [],
     showAt: showAt.length > 0 ? showAt : ["during_booking"],
     isRequired,
@@ -684,37 +815,54 @@ const showAtOptions: Array<{
   icon: IconComponent;
   description: string;
 }> = [
-  { value: "during_booking", label: "During online booking", icon: Calendar, description: "Guest fills out before payment" },
-  { value: "at_checkin", label: "At check-in", icon: Clock, description: "Staff collects during check-in" },
-  { value: "after_booking", label: "After booking (email)", icon: Send, description: "Sent via email after confirmation" },
-  { value: "on_demand", label: "On demand only", icon: Users, description: "Only when manually requested" },
+  {
+    value: "during_booking",
+    label: "During online booking",
+    icon: Calendar,
+    description: "Guest fills out before payment",
+  },
+  {
+    value: "at_checkin",
+    label: "At check-in",
+    icon: Clock,
+    description: "Staff collects during check-in",
+  },
+  {
+    value: "after_booking",
+    label: "After booking (email)",
+    icon: Send,
+    description: "Sent via email after confirmation",
+  },
+  {
+    value: "on_demand",
+    label: "On demand only",
+    icon: Users,
+    description: "Only when manually requested",
+  },
 ];
 
 // Visual Question Builder Component
 function QuestionBuilder({
   questions,
-  onChange
+  onChange,
 }: {
   questions: Question[];
   onChange: (questions: Question[]) => void;
 }) {
   const addQuestion = () => {
-    onChange([
-      ...questions,
-      { id: generateId(), label: "", type: "text", required: false }
-    ]);
+    onChange([...questions, { id: generateId(), label: "", type: "text", required: false }]);
   };
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
-    onChange(questions.map(q => q.id === id ? { ...q, ...updates } : q));
+    onChange(questions.map((q) => (q.id === id ? { ...q, ...updates } : q)));
   };
 
   const removeQuestion = (id: string) => {
-    onChange(questions.filter(q => q.id !== id));
+    onChange(questions.filter((q) => q.id !== id));
   };
 
   const moveQuestion = (id: string, direction: "up" | "down") => {
-    const index = questions.findIndex(q => q.id === id);
+    const index = questions.findIndex((q) => q.id === id);
     if (index === -1) return;
     if (direction === "up" && index === 0) return;
     if (direction === "down" && index === questions.length - 1) return;
@@ -726,13 +874,13 @@ function QuestionBuilder({
   };
 
   const addOption = (questionId: string) => {
-    const q = questions.find(q => q.id === questionId);
+    const q = questions.find((q) => q.id === questionId);
     if (!q) return;
     updateQuestion(questionId, { options: [...(q.options || []), ""] });
   };
 
   const updateOption = (questionId: string, optionIndex: number, value: string) => {
-    const q = questions.find(q => q.id === questionId);
+    const q = questions.find((q) => q.id === questionId);
     if (!q || !q.options) return;
     const newOptions = [...q.options];
     newOptions[optionIndex] = value;
@@ -740,13 +888,13 @@ function QuestionBuilder({
   };
 
   const removeOption = (questionId: string, optionIndex: number) => {
-    const q = questions.find(q => q.id === questionId);
+    const q = questions.find((q) => q.id === questionId);
     if (!q || !q.options) return;
     updateQuestion(questionId, { options: q.options.filter((_, i) => i !== optionIndex) });
   };
 
   const getTypeIcon = (type: string) => {
-    const t = questionTypes.find(qt => qt.value === type);
+    const t = questionTypes.find((qt) => qt.value === type);
     return t ? <t.icon className="h-4 w-4" /> : <Type className="h-4 w-4" />;
   };
 
@@ -754,7 +902,9 @@ function QuestionBuilder({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground">Questions</label>
-        <span className="text-xs text-muted-foreground">{questions.length} question{questions.length !== 1 ? "s" : ""}</span>
+        <span className="text-xs text-muted-foreground">
+          {questions.length} question{questions.length !== 1 ? "s" : ""}
+        </span>
       </div>
 
       {questions.length === 0 ? (
@@ -773,7 +923,7 @@ function QuestionBuilder({
               key={q.id}
               className={cn(
                 "rounded-lg border border-border bg-card p-3",
-                "transition-all duration-200 hover:border-border"
+                "transition-all duration-200 hover:border-border",
               )}
             >
               <div className="flex items-start gap-2">
@@ -784,7 +934,7 @@ function QuestionBuilder({
                     disabled={index === 0}
                     className={cn(
                       "p-0.5 rounded hover:bg-muted transition-colors",
-                      index === 0 && "opacity-30 cursor-not-allowed"
+                      index === 0 && "opacity-30 cursor-not-allowed",
                     )}
                     aria-label="Move question up"
                   >
@@ -796,7 +946,7 @@ function QuestionBuilder({
                     disabled={index === questions.length - 1}
                     className={cn(
                       "p-0.5 rounded hover:bg-muted transition-colors",
-                      index === questions.length - 1 && "opacity-30 cursor-not-allowed"
+                      index === questions.length - 1 && "opacity-30 cursor-not-allowed",
                     )}
                     aria-label="Move question down"
                   >
@@ -816,7 +966,10 @@ function QuestionBuilder({
                       value={q.type}
                       onValueChange={(value) => {
                         if (!isQuestionType(value)) return;
-                        updateQuestion(q.id, { type: value, options: value === "select" ? ["Option 1"] : undefined });
+                        updateQuestion(q.id, {
+                          type: value,
+                          options: value === "select" ? ["Option 1"] : undefined,
+                        });
                       }}
                     >
                       <SelectTrigger className="w-[140px]">
@@ -840,7 +993,9 @@ function QuestionBuilder({
 
                   {q.type === "select" && (
                     <div className="pl-4 border-l-2 border-border space-y-1.5">
-                      <div className="text-xs text-muted-foreground font-medium">Dropdown options:</div>
+                      <div className="text-xs text-muted-foreground font-medium">
+                        Dropdown options:
+                      </div>
                       {(q.options || []).map((opt, optIdx) => (
                         <div key={optIdx} className="flex items-center gap-1.5">
                           <span className="text-xs text-muted-foreground w-4">{optIdx + 1}.</span>
@@ -915,7 +1070,7 @@ function FormSettings({
   onChange,
   siteClasses,
   siteClassesLoading = false,
-  siteClassesError = null
+  siteClassesError = null,
 }: {
   form: FormTemplateInput;
   onChange: (updates: Partial<FormTemplateInput>) => void;
@@ -942,7 +1097,9 @@ function FormSettings({
             />
             <div>
               <div className="font-medium text-sm text-foreground">Manual only</div>
-              <div className="text-xs text-muted-foreground">Only attach when you manually select it</div>
+              <div className="text-xs text-muted-foreground">
+                Only attach when you manually select it
+              </div>
             </div>
           </label>
           <label className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
@@ -955,7 +1112,9 @@ function FormSettings({
             />
             <div>
               <div className="font-medium text-sm text-foreground">All bookings</div>
-              <div className="text-xs text-muted-foreground">Automatically attach to every booking</div>
+              <div className="text-xs text-muted-foreground">
+                Automatically attach to every booking
+              </div>
             </div>
           </label>
           <label className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
@@ -968,7 +1127,9 @@ function FormSettings({
             />
             <div className="flex-1">
               <div className="font-medium text-sm text-foreground">Specific site types</div>
-              <div className="text-xs text-muted-foreground">Only for selected accommodation types</div>
+              <div className="text-xs text-muted-foreground">
+                Only for selected accommodation types
+              </div>
             </div>
           </label>
         </div>
@@ -980,9 +1141,13 @@ function FormSettings({
             {siteClassesLoading ? (
               <div className="text-xs text-muted-foreground">Loading site classes...</div>
             ) : siteClassesError ? (
-              <div className="text-xs text-status-error">Error loading site classes: {String(siteClassesError)}</div>
+              <div className="text-xs text-status-error">
+                Error loading site classes: {String(siteClassesError)}
+              </div>
             ) : siteClasses.length === 0 ? (
-              <div className="text-xs text-muted-foreground">No site types found. Create site classes first.</div>
+              <div className="text-xs text-muted-foreground">
+                No site types found. Create site classes first.
+              </div>
             ) : (
               <div className="grid gap-1.5">
                 {siteClasses.map((sc) => (
@@ -993,7 +1158,9 @@ function FormSettings({
                         if (checked) {
                           onChange({ siteClassIds: [...form.siteClassIds, sc.id] });
                         } else {
-                          onChange({ siteClassIds: form.siteClassIds.filter(id => id !== sc.id) });
+                          onChange({
+                            siteClassIds: form.siteClassIds.filter((id) => id !== sc.id),
+                          });
                         }
                       }}
                     />
@@ -1014,14 +1181,17 @@ function FormSettings({
         </div>
         <div className="grid gap-2">
           {showAtOptions.map((option) => (
-            <label key={option.value} className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
+            <label
+              key={option.value}
+              className="flex items-start gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors"
+            >
               <Checkbox
                 checked={form.showAt.includes(option.value)}
                 onCheckedChange={(checked) => {
                   if (checked) {
                     onChange({ showAt: [...form.showAt, option.value] });
                   } else {
-                    onChange({ showAt: form.showAt.filter(v => v !== option.value) });
+                    onChange({ showAt: form.showAt.filter((v) => v !== option.value) });
                   }
                 }}
               />
@@ -1058,7 +1228,9 @@ function FormSettings({
             <div className="flex items-center justify-between pt-2 border-t border-border">
               <div>
                 <div className="text-sm font-medium text-foreground">Allow skip with note</div>
-                <div className="text-xs text-muted-foreground">Guest can skip but must provide reason</div>
+                <div className="text-xs text-muted-foreground">
+                  Guest can skip but must provide reason
+                </div>
               </div>
               <Switch
                 checked={form.allowSkipWithNote}
@@ -1110,7 +1282,9 @@ function FormSettings({
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-medium text-foreground">Send email reminder</div>
-              <div className="text-xs text-muted-foreground">Remind guests to complete before arrival</div>
+              <div className="text-xs text-muted-foreground">
+                Remind guests to complete before arrival
+              </div>
             </div>
             <Switch
               checked={form.sendReminder}
@@ -1152,7 +1326,9 @@ function FormSettings({
         <div className="space-y-3 p-3 rounded-lg border border-border">
           {form.displayConditions.length === 0 ? (
             <div className="text-center py-4">
-              <div className="text-sm text-muted-foreground mb-2">No conditions set - form shows for all bookings</div>
+              <div className="text-sm text-muted-foreground mb-2">
+                No conditions set - form shows for all bookings
+              </div>
               <Button
                 type="button"
                 variant="outline"
@@ -1162,7 +1338,7 @@ function FormSettings({
                     id: generateId(),
                     field: "pets",
                     operator: "greater_than",
-                    value: 0
+                    value: 0,
                   };
                   onChange({ displayConditions: [...form.displayConditions, newCondition] });
                 }}
@@ -1199,12 +1375,15 @@ function FormSettings({
               {/* Condition List */}
               <div className="space-y-2">
                 {form.displayConditions.map((condition, index) => {
-                  const fieldConfig = conditionFields.find(f => f.value === condition.field);
+                  const fieldConfig = conditionFields.find((f) => f.value === condition.field);
                   const operatorType: ConditionFieldType = fieldConfig?.type ?? "text";
                   const operators = conditionOperators[operatorType] ?? conditionOperators.text;
 
                   return (
-                    <div key={condition.id} className="flex items-center gap-2 p-2 rounded bg-muted">
+                    <div
+                      key={condition.id}
+                      className="flex items-center gap-2 p-2 rounded bg-muted"
+                    >
                       {/* Field Select */}
                       <Select
                         value={condition.field}
@@ -1217,7 +1396,7 @@ function FormSettings({
                             ...condition,
                             field: value,
                             operator: nextFieldType === "number" ? "greater_than" : "equals",
-                            value: nextFieldType === "number" ? 0 : ""
+                            value: nextFieldType === "number" ? 0 : "",
                           };
                           onChange({ displayConditions: updated });
                         }}
@@ -1226,8 +1405,10 @@ function FormSettings({
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          {conditionFields.map(f => (
-                            <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
+                          {conditionFields.map((f) => (
+                            <SelectItem key={f.value} value={f.value}>
+                              {f.label}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -1247,7 +1428,9 @@ function FormSettings({
                         </SelectTrigger>
                         <SelectContent>
                           {operators.map((op: { value: string; label: string }) => (
-                            <SelectItem key={op.value} value={op.value}>{op.label}</SelectItem>
+                            <SelectItem key={op.value} value={op.value}>
+                              {op.label}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -1278,8 +1461,10 @@ function FormSettings({
                             <SelectValue placeholder="Select..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {fieldConfig.options?.map(opt => (
-                              <SelectItem key={opt} value={opt} className="capitalize">{opt}</SelectItem>
+                            {fieldConfig.options?.map((opt) => (
+                              <SelectItem key={opt} value={opt} className="capitalize">
+                                {opt}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -1297,8 +1482,10 @@ function FormSettings({
                             <SelectValue placeholder="Select..." />
                           </SelectTrigger>
                           <SelectContent>
-                            {siteClasses.map(sc => (
-                              <SelectItem key={sc.id} value={sc.id}>{sc.name}</SelectItem>
+                            {siteClasses.map((sc) => (
+                              <SelectItem key={sc.id} value={sc.id}>
+                                {sc.name}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -1325,7 +1512,7 @@ function FormSettings({
                         className="h-8 w-8 p-0 text-muted-foreground hover:text-status-error"
                         onClick={() => {
                           onChange({
-                            displayConditions: form.displayConditions.filter((_, i) => i !== index)
+                            displayConditions: form.displayConditions.filter((_, i) => i !== index),
                           });
                         }}
                       >
@@ -1347,7 +1534,7 @@ function FormSettings({
                     id: generateId(),
                     field: "pets",
                     operator: "greater_than",
-                    value: 0
+                    value: 0,
                   };
                   onChange({ displayConditions: [...form.displayConditions, newCondition] });
                 }}
@@ -1369,12 +1556,14 @@ function FormSettings({
               className="text-xs"
               onClick={() => {
                 onChange({
-                  displayConditions: [{
-                    id: generateId(),
-                    field: "pets",
-                    operator: "greater_than",
-                    value: 0
-                  }]
+                  displayConditions: [
+                    {
+                      id: generateId(),
+                      field: "pets",
+                      operator: "greater_than",
+                      value: 0,
+                    },
+                  ],
                 });
               }}
             >
@@ -1388,12 +1577,14 @@ function FormSettings({
               className="text-xs"
               onClick={() => {
                 onChange({
-                  displayConditions: [{
-                    id: generateId(),
-                    field: "rigType",
-                    operator: "equals",
-                    value: "rv"
-                  }]
+                  displayConditions: [
+                    {
+                      id: generateId(),
+                      field: "rigType",
+                      operator: "equals",
+                      value: "rv",
+                    },
+                  ],
                 });
               }}
             >
@@ -1407,12 +1598,14 @@ function FormSettings({
               className="text-xs"
               onClick={() => {
                 onChange({
-                  displayConditions: [{
-                    id: generateId(),
-                    field: "stayLength",
-                    operator: "greater_than",
-                    value: 7
-                  }]
+                  displayConditions: [
+                    {
+                      id: generateId(),
+                      field: "stayLength",
+                      operator: "greater_than",
+                      value: 7,
+                    },
+                  ],
                 });
               }}
             >
@@ -1430,7 +1623,7 @@ function FormSettings({
 function ManualAttach({
   templates,
   campgroundId,
-  onAttach
+  onAttach,
 }: {
   templates: TemplateListItem[];
   campgroundId: string;
@@ -1456,18 +1649,20 @@ function ManualAttach({
   });
 
   const reservationResults = (reservationsQuery.data || [])
-    .filter((r) =>
-      r.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.guest?.primaryFirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      r.guest?.primaryLastName?.toLowerCase().includes(searchQuery.toLowerCase())
+    .filter(
+      (r) =>
+        r.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.guest?.primaryFirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        r.guest?.primaryLastName?.toLowerCase().includes(searchQuery.toLowerCase()),
     )
     .slice(0, 10);
 
   const guestResults = (guestsQuery.data || [])
-    .filter((g) =>
-      g.primaryFirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.primaryLastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      g.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    .filter(
+      (g) =>
+        g.primaryFirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        g.primaryLastName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        g.email?.toLowerCase().includes(searchQuery.toLowerCase()),
     )
     .slice(0, 10);
 
@@ -1509,7 +1704,11 @@ function ManualAttach({
               type="button"
               size="sm"
               variant={searchType === "reservation" ? "default" : "outline"}
-              onClick={() => { setSearchType("reservation"); setSearchQuery(""); setSelectedId(""); }}
+              onClick={() => {
+                setSearchType("reservation");
+                setSearchQuery("");
+                setSelectedId("");
+              }}
               className="flex-1"
             >
               <Calendar className="h-4 w-4 mr-1" />
@@ -1519,7 +1718,11 @@ function ManualAttach({
               type="button"
               size="sm"
               variant={searchType === "guest" ? "default" : "outline"}
-              onClick={() => { setSearchType("guest"); setSearchQuery(""); setSelectedId(""); }}
+              onClick={() => {
+                setSearchType("guest");
+                setSearchQuery("");
+                setSelectedId("");
+              }}
               className="flex-1"
             >
               <Users className="h-4 w-4 mr-1" />
@@ -1539,7 +1742,11 @@ function ManualAttach({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={searchType === "reservation" ? "Search by confirmation # or guest name..." : "Search by name or email..."}
+            placeholder={
+              searchType === "reservation"
+                ? "Search by confirmation # or guest name..."
+                : "Search by name or email..."
+            }
             className="pl-10"
           />
         </div>
@@ -1557,7 +1764,7 @@ function ManualAttach({
                   onClick={() => setSelectedId(item.id)}
                   className={cn(
                     "w-full p-3 text-left hover:bg-muted transition-colors",
-                    selectedId === item.id && "bg-status-success/15"
+                    selectedId === item.id && "bg-status-success/15",
                   )}
                 >
                   <div>
@@ -1565,7 +1772,8 @@ function ManualAttach({
                       #{item.id} - {item.guest?.primaryFirstName} {item.guest?.primaryLastName}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(item.arrivalDate).toLocaleDateString()} - {new Date(item.departureDate).toLocaleDateString()}
+                      {new Date(item.arrivalDate).toLocaleDateString()} -{" "}
+                      {new Date(item.departureDate).toLocaleDateString()}
                     </div>
                   </div>
                 </button>
@@ -1578,7 +1786,7 @@ function ManualAttach({
                   onClick={() => setSelectedId(item.id)}
                   className={cn(
                     "w-full p-3 text-left hover:bg-muted transition-colors",
-                    selectedId === item.id && "bg-status-success/15"
+                    selectedId === item.id && "bg-status-success/15",
                   )}
                 >
                   <div>
@@ -1601,7 +1809,7 @@ function ManualAttach({
             onAttach(
               selectedTemplate,
               searchType === "reservation" ? selectedId : undefined,
-              searchType === "guest" ? selectedId : undefined
+              searchType === "guest" ? selectedId : undefined,
             );
             setSelectedTemplate("");
             setSearchQuery("");
@@ -1640,7 +1848,15 @@ function FormCardSkeleton() {
 }
 
 // Celebration modal
-function FirstFormCelebration({ open, onClose, formName }: { open: boolean; onClose: () => void; formName: string; }) {
+function FirstFormCelebration({
+  open,
+  onClose,
+  formName,
+}: {
+  open: boolean;
+  onClose: () => void;
+  formName: string;
+}) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
@@ -1652,14 +1868,24 @@ function FirstFormCelebration({ open, onClose, formName }: { open: boolean; onCl
         <p className="text-muted-foreground mb-6">
           <span className="font-medium text-status-success">{formName}</span> is now available.
         </p>
-        <Button onClick={onClose} className="bg-status-success hover:bg-status-success/90">Got it!</Button>
+        <Button onClick={onClose} className="bg-status-success hover:bg-status-success/90">
+          Got it!
+        </Button>
       </div>
     </div>
   );
 }
 
 // Form preview modal
-function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => void; form: TemplateListItem | null; }) {
+function FormPreview({
+  open,
+  onClose,
+  form,
+}: {
+  open: boolean;
+  onClose: () => void;
+  form: TemplateListItem | null;
+}) {
   if (!form) return null;
   const questions = fieldsToQuestions(form.fields);
   return (
@@ -1674,7 +1900,9 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
         <div className="border rounded-lg p-4 bg-muted space-y-4">
           <div className="text-center pb-3 border-b">
             <h3 className="font-semibold">{form.title}</h3>
-            {form.description && <p className="text-sm text-muted-foreground mt-1">{form.description}</p>}
+            {form.description && (
+              <p className="text-sm text-muted-foreground mt-1">{form.description}</p>
+            )}
           </div>
           {questions.length === 0 ? (
             <div className="text-center py-6 text-muted-foreground text-sm">No questions</div>
@@ -1693,19 +1921,31 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
                 ) : q.type === "select" ? (
                   <select disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card">
                     <option>Select...</option>
-                    {q.options?.map((opt: string) => <option key={opt}>{opt}</option>)}
+                    {q.options?.map((opt: string) => (
+                      <option key={opt}>{opt}</option>
+                    ))}
                   </select>
                 ) : q.type === "textarea" ? (
-                  <textarea disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card" rows={2} />
+                  <textarea
+                    disabled
+                    className="w-full px-3 py-2 text-sm border rounded-md bg-card"
+                    rows={2}
+                  />
                 ) : (
-                  <input type="text" disabled className="w-full px-3 py-2 text-sm border rounded-md bg-card" />
+                  <input
+                    type="text"
+                    disabled
+                    className="w-full px-3 py-2 text-sm border rounded-md bg-card"
+                  />
                 )}
               </div>
             ))
           )}
         </div>
         <div className="flex justify-end">
-          <Button variant="outline" onClick={() => onClose()}>Close</Button>
+          <Button variant="outline" onClick={() => onClose()}>
+            Close
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -1715,7 +1955,7 @@ function FormPreview({ open, onClose, form }: { open: boolean; onClose: () => vo
 // Empty state
 function EmptyFormsState({
   onCreateClick,
-  onTemplateClick
+  onTemplateClick,
 }: {
   onCreateClick: () => void;
   onTemplateClick: (t: StarterTemplate) => void;
@@ -1760,13 +2000,13 @@ function EmptyFormsState({
 // Convert questions to fields
 function questionsToFields(questions: Question[]): FormFields {
   return {
-    questions: questions.map(q => {
+    questions: questions.map((q) => {
       const base: FormFieldQuestion = { label: q.label, type: q.type, required: q.required };
       if (q.type === "select" && q.options) {
         return { ...base, options: q.options };
       }
       return base;
-    })
+    }),
   };
 }
 
@@ -1778,7 +2018,7 @@ function fieldsToQuestions(fields: FormFields | null | undefined): Question[] {
     label: q.label || "",
     type: isQuestionType(q.type) ? q.type : "text",
     required: q.required ?? false,
-    ...(q.options ? { options: q.options } : {})
+    ...(q.options ? { options: q.options } : {}),
   }));
 }
 
@@ -1805,7 +2045,8 @@ export default function FormsPage() {
   const [isFirstForm, setIsFirstForm] = useState(false);
 
   useEffect(() => {
-    const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const cg =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     setCampgroundId(cg);
   }, []);
 
@@ -1850,7 +2091,7 @@ export default function FormsPage() {
         id: generateId(),
         field: condition.field,
         operator: condition.operator,
-        value: condition.value
+        value: condition.value,
       })),
       conditionLogic: formTemplate.conditionLogic,
       updatedAt: formTemplate.updatedAt,
@@ -1889,8 +2130,8 @@ export default function FormsPage() {
         };
       });
 
-    return [...forms, ...policies].sort((a, b) =>
-      new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime()
+    return [...forms, ...policies].sort(
+      (a, b) => new Date(b.updatedAt ?? 0).getTime() - new Date(a.updatedAt ?? 0).getTime(),
     );
   }, [formTemplatesQuery.data, policyTemplatesQuery.data]);
 
@@ -1912,7 +2153,7 @@ export default function FormsPage() {
 
         if (editingId) {
           // Check if we're editing a policy or converting a form to a policy
-          const existingTemplate = allTemplates.find(t => t.id === editingId);
+          const existingTemplate = allTemplates.find((t) => t.id === editingId);
           if (existingTemplate?._backend === "policy") {
             return apiClient.updatePolicyTemplate(editingId, policyPayload, campgroundId!);
           }
@@ -1938,17 +2179,17 @@ export default function FormsPage() {
           validityDays: form.validityDays ?? undefined,
           sendReminder: form.sendReminder,
           reminderDaysBefore: form.reminderDaysBefore ?? undefined,
-          displayConditions: form.displayConditions.map(c => ({
+          displayConditions: form.displayConditions.map((c) => ({
             field: c.field,
             operator: c.operator,
-            value: c.value
+            value: c.value,
           })),
           conditionLogic: form.conditionLogic,
         };
 
         if (editingId) {
           // Check if we're editing a form or converting a policy to a form
-          const existingTemplate = allTemplates.find(t => t.id === editingId);
+          const existingTemplate = allTemplates.find((t) => t.id === editingId);
           if (existingTemplate?._backend === "form") {
             return apiClient.updateFormTemplate(editingId, payload);
           }
@@ -1993,7 +2234,7 @@ export default function FormsPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => {
       // Find the template to determine which backend to use
-      const template = allTemplates.find(t => t.id === id);
+      const template = allTemplates.find((t) => t.id === id);
       if (template?._backend === "policy") {
         return apiClient.deletePolicyTemplate(id, campgroundId!);
       }
@@ -2013,19 +2254,27 @@ export default function FormsPage() {
   });
 
   const attachMutation = useMutation({
-    mutationFn: ({ templateId, reservationId, guestId }: { templateId: string; reservationId?: string; guestId?: string }) => {
+    mutationFn: ({
+      templateId,
+      reservationId,
+      guestId,
+    }: {
+      templateId: string;
+      reservationId?: string;
+      guestId?: string;
+    }) => {
       return apiClient.createFormSubmission({
         formTemplateId: templateId,
         reservationId,
         guestId,
-        responses: {}
+        responses: {},
       });
     },
     onSuccess: () => {
       toast({ title: "Form attached", description: "The form has been linked successfully." });
     },
     onError: (error: unknown) =>
-      toast({ title: getErrorMessage(error, "Failed to attach form"), variant: "destructive" })
+      toast({ title: getErrorMessage(error, "Failed to attach form"), variant: "destructive" }),
   });
 
   const openCreate = () => {
@@ -2042,7 +2291,7 @@ export default function FormsPage() {
       title: template.name,
       type: template.type,
       description: template.description,
-      questions: template.questions.map(q => ({ ...q, id: generateId() })),
+      questions: template.questions.map((q) => ({ ...q, id: generateId() })),
       autoAttachMode: template.autoAttachMode,
       showAt: template.showAt,
     });
@@ -2089,21 +2338,36 @@ export default function FormsPage() {
   // Helper to get auto-attach badge
   const getAutoAttachBadge = (template: TemplateListItem) => {
     if (template.autoAttachMode === "all_bookings") {
-      return <Badge className="bg-status-warning/15 text-status-warning border-status-warning/30 hover:bg-status-warning/15">All bookings</Badge>;
+      return (
+        <Badge className="bg-status-warning/15 text-status-warning border-status-warning/30 hover:bg-status-warning/15">
+          All bookings
+        </Badge>
+      );
     }
     const siteClassIds = template.siteClassIds ?? [];
     if (template.autoAttachMode === "site_classes" && siteClassIds.length > 0) {
-      return <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">{siteClassIds.length} site types</Badge>;
+      return (
+        <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">
+          {siteClassIds.length} site types
+        </Badge>
+      );
     }
     return <Badge variant="secondary">Manual</Badge>;
   };
 
   return (
     <DashboardShell>
-      <FirstFormCelebration open={showCelebration} onClose={() => setShowCelebration(false)} formName={celebrationName} />
+      <FirstFormCelebration
+        open={showCelebration}
+        onClose={() => setShowCelebration(false)}
+        formName={celebrationName}
+      />
       <FormPreview open={!!previewForm} onClose={() => setPreviewForm(null)} form={previewForm} />
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -2111,7 +2375,8 @@ export default function FormsPage() {
               Delete Form Template?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete <span className="font-medium text-foreground">{formToDelete?.title}</span>?
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-foreground">{formToDelete?.title}</span>?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -2155,104 +2420,139 @@ export default function FormsPage() {
 
           {/* Forms List Card */}
           <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-status-success/15 text-status-success">
-                  <FileText className="h-4 w-4" />
-                </span>
-                Forms & Documents
-              </CardTitle>
-              <CardDescription>Create forms, legal documents, and configure auto-attach rules.</CardDescription>
-            </div>
-            {campgroundId && !isLoading && allTemplates.length > 0 && (
-              <Button onClick={openCreate} className="bg-status-success hover:bg-status-success/90">
-                <Plus className="h-4 w-4 mr-2" />
-                New form
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!campgroundId && (
-              <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 p-4 text-sm text-status-warning flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5" />
-                <span>Select a campground from the sidebar to manage forms.</span>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-status-success/15 text-status-success">
+                    <FileText className="h-4 w-4" />
+                  </span>
+                  Forms & Documents
+                </CardTitle>
+                <CardDescription>
+                  Create forms, legal documents, and configure auto-attach rules.
+                </CardDescription>
               </div>
-            )}
+              {campgroundId && !isLoading && allTemplates.length > 0 && (
+                <Button
+                  onClick={openCreate}
+                  className="bg-status-success hover:bg-status-success/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  New form
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {!campgroundId && (
+                <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 p-4 text-sm text-status-warning flex items-center gap-3">
+                  <AlertTriangle className="h-5 w-5" />
+                  <span>Select a campground from the sidebar to manage forms.</span>
+                </div>
+              )}
 
-            {isLoading && (
-              <div className="space-y-3">
-                <FormCardSkeleton />
-                <FormCardSkeleton />
-              </div>
-            )}
+              {isLoading && (
+                <div className="space-y-3">
+                  <FormCardSkeleton />
+                  <FormCardSkeleton />
+                </div>
+              )}
 
-            {campgroundId && !isLoading && allTemplates.length === 0 && (
-              <EmptyFormsState onCreateClick={openCreate} onTemplateClick={openFromTemplate} />
-            )}
+              {campgroundId && !isLoading && allTemplates.length === 0 && (
+                <EmptyFormsState onCreateClick={openCreate} onTemplateClick={openFromTemplate} />
+              )}
 
-            {allTemplates.length > 0 && (
-              <div className="grid gap-3">
-                {allTemplates.map((t) => {
-                  const updatedAt = t.updatedAt ? new Date(t.updatedAt) : null;
-                  return (
-                  <div
-                    key={t.id}
-                    className={cn(
-                      "rounded-lg border border-border bg-card p-4",
-                      "transition-all duration-200 hover:shadow-md hover:border-border"
-                    )}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1.5">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-semibold text-foreground">{t.title}</span>
-                          <Badge variant="secondary" className="uppercase flex items-center gap-1">
-                            {typeIcons[t.type] || <FileText className="h-4 w-4" />}
-                            {typeConfig[t.type]?.label || t.type}
-                          </Badge>
-                          {/* Show category badge for legal documents */}
-                          {isLegalDocumentType(t.type) && (
-                            <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">Legal</Badge>
-                          )}
-                          {getAutoAttachBadge(t)}
-                          <Badge variant={t.isActive ? "default" : "secondary"} className={t.isActive ? "bg-status-success/15 text-status-success border-status-success/30" : ""}>
-                            {t.isActive ? "Active" : "Inactive"}
-                          </Badge>
-                        </div>
-                        {t.description && <div className="text-sm text-muted-foreground">{t.description}</div>}
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <span>{t.fields?.questions?.length || 0} questions</span>
-                          {isLegalDocumentType(t.type) && t.documentContent && (
-                            <>
+              {allTemplates.length > 0 && (
+                <div className="grid gap-3">
+                  {allTemplates.map((t) => {
+                    const updatedAt = t.updatedAt ? new Date(t.updatedAt) : null;
+                    return (
+                      <div
+                        key={t.id}
+                        className={cn(
+                          "rounded-lg border border-border bg-card p-4",
+                          "transition-all duration-200 hover:shadow-md hover:border-border",
+                        )}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-semibold text-foreground">
+                                {t.title}
+                              </span>
+                              <Badge
+                                variant="secondary"
+                                className="uppercase flex items-center gap-1"
+                              >
+                                {typeIcons[t.type] || <FileText className="h-4 w-4" />}
+                                {typeConfig[t.type]?.label || t.type}
+                              </Badge>
+                              {/* Show category badge for legal documents */}
+                              {isLegalDocumentType(t.type) && (
+                                <Badge className="bg-status-info/15 text-status-info border-status-info/30 hover:bg-status-info/15">
+                                  Legal
+                                </Badge>
+                              )}
+                              {getAutoAttachBadge(t)}
+                              <Badge
+                                variant={t.isActive ? "default" : "secondary"}
+                                className={
+                                  t.isActive
+                                    ? "bg-status-success/15 text-status-success border-status-success/30"
+                                    : ""
+                                }
+                              >
+                                {t.isActive ? "Active" : "Inactive"}
+                              </Badge>
+                            </div>
+                            {t.description && (
+                              <div className="text-sm text-muted-foreground">{t.description}</div>
+                            )}
+                            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <span>{t.fields?.questions?.length || 0} questions</span>
+                              {isLegalDocumentType(t.type) && t.documentContent && (
+                                <>
+                                  <span>•</span>
+                                  <span>
+                                    {t.documentContent.length > 100 ? "Has document content" : ""}
+                                  </span>
+                                </>
+                              )}
                               <span>•</span>
-                              <span>{t.documentContent.length > 100 ? 'Has document content' : ''}</span>
-                            </>
-                          )}
-                          <span>•</span>
-                          <span>Updated {updatedAt ? updatedAt.toLocaleDateString() : "—"}</span>
+                              <span>
+                                Updated {updatedAt ? updatedAt.toLocaleDateString() : "—"}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setPreviewForm(t)}
+                              aria-label="Preview"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => openEdit(t.id)}>
+                              <Edit3 className="h-4 w-4 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeleteConfirmId(t.id)}
+                              className="text-muted-foreground hover:text-status-error hover:bg-status-error/15"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" variant="ghost" onClick={() => setPreviewForm(t)} aria-label="Preview">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => openEdit(t.id)}>
-                          <Edit3 className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => setDeleteConfirmId(t.id)} className="text-muted-foreground hover:text-status-error hover:bg-status-error/15">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Manual Attach Card */}
           {allTemplates.length > 0 && campgroundId && (
@@ -2285,7 +2585,9 @@ export default function FormsPage() {
               {editingId ? "Edit form" : "New form"}
             </DialogTitle>
             <DialogDescription>
-              {editingId ? "Update your form and settings" : "Create a form to collect guest information"}
+              {editingId
+                ? "Update your form and settings"
+                : "Create a form to collect guest information"}
             </DialogDescription>
           </DialogHeader>
 
@@ -2313,66 +2615,84 @@ export default function FormsPage() {
               <TabsContent value="questions" className="mt-0 space-y-5">
                 {!editingId && (
                   <div className="space-y-3">
-                    <label className="text-sm font-medium text-foreground">Start with a template</label>
+                    <label className="text-sm font-medium text-foreground">
+                      Start with a template
+                    </label>
                     {/* Data Collection Templates */}
                     <div>
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Data Collection</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                        Data Collection
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {starterTemplates.filter(t => t.category === "collection").map((t) => (
-                          <button
-                            key={t.name}
-                            type="button"
-                            onClick={() => setForm(f => ({
-                              ...f,
-                              title: t.name,
-                              type: t.type,
-                              description: t.description,
-                              questions: t.questions.map(q => ({ ...q, id: generateId() })),
-                              autoAttachMode: t.autoAttachMode,
-                              showAt: t.showAt,
-                              documentContent: "",
-                              enforcement: "post_booking",
-                            }))}
-                            className={cn(
-                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
-                              form.title === t.name ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-border bg-muted text-muted-foreground hover:border-status-success/30"
-                            )}
-                          >
-                            {t.icon}
-                            {t.name}
-                          </button>
-                        ))}
+                        {starterTemplates
+                          .filter((t) => t.category === "collection")
+                          .map((t) => (
+                            <button
+                              key={t.name}
+                              type="button"
+                              onClick={() =>
+                                setForm((f) => ({
+                                  ...f,
+                                  title: t.name,
+                                  type: t.type,
+                                  description: t.description,
+                                  questions: t.questions.map((q) => ({ ...q, id: generateId() })),
+                                  autoAttachMode: t.autoAttachMode,
+                                  showAt: t.showAt,
+                                  documentContent: "",
+                                  enforcement: "post_booking",
+                                }))
+                              }
+                              className={cn(
+                                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
+                                form.title === t.name
+                                  ? "border-status-success/30 bg-status-success/15 text-status-success"
+                                  : "border-border bg-muted text-muted-foreground hover:border-status-success/30",
+                              )}
+                            >
+                              {t.icon}
+                              {t.name}
+                            </button>
+                          ))}
                       </div>
                     </div>
                     {/* Legal Document Templates */}
                     <div>
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Legal Documents</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                        Legal Documents
+                      </div>
                       <div className="flex flex-wrap gap-2">
-                        {starterTemplates.filter(t => t.category === "legal").map((t) => (
-                          <button
-                            key={t.name}
-                            type="button"
-                            onClick={() => setForm(f => ({
-                              ...f,
-                              title: t.name,
-                              type: t.type,
-                              description: t.description,
-                              questions: t.questions.map(q => ({ ...q, id: generateId() })),
-                              autoAttachMode: t.autoAttachMode,
-                              showAt: t.showAt,
-                              documentContent: t.documentContent || "",
-                              enforcement: t.enforcement || "post_booking",
-                              requireSignature: true,
-                            }))}
-                            className={cn(
-                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
-                              form.title === t.name ? "border-blue-400 bg-blue-50 text-blue-700" : "border-border bg-muted text-muted-foreground hover:border-blue-300"
-                            )}
-                          >
-                            {t.icon}
-                            {t.name}
-                          </button>
-                        ))}
+                        {starterTemplates
+                          .filter((t) => t.category === "legal")
+                          .map((t) => (
+                            <button
+                              key={t.name}
+                              type="button"
+                              onClick={() =>
+                                setForm((f) => ({
+                                  ...f,
+                                  title: t.name,
+                                  type: t.type,
+                                  description: t.description,
+                                  questions: t.questions.map((q) => ({ ...q, id: generateId() })),
+                                  autoAttachMode: t.autoAttachMode,
+                                  showAt: t.showAt,
+                                  documentContent: t.documentContent || "",
+                                  enforcement: t.enforcement || "post_booking",
+                                  requireSignature: true,
+                                }))
+                              }
+                              className={cn(
+                                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border",
+                                form.title === t.name
+                                  ? "border-blue-400 bg-blue-50 text-blue-700"
+                                  : "border-border bg-muted text-muted-foreground hover:border-blue-300",
+                              )}
+                            >
+                              {t.icon}
+                              {t.name}
+                            </button>
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -2385,8 +2705,12 @@ export default function FormsPage() {
                     </label>
                     <Input
                       value={form.title}
-                      onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-                      placeholder={isLegalDocumentType(form.type) ? "e.g. Park Rules Agreement" : "e.g. Vehicle Registration"}
+                      onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                      placeholder={
+                        isLegalDocumentType(form.type)
+                          ? "e.g. Park Rules Agreement"
+                          : "e.g. Vehicle Registration"
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -2399,27 +2723,64 @@ export default function FormsPage() {
                         }
                       }}
                     >
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
-                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">Data Collection</div>
-                        <SelectItem value="vehicle"><span className="flex items-center gap-2"><Car className="h-4 w-4" /> Vehicle Info</span></SelectItem>
-                        <SelectItem value="intake"><span className="flex items-center gap-2"><ClipboardList className="h-4 w-4" /> Guest Intake</span></SelectItem>
-                        <SelectItem value="custom"><span className="flex items-center gap-2"><FileQuestion className="h-4 w-4" /> Custom Form</span></SelectItem>
-                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">Legal Documents</div>
-                        <SelectItem value="park_rules"><span className="flex items-center gap-2"><ScrollText className="h-4 w-4" /> Park Rules</span></SelectItem>
-                        <SelectItem value="liability_waiver"><span className="flex items-center gap-2"><Scale className="h-4 w-4" /> Liability Waiver</span></SelectItem>
-                        <SelectItem value="long_term_stay"><span className="flex items-center gap-2"><FileSignature className="h-4 w-4" /> Long-Term Stay</span></SelectItem>
-                        <SelectItem value="legal_agreement"><span className="flex items-center gap-2"><FileText className="h-4 w-4" /> Custom Legal</span></SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                          Data Collection
+                        </div>
+                        <SelectItem value="vehicle">
+                          <span className="flex items-center gap-2">
+                            <Car className="h-4 w-4" /> Vehicle Info
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="intake">
+                          <span className="flex items-center gap-2">
+                            <ClipboardList className="h-4 w-4" /> Guest Intake
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="custom">
+                          <span className="flex items-center gap-2">
+                            <FileQuestion className="h-4 w-4" /> Custom Form
+                          </span>
+                        </SelectItem>
+                        <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground border-t mt-1 pt-2">
+                          Legal Documents
+                        </div>
+                        <SelectItem value="park_rules">
+                          <span className="flex items-center gap-2">
+                            <ScrollText className="h-4 w-4" /> Park Rules
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="liability_waiver">
+                          <span className="flex items-center gap-2">
+                            <Scale className="h-4 w-4" /> Liability Waiver
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="long_term_stay">
+                          <span className="flex items-center gap-2">
+                            <FileSignature className="h-4 w-4" /> Long-Term Stay
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="legal_agreement">
+                          <span className="flex items-center gap-2">
+                            <FileText className="h-4 w-4" /> Custom Legal
+                          </span>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Description <span className="text-muted-foreground font-normal">(optional)</span></label>
+                  <label className="text-sm font-medium text-foreground">
+                    Description{" "}
+                    <span className="text-muted-foreground font-normal">(optional)</span>
+                  </label>
                   <Input
                     value={form.description}
-                    onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+                    onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                     placeholder="Brief description shown to guests"
                   />
                 </div>
@@ -2431,17 +2792,20 @@ export default function FormsPage() {
                       <label className="text-sm font-medium text-foreground">
                         Document Content
                       </label>
-                      <span className="text-xs text-muted-foreground">Supports Markdown formatting</span>
+                      <span className="text-xs text-muted-foreground">
+                        Supports Markdown formatting
+                      </span>
                     </div>
                     <Textarea
                       value={form.documentContent || ""}
-                      onChange={(e) => setForm(f => ({ ...f, documentContent: e.target.value }))}
+                      onChange={(e) => setForm((f) => ({ ...f, documentContent: e.target.value }))}
                       placeholder="Enter the full text of your legal document here. Use Markdown for formatting (# for headings, - for lists, etc.)"
                       rows={12}
                       className="font-mono text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
-                      This text will be displayed to guests before they sign. You can add acknowledgement questions below.
+                      This text will be displayed to guests before they sign. You can add
+                      acknowledgement questions below.
                     </p>
                   </div>
                 )}
@@ -2455,17 +2819,25 @@ export default function FormsPage() {
                     </div>
                     <div className="grid md:grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-status-info">When is signature required?</label>
+                        <label className="text-xs font-medium text-status-info">
+                          When is signature required?
+                        </label>
                         <Select
                           value={form.enforcement || "post_booking"}
-                          onValueChange={(v: EnforcementType) => setForm(f => ({ ...f, enforcement: v }))}
+                          onValueChange={(v: EnforcementType) =>
+                            setForm((f) => ({ ...f, enforcement: v }))
+                          }
                         >
                           <SelectTrigger className="bg-card">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="pre_booking">Before booking (blocks checkout)</SelectItem>
-                            <SelectItem value="post_booking">After booking (sent via email)</SelectItem>
+                            <SelectItem value="pre_booking">
+                              Before booking (blocks checkout)
+                            </SelectItem>
+                            <SelectItem value="post_booking">
+                              After booking (sent via email)
+                            </SelectItem>
                             <SelectItem value="pre_checkin">Before check-in</SelectItem>
                             <SelectItem value="none">Informational only (no signature)</SelectItem>
                           </SelectContent>
@@ -2474,7 +2846,9 @@ export default function FormsPage() {
                       <div className="flex items-center gap-2 pt-6">
                         <Switch
                           checked={form.requireSignature ?? true}
-                          onCheckedChange={(checked) => setForm(f => ({ ...f, requireSignature: checked }))}
+                          onCheckedChange={(checked) =>
+                            setForm((f) => ({ ...f, requireSignature: checked }))
+                          }
                           id="require-signature"
                         />
                         <label htmlFor="require-signature" className="text-xs text-status-info">
@@ -2487,14 +2861,14 @@ export default function FormsPage() {
 
                 <QuestionBuilder
                   questions={form.questions}
-                  onChange={(questions) => setForm(f => ({ ...f, questions }))}
+                  onChange={(questions) => setForm((f) => ({ ...f, questions }))}
                 />
               </TabsContent>
 
               <TabsContent value="settings" className="mt-0">
                 <FormSettings
                   form={form}
-                  onChange={(updates) => setForm(f => ({ ...f, ...updates }))}
+                  onChange={(updates) => setForm((f) => ({ ...f, ...updates }))}
                   siteClasses={siteClasses.map((sc) => ({ id: sc.id, name: sc.name }))}
                   siteClassesLoading={siteClassesQuery.isLoading}
                   siteClassesError={siteClassesError}
@@ -2505,17 +2879,35 @@ export default function FormsPage() {
 
           <div className="flex items-center justify-between pt-4 border-t">
             <div className="flex items-center gap-2">
-              <Switch checked={form.isActive} onCheckedChange={(checked) => setForm(f => ({ ...f, isActive: checked }))} id="form-active" />
-              <label htmlFor="form-active" className="text-sm text-foreground">Active</label>
+              <Switch
+                checked={form.isActive}
+                onCheckedChange={(checked) => setForm((f) => ({ ...f, isActive: checked }))}
+                id="form-active"
+              />
+              <label htmlFor="form-active" className="text-sm text-foreground">
+                Active
+              </label>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => { setIsModalOpen(false); setEditingId(null); }}>Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setEditingId(null);
+                }}
+              >
+                Cancel
+              </Button>
               <Button
                 onClick={() => upsertMutation.mutate()}
                 disabled={upsertMutation.isPending || !form.title}
                 className="bg-status-success text-white hover:bg-status-success/90"
               >
-                {upsertMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                {upsertMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                )}
                 {editingId ? "Save changes" : "Create form"}
               </Button>
             </div>

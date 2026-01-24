@@ -18,16 +18,17 @@ Local businesses can become your best marketing partners. They have customers lo
 
 ### Attraction Partnerships
 
-| Partner Type | Your Benefit | Their Benefit |
-|--------------|-------------|---------------|
-| Wineries/Breweries | Visitors need lodging | Designated drivers stay overnight |
-| Outdoor outfitters | Activity seekers stay | Place to recommend clients |
-| Restaurants | Dining options for guests | Steady customer flow |
-| Tour operators | Clients need accommodations | Packaged experiences |
+| Partner Type       | Your Benefit                | Their Benefit                     |
+| ------------------ | --------------------------- | --------------------------------- |
+| Wineries/Breweries | Visitors need lodging       | Designated drivers stay overnight |
+| Outdoor outfitters | Activity seekers stay       | Place to recommend clients        |
+| Restaurants        | Dining options for guests   | Steady customer flow              |
+| Tour operators     | Clients need accommodations | Packaged experiences              |
 
 ### Package Deals
 
 Create joint packages:
+
 - Stay + tour discount
 - Stay + dinner voucher
 - Stay + activity combo
@@ -74,4 +75,4 @@ Create joint packages:
 
 ---
 
-*Keepr includes partner discount codes that help you track which partnerships drive bookings. [Grow through partnerships at campreserv.com](https://campreserv.com)*
+_Keepr includes partner discount codes that help you track which partnerships drive bookings. [Grow through partnerships at campreserv.com](https://campreserv.com)_

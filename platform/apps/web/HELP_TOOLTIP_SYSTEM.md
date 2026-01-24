@@ -17,6 +17,7 @@ The help tooltip system consists of three main components:
 A lightweight tooltip component that displays contextual help information.
 
 **Features:**
+
 - Mobile-friendly (tap to show, tap outside to dismiss)
 - Desktop hover support
 - Customizable positioning (top, right, bottom, left)
@@ -60,7 +61,7 @@ import {
   HelpTooltipContent,
   HelpTooltipSection,
   HelpTooltipList,
-  HelpTooltipLink
+  HelpTooltipLink,
 } from "@/components/help/HelpTooltip";
 
 <HelpTooltip
@@ -72,42 +73,43 @@ import {
       </HelpTooltipSection>
 
       <HelpTooltipSection title="Stacking Modes">
-        <HelpTooltipList items={[
-          "Additive: Add adjustments together",
-          "Max: Use the highest adjustment",
-          "Override: Replace all other rules"
-        ]} />
+        <HelpTooltipList
+          items={[
+            "Additive: Add adjustments together",
+            "Max: Use the highest adjustment",
+            "Override: Replace all other rules",
+          ]}
+        />
       </HelpTooltipSection>
 
       <HelpTooltipSection>
-        <HelpTooltipLink href="/help/pricing-rules">
-          Learn more about pricing rules
-        </HelpTooltipLink>
+        <HelpTooltipLink href="/help/pricing-rules">Learn more about pricing rules</HelpTooltipLink>
       </HelpTooltipSection>
     </HelpTooltipContent>
   }
   side="right"
   maxWidth={360}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `content` | `ReactNode` | - | Tooltip content (required) |
-| `title` | `string` | - | Optional tooltip title |
-| `side` | `"top" \| "right" \| "bottom" \| "left"` | `"top"` | Tooltip position |
-| `align` | `"start" \| "center" \| "end"` | `"center"` | Tooltip alignment |
-| `maxWidth` | `number` | `320` | Maximum width in pixels |
-| `variant` | `"icon" \| "inline"` | `"icon"` | Display variant |
-| `className` | `string` | `""` | Additional CSS classes |
+| Prop        | Type                                     | Default    | Description                |
+| ----------- | ---------------------------------------- | ---------- | -------------------------- |
+| `content`   | `ReactNode`                              | -          | Tooltip content (required) |
+| `title`     | `string`                                 | -          | Optional tooltip title     |
+| `side`      | `"top" \| "right" \| "bottom" \| "left"` | `"top"`    | Tooltip position           |
+| `align`     | `"start" \| "center" \| "end"`           | `"center"` | Tooltip alignment          |
+| `maxWidth`  | `number`                                 | `320`      | Maximum width in pixels    |
+| `variant`   | `"icon" \| "inline"`                     | `"icon"`   | Display variant            |
+| `className` | `string`                                 | `""`       | Additional CSS classes     |
 
 ### OnboardingHint
 
 Contextual hints that appear on first visit to help onboard new users.
 
 **Features:**
+
 - Shows only on first visit (stored in localStorage)
 - Dismissible with "Got it!" button
 - Optional action buttons
@@ -124,15 +126,11 @@ import { OnboardingHint } from "@/components/help/OnboardingHint";
   <OnboardingHint
     id="calendar-drag-feature"
     title="Drag to Book"
-    content={
-      <div>
-        Click and drag across empty cells to quickly create a reservation.
-      </div>
-    }
+    content={<div>Click and drag across empty cells to quickly create a reservation.</div>}
     placement="bottom"
   />
   <div>Your calendar grid here</div>
-</div>
+</div>;
 ```
 
 **Page-Level Hint:**
@@ -157,24 +155,24 @@ import { PageOnboardingHint } from "@/components/help/OnboardingHint";
     {
       label: "Take a tour",
       onClick: () => startTour(),
-      variant: "ghost"
-    }
+      variant: "ghost",
+    },
   ]}
-/>
+/>;
 ```
 
 **Props:**
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `id` | `string` | - | Unique identifier (required) |
-| `title` | `string` | - | Hint title (required) |
-| `content` | `ReactNode` | - | Hint content (required) |
-| `placement` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"` | Hint position (OnboardingHint only) |
-| `showOnce` | `boolean` | `true` | Show only once |
-| `trigger` | `"immediate" \| "delay"` | `"immediate"` | When to show |
-| `delayMs` | `number` | `1000` | Delay in milliseconds |
-| `actions` | `Array<{label, onClick, variant?}>` | `[]` | Action buttons |
+| Prop        | Type                                     | Default       | Description                         |
+| ----------- | ---------------------------------------- | ------------- | ----------------------------------- |
+| `id`        | `string`                                 | -             | Unique identifier (required)        |
+| `title`     | `string`                                 | -             | Hint title (required)               |
+| `content`   | `ReactNode`                              | -             | Hint content (required)             |
+| `placement` | `"top" \| "right" \| "bottom" \| "left"` | `"bottom"`    | Hint position (OnboardingHint only) |
+| `showOnce`  | `boolean`                                | `true`        | Show only once                      |
+| `trigger`   | `"immediate" \| "delay"`                 | `"immediate"` | When to show                        |
+| `delayMs`   | `number`                                 | `1000`        | Delay in milliseconds               |
+| `actions`   | `Array<{label, onClick, variant?}>`      | `[]`          | Action buttons                      |
 
 ### useOnboardingHints Hook
 
@@ -237,9 +235,7 @@ function MyComponent() {
         content={
           <div className="space-y-1">
             <p>Percentage of sites currently occupied.</p>
-            <p className="text-xs text-slate-600">
-              Formula: (occupied sites / total sites) × 100
-            </p>
+            <p className="text-xs text-slate-600">Formula: (occupied sites / total sites) × 100</p>
           </div>
         }
         side="top"
@@ -288,12 +284,8 @@ function MyComponent() {
             <HelpTooltipSection title="Additive">
               Add this adjustment to other rules.
             </HelpTooltipSection>
-            <HelpTooltipSection title="Max">
-              Use the highest adjustment.
-            </HelpTooltipSection>
-            <HelpTooltipSection title="Override">
-              Ignore all other rules.
-            </HelpTooltipSection>
+            <HelpTooltipSection title="Max">Use the highest adjustment.</HelpTooltipSection>
+            <HelpTooltipSection title="Override">Ignore all other rules.</HelpTooltipSection>
           </HelpTooltipContent>
         }
         side="right"
@@ -321,9 +313,7 @@ export default function Dashboard() {
         title="Welcome to your Dashboard!"
         content={
           <div>
-            <p className="mb-2">
-              This is your command center. Here you'll find:
-            </p>
+            <p className="mb-2">This is your command center. Here you'll find:</p>
             <ul className="list-disc list-inside space-y-1 text-sm">
               <li>Today's arrivals and departures</li>
               <li>Current occupancy rates</li>
@@ -336,8 +326,8 @@ export default function Dashboard() {
           {
             label: "View Calendar",
             onClick: () => (window.location.href = "/calendar"),
-            variant: "ghost"
-          }
+            variant: "ghost",
+          },
         ]}
       />
 
@@ -383,6 +373,7 @@ export default function CalendarPage() {
 ### When to Use Tooltips
 
 **Good Use Cases:**
+
 - Explaining metrics or calculations
 - Clarifying form field requirements
 - Providing examples or tips
@@ -390,6 +381,7 @@ export default function CalendarPage() {
 - Showing keyboard shortcuts
 
 **Avoid Using For:**
+
 - Basic labels that are self-explanatory
 - Content that should be visible by default
 - Critical information users must see
@@ -423,6 +415,7 @@ export default function CalendarPage() {
 The following pages currently have help tooltips implemented:
 
 ### Dashboard (`/app/dashboard/page.tsx`)
+
 - [OK] Page onboarding hint (first visit)
 - [OK] Today's Numbers section explanation
 - [OK] Individual metric tooltips (Arrivals, Departures, In-house, Occupancy, Balance due)
@@ -430,10 +423,12 @@ The following pages currently have help tooltips implemented:
 - [OK] Needs Attention section tooltip
 
 ### Calendar (`/app/calendar/page.tsx`)
+
 - [OK] Page onboarding hint (drag-to-book feature)
 - [OK] Statistics tooltips (Reservations, Revenue, Occupancy, Avg Daily Rate)
 
 ### Pricing Rules (`/app/settings/pricing-rules/page.tsx`)
+
 - [OK] Page onboarding hint (dynamic pricing intro)
 - [OK] Priority field tooltip
 - [OK] Stacking mode tooltip
@@ -442,12 +437,14 @@ The following pages currently have help tooltips implemented:
 ## Adding Tooltips to New Pages
 
 1. **Import the components:**
+
    ```tsx
    import { HelpTooltip } from "@/components/help/HelpTooltip";
    import { PageOnboardingHint } from "@/components/help/OnboardingHint";
    ```
 
 2. **Add page-level onboarding hint:**
+
    ```tsx
    <PageOnboardingHint
      id="unique-page-id"
@@ -457,13 +454,11 @@ The following pages currently have help tooltips implemented:
    ```
 
 3. **Add tooltips to complex fields:**
+
    ```tsx
    <label className="flex items-center gap-2">
      Field Name
-     <HelpTooltip
-       content={<div>What this field does...</div>}
-       side="right"
-     />
+     <HelpTooltip content={<div>What this field does...</div>} side="right" />
    </label>
    ```
 

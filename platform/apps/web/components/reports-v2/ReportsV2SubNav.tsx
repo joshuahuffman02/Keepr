@@ -13,7 +13,7 @@ export function ReportsV2SubNav({
   tab,
   activeSubTab,
   dateRange,
-  filters
+  filters,
 }: {
   tab: ReportTabV2;
   activeSubTab?: string | null;
@@ -39,7 +39,10 @@ export function ReportsV2SubNav({
             <Button
               size="sm"
               variant={isActive ? "outline" : "ghost"}
-              className={cn("shrink-0 whitespace-nowrap", isActive && "border-primary/30 text-primary")}
+              className={cn(
+                "shrink-0 whitespace-nowrap",
+                isActive && "border-primary/30 text-primary",
+              )}
             >
               {sub.label}
             </Button>

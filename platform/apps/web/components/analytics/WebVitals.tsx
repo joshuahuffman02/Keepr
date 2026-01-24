@@ -51,10 +51,7 @@ export function useLongTaskMonitor() {
         for (const entry of list.getEntries()) {
           // Log long tasks (>50ms) in development
           if (process.env.NODE_ENV === "development" && entry.duration > 50) {
-            console.warn(
-              `[Long Task] Duration: ${entry.duration.toFixed(1)}ms`,
-              entry
-            );
+            console.warn(`[Long Task] Duration: ${entry.duration.toFixed(1)}ms`, entry);
           }
         }
       });

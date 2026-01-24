@@ -23,7 +23,12 @@ type Store = {
   setState: (updater: (prev: StoreState) => StoreState) => void;
   subscribe: (listener: () => void) => () => void;
   setDrag: (partial: Partial<DragState>) => void;
-  startDrag: (payload: { reservationId: string; siteId: string; startDate: string; endDate: string }) => void;
+  startDrag: (payload: {
+    reservationId: string;
+    siteId: string;
+    startDate: string;
+    endDate: string;
+  }) => void;
   resetDrag: () => void;
   setSelection: (partial: Partial<SelectionState>) => void;
 };
@@ -33,12 +38,12 @@ const defaultDrag: DragState = {
   reservationId: null,
   siteId: null,
   startDate: null,
-  endDate: null
+  endDate: null,
 };
 
 const defaultSelection: SelectionState = {
   highlightedId: null,
-  openDetailsId: null
+  openDetailsId: null,
 };
 
 // Cached server snapshot to avoid infinite loop
@@ -61,10 +66,15 @@ function createStore(): Store {
   const setDrag = (partial: Partial<DragState>) =>
     setState((prev) => ({
       ...prev,
-      drag: { ...prev.drag, ...partial }
+      drag: { ...prev.drag, ...partial },
     }));
 
-  const startDrag = (payload: { reservationId: string; siteId: string; startDate: string; endDate: string }) =>
+  const startDrag = (payload: {
+    reservationId: string;
+    siteId: string;
+    startDate: string;
+    endDate: string;
+  }) =>
     setState((prev) => ({
       ...prev,
       drag: {
@@ -72,20 +82,20 @@ function createStore(): Store {
         reservationId: payload.reservationId,
         siteId: payload.siteId,
         startDate: payload.startDate,
-        endDate: payload.endDate
-      }
+        endDate: payload.endDate,
+      },
     }));
 
   const resetDrag = () =>
     setState((prev) => ({
       ...prev,
-      drag: defaultDrag
+      drag: defaultDrag,
     }));
 
   const setSelection = (partial: Partial<SelectionState>) =>
     setState((prev) => ({
       ...prev,
-      selection: { ...prev.selection, ...partial }
+      selection: { ...prev.selection, ...partial },
     }));
 
   return { getState, setState, subscribe, setDrag, startDrag, resetDrag, setSelection };
@@ -97,16 +107,12 @@ const store = createStore();
 const getServerSnapshot = () => serverSnapshot;
 
 export function useGanttStore() {
-  const state = useSyncExternalStore(
-    store.subscribe,
-    store.getState,
-    getServerSnapshot
-  );
+  const state = useSyncExternalStore(store.subscribe, store.getState, getServerSnapshot);
   return {
     ...state,
     setDrag: store.setDrag,
     startDrag: store.startDrag,
     resetDrag: store.resetDrag,
-    setSelection: store.setSelection
+    setSelection: store.setSelection,
   };
 }

@@ -19,7 +19,8 @@ export default function PhotosPage() {
   const [newPhoto, setNewPhoto] = useState("");
 
   useEffect(() => {
-    const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const cg =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     setCampgroundId(cg);
   }, []);
 
@@ -42,7 +43,10 @@ export default function PhotosPage() {
       if (!campgroundId) throw new Error("Select a campground");
       const unique = Array.from(new Set(photos.filter(Boolean)));
       if (unique.length === 0) throw new Error("Add at least one photo URL");
-      await apiClient.updateCampgroundPhotos(campgroundId, { photos: unique, heroImageUrl: hero || null });
+      await apiClient.updateCampgroundPhotos(campgroundId, {
+        photos: unique,
+        heroImageUrl: hero || null,
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campground", campgroundId] });
@@ -108,16 +112,35 @@ export default function PhotosPage() {
                 <div className="space-y-2">
                   <h4 className="font-semibold text-foreground">How Photos Work</h4>
                   <div className="text-sm text-muted-foreground space-y-1">
-                    <p><strong>Media Pool:</strong> This is your campground's central photo library. All photos added here can be used across your listing.</p>
-                    <p><strong>Hero Image:</strong> Select one photo (using the radio button) to be your primary display image on the homepage and search results.</p>
-                    <p><strong>Order Matters:</strong> Use the ↑↓ buttons to reorder photos. The order here determines how they appear in your public gallery.</p>
-                    <p><strong>Sites & Classes:</strong> To link photos to specific sites or site classes, edit them in Setup → Sites or Setup → Site Classes. Photos from this pool will be available for selection.</p>
+                    <p>
+                      <strong>Media Pool:</strong> This is your campground's central photo library.
+                      All photos added here can be used across your listing.
+                    </p>
+                    <p>
+                      <strong>Hero Image:</strong> Select one photo (using the radio button) to be
+                      your primary display image on the homepage and search results.
+                    </p>
+                    <p>
+                      <strong>Order Matters:</strong> Use the ↑↓ buttons to reorder photos. The
+                      order here determines how they appear in your public gallery.
+                    </p>
+                    <p>
+                      <strong>Sites & Classes:</strong> To link photos to specific sites or site
+                      classes, edit them in Setup → Sites or Setup → Site Classes. Photos from this
+                      pool will be available for selection.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-            {!campgroundId && <div className="text-sm text-muted-foreground">Select a campground to edit photos.</div>}
-            {campgroundQuery.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
+            {!campgroundId && (
+              <div className="text-sm text-muted-foreground">
+                Select a campground to edit photos.
+              </div>
+            )}
+            {campgroundQuery.isLoading && (
+              <div className="text-sm text-muted-foreground">Loading…</div>
+            )}
 
             {campgroundId && !campgroundQuery.isLoading && (
               <div className="space-y-4">
@@ -137,18 +160,33 @@ export default function PhotosPage() {
                   value={hero ?? ""}
                   onValueChange={(value) => setHero(value || null)}
                 >
-                  {photos.length === 0 && <div className="text-sm text-muted-foreground">No photos yet.</div>}
+                  {photos.length === 0 && (
+                    <div className="text-sm text-muted-foreground">No photos yet.</div>
+                  )}
                   {photos.map((url, idx) => (
-                    <div key={url} className="flex items-center gap-3 border border-border rounded-lg p-3">
+                    <div
+                      key={url}
+                      className="flex items-center gap-3 border border-border rounded-lg p-3"
+                    >
                       <RadioGroupItem id={`hero-${idx}`} value={url} />
                       <Label htmlFor={`hero-${idx}`} className="flex-1 truncate text-sm">
                         {url}
                       </Label>
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => move(idx, -1)} disabled={idx === 0}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => move(idx, -1)}
+                          disabled={idx === 0}
+                        >
                           ↑
                         </Button>
-                        <Button variant="outline" size="sm" onClick={() => move(idx, 1)} disabled={idx === photos.length - 1}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => move(idx, 1)}
+                          disabled={idx === photos.length - 1}
+                        >
                           ↓
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => remove(idx)}>
@@ -160,10 +198,17 @@ export default function PhotosPage() {
                 </RadioGroup>
 
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => campgroundQuery.refetch()} disabled={campgroundQuery.isFetching}>
+                  <Button
+                    variant="outline"
+                    onClick={() => campgroundQuery.refetch()}
+                    disabled={campgroundQuery.isFetching}
+                  >
                     Reset
                   </Button>
-                  <Button onClick={() => saveMutation.mutate()} disabled={!isDirty || saveMutation.isPending}>
+                  <Button
+                    onClick={() => saveMutation.mutate()}
+                    disabled={!isDirty || saveMutation.isPending}
+                  >
                     {saveMutation.isPending ? "Saving..." : "Save order"}
                   </Button>
                 </div>

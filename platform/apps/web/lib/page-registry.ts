@@ -30,15 +30,17 @@ export interface PageDefinition {
 
 const REPORT_PAGE_DEFINITIONS: PageDefinition[] = reportCatalog.flatMap((category) => {
   if (category.id === "overview") {
-    return [{
-      href: "/reports/overview",
-      label: "Reports Overview",
-      icon: "reports",
-      category: "reports",
-      description: category.description,
-      keywords: ["reports", "overview", "dashboard", "summary"],
-      permissions: ["reportsRead"]
-    }];
+    return [
+      {
+        href: "/reports/overview",
+        label: "Reports Overview",
+        icon: "reports",
+        category: "reports",
+        description: category.description,
+        keywords: ["reports", "overview", "dashboard", "summary"],
+        permissions: ["reportsRead"],
+      },
+    ];
   }
 
   const isSubTabCategory = (value: string): value is keyof typeof subTabs =>
@@ -52,7 +54,7 @@ const REPORT_PAGE_DEFINITIONS: PageDefinition[] = reportCatalog.flatMap((categor
     category: "reports",
     description: sub.description || `${category.label} report`,
     keywords: ["reports", category.label, sub.label, category.id, sub.id],
-    permissions: ["reportsRead"]
+    permissions: ["reportsRead"],
   }));
 });
 
@@ -574,7 +576,21 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     icon: "payments",
     category: "settings",
     description: "Configure payment methods, card brands, terminals, and processing fees",
-    keywords: ["stripe", "credit cards", "billing", "payment methods", "apple pay", "google pay", "cash", "check", "terminal", "card reader", "fees", "pass through", "absorb"],
+    keywords: [
+      "stripe",
+      "credit cards",
+      "billing",
+      "payment methods",
+      "apple pay",
+      "google pay",
+      "cash",
+      "check",
+      "terminal",
+      "card reader",
+      "fees",
+      "pass through",
+      "absorb",
+    ],
     permissions: ["settingsWrite"],
     defaultForRoles: ["manager", "owner", "admin"],
   },
@@ -704,7 +720,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["api", "automation", "events"],
     permissions: ["settingsWrite"],
   },
-    {
+  {
     href: "/dashboard/settings/import",
     label: "Import Data",
     icon: "form",
@@ -854,7 +870,15 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     icon: "form",
     category: "settings",
     description: "Certify accessibility features and earn ADA badges",
-    keywords: ["ada", "accessibility", "wheelchair", "accessible", "disability", "compliance", "certification"],
+    keywords: [
+      "ada",
+      "accessibility",
+      "wheelchair",
+      "accessible",
+      "disability",
+      "compliance",
+      "certification",
+    ],
     permissions: ["settingsWrite"],
   },
   {
@@ -863,7 +887,17 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     icon: "shield",
     category: "settings",
     description: "CISO-level security checklist and privacy certification",
-    keywords: ["security", "privacy", "ciso", "compliance", "certification", "data protection", "gdpr", "ccpa", "pci"],
+    keywords: [
+      "security",
+      "privacy",
+      "ciso",
+      "compliance",
+      "certification",
+      "data protection",
+      "gdpr",
+      "ccpa",
+      "pci",
+    ],
     permissions: ["settingsWrite"],
   },
   {
@@ -1993,7 +2027,7 @@ export function resolvePages(campgroundId: string | null): PageDefinition[] {
  * Get pages grouped by category
  */
 export function getPagesByCategory(
-  pages: PageDefinition[]
+  pages: PageDefinition[],
 ): Record<PageCategory, PageDefinition[]> {
   const grouped: Record<PageCategory, PageDefinition[]> = {
     operations: [],
@@ -2071,21 +2105,12 @@ export const CATEGORY_INFO: Record<
 /**
  * Search pages by query
  */
-export function searchPages(
-  pages: PageDefinition[],
-  query: string
-): PageDefinition[] {
+export function searchPages(pages: PageDefinition[], query: string): PageDefinition[] {
   const lowerQuery = query.toLowerCase().trim();
   if (!lowerQuery) return [];
 
   return pages.filter((page) => {
-    const searchText = [
-      page.label,
-      page.description,
-      ...page.keywords,
-    ]
-      .join(" ")
-      .toLowerCase();
+    const searchText = [page.label, page.description, ...page.keywords].join(" ").toLowerCase();
 
     return searchText.includes(lowerQuery);
   });

@@ -9,10 +9,15 @@ import { ObservabilityModule } from "../observability/observability.module";
 import { AiModule } from "../ai/ai.module";
 
 @Module({
-  imports: [SmsModule, NpsModule, PermissionsModule, ObservabilityModule, forwardRef(() => AiModule)],
+  imports: [
+    SmsModule,
+    NpsModule,
+    PermissionsModule,
+    ObservabilityModule,
+    forwardRef(() => AiModule),
+  ],
   controllers: [CommunicationsController],
   providers: [EmailService],
-  exports: []
+  exports: [],
 })
-export class CommunicationsModule { }
-
+export class CommunicationsModule {}

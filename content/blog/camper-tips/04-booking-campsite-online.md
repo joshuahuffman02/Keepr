@@ -17,6 +17,7 @@ If you've never booked a campsite online, the process is straightforward. Here's
 ## Before You Book
 
 ### Information You'll Need
+
 - Arrival and departure dates
 - Type of site (tent, RV, cabin)
 - RV length (if applicable)
@@ -26,6 +27,7 @@ If you've never booked a campsite online, the process is straightforward. Here's
 - Payment method
 
 ### Good to Research First
+
 - Campground rules and policies
 - Cancellation terms
 - Check-in and check-out times
@@ -36,28 +38,33 @@ If you've never booked a campsite online, the process is straightforward. Here's
 ## The Booking Process
 
 ### Step 1: Check Availability
+
 - Enter your dates
 - Select site type
 - See what's available
 
 ### Step 2: Choose Your Site
+
 - Some campgrounds assign sites
 - Others let you choose specific sites
 - Review site details (hookups, size, location)
 
 ### Step 3: Enter Your Information
+
 - Contact details
 - Vehicle information
 - Guest count
 - Any special requests
 
 ### Step 4: Review and Pay
+
 - Confirm all details
 - Review total (including taxes/fees)
 - Enter payment information
 - Submit booking
 
 ### Step 5: Confirmation
+
 - Receive email confirmation
 - Save or print for check-in
 - Add to your calendar
@@ -101,4 +108,4 @@ Yes! Check email (and spam folder). Save or print it.
 
 ---
 
-*Book your next campsite at [campreserv.com](https://campreserv.com)*
+_Book your next campsite at [campreserv.com](https://campreserv.com)_

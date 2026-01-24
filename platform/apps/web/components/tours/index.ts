@@ -5,6 +5,6 @@ export {
   getFirstLoginTours,
   isTourCompleted,
   markTourCompleted,
-  resetTourCompletion
+  resetTourCompletion,
 } from "@/lib/tours/feature-tours";
 export type { FeatureTour, TourStep } from "@/lib/tours/feature-tours";

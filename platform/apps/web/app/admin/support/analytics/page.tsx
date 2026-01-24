@@ -4,9 +4,22 @@ import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Progress } from "@/components/ui/progress";
 import { useWhoami } from "@/hooks/use-whoami";
 import { useToast } from "@/components/ui/use-toast";
@@ -71,7 +84,9 @@ export default function SupportAnalyticsPage() {
   const viewerRegion = user?.platformRegion ?? user?.region ?? null;
   const regionAllowed = regionFilter === "all" || !viewerRegion || viewerRegion === regionFilter;
   const campgroundAllowed =
-    !campgroundId || platformRole || user?.memberships?.some((m) => m.campgroundId === campgroundId);
+    !campgroundId ||
+    platformRole ||
+    user?.memberships?.some((m) => m.campgroundId === campgroundId);
   const inScope = allowSupport && regionAllowed && campgroundAllowed;
 
   useEffect(() => {
@@ -99,7 +114,11 @@ export default function SupportAnalyticsPage() {
       setPayload(null);
       const message = err instanceof Error ? err.message : "Failed to load analytics";
       setError(message);
-      toast({ title: "Support analytics unavailable", description: message || "Try again later", variant: "destructive" });
+      toast({
+        title: "Support analytics unavailable",
+        description: message || "Try again later",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -119,7 +138,7 @@ export default function SupportAnalyticsPage() {
     if (!payload?.slaSummary?.length) return { onTime: 0, overdue: 0, compliance: 1 };
     const agg = payload.slaSummary.reduce(
       (acc, row) => ({ onTime: acc.onTime + row.onTime, overdue: acc.overdue + row.overdue }),
-      { onTime: 0, overdue: 0 }
+      { onTime: 0, overdue: 0 },
     );
     const total = agg.onTime + agg.overdue;
     return { ...agg, compliance: total === 0 ? 1 : agg.onTime / total };
@@ -127,8 +146,10 @@ export default function SupportAnalyticsPage() {
 
   const needsAttention = useMemo(
     () =>
-      (payload?.needsAttention || []).slice().sort((a, b) => new Date(a.reportedAt).getTime() - new Date(b.reportedAt).getTime()),
-    [payload]
+      (payload?.needsAttention || [])
+        .slice()
+        .sort((a, b) => new Date(a.reportedAt).getTime() - new Date(b.reportedAt).getTime()),
+    [payload],
   );
 
   const regionOptions = useMemo(
@@ -139,7 +160,7 @@ export default function SupportAnalyticsPage() {
       { value: "east", label: "East" },
       { value: "west", label: "West" },
     ],
-    []
+    [],
   );
 
   const ready = hydrated && !whoamiLoading;
@@ -177,7 +198,8 @@ export default function SupportAnalyticsPage() {
             <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
             <h1 className="text-2xl font-bold text-foreground">Support analytics</h1>
             <p className="text-sm text-muted-foreground">
-              SLA compliance by region/campground, category volume, and a list of tickets that need attention.
+              SLA compliance by region/campground, category volume, and a list of tickets that need
+              attention.
             </p>
             <div className="text-xs text-muted-foreground mt-1">
               Scope: {regionAllowed ? regionFilter : "out-of-scope region"} •{" "}
@@ -203,16 +225,26 @@ export default function SupportAnalyticsPage() {
               placeholder="Campground ID (optional)"
               className="h-8 w-48"
             />
-            <Button size="sm" variant="outline" onClick={() => void loadAnalytics()} disabled={loading || whoamiLoading || !inScope}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void loadAnalytics()}
+              disabled={loading || whoamiLoading || !inScope}
+            >
               {loading ? "Refreshing…" : "Refresh"}
             </Button>
-            {payload?.source && <Badge variant="outline">{payload.source === "stub" ? "Stub data" : payload.source}</Badge>}
+            {payload?.source && (
+              <Badge variant="outline">
+                {payload.source === "stub" ? "Stub data" : payload.source}
+              </Badge>
+            )}
           </div>
         </div>
 
         {!regionAllowed || !campgroundAllowed ? (
           <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 text-status-warning p-4">
-            You are out of scope for this region/campground selection. Adjust filters to view analytics.
+            You are out of scope for this region/campground selection. Adjust filters to view
+            analytics.
           </div>
         ) : null}
 
@@ -224,12 +256,16 @@ export default function SupportAnalyticsPage() {
             <Card>
               <CardHeader className="flex items-center justify-between">
                 <CardTitle>SLA compliance</CardTitle>
-                <div className="text-xs text-muted-foreground">Updated {new Date(payload.generatedAt).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">
+                  Updated {new Date(payload.generatedAt).toLocaleString()}
+                </div>
               </CardHeader>
               <CardContent className="grid gap-3 md:grid-cols-3">
                 <div className="rounded border border-border p-3">
                   <div className="text-xs uppercase text-muted-foreground">Compliance</div>
-                  <div className="text-2xl font-bold text-foreground">{percent(totals.compliance)}%</div>
+                  <div className="text-2xl font-bold text-foreground">
+                    {percent(totals.compliance)}%
+                  </div>
                   <Progress value={totals.compliance * 100} className="mt-2" />
                 </div>
                 <div className="rounded border border-border p-3">
@@ -268,12 +304,18 @@ export default function SupportAnalyticsPage() {
                         <TableRow key={`${row.region}-${row.campgroundId || "all"}`}>
                           <TableCell className="font-medium capitalize">{row.region}</TableCell>
                           <TableCell>{row.campgroundName || row.campgroundId || "—"}</TableCell>
-                          <TableCell className="text-right text-status-success">{row.onTime}</TableCell>
-                          <TableCell className="text-right text-status-error">{row.overdue}</TableCell>
+                          <TableCell className="text-right text-status-success">
+                            {row.onTime}
+                          </TableCell>
+                          <TableCell className="text-right text-status-error">
+                            {row.overdue}
+                          </TableCell>
                           <TableCell className="text-right w-48">
                             <div className="flex items-center gap-2 justify-end">
                               <Progress value={compliance * 100} className="w-28" />
-                              <span className="text-xs text-muted-foreground">{percent(compliance)}%</span>
+                              <span className="text-xs text-muted-foreground">
+                                {percent(compliance)}%
+                              </span>
                             </div>
                           </TableCell>
                         </TableRow>
@@ -345,8 +387,14 @@ export default function SupportAnalyticsPage() {
                       ) : null}
                       {item.category && <span>Category: {item.category}</span>}
                       <span>Reported: {new Date(item.reportedAt).toLocaleString()}</span>
-                      {item.slaBreachedMinutes ? <span>SLA breach: {item.slaBreachedMinutes}m</span> : null}
-                      {item.assignee ? <span>Owner: {item.assignee}</span> : <span>Owner: Unassigned</span>}
+                      {item.slaBreachedMinutes ? (
+                        <span>SLA breach: {item.slaBreachedMinutes}m</span>
+                      ) : null}
+                      {item.assignee ? (
+                        <span>Owner: {item.assignee}</span>
+                      ) : (
+                        <span>Owner: Unassigned</span>
+                      )}
                     </div>
                   </div>
                 ))}

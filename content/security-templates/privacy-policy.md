@@ -27,24 +27,24 @@ We collect information you voluntarily provide when you:
 
 This may include:
 
-| Information Type | Examples |
-|------------------|----------|
-| Contact Information | Name, email, phone number, address |
+| Information Type    | Examples                                             |
+| ------------------- | ---------------------------------------------------- |
+| Contact Information | Name, email, phone number, address                   |
 | Reservation Details | Dates of stay, site preferences, vehicle information |
 | Payment Information | Credit card number (processed by secure third party) |
-| Guest Information | Number of guests, pet information |
-| Communication | Messages, reviews, survey responses |
+| Guest Information   | Number of guests, pet information                    |
+| Communication       | Messages, reviews, survey responses                  |
 
 ### Information Collected Automatically
 
 When you visit our website, we may automatically collect:
 
-| Information Type | Examples |
-|------------------|----------|
+| Information Type   | Examples                                    |
+| ------------------ | ------------------------------------------- |
 | Device Information | Browser type, operating system, device type |
-| Usage Data | Pages visited, time spent, referring site |
-| Location Data | General geographic location (city/region) |
-| Cookies | Session identifiers, preferences |
+| Usage Data         | Pages visited, time spent, referring site   |
+| Location Data      | General geographic location (city/region)   |
+| Cookies            | Session identifiers, preferences            |
 
 ### Information from Third Parties
 
@@ -60,14 +60,14 @@ We may receive information from:
 
 We use your information to:
 
-| Purpose | Examples |
-|---------|----------|
-| **Provide Services** | Process reservations, communicate about your stay |
-| **Improve Operations** | Analyze usage, develop new features |
-| **Communicate** | Send confirmations, respond to inquiries |
-| **Marketing** | Send promotions (with your consent) |
-| **Security** | Prevent fraud, protect our systems |
-| **Legal Compliance** | Meet regulatory requirements |
+| Purpose                | Examples                                          |
+| ---------------------- | ------------------------------------------------- |
+| **Provide Services**   | Process reservations, communicate about your stay |
+| **Improve Operations** | Analyze usage, develop new features               |
+| **Communicate**        | Send confirmations, respond to inquiries          |
+| **Marketing**          | Send promotions (with your consent)               |
+| **Security**           | Prevent fraud, protect our systems                |
+| **Legal Compliance**   | Meet regulatory requirements                      |
 
 ---
 
@@ -103,13 +103,13 @@ If we merge with or are acquired by another company, your information may be tra
 
 Depending on your location, you may have the right to:
 
-| Right | Description |
-|-------|-------------|
-| **Access** | Request a copy of your personal information |
-| **Correction** | Request correction of inaccurate information |
-| **Deletion** | Request deletion of your information |
-| **Opt-Out** | Unsubscribe from marketing communications |
-| **Portability** | Receive your data in a portable format |
+| Right                  | Description                                        |
+| ---------------------- | -------------------------------------------------- |
+| **Access**             | Request a copy of your personal information        |
+| **Correction**         | Request correction of inaccurate information       |
+| **Deletion**           | Request deletion of your information               |
+| **Opt-Out**            | Unsubscribe from marketing communications          |
+| **Portability**        | Receive your data in a portable format             |
 | **Non-Discrimination** | Not be discriminated against for exercising rights |
 
 ### How to Exercise Your Rights
@@ -143,12 +143,12 @@ Cookies are small files stored on your device that help websites remember your p
 
 ### Cookies We Use
 
-| Type | Purpose | Duration |
-|------|---------|----------|
-| Essential | Required for site functionality | Session |
-| Preferences | Remember your settings | 1 year |
-| Analytics | Understand site usage | 2 years |
-| Marketing | Personalize advertisements | 90 days |
+| Type        | Purpose                         | Duration |
+| ----------- | ------------------------------- | -------- |
+| Essential   | Required for site functionality | Session  |
+| Preferences | Remember your settings          | 1 year   |
+| Analytics   | Understand site usage           | 2 years  |
+| Marketing   | Personalize advertisements      | 90 days  |
 
 ### Managing Cookies
 
@@ -183,12 +183,12 @@ We retain your information for as long as necessary to:
 - Resolve disputes
 - Enforce our agreements
 
-| Data Type | Retention Period |
-|-----------|------------------|
-| Reservation records | 7 years |
-| Contact information | 3 years after last stay |
-| Marketing preferences | Until you unsubscribe |
-| Website analytics | 2 years |
+| Data Type             | Retention Period        |
+| --------------------- | ----------------------- |
+| Reservation records   | 7 years                 |
+| Contact information   | 3 years after last stay |
+| Marketing preferences | Until you unsubscribe   |
+| Website analytics     | 2 years                 |
 
 ---
 
@@ -222,11 +222,11 @@ If you have questions about this Privacy Policy or our data practices:
 
 **[CAMPGROUND NAME]**
 
-| Method | Contact |
-|--------|---------|
-| Email | [privacy@campgroundname.com] |
-| Phone | [NUMBER] |
-| Mail | [ADDRESS] |
+| Method | Contact                      |
+| ------ | ---------------------------- |
+| Email  | [privacy@campgroundname.com] |
+| Phone  | [NUMBER]                     |
+| Mail   | [ADDRESS]                    |
 
 ---
 
@@ -242,4 +242,4 @@ Residents of these states have similar rights to California residents under thei
 
 ---
 
-*This template is provided for informational purposes only. Consult with legal counsel to ensure compliance with applicable privacy laws in your jurisdiction.*
+_This template is provided for informational purposes only. Consult with legal counsel to ensure compliance with applicable privacy laws in your jurisdiction._

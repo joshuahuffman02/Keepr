@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-  Res,
-} from "@nestjs/common";
+import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Res } from "@nestjs/common";
 import { Response } from "express";
 import { QRCodeService, QRCodeType } from "./qr-code.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -37,21 +27,13 @@ export class QRCodeController {
 
   @Post("wifi")
   @ApiOperation({ summary: "Generate WiFi QR code" })
-  async generateWifiCode(
-    @Body() body: { campgroundId: string; ssid: string; password: string }
-  ) {
-    return this.qrCodeService.generateWifiCode(
-      body.campgroundId,
-      body.ssid,
-      body.password
-    );
+  async generateWifiCode(@Body() body: { campgroundId: string; ssid: string; password: string }) {
+    return this.qrCodeService.generateWifiCode(body.campgroundId, body.ssid, body.password);
   }
 
   @Post("store")
   @ApiOperation({ summary: "Generate store/ordering QR code" })
-  async generateStoreCode(
-    @Body() body: { campgroundId: string; tableNumber?: string }
-  ) {
+  async generateStoreCode(@Body() body: { campgroundId: string; tableNumber?: string }) {
     return this.qrCodeService.generateStoreCode(body.campgroundId, body.tableNumber);
   }
 
@@ -63,10 +45,7 @@ export class QRCodeController {
 
   @Get()
   @ApiOperation({ summary: "List QR codes for a campground" })
-  async listCodes(
-    @Query("campgroundId") campgroundId: string,
-    @Query("type") type?: QRCodeType
-  ) {
+  async listCodes(@Query("campgroundId") campgroundId: string, @Query("type") type?: QRCodeType) {
     return this.qrCodeService.listCodes(campgroundId, type);
   }
 

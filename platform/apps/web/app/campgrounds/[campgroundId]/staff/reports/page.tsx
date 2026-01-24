@@ -126,7 +126,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
     setError(null);
     try {
       const res = await fetch(
-        `/api/staff/reports/timesheet?campgroundId=${params.campgroundId}&periodStart=${periodStart}&periodEnd=${periodEnd}`
+        `/api/staff/reports/timesheet?campgroundId=${params.campgroundId}&periodStart=${periodStart}&periodEnd=${periodEnd}`,
       );
       if (!res.ok) throw new Error("Failed to load report");
       setReport(await res.json());
@@ -185,7 +185,15 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
     // Add summary section
     rows.push([]);
     rows.push(["SUMMARY"]);
-    rows.push(["Employee", "Entries", "Gross Hours", "Break Hours", "Net Hours", "Regular", "Overtime"]);
+    rows.push([
+      "Employee",
+      "Entries",
+      "Gross Hours",
+      "Break Hours",
+      "Net Hours",
+      "Regular",
+      "Overtime",
+    ]);
     userSummaries.forEach((u) => {
       rows.push([
         u.name,
@@ -253,7 +261,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
               className={cn(
                 "px-4 py-2 bg-foreground text-white rounded-lg font-medium flex items-center gap-2",
                 "hover:bg-foreground/90 transition-colors",
-                (!report || exporting) && "opacity-50 cursor-not-allowed"
+                (!report || exporting) && "opacity-50 cursor-not-allowed",
               )}
             >
               {exporting ? (
@@ -333,7 +341,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                   "px-3 py-1.5 rounded text-sm font-medium transition-colors",
                   viewMode === "summary"
                     ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-pressed={viewMode === "summary"}
               >
@@ -345,7 +353,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                   "px-3 py-1.5 rounded text-sm font-medium transition-colors",
                   viewMode === "detailed"
                     ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-pressed={viewMode === "detailed"}
               >
@@ -457,7 +465,9 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                             </div>
                             <div>
                               <p className="font-medium text-foreground">{user.name}</p>
-                              <p className="text-sm text-muted-foreground">{user.entries} entries</p>
+                              <p className="text-sm text-muted-foreground">
+                                {user.entries} entries
+                              </p>
                             </div>
                           </div>
                           <div className="text-right">
@@ -467,7 +477,8 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                             <p className="text-sm text-muted-foreground">
                               {user.breakMinutes > 0 && (
                                 <span className="text-muted-foreground mr-2">
-                                  <Coffee className="w-3 h-3 inline" /> {formatMinutes(user.breakMinutes)}
+                                  <Coffee className="w-3 h-3 inline" />{" "}
+                                  {formatMinutes(user.breakMinutes)}
                                 </span>
                               )}
                             </p>
@@ -552,8 +563,12 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                             <td className="px-4 py-3 font-medium text-foreground">
                               {entry.userName}
                             </td>
-                            <td className="px-4 py-3 text-muted-foreground">{formatDate(entry.date)}</td>
-                            <td className="px-4 py-3 text-muted-foreground">{formatTime(entry.clockIn)}</td>
+                            <td className="px-4 py-3 text-muted-foreground">
+                              {formatDate(entry.date)}
+                            </td>
+                            <td className="px-4 py-3 text-muted-foreground">
+                              {formatTime(entry.clockIn)}
+                            </td>
                             <td className="px-4 py-3 text-muted-foreground">
                               {entry.clockOut ? formatTime(entry.clockOut) : "-"}
                             </td>
@@ -574,10 +589,10 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                                   entry.status === "approved"
                                     ? "bg-status-success/15 text-status-success"
                                     : entry.status === "submitted"
-                                    ? "bg-status-info/15 text-status-info"
-                                    : entry.status === "open"
-                                    ? "bg-status-warning/15 text-status-warning"
-                                    : "bg-muted text-muted-foreground"
+                                      ? "bg-status-info/15 text-status-info"
+                                      : entry.status === "open"
+                                        ? "bg-status-warning/15 text-status-warning"
+                                        : "bg-muted text-muted-foreground",
                                 )}
                               >
                                 {entry.status}

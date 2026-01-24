@@ -31,7 +31,13 @@ export class AlertingService {
     }
   }
 
-  async notifyPagerDuty(summary: string, severity: Severity = "error", source = "campreserv-api", dedupKey?: string, details?: Record<string, unknown>) {
+  async notifyPagerDuty(
+    summary: string,
+    severity: Severity = "error",
+    source = "campreserv-api",
+    dedupKey?: string,
+    details?: Record<string, unknown>,
+  ) {
     if (!this.pagerDutyKey) {
       this.logger.debug(`PagerDuty alert skipped (no service key configured)`);
       return { ok: false, skipped: true };
@@ -63,9 +69,21 @@ export class AlertingService {
     }
   }
 
-  async dispatch(title: string, body: string, severity: Severity = "error", dedupKey?: string, details?: Record<string, unknown>) {
+  async dispatch(
+    title: string,
+    body: string,
+    severity: Severity = "error",
+    dedupKey?: string,
+    details?: Record<string, unknown>,
+  ) {
     const slack = await this.notifySlack(`:rotating_light: ${title}\n${body}`);
-    const pd = await this.notifyPagerDuty(`${title} — ${body}`, severity, "campreserv-api", dedupKey, details);
+    const pd = await this.notifyPagerDuty(
+      `${title} — ${body}`,
+      severity,
+      "campreserv-api",
+      dedupKey,
+      details,
+    );
     return { slack, pagerDuty: pd };
   }
 }

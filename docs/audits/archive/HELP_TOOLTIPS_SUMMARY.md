@@ -1,11 +1,13 @@
 # Help Tooltips Implementation Summary
 
 ## Overview
+
 Added inline help tooltips to complex form fields across the application to improve user experience and reduce confusion. All tooltips use the HelpCircle icon from Lucide and are accessible.
 
 ## New Component Created
 
 ### `/platform/apps/web/components/ui/help-tooltip.tsx`
+
 - Reusable component for displaying contextual help
 - Uses Radix UI Tooltip primitive
 - Features:
@@ -21,6 +23,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ### 1. `/platform/apps/web/components/store/ProductModal.tsx`
 
 **Fields with tooltips added:**
+
 - **Price (cents)**: "Enter price in cents (e.g., 999 = $9.99)"
 - **SKU**: "Stock Keeping Unit - unique identifier for inventory"
 - **GL Code**: "General Ledger code for accounting integration" (also added the field to the UI)
@@ -28,6 +31,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ### 2. `/platform/apps/web/app/dashboard/settings/tax-rules/page.tsx`
 
 **Fields with tooltips added:**
+
 - **Rate (%)**: "Enter as decimal (e.g., 7.5 for 7.5% or 5.00 for $5.00)"
 - **Min Nights**: "Minimum stay length required for this tax rule to apply"
 - **Max Nights**: "Maximum stay length for this tax rule to apply"
@@ -36,6 +40,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ### 3. `/platform/apps/web/app/dashboard/settings/deposit-policies/page.tsx`
 
 **Fields with tooltips added:**
+
 - **Due Timing**: "When the deposit should be collected from the guest"
 - **Min Cap ($)**: "Minimum deposit amount regardless of calculation (e.g., always collect at least $25)"
 - **Max Cap ($)**: "Maximum deposit amount regardless of calculation (e.g., never collect more than $500)"
@@ -43,6 +48,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ### 4. `/platform/apps/web/app/dashboard/settings/policies/page.tsx`
 
 **Fields with tooltips added:**
+
 - **Cancel Window (hours before arrival)**: "Number of hours before arrival when free cancellation is allowed (e.g., 48 hours)"
 - **Fee Type**: "How the cancellation fee is calculated: none, flat dollar amount, percentage of total, or one night's rate"
 - **Flat Fee (cents)**: "Fixed cancellation fee in cents (e.g., 2500 = $25.00)"
@@ -51,6 +57,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ## Design Patterns Used
 
 1. **Consistent Layout**: All tooltips follow the same pattern:
+
    ```tsx
    <div className="flex items-center gap-1.5">
      <Label htmlFor="fieldId">Field Name</Label>
@@ -83,6 +90,7 @@ Added inline help tooltips to complex form fields across the application to impr
 ## Future Enhancements
 
 Consider adding tooltips to:
+
 - Form validation rules
 - Advanced calculation fields
 - Fields with specific format requirements

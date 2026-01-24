@@ -14,7 +14,13 @@ import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Badge } from "../../../../components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 import {
   Select,
   SelectContent,
@@ -80,11 +86,31 @@ type SiteType = "rv" | "tent" | "cabin" | "group" | "glamping";
 
 // Site type configuration with icons
 const siteTypeConfig: Record<SiteType, { icon: React.ReactNode; label: string; color: string }> = {
-  rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
-  tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
-  cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
-  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-status-info/15 text-status-info" },
-  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-status-warning/15 text-status-warning" },
+  rv: {
+    icon: <Home className="h-4 w-4" />,
+    label: "RV",
+    color: "bg-status-info/15 text-status-info",
+  },
+  tent: {
+    icon: <Tent className="h-4 w-4" />,
+    label: "Tent",
+    color: "bg-status-success/15 text-status-success",
+  },
+  cabin: {
+    icon: <Home className="h-4 w-4" />,
+    label: "Cabin",
+    color: "bg-status-warning/15 text-status-warning",
+  },
+  group: {
+    icon: <Users className="h-4 w-4" />,
+    label: "Group",
+    color: "bg-status-info/15 text-status-info",
+  },
+  glamping: {
+    icon: <Sparkles className="h-4 w-4" />,
+    label: "Glamping",
+    color: "bg-status-warning/15 text-status-warning",
+  },
 };
 
 type Site = Awaited<ReturnType<typeof apiClient.getSites>>[number];
@@ -134,25 +160,51 @@ const defaultClassForm: SiteClassFormState = {
   accessible: false,
   photos: "",
   policyVersion: "",
-  isActive: true
+  isActive: true,
 };
 
 const isSiteType = (value: string): value is SiteType =>
-  value === "rv" || value === "tent" || value === "cabin" || value === "group" || value === "glamping";
+  value === "rv" ||
+  value === "tent" ||
+  value === "cabin" ||
+  value === "group" ||
+  value === "glamping";
 
 type HookupKey = "hookupsPower" | "hookupsWater" | "hookupsSewer";
 
-const hookupOptions: Array<{ key: HookupKey; label: string; icon: React.ReactNode; color: string }> = [
-  { key: "hookupsPower", label: "Power", icon: <Zap className="h-4 w-4" />, color: "text-status-warning" },
-  { key: "hookupsWater", label: "Water", icon: <Droplet className="h-4 w-4" />, color: "text-status-info" },
-  { key: "hookupsSewer", label: "Sewer", icon: <Waves className="h-4 w-4" />, color: "text-muted-foreground" },
+const hookupOptions: Array<{
+  key: HookupKey;
+  label: string;
+  icon: React.ReactNode;
+  color: string;
+}> = [
+  {
+    key: "hookupsPower",
+    label: "Power",
+    icon: <Zap className="h-4 w-4" />,
+    color: "text-status-warning",
+  },
+  {
+    key: "hookupsWater",
+    label: "Water",
+    icon: <Droplet className="h-4 w-4" />,
+    color: "text-status-info",
+  },
+  {
+    key: "hookupsSewer",
+    label: "Sewer",
+    icon: <Waves className="h-4 w-4" />,
+    color: "text-muted-foreground",
+  },
 ];
 
 export default function SiteClassesPage() {
   const params = useParams();
   const router = useRouter();
   const rawCampgroundId = params?.campgroundId;
-  const campgroundId = Array.isArray(rawCampgroundId) ? rawCampgroundId[0] : rawCampgroundId ?? "";
+  const campgroundId = Array.isArray(rawCampgroundId)
+    ? rawCampgroundId[0]
+    : (rawCampgroundId ?? "");
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const prefersReducedMotion = useReducedMotion();
@@ -160,19 +212,19 @@ export default function SiteClassesPage() {
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
   const classesQuery = useQuery<SiteClass[]>({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Fetch sites to show counts per class
   const sitesQuery = useQuery<Site[]>({
     queryKey: ["sites", campgroundId],
     queryFn: () => apiClient.getSites(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   // Count sites per class
@@ -194,7 +246,11 @@ export default function SiteClassesPage() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [inlineEditingRate, setInlineEditingRate] = useState<string | null>(null);
   const [inlineRateValue, setInlineRateValue] = useState<string>("");
-  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; siteCount: number } | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    id: string;
+    name: string;
+    siteCount: number;
+  } | null>(null);
   const inlineRateInputRef = useRef<HTMLInputElement>(null);
 
   // Focus inline rate input when it becomes visible
@@ -205,7 +261,10 @@ export default function SiteClassesPage() {
     }
   }, [inlineEditingRate]);
 
-  const mapClassFormToPayload = (state: SiteClassFormState, opts?: { clearEmptyAsNull?: boolean }) => {
+  const mapClassFormToPayload = (
+    state: SiteClassFormState,
+    opts?: { clearEmptyAsNull?: boolean },
+  ) => {
     const parseOptionalNumber = (value: number | "" | undefined | null) => {
       if (value === "" || value === undefined || value === null) {
         return opts?.clearEmptyAsNull ? null : undefined;
@@ -227,20 +286,27 @@ export default function SiteClassesPage() {
       maxNights: parseOptionalNumber(state.maxNights),
       petFriendly: state.petFriendly,
       accessible: state.accessible,
-      photos: state.photos ? state.photos.split(",").map((p) => p.trim()) : opts?.clearEmptyAsNull ? [] : [],
-      policyVersion: state.policyVersion ? state.policyVersion : opts?.clearEmptyAsNull ? null : undefined,
-      isActive: state.isActive
+      photos: state.photos
+        ? state.photos.split(",").map((p) => p.trim())
+        : opts?.clearEmptyAsNull
+          ? []
+          : [],
+      policyVersion: state.policyVersion
+        ? state.policyVersion
+        : opts?.clearEmptyAsNull
+          ? null
+          : undefined,
+      isActive: state.isActive,
     };
   };
 
   const createClass = useMutation({
-    mutationFn: () =>
-      apiClient.createSiteClass(campgroundId, mapClassFormToPayload(form)),
+    mutationFn: () => apiClient.createSiteClass(campgroundId, mapClassFormToPayload(form)),
     onSuccess: () => {
       setForm(defaultClassForm);
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       toast({ title: "Site class created", description: "The new site class has been added." });
-    }
+    },
   });
   const updateClass = useMutation({
     mutationFn: (payload: { id: string; data: ReturnType<typeof mapClassFormToPayload> }) =>
@@ -250,11 +316,15 @@ export default function SiteClassesPage() {
       setEditingId(null);
       setEditForm(null);
       toast({ title: "Changes saved", description: "Site class has been updated." });
-    }
+    },
   });
   const updateInlineRate = useMutation({
     mutationFn: (payload: { id: string; rate: number; previousRate: number; className: string }) =>
-      apiClient.updateSiteClass(payload.id, { defaultRate: Math.round(payload.rate * 100) }, campgroundId),
+      apiClient.updateSiteClass(
+        payload.id,
+        { defaultRate: Math.round(payload.rate * 100) },
+        campgroundId,
+      ),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       setInlineEditingRate(null);
@@ -263,35 +333,43 @@ export default function SiteClassesPage() {
         title: "Rate updated",
         description: `${className} rate set to $${variables.rate.toFixed(2)}`,
         action: (
-          <ToastAction altText="Undo" onClick={() => {
-            apiClient.updateSiteClass(id, { defaultRate: Math.round(previousRate * 100) }, campgroundId).then(() => {
-              queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
-              toast({ title: "Undone", description: `Rate reverted to $${previousRate.toFixed(2)}` });
-            });
-          }}>
+          <ToastAction
+            altText="Undo"
+            onClick={() => {
+              apiClient
+                .updateSiteClass(id, { defaultRate: Math.round(previousRate * 100) }, campgroundId)
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
+                  toast({
+                    title: "Undone",
+                    description: `Rate reverted to $${previousRate.toFixed(2)}`,
+                  });
+                });
+            }}
+          >
             Undo
           </ToastAction>
         ),
       });
-    }
+    },
   });
   const deleteClass = useMutation({
     mutationFn: (id: string) => apiClient.deleteSiteClass(id, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["site-classes", campgroundId] });
       toast({ title: "Site class deleted", description: "The site class has been removed." });
-    }
+    },
   });
 
   const handleInlineRateSave = (classId: string) => {
     const rate = parseFloat(inlineRateValue);
-    const cls = classesQuery.data?.find(c => c.id === classId);
+    const cls = classesQuery.data?.find((c) => c.id === classId);
     if (!isNaN(rate) && rate >= 0 && cls) {
       updateInlineRate.mutate({
         id: classId,
         rate,
         previousRate: cls.defaultRate / 100,
-        className: cls.name
+        className: cls.name,
       });
     } else {
       setInlineEditingRate(null);
@@ -312,7 +390,7 @@ export default function SiteClassesPage() {
 
   // Stats
   const totalClasses = classesQuery.data?.length || 0;
-  const activeClasses = classesQuery.data?.filter(c => c.isActive !== false).length || 0;
+  const activeClasses = classesQuery.data?.filter((c) => c.isActive !== false).length || 0;
   const totalSitesWithClass = Object.values(sitesPerClass).reduce((a, b) => a + b, 0);
 
   if (classesQuery.isLoading) {
@@ -345,7 +423,7 @@ export default function SiteClassesPage() {
           items={[
             { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: campgroundQuery.data?.name || campgroundId },
-            { label: "Site Classes" }
+            { label: "Site Classes" },
           ]}
         />
 
@@ -459,7 +537,9 @@ export default function SiteClassesPage() {
                   {/* Essential fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-foreground">Name *</Label>
+                      <Label htmlFor="name" className="text-foreground">
+                        Name *
+                      </Label>
                       <Input
                         id="name"
                         placeholder="e.g., Premium Full Hookup"
@@ -469,7 +549,9 @@ export default function SiteClassesPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="rate" className="text-foreground">Default Rate ($) *</Label>
+                      <Label htmlFor="rate" className="text-foreground">
+                        Default Rate ($) *
+                      </Label>
                       <div className="relative">
                         <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -479,13 +561,20 @@ export default function SiteClassesPage() {
                           min="0"
                           placeholder="45.00"
                           value={form.defaultRate}
-                          onChange={(e) => setForm((s) => ({ ...s, defaultRate: e.target.value === "" ? "" : Number(e.target.value) }))}
+                          onChange={(e) =>
+                            setForm((s) => ({
+                              ...s,
+                              defaultRate: e.target.value === "" ? "" : Number(e.target.value),
+                            }))
+                          }
                           className="pl-10 bg-background border-border"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="type" className="text-foreground">Site Type</Label>
+                      <Label htmlFor="type" className="text-foreground">
+                        Site Type
+                      </Label>
                       <Select
                         value={form.siteType}
                         onValueChange={(value) => {
@@ -510,7 +599,9 @@ export default function SiteClassesPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="occupancy" className="text-foreground">Max Guests</Label>
+                      <Label htmlFor="occupancy" className="text-foreground">
+                        Max Guests
+                      </Label>
                       <div className="relative">
                         <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -519,7 +610,12 @@ export default function SiteClassesPage() {
                           min="1"
                           placeholder="6"
                           value={form.maxOccupancy}
-                          onChange={(e) => setForm((s) => ({ ...s, maxOccupancy: e.target.value === "" ? "" : Number(e.target.value) }))}
+                          onChange={(e) =>
+                            setForm((s) => ({
+                              ...s,
+                              maxOccupancy: e.target.value === "" ? "" : Number(e.target.value),
+                            }))
+                          }
                           className="pl-10 bg-background border-border"
                         />
                       </div>
@@ -538,7 +634,7 @@ export default function SiteClassesPage() {
                           "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                           form[hookup.key]
                             ? "border-primary bg-primary/10"
-                            : "border-border hover:border-muted-foreground/30"
+                            : "border-border hover:border-muted-foreground/30",
                         )}
                         whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                         whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -546,9 +642,7 @@ export default function SiteClassesPage() {
                       >
                         <span className={hookup.color}>{hookup.icon}</span>
                         <span className="text-sm text-foreground">{hookup.label}</span>
-                        {form[hookup.key] && (
-                          <CheckCircle2 className="h-4 w-4 text-primary" />
-                        )}
+                        {form[hookup.key] && <CheckCircle2 className="h-4 w-4 text-primary" />}
                       </motion.button>
                     ))}
                   </div>
@@ -563,7 +657,7 @@ export default function SiteClassesPage() {
                         "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                         form.petFriendly
                           ? "border-primary bg-primary/10"
-                          : "border-border hover:border-muted-foreground/30"
+                          : "border-border hover:border-muted-foreground/30",
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -580,7 +674,7 @@ export default function SiteClassesPage() {
                         "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                         form.accessible
                           ? "border-primary bg-primary/10"
-                          : "border-border hover:border-muted-foreground/30"
+                          : "border-border hover:border-muted-foreground/30",
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -601,7 +695,11 @@ export default function SiteClassesPage() {
                     aria-controls="site-class-advanced"
                     id="site-class-advanced-toggle"
                   >
-                    {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    {showAdvanced ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
                     {showAdvanced ? "Hide" : "Show"} advanced options
                   </button>
 
@@ -617,46 +715,71 @@ export default function SiteClassesPage() {
                         aria-labelledby="site-class-advanced-toggle"
                       >
                         <div className="space-y-2">
-                          <Label htmlFor="description" className="text-foreground">Description</Label>
+                          <Label htmlFor="description" className="text-foreground">
+                            Description
+                          </Label>
                           <Textarea
                             id="description"
                             placeholder="Describe what makes this class special..."
                             value={form.description}
-                            onChange={(e) => setForm((s) => ({ ...s, description: e.target.value }))}
+                            onChange={(e) =>
+                              setForm((s) => ({ ...s, description: e.target.value }))
+                            }
                             className="bg-background border-border"
                           />
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor="min-nights" className="text-foreground">Min Nights</Label>
+                            <Label htmlFor="min-nights" className="text-foreground">
+                              Min Nights
+                            </Label>
                             <Input
                               id="min-nights"
                               type="number"
                               min="1"
                               value={form.minNights}
-                              onChange={(e) => setForm((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              onChange={(e) =>
+                                setForm((s) => ({
+                                  ...s,
+                                  minNights: e.target.value === "" ? "" : Number(e.target.value),
+                                }))
+                              }
                               className="bg-background border-border"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="max-nights" className="text-foreground">Max Nights</Label>
+                            <Label htmlFor="max-nights" className="text-foreground">
+                              Max Nights
+                            </Label>
                             <Input
                               id="max-nights"
                               type="number"
                               min="1"
                               value={form.maxNights}
-                              onChange={(e) => setForm((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              onChange={(e) =>
+                                setForm((s) => ({
+                                  ...s,
+                                  maxNights: e.target.value === "" ? "" : Number(e.target.value),
+                                }))
+                              }
                               className="bg-background border-border"
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="max-rig-length" className="text-foreground">Max Rig Length (ft)</Label>
+                            <Label htmlFor="max-rig-length" className="text-foreground">
+                              Max Rig Length (ft)
+                            </Label>
                             <Input
                               id="max-rig-length"
                               type="number"
                               min="0"
                               value={form.rigMaxLength}
-                              onChange={(e) => setForm((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
+                              onChange={(e) =>
+                                setForm((s) => ({
+                                  ...s,
+                                  rigMaxLength: e.target.value === "" ? "" : Number(e.target.value),
+                                }))
+                              }
                               className="bg-background border-border"
                             />
                           </div>
@@ -664,7 +787,9 @@ export default function SiteClassesPage() {
                             <label className="flex items-center gap-2 text-sm text-foreground h-10">
                               <Checkbox
                                 checked={form.isActive}
-                                onCheckedChange={(checked) => setForm((s) => ({ ...s, isActive: Boolean(checked) }))}
+                                onCheckedChange={(checked) =>
+                                  setForm((s) => ({ ...s, isActive: Boolean(checked) }))
+                                }
                                 aria-label="Class is active"
                               />
                               Active
@@ -677,8 +802,13 @@ export default function SiteClassesPage() {
                             <ImageUpload
                               onChange={(url) => {
                                 if (!url) return;
-                                const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                                setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
+                                const current = form.photos
+                                  ? form.photos
+                                      .split(",")
+                                      .map((p) => p.trim())
+                                      .filter(Boolean)
+                                  : [];
+                                setForm((s) => ({ ...s, photos: [...current, url].join(", ") }));
                               }}
                               placeholder="Upload class photo"
                             />
@@ -693,7 +823,7 @@ export default function SiteClassesPage() {
                     <Button
                       onClick={() => {
                         createClass.mutate(undefined, {
-                          onSuccess: () => setShowCreateForm(false)
+                          onSuccess: () => setShowCreateForm(false),
                         });
                       }}
                       disabled={createClass.isPending || !form.name}
@@ -739,21 +869,18 @@ export default function SiteClassesPage() {
                 <Card className="border-border bg-card/80 backdrop-blur-sm">
                   <CardContent className="py-16">
                     <div className="flex flex-col items-center justify-center text-center">
-                        <motion.div
-                          animate={{ y: [0, -8, 0] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4"
-                        >
-                          <Layers className="h-8 w-8 text-primary" />
-                        </motion.div>
+                      <motion.div
+                        animate={{ y: [0, -8, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+                      >
+                        <Layers className="h-8 w-8 text-primary" />
+                      </motion.div>
                       <p className="text-lg font-medium text-foreground">No site classes yet</p>
                       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
                         Create your first site class to define pricing tiers and amenity packages
                       </p>
-                      <Button
-                        onClick={() => setShowCreateForm(true)}
-                        className="mt-4 gap-2"
-                      >
+                      <Button onClick={() => setShowCreateForm(true)} className="mt-4 gap-2">
                         <Plus className="h-4 w-4" />
                         Create First Class
                       </Button>
@@ -796,8 +923,14 @@ export default function SiteClassesPage() {
                     annual: "Annual",
                   };
 
-                  const orientationLabels: Record<string, { label: string; icon: React.ReactNode }> = {
-                    "pull-through": { label: "Pull-Through", icon: <ArrowRight className="h-3 w-3" /> },
+                  const orientationLabels: Record<
+                    string,
+                    { label: string; icon: React.ReactNode }
+                  > = {
+                    "pull-through": {
+                      label: "Pull-Through",
+                      icon: <ArrowRight className="h-3 w-3" />,
+                    },
                     "back-in": { label: "Back-In", icon: <ArrowLeft className="h-3 w-3" /> },
                   };
 
@@ -808,20 +941,27 @@ export default function SiteClassesPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className={cn(
-                        "border-border bg-card/80 backdrop-blur-sm transition-all hover:shadow-lg",
-                        isInactive && "opacity-60"
-                      )}>
+                      <Card
+                        className={cn(
+                          "border-border bg-card/80 backdrop-blur-sm transition-all hover:shadow-lg",
+                          isInactive && "opacity-60",
+                        )}
+                      >
                         <CardContent className="p-4">
                           {/* Header */}
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <Badge className={cn("text-xs flex items-center gap-1", typeConfig.color)}>
+                              <Badge
+                                className={cn("text-xs flex items-center gap-1", typeConfig.color)}
+                              >
                                 {typeConfig.icon}
                                 {typeConfig.label}
                               </Badge>
                               {rentalType !== "transient" && (
-                                <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs bg-muted text-muted-foreground"
+                                >
                                   {rentalTypeLabels[rentalType] || rentalType}
                                 </Badge>
                               )}
@@ -835,7 +975,9 @@ export default function SiteClassesPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
+                                onClick={() =>
+                                  router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)
+                                }
                                 className="h-8 w-8 p-0"
                                 aria-label={`Edit ${cls.name}`}
                               >
@@ -901,28 +1043,29 @@ export default function SiteClassesPage() {
                           )}
 
                           {/* RV Configuration (only for RV sites) */}
-                          {cls.siteType === "rv" && (rvOrientation || (electricAmps && electricAmps.length > 0)) && (
-                            <div className="flex flex-wrap gap-2 mb-3 p-2 rounded-lg bg-status-info/15">
-                              {rvOrientation && orientationLabels[rvOrientation] && (
-                                <div className="flex items-center gap-1 text-xs text-status-info">
-                                  {orientationLabels[rvOrientation].icon}
-                                  <span>{orientationLabels[rvOrientation].label}</span>
-                                </div>
-                              )}
-                              {electricAmps && electricAmps.length > 0 && (
-                                <div className="flex items-center gap-1 text-xs text-status-info">
-                                  <Gauge className="h-3 w-3" />
-                                  <span>{electricAmps.join("/")}A</span>
-                                </div>
-                              )}
-                              {slideOutsAccepted && slideOutsAccepted !== "none" && (
-                                <div className="flex items-center gap-1 text-xs text-status-info">
-                                  <Truck className="h-3 w-3" />
-                                  <span>Slide-outs: {slideOutsAccepted}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                          {cls.siteType === "rv" &&
+                            (rvOrientation || (electricAmps && electricAmps.length > 0)) && (
+                              <div className="flex flex-wrap gap-2 mb-3 p-2 rounded-lg bg-status-info/15">
+                                {rvOrientation && orientationLabels[rvOrientation] && (
+                                  <div className="flex items-center gap-1 text-xs text-status-info">
+                                    {orientationLabels[rvOrientation].icon}
+                                    <span>{orientationLabels[rvOrientation].label}</span>
+                                  </div>
+                                )}
+                                {electricAmps && electricAmps.length > 0 && (
+                                  <div className="flex items-center gap-1 text-xs text-status-info">
+                                    <Gauge className="h-3 w-3" />
+                                    <span>{electricAmps.join("/")}A</span>
+                                  </div>
+                                )}
+                                {slideOutsAccepted && slideOutsAccepted !== "none" && (
+                                  <div className="flex items-center gap-1 text-xs text-status-info">
+                                    <Truck className="h-3 w-3" />
+                                    <span>Slide-outs: {slideOutsAccepted}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
                           {/* Features */}
                           <div className="flex flex-wrap gap-2 mb-3">
@@ -930,26 +1073,38 @@ export default function SiteClassesPage() {
                               <Users className="h-3.5 w-3.5" />
                               {occupantsIncluded || cls.maxOccupancy} guests
                               {(extraAdultFee || extraChildFee) && (
-                                <span className="text-[10px] text-muted-foreground">
-                                  (+fees)
-                                </span>
+                                <span className="text-[10px] text-muted-foreground">(+fees)</span>
                               )}
                             </div>
                             {hasHookups && (
                               <div className="flex items-center gap-1">
-                                {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-status-warning" />}
-                                {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-status-info" />}
-                                {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-muted-foreground" />}
+                                {cls.hookupsPower && (
+                                  <Zap className="h-3.5 w-3.5 text-status-warning" />
+                                )}
+                                {cls.hookupsWater && (
+                                  <Droplet className="h-3.5 w-3.5 text-status-info" />
+                                )}
+                                {cls.hookupsSewer && (
+                                  <Waves className="h-3.5 w-3.5 text-muted-foreground" />
+                                )}
                               </div>
                             )}
                             {meteredEnabled && (
                               <div className="flex items-center gap-1 text-xs text-status-warning">
                                 <Gauge className="h-3.5 w-3.5" />
-                                {meteredType === "electric" ? "Metered" : meteredType === "propane" ? "Propane" : "Metered"}
+                                {meteredType === "electric"
+                                  ? "Metered"
+                                  : meteredType === "propane"
+                                    ? "Propane"
+                                    : "Metered"}
                               </div>
                             )}
-                            {cls.petFriendly && <PawPrint className="h-3.5 w-3.5 text-status-warning" />}
-                            {cls.accessible && <Accessibility className="h-3.5 w-3.5 text-status-info" />}
+                            {cls.petFriendly && (
+                              <PawPrint className="h-3.5 w-3.5 text-status-warning" />
+                            )}
+                            {cls.accessible && (
+                              <Accessibility className="h-3.5 w-3.5 text-status-info" />
+                            )}
                           </div>
 
                           {/* Amenity Tags */}
@@ -1007,7 +1162,8 @@ export default function SiteClassesPage() {
               Are you sure you want to delete "{deleteConfirm?.name}"?
               {deleteConfirm?.siteCount && deleteConfirm.siteCount > 0 && (
                 <span className="block mt-2 text-status-warning">
-                  {deleteConfirm.siteCount} site{deleteConfirm.siteCount === 1 ? '' : 's'} will lose {deleteConfirm.siteCount === 1 ? 'its' : 'their'} class assignment.
+                  {deleteConfirm.siteCount} site{deleteConfirm.siteCount === 1 ? "" : "s"} will lose{" "}
+                  {deleteConfirm.siteCount === 1 ? "its" : "their"} class assignment.
                 </span>
               )}
               <span className="block mt-2">This action cannot be undone.</span>

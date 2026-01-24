@@ -8,7 +8,7 @@ export class DashboardService {
   async summary(campgroundId: string, orgId?: string) {
     const campground = await this.prisma.campground.findFirst({
       where: { id: campgroundId, ...(orgId ? { organizationId: orgId } : {}) },
-      select: { id: true, organizationId: true, name: true }
+      select: { id: true, organizationId: true, name: true },
     });
     if (!campground) throw new NotFoundException("Campground not found");
 
@@ -19,13 +19,17 @@ export class DashboardService {
     // Run all queries in parallel - use SQL aggregation instead of fetching all rows
     const [sites, reservationStats, maintenanceOpen, maintenanceOverdue] = await Promise.all([
       this.prisma.site.count({ where: { campgroundId } }),
-      this.prisma.$queryRaw<[{
-        future_reservations: bigint;
-        booked_nights: bigint;
-        total_nights: bigint;
-        revenue_cents: bigint;
-        overdue_cents: bigint;
-      }]>`
+      this.prisma.$queryRaw<
+        [
+          {
+            future_reservations: bigint;
+            booked_nights: bigint;
+            total_nights: bigint;
+            revenue_cents: bigint;
+            overdue_cents: bigint;
+          },
+        ]
+      >`
         SELECT
           COUNT(*) FILTER (WHERE "arrivalDate" >= ${now}) as future_reservations,
           COALESCE(SUM(
@@ -48,15 +52,15 @@ export class DashboardService {
           AND "status" != 'cancelled'
       `,
       this.prisma.maintenanceTicket.count({
-        where: { campgroundId, status: { not: "closed" } }
+        where: { campgroundId, status: { not: "closed" } },
       }),
       this.prisma.maintenanceTicket.count({
         where: {
           campgroundId,
           status: { not: "closed" },
-          dueDate: { lt: now }
-        }
-      })
+          dueDate: { lt: now },
+        },
+      }),
     ]);
 
     const stats = reservationStats[0];
@@ -66,7 +70,8 @@ export class DashboardService {
     const revenueCents = Number(stats?.revenue_cents ?? 0);
     const overdueBalancesCents = Number(stats?.overdue_cents ?? 0);
 
-    const occupancy = sites > 0 ? Math.min(100, Math.round((bookedNights / (sites * 30)) * 100)) : 0;
+    const occupancy =
+      sites > 0 ? Math.min(100, Math.round((bookedNights / (sites * 30)) * 100)) : 0;
     const adr = totalNights > 0 ? revenueCents / 100 / totalNights : 0;
     const revpar = sites > 0 ? revenueCents / 100 / (sites * 30) : 0;
 
@@ -80,7 +85,7 @@ export class DashboardService {
       revenue: revenueCents / 100,
       overdueBalance: overdueBalancesCents / 100,
       maintenanceOpen,
-      maintenanceOverdue
+      maintenanceOverdue,
     };
   }
 }

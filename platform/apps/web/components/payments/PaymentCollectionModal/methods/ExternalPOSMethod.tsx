@@ -15,9 +15,7 @@ interface ExternalPOSMethodProps {
  * Note: External payment recording API is not yet implemented.
  * This component shows a placeholder until the API is ready.
  */
-export default function ExternalPOSMethod({
-  onCancel,
-}: ExternalPOSMethodProps) {
+export default function ExternalPOSMethod({ onCancel }: ExternalPOSMethodProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -40,9 +38,8 @@ export default function ExternalPOSMethod({
           <div>
             <p className="font-medium text-blue-800">Coming Soon</p>
             <p className="text-sm text-blue-700 mt-1">
-              External POS payment recording is not yet available.
-              This feature will allow you to record payments processed through
-              Square, Clover, or other external payment terminals.
+              External POS payment recording is not yet available. This feature will allow you to
+              record payments processed through Square, Clover, or other external payment terminals.
             </p>
           </div>
         </div>
@@ -57,8 +54,8 @@ export default function ExternalPOSMethod({
           <li>Tracking payments processed outside of Stripe</li>
         </ul>
         <p className="mt-3">
-          You'll be able to enter the transaction ID from your external
-          terminal to keep your records in sync.
+          You'll be able to enter the transaction ID from your external terminal to keep your
+          records in sync.
         </p>
       </div>
 

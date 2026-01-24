@@ -59,7 +59,7 @@ export class AiAutopilotController {
     private readonly phoneAgentService: AiPhoneAgentService,
     private readonly dashboardService: AiDashboardService,
     private readonly yieldService: AiYieldService,
-    private readonly demandForecastService: AiDemandForecastService
+    private readonly demandForecastService: AiDemandForecastService,
   ) {}
 
   // ==================== CONFIG ENDPOINTS ====================
@@ -74,7 +74,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager)
   async updateConfig(
     @Param("campgroundId") campgroundId: string,
-    @Body() updates: UpdateAutopilotConfigDto
+    @Body() updates: UpdateAutopilotConfigDto,
   ) {
     return this.configService.updateConfig(campgroundId, updates);
   }
@@ -87,31 +87,23 @@ export class AiAutopilotController {
     @Param("campgroundId") campgroundId: string,
     @Query("type") type?: string,
     @Query("category") category?: string,
-    @Query("activeOnly") activeOnly?: string
+    @Query("activeOnly") activeOnly?: string,
   ) {
-    return this.configService.getContextItems(
-      campgroundId,
-      type,
-      category,
-      activeOnly !== "false"
-    );
+    return this.configService.getContextItems(campgroundId, type, category, activeOnly !== "false");
   }
 
   @Post("campgrounds/:campgroundId/context")
   @Roles(UserRole.owner, UserRole.manager)
   async createContextItem(
     @Param("campgroundId") campgroundId: string,
-    @Body() data: CreateContextItemDto
+    @Body() data: CreateContextItemDto,
   ) {
     return this.configService.createContextItem(campgroundId, data);
   }
 
   @Patch("context/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  async updateContextItem(
-    @Param("id") id: string,
-    @Body() updates: UpdateContextItemDto
-  ) {
+  async updateContextItem(@Param("id") id: string, @Body() updates: UpdateContextItemDto) {
     return this.configService.updateContextItem(id, updates);
   }
 
@@ -133,7 +125,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getReplyDrafts(
     @Param("campgroundId") campgroundId: string,
-    @Query("status") status?: string
+    @Query("status") status?: string,
   ) {
     return this.autoReplyService.getDrafts(campgroundId, status);
   }
@@ -149,7 +141,7 @@ export class AiAutopilotController {
   async reviewDraft(
     @Param("id") id: string,
     @Body() data: ReviewDraftDto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.autoReplyService.reviewDraft(id, data, req.user.id);
   }
@@ -187,7 +179,7 @@ export class AiAutopilotController {
   async getAnomalyAlerts(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: string,
-    @Query("severity") severity?: string
+    @Query("severity") severity?: string,
   ) {
     return this.anomalyService.getAlerts(campgroundId, status, severity);
   }
@@ -203,7 +195,7 @@ export class AiAutopilotController {
   async updateAnomalyStatus(
     @Param("id") id: string,
     @Body() data: UpdateAnomalyStatusDto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.anomalyService.updateAlertStatus(id, data, req.user.id);
   }
@@ -221,12 +213,12 @@ export class AiAutopilotController {
   async getNoShowRisks(
     @Param("campgroundId") campgroundId: string,
     @Query("flaggedOnly") flaggedOnly?: string,
-    @Query("daysAhead") daysAhead?: string
+    @Query("daysAhead") daysAhead?: string,
   ) {
     return this.noShowService.getRisks(
       campgroundId,
       flaggedOnly === "true",
-      daysAhead ? parseInt(daysAhead) : undefined
+      daysAhead ? parseInt(daysAhead) : undefined,
     );
   }
 
@@ -252,7 +244,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async markConfirmed(
     @Param("reservationId") reservationId: string,
-    @Body() data: MarkConfirmedDto
+    @Body() data: MarkConfirmedDto,
   ) {
     return this.noShowService.markConfirmed(reservationId, data.source);
   }
@@ -261,11 +253,11 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager)
   async recalculateAllRisks(
     @Param("campgroundId") campgroundId: string,
-    @Query("daysAhead") daysAhead?: string
+    @Query("daysAhead") daysAhead?: string,
   ) {
     return this.noShowService.recalculateAll(
       campgroundId,
-      daysAhead ? parseInt(daysAhead) : undefined
+      daysAhead ? parseInt(daysAhead) : undefined,
     );
   }
 
@@ -287,24 +279,15 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getActivityFeed(
     @Param("campgroundId") campgroundId: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
-    return this.dashboardService.getActivityFeed(
-      campgroundId,
-      limit ? parseInt(limit) : 20
-    );
+    return this.dashboardService.getActivityFeed(campgroundId, limit ? parseInt(limit) : 20);
   }
 
   @Get("campgrounds/:campgroundId/dashboard/metrics")
   @Roles(UserRole.owner, UserRole.manager)
-  async getMetrics(
-    @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
-  ) {
-    return this.dashboardService.getMetrics(
-      campgroundId,
-      days ? parseInt(days) : 30
-    );
+  async getMetrics(@Param("campgroundId") campgroundId: string, @Query("days") days?: string) {
+    return this.dashboardService.getMetrics(campgroundId, days ? parseInt(days) : 30);
   }
 
   // ==================== DYNAMIC PRICING ENDPOINTS ====================
@@ -314,7 +297,7 @@ export class AiAutopilotController {
   async getPricingRecommendations(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: string,
-    @Query("siteClassId") siteClassId?: string
+    @Query("siteClassId") siteClassId?: string,
   ) {
     return this.dynamicPricingService.getRecommendations(campgroundId, {
       status,
@@ -330,10 +313,7 @@ export class AiAutopilotController {
 
   @Post("pricing/recommendations/:id/apply")
   @Roles(UserRole.owner, UserRole.manager)
-  async applyPricingRecommendation(
-    @Param("id") id: string,
-    @Req() req: AuthRequest
-  ) {
+  async applyPricingRecommendation(@Param("id") id: string, @Req() req: AuthRequest) {
     return this.dynamicPricingService.applyRecommendation(id, req.user.id);
   }
 
@@ -342,7 +322,7 @@ export class AiAutopilotController {
   async dismissPricingRecommendation(
     @Param("id") id: string,
     @Body("reason") reason: string,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.dynamicPricingService.dismissRecommendation(id, req.user.id, reason);
   }
@@ -363,7 +343,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   async getPriceSensitivity(
     @Param("campgroundId") campgroundId: string,
-    @Query("siteClassId") siteClassId?: string
+    @Query("siteClassId") siteClassId?: string,
   ) {
     return this.dynamicPricingService.analyzePriceSensitivity(campgroundId, siteClassId);
   }
@@ -380,7 +360,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager)
   async getExperiments(
     @Param("campgroundId") campgroundId: string,
-    @Query("status") status?: string
+    @Query("status") status?: string,
   ) {
     return this.dynamicPricingService.getExperiments(campgroundId, status);
   }
@@ -406,7 +386,7 @@ export class AiAutopilotController {
       endDate: string;
       autoApplyWinner?: boolean;
     },
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.dynamicPricingService.createExperiment(campgroundId, {
       ...data,
@@ -430,10 +410,7 @@ export class AiAutopilotController {
 
   @Post("pricing/experiments/:id/complete")
   @Roles(UserRole.owner)
-  async completeExperiment(
-    @Param("id") id: string,
-    @Body("applyWinner") applyWinner?: boolean
-  ) {
+  async completeExperiment(@Param("id") id: string, @Body("applyWinner") applyWinner?: boolean) {
     return this.dynamicPricingService.completeExperiment(id, applyWinner);
   }
 
@@ -444,7 +421,7 @@ export class AiAutopilotController {
   async getRevenueInsights(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: string,
-    @Query("type") insightType?: string
+    @Query("type") insightType?: string,
   ) {
     return this.revenueManagerService.getInsights(campgroundId, {
       status,
@@ -472,10 +449,7 @@ export class AiAutopilotController {
 
   @Post("revenue/insights/:id/dismiss")
   @Roles(UserRole.owner, UserRole.manager)
-  async dismissRevenueInsight(
-    @Param("id") id: string,
-    @Body("reason") reason?: string
-  ) {
+  async dismissRevenueInsight(@Param("id") id: string, @Body("reason") reason?: string) {
     return this.revenueManagerService.dismissInsight(id, reason);
   }
 
@@ -499,7 +473,7 @@ export class AiAutopilotController {
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: string,
     @Query("severity") severity?: string,
-    @Query("category") category?: string
+    @Query("category") category?: string,
   ) {
     return this.predictiveMaintenanceService.getAlerts(campgroundId, {
       status,
@@ -516,19 +490,13 @@ export class AiAutopilotController {
 
   @Post("maintenance/alerts/:id/acknowledge")
   @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
-  async acknowledgeMaintenanceAlert(
-    @Param("id") id: string,
-    @Req() req: AuthRequest
-  ) {
+  async acknowledgeMaintenanceAlert(@Param("id") id: string, @Req() req: AuthRequest) {
     return this.predictiveMaintenanceService.acknowledgeAlert(id, req.user.id);
   }
 
   @Post("maintenance/alerts/:id/schedule")
   @Roles(UserRole.owner, UserRole.manager, UserRole.maintenance)
-  async scheduleMaintenanceAlert(
-    @Param("id") id: string,
-    @Body("ticketId") ticketId: string
-  ) {
+  async scheduleMaintenanceAlert(@Param("id") id: string, @Body("ticketId") ticketId: string) {
     return this.predictiveMaintenanceService.scheduleAlert(id, ticketId);
   }
 
@@ -574,7 +542,7 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getWeatherAlerts(
     @Param("campgroundId") campgroundId: string,
-    @Query("status") status?: string
+    @Query("status") status?: string,
   ) {
     return this.weatherService.getAlerts(campgroundId, { status });
   }
@@ -610,7 +578,7 @@ export class AiAutopilotController {
   async getPhoneSessions(
     @Param("campgroundId") campgroundId: string,
     @Query("status") status?: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     return this.phoneAgentService.getSessions(campgroundId, {
       status,
@@ -626,14 +594,8 @@ export class AiAutopilotController {
 
   @Get("campgrounds/:campgroundId/phone/summary")
   @Roles(UserRole.owner, UserRole.manager)
-  async getPhoneSummary(
-    @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
-  ) {
-    return this.phoneAgentService.getPhoneSummary(
-      campgroundId,
-      days ? parseInt(days) : 30
-    );
+  async getPhoneSummary(@Param("campgroundId") campgroundId: string, @Query("days") days?: string) {
+    return this.phoneAgentService.getPhoneSummary(campgroundId, days ? parseInt(days) : 30);
   }
 
   // ==================== AUTONOMOUS ACTIONS ENDPOINTS ====================
@@ -643,7 +605,7 @@ export class AiAutopilotController {
   async getAutonomousActions(
     @Param("campgroundId") campgroundId: string,
     @Query("actionType") actionType?: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     return this.autonomousActionService.getRecentActions(campgroundId, {
       actionType,
@@ -662,7 +624,7 @@ export class AiAutopilotController {
   async reverseAutonomousAction(
     @Param("id") id: string,
     @Body("reason") reason: string,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     return this.autonomousActionService.reverseAction(id, req.user.id, reason);
   }
@@ -671,12 +633,9 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager)
   async getAutonomousActionsSummary(
     @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
+    @Query("days") days?: string,
   ) {
-    return this.autonomousActionService.getActionsSummary(
-      campgroundId,
-      days ? parseInt(days) : 30
-    );
+    return this.autonomousActionService.getActionsSummary(campgroundId, days ? parseInt(days) : 30);
   }
 
   // ==================== YIELD MANAGEMENT ENDPOINTS ====================
@@ -692,7 +651,7 @@ export class AiAutopilotController {
   async getYieldMetrics(
     @Param("campgroundId") campgroundId: string,
     @Query("startDate") startDate?: string,
-    @Query("endDate") endDate?: string
+    @Query("endDate") endDate?: string,
   ) {
     return this.yieldService.getYieldMetrics(campgroundId, {
       startDate: startDate ? new Date(startDate) : undefined,
@@ -704,36 +663,24 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getOccupancyTrend(
     @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
+    @Query("days") days?: string,
   ) {
-    return this.yieldService.getOccupancyTrend(
-      campgroundId,
-      days ? parseInt(days) : 30
-    );
+    return this.yieldService.getOccupancyTrend(campgroundId, days ? parseInt(days) : 30);
   }
 
   @Get("campgrounds/:campgroundId/yield/forecast")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getOccupancyForecast(
     @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
+    @Query("days") days?: string,
   ) {
-    return this.yieldService.forecastOccupancy(
-      campgroundId,
-      days ? parseInt(days) : 30
-    );
+    return this.yieldService.forecastOccupancy(campgroundId, days ? parseInt(days) : 30);
   }
 
   @Post("campgrounds/:campgroundId/yield/record-snapshot")
   @Roles(UserRole.owner, UserRole.manager)
-  async recordSnapshot(
-    @Param("campgroundId") campgroundId: string,
-    @Body("date") date?: string
-  ) {
-    await this.yieldService.recordSnapshot(
-      campgroundId,
-      date ? new Date(date) : new Date()
-    );
+  async recordSnapshot(@Param("campgroundId") campgroundId: string, @Body("date") date?: string) {
+    await this.yieldService.recordSnapshot(campgroundId, date ? new Date(date) : new Date());
     return { success: true };
   }
 
@@ -741,12 +688,9 @@ export class AiAutopilotController {
   @Roles(UserRole.owner)
   async backfillSnapshots(
     @Param("campgroundId") campgroundId: string,
-    @Body("days") days?: number
+    @Body("days") days?: number,
   ) {
-    const recorded = await this.yieldService.backfillSnapshots(
-      campgroundId,
-      days || 90
-    );
+    const recorded = await this.yieldService.backfillSnapshots(campgroundId, days || 90);
     return { success: true, recordedDays: recorded };
   }
 
@@ -756,11 +700,11 @@ export class AiAutopilotController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   async getDemandForecast(
     @Param("campgroundId") campgroundId: string,
-    @Query("days") days?: string
+    @Query("days") days?: string,
   ) {
     return this.demandForecastService.generateForecast(
       campgroundId,
-      days ? parseInt(days, 10) : 90
+      days ? parseInt(days, 10) : 90,
     );
   }
 
@@ -769,12 +713,10 @@ export class AiAutopilotController {
   async getDemandHeatmap(
     @Param("campgroundId") campgroundId: string,
     @Query("startDate") startDate?: string,
-    @Query("endDate") endDate?: string
+    @Query("endDate") endDate?: string,
   ) {
     const start = startDate ? new Date(startDate) : new Date();
-    const end = endDate
-      ? new Date(endDate)
-      : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date(Date.now() + 90 * 24 * 60 * 60 * 1000);
 
     return this.demandForecastService.getDemandHeatmap(campgroundId, start, end);
   }

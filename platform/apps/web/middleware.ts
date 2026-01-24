@@ -25,9 +25,9 @@ const PUBLIC_PREFIXES = [
   "/assets",
   "/favicon",
   "/manifest",
-  "/park",      // Public campground pages
-  "/images",    // Public images
-  "/icons",     // Public icons
+  "/park", // Public campground pages
+  "/images", // Public images
+  "/icons", // Public icons
 ];
 
 export default auth((req) => {

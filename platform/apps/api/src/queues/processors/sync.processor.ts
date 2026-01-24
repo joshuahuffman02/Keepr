@@ -30,10 +30,7 @@ export class SyncQueueProcessor implements OnModuleInit {
   constructor(private readonly queueService: BullQueueService) {}
 
   onModuleInit() {
-    this.queueService.registerProcessor<SyncJobData>(
-      SYNC_QUEUE,
-      this.process.bind(this)
-    );
+    this.queueService.registerProcessor<SyncJobData>(SYNC_QUEUE, this.process.bind(this));
     this.logger.log("Sync processor registered");
   }
 
@@ -42,7 +39,7 @@ export class SyncQueueProcessor implements OnModuleInit {
     const startTime = Date.now();
 
     this.logger.debug(
-      `Starting ${syncType} sync for integration ${integrationId}, campground ${campgroundId}`
+      `Starting ${syncType} sync for integration ${integrationId}, campground ${campgroundId}`,
     );
 
     // Simulate sync operation
@@ -72,7 +69,7 @@ export class SyncQueueProcessor implements OnModuleInit {
     };
 
     this.logger.log(
-      `Sync completed: ${syncId} - ${result.recordsProcessed} records processed (${result.duration}ms)`
+      `Sync completed: ${syncId} - ${result.recordsProcessed} records processed (${result.duration}ms)`,
     );
 
     return result;

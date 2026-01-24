@@ -68,9 +68,7 @@ const isChatToolCall = (value: unknown): value is ChatToolCall =>
   isRecord(value.args);
 
 const isChatToolResult = (value: unknown): value is ChatToolResult =>
-  isRecord(value) &&
-  typeof value.toolCallId === "string" &&
-  "result" in value;
+  isRecord(value) && typeof value.toolCallId === "string" && "result" in value;
 
 const isChatAttachment = (value: unknown): value is ChatAttachment =>
   isRecord(value) &&
@@ -130,7 +128,9 @@ const toChatMessageResponse = (value: unknown): ChatMessageResponse | null => {
     content,
     parts: Array.isArray(value.parts) ? value.parts.filter(isChatMessagePart) : undefined,
     toolCalls: Array.isArray(value.toolCalls) ? value.toolCalls.filter(isChatToolCall) : undefined,
-    toolResults: Array.isArray(value.toolResults) ? value.toolResults.filter(isChatToolResult) : undefined,
+    toolResults: Array.isArray(value.toolResults)
+      ? value.toolResults.filter(isChatToolResult)
+      : undefined,
     actionRequired: isChatActionRequired(value.actionRequired) ? value.actionRequired : undefined,
     createdAt: getString(value.createdAt),
     visibility: getVisibility(value.visibility),
@@ -243,40 +243,35 @@ export function useChatStreamSse({
     (updater: (message: UnifiedChatMessage) => UnifiedChatMessage) => {
       const streamingId = streamingMessageIdRef.current;
       if (!streamingId) return;
-      setMessages((prev) =>
-        prev.map((msg) => (msg.id === streamingId ? updater(msg) : msg))
-      );
+      setMessages((prev) => prev.map((msg) => (msg.id === streamingId ? updater(msg) : msg)));
     },
-    []
+    [],
   );
 
-  const ensureStreamingMessage = useCallback(
-    (meta?: ChatStreamMeta) => {
-      if (streamingMessageIdRef.current) return;
-      hasStreamedTextRef.current = false;
-      hasMetaContentRef.current = false;
-      const id = meta?.messageId ?? `assistant_${Date.now()}`;
-      streamingMessageIdRef.current = id;
-      setMessages((prev) => [
-        ...prev,
-        {
-          id,
-          role: "assistant",
-          content: meta?.content ?? "",
-          parts: meta?.parts,
-          toolCalls: meta?.toolCalls,
-          toolResults: meta?.toolResults,
-          actionRequired: meta?.actionRequired,
-          recommendations: meta?.recommendations,
-          clarifyingQuestions: meta?.clarifyingQuestions,
-          helpArticles: meta?.helpArticles,
-          showTicketPrompt: meta?.showTicketPrompt,
-          visibility: meta?.visibility,
-        },
-      ]);
-    },
-    []
-  );
+  const ensureStreamingMessage = useCallback((meta?: ChatStreamMeta) => {
+    if (streamingMessageIdRef.current) return;
+    hasStreamedTextRef.current = false;
+    hasMetaContentRef.current = false;
+    const id = meta?.messageId ?? `assistant_${Date.now()}`;
+    streamingMessageIdRef.current = id;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id,
+        role: "assistant",
+        content: meta?.content ?? "",
+        parts: meta?.parts,
+        toolCalls: meta?.toolCalls,
+        toolResults: meta?.toolResults,
+        actionRequired: meta?.actionRequired,
+        recommendations: meta?.recommendations,
+        clarifyingQuestions: meta?.clarifyingQuestions,
+        helpArticles: meta?.helpArticles,
+        showTicketPrompt: meta?.showTicketPrompt,
+        visibility: meta?.visibility,
+      },
+    ]);
+  }, []);
 
   const handleMeta = useCallback(
     (meta: ChatStreamMeta) => {
@@ -284,7 +279,11 @@ export function useChatStreamSse({
         setConversationId(meta.conversationId);
       }
       ensureStreamingMessage(meta);
-      if (typeof meta.content === "string" && meta.content.length > 0 && !hasStreamedTextRef.current) {
+      if (
+        typeof meta.content === "string" &&
+        meta.content.length > 0 &&
+        !hasStreamedTextRef.current
+      ) {
         hasMetaContentRef.current = true;
       }
       updateStreamingMessage((message) => ({
@@ -305,7 +304,7 @@ export function useChatStreamSse({
       }));
       onMeta?.(meta);
     },
-    [ensureStreamingMessage, onMeta, updateStreamingMessage]
+    [ensureStreamingMessage, onMeta, updateStreamingMessage],
   );
 
   const handleText = useCallback(
@@ -318,11 +317,14 @@ export function useChatStreamSse({
         content: `${message.content}${value}`,
       }));
     },
-    [ensureStreamingMessage, updateStreamingMessage]
+    [ensureStreamingMessage, updateStreamingMessage],
   );
 
   const sendMessage = useCallback(
-    async (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
+    async (
+      message: string,
+      options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility },
+    ) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if ((!trimmed && (!attachments || attachments.length === 0)) || isSending) return;
@@ -393,9 +395,7 @@ export function useChatStreamSse({
           while (buffer.includes("\n\n")) {
             const [rawEvent, rest] = buffer.split("\n\n", 2);
             buffer = rest ?? "";
-            const dataLine = rawEvent
-              .split("\n")
-              .find((line) => line.startsWith("data:"));
+            const dataLine = rawEvent.split("\n").find((line) => line.startsWith("data:"));
             if (!dataLine) continue;
             const payloadText = dataLine.replace(/^data:\s*/, "").trim();
             if (!payloadText) continue;
@@ -449,7 +449,18 @@ export function useChatStreamSse({
         setMessages((prev) => [...prev, errorMessage]);
       }
     },
-    [authToken, campgroundId, context, conversationId, guestId, handleMeta, handleText, isSending, mode, sessionId]
+    [
+      authToken,
+      campgroundId,
+      context,
+      conversationId,
+      guestId,
+      handleMeta,
+      handleText,
+      isSending,
+      mode,
+      sessionId,
+    ],
   );
 
   const executeAction = useCallback(
@@ -511,7 +522,7 @@ export function useChatStreamSse({
         setIsExecuting(false);
       }
     },
-    [authToken, campgroundId, conversationId, guestId, mode]
+    [authToken, campgroundId, conversationId, guestId, mode],
   );
 
   const executeTool = useCallback(
@@ -551,13 +562,11 @@ export function useChatStreamSse({
 
         const result = toExecuteToolResponse(await response.json());
         const toolCallId = `tool_${Date.now()}`;
-        const resultPayload =
-          result.result ??
-          {
-            success: result.success,
-            message: result.message,
-            prevalidateFailed: result.prevalidateFailed,
-          };
+        const resultPayload = result.result ?? {
+          success: result.success,
+          message: result.message,
+          prevalidateFailed: result.prevalidateFailed,
+        };
         const resultMessage: UnifiedChatMessage = {
           id: `tool_${Date.now()}`,
           role: "assistant",
@@ -579,7 +588,7 @@ export function useChatStreamSse({
         setIsExecutingTool(false);
       }
     },
-    [authToken, campgroundId, conversationId, guestId, mode, sessionId]
+    [authToken, campgroundId, conversationId, guestId, mode, sessionId],
   );
 
   const submitFeedback = useCallback(
@@ -619,7 +628,7 @@ export function useChatStreamSse({
         setMessages((prev) => [...prev, errorMessage]);
       }
     },
-    [authToken, campgroundId, guestId, mode, sessionId]
+    [authToken, campgroundId, guestId, mode, sessionId],
   );
 
   const regenerateMessage = useCallback(
@@ -686,7 +695,7 @@ export function useChatStreamSse({
         setIsTyping(false);
       }
     },
-    [authToken, campgroundId, guestId, isSending, mode, sessionId]
+    [authToken, campgroundId, guestId, isSending, mode, sessionId],
   );
 
   const clearMessages = useCallback(() => {

@@ -167,13 +167,23 @@ export default function ExplorePage() {
   const [campgrounds, setCampgrounds] = useState<SearchableCampground[]>(DEMO_CAMPGROUNDS);
   const [selectedCampground, setSelectedCampground] = useState<SearchableCampground | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("map");
-  const [visibleBounds, setVisibleBounds] = useState<{ north: number; south: number; east: number; west: number } | null>(null);
+  const [visibleBounds, setVisibleBounds] = useState<{
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  } | null>(null);
 
   const handleSelectCampground = (campground: SearchableCampground) => {
     setSelectedCampground(campground);
   };
 
-  const handleBoundsChange = (bounds: { north: number; south: number; east: number; west: number }) => {
+  const handleBoundsChange = (bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  }) => {
     setVisibleBounds(bounds);
     // In production, you would fetch campgrounds within these bounds from the API
   };

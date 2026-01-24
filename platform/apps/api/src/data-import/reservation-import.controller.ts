@@ -69,10 +69,7 @@ export class ReservationImportController {
       throw new BadRequestException("CSV content is required");
     }
 
-    return this.reservationImport.parseAndDetectColumns(
-      body.csvContent,
-      campgroundId
-    );
+    return this.reservationImport.parseAndDetectColumns(body.csvContent, campgroundId);
   }
 
   /**
@@ -92,14 +89,12 @@ export class ReservationImportController {
     }
 
     if (!body.mapping || !body.mapping.arrivalDate || !body.mapping.departureDate) {
-      throw new BadRequestException("Column mapping with at least arrivalDate and departureDate is required");
+      throw new BadRequestException(
+        "Column mapping with at least arrivalDate and departureDate is required",
+      );
     }
 
-    return this.reservationImport.previewImport(
-      campgroundId,
-      body.csvContent,
-      body.mapping
-    );
+    return this.reservationImport.previewImport(campgroundId, body.csvContent, body.mapping);
   }
 
   /**
@@ -130,14 +125,10 @@ export class ReservationImportController {
     const preview = await this.reservationImport.previewImport(
       campgroundId,
       body.csvContent,
-      body.mapping
+      body.mapping,
     );
 
-    return this.reservationImport.executeImport(
-      campgroundId,
-      preview.parsedRows,
-      body.rows
-    );
+    return this.reservationImport.executeImport(campgroundId, preview.parsedRows, body.rows);
   }
 
   /**
@@ -194,7 +185,7 @@ export class ReservationImportController {
   private async validateCampgroundAccess(
     campgroundId: string,
     onboardingToken?: string,
-    user?: AuthUser
+    user?: AuthUser,
   ): Promise<void> {
     // If onboarding token provided, validate it matches the campground
     if (onboardingToken) {
@@ -218,8 +209,7 @@ export class ReservationImportController {
         throw new BadRequestException("Onboarding session expired");
       }
 
-      const scopedCampgroundId =
-        invite.campgroundId || invite.OnboardingSession?.campgroundId;
+      const scopedCampgroundId = invite.campgroundId || invite.OnboardingSession?.campgroundId;
 
       if (!scopedCampgroundId) {
         throw new BadRequestException("Onboarding invite is not linked to a campground yet");
@@ -234,7 +224,9 @@ export class ReservationImportController {
 
     // Without onboarding token, require authenticated user with campground access
     if (!user) {
-      throw new ForbiddenException("Authentication required - provide JWT token or onboarding token");
+      throw new ForbiddenException(
+        "Authentication required - provide JWT token or onboarding token",
+      );
     }
 
     // Platform admins can access any campground

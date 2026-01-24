@@ -74,10 +74,7 @@ export function ValidatedFormField({
       <div className="flex items-center justify-between">
         <Label
           htmlFor={id}
-          className={cn(
-            "text-sm font-medium",
-            hasError ? "text-red-600" : "text-foreground"
-          )}
+          className={cn("text-sm font-medium", hasError ? "text-red-600" : "text-foreground")}
         >
           {label}
           {required && <span className="text-red-500 ml-0.5">*</span>}
@@ -124,16 +121,14 @@ export function ValidatedFormField({
           onBlur={onBlur}
           aria-invalid={hasError ? "true" : "false"}
           aria-describedby={
-            [hasError ? errorId : null, hint ? hintId : null]
-              .filter(Boolean)
-              .join(" ") || undefined
+            [hasError ? errorId : null, hint ? hintId : null].filter(Boolean).join(" ") || undefined
           }
           aria-required={required}
           className={cn(
             "pr-10 transition-colors",
             hasError && "border-red-300 focus:border-red-500 focus:ring-red-200",
             isValid && "border-emerald-300 focus:border-emerald-500 focus:ring-emerald-200",
-            inputClassName
+            inputClassName,
           )}
         />
 
@@ -146,11 +141,7 @@ export function ValidatedFormField({
               className="text-muted-foreground hover:text-muted-foreground transition-colors"
               tabIndex={-1}
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           )}
 
@@ -269,12 +260,7 @@ export function EmailFormField(props: Omit<ValidatedFormFieldProps, "type">) {
 
   return (
     <div>
-      <ValidatedFormField
-        {...props}
-        type="email"
-        onChange={handleChange}
-        autoComplete="email"
-      />
+      <ValidatedFormField {...props} type="email" onChange={handleChange} autoComplete="email" />
 
       <AnimatePresence>
         {suggestion && (

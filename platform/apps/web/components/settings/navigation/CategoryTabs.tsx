@@ -110,7 +110,7 @@ export function CategoryTabs({ className }: CategoryTabsProps) {
                 "hover:bg-muted",
                 isActive
                   ? "border-emerald-600 text-emerald-700 bg-emerald-50/50"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground",
               )}
             >
               <Icon className="h-4 w-4" aria-hidden="true" />

@@ -127,16 +127,86 @@ const mockGrowthData: PlatformGrowthData = {
     { name: "Founding (Free)", value: 9, mrr: 0, color: "#f59e0b" },
   ],
   foundingMembers: [
-    { name: "Founding Member 1", signupDate: "2023-03-15", status: "active", mrr: 0, monthsActive: 21, lastActivity: "2024-12-15" },
-    { name: "Founding Member 2", signupDate: "2023-03-18", status: "active", mrr: 0, monthsActive: 21, lastActivity: "2024-12-16" },
-    { name: "Founding Member 3", signupDate: "2023-03-20", status: "active", mrr: 0, monthsActive: 21, lastActivity: "2024-12-14" },
-    { name: "Founding Member 4", signupDate: "2023-03-22", status: "at_risk", mrr: 0, monthsActive: 21, lastActivity: "2024-11-28" },
-    { name: "Founding Member 5", signupDate: "2023-03-25", status: "active", mrr: 0, monthsActive: 21, lastActivity: "2024-12-15" },
-    { name: "Founding Member 6", signupDate: "2023-04-01", status: "churned", mrr: 0, monthsActive: 18, lastActivity: "2024-09-15" },
-    { name: "Founding Member 7", signupDate: "2023-04-05", status: "active", mrr: 0, monthsActive: 20, lastActivity: "2024-12-16" },
-    { name: "Founding Member 8", signupDate: "2023-04-08", status: "churned", mrr: 0, monthsActive: 15, lastActivity: "2024-07-10" },
-    { name: "Founding Member 9", signupDate: "2023-04-10", status: "active", mrr: 0, monthsActive: 20, lastActivity: "2024-12-14" },
-    { name: "Founding Member 10", signupDate: "2023-04-12", status: "at_risk", mrr: 0, monthsActive: 20, lastActivity: "2024-11-20" },
+    {
+      name: "Founding Member 1",
+      signupDate: "2023-03-15",
+      status: "active",
+      mrr: 0,
+      monthsActive: 21,
+      lastActivity: "2024-12-15",
+    },
+    {
+      name: "Founding Member 2",
+      signupDate: "2023-03-18",
+      status: "active",
+      mrr: 0,
+      monthsActive: 21,
+      lastActivity: "2024-12-16",
+    },
+    {
+      name: "Founding Member 3",
+      signupDate: "2023-03-20",
+      status: "active",
+      mrr: 0,
+      monthsActive: 21,
+      lastActivity: "2024-12-14",
+    },
+    {
+      name: "Founding Member 4",
+      signupDate: "2023-03-22",
+      status: "at_risk",
+      mrr: 0,
+      monthsActive: 21,
+      lastActivity: "2024-11-28",
+    },
+    {
+      name: "Founding Member 5",
+      signupDate: "2023-03-25",
+      status: "active",
+      mrr: 0,
+      monthsActive: 21,
+      lastActivity: "2024-12-15",
+    },
+    {
+      name: "Founding Member 6",
+      signupDate: "2023-04-01",
+      status: "churned",
+      mrr: 0,
+      monthsActive: 18,
+      lastActivity: "2024-09-15",
+    },
+    {
+      name: "Founding Member 7",
+      signupDate: "2023-04-05",
+      status: "active",
+      mrr: 0,
+      monthsActive: 20,
+      lastActivity: "2024-12-16",
+    },
+    {
+      name: "Founding Member 8",
+      signupDate: "2023-04-08",
+      status: "churned",
+      mrr: 0,
+      monthsActive: 15,
+      lastActivity: "2024-07-10",
+    },
+    {
+      name: "Founding Member 9",
+      signupDate: "2023-04-10",
+      status: "active",
+      mrr: 0,
+      monthsActive: 20,
+      lastActivity: "2024-12-14",
+    },
+    {
+      name: "Founding Member 10",
+      signupDate: "2023-04-12",
+      status: "at_risk",
+      mrr: 0,
+      monthsActive: 20,
+      lastActivity: "2024-11-20",
+    },
   ],
   recentSignups: [
     { name: "New Signup 1", signupDate: "2024-12-14", tier: "Professional", state: "FL", mrr: 450 },
@@ -146,9 +216,27 @@ const mockGrowthData: PlatformGrowthData = {
     { name: "New Signup 5", signupDate: "2024-12-05", tier: "Starter", state: "WA", mrr: 200 },
   ],
   recentChurn: [
-    { name: "Churned Customer 1", churnDate: "2024-12-10", reason: "Business closed", monthsActive: 8, lifetimeValue: 3600 },
-    { name: "Churned Customer 2", churnDate: "2024-12-05", reason: "Switched to competitor", monthsActive: 14, lifetimeValue: 6300 },
-    { name: "Churned Customer 3", churnDate: "2024-11-28", reason: "Budget constraints", monthsActive: 6, lifetimeValue: 2700 },
+    {
+      name: "Churned Customer 1",
+      churnDate: "2024-12-10",
+      reason: "Business closed",
+      monthsActive: 8,
+      lifetimeValue: 3600,
+    },
+    {
+      name: "Churned Customer 2",
+      churnDate: "2024-12-05",
+      reason: "Switched to competitor",
+      monthsActive: 14,
+      lifetimeValue: 6300,
+    },
+    {
+      name: "Churned Customer 3",
+      churnDate: "2024-11-28",
+      reason: "Budget constraints",
+      monthsActive: 6,
+      lifetimeValue: 2700,
+    },
   ],
   cohortRetention: [
     { cohort: "Q1 2023 (Founding)", month0: 100, month1: 100, month3: 98, month6: 95, month12: 91 },
@@ -162,13 +250,25 @@ const mockGrowthData: PlatformGrowthData = {
 
 const StatusBadge = ({ status }: { status: "active" | "churned" | "at_risk" }) => {
   const config = {
-    active: { bg: "bg-emerald-500/20", text: "text-emerald-400", icon: CheckCircle, label: "Active" },
+    active: {
+      bg: "bg-emerald-500/20",
+      text: "text-emerald-400",
+      icon: CheckCircle,
+      label: "Active",
+    },
     churned: { bg: "bg-red-500/20", text: "text-red-400", icon: XCircle, label: "Churned" },
-    at_risk: { bg: "bg-amber-500/20", text: "text-amber-400", icon: AlertTriangle, label: "At Risk" },
+    at_risk: {
+      bg: "bg-amber-500/20",
+      text: "text-amber-400",
+      icon: AlertTriangle,
+      label: "At Risk",
+    },
   };
   const { bg, text, icon: Icon, label } = config[status];
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${bg} ${text}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${bg} ${text}`}
+    >
       <Icon className="h-3 w-3" />
       {label}
     </span>
@@ -202,8 +302,12 @@ export default function PlatformGrowthPage() {
     fetchData();
   }, [dateRange]);
 
-  const foundingRetentionRate = Math.round((data.overview.foundingMembersActive / data.overview.foundingMembers) * 100);
-  const overallRetentionRate = Math.round((data.overview.activeCampgrounds / data.overview.totalCampgrounds) * 100);
+  const foundingRetentionRate = Math.round(
+    (data.overview.foundingMembersActive / data.overview.foundingMembers) * 100,
+  );
+  const overallRetentionRate = Math.round(
+    (data.overview.activeCampgrounds / data.overview.totalCampgrounds) * 100,
+  );
 
   const toNumber = (value: unknown): number | undefined =>
     typeof value === "number" ? value : undefined;
@@ -265,11 +369,15 @@ export default function PlatformGrowthPage() {
             </div>
             <div className="flex gap-8">
               <div className="text-center">
-                <p className="text-4xl font-bold text-amber-600">{data.overview.foundingMembersActive}</p>
+                <p className="text-4xl font-bold text-amber-600">
+                  {data.overview.foundingMembersActive}
+                </p>
                 <p className="text-sm text-amber-700/60">Still Active</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-foreground">{data.overview.foundingMembers - data.overview.foundingMembersActive}</p>
+                <p className="text-4xl font-bold text-foreground">
+                  {data.overview.foundingMembers - data.overview.foundingMembersActive}
+                </p>
                 <p className="text-sm text-muted-foreground">Churned</p>
               </div>
               <div className="text-center">
@@ -343,7 +451,10 @@ export default function PlatformGrowthPage() {
         />
         <KpiCard
           title="Avg LTV"
-          value={Math.round(data.overview.averageCustomerLifetime * (data.overview.mrr / data.overview.activeCampgrounds))}
+          value={Math.round(
+            data.overview.averageCustomerLifetime *
+              (data.overview.mrr / data.overview.activeCampgrounds),
+          )}
           format="currency"
           subtitle="Lifetime Value"
           loading={loading}
@@ -384,9 +495,7 @@ export default function PlatformGrowthPage() {
         title="Cumulative Growth"
         description="Total active campgrounds over time"
         data={data.signupTrends}
-        dataKeys={[
-          { key: "cumulative", color: "#3b82f6", name: "Total Active" },
-        ]}
+        dataKeys={[{ key: "cumulative", color: "#3b82f6", name: "Total Active" }]}
         xAxisKey="month"
         type="area"
         height={250}
@@ -410,11 +519,21 @@ export default function PlatformGrowthPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Campground</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Joined</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Months Active</th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Last Activity</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                    Campground
+                  </th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                    Joined
+                  </th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                    Months Active
+                  </th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                    Last Activity
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -427,7 +546,9 @@ export default function PlatformGrowthPage() {
                     <td className="py-3 px-4">
                       <StatusBadge status={member.status} />
                     </td>
-                    <td className="py-3 px-4 text-sm text-foreground text-right">{member.monthsActive}</td>
+                    <td className="py-3 px-4 text-sm text-foreground text-right">
+                      {member.monthsActive}
+                    </td>
                     <td className="py-3 px-4 text-sm text-muted-foreground">
                       {new Date(member.lastActivity).toLocaleDateString()}
                     </td>
@@ -536,7 +657,12 @@ export default function PlatformGrowthPage() {
         </div>
         <div className="text-center">
           <p className="text-2xl font-bold text-purple-600">
-            {Math.round((data.overview.signupsThisMonth - data.overview.churnedThisMonth) / data.overview.activeCampgrounds * 100)}%
+            {Math.round(
+              ((data.overview.signupsThisMonth - data.overview.churnedThisMonth) /
+                data.overview.activeCampgrounds) *
+                100,
+            )}
+            %
           </p>
           <p className="text-sm text-muted-foreground">Net Growth Rate</p>
         </div>

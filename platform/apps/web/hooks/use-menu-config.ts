@@ -28,7 +28,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api"
 async function fetchWithAuth<T>(
   endpoint: string,
   token: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
@@ -256,7 +256,7 @@ export function useMenuConfig() {
       const pinnedPages = getEffectivePinnedPages();
       return pinnedPages.includes(href);
     },
-    [getEffectivePinnedPages]
+    [getEffectivePinnedPages],
   );
 
   // Toggle pin state
@@ -268,7 +268,7 @@ export function useMenuConfig() {
         pinMutation.mutate(href);
       }
     },
-    [isPinned, pinMutation, unpinMutation]
+    [isPinned, pinMutation, unpinMutation],
   );
 
   return {

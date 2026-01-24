@@ -10,7 +10,7 @@ const API_BASE =
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ campgroundId: string }> }
+  { params }: { params: Promise<{ campgroundId: string }> },
 ) {
   const { campgroundId } = await params;
   const url = `${API_BASE}/public/campgrounds/${campgroundId}/leads`;
@@ -32,9 +32,6 @@ export async function POST(
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
     console.error("[public-leads] Error:", err);
-    return NextResponse.json(
-      { error: "Failed to capture lead" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to capture lead" }, { status: 500 });
   }
 }

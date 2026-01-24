@@ -8,7 +8,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PrismaModule, PermissionsModule],
   controllers: [FormsController],
   providers: [FormsService],
-  exports: [FormsService]
+  exports: [FormsService],
 })
 export class FormsModule {}
-

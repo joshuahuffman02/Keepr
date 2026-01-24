@@ -1,4 +1,5 @@
 # RV Hospitality Roadmap (Internal)
+
 Last updated: 2025-12-17 (PLG complete)
 Audience: product, engineering, GTM. Structure: Foundations → Differentiators → Moats. Owners are placeholders until staffed.
 
@@ -7,12 +8,14 @@ Audience: product, engineering, GTM. Structure: Foundations → Differentiators 
 All PLG features are now complete. Keepr can sell itself with minimal founder involvement.
 
 ### AI Support Backend
+
 - **New service**: `ai-support.service.ts` with embedded help knowledge base
 - **Endpoint**: `POST /ai/support/chat` in `ai.controller.ts`
 - **Features**: Context-aware responses from help topics, graceful fallbacks, ticket prompts
 - **Integration**: Connects to existing `SupportChatWidget.tsx`
 
 ### Referral Program Frontend
+
 - **New page**: `/dashboard/referrals/page.tsx`
 - **Stats display**: Clicks, signups, conversions, pending/earned credits
 - **Sharing**: Copy link, email, Twitter, Facebook sharing
@@ -20,6 +23,7 @@ All PLG features are now complete. Keepr can sell itself with minimal founder in
 - **How it works**: Visual 3-step explanation
 
 ### Feature Tours System
+
 - **Tour definitions**: `lib/tours/feature-tours.ts` with 4 tours (dashboard-welcome, booking-flow, pricing-setup, referral-program)
 - **Hook**: `hooks/use-feature-tour.ts` for programmatic tour control
 - **Provider**: `components/tours/FeatureTourProvider.tsx` with:
@@ -30,6 +34,7 @@ All PLG features are now complete. Keepr can sell itself with minimal founder in
   - `data-tour` attribute targeting
 
 ### Files Created
+
 ```
 platform/apps/api/src/ai/ai-support.service.ts
 platform/apps/web/app/dashboard/referrals/page.tsx
@@ -40,12 +45,14 @@ platform/apps/web/components/tours/index.ts
 ```
 
 ### Files Modified
+
 ```
 platform/apps/api/src/ai/ai.module.ts - Added AiSupportService
 platform/apps/api/src/ai/ai.controller.ts - Added support chat endpoint
 ```
 
 ### Remaining Integration Work
+
 - Add `FeatureTourProvider` to app layout
 - Add `data-tour` attributes to nav elements for tour highlighting
 - Create org-level referral tracking backend (frontend ready)
@@ -53,9 +60,11 @@ platform/apps/api/src/ai/ai.controller.ts - Added support chat endpoint
 ---
 
 ## Update — Dec 17, 2025 (Session 1): Emotional Design & UX Polish (SHIPPED)
+
 Comprehensive emotional design improvements deployed to all public-facing pages:
 
 ### Booking Flow
+
 - Trust badges before payment (SSL, PCI, Stripe Secure, Instant Confirm)
 - Enhanced error messages with recovery guidance
 - Celebration success screen with animations
@@ -65,23 +74,27 @@ Comprehensive emotional design improvements deployed to all public-facing pages:
 - **Bug fix**: Zip code now required (5+ chars) with visual validation
 
 ### Gamification (Staff)
+
 - Level-up modal with celebration animations
 - XP toast notification system
 - Demo button for testing
 
 ### Campground Public Page
+
 - Photo gallery with emotional overlay (name, tagline, reviews, location)
 - Mobile swipe gestures for photos
 - Social proof notifications (RecentBookingNotification component)
 - Improved loading state
 
 ### Home Page
+
 - Scroll animations with framer-motion
 - Animated blog section
 - Shimmer loading skeleton
 - Emotional CTA language throughout
 
 ### CTA Language Updates
+
 - "Check Availability" → "Find Your Perfect Spot" / "Reserve This Site"
 - "Book Now" → "Reserve Your Stay"
 - "Claim Deal" → "Grab This Deal"
@@ -89,6 +102,7 @@ Comprehensive emotional design improvements deployed to all public-facing pages:
 - "Search" → "Explore" with arrow animation
 
 ### Files Modified
+
 ```
 platform/apps/web/app/(public)/client.tsx
 platform/apps/web/app/(public)/park/[slug]/client.tsx
@@ -101,12 +115,14 @@ platform/apps/web/tailwind.config.ts
 ```
 
 ## Scope & principles
+
 - RV-native journeys first: rig-fit accuracy, site assignment, seasonal/long-stay rules, add-ons, and POS tied to reservations.
 - Arrival to departure lifecycle: booking → hold → check-in → on-site service → checkout → rebook.
 - Operational efficiency: offline-tolerant, task automation, and unified comms timelines.
 - Open + measurable: APIs/webhooks, analytics, and explicit ROI (ADR, occupancy, attach rate, labor per revenue).
 
 ## Planning Update — Dec 09, 2025
+
 - Goals: revenue reliability first, then ops experience, then distribution/sales, finishing with monetization and insights.
 - Sequence:
   - Phase 1: Dynamic pricing & seasonal rate plans; deposits/auto-collect; add-ons/upsells; automated comms (templates + event hooks); audit logs/RBAC hardening. Dependencies: pricing/rate model, payments, comms hooks, auth/tenant isolation.
@@ -130,6 +146,7 @@ platform/apps/web/tailwind.config.ts
   - Quick wins: comms bounce/block alerts + webhook logging; queue stale/failure alerts to sinks.
 
 ### Phase 4 (Monetization & Insights) execution — Dec 10, 2025
+
 - Scope: stored value (issue/reload/redeem/void/refund-to-credit with optional PIN, taxable-load flag, idempotent ledger, liability snapshots); POS (split tender incl. gift card/charge-to-site/cash, receipts, returns/exchanges, offline replay with seq dedupe and backlog alert); waitlist (holds, throttles, idempotent accept/decline/expire); reporting (ADR/RevPAR/revenue/channel mix/liability, saved filters, CSV export, scheduled email); observability/rate limits/redaction.
 - Data/API: SQL DDL drafted (gift_card/ledger, POS orders/lines/tenders/returns + terminal sessions, waitlist entries/holds/offers, facts/dims + liability_snapshot); OpenAPI 3.1 drafts for gift cards/POS/waitlist/reports; shared idempotency + tenant scoping/RLS; comms triggers/templates enumerated (gift card events, receipts/refunds, offers/reminders/outcomes, report ready).
 - Backlog source: `docs/phase4-backlog.csv` (owners/dates/points for gift cards, POS, waitlist, reporting, idempotency, security, observability). Keep status in sync with that file.
@@ -138,23 +155,27 @@ platform/apps/web/tailwind.config.ts
 - Open items before coding: confirm tax/expiry/breakage policy per region (load vs redeem taxable, sweep cadence); approve UX mocks for POS/gift card/waitlist; stage creds/config for payments/comms/tax and POS device/auth; sender domains ready; hardware/offline limits locked.
 
 ### Milestones & asks (Dec–Jan)
+
 - Dec 17: Processor/tokenization, tax engine + taxable-load rules, comms provider/template owner, staging creds live. Owners: Alex, Priya, Sam, Casey. Ask: unblock tax/consent/PCI scope and enable staging calls.
 - Dec 20: POS hardware/offline limits and POS/gift card/waitlist UX mocks approved. Owners: Taylor, Jordan. Ask: lock device/auth/offline envelopes and UX so build can start.
 - Dec 24: Idempotency store + rate limit validation + offline replay dedupe + observability wiring. Owner: Casey. Ask: enforce idempotency/rate limits, add replay dedupe and alert sinks (redeem/offline backlog/offer lag/report failures).
 - Jan 3 (Go/No-Go, per `docs/phase4-go-no-go.md`): Owners: leads above + Eng. Ask: all gates green — idempotency, rate limits, offline replay dedupe/backlog alert, consent/quiet hours, tax/breakage rules, RLS/audit, alerts + synthetics, liability tie-out, DR drill scheduled.
 
 ### Go/No-Go snapshot (Jan 3, 2026)
+
 - Status: Phase 4 in-progress. Done: schemas/DDL, initial idempotency keys, rate-limit scaffolds, consent/quiet-hours enforcement, DMARC/DKIM/SPF verified, tax engine + liability snapshot hooks, initial alerts defined, DR plan drafted. Outstanding: finalize idempotency store + replay dedupe, validate rate limits, wire alerts/sinks + synthetics, confirm tax/breakage rules + sweep, lock processor/tokenization + vendor creds, hardware/offline envelopes, liability tie-out run, DR restore drill executed.
 - Top risks (see `docs/phase4-go-no-go-onepager.md`): observability/alerts (Casey, Dec 24), PCI/POS scope + hardware/offline (Taylor/Alex, Dec 20; tokenization Dec 17), comms consent/deliverability (Sam, Dec 17), tax/breakage policy (Priya, Dec 17), offline replay/idempotency (Casey, Dec 24), vendor creds/approvals (Casey/Alex/Sam/Priya/Taylor, Dec 17–20).
 - Gates to green: idempotency + rate limits; offline replay dedupe/backlog alert; consent/quiet hours/unsubscribe; tax/breakage rules + sweep; RLS/audit + PII/PAN redaction; alerts + synthetics for redeem/offline backlog/offer lag/report failures; reports 503 capacity guard; liability snapshot = balances; DR restore drill recorded.
 - Asks by date: Dec 17 (processor/tokenization, tax engine + taxable-load rules, comms provider/template owner, staging creds); Dec 20 (POS hardware/offline limits, POS/gift card/waitlist UX mocks); Dec 24 (idempotency store, rate-limit validation, offline replay dedupe, observability wiring validated); Jan 3 (all gates green).
 
 ### Production readiness (internal)
+
 - Gates: idempotency enforced on new tables/APIs; rate limits validated (lookup/apply/reporting); offline replay dedupe with backlog alert; waitlist throttle/expiry/accept idempotent; reports 503 capacity guard; comms consent/quiet hours/unsubscribe enforced; tax/breakage rules implemented with sweep; liability snapshot = balances; PII/PAN redaction verified; alerts + synthetics firing for redeem/offline backlog/offer lag/report failures.
 - Post-completion polish: see `docs/post-completion-polish.md` for observability/security/UX/test checklist; prioritize alert sinks, perf budgets, and tagged smoke/E2E coverage (`@smoke-hardening`).
 - DR: runbook at `docs/dr-readiness.md`; schedule and record a restore drill before Go/No-Go.
 
 ### Risks & controls (internal)
+
 - Observability/alerts gaps — Owner: Casey — Control: wire Slack/PagerDuty/email sinks and perf budgets; stage alerts for redeem/offline backlog/offer lag/report failures proven.
 - PCI/scope & hardware/offline limits — Owner: Taylor (hardware) + Alex (PCI) — Control: keep card processing behind flags until sandbox validated; lock device/auth/offline envelopes; enforce tender ledger/idempotency; over/short alerts.
 - Comms consent/deliverability — Owner: Sam — Control: enforce consent/quiet hours/unsubscribe in hooks; bounce/block alerts; template approvals.
@@ -164,6 +185,7 @@ platform/apps/web/tailwind.config.ts
 ## Phasing
 
 ### Foundations (0–3 months)
+
 - **Offline/resilience** — offline POS/kiosk with sync queue, SMS fallbacks, safe retries.  
   Owners: Eng Lead, Infra. Dependencies: payments queueing, ledger idempotency.
 - **RV-native inventory & assignments** — rig-fit guardrails everywhere, auto-assign with constraint solver, conflict detection for holds/blocks/maintenance.  
@@ -176,6 +198,7 @@ platform/apps/web/tailwind.config.ts
   Owners: Ops PM, Mobile Eng. Dependencies: task model, map data.
 
 ### Differentiators (3–9 months)
+
 - **Arrival automation** — self-check-in, gate/lock/RFID integrations, vehicle/RV plate capture, late-arrival flows, “site ready” signals.  
   Owners: PM, Integrations Eng. Dependencies: access control provider, assignments.
 - **Unified upsell engine** — context-aware offers (arrival firewood bundles, mid-stay activities, late checkout), store/POS charges to folio, A/B hooks.  
@@ -190,6 +213,7 @@ platform/apps/web/tailwind.config.ts
   Owners: PM, Marketing/AI Eng. Dependencies: comms/templates, events/deals data, media storage.
 
 ### Moats (9–18 months)
+
 - **Developer ecosystem** — public API + webhooks, OAuth2 scoped tokens, sandbox + SDKs, extension surfaces in admin.  
   Owners: Platform PM, DevEx Eng. Dependencies: auth, rate limits, audit.
 - **AI Ops Copilot** — suggested replies, task bundling/route optimization, bulk changes (pricing, blocks), semantic search.  
@@ -200,6 +224,7 @@ platform/apps/web/tailwind.config.ts
   Owners: PM, Sec/Infra. Dependencies: controls, compliance runbook.
 
 ## Data Intelligence & Decision Engine
+
 - Core philosophy: empower operators without noise; privacy-first (aggregated/anonymous); explain “what the data says” with confidence + projected impact; make actions one-click where permissions allow; track conversion health across every meaningful interaction.
 - Data tracking layer: structured events across booking/browsing (page views, site card/detail, image hover/click/viewed, site class viewed, availability check, add-to-stay, reservation start/abandon/complete, deal viewed/applied, email signup, review viewed) with timestamp, anonymous session ID, device, referrer, coarse geolocation.
 - Image conversion tracking: first-seen images, time viewed, CTR, conversion correlation, A/B ordering, heat ranks; insights like “Image #3 drives +45% conversions vs current first image” and “Outdoor images keep guests 2.8s longer.”
@@ -216,6 +241,7 @@ platform/apps/web/tailwind.config.ts
 - Codex implementation notes: event-based analytics tables; image-level conversion tracking; conversion pipelines; permissions-based apply actions; reports UI; recommendation engine hooks; dashboard query caching; future-ready ML entry points.
 
 ## Gamification (staff-only, opt-in per campground)
+
 - Philosophy: reward consistent, quality work; mature UI (no cartoon/cheesy visuals). Guests never see it.
 - Opt-in: camp-level toggle; manager controls for XP ranges, overrides, and manual “Merit XP”.
 - XP system: actions grant XP (daily tasks, maintenance completions, smooth check-ins, zero-error reservations, checklists, positive reviews, on-time assignments, helping teammates). Light penalties for overdue tasks, correction-required mistakes, skipped checklist items.
@@ -230,17 +256,20 @@ platform/apps/web/tailwind.config.ts
 - Anti-cheese design: no cartoon graphics or playful sounds; subtle gradients, clean typography, CRM/fitness-inspired.
 
 ## Sequencing (near → mid → long)
-- Near (0–3 mo): offline/resilience; assignments/rig-fit hardening; payments/finops; comms timelines + deliverability; staff mobility v1.  
-- Mid (3–9 mo): arrival automation; unified upsell engine; activities/rentals depth; data/forecasting; integrations wave 1.  
+
+- Near (0–3 mo): offline/resilience; assignments/rig-fit hardening; payments/finops; comms timelines + deliverability; staff mobility v1.
+- Mid (3–9 mo): arrival automation; unified upsell engine; activities/rentals depth; data/forecasting; integrations wave 1.
 - Long (9–18 mo): developer ecosystem; AI Ops Copilot; IoT/utilities; enterprise/international.
 
 ## Payments & finops status (2025-12-06)
+
 - Stripe Connect live for per-booking fees/plans with application fees and pass-through toggle in staff/public checkout.
 - Gaps: no payout reconciliation/export job, no ledger lines for platform/Stripe fees or double-entry tie-out, no saved wallets/ACH/setup intents, and no chargeback/dispute UI/queues/evidence kits/alerts.
 - Actions: add payout + fee journal and recon job + admin payout report, enable ACH/wallet methods with mandates and retries, build dispute center with webhook ingestion, evidence templates, alerts, and audit trail on payment actions.
 - Behind the scenes: create Stripe test accounts/fixtures for payouts and disputes; add evidence kit templates and alert channels; wire payout/job telemetry to catch drift before GA.
 
 ## Communications automation status (2025-12-08)
+
 - Webhooks: Postmark/Twilio webhooks persist provider message IDs and statuses; outbound email retries with backoff and fails over to SMTP; SMS retries with backoff. Sender domain allowlist enforced.
 - Deliverability: DMARC/DKIM/SPF verification per sender domain with status surfaces; bounce/complaint classification feeds timelines/inbox; provider health badges on comms timelines.
 - Templates/approvals: Per-campground template library with preview/smoke-send, versioning, approvals, and audit log; exposed in admin.
@@ -249,6 +278,7 @@ platform/apps/web/tailwind.config.ts
 - Tests/verification: Manual DMARC/DKIM/SPF checks against sender domains, webhook receipt of provider message IDs and bounce/complaint normalization, playbook firing for arrival/unpaid/upsell/abandoned-cart triggers, and SLA badge behavior validated in inbox/reservation/guest views.
 
 ## Performance & reliability status (2025-12-21)
+
 - SLOs: API p95 target `${SLO_API_P95_MS:-800}`ms, error rate ≤ `${SLO_API_ERROR_RATE:-0.01}`; jobs p95 target `${SLO_JOB_P95_MS:-30000}`ms, failure rate ≤ `${SLO_JOB_FAILURE_RATE:-0.02}`. Snapshot endpoint `/api/observability/snapshot` and UI at `/tech` surface live data.
 - Perf budgets: CI step `pnpm --dir platform/apps/web budgets` enforces bundle size (total JS ≤ 0.8MB, per-route ≤ 250KB by default).
 - Rate limits & queuing: Per-IP/org 429s via `PERF_RATE_LIMIT_*`; queue/backpressure for campaign dispatch and payout reconciliation with queue depth and timeouts recorded.
@@ -256,6 +286,7 @@ platform/apps/web/tailwind.config.ts
 - New hardening: API logger PII-masking shipped (email/phone/last4) with Jest coverage; post-completion checklist tracks alerts/UX/test polish; k6 perf smoke and `@smoke-hardening` E2E tagging guidance added.
 
 ## Notes / parking lot
+
 - Image mirroring + external review connectors: Google Places live; RV Life left stubbed. S3 mirroring scaffolded; defer enabling (bucket/creds) until closer to go-live to avoid ongoing storage/egress costs. Trigger endpoints are in place (`/campgrounds/:id/refresh-reviews`, `/campgrounds/:id/mirror-photos`).
 - Native app placeholder (PWA wrapper): ship a store-listed shell around current guest/staff PWA slices, reuse push preferences/registration stubs, and make offline parity explicit (same SW caches/queues and banners). No new backend scope beyond the existing push/offline stack.
 - Mobile/offline audit (2025-12-06):
@@ -266,22 +297,26 @@ platform/apps/web/tailwind.config.ts
   - Behind the scenes: add synthetic offline test harness, SW version pinning + busting, sync success/fail metrics, and alarms on queue depth/age; capture conflict samples to refine merge strategies.
 
 ## Dependencies & risks
-- Data quality: enforce event schemas and idempotency for comms/payments.  
-- Access control vendors: lead times and certification may slow arrival automation.  
-- Offline sync: clear conflict resolution rules for inventory, payments, and tasks.  
+
+- Data quality: enforce event schemas and idempotency for comms/payments.
+- Access control vendors: lead times and certification may slow arrival automation.
+- Offline sync: clear conflict resolution rules for inventory, payments, and tasks.
 - Compliance: SOC2 controls and PII handling gate multi-property/enterprise deals.
 - Deliverability: DMARC/DKIM/SPF checks, bounce classification, and provider failover/backoff shipped; continue monitoring reputation and keep health alerts active before higher-volume sends.
 
 ## Public roadmap alignment
+
 The public view should surface themes (Now/Next/Later) without sensitive dependencies. See `docs/roadmap-public.md` once generated.
 
 ## Audit checkpoint — 2025-12-06
+
 - Communications Quality & Automation: deliverability health (DMARC/DKIM/SPF) and provider failover not yet verified; template library/approvals and event-based sequences still need implementation; inbox SLA/routing logic should be confirmed before send volume increases.
 - Payments & Fintech Evolution: payout reconciliation jobs, ACH/wallet flows, and chargeback center surfaces are not observed yet; ensure ledger tie-out and evidence kit generation before broad rollout.
 - Mobile & Offline: service worker/offline queues need durability and conflict resolution review; offline POS/kiosk and push notification preferences remain to be built; add telemetry for sync success/fail to catch edge cases.
 - Recommendation: agents can continue with the above priorities; raise blockers if provider creds, Stripe Connect test accounts, or PWA offline testing harnesses are missing.
 
 ## Pre-ship QA & UI polish (2025-12-22) — in progress
+
 - Scope: dev, staging, prod; Chromium first; call out Safari/Firefox/mobile gaps. No new features unless required to ship.
 - Coverage matrix drafted: public booking + payments (cards/ACH/wallet gating), portal/PWA offline (My Stay, upsells, orders, messaging, activities), POS/kiosk (offline queue, refund/exchange, gift card redeem), admin ops/finance/support/marketing/settings, comms templates/playbooks/timelines, lead capture/referrals/promos, OTA stub, audit/exports, backup/DR, integrations/API/SDK smokes.
 - UI/UX: professional nav regrouping (Core Ops, Calendar, Property/Inventory, Finance, Marketing/Social, Support, Settings/Admin), consistent spacing/typography/buttons/tables/cards, clean empty/loading/error states, mobile quick actions.

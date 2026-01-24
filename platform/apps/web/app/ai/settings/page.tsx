@@ -13,7 +13,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Loader2,
   Settings,
@@ -30,7 +36,7 @@ import {
   Zap,
   Shield,
   Bot,
-  Brain
+  Brain,
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -125,7 +131,7 @@ export default function AISettingsPage() {
   });
 
   const updateField = <K extends keyof AutopilotConfig>(key: K, value: AutopilotConfig[K]) => {
-    setLocalConfig(prev => ({ ...prev, [key]: value }));
+    setLocalConfig((prev) => ({ ...prev, [key]: value }));
     setHasChanges(true);
   };
 
@@ -178,9 +184,7 @@ export default function AISettingsPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">AI Settings</h1>
-              <p className="text-sm text-muted-foreground">
-                Configure your AI assistant behavior
-              </p>
+              <p className="text-sm text-muted-foreground">Configure your AI assistant behavior</p>
             </div>
           </div>
           <Button
@@ -233,7 +237,9 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Auto-Reply Suggestions</p>
-                      <p className="text-sm text-muted-foreground">AI drafts replies for guest messages</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI drafts replies for guest messages
+                      </p>
                     </div>
                   </div>
                   <Switch
@@ -249,7 +255,9 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Smart Waitlist</p>
-                      <p className="text-sm text-muted-foreground">AI ranks and manages waitlist entries</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI ranks and manages waitlist entries
+                      </p>
                     </div>
                   </div>
                   <Switch
@@ -265,7 +273,9 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Anomaly Detection</p>
-                      <p className="text-sm text-muted-foreground">AI identifies booking and pricing anomalies</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI identifies booking and pricing anomalies
+                      </p>
                     </div>
                   </div>
                   <Switch
@@ -281,7 +291,9 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">No-Show Prediction</p>
-                      <p className="text-sm text-muted-foreground">AI predicts and flags potential no-shows</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI predicts and flags potential no-shows
+                      </p>
                     </div>
                   </div>
                   <Switch
@@ -297,12 +309,16 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Predictive Maintenance</p>
-                      <p className="text-sm text-muted-foreground">AI detects maintenance patterns</p>
+                      <p className="text-sm text-muted-foreground">
+                        AI detects maintenance patterns
+                      </p>
                     </div>
                   </div>
                   <Switch
                     checked={localConfig.predictiveMaintenanceEnabled ?? false}
-                    onCheckedChange={(checked) => updateField("predictiveMaintenanceEnabled", checked)}
+                    onCheckedChange={(checked) =>
+                      updateField("predictiveMaintenanceEnabled", checked)
+                    }
                   />
                 </div>
 
@@ -313,7 +329,9 @@ export default function AISettingsPage() {
                     </div>
                     <div>
                       <p className="font-medium text-foreground">Weather Alerts</p>
-                      <p className="text-sm text-muted-foreground">Auto-notify guests of weather events</p>
+                      <p className="text-sm text-muted-foreground">
+                        Auto-notify guests of weather events
+                      </p>
                     </div>
                   </div>
                   <Switch
@@ -344,7 +362,8 @@ export default function AISettingsPage() {
                     <div>
                       <p className="font-medium text-status-warning-text">Safety First</p>
                       <p className="text-sm text-status-warning-text mt-1">
-                        All autonomous actions are logged and can be reversed. Start with conservative settings and increase as you build confidence.
+                        All autonomous actions are logged and can be reversed. Start with
+                        conservative settings and increase as you build confidence.
                       </p>
                     </div>
                   </div>
@@ -354,11 +373,15 @@ export default function AISettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">Auto-Send Replies</p>
-                      <p className="text-sm text-muted-foreground">Automatically send AI-drafted replies</p>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically send AI-drafted replies
+                      </p>
                     </div>
                     <Switch
                       checked={localConfig.autoReplyAutoSendEnabled ?? false}
-                      onCheckedChange={(checked) => updateField("autoReplyAutoSendEnabled", checked)}
+                      onCheckedChange={(checked) =>
+                        updateField("autoReplyAutoSendEnabled", checked)
+                      }
                     />
                   </div>
 
@@ -375,7 +398,9 @@ export default function AISettingsPage() {
                             step={10}
                             className="flex-1"
                           />
-                          <span className="w-12 text-sm font-medium">{localConfig.autoReplyMaxDailyAutoSends ?? 50}</span>
+                          <span className="w-12 text-sm font-medium">
+                            {localConfig.autoReplyMaxDailyAutoSends ?? 50}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -386,11 +411,15 @@ export default function AISettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">Auto-Offer Waitlist Spots</p>
-                      <p className="text-sm text-muted-foreground">Automatically offer spots when cancellations occur</p>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically offer spots when cancellations occur
+                      </p>
                     </div>
                     <Switch
                       checked={localConfig.waitlistAutoOfferEnabled ?? false}
-                      onCheckedChange={(checked) => updateField("waitlistAutoOfferEnabled", checked)}
+                      onCheckedChange={(checked) =>
+                        updateField("waitlistAutoOfferEnabled", checked)
+                      }
                     />
                   </div>
 
@@ -407,7 +436,9 @@ export default function AISettingsPage() {
                             step={5}
                             className="flex-1"
                           />
-                          <span className="w-12 text-sm font-medium">{localConfig.waitlistAutoOfferMinScore ?? 75}%</span>
+                          <span className="w-12 text-sm font-medium">
+                            {localConfig.waitlistAutoOfferMinScore ?? 75}%
+                          </span>
                         </div>
                       </div>
                       <div>
@@ -421,7 +452,9 @@ export default function AISettingsPage() {
                             step={15}
                             className="flex-1"
                           />
-                          <span className="w-12 text-sm font-medium">{localConfig.waitlistAutoOfferHoldMinutes ?? 30}m</span>
+                          <span className="w-12 text-sm font-medium">
+                            {localConfig.waitlistAutoOfferHoldMinutes ?? 30}m
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -432,18 +465,24 @@ export default function AISettingsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="font-medium text-foreground">Auto-Release No-Shows</p>
-                      <p className="text-sm text-muted-foreground">Automatically release sites from unconfirmed guests</p>
+                      <p className="text-sm text-muted-foreground">
+                        Automatically release sites from unconfirmed guests
+                      </p>
                     </div>
                     <Switch
                       checked={localConfig.noShowAutoReleaseEnabled ?? false}
-                      onCheckedChange={(checked) => updateField("noShowAutoReleaseEnabled", checked)}
+                      onCheckedChange={(checked) =>
+                        updateField("noShowAutoReleaseEnabled", checked)
+                      }
                     />
                   </div>
 
                   {localConfig.noShowAutoReleaseEnabled && (
                     <div className="ml-6 space-y-3">
                       <div>
-                        <Label className="text-sm">Confirmation Window (hours before arrival)</Label>
+                        <Label className="text-sm">
+                          Confirmation Window (hours before arrival)
+                        </Label>
                         <div className="flex items-center gap-4 mt-2">
                           <Slider
                             value={[localConfig.noShowAutoConfirmHours ?? 24]}
@@ -453,7 +492,9 @@ export default function AISettingsPage() {
                             step={6}
                             className="flex-1"
                           />
-                          <span className="w-12 text-sm font-medium">{localConfig.noShowAutoConfirmHours ?? 24}h</span>
+                          <span className="w-12 text-sm font-medium">
+                            {localConfig.noShowAutoConfirmHours ?? 24}h
+                          </span>
                         </div>
                       </div>
                       <div>
@@ -467,7 +508,9 @@ export default function AISettingsPage() {
                             step={1}
                             className="flex-1"
                           />
-                          <span className="w-12 text-sm font-medium">{localConfig.noShowAutoReleaseHours ?? 4}h</span>
+                          <span className="w-12 text-sm font-medium">
+                            {localConfig.noShowAutoReleaseHours ?? 4}h
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -488,7 +531,9 @@ export default function AISettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-foreground">Enable Dynamic Pricing</p>
-                    <p className="text-sm text-muted-foreground">AI analyzes demand and suggests pricing</p>
+                    <p className="text-sm text-muted-foreground">
+                      AI analyzes demand and suggests pricing
+                    </p>
                   </div>
                   <Switch
                     checked={localConfig.dynamicPricingAiEnabled ?? false}
@@ -509,7 +554,9 @@ export default function AISettingsPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="suggest">Suggest Only (Manual approval)</SelectItem>
-                          <SelectItem value="auto_minor">Auto-Apply Minor Changes (&lt;10%)</SelectItem>
+                          <SelectItem value="auto_minor">
+                            Auto-Apply Minor Changes (&lt;10%)
+                          </SelectItem>
                           <SelectItem value="auto_all">Auto-Apply All (Full autonomous)</SelectItem>
                         </SelectContent>
                       </Select>
@@ -526,7 +573,9 @@ export default function AISettingsPage() {
                           step={5}
                           className="flex-1"
                         />
-                        <span className="w-16 text-sm font-medium">+/- {localConfig.dynamicPricingMaxAdjust ?? 50}%</span>
+                        <span className="w-16 text-sm font-medium">
+                          +/- {localConfig.dynamicPricingMaxAdjust ?? 50}%
+                        </span>
                       </div>
                     </div>
                   </>
@@ -546,7 +595,9 @@ export default function AISettingsPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-foreground">Enable Phone Agent</p>
-                    <p className="text-sm text-muted-foreground">AI answers calls and handles inquiries</p>
+                    <p className="text-sm text-muted-foreground">
+                      AI answers calls and handles inquiries
+                    </p>
                   </div>
                   <Switch
                     checked={localConfig.phoneAgentEnabled ?? false}

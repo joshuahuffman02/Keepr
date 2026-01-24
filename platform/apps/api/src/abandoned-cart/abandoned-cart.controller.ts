@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, Get, NotFoundException, Param, Post, Query, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from "@nestjs/common";
 import { AbandonedCartService } from "./abandoned-cart.service";
 import { JwtAuthGuard } from "../auth/guards";
 
@@ -15,7 +25,9 @@ export class AbandonedCartController {
 
   @UseGuards(JwtAuthGuard)
   @Post("abandoned-carts/queue")
-  queue(@Body() body: { campgroundId?: string; email?: string; phone?: string; abandonedAt?: string }) {
+  queue(
+    @Body() body: { campgroundId?: string; email?: string; phone?: string; abandonedAt?: string },
+  ) {
     if (!body.campgroundId) throw new BadRequestException("campgroundId is required");
     return this.abandonedCarts.record({
       campgroundId: body.campgroundId,
@@ -35,4 +47,3 @@ export class AbandonedCartController {
     return updated;
   }
 }
-

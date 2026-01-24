@@ -37,6 +37,7 @@ If you charge one flat rate year-round, you're either:
 2. **Priced too high during slow times** - Leaving sites empty when you could fill them
 
 Consider this scenario: Your campground has 50 sites at $45/night.
+
 - Peak July weekend: You sell out instantly. You could have charged $65 and still filled every site. **Lost revenue: $1,000/night**
 - Slow October Tuesday: Only 10 sites booked. At $35/night, you might have filled 25 sites. **Lost revenue: $525/night**
 
@@ -48,13 +49,14 @@ Consider this scenario: Your campground has 50 sites at $45/night.
 
 The most basic form of dynamic pricing is seasonal rates. Most campgrounds should have at least three tiers:
 
-| Season | Timeframe | Rate Adjustment |
-|--------|-----------|-----------------|
-| Peak Season | Memorial Day - Labor Day | Base rate + 20-40% |
-| Shoulder Season | Spring & Fall | Base rate |
-| Off Season | Winter months | Base rate - 20-30% |
+| Season          | Timeframe                | Rate Adjustment    |
+| --------------- | ------------------------ | ------------------ |
+| Peak Season     | Memorial Day - Labor Day | Base rate + 20-40% |
+| Shoulder Season | Spring & Fall            | Base rate          |
+| Off Season      | Winter months            | Base rate - 20-30% |
 
 **Implementation tips:**
+
 - Define your seasons based on your actual booking data, not the calendar
 - Consider micro-seasons (leaf peeping in fall, spring break, etc.)
 - Communicate season dates clearly on your website
@@ -63,10 +65,10 @@ The most basic form of dynamic pricing is seasonal rates. Most campgrounds shoul
 
 Weekend demand is almost always higher than weekdays. Smart pricing reflects this:
 
-| Day | Typical Adjustment |
-|-----|-------------------|
-| Friday | +15-25% |
-| Saturday | +20-30% |
+| Day             | Typical Adjustment |
+| --------------- | ------------------ |
+| Friday          | +15-25%            |
+| Saturday        | +20-30%            |
 | Sunday-Thursday | Base rate or lower |
 
 **Pro tip:** Some campgrounds offer "weeknight specials" to attract retirees, remote workers, and flexible travelers who can avoid weekend crowds.
@@ -89,12 +91,14 @@ Research your local event calendar and adjust pricing 3-6 months in advance. Gue
 The most sophisticated approach adjusts prices automatically based on real-time occupancy:
 
 **Example rule:**
+
 - 0-50% booked: Base rate
 - 51-75% booked: +10%
 - 76-90% booked: +20%
 - 91%+ booked: +30%
 
 **Booking window adjustments:**
+
 - 90+ days in advance: Base rate
 - 30-89 days in advance: +5%
 - 7-29 days in advance: +10%
@@ -154,14 +158,15 @@ Transparency is key to guest acceptance. Here's how to handle common questions:
 ### On Your Website
 
 ```
-PRICING NOTE: Our rates vary by season, day of week, and 
-demand to offer the best value year-round. Book early for 
+PRICING NOTE: Our rates vary by season, day of week, and
+demand to offer the best value year-round. Book early for
 the best rates on popular dates!
 ```
 
 ### When Guests Ask "Why Did the Price Change?"
 
 **Good response:**
+
 > "Our rates adjust based on the season and how busy we are. Popular weekends like July 4th fill up quickly, so they're priced higher. If you're flexible, our weeknight rates are our best value!"
 
 ### Rate Lock Policy
@@ -184,6 +189,7 @@ Dramatic swings feel arbitrary and alienate guests.
 ### 2. Not Adjusting for Site Type
 
 Premium sites deserve premium pricing:
+
 - Waterfront sites: +$15-25/night
 - Full hookup vs. electric only: +$10/night
 - Pull-through vs. back-in: +$5/night
@@ -191,6 +197,7 @@ Premium sites deserve premium pricing:
 ### 3. Forgetting Long-Stay Discounts
 
 Monthly or weekly guests expect volume discounts:
+
 - Weekly rate: 6 nights for the price of 7
 - Monthly rate: Up to 30-50% off nightly rates
 
@@ -203,22 +210,26 @@ If adjusting prices requires manually updating multiple calendars and websites, 
 ## Setting Up Dynamic Pricing: Step by Step
 
 ### Week 1: Audit Current Performance
+
 - [ ] Export 12 months of booking data
 - [ ] Identify occupancy by month and day of week
 - [ ] Note which dates sold out and which had vacancies
 
 ### Week 2: Define Your Pricing Rules
+
 - [ ] Set seasonal date ranges
 - [ ] Determine day-of-week adjustments
 - [ ] Identify local events requiring premium pricing
 - [ ] Set minimum and maximum rate caps
 
 ### Week 3: Configure Your System
+
 - [ ] Enter pricing rules into your reservation software
 - [ ] Set up automated adjustments if available
 - [ ] Update website with pricing communication
 
 ### Week 4: Launch and Monitor
+
 - [ ] Go live with new pricing
 - [ ] Track booking pace versus last year
 - [ ] Gather staff feedback on guest questions
@@ -246,4 +257,4 @@ The key is starting simple and building sophistication over time. Begin with sea
 
 ---
 
-*Keepr includes built-in dynamic pricing tools that automatically adjust your rates based on customizable rules. Set it once and let the system optimize your revenue. [Explore pricing features at campreserv.com](https://campreserv.com)*
+_Keepr includes built-in dynamic pricing tools that automatically adjust your rates based on customizable rules. Set it once and let the system optimize your revenue. [Explore pricing features at campreserv.com](https://campreserv.com)_

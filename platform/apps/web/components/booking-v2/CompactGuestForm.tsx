@@ -98,20 +98,13 @@ export function CompactGuestForm({
 
   // Determine if vehicle section is relevant
   const isRvOrTrailer =
-    siteType?.toLowerCase().includes("rv") ||
-    siteType?.toLowerCase().includes("trailer");
+    siteType?.toLowerCase().includes("rv") || siteType?.toLowerCase().includes("trailer");
 
-  const updateField = <K extends keyof GuestFormData>(
-    field: K,
-    value: GuestFormData[K]
-  ) => {
+  const updateField = <K extends keyof GuestFormData>(field: K, value: GuestFormData[K]) => {
     onChange({ ...data, [field]: value });
   };
 
-  const updateAddress = (
-    field: keyof NonNullable<GuestFormData["address"]>,
-    value: string
-  ) => {
+  const updateAddress = (field: keyof NonNullable<GuestFormData["address"]>, value: string) => {
     onChange({
       ...data,
       address: {
@@ -125,10 +118,7 @@ export function CompactGuestForm({
     });
   };
 
-  const updateVehicle = (
-    field: keyof NonNullable<GuestFormData["vehicle"]>,
-    value: string
-  ) => {
+  const updateVehicle = (field: keyof NonNullable<GuestFormData["vehicle"]>, value: string) => {
     onChange({
       ...data,
       vehicle: {
@@ -156,9 +146,7 @@ export function CompactGuestForm({
               placeholder="John"
               className={cn(errors.firstName && "border-red-500")}
               aria-invalid={!!errors.firstName}
-              aria-describedby={
-                errors.firstName ? `${formId}-firstName-error` : undefined
-              }
+              aria-describedby={errors.firstName ? `${formId}-firstName-error` : undefined}
             />
             {errors.firstName && (
               <p
@@ -275,9 +263,7 @@ export function CompactGuestForm({
                   <Input
                     id={`${formId}-state`}
                     value={data.address?.state || ""}
-                    onChange={(e) =>
-                      updateAddress("state", e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => updateAddress("state", e.target.value.toUpperCase())}
                     placeholder="CA"
                     maxLength={2}
                   />
@@ -353,9 +339,7 @@ export function CompactGuestForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`${formId}-vehicleLength`}>
-                    Length (feet)
-                  </Label>
+                  <Label htmlFor={`${formId}-vehicleLength`}>Length (feet)</Label>
                   <Input
                     id={`${formId}-vehicleLength`}
                     type="number"
@@ -372,9 +356,7 @@ export function CompactGuestForm({
                   <Input
                     id={`${formId}-plateNumber`}
                     value={data.vehicle?.plateNumber || ""}
-                    onChange={(e) =>
-                      updateVehicle("plateNumber", e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => updateVehicle("plateNumber", e.target.value.toUpperCase())}
                     placeholder="ABC1234"
                   />
                 </div>
@@ -384,9 +366,7 @@ export function CompactGuestForm({
                   <Input
                     id={`${formId}-plateState`}
                     value={data.vehicle?.plateState || ""}
-                    onChange={(e) =>
-                      updateVehicle("plateState", e.target.value.toUpperCase())
-                    }
+                    onChange={(e) => updateVehicle("plateState", e.target.value.toUpperCase())}
                     placeholder="CA"
                     maxLength={2}
                   />
@@ -415,17 +395,13 @@ export function CompactGuestForm({
                     variant="outline"
                     size="icon"
                     className="h-10 w-10"
-                    onClick={() =>
-                      updateField("adults", Math.max(1, data.adults - 1))
-                    }
+                    onClick={() => updateField("adults", Math.max(1, data.adults - 1))}
                     disabled={data.adults <= 1}
                     aria-label="Decrease adults"
                   >
                     -
                   </Button>
-                  <span className="w-12 text-center font-medium">
-                    {data.adults}
-                  </span>
+                  <span className="w-12 text-center font-medium">{data.adults}</span>
                   <Button
                     type="button"
                     variant="outline"
@@ -447,17 +423,13 @@ export function CompactGuestForm({
                     variant="outline"
                     size="icon"
                     className="h-10 w-10"
-                    onClick={() =>
-                      updateField("children", Math.max(0, data.children - 1))
-                    }
+                    onClick={() => updateField("children", Math.max(0, data.children - 1))}
                     disabled={data.children <= 0}
                     aria-label="Decrease children"
                   >
                     -
                   </Button>
-                  <span className="w-12 text-center font-medium">
-                    {data.children}
-                  </span>
+                  <span className="w-12 text-center font-medium">{data.children}</span>
                   <Button
                     type="button"
                     variant="outline"
@@ -497,17 +469,13 @@ export function CompactGuestForm({
                     variant="outline"
                     size="icon"
                     className="h-10 w-10"
-                    onClick={() =>
-                      updateField("petCount", Math.max(0, data.petCount - 1))
-                    }
+                    onClick={() => updateField("petCount", Math.max(0, data.petCount - 1))}
                     disabled={data.petCount <= 0}
                     aria-label="Decrease pets"
                   >
                     -
                   </Button>
-                  <span className="w-12 text-center font-medium">
-                    {data.petCount}
-                  </span>
+                  <span className="w-12 text-center font-medium">{data.petCount}</span>
                   <Button
                     type="button"
                     variant="outline"
@@ -529,9 +497,7 @@ export function CompactGuestForm({
                       <Button
                         key={type}
                         type="button"
-                        variant={
-                          data.petTypes.includes(type) ? "default" : "outline"
-                        }
+                        variant={data.petTypes.includes(type) ? "default" : "outline"}
                         size="sm"
                         onClick={() => {
                           const newTypes = data.petTypes.includes(type)
@@ -540,8 +506,7 @@ export function CompactGuestForm({
                           updateField("petTypes", newTypes);
                         }}
                         className={cn(
-                          data.petTypes.includes(type) &&
-                            "bg-emerald-600 hover:bg-emerald-700"
+                          data.petTypes.includes(type) && "bg-emerald-600 hover:bg-emerald-700",
                         )}
                       >
                         {type}
@@ -584,7 +549,7 @@ function ExpandableSection({
     <div
       className={cn(
         "border rounded-lg overflow-hidden transition-colors",
-        isOpen ? "border-border bg-muted/50" : "border-border"
+        isOpen ? "border-border bg-muted/50" : "border-border",
       )}
     >
       <button
@@ -595,14 +560,11 @@ function ExpandableSection({
         <div
           className={cn(
             "w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0",
-            hasContent ? "bg-emerald-100" : "bg-muted"
+            hasContent ? "bg-emerald-100" : "bg-muted",
           )}
         >
           <Icon
-            className={cn(
-              "h-4 w-4",
-              hasContent ? "text-emerald-600" : "text-muted-foreground"
-            )}
+            className={cn("h-4 w-4", hasContent ? "text-emerald-600" : "text-muted-foreground")}
           />
         </div>
 

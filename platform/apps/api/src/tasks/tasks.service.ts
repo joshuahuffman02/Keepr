@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { TaskType, TaskState, SlaStatus } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { TaskType, TaskState, SlaStatus } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
@@ -23,18 +23,18 @@ export class TasksService {
    * Compute SLA status based on current time vs due date
    */
   computeSlaStatus(slaDueAt: Date | null, state: TaskState): SlaStatus {
-    if (!slaDueAt || state === 'done' || state === 'failed' || state === 'expired') {
-      return 'on_track';
+    if (!slaDueAt || state === "done" || state === "failed" || state === "expired") {
+      return "on_track";
     }
     const now = Date.now();
     const due = slaDueAt.getTime();
     const remaining = due - now;
 
-    if (remaining < 0) return 'breached';
+    if (remaining < 0) return "breached";
     // At risk if less than 30% of original window remains
     const totalWindow = due - (due - 24 * 60 * 60 * 1000); // assume 24h window for simplicity
-    if (remaining < totalWindow * 0.3) return 'at_risk';
-    return 'on_track';
+    if (remaining < totalWindow * 0.3) return "at_risk";
+    return "on_track";
   }
 
   async create(data: {
@@ -52,7 +52,7 @@ export class TasksService {
     createdBy: string;
   }) {
     const slaDueAt = data.slaDueAt ? new Date(data.slaDueAt) : null;
-    const slaStatus = this.computeSlaStatus(slaDueAt, 'pending');
+    const slaStatus = this.computeSlaStatus(slaDueAt, "pending");
     const checklist = toJsonValue(data.checklist);
 
     return this.prisma.task.create({
@@ -60,7 +60,7 @@ export class TasksService {
         id: randomUUID(),
         tenantId: data.tenantId,
         type: data.type,
-        state: 'pending',
+        state: "pending",
         priority: data.priority,
         siteId: data.siteId,
         reservationId: data.reservationId,
@@ -101,7 +101,7 @@ export class TasksService {
         type: filters?.type,
         assignedToUserId: filters?.assignedToUserId,
       },
-      orderBy: [{ slaDueAt: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ slaDueAt: "asc" }, { createdAt: "desc" }],
       take: limit,
       skip: offset,
     });
@@ -125,7 +125,7 @@ export class TasksService {
     },
   ) {
     const existing = await this.prisma.task.findUnique({ where: { id } });
-    if (!existing) throw new NotFoundException('Task not found');
+    if (!existing) throw new NotFoundException("Task not found");
 
     const slaDueAt = data.slaDueAt ? new Date(data.slaDueAt) : existing.slaDueAt;
     const state = data.state ?? existing.state;
@@ -149,11 +149,7 @@ export class TasksService {
     });
 
     // If turnover task completed, mark site ready on reservation
-    if (
-      updated.type === 'turnover' &&
-      updated.state === 'done' &&
-      updated.reservationId
-    ) {
+    if (updated.type === "turnover" && updated.state === "done" && updated.reservationId) {
       await this.markSiteReady(updated.reservationId);
     }
 
@@ -182,15 +178,15 @@ export class TasksService {
           campgroundId: reservation.campgroundId,
           guestId: reservation.guestId,
           reservationId: reservation.id,
-          type: 'email',
+          type: "email",
           subject: `Your site is ready at ${reservation.Campground.name}`,
           body: `Good news! Site ${reservation.Site.siteNumber} is now ready for your arrival.`,
-          status: 'queued',
-          direction: 'outbound',
+          status: "queued",
+          direction: "outbound",
         },
       });
     } catch (err) {
-      this.logger.error('Failed to create site-ready communication:', err);
+      this.logger.error("Failed to create site-ready communication:", err);
     }
   }
 
@@ -198,7 +194,7 @@ export class TasksService {
     const existing = await this.prisma.task.findUnique({ where: { id } });
 
     if (!existing) {
-      throw new NotFoundException('Task not found');
+      throw new NotFoundException("Task not found");
     }
 
     return this.prisma.task.delete({ where: { id } });
@@ -209,21 +205,19 @@ export class TasksService {
    */
   async sweepSlaStatuses() {
     const pendingTasks = await this.prisma.task.findMany({
-      where: { state: { in: ['pending', 'in_progress'] } },
+      where: { state: { in: ["pending", "in_progress"] } },
     });
 
     for (const task of pendingTasks) {
       const newStatus = this.computeSlaStatus(task.slaDueAt, task.state);
       const shouldExpire =
-        task.state === 'pending' &&
-        task.slaDueAt &&
-        task.slaDueAt.getTime() < Date.now();
+        task.state === "pending" && task.slaDueAt && task.slaDueAt.getTime() < Date.now();
 
       await this.prisma.task.update({
         where: { id: task.id },
         data: {
           slaStatus: newStatus,
-          state: shouldExpire ? 'expired' : task.state,
+          state: shouldExpire ? "expired" : task.state,
         },
       });
     }

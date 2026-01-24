@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsInt, Min, Max, MaxLength } from 'class-validator';
-import { Type } from 'class-transformer';
-import { z } from 'zod';
+import { IsString, IsOptional, IsInt, Min, Max, MaxLength } from "class-validator";
+import { Type } from "class-transformer";
+import { z } from "zod";
 
 export const getConversationsSchema = z.object({
   limit: z.number().min(1).max(50).default(20),

@@ -6,13 +6,7 @@ import { Card, CardContent, CardHeader } from "./card";
 /**
  * Skeleton for a table with header and rows
  */
-export function TableSkeleton({
-  columns = 4,
-  rows = 5,
-}: {
-  columns?: number;
-  rows?: number;
-}) {
+export function TableSkeleton({ columns = 4, rows = 5 }: { columns?: number; rows?: number }) {
   return (
     <div className="rounded-lg border border-border overflow-hidden">
       {/* Table Header */}
@@ -120,10 +114,7 @@ export function ListSkeleton({ items = 5 }: { items?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: items }).map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 p-4 rounded-lg border border-border"
-        >
+        <div key={i} className="flex items-center gap-4 p-4 rounded-lg border border-border">
           <Skeleton className="h-10 w-10 rounded-full" />
           <div className="flex-1 space-y-2">
             <Skeleton className="h-4 w-32" />

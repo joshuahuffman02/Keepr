@@ -25,7 +25,10 @@ const validators: Record<ValidationRule, (value: string) => boolean> = {
   required: (value) => value.trim().length > 0,
   email: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
   password: (value) => value.length >= 8,
-  phone: (value) => /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(value.replace(/\D/g, "").length >= 10 ? value : "")
+  phone: (value) =>
+    /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(
+      value.replace(/\D/g, "").length >= 10 ? value : "",
+    ),
 };
 
 export function ValidatedInput({
@@ -38,7 +41,7 @@ export function ValidatedInput({
   validation = "required",
   className,
   showSuccessMessage = true,
-  successMessage = "Looks good!"
+  successMessage = "Looks good!",
 }: ValidatedInputProps) {
   const [isValid, setIsValid] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -81,7 +84,7 @@ export function ValidatedInput({
             "transition-all duration-200",
             "focus:bg-muted focus:shadow-[0_0_20px_-5px_rgba(16,185,129,0.3)]",
             isValid && touched && "border-emerald-500/50 focus:border-emerald-500",
-            className
+            className,
           )}
         />
 

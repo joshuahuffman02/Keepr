@@ -88,17 +88,37 @@ const EVENT_ICONS: Record<TriggerEvent, ReactNode> = {
 };
 
 const EVENT_OPTIONS: { value: TriggerEvent; label: string; description: string }[] = [
-  { value: "reservation_created", label: "Reservation Created", description: "When a new booking is made" },
-  { value: "reservation_confirmed", label: "Reservation Confirmed", description: "When booking is confirmed" },
-  { value: "reservation_cancelled", label: "Reservation Cancelled", description: "When booking is cancelled" },
-  { value: "payment_received", label: "Payment Received", description: "When payment is processed" },
+  {
+    value: "reservation_created",
+    label: "Reservation Created",
+    description: "When a new booking is made",
+  },
+  {
+    value: "reservation_confirmed",
+    label: "Reservation Confirmed",
+    description: "When booking is confirmed",
+  },
+  {
+    value: "reservation_cancelled",
+    label: "Reservation Cancelled",
+    description: "When booking is cancelled",
+  },
+  {
+    value: "payment_received",
+    label: "Payment Received",
+    description: "When payment is processed",
+  },
   { value: "payment_failed", label: "Payment Failed", description: "When payment fails" },
   { value: "checkin_reminder", label: "Check-in Reminder", description: "Before arrival date" },
   { value: "checkout_reminder", label: "Check-out Reminder", description: "Before departure date" },
   { value: "site_ready", label: "Site Ready", description: "When housekeeping marks site ready" },
   { value: "balance_due", label: "Balance Due", description: "Reminder for unpaid balance" },
   { value: "review_request", label: "Review Request", description: "After checkout" },
-  { value: "waitlist_match", label: "Waitlist Match", description: "When a site becomes available" },
+  {
+    value: "waitlist_match",
+    label: "Waitlist Match",
+    description: "When a site becomes available",
+  },
   { value: "group_update", label: "Group Update", description: "When group booking changes" },
 ];
 const EMPTY_SELECT_VALUE = "__empty";
@@ -111,7 +131,16 @@ const isTriggerEvent = (value: string): value is TriggerEvent => triggerEventSet
 const CHANNEL_OPTIONS: { value: Channel; label: string; icon: ReactNode }[] = [
   { value: "email", label: "Email", icon: <Mail className="h-4 w-4" /> },
   { value: "sms", label: "SMS", icon: <Smartphone className="h-4 w-4" /> },
-  { value: "both", label: "Both", icon: <><Mail className="h-4 w-4" /><Smartphone className="h-4 w-4" /></> },
+  {
+    value: "both",
+    label: "Both",
+    icon: (
+      <>
+        <Mail className="h-4 w-4" />
+        <Smartphone className="h-4 w-4" />
+      </>
+    ),
+  },
 ];
 
 const DELAY_PRESETS = [
@@ -163,12 +192,16 @@ export default function NotificationTriggersPage() {
   const triggers = triggersQuery.data ?? [];
 
   // Group triggers by event
-  const triggersByEvent = EVENT_OPTIONS.map(event => ({
+  const triggersByEvent = EVENT_OPTIONS.map((event) => ({
     ...event,
-    triggers: triggers.filter(t => t.event === event.value)
+    triggers: triggers.filter((t) => t.event === event.value),
   }));
 
-  const handleQuickCreate = async (event: TriggerEvent, channel: "email" | "sms" | "both", delayMinutes = 0) => {
+  const handleQuickCreate = async (
+    event: TriggerEvent,
+    channel: "email" | "sms" | "both",
+    delayMinutes = 0,
+  ) => {
     if (!campgroundId) return;
     try {
       await apiClient.createNotificationTrigger(campgroundId, {
@@ -237,8 +270,8 @@ export default function NotificationTriggersPage() {
             Automate Your Guest Communication
           </h2>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Set up triggers to automatically send emails and SMS when important events happen—
-            like booking confirmations, check-in reminders, and payment receipts.
+            Set up triggers to automatically send emails and SMS when important events happen— like
+            booking confirmations, check-in reminders, and payment receipts.
           </p>
 
           {/* Quick Start Suggestions */}
@@ -281,9 +314,23 @@ export default function NotificationTriggersPage() {
             <Lightbulb className="h-4 w-4" /> How to customize messages
           </div>
           <ul className="list-disc pl-6 space-y-1">
-            <li>Create or edit a template in <Link href="/dashboard/settings/templates" className="underline font-semibold text-amber-800 hover:text-amber-900">Settings → Templates</Link>.</li>
-            <li>Pick the template when you set up the trigger. If none is set, the default system message is used.</li>
-            <li>Use <strong>Send Test</strong> to preview exactly what guests will receive.</li>
+            <li>
+              Create or edit a template in{" "}
+              <Link
+                href="/dashboard/settings/templates"
+                className="underline font-semibold text-amber-800 hover:text-amber-900"
+              >
+                Settings → Templates
+              </Link>
+              .
+            </li>
+            <li>
+              Pick the template when you set up the trigger. If none is set, the default system
+              message is used.
+            </li>
+            <li>
+              Use <strong>Send Test</strong> to preview exactly what guests will receive.
+            </li>
           </ul>
         </div>
       )}
@@ -318,7 +365,7 @@ export default function NotificationTriggersPage() {
 
               {eventTriggers.length > 0 ? (
                 <div className="divide-y divide-border">
-                  {eventTriggers.map(trigger => (
+                  {eventTriggers.map((trigger) => (
                     <TriggerRow
                       key={trigger.id}
                       trigger={trigger}
@@ -354,16 +401,11 @@ export default function NotificationTriggersPage() {
 
       {/* Test Modal */}
       {showTestModal && (
-        <TestTriggerModal
-          trigger={showTestModal}
-          onClose={() => setShowTestModal(null)}
-        />
+        <TestTriggerModal trigger={showTestModal} onClose={() => setShowTestModal(null)} />
       )}
 
       {/* Celebration Modal */}
-      {showCelebration && (
-        <CelebrationModal onClose={() => setShowCelebration(false)} />
-      )}
+      {showCelebration && <CelebrationModal onClose={() => setShowCelebration(false)} />}
     </div>
   );
 }
@@ -372,7 +414,7 @@ function QuickStartCard({
   icon,
   title,
   description,
-  onClick
+  onClick,
 }: {
   icon: ReactNode;
   title: string;
@@ -409,8 +451,8 @@ function TriggerRow({
   onDelete: () => void;
 }) {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const eventLabel = EVENT_OPTIONS.find(e => e.value === trigger.event)?.label ?? trigger.event;
-  const channelOption = CHANNEL_OPTIONS.find(c => c.value === trigger.channel);
+  const eventLabel = EVENT_OPTIONS.find((e) => e.value === trigger.event)?.label ?? trigger.event;
+  const channelOption = CHANNEL_OPTIONS.find((c) => c.value === trigger.channel);
 
   return (
     <div className="px-5 py-4 flex items-center justify-between">
@@ -443,9 +485,7 @@ function TriggerRow({
             )}
           </div>
           {trigger.template && (
-            <span className="text-xs text-muted-foreground">
-              Template: {trigger.template.name}
-            </span>
+            <span className="text-xs text-muted-foreground">Template: {trigger.template.name}</span>
           )}
         </div>
       </div>
@@ -583,7 +623,7 @@ function TriggerModal({
   const firstFocusRef = useRef<ElementRef<typeof SelectTrigger>>(null);
 
   const [event, setEvent] = useState<TriggerEvent>(() =>
-    trigger && isTriggerEvent(trigger.event) ? trigger.event : "reservation_created"
+    trigger && isTriggerEvent(trigger.event) ? trigger.event : "reservation_created",
   );
   const [channel, setChannel] = useState<Channel>(trigger?.channel ?? "email");
   const [templateId, setTemplateId] = useState<string | null>(trigger?.templateId ?? null);
@@ -602,7 +642,7 @@ function TriggerModal({
   const templates = templatesQuery.data ?? [];
 
   // Filter templates by compatible channel
-  const compatibleTemplates = templates.filter(t => {
+  const compatibleTemplates = templates.filter((t) => {
     if (channel === "both") return true;
     if (t.channel === "both") return true;
     return t.channel === channel;
@@ -675,7 +715,10 @@ function TriggerModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Event Select */}
           <div>
-            <Label htmlFor="event-select" className="block text-sm font-medium text-foreground mb-1">
+            <Label
+              htmlFor="event-select"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               When this happens...
             </Label>
             <Select
@@ -686,15 +729,11 @@ function TriggerModal({
                 }
               }}
             >
-              <SelectTrigger
-                id="event-select"
-                ref={firstFocusRef}
-                className="w-full"
-              >
+              <SelectTrigger id="event-select" ref={firstFocusRef} className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {EVENT_OPTIONS.map(opt => (
+                {EVENT_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     {opt.label}
                   </SelectItem>
@@ -709,7 +748,7 @@ function TriggerModal({
               Send notification via...
             </label>
             <div className="flex gap-2" role="radiogroup" aria-label="Notification channel">
-              {CHANNEL_OPTIONS.map(opt => (
+              {CHANNEL_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"
@@ -718,9 +757,10 @@ function TriggerModal({
                   onClick={() => setChannel(opt.value)}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                     focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
-                    ${channel === opt.value
-                      ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                      : "bg-muted text-muted-foreground border border-border hover:border-border"
+                    ${
+                      channel === opt.value
+                        ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                        : "bg-muted text-muted-foreground border border-border hover:border-border"
                     }`}
                 >
                   {opt.icon} {opt.label}
@@ -731,7 +771,10 @@ function TriggerModal({
 
           {/* Template Select */}
           <div>
-            <label htmlFor="template-select" className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="template-select"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               Use template
             </label>
             {templatesQuery.isLoading ? (
@@ -742,7 +785,10 @@ function TriggerModal({
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-sm text-amber-800">
                   No {channel} templates available.{" "}
-                  <Link href="/dashboard/settings/templates" className="underline font-medium hover:text-amber-900">
+                  <Link
+                    href="/dashboard/settings/templates"
+                    className="underline font-medium hover:text-amber-900"
+                  >
                     Create one first
                   </Link>
                 </p>
@@ -750,16 +796,19 @@ function TriggerModal({
             ) : (
               <Select
                 value={templateId ?? EMPTY_SELECT_VALUE}
-                onValueChange={(value) => setTemplateId(value === EMPTY_SELECT_VALUE ? null : value)}
+                onValueChange={(value) =>
+                  setTemplateId(value === EMPTY_SELECT_VALUE ? null : value)
+                }
               >
                 <SelectTrigger id="template-select" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={EMPTY_SELECT_VALUE}>Default system message</SelectItem>
-                  {compatibleTemplates.map(t => (
+                  {compatibleTemplates.map((t) => (
                     <SelectItem key={t.id} value={t.id}>
-                      {t.name} {t.channel !== channel && t.channel !== "both" ? `(${t.channel})` : ""}
+                      {t.name}{" "}
+                      {t.channel !== channel && t.channel !== "both" ? `(${t.channel})` : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -772,11 +821,9 @@ function TriggerModal({
 
           {/* Delay Presets */}
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
-              When to send
-            </label>
+            <label className="block text-sm font-medium text-foreground mb-2">When to send</label>
             <div className="grid grid-cols-2 gap-2 mb-2">
-              {DELAY_PRESETS.map(preset => (
+              {DELAY_PRESETS.map((preset) => (
                 <button
                   key={preset.value}
                   type="button"
@@ -786,9 +833,10 @@ function TriggerModal({
                   }}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                     focus-visible:ring-2 focus-visible:ring-violet-500
-                    ${delayMinutes === preset.value && !showCustomDelay
-                      ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                      : "bg-muted text-muted-foreground border border-border hover:border-border"
+                    ${
+                      delayMinutes === preset.value && !showCustomDelay
+                        ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                        : "bg-muted text-muted-foreground border border-border hover:border-border"
                     }`}
                 >
                   {preset.label}
@@ -811,7 +859,7 @@ function TriggerModal({
                   type="number"
                   min="0"
                   value={delayMinutes}
-                  onChange={e => setDelayMinutes(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setDelayMinutes(parseInt(e.target.value) || 0)}
                   className="w-24 px-3 py-2 border border-border rounded-lg
                     focus:ring-2 focus:ring-violet-500"
                   aria-label="Delay in minutes"
@@ -830,7 +878,9 @@ function TriggerModal({
             />
             <Label htmlFor="trigger-enabled" className="cursor-pointer">
               <div className="font-medium text-foreground">Enabled</div>
-              <div className="text-sm text-muted-foreground">Trigger will fire when event occurs</div>
+              <div className="text-sm text-muted-foreground">
+                Trigger will fire when event occurs
+              </div>
             </Label>
           </div>
 
@@ -884,8 +934,8 @@ function TestTriggerModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const eventInfo = EVENT_OPTIONS.find(e => e.value === trigger.event);
-  const channelOption = CHANNEL_OPTIONS.find(c => c.value === trigger.channel);
+  const eventInfo = EVENT_OPTIONS.find((e) => e.value === trigger.event);
+  const channelOption = CHANNEL_OPTIONS.find((c) => c.value === trigger.channel);
 
   const handleSendTest = async () => {
     if (!testEmail) return;
@@ -936,8 +986,8 @@ function TestTriggerModal({
         </div>
 
         <p className="text-muted-foreground text-sm mb-4">
-          Send a test notification to see exactly what your guests will receive.
-          We'll use sample data to fill in the template variables.
+          Send a test notification to see exactly what your guests will receive. We'll use sample
+          data to fill in the template variables.
         </p>
 
         {sent ? (
@@ -951,7 +1001,10 @@ function TestTriggerModal({
         ) : (
           <>
             <div className="mb-4">
-              <Label htmlFor="test-email" className="block text-sm font-medium text-foreground mb-1">
+              <Label
+                htmlFor="test-email"
+                className="block text-sm font-medium text-foreground mb-1"
+              >
                 Send test to
               </Label>
               <Input
@@ -959,7 +1012,7 @@ function TestTriggerModal({
                 ref={inputRef}
                 type="email"
                 value={testEmail}
-                onChange={e => setTestEmail(e.target.value)}
+                onChange={(e) => setTestEmail(e.target.value)}
                 placeholder="hello@keeprstay.com"
                 className="w-full px-3 py-2 border border-border rounded-lg
                   focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
@@ -1041,8 +1094,7 @@ function CelebrationModal({ onClose }: { onClose: () => void }) {
           Your first automation is live!
         </h2>
         <p className="text-muted-foreground mb-6">
-          Guests will now receive automatic notifications.
-          You're saving hours of manual work!
+          Guests will now receive automatic notifications. You're saving hours of manual work!
         </p>
         <button
           onClick={onClose}

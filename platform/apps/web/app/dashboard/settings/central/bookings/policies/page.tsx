@@ -109,12 +109,7 @@ export default function BookingPoliciesPage() {
           <div className="space-y-2">
             <Label htmlFor="deposit-amount">Deposit Amount</Label>
             <div className="flex items-center gap-2">
-              <Input
-                id="deposit-amount"
-                type="number"
-                defaultValue="50"
-                className="w-24"
-              />
+              <Input id="deposit-amount" type="number" defaultValue="50" className="w-24" />
               <Select defaultValue="percent">
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -156,8 +151,8 @@ export default function BookingPoliciesPage() {
           <Alert className="bg-amber-50 border-amber-200">
             <Info className="h-4 w-4 text-amber-600" />
             <AlertDescription className="text-amber-800">
-              Set up tiered cancellation policies based on days before arrival.
-              These rules determine refund amounts for cancelled reservations.
+              Set up tiered cancellation policies based on days before arrival. These rules
+              determine refund amounts for cancelled reservations.
             </AlertDescription>
           </Alert>
 
@@ -199,9 +194,7 @@ export default function BookingPoliciesPage() {
             <FileText className="h-5 w-5 text-muted-foreground" />
             Policy Text
           </CardTitle>
-          <CardDescription>
-            Displayed to guests during booking
-          </CardDescription>
+          <CardDescription>Displayed to guests during booking</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

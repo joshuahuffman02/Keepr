@@ -10,12 +10,12 @@ Generate comprehensive AI-readable documentation from the Prisma schema.
 
 $ARGUMENTS
 
-| Argument | Description |
-|----------|-------------|
-| `context` | Import schema and generate AI context file (default) |
-| `import` | Only import Prisma schema to .forge format |
-| `generate` | Generate code (validators, types, API, forms) |
-| `full` | Run all: import -> context -> generate |
+| Argument   | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `context`  | Import schema and generate AI context file (default) |
+| `import`   | Only import Prisma schema to .forge format           |
+| `generate` | Generate code (validators, types, API, forms)        |
+| `full`     | Run all: import -> context -> generate               |
 
 ## Setup (First Time Only)
 
@@ -55,6 +55,7 @@ npx tsx src/cli/index.ts generate --schema ./campreserv.forge
 ## Output
 
 The context file includes:
+
 - All 335 models with field definitions
 - Relationship mappings between entities
 - 1,675 auto-documented API endpoints
@@ -64,6 +65,7 @@ The context file includes:
 ## Reserved Keyword Handling
 
 The importer automatically renames:
+
 - `action` -> `actionType`
 - `model` -> `modelRef`
 
@@ -78,8 +80,8 @@ These are reserved keywords in SchemaForge syntax.
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `campreserv.forge` | SchemaForge schema (in SF directory) |
-| `docs/schema-context.md` | AI-readable context (in project) |
-| `./generated/` | Generated code output (in SF directory) |
+| File                     | Purpose                                 |
+| ------------------------ | --------------------------------------- |
+| `campreserv.forge`       | SchemaForge schema (in SF directory)    |
+| `docs/schema-context.md` | AI-readable context (in project)        |
+| `./generated/`           | Generated code output (in SF directory) |

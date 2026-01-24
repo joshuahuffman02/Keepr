@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 /**
  * Zod validation schemas for payment processing
@@ -14,80 +14,80 @@ const MAX_PAYMENT_CENTS = 100_000_000;
 
 // Payment Intent Schemas
 export const CreatePaymentIntentSchema = z.object({
-  reservationId: z.string().min(1, 'Reservation ID is required'),
+  reservationId: z.string().min(1, "Reservation ID is required"),
   amountCents: z
     .number()
-    .int('Amount must be an integer')
-    .positive('Amount must be positive')
-    .max(MAX_PAYMENT_CENTS, 'Amount exceeds maximum allowed'),
-  currency: z.string().toLowerCase().optional().default('usd'),
+    .int("Amount must be an integer")
+    .positive("Amount must be positive")
+    .max(MAX_PAYMENT_CENTS, "Amount exceeds maximum allowed"),
+  currency: z.string().toLowerCase().optional().default("usd"),
   autoCapture: z.boolean().optional().default(true),
 });
 
 export const CreatePublicPaymentIntentSchema = z.object({
-  reservationId: z.string().min(1, 'Reservation ID is required'),
-  currency: z.string().toLowerCase().optional().default('usd'),
+  reservationId: z.string().min(1, "Reservation ID is required"),
+  currency: z.string().toLowerCase().optional().default("usd"),
   guestEmail: z.string().email().optional(),
-  captureMethod: z.enum(['automatic', 'manual']).optional().default('automatic'),
+  captureMethod: z.enum(["automatic", "manual"]).optional().default("automatic"),
 });
 
 export const CapturePaymentIntentSchema = z.object({
   amountCents: z
     .number()
-    .int('Amount must be an integer')
-    .positive('Amount must be positive')
-    .max(MAX_PAYMENT_CENTS, 'Amount exceeds maximum allowed')
+    .int("Amount must be an integer")
+    .positive("Amount must be positive")
+    .max(MAX_PAYMENT_CENTS, "Amount exceeds maximum allowed")
     .optional(),
 });
 
 export const RefundPaymentIntentSchema = z.object({
   amountCents: z
     .number()
-    .int('Amount must be an integer')
-    .positive('Amount must be positive')
-    .max(MAX_PAYMENT_CENTS, 'Amount exceeds maximum allowed')
+    .int("Amount must be an integer")
+    .positive("Amount must be positive")
+    .max(MAX_PAYMENT_CENTS, "Amount exceeds maximum allowed")
     .optional(),
-  reason: z.enum(['duplicate', 'fraudulent', 'requested_by_customer']).optional(),
+  reason: z.enum(["duplicate", "fraudulent", "requested_by_customer"]).optional(),
 });
 
 // Payment Settings Schemas
 export const UpdatePaymentSettingsSchema = z.object({
   applicationFeeFlatCents: z
     .number()
-    .int('Fee must be an integer')
-    .min(0, 'Fee cannot be negative')
-    .max(10_000, 'Fee exceeds maximum (100.00)')
+    .int("Fee must be an integer")
+    .min(0, "Fee cannot be negative")
+    .max(10_000, "Fee exceeds maximum (100.00)")
     .optional(),
-  billingPlan: z.enum(['ota_only', 'standard', 'enterprise']).optional(),
+  billingPlan: z.enum(["ota_only", "standard", "enterprise"]).optional(),
   perBookingFeeCents: z
     .number()
-    .int('Fee must be an integer')
-    .min(0, 'Fee cannot be negative')
-    .max(10_000, 'Fee exceeds maximum (100.00)')
+    .int("Fee must be an integer")
+    .min(0, "Fee cannot be negative")
+    .max(10_000, "Fee exceeds maximum (100.00)")
     .optional(),
   monthlyFeeCents: z
     .number()
-    .int('Fee must be an integer')
-    .min(0, 'Fee cannot be negative')
-    .max(100_000, 'Fee exceeds maximum (1000.00)')
+    .int("Fee must be an integer")
+    .min(0, "Fee cannot be negative")
+    .max(100_000, "Fee exceeds maximum (1000.00)")
     .optional(),
-  feeMode: z.enum(['absorb', 'pass_through']).optional(),
+  feeMode: z.enum(["absorb", "pass_through"]).optional(),
 });
 
 // Setup Intent Schemas
 export const CreateSetupIntentSchema = z.object({
-  reservationId: z.string().min(1, 'Reservation ID is required'),
+  reservationId: z.string().min(1, "Reservation ID is required"),
   customerEmail: z.string().email().optional(),
 });
 
 export const CreatePublicSetupIntentSchema = z.object({
-  reservationId: z.string().min(1, 'Reservation ID is required'),
+  reservationId: z.string().min(1, "Reservation ID is required"),
   guestEmail: z.string().email().optional(),
 });
 
 // Payment Confirmation Schema
 export const ConfirmPublicPaymentIntentSchema = z.object({
-  reservationId: z.string().min(1, 'Reservation ID is required'),
+  reservationId: z.string().min(1, "Reservation ID is required"),
 });
 
 // Type exports for TypeScript

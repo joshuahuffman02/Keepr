@@ -24,7 +24,11 @@ test.describe("Analytics (Data Intelligence) smoke", () => {
     ]);
 
     if (await dashboardHeading.isVisible()) {
-      await page.getByText(/recommendations/i).first().waitFor({ timeout: 3000 }).catch(() => {});
+      await page
+        .getByText(/recommendations/i)
+        .first()
+        .waitFor({ timeout: 3000 })
+        .catch(() => {});
     }
   });
 });

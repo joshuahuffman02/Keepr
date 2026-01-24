@@ -127,16 +127,21 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   });
 
   // Selected staff display
-  const selectedStaff = useMemo(() => staffMembers.find(s => s.id === form.userId), [staffMembers, form.userId]);
+  const selectedStaff = useMemo(
+    () => staffMembers.find((s) => s.id === form.userId),
+    [staffMembers, form.userId],
+  );
 
   // Filtered staff list
   const filteredStaff = useMemo(() => {
     if (!staffSearch.trim()) return staffMembers.slice(0, 10);
     const q = staffSearch.toLowerCase();
-    return staffMembers.filter(s => {
-      const name = `${s.firstName || ""} ${s.lastName || ""}`.toLowerCase();
-      return name.includes(q) || (s.email || "").toLowerCase().includes(q);
-    }).slice(0, 10);
+    return staffMembers
+      .filter((s) => {
+        const name = `${s.firstName || ""} ${s.lastName || ""}`.toLowerCase();
+        return name.includes(q) || (s.email || "").toLowerCase().includes(q);
+      })
+      .slice(0, 10);
   }, [staffMembers, staffSearch]);
 
   const [startDay, setStartDay] = useState(() => new Date());
@@ -144,7 +149,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   const windowStart = useMemo(() => startDay, [startDay]);
   const windowEnd = useMemo(
     () => new Date(windowStart.getTime() + 21 * 24 * 60 * 60 * 1000),
-    [windowStart]
+    [windowStart],
   );
 
   const groupedByDay = useMemo(() => {
@@ -187,7 +192,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
     try {
       const [rolesRes, membersRes] = await Promise.all([
         fetch(`/api/staff/roles?campgroundId=${params.campgroundId}`),
-        fetch(`/api/campgrounds/${params.campgroundId}/members`).catch(() => null)
+        fetch(`/api/campgrounds/${params.campgroundId}/members`).catch(() => null),
       ]);
 
       if (rolesRes.ok) {
@@ -201,9 +206,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
       if (membersRes?.ok) {
         const members = await membersRes.json();
         const parsed = Array.isArray(members)
-          ? members
-              .map(toStaffMember)
-              .filter((member): member is StaffMember => Boolean(member))
+          ? members.map(toStaffMember).filter((member): member is StaffMember => Boolean(member))
           : [];
         setStaffMembers(parsed);
       }
@@ -217,7 +220,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
     setError(null);
     try {
       const res = await fetch(
-        `/api/staff/shifts?campgroundId=${params.campgroundId}&startDate=${windowStart.toISOString()}&endDate=${windowEnd.toISOString()}${statusFilter !== "all" ? `&status=${statusFilter}` : ""}`
+        `/api/staff/shifts?campgroundId=${params.campgroundId}&startDate=${windowStart.toISOString()}&endDate=${windowEnd.toISOString()}${statusFilter !== "all" ? `&status=${statusFilter}` : ""}`,
       );
       if (!res.ok) throw new Error("Failed to load shifts");
       const data = await res.json();
@@ -286,11 +289,14 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
     }
   };
 
-  const updateShift = async (id: string, payload: Partial<{ shiftDate: string; startTime: string; endTime: string }>) => {
+  const updateShift = async (
+    id: string,
+    payload: Partial<{ shiftDate: string; startTime: string; endTime: string }>,
+  ) => {
     await fetch(`/api/staff/shifts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     await load();
   };
@@ -324,7 +330,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
       await updateShift(shift.id, {
         shiftDate: datePart,
         startTime: start.toISOString().slice(11, 16),
-        endTime: end.toISOString().slice(11, 16)
+        endTime: end.toISOString().slice(11, 16),
       });
     } finally {
       setProcessing((prev) => {
@@ -358,7 +364,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
     await updateShift(target.id, {
       shiftDate: day,
       startTime: start.toISOString().slice(11, 16),
-      endTime: end.toISOString().slice(11, 16)
+      endTime: end.toISOString().slice(11, 16),
     });
     setDragShiftId(null);
   };
@@ -369,7 +375,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
       date: shift.shiftDate?.slice(0, 10) ?? "",
       start: shift.startTime?.slice(11, 16) ?? "09:00",
       end: shift.endTime?.slice(11, 16) ?? "17:00",
-      role: shift.role ?? ""
+      role: shift.role ?? "",
     });
     showSuccess("Form prefilled from shift");
   };
@@ -385,7 +391,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
       await fetch(`/api/staff/shifts/${id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: currentUserId })
+        body: JSON.stringify({ approverId: currentUserId }),
       });
       showSuccess("Shift approved!");
       await load();
@@ -409,7 +415,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
       await fetch(`/api/staff/shifts/${id}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: currentUserId })
+        body: JSON.stringify({ approverId: currentUserId }),
       });
       showSuccess("Shift rejected");
       await load();
@@ -489,7 +495,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
   };
 
   const totalShiftsCount = shifts.length;
-  const pendingApprovalCount = shifts.filter(s => s.status === "submitted").length;
+  const pendingApprovalCount = shifts.filter((s) => s.status === "submitted").length;
 
   return (
     <DashboardShell>
@@ -543,7 +549,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       </div>
                       <div>
                         <h3 className="font-semibold text-foreground">Request Shift Swap</h3>
-                        <p className="text-sm text-muted-foreground">Find someone to take your shift</p>
+                        <p className="text-sm text-muted-foreground">
+                          Find someone to take your shift
+                        </p>
                       </div>
                     </div>
                     <button
@@ -559,24 +567,45 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                 <div className="p-6 space-y-4">
                   {/* Shift info */}
                   <div className="p-4 bg-muted/60 rounded-xl">
-                    <div className="text-sm font-medium text-muted-foreground mb-1">Shift to swap</div>
+                    <div className="text-sm font-medium text-muted-foreground mb-1">
+                      Shift to swap
+                    </div>
                     <div className="font-semibold text-foreground">
-                      {new Date(swapShift.shiftDate).toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" })}
+                      {new Date(swapShift.shiftDate).toLocaleDateString(undefined, {
+                        weekday: "long",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {new Date(swapShift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(swapShift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-                      {swapShift.role && <span className="ml-2 text-muted-foreground">({swapShift.role})</span>}
+                      {new Date(swapShift.startTime).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}{" "}
+                      -{" "}
+                      {new Date(swapShift.endTime).toLocaleTimeString([], {
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                      {swapShift.role && (
+                        <span className="ml-2 text-muted-foreground">({swapShift.role})</span>
+                      )}
                     </div>
                   </div>
 
                   {/* Recipient selector */}
                   <div>
-                    <Label htmlFor="swap-recipient" className="block text-sm font-medium text-foreground mb-2">
+                    <Label
+                      htmlFor="swap-recipient"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       Ask someone to take it
                     </Label>
                     <Select
                       value={swapRecipientId || EMPTY_SELECT_VALUE}
-                      onValueChange={(value) => setSwapRecipientId(value === EMPTY_SELECT_VALUE ? "" : value)}
+                      onValueChange={(value) =>
+                        setSwapRecipientId(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
                       <SelectTrigger id="swap-recipient" className="w-full">
                         <SelectValue />
@@ -594,7 +623,10 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                   {/* Note */}
                   <div>
-                    <Label htmlFor="swap-note" className="block text-sm font-medium text-foreground mb-2">
+                    <Label
+                      htmlFor="swap-note"
+                      className="block text-sm font-medium text-foreground mb-2"
+                    >
                       Note (optional)
                     </Label>
                     <Textarea
@@ -621,7 +653,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       className={cn(
                         "flex-1 px-4 py-3 rounded-xl font-medium flex items-center justify-center gap-2",
                         "bg-violet-600 text-white hover:bg-violet-700",
-                        (!swapRecipientId || swapSubmitting) && "opacity-50 cursor-not-allowed"
+                        (!swapRecipientId || swapSubmitting) && "opacity-50 cursor-not-allowed",
                       )}
                     >
                       {swapSubmitting ? (
@@ -648,7 +680,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">This Window</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  This Window
+                </div>
                 <div className="text-3xl font-bold text-foreground mt-1">{totalShiftsCount}</div>
               </div>
               <div className="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center">
@@ -661,13 +695,19 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Approval</div>
-                <div className="text-3xl font-bold text-foreground mt-1">{pendingApprovalCount}</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Pending Approval
+                </div>
+                <div className="text-3xl font-bold text-foreground mt-1">
+                  {pendingApprovalCount}
+                </div>
               </div>
-              <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                pendingApprovalCount > 0 ? "bg-status-warning/15" : "bg-status-success/15"
-              )}>
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center",
+                  pendingApprovalCount > 0 ? "bg-status-warning/15" : "bg-status-success/15",
+                )}
+              >
                 {pendingApprovalCount > 0 ? (
                   <Clock className="w-6 h-6 text-amber-600" />
                 ) : (
@@ -681,7 +721,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Staff Members</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Staff Members
+                </div>
                 <div className="text-3xl font-bold text-foreground mt-1">{staffMembers.length}</div>
               </div>
               <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
@@ -694,13 +736,17 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Conflicts</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Conflicts
+                </div>
                 <div className="text-3xl font-bold text-foreground mt-1">{conflicts.size}</div>
               </div>
-              <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                conflicts.size > 0 ? "bg-status-error/15" : "bg-status-success/15"
-              )}>
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center",
+                  conflicts.size > 0 ? "bg-status-error/15" : "bg-status-success/15",
+                )}
+              >
                 {conflicts.size > 0 ? (
                   <AlertCircle className="w-6 h-6 text-red-600" />
                 ) : (
@@ -708,7 +754,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                 )}
               </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">{conflicts.size > 0 ? "Overlapping shifts detected" : "No scheduling conflicts"}</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              {conflicts.size > 0 ? "Overlapping shifts detected" : "No scheduling conflicts"}
+            </p>
           </div>
         </motion.div>
 
@@ -735,7 +783,10 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             <div className="p-6 space-y-4">
               {/* Staff Member Selector */}
               <div className="relative">
-                <Label htmlFor="staff-member-search" className="block text-sm font-medium text-foreground mb-2">
+                <Label
+                  htmlFor="staff-member-search"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
                   Staff Member
                 </Label>
                 <div className="relative">
@@ -744,7 +795,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     id="staff-member-search"
                     className="w-full pl-10 pr-10 rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     placeholder="Search staff..."
-                    value={form.userId ? `${selectedStaff?.firstName || ""} ${selectedStaff?.lastName || ""}`.trim() || form.userId : staffSearch}
+                    value={
+                      form.userId
+                        ? `${selectedStaff?.firstName || ""} ${selectedStaff?.lastName || ""}`.trim() ||
+                          form.userId
+                        : staffSearch
+                    }
                     onChange={(e) => {
                       setStaffSearch(e.target.value);
                       setForm({ ...form, userId: "" });
@@ -755,10 +811,15 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   {form.userId && (
                     <button
                       type="button"
-                      onClick={() => { setForm({ ...form, userId: "" }); setStaffSearch(""); }}
+                      onClick={() => {
+                        setForm({ ...form, userId: "" });
+                        setStaffSearch("");
+                      }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
                       aria-label="Clear selected staff member"
-                    >×</button>
+                    >
+                      ×
+                    </button>
                   )}
                 </div>
                 <AnimatePresence>
@@ -769,28 +830,34 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       exit={{ opacity: 0, y: -10 }}
                       className="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto"
                     >
-                      {filteredStaff.length > 0 ? filteredStaff.map(s => (
-                        <button
-                          key={s.id}
-                          type="button"
-                          onClick={() => {
-                            setForm({ ...form, userId: s.id });
-                            setShowStaffDropdown(false);
-                            setStaffSearch("");
-                          }}
-                          className="w-full px-4 py-3 text-left hover:bg-muted/60 text-sm border-b last:border-b-0 flex items-center gap-3"
-                        >
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                            <User className="w-4 h-4 text-muted-foreground" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-foreground">{s.firstName} {s.lastName}</div>
-                            <div className="text-xs text-muted-foreground">{s.email}</div>
-                          </div>
-                        </button>
-                      )) : (
+                      {filteredStaff.length > 0 ? (
+                        filteredStaff.map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => {
+                              setForm({ ...form, userId: s.id });
+                              setShowStaffDropdown(false);
+                              setStaffSearch("");
+                            }}
+                            className="w-full px-4 py-3 text-left hover:bg-muted/60 text-sm border-b last:border-b-0 flex items-center gap-3"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                              <User className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-foreground">
+                                {s.firstName} {s.lastName}
+                              </div>
+                              <div className="text-xs text-muted-foreground">{s.email}</div>
+                            </div>
+                          </button>
+                        ))
+                      ) : (
                         <div className="px-4 py-3 text-sm text-muted-foreground">
-                          {staffMembers.length === 0 ? "No staff members found. Add members in Settings." : "No matching staff."}
+                          {staffMembers.length === 0
+                            ? "No staff members found. Add members in Settings."
+                            : "No matching staff."}
                         </div>
                       )}
                     </motion.div>
@@ -800,7 +867,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Date */}
               <div>
-                <Label htmlFor="shift-date" className="block text-sm font-medium text-foreground mb-2">Date</Label>
+                <Label
+                  htmlFor="shift-date"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
+                  Date
+                </Label>
                 <Input
                   id="shift-date"
                   className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
@@ -834,7 +906,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Role */}
               <div>
-                <Label htmlFor="shift-role" className="block text-sm font-medium text-foreground mb-2">Role</Label>
+                <Label
+                  htmlFor="shift-role"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
+                  Role
+                </Label>
                 <Select
                   value={form.role || EMPTY_SELECT_VALUE}
                   onValueChange={(value) =>
@@ -859,7 +936,10 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Error */}
               {error && (
-                <div className="rounded-lg border bg-status-error/15 px-4 py-3 text-sm text-status-error flex items-center gap-2" role="alert">
+                <div
+                  className="rounded-lg border bg-status-error/15 px-4 py-3 text-sm text-status-error flex items-center gap-2"
+                  role="alert"
+                >
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {error}
                 </div>
@@ -899,7 +979,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   <div>
                     <h2 className="text-lg font-semibold text-foreground">Shift Schedule</h2>
                     <p className="text-sm text-muted-foreground">
-                      {windowStart.toLocaleDateString(undefined, { month: "short", day: "numeric" })} — {windowEnd.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      {windowStart.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}{" "}
+                      —{" "}
+                      {windowEnd.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                     </p>
                   </div>
                 </div>
@@ -911,7 +996,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       onClick={() => setViewMode("calendar")}
                       className={cn(
                         "px-3 py-2 flex items-center gap-1.5 text-sm",
-                        viewMode === "calendar" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
+                        viewMode === "calendar"
+                          ? "bg-muted text-foreground"
+                          : "text-muted-foreground hover:bg-muted/60",
                       )}
                       aria-pressed={viewMode === "calendar"}
                     >
@@ -922,7 +1009,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       onClick={() => setViewMode("list")}
                       className={cn(
                         "px-3 py-2 flex items-center gap-1.5 text-sm border-l border-border",
-                        viewMode === "list" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
+                        viewMode === "list"
+                          ? "bg-muted text-foreground"
+                          : "text-muted-foreground hover:bg-muted/60",
                       )}
                       aria-pressed={viewMode === "list"}
                     >
@@ -963,7 +1052,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   {/* Navigation */}
                   <div className="flex items-center gap-1">
                     <button
-                      onClick={() => setStartDay(new Date(windowStart.getTime() - 7 * 24 * 60 * 60 * 1000))}
+                      onClick={() =>
+                        setStartDay(new Date(windowStart.getTime() - 7 * 24 * 60 * 60 * 1000))
+                      }
                       className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
                       aria-label="Previous week"
                     >
@@ -976,7 +1067,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       Today
                     </button>
                     <button
-                      onClick={() => setStartDay(new Date(windowStart.getTime() + 7 * 24 * 60 * 60 * 1000))}
+                      onClick={() =>
+                        setStartDay(new Date(windowStart.getTime() + 7 * 24 * 60 * 60 * 1000))
+                      }
                       className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
                       aria-label="Next week"
                     >
@@ -1006,8 +1099,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                           <Inbox className="w-8 h-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold text-foreground">No shifts scheduled</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Create a shift using the form on the left.</p>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          No shifts scheduled
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Create a shift using the form on the left.
+                        </p>
                       </motion.div>
                     ) : (
                       shifts.map((shift, index) => (
@@ -1020,7 +1117,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                           transition={{ ...SPRING_CONFIG, delay: index * 0.03 }}
                           className={cn(
                             "rounded-xl border p-4 transition-colors",
-                            conflicts.has(shift.id) ? "bg-status-error/15" : "border-border hover:bg-muted/60"
+                            conflicts.has(shift.id)
+                              ? "bg-status-error/15"
+                              : "border-border hover:bg-muted/60",
                           )}
                         >
                           <div className="flex items-center justify-between">
@@ -1029,22 +1128,42 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                 <User className="w-5 h-5 text-muted-foreground" />
                               </div>
                               <div>
-                                <div className="font-semibold text-foreground">{shift.role || "Shift"}</div>
+                                <div className="font-semibold text-foreground">
+                                  {shift.role || "Shift"}
+                                </div>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Calendar className="w-3.5 h-3.5" />
-                                  <span>{new Date(shift.shiftDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
+                                  <span>
+                                    {new Date(shift.shiftDate).toLocaleDateString(undefined, {
+                                      weekday: "short",
+                                      month: "short",
+                                      day: "numeric",
+                                    })}
+                                  </span>
                                   <span>·</span>
                                   <Clock className="w-3.5 h-3.5" />
                                   <span>
-                                    {new Date(shift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(shift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                                    {new Date(shift.startTime).toLocaleTimeString([], {
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                    })}{" "}
+                                    -{" "}
+                                    {new Date(shift.endTime).toLocaleTimeString([], {
+                                      hour: "numeric",
+                                      minute: "2-digit",
+                                    })}
                                   </span>
                                 </div>
                                 {(shift.scheduledMinutes || shift.actualMinutes) && (
                                   <div className="text-xs text-muted-foreground mt-1">
                                     {shift.actualMinutes ? (
-                                      <span className="text-emerald-600 font-medium">Actual: {formatDuration(shift.actualMinutes)}</span>
+                                      <span className="text-emerald-600 font-medium">
+                                        Actual: {formatDuration(shift.actualMinutes)}
+                                      </span>
                                     ) : (
-                                      <span>Scheduled: {formatDuration(shift.scheduledMinutes)}</span>
+                                      <span>
+                                        Scheduled: {formatDuration(shift.scheduledMinutes)}
+                                      </span>
                                     )}
                                   </div>
                                 )}
@@ -1058,12 +1177,19 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className={cn(
-                                "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                                getStatusStyle(shift.status).bg,
-                                getStatusStyle(shift.status).text
-                              )}>
-                                <span className={cn("w-1.5 h-1.5 rounded-full", getStatusStyle(shift.status).dot)} />
+                              <span
+                                className={cn(
+                                  "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
+                                  getStatusStyle(shift.status).bg,
+                                  getStatusStyle(shift.status).text,
+                                )}
+                              >
+                                <span
+                                  className={cn(
+                                    "w-1.5 h-1.5 rounded-full",
+                                    getStatusStyle(shift.status).dot,
+                                  )}
+                                />
                                 {(shift.status ?? "scheduled").replace("_", " ")}
                               </span>
                             </div>
@@ -1078,7 +1204,11 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                 onClick={() => submitShift(shift.id)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-100 text-teal-700 text-xs font-medium hover:bg-teal-200 transition-colors"
                               >
-                                {processing.has(shift.id) ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
+                                {processing.has(shift.id) ? (
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : (
+                                  <Send className="w-3.5 h-3.5" />
+                                )}
                                 Submit
                               </motion.button>
                             )}
@@ -1091,7 +1221,11 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   onClick={() => approveShift(shift.id)}
                                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-status-success/15 text-status-success text-xs font-medium hover:bg-status-success/25 transition-colors"
                                 >
-                                  {processing.has(shift.id) ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                                  {processing.has(shift.id) ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                  )}
                                   Approve
                                 </motion.button>
                                 <motion.button
@@ -1155,8 +1289,12 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                           <Inbox className="w-8 h-8 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-semibold text-foreground">No shifts in this window</h3>
-                        <p className="text-sm text-muted-foreground mt-1">Create a shift or navigate to a different date range.</p>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          No shifts in this window
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Create a shift or navigate to a different date range.
+                        </p>
                       </motion.div>
                     ) : (
                       Object.keys(groupedByDay)
@@ -1178,10 +1316,15 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                             <div className="bg-muted/60 px-4 py-3 border-b border-border">
                               <div className="flex items-center justify-between">
                                 <div className="font-semibold text-foreground">
-                                  {new Date(day).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                                  {new Date(day).toLocaleDateString(undefined, {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
                                 </div>
                                 <span className="text-xs text-muted-foreground bg-card px-2 py-1 rounded-full">
-                                  {groupedByDay[day].length} shift{groupedByDay[day].length !== 1 ? "s" : ""}
+                                  {groupedByDay[day].length} shift
+                                  {groupedByDay[day].length !== 1 ? "s" : ""}
                                 </span>
                               </div>
                               <div className="flex gap-1 mt-2 flex-wrap">
@@ -1211,7 +1354,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   transition={{ delay: index * 0.02 }}
                                   className={cn(
                                     "rounded-lg border p-3 cursor-grab active:cursor-grabbing transition-shadow hover:shadow-md",
-                                    conflicts.has(shift.id) ? "bg-status-error/15" : "border-border bg-card"
+                                    conflicts.has(shift.id)
+                                      ? "bg-status-error/15"
+                                      : "border-border bg-card",
                                   )}
                                   draggable
                                   onDragStart={() => handleDragStart(shift.id)}
@@ -1221,18 +1366,35 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     <div className="flex items-center gap-2">
                                       <GripVertical className="w-4 h-4 text-muted-foreground" />
                                       <div>
-                                        <div className="font-medium text-foreground text-sm">{shift.role || "Shift"}</div>
+                                        <div className="font-medium text-foreground text-sm">
+                                          {shift.role || "Shift"}
+                                        </div>
                                         <div className="text-xs text-muted-foreground">
-                                          {new Date(shift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(shift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                                          {new Date(shift.startTime).toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                          })}{" "}
+                                          -{" "}
+                                          {new Date(shift.endTime).toLocaleTimeString([], {
+                                            hour: "numeric",
+                                            minute: "2-digit",
+                                          })}
                                         </div>
                                       </div>
                                     </div>
-                                    <span className={cn(
-                                      "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
-                                      getStatusStyle(shift.status).bg,
-                                      getStatusStyle(shift.status).text
-                                    )}>
-                                      <span className={cn("w-1 h-1 rounded-full", getStatusStyle(shift.status).dot)} />
+                                    <span
+                                      className={cn(
+                                        "flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium",
+                                        getStatusStyle(shift.status).bg,
+                                        getStatusStyle(shift.status).text,
+                                      )}
+                                    >
+                                      <span
+                                        className={cn(
+                                          "w-1 h-1 rounded-full",
+                                          getStatusStyle(shift.status).dot,
+                                        )}
+                                      />
                                       {(shift.status ?? "scheduled").replace("_", " ")}
                                     </span>
                                   </div>
@@ -1245,7 +1407,8 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                   )}
 
                                   <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border flex-wrap">
-                                    {(shift.status === "scheduled" || shift.status === "in_progress") && (
+                                    {(shift.status === "scheduled" ||
+                                      shift.status === "in_progress") && (
                                       <button
                                         disabled={processing.has(shift.id)}
                                         onClick={() => submitShift(shift.id)}
@@ -1278,14 +1441,15 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                                     >
                                       Prefill
                                     </button>
-                                    {shift.status === "scheduled" && shift.userId === currentUserId && (
-                                      <button
-                                        onClick={() => openSwapModal(shift)}
-                                        className="text-[10px] text-violet-700 font-medium hover:underline"
-                                      >
-                                        Swap
-                                      </button>
-                                    )}
+                                    {shift.status === "scheduled" &&
+                                      shift.userId === currentUserId && (
+                                        <button
+                                          onClick={() => openSwapModal(shift)}
+                                          className="text-[10px] text-violet-700 font-medium hover:underline"
+                                        >
+                                          Swap
+                                        </button>
+                                      )}
                                     <button
                                       disabled={processing.has(shift.id)}
                                       onClick={() => moveShiftByDays(shift, -1)}

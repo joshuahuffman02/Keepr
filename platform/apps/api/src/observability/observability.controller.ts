@@ -14,7 +14,7 @@ export class ObservabilityController {
     private readonly observability: ObservabilityService,
     private readonly prometheus: PrometheusService,
     private readonly syntheticChecks: SyntheticChecksService,
-    private readonly alertSinks: AlertSinksService
+    private readonly alertSinks: AlertSinksService,
   ) {}
 
   /**
@@ -57,9 +57,18 @@ export class ObservabilityController {
   @Roles(PlatformRole.platform_admin)
   getFlags() {
     return {
-      commsAlertsEnabled: (process.env.ENABLE_COMMS_METRICS ?? process.env.comms_alerts_enabled ?? "true").toString().toLowerCase() === "true",
-      readyAlertsEnabled: (process.env.ENABLE_READY_PROBE ?? process.env.ready_checks_enabled ?? "true").toString().toLowerCase() === "true",
-      otaAlertsEnabled: (process.env.ENABLE_OTA_MONITORING ?? process.env.ota_alerts_enabled ?? "true").toString().toLowerCase() === "true",
+      commsAlertsEnabled:
+        (process.env.ENABLE_COMMS_METRICS ?? process.env.comms_alerts_enabled ?? "true")
+          .toString()
+          .toLowerCase() === "true",
+      readyAlertsEnabled:
+        (process.env.ENABLE_READY_PROBE ?? process.env.ready_checks_enabled ?? "true")
+          .toString()
+          .toLowerCase() === "true",
+      otaAlertsEnabled:
+        (process.env.ENABLE_OTA_MONITORING ?? process.env.ota_alerts_enabled ?? "true")
+          .toString()
+          .toLowerCase() === "true",
       syntheticsEnabled: (process.env.SYNTHETICS_ENABLED ?? "true").toLowerCase() === "true",
       prometheusEnabled: (process.env.PROMETHEUS_ENABLED ?? "true").toLowerCase() === "true",
       alertSinksEnabled: (process.env.ALERT_SINKS_ENABLED ?? "true").toLowerCase() === "true",
@@ -153,4 +162,3 @@ export class ObservabilityController {
     });
   }
 }
-

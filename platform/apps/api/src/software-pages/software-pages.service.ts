@@ -400,8 +400,7 @@ const FEATURE_PAGES: Record<string, FeaturePageData> = {
     ],
     testimonials: [
       {
-        quote:
-          "Staff scheduling used to take me 4 hours a week. Now it's 30 minutes.",
+        quote: "Staff scheduling used to take me 4 hours a week. Now it's 30 minutes.",
         author: "David R.",
         role: "Owner",
         campground: "Sunny Acres Campground",
@@ -412,8 +411,7 @@ const FEATURE_PAGES: Record<string, FeaturePageData> = {
     feature: "Loyalty Program",
     slug: "loyalty-program",
     title: "Campground Loyalty & Rewards Program",
-    description:
-      "Build guest loyalty and drive repeat bookings with a branded rewards program.",
+    description: "Build guest loyalty and drive repeat bookings with a branded rewards program.",
     benefits: [
       "Increase repeat bookings by 40%",
       "Build a database of loyal guests",
@@ -625,8 +623,7 @@ export class SoftwarePagesService {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const coerceRecord = (value: unknown): Record<string, unknown> =>
-  isRecord(value) ? value : {};
+const coerceRecord = (value: unknown): Record<string, unknown> => (isRecord(value) ? value : {});
 
 const getString = (value: unknown): string | undefined =>
   typeof value === "string" ? value : undefined;

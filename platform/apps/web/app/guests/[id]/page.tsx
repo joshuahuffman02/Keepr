@@ -8,25 +8,77 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "../../../lib/api-client";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
-import { Badge } from "../../../components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { Trophy, Star, History, ArrowLeft, Trash2, Plus, Car, Truck, Mail, MessageSquare, GitBranch, RotateCcw, PlusCircle, Send, Wallet, DollarSign, ClipboardList, CreditCard, Calendar, ExternalLink, Phone, StickyNote, PhoneCall, User } from "lucide-react";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../../components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../../components/ui/table";
+import { Badge } from "../../../components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import {
+  Trophy,
+  Star,
+  History,
+  ArrowLeft,
+  Trash2,
+  Plus,
+  Car,
+  Truck,
+  Mail,
+  MessageSquare,
+  GitBranch,
+  RotateCcw,
+  PlusCircle,
+  Send,
+  Wallet,
+  DollarSign,
+  ClipboardList,
+  CreditCard,
+  Calendar,
+  ExternalLink,
+  Phone,
+  StickyNote,
+  PhoneCall,
+  User,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
 import { GuestPaymentMethods } from "../../../components/guests/GuestPaymentMethods";
 import { AuditLogTimeline } from "../../../components/audit/AuditLogTimeline";
@@ -38,10 +90,10 @@ import { useCampground } from "../../../contexts/CampgroundContext";
 import { Guest } from "@keepr/shared";
 
 const TIER_COLORS: Record<string, string> = {
-    Bronze: "bg-status-warning/80",
-    Silver: "bg-muted-foreground",
-    Gold: "bg-status-warning",
-    Platinum: "bg-foreground"
+  Bronze: "bg-status-warning/80",
+  Silver: "bg-muted-foreground",
+  Gold: "bg-status-warning",
+  Platinum: "bg-foreground",
 };
 
 type CommunicationsPage = Awaited<ReturnType<typeof apiClient.listCommunications>>;
@@ -50,8 +102,8 @@ type Playbook = Awaited<ReturnType<typeof apiClient.listPlaybooks>>[number];
 type PlaybookJob = Awaited<ReturnType<typeof apiClient.listPlaybookJobs>>[number];
 
 const formatPlaybookType = (type: Playbook["type"]) => {
-    const label = type.replace("_", " ");
-    return label.charAt(0).toUpperCase() + label.slice(1);
+  const label = type.replace("_", " ");
+  return label.charAt(0).toUpperCase() + label.slice(1);
 };
 type FormSubmission = Awaited<ReturnType<typeof apiClient.getFormSubmissionsByGuest>>[number];
 
@@ -61,27 +113,27 @@ type ComposeDirection = "inbound" | "outbound";
 type CommTypeFilter = "all" | "automation" | ComposeType;
 type CommDirectionFilter = "all" | ComposeDirection;
 type TimelineItem =
-    | {
-        kind: "communication";
-        id: string;
-        date?: string;
-        type: string;
-        direction?: string | null;
-        subject?: string | null;
-        body?: string | null;
-        status?: string | null;
-        provider?: string | null;
-        toAddress?: string | null;
-        fromAddress?: string | null;
+  | {
+      kind: "communication";
+      id: string;
+      date?: string;
+      type: string;
+      direction?: string | null;
+      subject?: string | null;
+      body?: string | null;
+      status?: string | null;
+      provider?: string | null;
+      toAddress?: string | null;
+      fromAddress?: string | null;
     }
-    | {
-        kind: "playbook";
-        id: string;
-        date?: string;
-        status?: string | null;
-        name: string;
-        attempts?: number | null;
-        lastError?: string | null;
+  | {
+      kind: "playbook";
+      id: string;
+      date?: string;
+      status?: string | null;
+      name: string;
+      attempts?: number | null;
+      lastError?: string | null;
     };
 
 const creditScopeValues: CreditScopeType[] = ["campground", "organization", "global"];
@@ -91,1472 +143,1701 @@ const commTypeFilterValues: CommTypeFilter[] = ["all", "automation", ...composeT
 const commDirectionFilterValues: CommDirectionFilter[] = ["all", ...composeDirectionValues];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null && !Array.isArray(value);
+  typeof value === "object" && value !== null && !Array.isArray(value);
 
 const readString = (value: unknown): string | undefined =>
-    typeof value === "string" ? value : undefined;
+  typeof value === "string" ? value : undefined;
 
 const isCreditScopeType = (value: string): value is CreditScopeType =>
-    creditScopeValues.some((scope) => scope === value);
+  creditScopeValues.some((scope) => scope === value);
 
 const isComposeType = (value: string): value is ComposeType =>
-    composeTypeValues.some((type) => type === value);
+  composeTypeValues.some((type) => type === value);
 
 const isComposeDirection = (value: string): value is ComposeDirection =>
-    composeDirectionValues.some((direction) => direction === value);
+  composeDirectionValues.some((direction) => direction === value);
 
 const isCommTypeFilter = (value: string): value is CommTypeFilter =>
-    commTypeFilterValues.some((type) => type === value);
+  commTypeFilterValues.some((type) => type === value);
 
 const isCommDirectionFilter = (value: string): value is CommDirectionFilter =>
-    commDirectionFilterValues.some((direction) => direction === value);
+  commDirectionFilterValues.some((direction) => direction === value);
 
 const getErrorMessage = (error: unknown, fallback: string) => {
-    if (error instanceof Error) return error.message;
-    if (isRecord(error) && typeof error.message === "string") return error.message;
-    return fallback;
+  if (error instanceof Error) return error.message;
+  if (isRecord(error) && typeof error.message === "string") return error.message;
+  return fallback;
 };
 
 export default function GuestDetailPage() {
-    const params = useParams<{ id?: string }>();
-    const router = useRouter();
-    const guestId = params.id ?? "";
-    const { toast } = useToast();
-    const queryClient = useQueryClient();
+  const params = useParams<{ id?: string }>();
+  const router = useRouter();
+  const guestId = params.id ?? "";
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-    // Use the global campground selector
-    const { selectedCampground } = useCampground();
+  // Use the global campground selector
+  const { selectedCampground } = useCampground();
 
-    const guestQuery = useQuery<Guest>({
-        queryKey: ["guest", guestId],
-        queryFn: () => apiClient.getGuest(guestId)
+  const guestQuery = useQuery<Guest>({
+    queryKey: ["guest", guestId],
+    queryFn: () => apiClient.getGuest(guestId),
+  });
+
+  const loyaltyQuery = useQuery({
+    queryKey: ["loyalty", guestId],
+    queryFn: () => apiClient.getLoyaltyProfile(guestId),
+  });
+
+  const [commTypeFilter, setCommTypeFilter] = useState<CommTypeFilter>("all");
+  const [commDirectionFilter, setCommDirectionFilter] = useState<CommDirectionFilter>("all");
+  const [commStatusFilter, setCommStatusFilter] = useState<string>("all");
+  const [composeType, setComposeType] = useState<ComposeType>("email");
+  const [composeDirection, setComposeDirection] = useState<ComposeDirection>("outbound");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+  const [composeTo, setComposeTo] = useState("");
+  const [composeFrom, setComposeFrom] = useState("");
+
+  const guest = guestQuery.data;
+
+  const guestCampgroundId = useMemo(() => {
+    if (!guest || !("campgroundId" in guest)) return undefined;
+    return readString(guest.campgroundId);
+  }, [guest]);
+
+  const guestCampgroundIds = useMemo(() => {
+    const reservations = guest?.reservations || [];
+    const ids = new Set<string>();
+    reservations.forEach((r) => {
+      if (r.campgroundId) ids.add(r.campgroundId);
     });
+    return Array.from(ids);
+  }, [guest]);
 
-    const loyaltyQuery = useQuery({
-        queryKey: ["loyalty", guestId],
-        queryFn: () => apiClient.getLoyaltyProfile(guestId)
-    });
+  const campgroundIdForGuest = useMemo(
+    () => selectedCampground?.id || guestCampgroundIds[0] || guestCampgroundId || "",
+    [selectedCampground?.id, guestCampgroundIds, guestCampgroundId],
+  );
 
-    const [commTypeFilter, setCommTypeFilter] = useState<CommTypeFilter>("all");
-    const [commDirectionFilter, setCommDirectionFilter] = useState<CommDirectionFilter>("all");
-    const [commStatusFilter, setCommStatusFilter] = useState<string>("all");
-    const [composeType, setComposeType] = useState<ComposeType>("email");
-    const [composeDirection, setComposeDirection] = useState<ComposeDirection>("outbound");
-    const [composeSubject, setComposeSubject] = useState("");
-    const [composeBody, setComposeBody] = useState("");
-    const [composeTo, setComposeTo] = useState("");
-    const [composeFrom, setComposeFrom] = useState("");
+  // Wallet state and queries
+  const [addCreditOpen, setAddCreditOpen] = useState(false);
+  const [creditAmount, setCreditAmount] = useState("");
+  const [creditReason, setCreditReason] = useState("");
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
+  const [creditScopeType, setCreditScopeType] = useState<"campground" | "organization" | "global">(
+    "campground",
+  );
 
-    const guest = guestQuery.data;
+  const walletsQuery = useQuery({
+    queryKey: ["wallets", campgroundIdForGuest, guestId],
+    queryFn: () => apiClient.getGuestWalletsForCampground(campgroundIdForGuest, guestId),
+    enabled: !!campgroundIdForGuest && !!guestId,
+  });
 
-    const guestCampgroundId = useMemo(() => {
-        if (!guest || !("campgroundId" in guest)) return undefined;
-        return readString(guest.campgroundId);
-    }, [guest]);
+  const wallets = walletsQuery.data ?? [];
+  const selectedWallet = useMemo(
+    () => wallets.find((wallet) => wallet.walletId === selectedWalletId) ?? wallets[0],
+    [wallets, selectedWalletId],
+  );
+  const selectedBalanceCents = selectedWallet?.balanceCents ?? 0;
+  const selectedAvailableCents = selectedWallet?.availableCents ?? 0;
+  const walletScopeLabel = (wallet: { scopeType: string; campgroundName?: string }) => {
+    if (wallet.scopeType === "organization")
+      return `Portfolio${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
+    if (wallet.scopeType === "global") return "Global wallet";
+    return `Campground${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
+  };
 
-    const guestCampgroundIds = useMemo(() => {
-        const reservations = guest?.reservations || [];
-        const ids = new Set<string>();
-        reservations.forEach((r) => {
-            if (r.campgroundId) ids.add(r.campgroundId);
-        });
-        return Array.from(ids);
-    }, [guest]);
-
-    const campgroundIdForGuest = useMemo(
-        () => selectedCampground?.id || guestCampgroundIds[0] || guestCampgroundId || "",
-        [selectedCampground?.id, guestCampgroundIds, guestCampgroundId]
-    );
-
-    // Wallet state and queries
-    const [addCreditOpen, setAddCreditOpen] = useState(false);
-    const [creditAmount, setCreditAmount] = useState("");
-    const [creditReason, setCreditReason] = useState("");
-    const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
-    const [creditScopeType, setCreditScopeType] = useState<"campground" | "organization" | "global">("campground");
-
-    const walletsQuery = useQuery({
-        queryKey: ["wallets", campgroundIdForGuest, guestId],
-        queryFn: () => apiClient.getGuestWalletsForCampground(campgroundIdForGuest, guestId),
-        enabled: !!campgroundIdForGuest && !!guestId
-    });
-
-    const wallets = walletsQuery.data ?? [];
-    const selectedWallet = useMemo(
-        () => wallets.find((wallet) => wallet.walletId === selectedWalletId) ?? wallets[0],
-        [wallets, selectedWalletId]
-    );
-    const selectedBalanceCents = selectedWallet?.balanceCents ?? 0;
-    const selectedAvailableCents = selectedWallet?.availableCents ?? 0;
-    const walletScopeLabel = (wallet: { scopeType: string; campgroundName?: string }) => {
-        if (wallet.scopeType === "organization") return `Portfolio${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
-        if (wallet.scopeType === "global") return "Global wallet";
-        return `Campground${wallet.campgroundName ? ` · ${wallet.campgroundName}` : ""}`;
-    };
-
-    useEffect(() => {
-        if (!wallets.length) {
-            setSelectedWalletId(null);
-            return;
-        }
-        if (!selectedWalletId || !wallets.some((wallet) => wallet.walletId === selectedWalletId)) {
-            setSelectedWalletId(wallets[0].walletId);
-        }
-    }, [selectedWalletId, wallets]);
-
-    useEffect(() => {
-        if (selectedWallet?.scopeType && isCreditScopeType(selectedWallet.scopeType)) {
-            setCreditScopeType(selectedWallet.scopeType);
-        }
-    }, [selectedWallet?.walletId, selectedWallet?.scopeType]);
-
-    const walletTransactionsQuery = useQuery({
-        queryKey: ["wallet-transactions", campgroundIdForGuest, guestId, selectedWallet?.walletId],
-        queryFn: () =>
-            apiClient.getWalletTransactions(campgroundIdForGuest, guestId, 20, 0, selectedWallet?.walletId),
-        enabled: !!campgroundIdForGuest && !!guestId && !!selectedWallet?.walletId
-    });
-
-    const addCreditMutation = useMutation({
-        mutationFn: (data: { amountCents: number; reason?: string; scopeType: "campground" | "organization" | "global"; scopeId?: string }) =>
-            apiClient.addWalletCredit(campgroundIdForGuest, guestId, data.amountCents, data.reason, data.scopeType, data.scopeId),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["wallets", campgroundIdForGuest, guestId] });
-            queryClient.invalidateQueries({ queryKey: ["wallet-transactions", campgroundIdForGuest, guestId] });
-            setAddCreditOpen(false);
-            setCreditAmount("");
-            setCreditReason("");
-            toast({ title: "Credit added", description: "Wallet credit has been added successfully." });
-        },
-        onError: (error: unknown) => {
-            toast({ title: "Error", description: getErrorMessage(error, "Failed to add credit"), variant: "destructive" });
-        }
-    });
-    const campgroundQuery = useQuery({
-        queryKey: ["campground", campgroundIdForGuest],
-        queryFn: () => apiClient.getCampground(campgroundIdForGuest),
-        enabled: !!campgroundIdForGuest
-    });
-    const organizationId = campgroundQuery.data?.organizationId;
-    const SLA_MINUTES = campgroundQuery.data?.slaMinutes ?? Number(process.env.NEXT_PUBLIC_SLA_MINUTES || 30);
-
-    const commsQuery = useInfiniteQuery<CommunicationsPage>({
-        queryKey: ["communications", "guest", guestId, commTypeFilter, commDirectionFilter],
-        queryFn: ({ pageParam }) => {
-            const cursor = typeof pageParam === "string" ? pageParam : undefined;
-            return apiClient.listCommunications({
-                campgroundId: campgroundIdForGuest,
-                guestId: guestId,
-                limit: 20,
-                type: isComposeType(commTypeFilter) ? commTypeFilter : undefined,
-                direction: commDirectionFilter === "all" ? undefined : commDirectionFilter,
-                cursor
-            });
-        },
-        enabled: !!guestId && !!campgroundIdForGuest,
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined
-    });
-
-    const commItems = commsQuery.data?.pages?.flatMap((page) => page.items) ?? [];
-    const overdueCount = commItems.filter((item) => {
-        const createdDate = item.createdAt ? new Date(item.createdAt) : null;
-        const minutesSince = createdDate ? (Date.now() - createdDate.getTime()) / 60000 : 0;
-        const isInboundPending = item.direction === "inbound" && !(item.status || "").startsWith("delivered") && (item.status || "") !== "sent" && (item.status || "") !== "failed";
-        return isInboundPending && minutesSince > SLA_MINUTES;
-    }).length;
-
-    const playbookJobsQuery = useQuery<PlaybookJob[]>({
-        queryKey: ["communications", "playbook-jobs", campgroundIdForGuest],
-        queryFn: () => apiClient.listPlaybookJobs(campgroundIdForGuest),
-        enabled: !!campgroundIdForGuest
-    });
-
-    const playbooksQuery = useQuery<Playbook[]>({
-        queryKey: ["communications", "playbooks", campgroundIdForGuest],
-        queryFn: () => apiClient.listPlaybooks(campgroundIdForGuest),
-        enabled: !!campgroundIdForGuest
-    });
-
-    const playbookNameById = useMemo(() => {
-        const map: Record<string, string> = {};
-        (playbooksQuery.data || []).forEach((playbook) => {
-            map[playbook.id] = formatPlaybookType(playbook.type);
-        });
-        return map;
-    }, [playbooksQuery.data]);
-
-    const statusTone = (status?: string | null) => {
-        const normalized = (status || "").toLowerCase();
-        if (normalized.includes("complaint") || normalized.includes("bounce") || normalized.includes("fail")) {
-            return "bg-status-error-bg text-status-error-text border border-status-error-border";
-        }
-        if (normalized.startsWith("delivered") || normalized === "sent" || normalized === "received") {
-            return "bg-status-success-bg text-status-success-text border border-status-success-border";
-        }
-        if (normalized.includes("pending") || normalized.includes("processing")) {
-            return "bg-status-warning-bg text-status-warning-text border border-status-warning-border";
-        }
-        return "bg-muted text-muted-foreground border border-border";
-    };
-
-    const timelineItems = useMemo(() => {
-        const normalizedStatus = commStatusFilter.toLowerCase();
-        const comms: TimelineItem[] = commItems
-            .filter((item) => ["email", "sms"].includes(item.type))
-            .filter((item) => (commTypeFilter === "all" || commTypeFilter === "automation" ? true : item.type === commTypeFilter))
-            .filter((item) => (commStatusFilter === "all" ? true : (item.status || "").toLowerCase().includes(normalizedStatus)))
-            .map((item) => ({
-                kind: "communication",
-                id: item.id,
-                date: item.createdAt,
-                type: item.type,
-                direction: item.direction,
-                subject: item.subject,
-                body: item.preview || item.body,
-                status: item.status,
-                provider: item.provider,
-                toAddress: item.toAddress,
-                fromAddress: item.fromAddress
-            }));
-
-        const jobs: TimelineItem[] = (playbookJobsQuery.data || [])
-            .filter((job) => !guestId || job.guestId === guestId)
-            .filter((job) => commStatusFilter === "all" ? true : (job.status || "").toLowerCase().includes(normalizedStatus))
-            .filter(() => commTypeFilter === "all" || commTypeFilter === "automation")
-            .map((job) => ({
-                kind: "playbook",
-                id: job.id,
-                date: job.updatedAt || job.scheduledAt || job.createdAt,
-                status: job.status,
-                name: playbookNameById[job.playbookId] || "Playbook step",
-                attempts: job.attempts,
-                lastError: job.lastError
-            }));
-
-        return [...comms, ...jobs].sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
-    }, [commItems, commStatusFilter, commTypeFilter, guestId, playbookJobsQuery.data, playbookNameById]);
-
-    const retryPlaybookMutation = useMutation({
-        mutationFn: async (jobId: string) => {
-            return apiClient.retryPlaybookJob(jobId, campgroundIdForGuest);
-        },
-        onSuccess: () => {
-            playbookJobsQuery.refetch();
-            toast({ title: "Retry queued" });
-        },
-        onError: () => {
-            toast({ title: "Retry failed", variant: "destructive" });
-        }
-    });
-
-    const [adjustPointsOpen, setAdjustPointsOpen] = useState(false);
-    const [adjustAmount, setAdjustAmount] = useState("");
-    const [adjustReason, setAdjustReason] = useState("");
-    const [adjustType, setAdjustType] = useState<"add" | "deduct">("add");
-
-    const adjustPointsMutation = useMutation({
-        mutationFn: async () => {
-            const amount = parseInt(adjustAmount);
-            if (isNaN(amount) || amount <= 0) throw new Error("Invalid amount");
-            const finalAmount = adjustType === "add" ? amount : -amount;
-            return apiClient.awardPoints(guestId, finalAmount, adjustReason);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["loyalty", guestId] });
-            setAdjustPointsOpen(false);
-            setAdjustAmount("");
-            setAdjustReason("");
-            toast({ title: "Points updated successfully" });
-        },
-        onError: () => {
-            toast({ title: "Failed to update points", variant: "destructive" });
-        }
-    });
-
-    const formsQuery = useQuery<FormSubmission[]>({
-        queryKey: ["form-submissions-guest", guestId],
-        queryFn: () => apiClient.getFormSubmissionsByGuest(guestId),
-    });
-
-    if (guestQuery.isLoading) {
-        return (
-            <DashboardShell>
-                <div className="flex items-center justify-center h-96">Loading guest details...</div>
-            </DashboardShell>
-        );
+  useEffect(() => {
+    if (!wallets.length) {
+      setSelectedWalletId(null);
+      return;
     }
-
-    if (!guest) {
-        return (
-            <DashboardShell>
-                <div className="flex flex-col items-center justify-center h-96 gap-4">
-                    <div className="text-lg text-muted-foreground">Guest not found</div>
-                    <Button onClick={() => router.push("/guests")}>Back to Guests</Button>
-                </div>
-            </DashboardShell>
-        );
+    if (!selectedWalletId || !wallets.some((wallet) => wallet.walletId === selectedWalletId)) {
+      setSelectedWalletId(wallets[0].walletId);
     }
+  }, [selectedWalletId, wallets]);
 
+  useEffect(() => {
+    if (selectedWallet?.scopeType && isCreditScopeType(selectedWallet.scopeType)) {
+      setCreditScopeType(selectedWallet.scopeType);
+    }
+  }, [selectedWallet?.walletId, selectedWallet?.scopeType]);
+
+  const walletTransactionsQuery = useQuery({
+    queryKey: ["wallet-transactions", campgroundIdForGuest, guestId, selectedWallet?.walletId],
+    queryFn: () =>
+      apiClient.getWalletTransactions(
+        campgroundIdForGuest,
+        guestId,
+        20,
+        0,
+        selectedWallet?.walletId,
+      ),
+    enabled: !!campgroundIdForGuest && !!guestId && !!selectedWallet?.walletId,
+  });
+
+  const addCreditMutation = useMutation({
+    mutationFn: (data: {
+      amountCents: number;
+      reason?: string;
+      scopeType: "campground" | "organization" | "global";
+      scopeId?: string;
+    }) =>
+      apiClient.addWalletCredit(
+        campgroundIdForGuest,
+        guestId,
+        data.amountCents,
+        data.reason,
+        data.scopeType,
+        data.scopeId,
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["wallets", campgroundIdForGuest, guestId] });
+      queryClient.invalidateQueries({
+        queryKey: ["wallet-transactions", campgroundIdForGuest, guestId],
+      });
+      setAddCreditOpen(false);
+      setCreditAmount("");
+      setCreditReason("");
+      toast({ title: "Credit added", description: "Wallet credit has been added successfully." });
+    },
+    onError: (error: unknown) => {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error, "Failed to add credit"),
+        variant: "destructive",
+      });
+    },
+  });
+  const campgroundQuery = useQuery({
+    queryKey: ["campground", campgroundIdForGuest],
+    queryFn: () => apiClient.getCampground(campgroundIdForGuest),
+    enabled: !!campgroundIdForGuest,
+  });
+  const organizationId = campgroundQuery.data?.organizationId;
+  const SLA_MINUTES =
+    campgroundQuery.data?.slaMinutes ?? Number(process.env.NEXT_PUBLIC_SLA_MINUTES || 30);
+
+  const commsQuery = useInfiniteQuery<CommunicationsPage>({
+    queryKey: ["communications", "guest", guestId, commTypeFilter, commDirectionFilter],
+    queryFn: ({ pageParam }) => {
+      const cursor = typeof pageParam === "string" ? pageParam : undefined;
+      return apiClient.listCommunications({
+        campgroundId: campgroundIdForGuest,
+        guestId: guestId,
+        limit: 20,
+        type: isComposeType(commTypeFilter) ? commTypeFilter : undefined,
+        direction: commDirectionFilter === "all" ? undefined : commDirectionFilter,
+        cursor,
+      });
+    },
+    enabled: !!guestId && !!campgroundIdForGuest,
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage?.nextCursor ?? undefined,
+  });
+
+  const commItems = commsQuery.data?.pages?.flatMap((page) => page.items) ?? [];
+  const overdueCount = commItems.filter((item) => {
+    const createdDate = item.createdAt ? new Date(item.createdAt) : null;
+    const minutesSince = createdDate ? (Date.now() - createdDate.getTime()) / 60000 : 0;
+    const isInboundPending =
+      item.direction === "inbound" &&
+      !(item.status || "").startsWith("delivered") &&
+      (item.status || "") !== "sent" &&
+      (item.status || "") !== "failed";
+    return isInboundPending && minutesSince > SLA_MINUTES;
+  }).length;
+
+  const playbookJobsQuery = useQuery<PlaybookJob[]>({
+    queryKey: ["communications", "playbook-jobs", campgroundIdForGuest],
+    queryFn: () => apiClient.listPlaybookJobs(campgroundIdForGuest),
+    enabled: !!campgroundIdForGuest,
+  });
+
+  const playbooksQuery = useQuery<Playbook[]>({
+    queryKey: ["communications", "playbooks", campgroundIdForGuest],
+    queryFn: () => apiClient.listPlaybooks(campgroundIdForGuest),
+    enabled: !!campgroundIdForGuest,
+  });
+
+  const playbookNameById = useMemo(() => {
+    const map: Record<string, string> = {};
+    (playbooksQuery.data || []).forEach((playbook) => {
+      map[playbook.id] = formatPlaybookType(playbook.type);
+    });
+    return map;
+  }, [playbooksQuery.data]);
+
+  const statusTone = (status?: string | null) => {
+    const normalized = (status || "").toLowerCase();
+    if (
+      normalized.includes("complaint") ||
+      normalized.includes("bounce") ||
+      normalized.includes("fail")
+    ) {
+      return "bg-status-error-bg text-status-error-text border border-status-error-border";
+    }
+    if (normalized.startsWith("delivered") || normalized === "sent" || normalized === "received") {
+      return "bg-status-success-bg text-status-success-text border border-status-success-border";
+    }
+    if (normalized.includes("pending") || normalized.includes("processing")) {
+      return "bg-status-warning-bg text-status-warning-text border border-status-warning-border";
+    }
+    return "bg-muted text-muted-foreground border border-border";
+  };
+
+  const timelineItems = useMemo(() => {
+    const normalizedStatus = commStatusFilter.toLowerCase();
+    const comms: TimelineItem[] = commItems
+      .filter((item) => ["email", "sms"].includes(item.type))
+      .filter((item) =>
+        commTypeFilter === "all" || commTypeFilter === "automation"
+          ? true
+          : item.type === commTypeFilter,
+      )
+      .filter((item) =>
+        commStatusFilter === "all"
+          ? true
+          : (item.status || "").toLowerCase().includes(normalizedStatus),
+      )
+      .map((item) => ({
+        kind: "communication",
+        id: item.id,
+        date: item.createdAt,
+        type: item.type,
+        direction: item.direction,
+        subject: item.subject,
+        body: item.preview || item.body,
+        status: item.status,
+        provider: item.provider,
+        toAddress: item.toAddress,
+        fromAddress: item.fromAddress,
+      }));
+
+    const jobs: TimelineItem[] = (playbookJobsQuery.data || [])
+      .filter((job) => !guestId || job.guestId === guestId)
+      .filter((job) =>
+        commStatusFilter === "all"
+          ? true
+          : (job.status || "").toLowerCase().includes(normalizedStatus),
+      )
+      .filter(() => commTypeFilter === "all" || commTypeFilter === "automation")
+      .map((job) => ({
+        kind: "playbook",
+        id: job.id,
+        date: job.updatedAt || job.scheduledAt || job.createdAt,
+        status: job.status,
+        name: playbookNameById[job.playbookId] || "Playbook step",
+        attempts: job.attempts,
+        lastError: job.lastError,
+      }));
+
+    return [...comms, ...jobs].sort(
+      (a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+    );
+  }, [
+    commItems,
+    commStatusFilter,
+    commTypeFilter,
+    guestId,
+    playbookJobsQuery.data,
+    playbookNameById,
+  ]);
+
+  const retryPlaybookMutation = useMutation({
+    mutationFn: async (jobId: string) => {
+      return apiClient.retryPlaybookJob(jobId, campgroundIdForGuest);
+    },
+    onSuccess: () => {
+      playbookJobsQuery.refetch();
+      toast({ title: "Retry queued" });
+    },
+    onError: () => {
+      toast({ title: "Retry failed", variant: "destructive" });
+    },
+  });
+
+  const [adjustPointsOpen, setAdjustPointsOpen] = useState(false);
+  const [adjustAmount, setAdjustAmount] = useState("");
+  const [adjustReason, setAdjustReason] = useState("");
+  const [adjustType, setAdjustType] = useState<"add" | "deduct">("add");
+
+  const adjustPointsMutation = useMutation({
+    mutationFn: async () => {
+      const amount = parseInt(adjustAmount);
+      if (isNaN(amount) || amount <= 0) throw new Error("Invalid amount");
+      const finalAmount = adjustType === "add" ? amount : -amount;
+      return apiClient.awardPoints(guestId, finalAmount, adjustReason);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["loyalty", guestId] });
+      setAdjustPointsOpen(false);
+      setAdjustAmount("");
+      setAdjustReason("");
+      toast({ title: "Points updated successfully" });
+    },
+    onError: () => {
+      toast({ title: "Failed to update points", variant: "destructive" });
+    },
+  });
+
+  const formsQuery = useQuery<FormSubmission[]>({
+    queryKey: ["form-submissions-guest", guestId],
+    queryFn: () => apiClient.getFormSubmissionsByGuest(guestId),
+  });
+
+  if (guestQuery.isLoading) {
     return (
-        <DashboardShell>
-            <div className="space-y-6">
-                <Breadcrumbs items={[{ label: "Guests", href: "/guests" }, { label: `${guest.primaryFirstName} ${guest.primaryLastName}` }]} />
-
-                <PageHeader
-                    eyebrow="Guest"
-                    title={(
-                        <span className="flex items-center gap-3">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
-                                <User className="h-5 w-5" />
-                            </span>
-                            <span>{guest.primaryFirstName} {guest.primaryLastName}</span>
-                        </span>
-                    )}
-                    subtitle={`${guest.email ?? "No email"}${guest.phone ? ` • ${guest.phone}` : ""}`}
-                    actions={(
-                        <>
-                            <Button variant="secondary" onClick={() => router.push("/guests")}>
-                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                Back to Guests
-                            </Button>
-                            {guest.reservations?.[0] && (
-                                <Button
-                                    variant="outline"
-                                    className="gap-2"
-                                    onClick={() => router.push(`/booking?guestId=${guest.id}`)}
-                                >
-                                    <History className="h-4 w-4" />
-                                    Rebook Last Trip
-                                </Button>
-                            )}
-                        </>
-                    )}
-                />
-
-                <Tabs defaultValue="overview" className="space-y-4">
-                    <TabsList>
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
-                        <TabsTrigger value="reservations" className="gap-1">
-                            <Calendar className="h-3.5 w-3.5" />
-                            Reservations
-                        </TabsTrigger>
-                        <TabsTrigger value="equipment">Equipment</TabsTrigger>
-                        <TabsTrigger value="wallet">Wallet</TabsTrigger>
-                        <TabsTrigger value="payment-methods" className="gap-1">
-                            <CreditCard className="h-3.5 w-3.5" />
-                            Cards
-                        </TabsTrigger>
-                        <TabsTrigger value="loyalty">Loyalty & Rewards</TabsTrigger>
-                        <TabsTrigger value="communications">Communications</TabsTrigger>
-                        <TabsTrigger value="activity" className="gap-1">
-                            <ClipboardList className="h-3.5 w-3.5" />
-                            Activity
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="overview" className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Guest Information</CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label className="text-xs text-muted-foreground">Full Name</Label>
-                                    <div className="font-medium">{guest.primaryFirstName} {guest.primaryLastName}</div>
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-muted-foreground">Email</Label>
-                                    <div className="font-medium">{guest.email}</div>
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-muted-foreground">Phone</Label>
-                                    <div className="font-medium">{guest.phone}</div>
-                                </div>
-                                <div>
-                                    <Label className="text-xs text-muted-foreground">Address</Label>
-                                    <div className="font-medium">
-                                        {guest.address1}
-                                        {guest.address2 && <>, {guest.address2}</>}
-                                        <br />
-                                        {guest.city}, {guest.state} {guest.postalCode}
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                        <Card>
-                            <CardHeader className="flex items-center justify-between">
-                                <CardTitle>Forms</CardTitle>
-                                {formsQuery.isLoading ? (
-                                    <span className="text-xs text-muted-foreground">Loading…</span>
-                                ) : (
-                                    <Badge variant={(formsQuery.data || []).some((form) => form.status === "pending") ? "destructive" : "secondary"}>
-                                        {(formsQuery.data || []).filter((form) => form.status === "pending").length} pending
-                                    </Badge>
-                                )}
-                            </CardHeader>
-                            <CardContent className="space-y-2 text-sm">
-                                {formsQuery.isError && (
-                                    <div role="alert" className="text-xs text-status-error">
-                                        Failed to load forms.
-                                    </div>
-                                )}
-                                {!formsQuery.isLoading && (formsQuery.data || []).length === 0 && (
-                                    <div className="text-xs text-muted-foreground">No forms for this guest.</div>
-                                )}
-                                <div className="space-y-1">
-                                    {(formsQuery.data || []).map((form) => (
-                                        <div key={form.id} className="flex items-center justify-between rounded border border-border px-2 py-1">
-                                            <div>
-                                                <div className="font-medium text-foreground text-sm">{form.formTemplate?.title || "Form"}</div>
-                                                <div className="text-xs text-muted-foreground">{form.formTemplate?.type}</div>
-                                            </div>
-                                            <Badge variant={form.status === "completed" ? "default" : form.status === "pending" ? "destructive" : "secondary"}>
-                                                {form.status}
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="reservations" className="space-y-4">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div>
-                                    <CardTitle className="flex items-center gap-2">
-                                        <Calendar className="h-5 w-5" />
-                                        Reservations
-                                    </CardTitle>
-                                    <CardDescription>
-                                        All reservations for this guest
-                                    </CardDescription>
-                                </div>
-                                <Button
-                                    variant="outline"
-                                    className="gap-2"
-                                    onClick={() => router.push(`/booking?guestId=${guest.id}`)}
-                                >
-                                    <Plus className="h-4 w-4" />
-                                    New Reservation
-                                </Button>
-                            </CardHeader>
-                            <CardContent>
-                                {guest.reservations && guest.reservations.length > 0 ? (
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Dates</TableHead>
-                                                <TableHead>Site</TableHead>
-                                                <TableHead>Status</TableHead>
-                                                <TableHead className="text-right">Actions</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {guest.reservations.map((res, index) => (
-                                                <TableRow key={res.id ?? `${res.campgroundId ?? "reservation"}-${index}`}>
-                                                    <TableCell>
-                                                        <div className="font-medium">
-                                                            {res.arrivalDate ? new Date(res.arrivalDate).toLocaleDateString() : "—"} - {res.departureDate ? new Date(res.departureDate).toLocaleDateString() : "—"}
-                                                        </div>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {res.site?.siteNumber || res.site?.name || "—"}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={
-                                                            res.status === "checked_in" ? "default" :
-                                                            res.status === "confirmed" ? "secondary" :
-                                                            res.status === "checked_out" ? "outline" :
-                                                            res.status === "cancelled" ? "destructive" : "secondary"
-                                                        }>
-                                                            {res.status?.replace("_", " ")}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() => router.push(`/reservations/${res.id}`)}
-                                                            className="gap-1"
-                                                        >
-                                                            View <ExternalLink className="h-3 w-3" />
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                        <p>No reservations found for this guest</p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="equipment" className="space-y-4">
-                        <GuestEquipmentTab guestId={guestId} />
-                    </TabsContent>
-
-                    <TabsContent value="payment-methods" className="space-y-4">
-                        {campgroundIdForGuest || guestCampgroundIds.length > 0 ? (
-                            <GuestPaymentMethods
-                                guestId={guestId}
-                                campgroundId={campgroundIdForGuest || guestCampgroundIds[0]}
-                                additionalCampgroundIds={guestCampgroundIds.filter(id => id !== campgroundIdForGuest)}
-                            />
-                        ) : (
-                            <Card>
-                                <CardContent className="py-8 text-center text-muted-foreground">
-                                    No saved payment methods. Cards are saved when the guest makes a reservation.
-                                </CardContent>
-                            </Card>
-                        )}
-                    </TabsContent>
-
-                    <TabsContent value="wallet" className="space-y-4">
-                        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
-                            <div>
-                                <div className="text-sm font-medium">Wallet scope</div>
-                                <div className="text-xs text-muted-foreground">Choose which wallet to view or apply.</div>
-                            </div>
-                            <Select value={selectedWalletId ?? ""} onValueChange={setSelectedWalletId}>
-                                <SelectTrigger
-                                    className="w-[220px]"
-                                    disabled={!wallets.length}
-                                    aria-label="Wallet scope"
-                                >
-                                    <SelectValue placeholder={wallets.length ? "Select wallet" : "No wallets yet"} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {wallets.map((wallet) => (
-                                        <SelectItem key={wallet.walletId} value={wallet.walletId}>
-                                            {walletScopeLabel(wallet)} · ${(wallet.balanceCents / 100).toFixed(2)}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
-                                    <Wallet className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">
-                                        ${(selectedBalanceCents / 100).toFixed(2)}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        {selectedWallet ? walletScopeLabel(selectedWallet) : "Available for purchases"}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Available</CardTitle>
-                                    <DollarSign className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">
-                                        ${(selectedAvailableCents / 100).toFixed(2)}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        After pending holds
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div>
-                                    <CardTitle>Transaction History</CardTitle>
-                                    <CardDescription>Recent wallet activity for this guest</CardDescription>
-                                </div>
-                                <Dialog open={addCreditOpen} onOpenChange={setAddCreditOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button>
-                                            <Plus className="h-4 w-4 mr-2" />
-                                            Add Credit
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Add Wallet Credit</DialogTitle>
-                                            <DialogDescription>
-                                                Add credit to this guest&apos;s wallet. This can be used for POS purchases or reservation payments.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="credit-amount" className="text-right">
-                                                    Amount
-                                                </Label>
-                                                <div className="col-span-3 relative">
-                                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                                                    <Input
-                                                        id="credit-amount"
-                                                        type="number"
-                                                        step="0.01"
-                                                        min="0"
-                                                        value={creditAmount}
-                                                        onChange={(e) => setCreditAmount(e.target.value)}
-                                                        className="pl-7"
-                                                        placeholder="0.00"
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="credit-reason" className="text-right">
-                                                    Reason
-                                                </Label>
-                                                <Input
-                                                    id="credit-reason"
-                                                    value={creditReason}
-                                                    onChange={(e) => setCreditReason(e.target.value)}
-                                                    className="col-span-3"
-                                                    placeholder="e.g. Grandparent gift, Goodwill credit"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="credit-scope" className="text-right">Scope</Label>
-                                                <div className="col-span-3">
-                                                    <Select
-                                                        value={creditScopeType}
-                                                        onValueChange={(value) => {
-                                                            if (isCreditScopeType(value)) {
-                                                                setCreditScopeType(value);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <SelectTrigger id="credit-scope" aria-label="Credit scope">
-                                                            <SelectValue placeholder="Select scope" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="campground">This campground</SelectItem>
-                                                            {organizationId && <SelectItem value="organization">Portfolio (all campgrounds)</SelectItem>}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <DialogFooter>
-                                            <Button variant="outline" onClick={() => setAddCreditOpen(false)}>
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                onClick={() => {
-                                                    const amountCents = Math.round(parseFloat(creditAmount) * 100);
-                                                    if (isNaN(amountCents) || amountCents <= 0) {
-                                                        toast({ title: "Invalid amount", variant: "destructive" });
-                                                        return;
-                                                    }
-                                                    if (creditScopeType === "organization" && !organizationId) {
-                                                        toast({ title: "Organization required", variant: "destructive" });
-                                                        return;
-                                                    }
-                                                    const scopeId =
-                                                        creditScopeType === "organization"
-                                                            ? organizationId
-                                                            : creditScopeType === "campground"
-                                                            ? campgroundIdForGuest
-                                                            : undefined;
-                                                    addCreditMutation.mutate({
-                                                        amountCents,
-                                                        reason: creditReason || undefined,
-                                                        scopeType: creditScopeType,
-                                                        scopeId: scopeId || undefined
-                                                    });
-                                                }}
-                                                disabled={addCreditMutation.isPending}
-                                            >
-                                                {addCreditMutation.isPending ? "Adding..." : "Add Credit"}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            </CardHeader>
-                            <CardContent>
-                                {walletTransactionsQuery.isLoading ? (
-                                    <div className="text-center py-4 text-muted-foreground">Loading transactions...</div>
-                                ) : walletTransactionsQuery.data?.transactions.length === 0 ? (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                                        <p>No wallet transactions yet</p>
-                                        <p className="text-sm">Add credit to get started</p>
-                                    </div>
-                                ) : (
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Date</TableHead>
-                                                <TableHead>Type</TableHead>
-                                                <TableHead>Reason</TableHead>
-                                                <TableHead className="text-right">Amount</TableHead>
-                                                <TableHead className="text-right">Balance</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {walletTransactionsQuery.data?.transactions.map((tx) => (
-                                                <TableRow key={tx.id}>
-                                                    <TableCell className="text-muted-foreground">
-                                                        {formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Badge variant={
-                                                            tx.direction === "issue" || tx.direction === "refund" ? "default" :
-                                                            tx.direction === "redeem" ? "secondary" : "outline"
-                                                        }>
-                                                            {tx.direction}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>{tx.reason || tx.referenceType}</TableCell>
-                                                    <TableCell className={cn(
-                                                        "text-right font-medium",
-                                                        tx.direction === "issue" || tx.direction === "refund" ? "text-status-success" : "text-status-error"
-                                                    )}>
-                                                        {tx.direction === "issue" || tx.direction === "refund" ? "+" : "-"}
-                                                        ${(tx.amountCents / 100).toFixed(2)}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        ${(tx.afterBalanceCents / 100).toFixed(2)}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="loyalty" className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Current Tier</CardTitle>
-                                    <Trophy className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{loyaltyQuery.data?.tier || "Bronze"}</div>
-                                    <p className="text-xs text-muted-foreground">
-                                        Based on lifetime points
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            <Card>
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Points Balance</CardTitle>
-                                    <Star className="h-4 w-4 text-muted-foreground" />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold">{loyaltyQuery.data?.pointsBalance.toLocaleString() || 0}</div>
-                                    <p className="text-xs text-muted-foreground">
-                                        Available to redeem
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <div>
-                                    <CardTitle>Transaction History</CardTitle>
-                                    <CardDescription>Recent points activity for this guest</CardDescription>
-                                </div>
-                                <Dialog open={adjustPointsOpen} onOpenChange={setAdjustPointsOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button variant="outline">Adjust Points</Button>
-                                    </DialogTrigger>
-                                    <DialogContent>
-                                        <DialogHeader>
-                                            <DialogTitle>Adjust Loyalty Points</DialogTitle>
-                                            <DialogDescription>
-                                                Manually add or deduct points for this guest.
-                                            </DialogDescription>
-                                        </DialogHeader>
-                                        <div className="grid gap-4 py-4">
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label className="text-right">Action</Label>
-                                                <div className="col-span-3 flex gap-2">
-                                                    <Button
-                                                        type="button"
-                                                        variant={adjustType === "add" ? "default" : "outline"}
-                                                        onClick={() => setAdjustType("add")}
-                                                        className="flex-1"
-                                                        aria-pressed={adjustType === "add"}
-                                                    >
-                                                        Add
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant={adjustType === "deduct" ? "default" : "outline"}
-                                                        onClick={() => setAdjustType("deduct")}
-                                                        className={cn("flex-1", adjustType === "deduct" && "bg-destructive hover:bg-destructive/90")}
-                                                        aria-pressed={adjustType === "deduct"}
-                                                    >
-                                                        Deduct
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="amount" className="text-right">
-                                                    Amount
-                                                </Label>
-                                                <Input
-                                                    id="amount"
-                                                    type="number"
-                                                    value={adjustAmount}
-                                                    onChange={(e) => setAdjustAmount(e.target.value)}
-                                                    className="col-span-3"
-                                                    placeholder="e.g. 500"
-                                                />
-                                            </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="reason" className="text-right">
-                                                    Reason
-                                                </Label>
-                                                <Input
-                                                    id="reason"
-                                                    value={adjustReason}
-                                                    onChange={(e) => setAdjustReason(e.target.value)}
-                                                    className="col-span-3"
-                                                    placeholder="e.g. Manual adjustment, Bonus"
-                                                />
-                                            </div>
-                                        </div>
-                                        <DialogFooter>
-                                            <Button variant="ghost" onClick={() => setAdjustPointsOpen(false)}>Cancel</Button>
-                                            <Button onClick={() => adjustPointsMutation.mutate()} disabled={adjustPointsMutation.isPending || !adjustAmount || !adjustReason}>
-                                                {adjustPointsMutation.isPending ? "Saving..." : "Save Adjustment"}
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
-                            </CardHeader>
-                            <CardContent>
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead>Date</TableHead>
-                                            <TableHead>Reason</TableHead>
-                                            <TableHead className="text-right">Amount</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {loyaltyQuery.data?.transactions?.map((tx) => (
-                                            <TableRow key={tx.id}>
-                                                <TableCell>{new Date(tx.createdAt).toLocaleDateString()}</TableCell>
-                                                <TableCell>{tx.reason}</TableCell>
-                                                <TableCell className={cn("text-right font-medium", tx.amount > 0 ? "text-status-success" : "text-status-error")}>
-                                                    {tx.amount > 0 ? "+" : ""}{tx.amount.toLocaleString()}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))}
-                                        {(!loyaltyQuery.data?.transactions || loyaltyQuery.data.transactions.length === 0) && (
-                                            <TableRow>
-                                                <TableCell colSpan={3} className="text-center text-muted-foreground h-24">
-                                                    No transactions found
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="communications" className="space-y-4">
-                        <Card>
-                            <CardHeader className="flex flex-row items-center justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                    <CardTitle>Communications</CardTitle>
-                                    {overdueCount > 0 && (
-                                        <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning/15 text-status-warning border border-status-warning">
-                                            {overdueCount} need reply
-                                        </span>
-                                    )}
-                                </div>
-                                <CardDescription>Last 20 messages for this guest</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                {/* Quick Filters */}
-                                <div className="flex flex-wrap gap-2 text-sm">
-                                    <Button
-                                        size="sm"
-                                        variant={commTypeFilter === "email" && commDirectionFilter === "outbound" ? "secondary" : "outline"}
-                                        aria-pressed={commTypeFilter === "email" && commDirectionFilter === "outbound"}
-                                        onClick={() => {
-                                            setCommTypeFilter("email");
-                                            setCommDirectionFilter("outbound");
-                                            commsQuery.refetch();
-                                        }}
-                                        className="gap-1"
-                                    >
-                                        <Send className="h-3 w-3" />
-                                        Sent Emails
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant={commTypeFilter === "all" && commDirectionFilter === "all" ? "secondary" : "outline"}
-                                        aria-pressed={commTypeFilter === "all" && commDirectionFilter === "all"}
-                                        onClick={() => {
-                                            setCommTypeFilter("all");
-                                            setCommDirectionFilter("all");
-                                            commsQuery.refetch();
-                                        }}
-                                    >
-                                        All Communications
-                                    </Button>
-                                </div>
-
-                                {/* Filters */}
-                                <div className="flex flex-wrap gap-3 text-sm">
-                                    <div className="space-y-1">
-                                        <Label htmlFor="comm-type-filter" className="text-xs">Type</Label>
-                                        <Select
-                                            value={commTypeFilter}
-                                            onValueChange={(value) => {
-                                                if (isCommTypeFilter(value)) {
-                                                    setCommTypeFilter(value);
-                                                    queryClient.removeQueries({
-                                                        queryKey: ["communications", "guest", guestId, commDirectionFilter]
-                                                    });
-                                                    commsQuery.refetch();
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger id="comm-type-filter" className="h-9 bg-background" aria-label="Communication type">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">All</SelectItem>
-                                                <SelectItem value="email">Email</SelectItem>
-                                                <SelectItem value="sms">SMS</SelectItem>
-                                                <SelectItem value="automation">Automation</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="comm-status-filter" className="text-xs">Status</Label>
-                                        <Select value={commStatusFilter} onValueChange={setCommStatusFilter}>
-                                            <SelectTrigger id="comm-status-filter" className="h-9 bg-background" aria-label="Communication status">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">All</SelectItem>
-                                                <SelectItem value="sent">Sent</SelectItem>
-                                                <SelectItem value="delivered">Delivered</SelectItem>
-                                                <SelectItem value="pending">Pending</SelectItem>
-                                                <SelectItem value="failed">Failed</SelectItem>
-                                                <SelectItem value="bounce">Bounced</SelectItem>
-                                                <SelectItem value="complaint">Complaint</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="space-y-1">
-                                        <Label htmlFor="comm-direction-filter" className="text-xs">Direction</Label>
-                                        <Select
-                                            value={commDirectionFilter}
-                                            onValueChange={(value) => {
-                                                if (isCommDirectionFilter(value)) {
-                                                    setCommDirectionFilter(value);
-                                                    queryClient.removeQueries({
-                                                        queryKey: ["communications", "guest", guestId, commTypeFilter]
-                                                    });
-                                                    commsQuery.refetch();
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger id="comm-direction-filter" className="h-9 bg-background" aria-label="Communication direction">
-                                                <SelectValue />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="all">All</SelectItem>
-                                                <SelectItem value="outbound">Outbound</SelectItem>
-                                                <SelectItem value="inbound">Inbound</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                </div>
-
-                                {/* Collapsible Log Communication Form */}
-                                <details className="group">
-                                    <summary className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground py-2 border-t border-border mt-2">
-                                        <PlusCircle className="h-4 w-4" />
-                                        <span>Log Communication</span>
-                                    </summary>
-                                    <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1">
-                                                <Label htmlFor="compose-type" className="text-xs">Type</Label>
-                                                <Select
-                                                    value={composeType}
-                                                    onValueChange={(value) => {
-                                                        if (isComposeType(value)) {
-                                                            setComposeType(value);
-                                                        }
-                                                    }}
-                                                >
-                                                    <SelectTrigger id="compose-type" className="h-9 bg-background" aria-label="Compose type">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="email">Email</SelectItem>
-                                                        <SelectItem value="sms">SMS</SelectItem>
-                                                        <SelectItem value="note">Note</SelectItem>
-                                                        <SelectItem value="call">Call</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label htmlFor="compose-direction" className="text-xs">Direction</Label>
-                                                <Select
-                                                    value={composeDirection}
-                                                    onValueChange={(value) => {
-                                                        if (isComposeDirection(value)) {
-                                                            setComposeDirection(value);
-                                                        }
-                                                    }}
-                                                >
-                                                    <SelectTrigger id="compose-direction" className="h-9 bg-background" aria-label="Compose direction">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="outbound">Outbound</SelectItem>
-                                                        <SelectItem value="inbound">Inbound</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label htmlFor="compose-subject" className="text-xs">Subject (optional)</Label>
-                                            <Input
-                                                id="compose-subject"
-                                                value={composeSubject}
-                                                onChange={(e) => setComposeSubject(e.target.value)}
-                                                placeholder="Subject"
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <Label htmlFor="compose-body" className="text-xs">Body</Label>
-                                            <Textarea
-                                                id="compose-body"
-                                                className="min-h-[80px] bg-background"
-                                                value={composeBody}
-                                                onChange={(e) => setComposeBody(e.target.value)}
-                                                placeholder="Log the message content"
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="space-y-1">
-                                                <Label htmlFor="compose-to" className="text-xs">To</Label>
-                                                <Input
-                                                    id="compose-to"
-                                                    value={composeTo}
-                                                    onChange={(e) => setComposeTo(e.target.value)}
-                                                    placeholder="email or phone"
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label htmlFor="compose-from" className="text-xs">From</Label>
-                                                <Input
-                                                    id="compose-from"
-                                                    value={composeFrom}
-                                                    onChange={(e) => setComposeFrom(e.target.value)}
-                                                    placeholder="email or phone"
-                                                />
-                                            </div>
-                                        </div>
-                                        <Button
-                                            size="sm"
-                                            onClick={async () => {
-                                                if (!campgroundIdForGuest) return;
-                                                if (!composeBody.trim()) {
-                                                    return toast({ title: "Body required", variant: "destructive" });
-                                                }
-                                                await apiClient.createCommunication({
-                                                    campgroundId: campgroundIdForGuest,
-                                                    guestId,
-                                                    type: composeType,
-                                                    direction: composeDirection,
-                                                    subject: composeSubject || undefined,
-                                                    body: composeBody,
-                                                    toAddress: composeTo || undefined,
-                                                    fromAddress: composeFrom || undefined
-                                                });
-                                                setComposeBody("");
-                                                setComposeSubject("");
-                                                setComposeTo("");
-                                                setComposeFrom("");
-                                                commsQuery.refetch();
-                                                toast({ title: "Logged" });
-                                            }}
-                                            disabled={!campgroundIdForGuest}
-                                        >
-                                            Log communication
-                                        </Button>
-                                    </div>
-                                </details>
-
-                                <div className="space-y-2 max-h-96 overflow-auto pr-1">
-                                    {!timelineItems.length && (
-                                        <div className="text-sm text-muted-foreground">No communications yet.</div>
-                                    )}
-                                    <div className="relative pl-3 border-l border-border space-y-4">
-                                        {timelineItems.map((item) => {
-                                            const createdDate = item.date ? new Date(item.date) : null;
-                                            const getCommIcon = () => {
-                                                if (item.kind === "playbook") return GitBranch;
-                                                switch (item.type) {
-                                                    case "sms": return Phone;
-                                                    case "note": return StickyNote;
-                                                    case "call": return PhoneCall;
-                                                    default: return Mail;
-                                                }
-                                            };
-                                            const Icon = getCommIcon();
-                                            return (
-                                                <div key={`${item.kind}-${item.id}`} className="relative pl-4">
-                                                    <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-card border border-border flex items-center justify-center">
-                                                        <Icon className="h-3 w-3 text-muted-foreground" />
-                                                    </span>
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                            <span>{createdDate ? formatDistanceToNow(createdDate, { addSuffix: true }) : ""}</span>
-                                                            {item.kind === "communication" && (
-                                                                <span
-                                                                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                                                                        item.direction === "outbound"
-                                                                            ? "bg-status-info/15 text-status-info border border-status-info"
-                                                                            : "bg-status-success/15 text-status-success border border-status-success"
-                                                                    }`}
-                                                                >
-                                                                    {item.direction}
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className={cn("px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize", statusTone(item.status))}>
-                                                                {item.status || "sent"}
-                                                            </span>
-                                                            {item.kind === "playbook" && (item.status || "").toLowerCase() === "failed" && (
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="ghost"
-                                                                    onClick={() => retryPlaybookMutation.mutate(item.id)}
-                                                                    disabled={retryPlaybookMutation.isPending}
-                                                                    className="h-7"
-                                                                >
-                                                                    <RotateCcw className="h-3 w-3 mr-1" />
-                                                                    Retry
-                                                                </Button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="mt-1 space-y-1">
-                                                        <div className="flex items-center gap-2">
-                                                            <Badge variant="outline" className="text-[10px] font-semibold">
-                                                                {item.kind === "playbook" ? "Playbook" : item.type}
-                                                            </Badge>
-                                                            {item.kind === "playbook" && <span className="text-xs text-muted-foreground">{item.name}</span>}
-                                                            {item.kind === "communication" && item.subject && (
-                                                                <span className="text-sm font-medium text-foreground">{item.subject}</span>
-                                                            )}
-                                                        </div>
-                                                        <div className="text-sm text-foreground line-clamp-2">
-                                                            {item.kind === "playbook"
-                                                                ? item.lastError
-                                                                    ? `Attempts: ${item.attempts ?? 0} • Last error: ${item.lastError}`
-                                                                    : `Attempts: ${item.attempts ?? 0}`
-                                                                : item.body}
-                                                        </div>
-                                                        {item.kind === "communication" && (
-                                                            <div className="text-xs text-muted-foreground">
-                                                                {item.provider ? `Provider: ${item.provider}` : ""}
-                                                                {item.toAddress ? ` • To: ${item.toAddress}` : ""}
-                                                                {item.fromAddress ? ` • From: ${item.fromAddress}` : ""}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    {commsQuery.hasNextPage && (
-                                        <div className="pt-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => commsQuery.fetchNextPage()}
-                                                disabled={commsQuery.isFetchingNextPage}
-                                            >
-                                                {commsQuery.isFetchingNextPage ? "Loading..." : "Load more"}
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    <TabsContent value="activity" className="space-y-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <ClipboardList className="h-5 w-5" />
-                                    Activity Log
-                                </CardTitle>
-                                <CardDescription>
-                                    Track all changes made to this guest's profile
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                {campgroundIdForGuest ? (
-                                    <AuditLogTimeline
-                                        campgroundId={campgroundIdForGuest}
-                                        entityType="guest"
-                                        entityId={guestId}
-                                        limit={50}
-                                    />
-                                ) : (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <p>Unable to load activity log</p>
-                                        <p className="text-sm">Guest is not associated with a campground</p>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
-            </div>
-        </DashboardShell>
+      <DashboardShell>
+        <div className="flex items-center justify-center h-96">Loading guest details...</div>
+      </DashboardShell>
     );
+  }
+
+  if (!guest) {
+    return (
+      <DashboardShell>
+        <div className="flex flex-col items-center justify-center h-96 gap-4">
+          <div className="text-lg text-muted-foreground">Guest not found</div>
+          <Button onClick={() => router.push("/guests")}>Back to Guests</Button>
+        </div>
+      </DashboardShell>
+    );
+  }
+
+  return (
+    <DashboardShell>
+      <div className="space-y-6">
+        <Breadcrumbs
+          items={[
+            { label: "Guests", href: "/guests" },
+            { label: `${guest.primaryFirstName} ${guest.primaryLastName}` },
+          ]}
+        />
+
+        <PageHeader
+          eyebrow="Guest"
+          title={
+            <span className="flex items-center gap-3">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
+                <User className="h-5 w-5" />
+              </span>
+              <span>
+                {guest.primaryFirstName} {guest.primaryLastName}
+              </span>
+            </span>
+          }
+          subtitle={`${guest.email ?? "No email"}${guest.phone ? ` • ${guest.phone}` : ""}`}
+          actions={
+            <>
+              <Button variant="secondary" onClick={() => router.push("/guests")}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Guests
+              </Button>
+              {guest.reservations?.[0] && (
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => router.push(`/booking?guestId=${guest.id}`)}
+                >
+                  <History className="h-4 w-4" />
+                  Rebook Last Trip
+                </Button>
+              )}
+            </>
+          }
+        />
+
+        <Tabs defaultValue="overview" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="reservations" className="gap-1">
+              <Calendar className="h-3.5 w-3.5" />
+              Reservations
+            </TabsTrigger>
+            <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="wallet">Wallet</TabsTrigger>
+            <TabsTrigger value="payment-methods" className="gap-1">
+              <CreditCard className="h-3.5 w-3.5" />
+              Cards
+            </TabsTrigger>
+            <TabsTrigger value="loyalty">Loyalty & Rewards</TabsTrigger>
+            <TabsTrigger value="communications">Communications</TabsTrigger>
+            <TabsTrigger value="activity" className="gap-1">
+              <ClipboardList className="h-3.5 w-3.5" />
+              Activity
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Guest Information</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs text-muted-foreground">Full Name</Label>
+                  <div className="font-medium">
+                    {guest.primaryFirstName} {guest.primaryLastName}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Email</Label>
+                  <div className="font-medium">{guest.email}</div>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Phone</Label>
+                  <div className="font-medium">{guest.phone}</div>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Address</Label>
+                  <div className="font-medium">
+                    {guest.address1}
+                    {guest.address2 && <>, {guest.address2}</>}
+                    <br />
+                    {guest.city}, {guest.state} {guest.postalCode}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex items-center justify-between">
+                <CardTitle>Forms</CardTitle>
+                {formsQuery.isLoading ? (
+                  <span className="text-xs text-muted-foreground">Loading…</span>
+                ) : (
+                  <Badge
+                    variant={
+                      (formsQuery.data || []).some((form) => form.status === "pending")
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {(formsQuery.data || []).filter((form) => form.status === "pending").length}{" "}
+                    pending
+                  </Badge>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                {formsQuery.isError && (
+                  <div role="alert" className="text-xs text-status-error">
+                    Failed to load forms.
+                  </div>
+                )}
+                {!formsQuery.isLoading && (formsQuery.data || []).length === 0 && (
+                  <div className="text-xs text-muted-foreground">No forms for this guest.</div>
+                )}
+                <div className="space-y-1">
+                  {(formsQuery.data || []).map((form) => (
+                    <div
+                      key={form.id}
+                      className="flex items-center justify-between rounded border border-border px-2 py-1"
+                    >
+                      <div>
+                        <div className="font-medium text-foreground text-sm">
+                          {form.formTemplate?.title || "Form"}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {form.formTemplate?.type}
+                        </div>
+                      </div>
+                      <Badge
+                        variant={
+                          form.status === "completed"
+                            ? "default"
+                            : form.status === "pending"
+                              ? "destructive"
+                              : "secondary"
+                        }
+                      >
+                        {form.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reservations" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5" />
+                    Reservations
+                  </CardTitle>
+                  <CardDescription>All reservations for this guest</CardDescription>
+                </div>
+                <Button
+                  variant="outline"
+                  className="gap-2"
+                  onClick={() => router.push(`/booking?guestId=${guest.id}`)}
+                >
+                  <Plus className="h-4 w-4" />
+                  New Reservation
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {guest.reservations && guest.reservations.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Dates</TableHead>
+                        <TableHead>Site</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {guest.reservations.map((res, index) => (
+                        <TableRow key={res.id ?? `${res.campgroundId ?? "reservation"}-${index}`}>
+                          <TableCell>
+                            <div className="font-medium">
+                              {res.arrivalDate
+                                ? new Date(res.arrivalDate).toLocaleDateString()
+                                : "—"}{" "}
+                              -{" "}
+                              {res.departureDate
+                                ? new Date(res.departureDate).toLocaleDateString()
+                                : "—"}
+                            </div>
+                          </TableCell>
+                          <TableCell>{res.site?.siteNumber || res.site?.name || "—"}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                res.status === "checked_in"
+                                  ? "default"
+                                  : res.status === "confirmed"
+                                    ? "secondary"
+                                    : res.status === "checked_out"
+                                      ? "outline"
+                                      : res.status === "cancelled"
+                                        ? "destructive"
+                                        : "secondary"
+                              }
+                            >
+                              {res.status?.replace("_", " ")}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => router.push(`/reservations/${res.id}`)}
+                              className="gap-1"
+                            >
+                              View <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No reservations found for this guest</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="equipment" className="space-y-4">
+            <GuestEquipmentTab guestId={guestId} />
+          </TabsContent>
+
+          <TabsContent value="payment-methods" className="space-y-4">
+            {campgroundIdForGuest || guestCampgroundIds.length > 0 ? (
+              <GuestPaymentMethods
+                guestId={guestId}
+                campgroundId={campgroundIdForGuest || guestCampgroundIds[0]}
+                additionalCampgroundIds={guestCampgroundIds.filter(
+                  (id) => id !== campgroundIdForGuest,
+                )}
+              />
+            ) : (
+              <Card>
+                <CardContent className="py-8 text-center text-muted-foreground">
+                  No saved payment methods. Cards are saved when the guest makes a reservation.
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="wallet" className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
+              <div>
+                <div className="text-sm font-medium">Wallet scope</div>
+                <div className="text-xs text-muted-foreground">
+                  Choose which wallet to view or apply.
+                </div>
+              </div>
+              <Select value={selectedWalletId ?? ""} onValueChange={setSelectedWalletId}>
+                <SelectTrigger
+                  className="w-[220px]"
+                  disabled={!wallets.length}
+                  aria-label="Wallet scope"
+                >
+                  <SelectValue placeholder={wallets.length ? "Select wallet" : "No wallets yet"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {wallets.map((wallet) => (
+                    <SelectItem key={wallet.walletId} value={wallet.walletId}>
+                      {walletScopeLabel(wallet)} · ${(wallet.balanceCents / 100).toFixed(2)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Wallet Balance</CardTitle>
+                  <Wallet className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    ${(selectedBalanceCents / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedWallet ? walletScopeLabel(selectedWallet) : "Available for purchases"}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Available</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    ${(selectedAvailableCents / 100).toFixed(2)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">After pending holds</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Transaction History</CardTitle>
+                  <CardDescription>Recent wallet activity for this guest</CardDescription>
+                </div>
+                <Dialog open={addCreditOpen} onOpenChange={setAddCreditOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Credit
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Wallet Credit</DialogTitle>
+                      <DialogDescription>
+                        Add credit to this guest&apos;s wallet. This can be used for POS purchases
+                        or reservation payments.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="credit-amount" className="text-right">
+                          Amount
+                        </Label>
+                        <div className="col-span-3 relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                            $
+                          </span>
+                          <Input
+                            id="credit-amount"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={creditAmount}
+                            onChange={(e) => setCreditAmount(e.target.value)}
+                            className="pl-7"
+                            placeholder="0.00"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="credit-reason" className="text-right">
+                          Reason
+                        </Label>
+                        <Input
+                          id="credit-reason"
+                          value={creditReason}
+                          onChange={(e) => setCreditReason(e.target.value)}
+                          className="col-span-3"
+                          placeholder="e.g. Grandparent gift, Goodwill credit"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="credit-scope" className="text-right">
+                          Scope
+                        </Label>
+                        <div className="col-span-3">
+                          <Select
+                            value={creditScopeType}
+                            onValueChange={(value) => {
+                              if (isCreditScopeType(value)) {
+                                setCreditScopeType(value);
+                              }
+                            }}
+                          >
+                            <SelectTrigger id="credit-scope" aria-label="Credit scope">
+                              <SelectValue placeholder="Select scope" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="campground">This campground</SelectItem>
+                              {organizationId && (
+                                <SelectItem value="organization">
+                                  Portfolio (all campgrounds)
+                                </SelectItem>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setAddCreditOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          const amountCents = Math.round(parseFloat(creditAmount) * 100);
+                          if (isNaN(amountCents) || amountCents <= 0) {
+                            toast({ title: "Invalid amount", variant: "destructive" });
+                            return;
+                          }
+                          if (creditScopeType === "organization" && !organizationId) {
+                            toast({ title: "Organization required", variant: "destructive" });
+                            return;
+                          }
+                          const scopeId =
+                            creditScopeType === "organization"
+                              ? organizationId
+                              : creditScopeType === "campground"
+                                ? campgroundIdForGuest
+                                : undefined;
+                          addCreditMutation.mutate({
+                            amountCents,
+                            reason: creditReason || undefined,
+                            scopeType: creditScopeType,
+                            scopeId: scopeId || undefined,
+                          });
+                        }}
+                        disabled={addCreditMutation.isPending}
+                      >
+                        {addCreditMutation.isPending ? "Adding..." : "Add Credit"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                {walletTransactionsQuery.isLoading ? (
+                  <div className="text-center py-4 text-muted-foreground">
+                    Loading transactions...
+                  </div>
+                ) : walletTransactionsQuery.data?.transactions.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No wallet transactions yet</p>
+                    <p className="text-sm">Add credit to get started</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Reason</TableHead>
+                        <TableHead className="text-right">Amount</TableHead>
+                        <TableHead className="text-right">Balance</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {walletTransactionsQuery.data?.transactions.map((tx) => (
+                        <TableRow key={tx.id}>
+                          <TableCell className="text-muted-foreground">
+                            {formatDistanceToNow(new Date(tx.createdAt), { addSuffix: true })}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                tx.direction === "issue" || tx.direction === "refund"
+                                  ? "default"
+                                  : tx.direction === "redeem"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              {tx.direction}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{tx.reason || tx.referenceType}</TableCell>
+                          <TableCell
+                            className={cn(
+                              "text-right font-medium",
+                              tx.direction === "issue" || tx.direction === "refund"
+                                ? "text-status-success"
+                                : "text-status-error",
+                            )}
+                          >
+                            {tx.direction === "issue" || tx.direction === "refund" ? "+" : "-"}$
+                            {(tx.amountCents / 100).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            ${(tx.afterBalanceCents / 100).toFixed(2)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="loyalty" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Current Tier</CardTitle>
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{loyaltyQuery.data?.tier || "Bronze"}</div>
+                  <p className="text-xs text-muted-foreground">Based on lifetime points</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Points Balance</CardTitle>
+                  <Star className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {loyaltyQuery.data?.pointsBalance.toLocaleString() || 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Available to redeem</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Transaction History</CardTitle>
+                  <CardDescription>Recent points activity for this guest</CardDescription>
+                </div>
+                <Dialog open={adjustPointsOpen} onOpenChange={setAdjustPointsOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">Adjust Points</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Adjust Loyalty Points</DialogTitle>
+                      <DialogDescription>
+                        Manually add or deduct points for this guest.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label className="text-right">Action</Label>
+                        <div className="col-span-3 flex gap-2">
+                          <Button
+                            type="button"
+                            variant={adjustType === "add" ? "default" : "outline"}
+                            onClick={() => setAdjustType("add")}
+                            className="flex-1"
+                            aria-pressed={adjustType === "add"}
+                          >
+                            Add
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={adjustType === "deduct" ? "default" : "outline"}
+                            onClick={() => setAdjustType("deduct")}
+                            className={cn(
+                              "flex-1",
+                              adjustType === "deduct" && "bg-destructive hover:bg-destructive/90",
+                            )}
+                            aria-pressed={adjustType === "deduct"}
+                          >
+                            Deduct
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="amount" className="text-right">
+                          Amount
+                        </Label>
+                        <Input
+                          id="amount"
+                          type="number"
+                          value={adjustAmount}
+                          onChange={(e) => setAdjustAmount(e.target.value)}
+                          className="col-span-3"
+                          placeholder="e.g. 500"
+                        />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="reason" className="text-right">
+                          Reason
+                        </Label>
+                        <Input
+                          id="reason"
+                          value={adjustReason}
+                          onChange={(e) => setAdjustReason(e.target.value)}
+                          className="col-span-3"
+                          placeholder="e.g. Manual adjustment, Bonus"
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="ghost" onClick={() => setAdjustPointsOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => adjustPointsMutation.mutate()}
+                        disabled={adjustPointsMutation.isPending || !adjustAmount || !adjustReason}
+                      >
+                        {adjustPointsMutation.isPending ? "Saving..." : "Save Adjustment"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Reason</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loyaltyQuery.data?.transactions?.map((tx) => (
+                      <TableRow key={tx.id}>
+                        <TableCell>{new Date(tx.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>{tx.reason}</TableCell>
+                        <TableCell
+                          className={cn(
+                            "text-right font-medium",
+                            tx.amount > 0 ? "text-status-success" : "text-status-error",
+                          )}
+                        >
+                          {tx.amount > 0 ? "+" : ""}
+                          {tx.amount.toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {(!loyaltyQuery.data?.transactions ||
+                      loyaltyQuery.data.transactions.length === 0) && (
+                      <TableRow>
+                        <TableCell colSpan={3} className="text-center text-muted-foreground h-24">
+                          No transactions found
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="communications" className="space-y-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <CardTitle>Communications</CardTitle>
+                  {overdueCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-status-warning/15 text-status-warning border border-status-warning">
+                      {overdueCount} need reply
+                    </span>
+                  )}
+                </div>
+                <CardDescription>Last 20 messages for this guest</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Quick Filters */}
+                <div className="flex flex-wrap gap-2 text-sm">
+                  <Button
+                    size="sm"
+                    variant={
+                      commTypeFilter === "email" && commDirectionFilter === "outbound"
+                        ? "secondary"
+                        : "outline"
+                    }
+                    aria-pressed={commTypeFilter === "email" && commDirectionFilter === "outbound"}
+                    onClick={() => {
+                      setCommTypeFilter("email");
+                      setCommDirectionFilter("outbound");
+                      commsQuery.refetch();
+                    }}
+                    className="gap-1"
+                  >
+                    <Send className="h-3 w-3" />
+                    Sent Emails
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant={
+                      commTypeFilter === "all" && commDirectionFilter === "all"
+                        ? "secondary"
+                        : "outline"
+                    }
+                    aria-pressed={commTypeFilter === "all" && commDirectionFilter === "all"}
+                    onClick={() => {
+                      setCommTypeFilter("all");
+                      setCommDirectionFilter("all");
+                      commsQuery.refetch();
+                    }}
+                  >
+                    All Communications
+                  </Button>
+                </div>
+
+                {/* Filters */}
+                <div className="flex flex-wrap gap-3 text-sm">
+                  <div className="space-y-1">
+                    <Label htmlFor="comm-type-filter" className="text-xs">
+                      Type
+                    </Label>
+                    <Select
+                      value={commTypeFilter}
+                      onValueChange={(value) => {
+                        if (isCommTypeFilter(value)) {
+                          setCommTypeFilter(value);
+                          queryClient.removeQueries({
+                            queryKey: ["communications", "guest", guestId, commDirectionFilter],
+                          });
+                          commsQuery.refetch();
+                        }
+                      }}
+                    >
+                      <SelectTrigger
+                        id="comm-type-filter"
+                        className="h-9 bg-background"
+                        aria-label="Communication type"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="sms">SMS</SelectItem>
+                        <SelectItem value="automation">Automation</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="comm-status-filter" className="text-xs">
+                      Status
+                    </Label>
+                    <Select value={commStatusFilter} onValueChange={setCommStatusFilter}>
+                      <SelectTrigger
+                        id="comm-status-filter"
+                        className="h-9 bg-background"
+                        aria-label="Communication status"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="failed">Failed</SelectItem>
+                        <SelectItem value="bounce">Bounced</SelectItem>
+                        <SelectItem value="complaint">Complaint</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="comm-direction-filter" className="text-xs">
+                      Direction
+                    </Label>
+                    <Select
+                      value={commDirectionFilter}
+                      onValueChange={(value) => {
+                        if (isCommDirectionFilter(value)) {
+                          setCommDirectionFilter(value);
+                          queryClient.removeQueries({
+                            queryKey: ["communications", "guest", guestId, commTypeFilter],
+                          });
+                          commsQuery.refetch();
+                        }
+                      }}
+                    >
+                      <SelectTrigger
+                        id="comm-direction-filter"
+                        className="h-9 bg-background"
+                        aria-label="Communication direction"
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        <SelectItem value="outbound">Outbound</SelectItem>
+                        <SelectItem value="inbound">Inbound</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* Collapsible Log Communication Form */}
+                <details className="group">
+                  <summary className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground hover:text-foreground py-2 border-t border-border mt-2">
+                    <PlusCircle className="h-4 w-4" />
+                    <span>Log Communication</span>
+                  </summary>
+                  <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="compose-type" className="text-xs">
+                          Type
+                        </Label>
+                        <Select
+                          value={composeType}
+                          onValueChange={(value) => {
+                            if (isComposeType(value)) {
+                              setComposeType(value);
+                            }
+                          }}
+                        >
+                          <SelectTrigger
+                            id="compose-type"
+                            className="h-9 bg-background"
+                            aria-label="Compose type"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="email">Email</SelectItem>
+                            <SelectItem value="sms">SMS</SelectItem>
+                            <SelectItem value="note">Note</SelectItem>
+                            <SelectItem value="call">Call</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="compose-direction" className="text-xs">
+                          Direction
+                        </Label>
+                        <Select
+                          value={composeDirection}
+                          onValueChange={(value) => {
+                            if (isComposeDirection(value)) {
+                              setComposeDirection(value);
+                            }
+                          }}
+                        >
+                          <SelectTrigger
+                            id="compose-direction"
+                            className="h-9 bg-background"
+                            aria-label="Compose direction"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="outbound">Outbound</SelectItem>
+                            <SelectItem value="inbound">Inbound</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="compose-subject" className="text-xs">
+                        Subject (optional)
+                      </Label>
+                      <Input
+                        id="compose-subject"
+                        value={composeSubject}
+                        onChange={(e) => setComposeSubject(e.target.value)}
+                        placeholder="Subject"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="compose-body" className="text-xs">
+                        Body
+                      </Label>
+                      <Textarea
+                        id="compose-body"
+                        className="min-h-[80px] bg-background"
+                        value={composeBody}
+                        onChange={(e) => setComposeBody(e.target.value)}
+                        placeholder="Log the message content"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="compose-to" className="text-xs">
+                          To
+                        </Label>
+                        <Input
+                          id="compose-to"
+                          value={composeTo}
+                          onChange={(e) => setComposeTo(e.target.value)}
+                          placeholder="email or phone"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="compose-from" className="text-xs">
+                          From
+                        </Label>
+                        <Input
+                          id="compose-from"
+                          value={composeFrom}
+                          onChange={(e) => setComposeFrom(e.target.value)}
+                          placeholder="email or phone"
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={async () => {
+                        if (!campgroundIdForGuest) return;
+                        if (!composeBody.trim()) {
+                          return toast({ title: "Body required", variant: "destructive" });
+                        }
+                        await apiClient.createCommunication({
+                          campgroundId: campgroundIdForGuest,
+                          guestId,
+                          type: composeType,
+                          direction: composeDirection,
+                          subject: composeSubject || undefined,
+                          body: composeBody,
+                          toAddress: composeTo || undefined,
+                          fromAddress: composeFrom || undefined,
+                        });
+                        setComposeBody("");
+                        setComposeSubject("");
+                        setComposeTo("");
+                        setComposeFrom("");
+                        commsQuery.refetch();
+                        toast({ title: "Logged" });
+                      }}
+                      disabled={!campgroundIdForGuest}
+                    >
+                      Log communication
+                    </Button>
+                  </div>
+                </details>
+
+                <div className="space-y-2 max-h-96 overflow-auto pr-1">
+                  {!timelineItems.length && (
+                    <div className="text-sm text-muted-foreground">No communications yet.</div>
+                  )}
+                  <div className="relative pl-3 border-l border-border space-y-4">
+                    {timelineItems.map((item) => {
+                      const createdDate = item.date ? new Date(item.date) : null;
+                      const getCommIcon = () => {
+                        if (item.kind === "playbook") return GitBranch;
+                        switch (item.type) {
+                          case "sms":
+                            return Phone;
+                          case "note":
+                            return StickyNote;
+                          case "call":
+                            return PhoneCall;
+                          default:
+                            return Mail;
+                        }
+                      };
+                      const Icon = getCommIcon();
+                      return (
+                        <div key={`${item.kind}-${item.id}`} className="relative pl-4">
+                          <span className="absolute -left-[9px] top-2 h-4 w-4 rounded-full bg-card border border-border flex items-center justify-center">
+                            <Icon className="h-3 w-3 text-muted-foreground" />
+                          </span>
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <span>
+                                {createdDate
+                                  ? formatDistanceToNow(createdDate, { addSuffix: true })
+                                  : ""}
+                              </span>
+                              {item.kind === "communication" && (
+                                <span
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                    item.direction === "outbound"
+                                      ? "bg-status-info/15 text-status-info border border-status-info"
+                                      : "bg-status-success/15 text-status-success border border-status-success"
+                                  }`}
+                                >
+                                  {item.direction}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={cn(
+                                  "px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize",
+                                  statusTone(item.status),
+                                )}
+                              >
+                                {item.status || "sent"}
+                              </span>
+                              {item.kind === "playbook" &&
+                                (item.status || "").toLowerCase() === "failed" && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => retryPlaybookMutation.mutate(item.id)}
+                                    disabled={retryPlaybookMutation.isPending}
+                                    className="h-7"
+                                  >
+                                    <RotateCcw className="h-3 w-3 mr-1" />
+                                    Retry
+                                  </Button>
+                                )}
+                            </div>
+                          </div>
+                          <div className="mt-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-[10px] font-semibold">
+                                {item.kind === "playbook" ? "Playbook" : item.type}
+                              </Badge>
+                              {item.kind === "playbook" && (
+                                <span className="text-xs text-muted-foreground">{item.name}</span>
+                              )}
+                              {item.kind === "communication" && item.subject && (
+                                <span className="text-sm font-medium text-foreground">
+                                  {item.subject}
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-sm text-foreground line-clamp-2">
+                              {item.kind === "playbook"
+                                ? item.lastError
+                                  ? `Attempts: ${item.attempts ?? 0} • Last error: ${item.lastError}`
+                                  : `Attempts: ${item.attempts ?? 0}`
+                                : item.body}
+                            </div>
+                            {item.kind === "communication" && (
+                              <div className="text-xs text-muted-foreground">
+                                {item.provider ? `Provider: ${item.provider}` : ""}
+                                {item.toAddress ? ` • To: ${item.toAddress}` : ""}
+                                {item.fromAddress ? ` • From: ${item.fromAddress}` : ""}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {commsQuery.hasNextPage && (
+                    <div className="pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => commsQuery.fetchNextPage()}
+                        disabled={commsQuery.isFetchingNextPage}
+                      >
+                        {commsQuery.isFetchingNextPage ? "Loading..." : "Load more"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ClipboardList className="h-5 w-5" />
+                  Activity Log
+                </CardTitle>
+                <CardDescription>Track all changes made to this guest's profile</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {campgroundIdForGuest ? (
+                  <AuditLogTimeline
+                    campgroundId={campgroundIdForGuest}
+                    entityType="guest"
+                    entityId={guestId}
+                    limit={50}
+                  />
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Unable to load activity log</p>
+                    <p className="text-sm">Guest is not associated with a campground</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </DashboardShell>
+  );
 }
 
 function GuestEquipmentTab({ guestId }: { guestId: string }) {
-    const { toast } = useToast();
-    const queryClient = useQueryClient();
-    const [addOpen, setAddOpen] = useState(false);
-    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-    const [newEquipment, setNewEquipment] = useState({
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [addOpen, setAddOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [newEquipment, setNewEquipment] = useState({
+    type: "trailer",
+    make: "",
+    model: "",
+    length: "",
+    plateNumber: "",
+    plateState: "",
+  });
+
+  const equipmentQuery = useQuery({
+    queryKey: ["guest-equipment", guestId],
+    queryFn: () => apiClient.getGuestEquipment(guestId),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      return apiClient.createGuestEquipment(guestId, {
+        ...newEquipment,
+        length: newEquipment.length ? parseInt(newEquipment.length) : undefined,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
+      setAddOpen(false);
+      setNewEquipment({
         type: "trailer",
         make: "",
         model: "",
         length: "",
         plateNumber: "",
-        plateState: ""
-    });
+        plateState: "",
+      });
+      toast({ title: "Equipment added" });
+    },
+    onError: () => {
+      toast({ title: "Failed to add equipment", variant: "destructive" });
+    },
+  });
 
-    const equipmentQuery = useQuery({
-        queryKey: ["guest-equipment", guestId],
-        queryFn: () => apiClient.getGuestEquipment(guestId)
-    });
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.deleteGuestEquipment(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
+      toast({ title: "Equipment removed" });
+    },
+    onError: () => {
+      toast({ title: "Failed to remove equipment", variant: "destructive" });
+    },
+  });
 
-    const createMutation = useMutation({
-        mutationFn: async () => {
-            return apiClient.createGuestEquipment(guestId, {
-                ...newEquipment,
-                length: newEquipment.length ? parseInt(newEquipment.length) : undefined
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
-            setAddOpen(false);
-            setNewEquipment({ type: "trailer", make: "", model: "", length: "", plateNumber: "", plateState: "" });
-            toast({ title: "Equipment added" });
-        },
-        onError: () => {
-            toast({ title: "Failed to add equipment", variant: "destructive" });
-        }
-    });
+  if (equipmentQuery.isLoading) return <div>Loading equipment...</div>;
 
-    const deleteMutation = useMutation({
-        mutationFn: async (id: string) => {
-            return apiClient.deleteGuestEquipment(id);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
-            toast({ title: "Equipment removed" });
-        },
-        onError: () => {
-            toast({ title: "Failed to remove equipment", variant: "destructive" });
-        }
-    });
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Guest Equipment</CardTitle>
+          <CardDescription>Manage vehicles and RVs for this guest</CardDescription>
+        </div>
+        <Dialog open={addOpen} onOpenChange={setAddOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Equipment
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Equipment</DialogTitle>
+              <DialogDescription>
+                Add a new vehicle or RV to this guest's profile.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="equipment-type" className="text-right">
+                  Type
+                </Label>
+                <Select
+                  value={newEquipment.type}
+                  onValueChange={(value) => setNewEquipment({ ...newEquipment, type: value })}
+                >
+                  <SelectTrigger id="equipment-type" className="col-span-3 h-10 bg-background">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="motorhome_a">Motorhome Class A</SelectItem>
+                    <SelectItem value="motorhome_b">Motorhome Class B</SelectItem>
+                    <SelectItem value="motorhome_c">Motorhome Class C</SelectItem>
+                    <SelectItem value="trailer">Travel Trailer</SelectItem>
+                    <SelectItem value="fifth_wheel">Fifth Wheel</SelectItem>
+                    <SelectItem value="popup">Pop-up Camper</SelectItem>
+                    <SelectItem value="truck_camper">Truck Camper</SelectItem>
+                    <SelectItem value="van">Camper Van</SelectItem>
+                    <SelectItem value="tow_vehicle">Tow Vehicle</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="equipment-make" className="text-right">
+                  Make
+                </Label>
+                <Input
+                  id="equipment-make"
+                  value={newEquipment.make}
+                  onChange={(e) => setNewEquipment({ ...newEquipment, make: e.target.value })}
+                  className="col-span-3"
+                  placeholder="e.g. Ford, Winnebago"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="equipment-model" className="text-right">
+                  Model
+                </Label>
+                <Input
+                  id="equipment-model"
+                  value={newEquipment.model}
+                  onChange={(e) => setNewEquipment({ ...newEquipment, model: e.target.value })}
+                  className="col-span-3"
+                  placeholder="e.g. F-150, Journey"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="equipment-length" className="text-right">
+                  Length (ft)
+                </Label>
+                <Input
+                  id="equipment-length"
+                  type="number"
+                  value={newEquipment.length}
+                  onChange={(e) => setNewEquipment({ ...newEquipment, length: e.target.value })}
+                  className="col-span-3"
+                  placeholder="e.g. 30"
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="equipment-plate" className="text-right">
+                  Plate
+                </Label>
+                <Input
+                  id="equipment-plate"
+                  value={newEquipment.plateNumber}
+                  onChange={(e) =>
+                    setNewEquipment({ ...newEquipment, plateNumber: e.target.value })
+                  }
+                  className="col-span-3"
+                  placeholder="License Plate"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setAddOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
+                {createMutation.isPending ? "Adding..." : "Add Equipment"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type</TableHead>
+              <TableHead>Make/Model</TableHead>
+              <TableHead>Length</TableHead>
+              <TableHead>Plate</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {equipmentQuery.data?.map((item) => (
+              <TableRow key={item.id}>
+                <TableCell className="capitalize flex items-center gap-2">
+                  {item.type === "car" || item.type === "truck" ? (
+                    <Car className="w-4 h-4" />
+                  ) : (
+                    <Truck className="w-4 h-4" />
+                  )}
+                  {item.type.replace("_", " ")}
+                </TableCell>
+                <TableCell>
+                  {item.make} {item.model}
+                </TableCell>
+                <TableCell>{item.length ? `${item.length}'` : "-"}</TableCell>
+                <TableCell>
+                  {item.plateNumber && (
+                    <Badge variant="outline" className="font-mono">
+                      {item.plateNumber}
+                    </Badge>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setDeleteConfirmId(item.id)}
+                    className="text-status-error hover:text-status-error hover:bg-status-error/10"
+                    aria-label="Remove equipment"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            {(!equipmentQuery.data || equipmentQuery.data.length === 0) && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground h-24">
+                  No equipment found
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
 
-    if (equipmentQuery.isLoading) return <div>Loading equipment...</div>;
-
-    return (
-        <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                    <CardTitle>Guest Equipment</CardTitle>
-                    <CardDescription>Manage vehicles and RVs for this guest</CardDescription>
-                </div>
-                <Dialog open={addOpen} onOpenChange={setAddOpen}>
-                    <DialogTrigger asChild>
-                        <Button>
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add Equipment
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Add Equipment</DialogTitle>
-                            <DialogDescription>Add a new vehicle or RV to this guest's profile.</DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="equipment-type" className="text-right">Type</Label>
-                                <Select value={newEquipment.type} onValueChange={(value) => setNewEquipment({ ...newEquipment, type: value })}>
-                                    <SelectTrigger id="equipment-type" className="col-span-3 h-10 bg-background">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="motorhome_a">Motorhome Class A</SelectItem>
-                                        <SelectItem value="motorhome_b">Motorhome Class B</SelectItem>
-                                        <SelectItem value="motorhome_c">Motorhome Class C</SelectItem>
-                                        <SelectItem value="trailer">Travel Trailer</SelectItem>
-                                        <SelectItem value="fifth_wheel">Fifth Wheel</SelectItem>
-                                        <SelectItem value="popup">Pop-up Camper</SelectItem>
-                                        <SelectItem value="truck_camper">Truck Camper</SelectItem>
-                                        <SelectItem value="van">Camper Van</SelectItem>
-                                        <SelectItem value="tow_vehicle">Tow Vehicle</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="equipment-make" className="text-right">Make</Label>
-                                <Input
-                                    id="equipment-make"
-                                    value={newEquipment.make}
-                                    onChange={(e) => setNewEquipment({ ...newEquipment, make: e.target.value })}
-                                    className="col-span-3"
-                                    placeholder="e.g. Ford, Winnebago"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="equipment-model" className="text-right">Model</Label>
-                                <Input
-                                    id="equipment-model"
-                                    value={newEquipment.model}
-                                    onChange={(e) => setNewEquipment({ ...newEquipment, model: e.target.value })}
-                                    className="col-span-3"
-                                    placeholder="e.g. F-150, Journey"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="equipment-length" className="text-right">Length (ft)</Label>
-                                <Input
-                                    id="equipment-length"
-                                    type="number"
-                                    value={newEquipment.length}
-                                    onChange={(e) => setNewEquipment({ ...newEquipment, length: e.target.value })}
-                                    className="col-span-3"
-                                    placeholder="e.g. 30"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="equipment-plate" className="text-right">Plate</Label>
-                                <Input
-                                    id="equipment-plate"
-                                    value={newEquipment.plateNumber}
-                                    onChange={(e) => setNewEquipment({ ...newEquipment, plateNumber: e.target.value })}
-                                    className="col-span-3"
-                                    placeholder="License Plate"
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button variant="ghost" onClick={() => setAddOpen(false)}>Cancel</Button>
-                            <Button onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
-                                {createMutation.isPending ? "Adding..." : "Add Equipment"}
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Make/Model</TableHead>
-                            <TableHead>Length</TableHead>
-                            <TableHead>Plate</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {equipmentQuery.data?.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell className="capitalize flex items-center gap-2">
-                                    {item.type === "car" || item.type === "truck" ? <Car className="w-4 h-4" /> : <Truck className="w-4 h-4" />}
-                                    {item.type.replace("_", " ")}
-                                </TableCell>
-                                <TableCell>{item.make} {item.model}</TableCell>
-                                <TableCell>{item.length ? `${item.length}'` : "-"}</TableCell>
-                                <TableCell>
-                                    {item.plateNumber && (
-                                        <Badge variant="outline" className="font-mono">
-                                            {item.plateNumber}
-                                        </Badge>
-                                    )}
-                                </TableCell>
-                                <TableCell className="text-right">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => setDeleteConfirmId(item.id)}
-                                        className="text-status-error hover:text-status-error hover:bg-status-error/10"
-                                        aria-label="Remove equipment"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        {(!equipmentQuery.data || equipmentQuery.data.length === 0) && (
-                            <TableRow>
-                                <TableCell colSpan={5} className="text-center text-muted-foreground h-24">
-                                    No equipment found
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </CardContent>
-
-            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Remove Equipment</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to remove this item? This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => {
-                                if (deleteConfirmId) {
-                                    deleteMutation.mutate(deleteConfirmId);
-                                    setDeleteConfirmId(null);
-                                }
-                            }}
-                            className="bg-destructive hover:bg-destructive/90"
-                        >
-                            Remove
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </Card>
-    );
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Equipment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove this item? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  deleteMutation.mutate(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </Card>
+  );
 }

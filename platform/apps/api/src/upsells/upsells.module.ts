@@ -9,6 +9,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [AuditModule, PermissionsModule],
   controllers: [UpsellsController],
   providers: [UpsellsService],
-  exports: [UpsellsService]
+  exports: [UpsellsService],
 })
 export class UpsellsModule {}

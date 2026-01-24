@@ -7,7 +7,16 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TrendingUp, Info, Percent, Calendar, Users, Loader2, Save, ExternalLink } from "lucide-react";
+import {
+  TrendingUp,
+  Info,
+  Percent,
+  Calendar,
+  Users,
+  Loader2,
+  Save,
+  ExternalLink,
+} from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import Link from "next/link";
 
@@ -70,7 +79,8 @@ export default function DynamicPricingPage() {
     }
 
     // Fetch existing pricing rules
-    apiClient.getPricingRulesV2(id)
+    apiClient
+      .getPricingRulesV2(id)
       .then((data: PricingRuleV2[]) => {
         setRules(data || []);
 
@@ -86,18 +96,20 @@ export default function DynamicPricingPage() {
 
         // Check if dynamic pricing is enabled (any of our managed rules is active)
         const managedRuleNames = Object.values(MANAGED_RULES);
-        const hasActiveManagedRules = data?.some((r: PricingRuleV2) =>
-          managedRuleNames.includes(r.name) && r.active
+        const hasActiveManagedRules = data?.some(
+          (r: PricingRuleV2) => managedRuleNames.includes(r.name) && r.active,
         );
         setDynamicPricingEnabled(hasActiveManagedRules || false);
 
         // Populate form values from existing rules (convert from decimal to percentage)
         if (occMediumRule) setOccupancyMedium(Math.round(occMediumRule.adjustmentValue * 100));
         if (occHighRule) setOccupancyHigh(Math.round(occHighRule.adjustmentValue * 100));
-        if (earlyBirdRule) setEarlyBirdDiscount(Math.abs(Math.round(earlyBirdRule.adjustmentValue * 100)));
+        if (earlyBirdRule)
+          setEarlyBirdDiscount(Math.abs(Math.round(earlyBirdRule.adjustmentValue * 100)));
         if (lastMinuteRule) setLastMinutePremium(Math.round(lastMinuteRule.adjustmentValue * 100));
         if (weeklyRule) setWeeklyDiscount(Math.abs(Math.round(weeklyRule.adjustmentValue * 100)));
-        if (monthlyRule) setMonthlyDiscount(Math.abs(Math.round(monthlyRule.adjustmentValue * 100)));
+        if (monthlyRule)
+          setMonthlyDiscount(Math.abs(Math.round(monthlyRule.adjustmentValue * 100)));
 
         setLoading(false);
       })
@@ -114,7 +126,7 @@ export default function DynamicPricingPage() {
 
     try {
       // Helper to find existing rule
-      const findExistingRule = (name: string) => rules.find(r => r.name === name);
+      const findExistingRule = (name: string) => rules.find((r) => r.name === name);
 
       // Helper to create or update a rule
       type PricingRulePayload = Parameters<typeof apiClient.createPricingRuleV2>[1];
@@ -123,7 +135,7 @@ export default function DynamicPricingPage() {
         name: string,
         adjustmentValue: number, // as decimal (e.g., 0.10 for 10%)
         type: "season" | "weekend" | "holiday" | "event" | "demand" = "event",
-        priority: number = 50
+        priority: number = 50,
       ) => {
         const existing = findExistingRule(name);
         const payload: PricingRulePayload = {
@@ -165,7 +177,6 @@ export default function DynamicPricingPage() {
       // Reload rules
       const updatedRules = await apiClient.getPricingRulesV2(campgroundId);
       setRules(updatedRules || []);
-
     } catch (err) {
       console.error("Failed to save pricing rules:", err);
       alert("Failed to save pricing rules. Please try again.");
@@ -229,9 +240,8 @@ export default function DynamicPricingPage() {
       <Alert className="bg-purple-50 border-purple-200">
         <TrendingUp className="h-4 w-4 text-purple-500" />
         <AlertDescription className="text-purple-800">
-          Dynamic pricing analyzes booking patterns to optimize your rates in real-time,
-          maximizing revenue during high-demand periods. These settings sync with your
-          Advanced Pricing Rules.
+          Dynamic pricing analyzes booking patterns to optimize your rates in real-time, maximizing
+          revenue during high-demand periods. These settings sync with your Advanced Pricing Rules.
         </AlertDescription>
       </Alert>
 
@@ -244,10 +254,7 @@ export default function DynamicPricingPage() {
                 Automatically adjust rates based on occupancy levels
               </CardDescription>
             </div>
-            <Switch
-              checked={dynamicPricingEnabled}
-              onCheckedChange={setDynamicPricingEnabled}
-            />
+            <Switch checked={dynamicPricingEnabled} onCheckedChange={setDynamicPricingEnabled} />
           </div>
         </CardHeader>
       </Card>
@@ -258,9 +265,7 @@ export default function DynamicPricingPage() {
             <Percent className="h-5 w-5 text-muted-foreground" />
             Occupancy-Based Adjustments
           </CardTitle>
-          <CardDescription>
-            Increase rates as occupancy rises for a given date
-          </CardDescription>
+          <CardDescription>Increase rates as occupancy rises for a given date</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
@@ -304,17 +309,13 @@ export default function DynamicPricingPage() {
             <Calendar className="h-5 w-5 text-muted-foreground" />
             Lead Time Adjustments
           </CardTitle>
-          <CardDescription>
-            Adjust rates based on how far in advance guests book
-          </CardDescription>
+          <CardDescription>Adjust rates based on how far in advance guests book</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between p-3 rounded-lg border">
             <div>
               <Label className="font-medium">Early Bird Discount</Label>
-              <p className="text-sm text-muted-foreground">
-                Bookings made 60+ days in advance
-              </p>
+              <p className="text-sm text-muted-foreground">Bookings made 60+ days in advance</p>
             </div>
             <div className="flex items-center gap-2">
               <Input

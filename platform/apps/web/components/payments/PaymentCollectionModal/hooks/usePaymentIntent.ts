@@ -46,7 +46,9 @@ export function usePaymentIntent(options: UsePaymentIntentOptions = {}): UsePaym
     async (amountCents?: number): Promise<PaymentIntentData | null> => {
       const amount = amountCents ?? state.remainingCents;
       if (amount <= 0) {
-        setError("Payment amount must be greater than zero. Please verify the amount and try again");
+        setError(
+          "Payment amount must be greater than zero. Please verify the amount and try again",
+        );
         return null;
       }
 
@@ -74,26 +76,29 @@ export function usePaymentIntent(options: UsePaymentIntentOptions = {}): UsePaym
             amount,
             "usd",
             reservationId,
-            captureMethod === "automatic"
+            captureMethod === "automatic",
           );
         } else {
-          throw new Error("Reservation ID is required to process payment. Please select a reservation");
+          throw new Error(
+            "Reservation ID is required to process payment. Please select a reservation",
+          );
         }
 
         setClientSecret(data.clientSecret);
         setPaymentIntentId(data.id);
         return data;
       } catch (err) {
-        const message = err instanceof Error
-          ? err.message
-          : "Failed to initialize payment. Please check your connection and try again";
+        const message =
+          err instanceof Error
+            ? err.message
+            : "Failed to initialize payment. Please check your connection and try again";
         setError(message);
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [state.remainingCents, getReservationId, props.context, props.guestEmail, captureMethod]
+    [state.remainingCents, getReservationId, props.context, props.guestEmail, captureMethod],
   );
 
   const resetIntent = useCallback(() => {
@@ -107,7 +112,13 @@ export function usePaymentIntent(options: UsePaymentIntentOptions = {}): UsePaym
   // Auto-create intent when hook mounts if requested
   // Only auto-create once - don't retry on error (user can click "Try Again")
   useEffect(() => {
-    if (autoCreate && state.remainingCents > 0 && !clientSecret && !loading && !autoCreateAttempted) {
+    if (
+      autoCreate &&
+      state.remainingCents > 0 &&
+      !clientSecret &&
+      !loading &&
+      !autoCreateAttempted
+    ) {
       setAutoCreateAttempted(true);
       createIntent();
     }
@@ -157,7 +168,7 @@ export function useDepositHold() {
           amountCents,
           "usd",
           reservationId,
-          false // autoCapture = false for holds
+          false, // autoCapture = false for holds
         );
 
         setHold({
@@ -171,14 +182,14 @@ export function useDepositHold() {
         setError(
           err instanceof Error
             ? err.message
-            : "Failed to create deposit hold. Please check your payment method and try again"
+            : "Failed to create deposit hold. Please check your payment method and try again",
         );
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [props.subject]
+    [props.subject],
   );
 
   const captureHold = useCallback(
@@ -197,14 +208,16 @@ export function useDepositHold() {
         return hold;
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to capture payment hold. Please try again or contact support"
+          err instanceof Error
+            ? err.message
+            : "Failed to capture payment hold. Please try again or contact support",
         );
         return null;
       } finally {
         setLoading(false);
       }
     },
-    [hold]
+    [hold],
   );
 
   const releaseHold = useCallback(async () => {
@@ -222,7 +235,9 @@ export function useDepositHold() {
       return true;
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to release payment hold. Please try again or contact support"
+        err instanceof Error
+          ? err.message
+          : "Failed to release payment hold. Please try again or contact support",
       );
       return false;
     } finally {

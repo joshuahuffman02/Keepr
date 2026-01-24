@@ -16,7 +16,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImageUpload } from "../ui/image-upload";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Building2, MapPin, Image as ImageIcon, Clock, Settings2, Check } from "lucide-react";
+import {
+  ChevronDown,
+  Building2,
+  MapPin,
+  Image as ImageIcon,
+  Clock,
+  Settings2,
+  Check,
+} from "lucide-react";
 
 interface CampgroundProfileFormProps {
   campground: Campground;
@@ -65,7 +73,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
     isPublished: campground.isPublished ?? true,
     currency: campground.currency || "USD",
     taxId: campground.taxId || "",
-    taxIdName: campground.taxIdName || "Tax ID"
+    taxIdName: campground.taxIdName || "Tax ID",
   });
 
   const photoList = form.photos
@@ -128,7 +136,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
         checkInTime: form.checkInTime || null,
         checkOutTime: form.checkOutTime || null,
         timezone: form.timezone || null,
-        isPublished: form.isPublished
+        isPublished: form.isPublished,
       };
 
       const profile = await apiClient.updateCampgroundProfile(campground.id, profileUpdate);
@@ -143,18 +151,18 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
         quietHoursStart: form.quietHoursStart || null,
         quietHoursEnd: form.quietHoursEnd || null,
         routingAssigneeId: form.routingAssigneeId || null,
-        officeClosesAt: form.officeClosesAt || "17:00"
+        officeClosesAt: form.officeClosesAt || "17:00",
       });
       await apiClient.updateCampgroundFinancials(campground.id, {
         currency: form.currency,
         taxId: form.taxId || null,
-        taxIdName: form.taxIdName
+        taxIdName: form.taxIdName,
       });
       return profile;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["campground", campground.id] });
-    }
+    },
   });
 
   const heroPreview = form.heroImageUrl?.trim();
@@ -192,7 +200,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-lg">Profile & Contact</CardTitle>
-                  <p className="text-sm text-muted-foreground">Basic information and how guests reach you</p>
+                  <p className="text-sm text-muted-foreground">
+                    Basic information and how guests reach you
+                  </p>
                 </div>
                 <div className="text-[11px] rounded-full bg-muted px-3 py-1 font-mono text-muted-foreground">
                   ID: {campground.id.slice(0, 8)}...
@@ -212,7 +222,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 <div className="space-y-1.5">
                   <Label className="text-xs">Web Address (slug)</Label>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground whitespace-nowrap">campreserv.com/park/</span>
+                    <span className="text-xs text-muted-foreground whitespace-nowrap">
+                      campreserv.com/park/
+                    </span>
                     <Input
                       value={form.slug}
                       onChange={(e) => setForm((s) => ({ ...s, slug: e.target.value }))}
@@ -283,7 +295,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Address Line 2 <span className="text-muted-foreground">(optional)</span></Label>
+                  <Label className="text-xs">
+                    Address Line 2 <span className="text-muted-foreground">(optional)</span>
+                  </Label>
                   <Input
                     value={form.address2}
                     onChange={(e) => setForm((s) => ({ ...s, address2: e.target.value }))}
@@ -342,7 +356,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   <option value="America/Anchorage">Alaska</option>
                   <option value="Pacific/Honolulu">Hawaii</option>
                 </select>
-                <p className="text-xs text-muted-foreground">Used for booking times and guest communications</p>
+                <p className="text-xs text-muted-foreground">
+                  Used for booking times and guest communications
+                </p>
               </div>
 
               {/* Collapsible advanced location */}
@@ -351,7 +367,12 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 onClick={() => setShowAdvancedLocation(!showAdvancedLocation)}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedLocation && "rotate-180")} />
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform",
+                    showAdvancedLocation && "rotate-180",
+                  )}
+                />
                 Map coordinates (optional)
               </button>
 
@@ -374,7 +395,8 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                     />
                   </div>
                   <p className="col-span-2 text-xs text-muted-foreground">
-                    Fine-tune where your park appears on maps. Leave blank to auto-detect from address.
+                    Fine-tune where your park appears on maps. Leave blank to auto-detect from
+                    address.
                   </p>
                 </div>
               )}
@@ -397,7 +419,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   onChange={(e) => setForm((s) => ({ ...s, tagline: e.target.value }))}
                   placeholder="e.g., Your riverside retreat in the heart of nature"
                 />
-                <p className="text-xs text-muted-foreground">A short, catchy phrase shown under your park name</p>
+                <p className="text-xs text-muted-foreground">
+                  A short, catchy phrase shown under your park name
+                </p>
               </div>
 
               <div className="space-y-1.5">
@@ -419,7 +443,11 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 />
                 {heroPreview && (
                   <div className="rounded-lg border overflow-hidden">
-                    <img src={heroPreview} alt="Hero preview" className="w-full h-48 object-cover" />
+                    <img
+                      src={heroPreview}
+                      alt="Hero preview"
+                      className="w-full h-48 object-cover"
+                    />
                   </div>
                 )}
               </div>
@@ -430,8 +458,13 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   <ImageUpload
                     onChange={(url) => {
                       if (!url) return;
-                      const current = form.photos ? form.photos.split(",").map(p => p.trim()).filter(Boolean) : [];
-                      setForm(s => ({ ...s, photos: [...current, url].join(", ") }));
+                      const current = form.photos
+                        ? form.photos
+                            .split(",")
+                            .map((p) => p.trim())
+                            .filter(Boolean)
+                        : [];
+                      setForm((s) => ({ ...s, photos: [...current, url].join(", ") }));
                     }}
                     placeholder="Add photo to gallery"
                   />
@@ -439,7 +472,10 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 {photoList && photoList.length > 0 && (
                   <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                     {photoList.map((url) => (
-                      <div key={url} className="relative h-20 w-full overflow-hidden rounded-lg border">
+                      <div
+                        key={url}
+                        className="relative h-20 w-full overflow-hidden rounded-lg border"
+                      >
                         <Image src={url} alt="Gallery photo" fill className="object-cover" />
                       </div>
                     ))}
@@ -507,14 +543,26 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 <div className="bg-muted/50 rounded-lg p-3 mt-2 text-xs text-muted-foreground space-y-1">
                   <p className="font-medium text-foreground">How same-day booking cutoffs work:</p>
                   <p>• RV/tent sites can be booked anytime (no cutoff by default)</p>
-                  <p>• Cabins/lodging require booking 60 minutes before office close (for prep time)</p>
-                  <p>• Customize cutoffs per site class in <Link href={`/campgrounds/${campground.id}/classes`} className="font-medium underline hover:no-underline">Site Classes</Link></p>
+                  <p>
+                    • Cabins/lodging require booking 60 minutes before office close (for prep time)
+                  </p>
+                  <p>
+                    • Customize cutoffs per site class in{" "}
+                    <Link
+                      href={`/campgrounds/${campground.id}/classes`}
+                      className="font-medium underline hover:no-underline"
+                    >
+                      Site Classes
+                    </Link>
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Season Start <span className="text-muted-foreground">(optional)</span></Label>
+                  <Label className="text-xs">
+                    Season Start <span className="text-muted-foreground">(optional)</span>
+                  </Label>
                   <Input
                     type="date"
                     value={form.seasonStart}
@@ -522,7 +570,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs">Season End <span className="text-muted-foreground">(optional)</span></Label>
+                  <Label className="text-xs">
+                    Season End <span className="text-muted-foreground">(optional)</span>
+                  </Label>
                   <Input
                     type="date"
                     value={form.seasonEnd}
@@ -537,7 +587,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                 onClick={() => setShowAdvancedOps(!showAdvancedOps)}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                <ChevronDown className={cn("h-4 w-4 transition-transform", showAdvancedOps && "rotate-180")} />
+                <ChevronDown
+                  className={cn("h-4 w-4 transition-transform", showAdvancedOps && "rotate-180")}
+                />
                 Message automation settings
               </button>
 
@@ -564,7 +616,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                     <div className="grid grid-cols-2 gap-4 max-w-xs">
                       <Input
                         value={form.quietHoursStart}
-                        onChange={(e) => setForm((s) => ({ ...s, quietHoursStart: e.target.value }))}
+                        onChange={(e) =>
+                          setForm((s) => ({ ...s, quietHoursStart: e.target.value }))
+                        }
                         placeholder="22:00"
                       />
                       <Input
@@ -588,7 +642,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
           <Card>
             <CardHeader className="pb-4">
               <CardTitle className="text-lg">Financial Settings</CardTitle>
-              <p className="text-sm text-muted-foreground">Currency and tax information for invoices</p>
+              <p className="text-sm text-muted-foreground">
+                Currency and tax information for invoices
+              </p>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -636,8 +692,8 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="bg-muted/50 rounded-lg p-3 text-xs text-muted-foreground">
-                Most parks don't need to configure this. Only set up if you have a custom email domain
-                and want emails to appear from your domain instead of campreserv.com
+                Most parks don't need to configure this. Only set up if you have a custom email
+                domain and want emails to appear from your domain instead of campreserv.com
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -650,7 +706,9 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   />
                 </div>
                 <div className="flex items-center gap-2 pt-6">
-                  <Badge variant={campground.senderDomainStatus === "verified" ? "default" : "secondary"}>
+                  <Badge
+                    variant={campground.senderDomainStatus === "verified" ? "default" : "secondary"}
+                  >
                     {campground.senderDomainStatus || "Not configured"}
                   </Badge>
                 </div>

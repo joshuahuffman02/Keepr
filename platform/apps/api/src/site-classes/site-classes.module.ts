@@ -7,6 +7,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
 @Module({
   imports: [PermissionsModule],
   controllers: [SiteClassesController],
-  providers: [SiteClassesService]
+  providers: [SiteClassesService],
 })
 export class SiteClassesModule {}

@@ -84,7 +84,7 @@ export class WebhookAdminController {
   constructor(
     private readonly webhookService: WebhookService,
     private readonly apiUsageService: ApiUsageService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {
     this.securityService = new WebhookSecurityService();
   }
@@ -162,7 +162,7 @@ export class WebhookAdminController {
     @Param("id") id: string,
     @Body() body: ToggleWebhookDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: WebhookRequest
+    @Req() req: WebhookRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.toggleEndpoint(id, requiredCampgroundId, body.isActive);
@@ -182,7 +182,7 @@ export class WebhookAdminController {
   replay(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: WebhookRequest
+    @Req() req: WebhookRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.replay(id, requiredCampgroundId);
@@ -199,12 +199,12 @@ export class WebhookAdminController {
   getDeadLetterQueue(
     @Query("campgroundId") campgroundId: string,
     @Req() req: WebhookRequest,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.getDeadLetterQueue(
       requiredCampgroundId,
-      limit ? parseInt(limit, 10) : 50
+      limit ? parseInt(limit, 10) : 50,
     );
   }
 
@@ -215,7 +215,7 @@ export class WebhookAdminController {
   retryDeadLetter(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: WebhookRequest
+    @Req() req: WebhookRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.retryDeadLetter(id, requiredCampgroundId);
@@ -233,7 +233,7 @@ export class WebhookAdminController {
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
     @Body() dto: TestWebhookDto,
-    @Req() req: WebhookRequest
+    @Req() req: WebhookRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     // Get the endpoint
@@ -256,7 +256,7 @@ export class WebhookAdminController {
       const example = getEventExample(eventType);
       if (!example) {
         throw new NotFoundException(
-          `No example payload available for event type '${dto.eventType}'`
+          `No example payload available for event type '${dto.eventType}'`,
         );
       }
       payload = {
@@ -280,7 +280,7 @@ export class WebhookAdminController {
     const legacySignature = this.securityService.generateLegacySignature(
       endpoint.secret,
       body,
-      timestamp
+      timestamp,
     );
     const { signature: v2Signature, timestamp: v2Timestamp } =
       this.securityService.generateSignature(endpoint.secret, body);
@@ -410,10 +410,7 @@ export class WebhookAdminController {
   // ============================================
 
   @Get("api-usage")
-  async getApiUsage(
-    @Query("campgroundId") campgroundId: string,
-    @Query("days") days?: string
-  ) {
+  async getApiUsage(@Query("campgroundId") campgroundId: string, @Query("days") days?: string) {
     return this.apiUsageService.getPlatformStats(days ? parseInt(days, 10) : 30);
   }
 }

@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { ValueStackService } from './value-stack.service';
-import { ValueStackController, PublicValueStackController } from './value-stack.controller';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from "@nestjs/common";
+import { ValueStackService } from "./value-stack.service";
+import { ValueStackController, PublicValueStackController } from "./value-stack.controller";
+import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
   imports: [PrismaModule],

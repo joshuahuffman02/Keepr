@@ -15,12 +15,14 @@ A comprehensive keyboard shortcuts system for power users has been implemented a
 ## Features
 
 ### Global Shortcuts (Work Even in Input Fields)
+
 - **Cmd/Ctrl + K**: Open global search
 - **Cmd/Ctrl + /**: Open help panel
 - **Escape**: Close any open modal/dialog
 - **?**: Show keyboard shortcuts reference panel
 
 ### Navigation (Sequential Shortcuts - Press One After Another)
+
 - **G then D**: Go to Dashboard
 - **G then C**: Go to Calendar
 - **G then R**: Go to Reservations
@@ -30,26 +32,33 @@ A comprehensive keyboard shortcuts system for power users has been implemented a
 - **G then S**: Go to Settings
 
 ### Quick Actions
+
 - **Cmd/Ctrl + N**: New booking
 
 ## How It Works
 
 ### 1. KeyboardShortcutsProvider
+
 The provider manages all keyboard shortcuts globally:
+
 - Listens to `keydown` events on the document
 - Tracks input focus state to avoid conflicts when typing
 - Handles sequential shortcuts with a 1-second timeout
 - Provides a context for components to register/unregister shortcuts
 
 ### 2. Sequential Shortcuts
+
 For shortcuts like "G then D":
+
 1. User presses **G** (primes the system)
 2. System waits up to 1 second for the next key
 3. User presses **D** (executes the shortcut)
 4. If timeout expires, the sequence is reset
 
 ### 3. Input Field Protection
+
 The system automatically detects when the user is typing in:
+
 - `<input>` elements
 - `<textarea>` elements
 - `<select>` elements
@@ -58,7 +67,9 @@ The system automatically detects when the user is typing in:
 For non-global shortcuts, they are disabled when typing to prevent conflicts.
 
 ### 4. Callbacks System
+
 Components can register callbacks for global actions:
+
 ```typescript
 useEffect(() => {
   if (typeof window !== "undefined" && window.__keyboardShortcuts) {
@@ -72,13 +83,17 @@ useEffect(() => {
 ## UI Indicators
 
 ### 1. Keyboard Button in Top Bar
+
 A new keyboard icon button in the AdminTopBar opens the shortcuts reference panel.
 
 ### 2. Keyboard Hints
+
 The search button in the top bar shows "⌘K" as a hint.
 
 ### 3. Shortcuts Reference Dialog
+
 Pressing **?** anywhere opens a beautiful modal showing:
+
 - All available shortcuts grouped by category
 - Platform-specific key names (⌘ on Mac, Ctrl on Windows/Linux)
 - Pro tips for power users
@@ -87,6 +102,7 @@ Pressing **?** anywhere opens a beautiful modal showing:
 ## Usage Examples
 
 ### For End Users
+
 1. Press **?** to see all shortcuts
 2. Press **Cmd+K** to quickly search
 3. Press **G then D** to navigate to Dashboard
@@ -145,6 +161,7 @@ function MyComponent() {
 ## Future Enhancements
 
 Possible additions:
+
 - User-customizable shortcuts
 - Shortcut recording/macro system
 - Per-page context shortcuts

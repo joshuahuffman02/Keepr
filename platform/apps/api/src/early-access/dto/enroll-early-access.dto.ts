@@ -5,7 +5,7 @@ export type EarlyAccessTierType = "founders_circle" | "pioneer" | "trailblazer";
 export const EARLY_ACCESS_TIERS: EarlyAccessTierType[] = [
   "founders_circle",
   "pioneer",
-  "trailblazer"
+  "trailblazer",
 ];
 
 export class EnrollEarlyAccessDto {

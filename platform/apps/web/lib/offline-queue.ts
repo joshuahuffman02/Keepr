@@ -8,9 +8,7 @@ const STORE = "queues";
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
-const hasSyncRegister = (
-  value: unknown
-): value is { register: (tag: string) => Promise<void> } =>
+const hasSyncRegister = (value: unknown): value is { register: (tag: string) => Promise<void> } =>
   isRecord(value) && typeof value.register === "function";
 
 function hasIndexedDb() {

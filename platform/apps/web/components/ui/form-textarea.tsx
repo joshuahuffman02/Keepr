@@ -29,9 +29,9 @@ const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
               hasError
                 ? "border-red-500 focus-visible:ring-red-500"
                 : isValid
-                ? "border-green-500 focus-visible:ring-green-500"
-                : "border-border focus-visible:ring-ring",
-              className
+                  ? "border-green-500 focus-visible:ring-green-500"
+                  : "border-border focus-visible:ring-ring",
+              className,
             )}
             {...props}
           />
@@ -48,7 +48,7 @@ const FormTextarea = React.forwardRef<HTMLTextAreaElement, FormTextareaProps>(
         )}
       </div>
     );
-  }
+  },
 );
 
 FormTextarea.displayName = "FormTextarea";

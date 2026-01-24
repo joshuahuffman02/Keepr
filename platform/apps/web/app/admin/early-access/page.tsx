@@ -15,7 +15,7 @@ import {
   Sparkles,
   TrendingUp,
   UserCheck,
-  Timer
+  Timer,
 } from "lucide-react";
 
 type TierStats = {
@@ -58,13 +58,13 @@ type PendingOnboarding = {
 const TIER_LABELS: Record<string, string> = {
   founders_circle: "Founder's Circle",
   pioneer: "Pioneer",
-  trailblazer: "Trailblazer"
+  trailblazer: "Trailblazer",
 };
 
 const TIER_COLORS: Record<string, string> = {
   founders_circle: "bg-amber-500",
   pioneer: "bg-emerald-500",
-  trailblazer: "bg-blue-500"
+  trailblazer: "bg-blue-500",
 };
 
 export default function EarlyAccessAdminPage() {
@@ -80,7 +80,7 @@ export default function EarlyAccessAdminPage() {
       const base = process.env.NEXT_PUBLIC_API_BASE || "";
       const [statsRes, pendingRes] = await Promise.all([
         fetch(`${base}/early-access/admin/stats`, { credentials: "include" }),
-        fetch(`${base}/early-access/admin/pending`, { credentials: "include" })
+        fetch(`${base}/early-access/admin/pending`, { credentials: "include" }),
       ]);
 
       if (!statsRes.ok) throw new Error(`Failed to load stats (${statsRes.status})`);
@@ -96,7 +96,7 @@ export default function EarlyAccessAdminPage() {
       toast({
         title: "Load failed",
         description: message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -113,7 +113,7 @@ export default function EarlyAccessAdminPage() {
       const base = process.env.NEXT_PUBLIC_API_BASE || "";
       const res = await fetch(`${base}/early-access/admin/resend/${sessionId}`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
 
       if (!res.ok) throw new Error(`Resend failed (${res.status})`);
@@ -121,7 +121,7 @@ export default function EarlyAccessAdminPage() {
       const result = await res.json();
       toast({
         title: "Email sent",
-        description: `Onboarding email resent to ${result.email}`
+        description: `Onboarding email resent to ${result.email}`,
       });
 
       // Reload to update lastEmailSent
@@ -131,7 +131,7 @@ export default function EarlyAccessAdminPage() {
       toast({
         title: "Resend failed",
         description: message,
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setResendingId(null);
@@ -145,7 +145,7 @@ export default function EarlyAccessAdminPage() {
       day: "numeric",
       year: "numeric",
       hour: "numeric",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   };
 
@@ -170,12 +170,7 @@ export default function EarlyAccessAdminPage() {
             Monitor signups, resend emails, and track conversion
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => void loadData()}
-          disabled={loading}
-        >
+        <Button variant="outline" size="sm" onClick={() => void loadData()} disabled={loading}>
           <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
           Refresh
         </Button>
@@ -212,7 +207,7 @@ export default function EarlyAccessAdminPage() {
                       <div
                         className={`${TIER_COLORS[tier.tier] || "bg-muted0"} h-2 rounded-full transition-all`}
                         style={{
-                          width: `${((tier.totalSpots - tier.remainingSpots) / tier.totalSpots) * 100}%`
+                          width: `${((tier.totalSpots - tier.remainingSpots) / tier.totalSpots) * 100}%`,
                         }}
                       />
                     </div>
@@ -244,7 +239,9 @@ export default function EarlyAccessAdminPage() {
                     <Timer className="h-6 w-6 text-status-warning" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.pending || 0}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats?.onboarding.pending || 0}
+                    </p>
                     <p className="text-sm text-muted-foreground">Pending Signups</p>
                   </div>
                 </div>
@@ -254,7 +251,9 @@ export default function EarlyAccessAdminPage() {
                     <UserCheck className="h-6 w-6 text-status-success" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.completed || 0}</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats?.onboarding.completed || 0}
+                    </p>
                     <p className="text-sm text-muted-foreground">Completed</p>
                   </div>
                 </div>
@@ -264,7 +263,9 @@ export default function EarlyAccessAdminPage() {
                     <TrendingUp className="h-6 w-6 text-status-info" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-foreground">{stats?.onboarding.conversionRate || 0}%</p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stats?.onboarding.conversionRate || 0}%
+                    </p>
                     <p className="text-sm text-muted-foreground">Conversion Rate</p>
                   </div>
                 </div>
@@ -362,7 +363,8 @@ export default function EarlyAccessAdminPage() {
                       {item.inviteExpired && (
                         <div className="mt-3 flex items-center gap-2 text-xs text-amber-400">
                           <AlertTriangle className="h-3 w-3" />
-                          Invite expired {formatDate(item.inviteExpiresAt)} - resending will extend by 7 days
+                          Invite expired {formatDate(item.inviteExpiresAt)} - resending will extend
+                          by 7 days
                         </div>
                       )}
                     </div>

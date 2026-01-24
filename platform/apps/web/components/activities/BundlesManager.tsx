@@ -5,7 +5,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../lib/api-client";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
@@ -16,498 +23,510 @@ import { Checkbox } from "../ui/checkbox";
 import { useToast } from "../ui/use-toast";
 import { cn } from "../../lib/utils";
 import {
-    Package, Plus, Trash2, Percent, DollarSign, Tag, Sparkles,
-    Check, Gift, Loader2, Edit2
+  Package,
+  Plus,
+  Trash2,
+  Percent,
+  DollarSign,
+  Tag,
+  Sparkles,
+  Check,
+  Gift,
+  Loader2,
+  Edit2,
 } from "lucide-react";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "../ui/alert-dialog";
 
 type Activity = {
-    id: string;
-    name: string;
-    price: number;
-    duration?: number;
-    imageUrl?: string | null;
+  id: string;
+  name: string;
+  price: number;
+  duration?: number;
+  imageUrl?: string | null;
 };
 
 type BundleItemActivity = {
-    id: string;
-    name: string;
-    price: number;
+  id: string;
+  name: string;
+  price: number;
 };
 
 type Bundle = {
+  id: string;
+  name: string;
+  description?: string | null;
+  price: number;
+  discountType: string;
+  discountValue?: number | null;
+  isActive: boolean;
+  items: Array<{
     id: string;
-    name: string;
-    description?: string | null;
-    price: number;
-    discountType: string;
-    discountValue?: number | null;
-    isActive: boolean;
-    items: Array<{
-        id: string;
-        activityId?: string;
-        quantity?: number;
-        activity: BundleItemActivity;
-    }>;
+    activityId?: string;
+    quantity?: number;
+    activity: BundleItemActivity;
+  }>;
 };
 
 interface BundlesManagerProps {
-    campgroundId: string;
-    activities: Activity[];
+  campgroundId: string;
+  activities: Activity[];
 }
 
 type DiscountType = "percent" | "fixed";
 
 type BundleFormState = {
-    name: string;
-    description: string;
-    discountType: DiscountType;
-    discountValue: string;
-    selectedActivities: string[];
+  name: string;
+  description: string;
+  discountType: DiscountType;
+  discountValue: string;
+  selectedActivities: string[];
 };
 
 export function BundlesManager({ campgroundId, activities }: BundlesManagerProps) {
-    const { toast } = useToast();
-    const queryClient = useQueryClient();
-    const [isCreateOpen, setIsCreateOpen] = useState(false);
-    const [editingBundle, setEditingBundle] = useState<Bundle | null>(null);
-    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingBundle, setEditingBundle] = useState<Bundle | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-    const [newBundle, setNewBundle] = useState<BundleFormState>({
+  const [newBundle, setNewBundle] = useState<BundleFormState>({
+    name: "",
+    description: "",
+    discountType: "percent",
+    discountValue: "15",
+    selectedActivities: [],
+  });
+
+  const { data: bundles, isLoading } = useQuery<Bundle[]>({
+    queryKey: ["bundles", campgroundId],
+    queryFn: () => apiClient.getActivityBundles(campgroundId),
+    enabled: !!campgroundId,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      // Calculate total price of selected activities
+      const selectedActivitiesData = activities.filter((a) =>
+        newBundle.selectedActivities.includes(a.id),
+      );
+      const totalPrice = selectedActivitiesData.reduce((sum, a) => sum + a.price, 0);
+
+      // Calculate discounted price
+      let bundlePrice = totalPrice;
+      const discountValue = parseInt(newBundle.discountValue) || 0;
+      if (newBundle.discountType === "percent") {
+        bundlePrice = Math.round(totalPrice * (1 - discountValue / 100));
+      } else {
+        bundlePrice = Math.max(0, totalPrice - discountValue * 100); // Convert dollars to cents
+      }
+
+      return apiClient.createActivityBundle(campgroundId, {
+        name: newBundle.name,
+        description: newBundle.description || undefined,
+        price: bundlePrice,
+        discountType: newBundle.discountType,
+        discountValue,
+        activityIds: newBundle.selectedActivities,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bundles", campgroundId] });
+      setIsCreateOpen(false);
+      setNewBundle({
         name: "",
         description: "",
         discountType: "percent",
         discountValue: "15",
-        selectedActivities: []
-    });
+        selectedActivities: [],
+      });
+      toast({
+        title: "Bundle created!",
+        description: "Guests can now purchase this package deal.",
+      });
+    },
+    onError: (err) => {
+      toast({
+        title: "Failed to create bundle",
+        description: err instanceof Error ? err.message : "Please try again",
+        variant: "destructive",
+      });
+    },
+  });
 
-    const { data: bundles, isLoading } = useQuery<Bundle[]>({
-        queryKey: ["bundles", campgroundId],
-        queryFn: () => apiClient.getActivityBundles(campgroundId),
-        enabled: !!campgroundId
-    });
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiClient.deleteActivityBundle(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["bundles", campgroundId] });
+      toast({ title: "Bundle deleted" });
+    },
+  });
 
-    const createMutation = useMutation({
-        mutationFn: async () => {
-            // Calculate total price of selected activities
-            const selectedActivitiesData = activities.filter(a =>
-                newBundle.selectedActivities.includes(a.id)
-            );
-            const totalPrice = selectedActivitiesData.reduce((sum, a) => sum + a.price, 0);
+  const toggleActivity = (activityId: string) => {
+    setNewBundle((prev) => ({
+      ...prev,
+      selectedActivities: prev.selectedActivities.includes(activityId)
+        ? prev.selectedActivities.filter((id) => id !== activityId)
+        : [...prev.selectedActivities, activityId],
+    }));
+  };
 
-            // Calculate discounted price
-            let bundlePrice = totalPrice;
-            const discountValue = parseInt(newBundle.discountValue) || 0;
-            if (newBundle.discountType === "percent") {
-                bundlePrice = Math.round(totalPrice * (1 - discountValue / 100));
-            } else {
-                bundlePrice = Math.max(0, totalPrice - (discountValue * 100)); // Convert dollars to cents
-            }
+  // Calculate bundle savings for display
+  const calculateSavings = () => {
+    const selectedActivitiesData = activities.filter((a) =>
+      newBundle.selectedActivities.includes(a.id),
+    );
+    const totalPrice = selectedActivitiesData.reduce((sum, a) => sum + a.price, 0);
+    const discountValue = parseInt(newBundle.discountValue) || 0;
 
-            return apiClient.createActivityBundle(campgroundId, {
-                name: newBundle.name,
-                description: newBundle.description || undefined,
-                price: bundlePrice,
-                discountType: newBundle.discountType,
-                discountValue,
-                activityIds: newBundle.selectedActivities
-            });
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bundles", campgroundId] });
-            setIsCreateOpen(false);
-            setNewBundle({
-                name: "",
-                description: "",
-                discountType: "percent",
-                discountValue: "15",
-                selectedActivities: []
-            });
-            toast({
-                title: "Bundle created!",
-                description: "Guests can now purchase this package deal."
-            });
-        },
-        onError: (err) => {
-            toast({
-                title: "Failed to create bundle",
-                description: err instanceof Error ? err.message : "Please try again",
-                variant: "destructive"
-            });
-        }
-    });
+    let bundlePrice = totalPrice;
+    if (newBundle.discountType === "percent") {
+      bundlePrice = Math.round(totalPrice * (1 - discountValue / 100));
+    } else {
+      bundlePrice = Math.max(0, totalPrice - discountValue * 100);
+    }
 
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => apiClient.deleteActivityBundle(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["bundles", campgroundId] });
-            toast({ title: "Bundle deleted" });
-        }
-    });
-
-    const toggleActivity = (activityId: string) => {
-        setNewBundle(prev => ({
-            ...prev,
-            selectedActivities: prev.selectedActivities.includes(activityId)
-                ? prev.selectedActivities.filter(id => id !== activityId)
-                : [...prev.selectedActivities, activityId]
-        }));
+    return {
+      originalPrice: totalPrice,
+      bundlePrice,
+      savings: totalPrice - bundlePrice,
     };
+  };
 
-    // Calculate bundle savings for display
-    const calculateSavings = () => {
-        const selectedActivitiesData = activities.filter(a =>
-            newBundle.selectedActivities.includes(a.id)
-        );
-        const totalPrice = selectedActivitiesData.reduce((sum, a) => sum + a.price, 0);
-        const discountValue = parseInt(newBundle.discountValue) || 0;
+  const savings = calculateSavings();
 
-        let bundlePrice = totalPrice;
-        if (newBundle.discountType === "percent") {
-            bundlePrice = Math.round(totalPrice * (1 - discountValue / 100));
-        } else {
-            bundlePrice = Math.max(0, totalPrice - (discountValue * 100));
-        }
+  return (
+    <>
+      {/* Bundles List */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Package className="h-5 w-5 text-action-primary" />
+              Activity Bundles
+            </h3>
+            <p className="text-sm text-muted-foreground">Create package deals to increase sales</p>
+          </div>
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            New Bundle
+          </Button>
+        </div>
 
-        return {
-            originalPrice: totalPrice,
-            bundlePrice,
-            savings: totalPrice - bundlePrice
-        };
-    };
-
-    const savings = calculateSavings();
-
-    return (
-        <>
-            {/* Bundles List */}
-            <div className="space-y-4">
-                <div className="flex items-center justify-between">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-action-primary" />
+          </div>
+        ) : bundles?.length === 0 ? (
+          <Card className="border-dashed">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="w-16 h-16 rounded-full bg-status-info-bg flex items-center justify-center mb-4">
+                <Gift className="h-8 w-8 text-action-primary" />
+              </div>
+              <h4 className="font-semibold text-foreground mb-1">No Bundles Yet</h4>
+              <p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
+                Create activity bundles to offer package deals and increase average order value.
+              </p>
+              <Button
+                onClick={() => setIsCreateOpen(true)}
+                className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Your First Bundle
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {bundles?.map((bundle) => (
+              <Card
+                key={bundle.id}
+                className={cn(
+                  "group overflow-hidden transition-all hover:shadow-lg",
+                  !bundle.isActive && "opacity-60",
+                )}
+              >
+                <div className="h-2 bg-action-primary" />
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between">
                     <div>
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <Package className="h-5 w-5 text-action-primary" />
-                            Activity Bundles
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                            Create package deals to increase sales
-                        </p>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Package className="h-4 w-4 text-action-primary" />
+                        {bundle.name}
+                      </CardTitle>
+                      {bundle.description && (
+                        <CardDescription className="text-xs mt-1">
+                          {bundle.description}
+                        </CardDescription>
+                      )}
+                    </div>
+                    <Badge
+                      variant={bundle.isActive ? "default" : "secondary"}
+                      className={
+                        bundle.isActive ? "bg-status-success text-status-success-foreground" : ""
+                      }
+                    >
+                      {bundle.isActive ? "Active" : "Inactive"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {/* Included activities */}
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Includes
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {bundle.items.map((item) => (
+                        <Badge key={item.id} variant="outline" className="text-xs">
+                          {item.activity.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pricing */}
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <div>
+                      <div className="text-xl font-bold text-foreground">
+                        ${(bundle.price / 100).toFixed(2)}
+                      </div>
+                      {bundle.discountValue && (
+                        <div className="flex items-center gap-1 text-xs text-status-success">
+                          <Tag className="h-3 w-3" />
+                          Save{" "}
+                          {bundle.discountType === "percent"
+                            ? `${bundle.discountValue}%`
+                            : `$${bundle.discountValue}`}
+                        </div>
+                      )}
                     </div>
                     <Button
-                        onClick={() => setIsCreateOpen(true)}
-                        className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-red-500"
+                      onClick={() => setDeleteConfirmId(bundle.id)}
+                      aria-label="Delete bundle"
                     >
-                        <Plus className="h-4 w-4 mr-2" />
-                        New Bundle
+                      <Trash2 className="h-4 w-4" />
                     </Button>
-                </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
 
-                {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-action-primary" />
-                    </div>
-                ) : bundles?.length === 0 ? (
-                    <Card className="border-dashed">
-                        <CardContent className="flex flex-col items-center justify-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-status-info-bg flex items-center justify-center mb-4">
-                                <Gift className="h-8 w-8 text-action-primary" />
-                            </div>
-                            <h4 className="font-semibold text-foreground mb-1">No Bundles Yet</h4>
-                            <p className="text-sm text-muted-foreground text-center max-w-sm mb-4">
-                                Create activity bundles to offer package deals and increase average order value.
-                            </p>
-                            <Button
-                                onClick={() => setIsCreateOpen(true)}
-                                className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
-                            >
-                                <Plus className="h-4 w-4 mr-2" />
-                                Create Your First Bundle
-                            </Button>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {bundles?.map(bundle => (
-                            <Card
-                                key={bundle.id}
-                                className={cn(
-                                    "group overflow-hidden transition-all hover:shadow-lg",
-                                    !bundle.isActive && "opacity-60"
-                                )}
-                            >
-                                <div className="h-2 bg-action-primary" />
-                                <CardHeader className="pb-2">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <CardTitle className="text-base flex items-center gap-2">
-                                                <Package className="h-4 w-4 text-action-primary" />
-                                                {bundle.name}
-                                            </CardTitle>
-                                            {bundle.description && (
-                                                <CardDescription className="text-xs mt-1">
-                                                    {bundle.description}
-                                                </CardDescription>
-                                            )}
-                                        </div>
-                                        <Badge
-                                            variant={bundle.isActive ? "default" : "secondary"}
-                                            className={bundle.isActive ? "bg-status-success text-status-success-foreground" : ""}
-                                        >
-                                            {bundle.isActive ? "Active" : "Inactive"}
-                                        </Badge>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-3">
-                                    {/* Included activities */}
-                                    <div className="space-y-1">
-                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                            Includes
-                                        </p>
-                                        <div className="flex flex-wrap gap-1">
-                                            {bundle.items.map(item => (
-                                                <Badge
-                                                    key={item.id}
-                                                    variant="outline"
-                                                    className="text-xs"
-                                                >
-                                                    {item.activity.name}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
+      {/* Create Bundle Dialog */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Gift className="h-5 w-5 text-action-primary" />
+              Create Activity Bundle
+            </DialogTitle>
+            <DialogDescription>
+              Combine activities into a discounted package deal.
+            </DialogDescription>
+          </DialogHeader>
 
-                                    {/* Pricing */}
-                                    <div className="flex items-center justify-between pt-2 border-t">
-                                        <div>
-                                            <div className="text-xl font-bold text-foreground">
-                                                ${(bundle.price / 100).toFixed(2)}
-                                            </div>
-                                            {bundle.discountValue && (
-                                                <div className="flex items-center gap-1 text-xs text-status-success">
-                                                    <Tag className="h-3 w-3" />
-                                                    Save {bundle.discountType === "percent"
-                                                        ? `${bundle.discountValue}%`
-                                                        : `$${bundle.discountValue}`}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-muted-foreground hover:text-red-500"
-                                            onClick={() => setDeleteConfirmId(bundle.id)}
-                                            aria-label="Delete bundle"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+          <div className="space-y-5 py-4">
+            {/* Bundle Name */}
+            <div className="grid gap-2">
+              <Label htmlFor="bundle-name">Bundle Name</Label>
+              <Input
+                id="bundle-name"
+                value={newBundle.name}
+                onChange={(e) => setNewBundle({ ...newBundle, name: e.target.value })}
+                placeholder="e.g. Adventure Weekend Package"
+              />
             </div>
 
-            {/* Create Bundle Dialog */}
-            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                <DialogContent className="sm:max-w-[550px] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Gift className="h-5 w-5 text-action-primary" />
-                            Create Activity Bundle
-                        </DialogTitle>
-                        <DialogDescription>
-                            Combine activities into a discounted package deal.
-                        </DialogDescription>
-                    </DialogHeader>
+            {/* Description */}
+            <div className="grid gap-2">
+              <Label htmlFor="bundle-description">Description (optional)</Label>
+              <Textarea
+                id="bundle-description"
+                value={newBundle.description}
+                onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })}
+                placeholder="Describe what's included and why it's a great deal..."
+                rows={2}
+              />
+            </div>
 
-                    <div className="space-y-5 py-4">
-                        {/* Bundle Name */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="bundle-name">Bundle Name</Label>
-                            <Input
-                                id="bundle-name"
-                                value={newBundle.name}
-                                onChange={(e) => setNewBundle({ ...newBundle, name: e.target.value })}
-                                placeholder="e.g. Adventure Weekend Package"
-                            />
-                        </div>
-
-                        {/* Description */}
-                        <div className="grid gap-2">
-                            <Label htmlFor="bundle-description">Description (optional)</Label>
-                            <Textarea
-                                id="bundle-description"
-                                value={newBundle.description}
-                                onChange={(e) => setNewBundle({ ...newBundle, description: e.target.value })}
-                                placeholder="Describe what's included and why it's a great deal..."
-                                rows={2}
-                            />
-                        </div>
-
-                        {/* Select Activities */}
-                        <div className="space-y-3">
-                            <Label>Select Activities to Include</Label>
-                            <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
-                                {activities.map(activity => (
-                                    <label
-                                        key={activity.id}
-                                        className={cn(
-                                            "flex items-center gap-3 p-3 cursor-pointer transition-colors",
-                                            newBundle.selectedActivities.includes(activity.id)
-                                                ? "bg-status-info-bg"
-                                                : "hover:bg-muted"
-                                        )}
-                                    >
-                                        <Checkbox
-                                            checked={newBundle.selectedActivities.includes(activity.id)}
-                                            onCheckedChange={() => toggleActivity(activity.id)}
-                                        />
-                                        <div className="flex-1">
-                                            <p className="font-medium text-sm">{activity.name}</p>
-                                            <p className="text-xs text-muted-foreground">
-                                                ${(activity.price / 100).toFixed(2)}{activity.duration ? ` · ${activity.duration} mins` : ''}
-                                            </p>
-                                        </div>
-                                        {newBundle.selectedActivities.includes(activity.id) && (
-                                            <Check className="h-4 w-4 text-action-primary" />
-                                        )}
-                                    </label>
-                                ))}
-                            </div>
-                            {activities.length === 0 && (
-                                <p className="text-sm text-muted-foreground text-center py-4">
-                                    Create some activities first to add them to a bundle.
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Discount Settings */}
-                        <div className="space-y-3">
-                            <Label>Discount</Label>
-                            <div className="flex gap-3">
-                                <Select
-                                    value={newBundle.discountType}
-                                    onValueChange={(v: "percent" | "fixed") => setNewBundle({ ...newBundle, discountType: v })}
-                                >
-                                    <SelectTrigger className="w-40">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="percent">
-                                            <span className="flex items-center gap-2">
-                                                <Percent className="h-4 w-4" />
-                                                Percentage
-                                            </span>
-                                        </SelectItem>
-                                        <SelectItem value="fixed">
-                                            <span className="flex items-center gap-2">
-                                                <DollarSign className="h-4 w-4" />
-                                                Fixed Amount
-                                            </span>
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <div className="relative flex-1">
-                                    <Input
-                                        type="number"
-                                        value={newBundle.discountValue}
-                                        onChange={(e) => setNewBundle({ ...newBundle, discountValue: e.target.value })}
-                                        className="pl-8"
-                                    />
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                                        {newBundle.discountType === "percent" ? "%" : "$"}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Price Preview */}
-                        {newBundle.selectedActivities.length > 0 && (
-                            <div className="rounded-lg bg-muted border border-border p-4">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-muted-foreground">Original Price</span>
-                                    <span className="text-muted-foreground line-through">
-                                        ${(savings.originalPrice / 100).toFixed(2)}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-muted-foreground">Discount</span>
-                                    <span className="text-status-success font-medium">
-                                        -${(savings.savings / 100).toFixed(2)}
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between pt-2 border-t border-border">
-                                    <span className="font-medium">Bundle Price</span>
-                                    <span className="text-xl font-bold text-action-primary">
-                                        ${(savings.bundlePrice / 100).toFixed(2)}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
+            {/* Select Activities */}
+            <div className="space-y-3">
+              <Label>Select Activities to Include</Label>
+              <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
+                {activities.map((activity) => (
+                  <label
+                    key={activity.id}
+                    className={cn(
+                      "flex items-center gap-3 p-3 cursor-pointer transition-colors",
+                      newBundle.selectedActivities.includes(activity.id)
+                        ? "bg-status-info-bg"
+                        : "hover:bg-muted",
+                    )}
+                  >
+                    <Checkbox
+                      checked={newBundle.selectedActivities.includes(activity.id)}
+                      onCheckedChange={() => toggleActivity(activity.id)}
+                    />
+                    <div className="flex-1">
+                      <p className="font-medium text-sm">{activity.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        ${(activity.price / 100).toFixed(2)}
+                        {activity.duration ? ` · ${activity.duration} mins` : ""}
+                      </p>
                     </div>
+                    {newBundle.selectedActivities.includes(activity.id) && (
+                      <Check className="h-4 w-4 text-action-primary" />
+                    )}
+                  </label>
+                ))}
+              </div>
+              {activities.length === 0 && (
+                <p className="text-sm text-muted-foreground text-center py-4">
+                  Create some activities first to add them to a bundle.
+                </p>
+              )}
+            </div>
 
-                    <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            onClick={() => createMutation.mutate()}
-                            disabled={
-                                createMutation.isPending ||
-                                !newBundle.name ||
-                                newBundle.selectedActivities.length < 2
-                            }
-                            className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
-                        >
-                            {createMutation.isPending ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Creating...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles className="h-4 w-4 mr-2" />
-                                    Create Bundle
-                                </>
-                            )}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            {/* Discount Settings */}
+            <div className="space-y-3">
+              <Label>Discount</Label>
+              <div className="flex gap-3">
+                <Select
+                  value={newBundle.discountType}
+                  onValueChange={(v: "percent" | "fixed") =>
+                    setNewBundle({ ...newBundle, discountType: v })
+                  }
+                >
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="percent">
+                      <span className="flex items-center gap-2">
+                        <Percent className="h-4 w-4" />
+                        Percentage
+                      </span>
+                    </SelectItem>
+                    <SelectItem value="fixed">
+                      <span className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4" />
+                        Fixed Amount
+                      </span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="relative flex-1">
+                  <Input
+                    type="number"
+                    value={newBundle.discountValue}
+                    onChange={(e) => setNewBundle({ ...newBundle, discountValue: e.target.value })}
+                    className="pl-8"
+                  />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                    {newBundle.discountType === "percent" ? "%" : "$"}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-            <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Bundle</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Are you sure you want to delete this bundle? This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => {
-                                if (deleteConfirmId) {
-                                    deleteMutation.mutate(deleteConfirmId);
-                                    setDeleteConfirmId(null);
-                                }
-                            }}
-                            className="bg-status-error text-status-error-foreground hover:bg-status-error/90"
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        </>
-    );
+            {/* Price Preview */}
+            {newBundle.selectedActivities.length > 0 && (
+              <div className="rounded-lg bg-muted border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Original Price</span>
+                  <span className="text-muted-foreground line-through">
+                    ${(savings.originalPrice / 100).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm text-muted-foreground">Discount</span>
+                  <span className="text-status-success font-medium">
+                    -${(savings.savings / 100).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <span className="font-medium">Bundle Price</span>
+                  <span className="text-xl font-bold text-action-primary">
+                    ${(savings.bundlePrice / 100).toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setIsCreateOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => createMutation.mutate()}
+              disabled={
+                createMutation.isPending ||
+                !newBundle.name ||
+                newBundle.selectedActivities.length < 2
+              }
+              className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+            >
+              {createMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Create Bundle
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Bundle</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this bundle? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (deleteConfirmId) {
+                  deleteMutation.mutate(deleteConfirmId);
+                  setDeleteConfirmId(null);
+                }
+              }}
+              className="bg-status-error text-status-error-foreground hover:bg-status-error/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
 }

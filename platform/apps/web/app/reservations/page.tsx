@@ -23,17 +23,16 @@ export default function ReservationsLanding() {
   }, [router]);
 
   return (
-    <DashboardShell
-      title="Reservations"
-      subtitle="Reservations are scoped by campground."
-    >
+    <DashboardShell title="Reservations" subtitle="Reservations are scoped by campground.">
       <Card className="p-6 space-y-3">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-foreground">Next steps</h2>
           <HelpAnchor topicId="reservation-manage" label="How to manage reservations" />
         </div>
         <p className="text-muted-foreground text-sm">
-          {selectedCg ? "Redirecting you to your campground…" : "Pick a campground to view or edit its bookings, or head to Booking to create a new one."}
+          {selectedCg
+            ? "Redirecting you to your campground…"
+            : "Pick a campground to view or edit its bookings, or head to Booking to create a new one."}
         </p>
         <div className="flex gap-3">
           <Button asChild>

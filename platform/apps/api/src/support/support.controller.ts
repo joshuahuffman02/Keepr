@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards, ForbiddenException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+  ForbiddenException,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { SupportService } from "./support.service";
 import { CreateSupportReportDto } from "./dto/create-support-report.dto";
@@ -9,7 +19,12 @@ import { RequireScope } from "../permissions/scope.decorator";
 import type { Request } from "express";
 import type { AuthUser } from "../auth/auth.types";
 
-const PLATFORM_SUPPORT_ROLES = ["support_agent", "support_lead", "regional_support", "platform_admin"];
+const PLATFORM_SUPPORT_ROLES = [
+  "support_agent",
+  "support_lead",
+  "regional_support",
+  "platform_admin",
+];
 
 type AuthRequest = Request & { user: AuthUser };
 
@@ -31,7 +46,7 @@ export class SupportController {
     const platformRole = user?.platformRole ?? null;
     const platformOk = Boolean(platformRole && PLATFORM_SUPPORT_ROLES.includes(platformRole));
     const membershipOk = Boolean(
-      membershipRole && ["owner", "manager", "support"].includes(membershipRole)
+      membershipRole && ["owner", "manager", "support"].includes(membershipRole),
     );
     return platformOk || membershipOk;
   }
@@ -73,7 +88,11 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "write" })
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() dto: UpdateSupportReportDto, @Req() req: AuthRequest) {
+  async update(
+    @Param("id") id: string,
+    @Body() dto: UpdateSupportReportDto,
+    @Req() req: AuthRequest,
+  ) {
     if (!this.canAct(req.user)) {
       throw new ForbiddenException();
     }
@@ -84,7 +103,7 @@ export class SupportController {
       req.user.id,
       req.user.platformRegion ?? req.user.region ?? null,
       actorCampgrounds,
-      this.canAct(req.user) && PLATFORM_SUPPORT_ROLES.includes(req.user.platformRole ?? "")
+      this.canAct(req.user) && PLATFORM_SUPPORT_ROLES.includes(req.user.platformRole ?? ""),
     );
   }
 
@@ -104,7 +123,11 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "assign" })
   @Patch("/staff/:id/scope")
-  async updateStaffScope(@Param("id") id: string, @Body() dto: UpdateStaffScopeDto, @Req() req: AuthRequest) {
+  async updateStaffScope(
+    @Param("id") id: string,
+    @Body() dto: UpdateStaffScopeDto,
+    @Req() req: AuthRequest,
+  ) {
     if (!this.canAct(req.user)) {
       throw new ForbiddenException();
     }

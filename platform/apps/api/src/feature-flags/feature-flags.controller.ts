@@ -26,7 +26,7 @@ export class FeatureFlagsController {
   @Get(":key")
   async get(
     @Param("key") key: string,
-    @Headers("x-campground-id") campgroundHeader?: string | string[]
+    @Headers("x-campground-id") campgroundHeader?: string | string[],
   ) {
     const campgroundId = resolveHeaderValue(campgroundHeader);
     const enabled = await this.flags.isEnabled(key, campgroundId);

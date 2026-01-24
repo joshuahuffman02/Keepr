@@ -5,10 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
-import {
-  getEmptyStateMessage,
-  type EmptyStateContext,
-} from "@/lib/empty-state-messages";
+import { getEmptyStateMessage, type EmptyStateContext } from "@/lib/empty-state-messages";
 
 interface ConversationalEmptyStateProps {
   /** Context key for automatic messaging */
@@ -78,7 +75,7 @@ export function ConversationalEmptyState({
       className={cn(
         "flex flex-col items-center justify-center text-center px-4",
         styles.container,
-        className
+        className,
       )}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
@@ -110,22 +107,12 @@ export function ConversationalEmptyState({
       </motion.div>
 
       {/* Title */}
-      <h3
-        className={cn(
-          "font-bold text-foreground mb-2 max-w-md",
-          styles.title
-        )}
-      >
+      <h3 className={cn("font-bold text-foreground mb-2 max-w-md", styles.title)}>
         {displayTitle}
       </h3>
 
       {/* Description */}
-      <p
-        className={cn(
-          "text-muted-foreground mb-6 max-w-sm",
-          styles.description
-        )}
-      >
+      <p className={cn("text-muted-foreground mb-6 max-w-sm", styles.description)}>
         {displayDescription}
       </p>
 
@@ -139,11 +126,7 @@ export function ConversationalEmptyState({
               </Button>
             </Link>
           ) : onAction ? (
-            <Button
-              variant="default"
-              size={size === "sm" ? "sm" : "default"}
-              onClick={onAction}
-            >
+            <Button variant="default" size={size === "sm" ? "sm" : "default"} onClick={onAction}>
               {displayActionLabel}
             </Button>
           ) : null}
@@ -169,17 +152,11 @@ export function InlineEmptyState({
     <div
       className={cn(
         "flex items-center gap-3 p-4 bg-muted rounded-xl text-sm text-muted-foreground",
-        className
+        className,
       )}
     >
       <div className="relative w-8 h-8 flex-shrink-0">
-        <Image
-          src={icon}
-          alt=""
-          fill
-          className="object-contain opacity-60"
-          sizes="32px"
-        />
+        <Image src={icon} alt="" fill className="object-contain opacity-60" sizes="32px" />
       </div>
       <p>{message}</p>
     </div>

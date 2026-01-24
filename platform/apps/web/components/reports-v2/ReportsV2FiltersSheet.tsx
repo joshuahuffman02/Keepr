@@ -3,8 +3,21 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 export type ReportsV2Filters = {
   status: "all" | "confirmed" | "checked_in" | "pending" | "cancelled";
@@ -12,8 +25,20 @@ export type ReportsV2Filters = {
   groupBy: "none" | "site" | "status" | "date" | "siteType";
 };
 
-const statusOptions: ReportsV2Filters["status"][] = ["all", "confirmed", "checked_in", "pending", "cancelled"];
-const groupByOptions: ReportsV2Filters["groupBy"][] = ["none", "site", "status", "date", "siteType"];
+const statusOptions: ReportsV2Filters["status"][] = [
+  "all",
+  "confirmed",
+  "checked_in",
+  "pending",
+  "cancelled",
+];
+const groupByOptions: ReportsV2Filters["groupBy"][] = [
+  "none",
+  "site",
+  "status",
+  "date",
+  "siteType",
+];
 
 const isStatus = (value: string): value is ReportsV2Filters["status"] =>
   statusOptions.some((status) => status === value);
@@ -108,7 +133,7 @@ const PRESETS = [
   { label: "YTD", range: rangeYearToDate },
   { label: "Past year", range: rangePastYear },
   { label: "Next 90 days", range: () => rangeNextDays(90) },
-  { label: "Next year", range: rangeNextYear }
+  { label: "Next year", range: rangeNextYear },
 ];
 
 export function ReportsV2FiltersSheet({
@@ -117,7 +142,7 @@ export function ReportsV2FiltersSheet({
   dateRange,
   onDateRangeChange,
   filters,
-  onFiltersChange
+  onFiltersChange,
 }: ReportsV2FiltersSheetProps) {
   const [draftRange, setDraftRange] = useState(dateRange);
   const [draftFilters, setDraftFilters] = useState(filters);
@@ -145,7 +170,7 @@ export function ReportsV2FiltersSheet({
     start.setDate(start.getDate() - 30);
     setDraftRange({
       start: start.toISOString().slice(0, 10),
-      end: end.toISOString().slice(0, 10)
+      end: end.toISOString().slice(0, 10),
     });
     setDraftFilters({ status: "all", siteType: "all", groupBy: "none" });
   };
@@ -155,15 +180,24 @@ export function ReportsV2FiltersSheet({
       <SheetContent side="right" className="w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Customize report</SheetTitle>
-          <SheetDescription>Adjust the date range, filters, and grouping for this view.</SheetDescription>
+          <SheetDescription>
+            Adjust the date range, filters, and grouping for this view.
+          </SheetDescription>
         </SheetHeader>
 
         <div className="space-y-5 py-4">
           <div>
-            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quick date range</div>
+            <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              Quick date range
+            </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {PRESETS.map((preset) => (
-                <Button key={preset.label} size="sm" variant="outline" onClick={() => applyPreset(preset.range())}>
+                <Button
+                  key={preset.label}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => applyPreset(preset.range())}
+                >
                   {preset.label}
                 </Button>
               ))}
@@ -260,7 +294,9 @@ export function ReportsV2FiltersSheet({
         </div>
 
         <SheetFooter className="flex gap-2">
-          <Button variant="outline" onClick={handleReset}>Reset</Button>
+          <Button variant="outline" onClick={handleReset}>
+            Reset
+          </Button>
           <Button onClick={handleApply}>Apply filters</Button>
         </SheetFooter>
       </SheetContent>

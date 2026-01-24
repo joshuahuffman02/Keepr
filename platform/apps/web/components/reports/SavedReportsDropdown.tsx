@@ -58,10 +58,7 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* Dropdown */}
           <div className="absolute right-0 mt-2 w-96 bg-card rounded-lg border border-border shadow-lg z-50">
@@ -91,14 +88,11 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
                       tab: report.tab,
                       subTab: report.subTab ?? null,
                       dateRange: report.dateRange,
-                      filters: report.filters
+                      filters: report.filters,
                     });
 
                     return (
-                      <div
-                        key={report.id}
-                        className="p-3 hover:bg-muted transition-colors"
-                      >
+                      <div key={report.id} className="p-3 hover:bg-muted transition-colors">
                         <div className="flex items-start justify-between gap-2">
                           <Link
                             href={url}

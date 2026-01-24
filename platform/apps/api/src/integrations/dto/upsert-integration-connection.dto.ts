@@ -33,4 +33,3 @@ export class UpsertIntegrationConnectionDto {
   @IsString()
   webhookSecret?: string;
 }
-

@@ -121,7 +121,7 @@ export function CohortHeatmap({
                             getRetentionColor(value, thresholds),
                             getRetentionTextColor(value),
                             getCellOpacity(value),
-                            value > 0 && "hover:scale-105 hover:shadow-lg cursor-default"
+                            value > 0 && "hover:scale-105 hover:shadow-lg cursor-default",
                           )}
                           title={value > 0 ? `${value}% retention` : "No data yet"}
                         >

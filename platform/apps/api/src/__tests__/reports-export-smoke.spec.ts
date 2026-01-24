@@ -40,7 +40,8 @@ type ExportJobCountArgs = { where?: { status?: { in?: string[] } } };
 
 type ReservationFindManyArgs = { cursor?: { id: string }; take: number };
 
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
 const resolveStatusFilter = (status: ExportJobStatusFilter | undefined): string[] | undefined => {
   if (!status) return undefined;
@@ -132,7 +133,9 @@ describe("Reports exports smoke", () => {
     },
     reservation: {
       findMany: jest.fn().mockImplementation((args: ReservationFindManyArgs) => {
-        const startIdx = args.cursor ? reservationRows.findIndex((row) => row.id === args.cursor?.id) + 1 : 0;
+        const startIdx = args.cursor
+          ? reservationRows.findIndex((row) => row.id === args.cursor?.id) + 1
+          : 0;
         return Promise.resolve(reservationRows.slice(startIdx, startIdx + args.take));
       }),
       count: jest.fn().mockResolvedValue(0),
@@ -246,7 +249,11 @@ describe("Reports exports smoke", () => {
     prismaStub.integrationExportJob.count.mockResolvedValue(999);
     let caught: ServiceUnavailableException | null = null;
     try {
-      await service.queueExport({ campgroundId, filters: { range: "last_7_days" }, requestedById: "tester" });
+      await service.queueExport({
+        campgroundId,
+        filters: { range: "last_7_days" },
+        requestedById: "tester",
+      });
     } catch (err) {
       if (err instanceof ServiceUnavailableException) {
         caught = err;
@@ -267,7 +274,7 @@ describe("Reports exports smoke", () => {
     expect(observabilityStub.recordReportResult).toHaveBeenCalledWith(
       false,
       undefined,
-      expect.objectContaining({ reason: "capacity_guard" })
+      expect.objectContaining({ reason: "capacity_guard" }),
     );
     expect(alertingStub.dispatch).toHaveBeenCalled();
     prismaStub.integrationExportJob.count.mockResolvedValue(0);

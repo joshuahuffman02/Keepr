@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Mail,
-  Sparkles,
-  Lock,
-  Unlock,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
+import { Mail, Sparkles, Lock, Unlock, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -52,17 +44,14 @@ export function AiAccessGate({
 
     try {
       const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
-      const response = await fetch(
-        `${apiBase}/onboarding/session/${sessionId}/verify-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({ token, email }),
-        }
-      );
+      const response = await fetch(`${apiBase}/onboarding/session/${sessionId}/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({ token, email }),
+      });
 
       const data = await response.json();
 
@@ -76,7 +65,7 @@ export function AiAccessGate({
           `${apiBase}/onboarding/session/${sessionId}/ai-gate/status?token=${token}`,
           {
             headers: { "x-onboarding-token": token },
-          }
+          },
         );
         const statusData = await statusRes.json();
         onAccessChange(statusData);
@@ -111,7 +100,7 @@ export function AiAccessGate({
             "x-onboarding-token": token,
           },
           body: JSON.stringify({ token, code: verificationCode }),
-        }
+        },
       );
 
       const data = await response.json();
@@ -224,11 +213,7 @@ export function AiAccessGate({
             </div>
 
             {accessLevel.tier === "none" && (
-              <Button
-                onClick={requestVerification}
-                disabled={isVerifying}
-                className="w-full"
-              >
+              <Button onClick={requestVerification} disabled={isVerifying} className="w-full">
                 {isVerifying ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
@@ -265,9 +250,7 @@ export function AiAccessGate({
                 pattern="[0-9]*"
                 maxLength={6}
                 value={verificationCode}
-                onChange={(e) =>
-                  setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 placeholder="Enter 6-digit code"
                 className="text-center text-xl tracking-widest"
                 autoFocus

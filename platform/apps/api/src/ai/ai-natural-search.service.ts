@@ -154,17 +154,13 @@ export class AiNaturalSearchService {
 
   constructor(
     private readonly aiProvider: AiProviderService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
    * Parse a natural language query into structured search intent
    */
-  async parseQuery(
-    campgroundId: string,
-    query: string,
-    sessionId?: string
-  ): Promise<SearchIntent> {
+  async parseQuery(campgroundId: string, query: string, sessionId?: string): Promise<SearchIntent> {
     const today = new Date().toISOString().split("T")[0];
     const systemPrompt = SEARCH_SYSTEM_PROMPT.replace("{{TODAY}}", today);
 
@@ -210,7 +206,7 @@ export class AiNaturalSearchService {
   async search(
     campgroundSlug: string,
     query: string,
-    sessionId?: string
+    sessionId?: string,
   ): Promise<NLSearchResponse> {
     // Get campground by slug
     const campground = await this.prisma.campground.findFirst({
@@ -246,11 +242,7 @@ export class AiNaturalSearchService {
     }
 
     // Get available sites using existing availability logic
-    const sites = await this.getAvailableSites(
-      campground.id,
-      campgroundSlug,
-      intent
-    );
+    const sites = await this.getAvailableSites(campground.id, campgroundSlug, intent);
 
     // Score and sort sites based on how well they match the intent
     const scoredSites = this.scoreSites(sites, intent);
@@ -308,7 +300,9 @@ export class AiNaturalSearchService {
     }
 
     // Price
-    const priceMatch = lowerQuery.match(/under \$?(\d+)|less than \$?(\d+)|max(?:imum)? \$?(\d+)|budget.*\$?(\d+)/i);
+    const priceMatch = lowerQuery.match(
+      /under \$?(\d+)|less than \$?(\d+)|max(?:imum)? \$?(\d+)|budget.*\$?(\d+)/i,
+    );
     if (priceMatch) {
       const price = parseInt(priceMatch[1] || priceMatch[2] || priceMatch[3] || priceMatch[4]);
       intent.maxPricePerNight = price * 100; // Convert to cents
@@ -384,7 +378,7 @@ export class AiNaturalSearchService {
   private async getAvailableSites(
     campgroundId: string,
     campgroundSlug: string,
-    intent: SearchIntent
+    intent: SearchIntent,
   ): Promise<AvailableSiteRow[]> {
     // Use raw SQL for performance - similar to public-reservations availability check
     const arrival = new Date(intent.arrivalDate!);
@@ -402,7 +396,9 @@ export class AiNaturalSearchService {
         lodging: ["lodging", "Lodging", "cabin", "Cabin"],
       };
       const types = typeMapping[intent.siteType] || [intent.siteType];
-      filters.push(`(s."siteType" IN (${types.map((t) => `'${t}'`).join(",")}) OR sc."siteType" IN (${types.map((t) => `'${t}'`).join(",")}))`);
+      filters.push(
+        `(s."siteType" IN (${types.map((t) => `'${t}'`).join(",")}) OR sc."siteType" IN (${types.map((t) => `'${t}'`).join(",")}))`,
+      );
     }
 
     if (intent.accessible) {
@@ -411,7 +407,7 @@ export class AiNaturalSearchService {
 
     if (intent.rigLength) {
       filters.push(
-        `(s."rigMaxLength" IS NULL OR s."rigMaxLength" >= ${intent.rigLength} OR sc."rigMaxLength" >= ${intent.rigLength})`
+        `(s."rigMaxLength" IS NULL OR s."rigMaxLength" >= ${intent.rigLength} OR sc."rigMaxLength" >= ${intent.rigLength})`,
       );
     }
 
@@ -473,12 +469,14 @@ export class AiNaturalSearchService {
       .map((site) => {
         let score = 50; // Base score
         const reasons: string[] = [];
-        const maxOccupancy = typeof site.maxOccupancy === "number"
-          ? site.maxOccupancy
-          : Number(site.maxOccupancy) || 0;
-        const rigMaxLength = typeof site.rigMaxLength === "number"
-          ? site.rigMaxLength
-          : Number(site.rigMaxLength) || 0;
+        const maxOccupancy =
+          typeof site.maxOccupancy === "number"
+            ? site.maxOccupancy
+            : Number(site.maxOccupancy) || 0;
+        const rigMaxLength =
+          typeof site.rigMaxLength === "number"
+            ? site.rigMaxLength
+            : Number(site.rigMaxLength) || 0;
         const pricePerNight = Number(site.defaultRate) || 0;
         const siteNumber = site.siteNumber ?? "";
         const siteName = site.name || siteNumber || "Site";
@@ -561,7 +559,8 @@ export class AiNaturalSearchService {
         }
 
         // Calculate nights for total price
-        const nights = intent.nights || this.calculateNights(intent.arrivalDate!, intent.departureDate!);
+        const nights =
+          intent.nights || this.calculateNights(intent.arrivalDate!, intent.departureDate!);
 
         return {
           siteId: site.id,

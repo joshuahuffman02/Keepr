@@ -3,7 +3,23 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { motion, useReducedMotion } from "framer-motion";
-import { Bot, Send, User, Sparkles, TrendingUp, DollarSign, Calendar, ArrowLeft, Brain, CloudRain, Wrench, BarChart3, Phone, AlertTriangle, Activity } from "lucide-react";
+import {
+  Bot,
+  Send,
+  User,
+  Sparkles,
+  TrendingUp,
+  DollarSign,
+  Calendar,
+  ArrowLeft,
+  Brain,
+  CloudRain,
+  Wrench,
+  BarChart3,
+  Phone,
+  AlertTriangle,
+  Activity,
+} from "lucide-react";
 import Link from "next/link";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -155,7 +171,7 @@ Type \`help\` to see all available commands, or just ask me anything!`,
 
   const history = useMemo(
     () => messages.map((msg) => ({ role: msg.role, content: msg.content })),
-    [messages]
+    [messages],
   );
 
   // Detect if message is a copilot action command
@@ -335,7 +351,8 @@ Type \`help\` to see all available commands, or just ask me anything!`,
         if (pendingReplies > 0) response += `- ${pendingReplies} pending replies\n`;
         if (activeAnomalies > 0) response += `- ${activeAnomalies} anomalies\n`;
         if (pendingPricing > 0) response += `- ${pendingPricing} pricing recommendations\n`;
-        if (activeMaintenanceAlerts > 0) response += `- ${activeMaintenanceAlerts} maintenance alerts\n`;
+        if (activeMaintenanceAlerts > 0)
+          response += `- ${activeMaintenanceAlerts} maintenance alerts\n`;
         if (activeWeatherAlerts > 0) response += `- ${activeWeatherAlerts} weather alerts`;
       }
     }
@@ -344,7 +361,8 @@ Type \`help\` to see all available commands, or just ask me anything!`,
     if (parsed.recommendations && parsed.recommendations.length > 0) {
       response += `\n\n**Recommendations (${parsed.recommendations.length})**\n`;
       parsed.recommendations.slice(0, 3).forEach((r, i) => {
-        const change = r.adjustmentPercent > 0 ? `+${r.adjustmentPercent}%` : `${r.adjustmentPercent}%`;
+        const change =
+          r.adjustmentPercent > 0 ? `+${r.adjustmentPercent}%` : `${r.adjustmentPercent}%`;
         response += `${i + 1}. ${r.siteClassName || "Sites"}: ${change} (${r.recommendationType})\n`;
       });
     }
@@ -353,7 +371,9 @@ Type \`help\` to see all available commands, or just ask me anything!`,
     if (parsed.insights && parsed.insights.length > 0) {
       response += `\n\n**Revenue Insights (${parsed.insights.length})**\n`;
       parsed.insights.slice(0, 3).forEach((insight, idx) => {
-        const impact = insight.impactCents ? `$${(insight.impactCents / 100).toLocaleString()}` : "TBD";
+        const impact = insight.impactCents
+          ? `$${(insight.impactCents / 100).toLocaleString()}`
+          : "TBD";
         response += `${idx + 1}. ${insight.title} (${impact})\n`;
       });
     }
@@ -389,7 +409,10 @@ Type \`help\` to see all available commands, or just ask me anything!`,
 
   // Chat mutation using the copilot endpoint
   const chatMutation = useMutation({
-    mutationFn: (payload: { message: string; history: { role: "user" | "assistant"; content: string }[] }) => {
+    mutationFn: (payload: {
+      message: string;
+      history: { role: "user" | "assistant"; content: string }[];
+    }) => {
       const cleanMessage = payload.message.trim();
 
       // If it looks like a copilot action, send as action
@@ -524,7 +547,8 @@ Type \`help\` to see all available commands, or just ask me anything!`,
             <CardContent className="space-y-3 text-sm text-muted-foreground">
               <p>Select a campground to start using your AI assistant.</p>
               <p className="text-xs text-muted-foreground">
-                The AI can help with guest replies, pricing suggestions, occupancy insights, and more.
+                The AI can help with guest replies, pricing suggestions, occupancy insights, and
+                more.
               </p>
             </CardContent>
           </Card>
@@ -593,7 +617,7 @@ Type \`help\` to see all available commands, or just ask me anything!`,
                     className={cn(
                       "flex flex-col items-start gap-2 rounded-lg border border-border bg-card p-4 text-left transition-all",
                       "hover:border-status-success-border hover:bg-status-success-bg hover:shadow-md",
-                      "focus:outline-none focus:ring-2 focus:ring-action-primary/20 focus:border-action-primary"
+                      "focus:outline-none focus:ring-2 focus:ring-action-primary/20 focus:border-action-primary",
                     )}
                     whileHover={prefersReducedMotion ? undefined : { scale: 1.02 }}
                     whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
@@ -631,17 +655,24 @@ Type \`help\` to see all available commands, or just ask me anything!`,
                     <div className="rounded-lg border border-dashed border-border bg-muted px-4 py-8 text-center text-sm text-muted-foreground">
                       <Sparkles className="h-8 w-8 mx-auto mb-3 text-muted-foreground" />
                       <p>Start a conversation with your AI assistant</p>
-                      <p className="text-xs mt-1">Try asking about pricing, occupancy, or drafting a guest reply</p>
+                      <p className="text-xs mt-1">
+                        Try asking about pricing, occupancy, or drafting a guest reply
+                      </p>
                     </div>
                   )}
 
                   {messages.map((msg, index) => (
                     <motion.div
                       key={msg.id}
-                      className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}
+                      className={cn(
+                        "flex gap-3",
+                        msg.role === "user" ? "justify-end" : "justify-start",
+                      )}
                       initial={prefersReducedMotion ? undefined : { opacity: 0, y: 10 }}
                       animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-                      transition={prefersReducedMotion ? undefined : { delay: index * 0.05, ...SPRING_CONFIG }}
+                      transition={
+                        prefersReducedMotion ? undefined : { delay: index * 0.05, ...SPRING_CONFIG }
+                      }
                     >
                       {msg.role === "assistant" && (
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-status-success-bg border border-status-success-border flex-shrink-0">
@@ -653,17 +684,20 @@ Type \`help\` to see all available commands, or just ask me anything!`,
                           "max-w-[75%] rounded-2xl px-4 py-3 text-sm shadow-sm",
                           msg.role === "user"
                             ? "bg-action-primary text-action-primary-foreground"
-                            : "bg-muted text-foreground border border-border"
+                            : "bg-muted text-foreground border border-border",
                         )}
                       >
                         <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                         <div
                           className={cn(
                             "mt-2 text-[10px]",
-                            msg.role === "user" ? "text-emerald-100" : "text-muted-foreground"
+                            msg.role === "user" ? "text-emerald-100" : "text-muted-foreground",
                           )}
                         >
-                          {msg.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          {msg.timestamp.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </div>
                       </div>
                       {msg.role === "user" && (

@@ -6,18 +6,40 @@ import { motion, AnimatePresence, type Transition } from "framer-motion";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetFooter, SheetClose } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -59,7 +81,7 @@ const DEFAULT_PREFERENCES: QueuePreferences = {
   urgentPolicyThreshold: true,
   urgentCustomAmountEnabled: false,
   urgentCustomAmount: "",
-  sortMode: "urgent"
+  sortMode: "urgent",
 };
 
 const SPRING_CONFIG: Transition = { type: "spring", stiffness: 300, damping: 25 };
@@ -117,16 +139,23 @@ const mergePreferences = (prev: QueuePreferences, value: unknown): QueuePreferen
   return {
     ...prev,
     urgentPendingSecond:
-      typeof value.urgentPendingSecond === "boolean" ? value.urgentPendingSecond : prev.urgentPendingSecond,
-    urgentAgeHours: typeof value.urgentAgeHours === "string" ? value.urgentAgeHours : prev.urgentAgeHours,
+      typeof value.urgentPendingSecond === "boolean"
+        ? value.urgentPendingSecond
+        : prev.urgentPendingSecond,
+    urgentAgeHours:
+      typeof value.urgentAgeHours === "string" ? value.urgentAgeHours : prev.urgentAgeHours,
     urgentPolicyThreshold:
-      typeof value.urgentPolicyThreshold === "boolean" ? value.urgentPolicyThreshold : prev.urgentPolicyThreshold,
+      typeof value.urgentPolicyThreshold === "boolean"
+        ? value.urgentPolicyThreshold
+        : prev.urgentPolicyThreshold,
     urgentCustomAmountEnabled:
       typeof value.urgentCustomAmountEnabled === "boolean"
         ? value.urgentCustomAmountEnabled
         : prev.urgentCustomAmountEnabled,
     urgentCustomAmount:
-      typeof value.urgentCustomAmount === "string" ? value.urgentCustomAmount : prev.urgentCustomAmount,
+      typeof value.urgentCustomAmount === "string"
+        ? value.urgentCustomAmount
+        : prev.urgentCustomAmount,
     sortMode: isSortMode(value.sortMode) ? value.sortMode : prev.sortMode,
   };
 };
@@ -191,7 +220,7 @@ function formatDateTime(value?: string | null) {
     month: "short",
     day: "numeric",
     hour: "numeric",
-    minute: "2-digit"
+    minute: "2-digit",
   });
 }
 
@@ -207,17 +236,27 @@ function formatRelativeTime(dateStr: string) {
 function ApprovalRowSkeleton() {
   return (
     <TableRow>
-      <TableCell><Skeleton className="h-5 w-20" /></TableCell>
+      <TableCell>
+        <Skeleton className="h-5 w-20" />
+      </TableCell>
       <TableCell>
         <div className="space-y-1">
           <Skeleton className="h-4 w-24" />
           <Skeleton className="h-3 w-16" />
         </div>
       </TableCell>
-      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-      <TableCell><Skeleton className="h-5 w-20 rounded-full" /></TableCell>
-      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-32" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-16" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-5 w-20 rounded-full" />
+      </TableCell>
+      <TableCell>
+        <Skeleton className="h-4 w-24" />
+      </TableCell>
       <TableCell>
         <div className="flex gap-2">
           <Skeleton className="h-8 w-20" />
@@ -323,7 +362,7 @@ export default function ApprovalsPage() {
       // Focus next available action
       requestAnimationFrame(() => {
         const nextButton = tableRef.current?.querySelector<HTMLButtonElement>(
-          "tbody tr button:not(:disabled)"
+          "tbody tr button:not(:disabled)",
         );
         nextButton?.focus();
       });
@@ -365,7 +404,9 @@ export default function ApprovalsPage() {
 
   const createPolicyMutation = useMutation({
     mutationFn: (data: PolicyFormData) => {
-      const thresholdCents = data.thresholdCents ? Math.round(parseFloat(data.thresholdCents) * 100) : undefined;
+      const thresholdCents = data.thresholdCents
+        ? Math.round(parseFloat(data.thresholdCents) * 100)
+        : undefined;
       return apiClient.createApprovalPolicy({
         name: data.name,
         appliesTo: data.appliesTo,
@@ -385,13 +426,19 @@ export default function ApprovalsPage() {
       announce("Policy created successfully");
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to create policy", description: getErrorMessage(err, "Try again"), variant: "destructive" });
+      toast({
+        title: "Failed to create policy",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      });
     },
   });
 
   const updatePolicyMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: PolicyFormData }) => {
-      const thresholdCents = data.thresholdCents ? Math.round(parseFloat(data.thresholdCents) * 100) : null;
+      const thresholdCents = data.thresholdCents
+        ? Math.round(parseFloat(data.thresholdCents) * 100)
+        : null;
       return apiClient.updateApprovalPolicy(id, {
         name: data.name,
         appliesTo: data.appliesTo,
@@ -412,7 +459,11 @@ export default function ApprovalsPage() {
       announce("Policy updated successfully");
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to update policy", description: getErrorMessage(err, "Try again"), variant: "destructive" });
+      toast({
+        title: "Failed to update policy",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -425,7 +476,11 @@ export default function ApprovalsPage() {
       announce("Policy deleted successfully");
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to delete policy", description: getErrorMessage(err, "Try again"), variant: "destructive" });
+      toast({
+        title: "Failed to delete policy",
+        description: getErrorMessage(err, "Try again"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -452,7 +507,11 @@ export default function ApprovalsPage() {
 
   const handlePolicySubmit = useCallback(() => {
     if (!policyForm.name.trim() || policyForm.appliesTo.length === 0) {
-      toast({ title: "Validation error", description: "Name and action types are required.", variant: "destructive" });
+      toast({
+        title: "Validation error",
+        description: "Name and action types are required.",
+        variant: "destructive",
+      });
       return;
     }
     if (editingPolicy) {
@@ -463,7 +522,10 @@ export default function ApprovalsPage() {
   }, [editingPolicy, policyForm, createPolicyMutation, updatePolicyMutation, toast]);
 
   const policies = approvalsQuery.data?.policies ?? [];
-  const policyMap = useMemo(() => new Map(policies.map((policy) => [policy.id, policy])), [policies]);
+  const policyMap = useMemo(
+    () => new Map(policies.map((policy) => [policy.id, policy])),
+    [policies],
+  );
   const requests = approvalsQuery.data?.requests ?? [];
   const sampleCurrency = requests.find((req) => req.currency)?.currency || "USD";
   const ageHours = Math.max(0, Number(preferences.urgentAgeHours));
@@ -472,8 +534,8 @@ export default function ApprovalsPage() {
     preferences.urgentCustomAmountEnabled && Number.isFinite(customAmount) && customAmount > 0;
 
   const approverKeys = useMemo(() => {
-    return [approverId, whoami?.user?.id, whoami?.user?.email].filter(
-      (value): value is string => Boolean(value)
+    return [approverId, whoami?.user?.id, whoami?.user?.email].filter((value): value is string =>
+      Boolean(value),
     );
   }, [approverId, whoami?.user?.id, whoami?.user?.email]);
 
@@ -484,7 +546,8 @@ export default function ApprovalsPage() {
       const policy = policyMap.get(req.policyId);
       const createdAtMs = Date.parse(req.createdAt);
       const isOpen = req.status === "pending" || req.status === "pending_second";
-      const matchesPendingSecond = preferences.urgentPendingSecond && req.status === "pending_second";
+      const matchesPendingSecond =
+        preferences.urgentPendingSecond && req.status === "pending_second";
       const isStale = ageHours > 0 && Number.isFinite(createdAtMs) && now - createdAtMs > cutoffMs;
       const thresholdCents = policy?.thresholdCents;
       const highValue =
@@ -494,7 +557,13 @@ export default function ApprovalsPage() {
         req.amount * 100 >= thresholdCents;
       const customValue = hasCustomAmount && req.amount >= customAmount;
       const urgent = isOpen && (matchesPendingSecond || isStale || highValue || customValue);
-      return { req, policy, createdAtMs: Number.isFinite(createdAtMs) ? createdAtMs : 0, urgent, isOpen };
+      return {
+        req,
+        policy,
+        createdAtMs: Number.isFinite(createdAtMs) ? createdAtMs : 0,
+        urgent,
+        isOpen,
+      };
     });
   }, [
     requests,
@@ -503,7 +572,7 @@ export default function ApprovalsPage() {
     customAmount,
     hasCustomAmount,
     preferences.urgentPendingSecond,
-    preferences.urgentPolicyThreshold
+    preferences.urgentPolicyThreshold,
   ]);
 
   const summary = useMemo(() => {
@@ -530,7 +599,7 @@ export default function ApprovalsPage() {
       pending_second: 0,
       pending: 1,
       approved: 2,
-      rejected: 3
+      rejected: 3,
     };
 
     const result = enrichedRequests.filter(({ req, policy, urgent, isOpen }) => {
@@ -555,12 +624,15 @@ export default function ApprovalsPage() {
     result.sort((a, b) => {
       if (preferences.sortMode === "urgent") {
         if (a.urgent !== b.urgent) return a.urgent ? -1 : 1;
-        const statusDiff = (statusPriority[a.req.status] ?? 99) - (statusPriority[b.req.status] ?? 99);
+        const statusDiff =
+          (statusPriority[a.req.status] ?? 99) - (statusPriority[b.req.status] ?? 99);
         if (statusDiff !== 0) return statusDiff;
         return b.createdAtMs - a.createdAtMs;
       }
       const timeDiff =
-        preferences.sortMode === "oldest" ? a.createdAtMs - b.createdAtMs : b.createdAtMs - a.createdAtMs;
+        preferences.sortMode === "oldest"
+          ? a.createdAtMs - b.createdAtMs
+          : b.createdAtMs - a.createdAtMs;
       if (timeDiff !== 0) return timeDiff;
       return (statusPriority[a.req.status] ?? 99) - (statusPriority[b.req.status] ?? 99);
     });
@@ -574,7 +646,9 @@ export default function ApprovalsPage() {
       ? `Org ${orgId}`
       : "Not set";
   const roleLabel =
-    platformRole || scopedRole || (ownershipRoles.length ? ownershipRoles.join(", ") : "unassigned");
+    platformRole ||
+    scopedRole ||
+    (ownershipRoles.length ? ownershipRoles.join(", ") : "unassigned");
 
   const isLoading = approvalsQuery.isLoading;
 
@@ -625,10 +699,14 @@ export default function ApprovalsPage() {
         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">Approvals</h1>
-            <p className="text-sm text-muted-foreground">Dual control for refunds, payouts, and high-value changes.</p>
+            <p className="text-sm text-muted-foreground">
+              Dual control for refunds, payouts, and high-value changes.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-2 sm:mt-0">
-            <Badge variant="secondary" className="font-normal">Scope: {scopeLabel}</Badge>
+            <Badge variant="secondary" className="font-normal">
+              Scope: {scopeLabel}
+            </Badge>
             <span className="hidden sm:inline">|</span>
             <span>{approverName}</span>
           </div>
@@ -645,11 +723,7 @@ export default function ApprovalsPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
             onClick={() => setShowCelebration(false)}
           >
-            <motion.div
-              initial={{ y: 20 }}
-              animate={{ y: 0 }}
-              className="text-center p-8"
-            >
+            <motion.div initial={{ y: 20 }} animate={{ y: 0 }} className="text-center p-8">
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
@@ -671,7 +745,9 @@ export default function ApprovalsPage() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <CardTitle>Approvals queue</CardTitle>
-                <CardDescription>Review requests scoped to the selected campground or organization.</CardDescription>
+                <CardDescription>
+                  Review requests scoped to the selected campground or organization.
+                </CardDescription>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-1.5 rounded-lg bg-muted px-3 py-1.5">
@@ -679,7 +755,9 @@ export default function ApprovalsPage() {
                   <span className="text-xs text-muted-foreground">Open</span>
                 </div>
                 <div className="flex items-center gap-1.5 rounded-lg bg-amber-100 border border-amber-200 px-3 py-1.5">
-                  <span className="text-sm font-semibold text-amber-700">{summary.pendingSecond}</span>
+                  <span className="text-sm font-semibold text-amber-700">
+                    {summary.pendingSecond}
+                  </span>
                   <span className="text-xs text-amber-700">Needs 2nd</span>
                 </div>
                 {summary.urgent > 0 && (
@@ -802,7 +880,9 @@ export default function ApprovalsPage() {
                     <CheckCircle2 className="h-8 w-8 text-status-success" />
                   </div>
                   <p className="font-medium text-foreground">All caught up!</p>
-                  <p className="text-sm text-muted-foreground mt-1">No approvals match the current filters.</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    No approvals match the current filters.
+                  </p>
                   {(statusFilter !== "open" || typeFilter !== "all" || urgentOnly || search) && (
                     <Button
                       variant="ghost"
@@ -820,112 +900,148 @@ export default function ApprovalsPage() {
                   )}
                 </div>
               )}
-              {!isLoading && !tableMessage && filteredRequests.map(({ req, policy, urgent, isOpen }) => {
-                const reason = rejectionReasons[req.id] ?? "";
-                const trimmedReason = reason.trim();
-                const alreadyApproved = approverKeys.length > 0 && req.approvals.some((a) => approverKeys.includes(a.approver));
-                const isMutating = processingId === req.id;
-                const approveDisabled = !canAct || !isOpen || alreadyApproved || isMutating;
+              {!isLoading &&
+                !tableMessage &&
+                filteredRequests.map(({ req, policy, urgent, isOpen }) => {
+                  const reason = rejectionReasons[req.id] ?? "";
+                  const trimmedReason = reason.trim();
+                  const alreadyApproved =
+                    approverKeys.length > 0 &&
+                    req.approvals.some((a) => approverKeys.includes(a.approver));
+                  const isMutating = processingId === req.id;
+                  const approveDisabled = !canAct || !isOpen || alreadyApproved || isMutating;
 
-                return (
-                  <motion.div
-                    key={req.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={cn(
-                      "rounded-lg border p-4 space-y-3 transition-colors",
-                      urgent && "border-amber-400 bg-amber-50/50"
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <TypeIcon type={req.type} />
-                        <span className="font-medium capitalize">{formatLabel(req.type)}</span>
-                        {urgent && <Badge variant="warning" className="text-[10px]">Urgent</Badge>}
-                      </div>
-                      <Badge variant={statusVariant(req.status)} className="text-[10px] flex items-center gap-1">
-                        <StatusIcon status={req.status} />
-                        {formatLabel(req.status)}
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div>
-                        <span className="text-muted-foreground text-xs block">Requester</span>
-                        <span className="font-medium text-foreground">{req.requester || "Unknown"}</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-muted-foreground text-xs block">Amount</span>
-                        <span className="font-semibold tabular-nums text-foreground">{formatAmount(req.amount, req.currency)}</span>
-                      </div>
-                    </div>
-
-                    {req.reason && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{req.reason}</p>
-                    )}
-
-                    <div className="flex items-center justify-between pt-2 border-t">
-                      <span className="text-xs text-muted-foreground">
-                        {req.approvals.length}/{req.requiredApprovals} approvals · {formatRelativeTime(req.createdAt)}
-                      </span>
-                    </div>
-
-                    {isOpen && (
-                      <div className="flex gap-2 pt-2">
-                        <Button
-                          className={cn(
-                            "flex-1 transition-all",
-                            !approveDisabled && "bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98]"
+                  return (
+                    <motion.div
+                      key={req.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "rounded-lg border p-4 space-y-3 transition-colors",
+                        urgent && "border-amber-400 bg-amber-50/50",
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <TypeIcon type={req.type} />
+                          <span className="font-medium capitalize">{formatLabel(req.type)}</span>
+                          {urgent && (
+                            <Badge variant="warning" className="text-[10px]">
+                              Urgent
+                            </Badge>
                           )}
-                          disabled={approveDisabled}
-                          onClick={() => approveMutation.mutate({ id: req.id, approver: approverId })}
+                        </div>
+                        <Badge
+                          variant={statusVariant(req.status)}
+                          className="text-[10px] flex items-center gap-1"
                         >
-                          {isMutating && approveMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                          ) : (
-                            <Check className="h-4 w-4 mr-1.5" />
-                          )}
-                          Approve
-                        </Button>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" className="flex-1 text-destructive hover:text-destructive">
-                              <X className="h-4 w-4 mr-1.5" />
-                              Reject
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-72 p-3" align="end">
-                            <div className="space-y-2">
-                              <Label htmlFor={`reject-reason-mobile-${req.id}`} className="text-xs font-medium">
-                                Rejection reason (required)
-                              </Label>
-                              <Input
-                                id={`reject-reason-mobile-${req.id}`}
-                                value={reason}
-                                onChange={(e) => setRejectionReasons((prev) => ({ ...prev, [req.id]: e.target.value }))}
-                                placeholder="Enter reason..."
-                                className="h-8 text-sm"
-                              />
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="w-full h-8"
-                                onClick={() => rejectMutation.mutate({ id: req.id, approver: approverId, reason: trimmedReason })}
-                                disabled={!trimmedReason || isMutating}
-                              >
-                                {isMutating && rejectMutation.isPending ? (
-                                  <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
-                                ) : null}
-                                Confirm Rejection
-                              </Button>
-                            </div>
-                          </PopoverContent>
-                        </Popover>
+                          <StatusIcon status={req.status} />
+                          {formatLabel(req.status)}
+                        </Badge>
                       </div>
-                    )}
-                  </motion.div>
-                );
-              })}
+
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="text-muted-foreground text-xs block">Requester</span>
+                          <span className="font-medium text-foreground">
+                            {req.requester || "Unknown"}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-muted-foreground text-xs block">Amount</span>
+                          <span className="font-semibold tabular-nums text-foreground">
+                            {formatAmount(req.amount, req.currency)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {req.reason && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">{req.reason}</p>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2 border-t">
+                        <span className="text-xs text-muted-foreground">
+                          {req.approvals.length}/{req.requiredApprovals} approvals ·{" "}
+                          {formatRelativeTime(req.createdAt)}
+                        </span>
+                      </div>
+
+                      {isOpen && (
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            className={cn(
+                              "flex-1 transition-all",
+                              !approveDisabled &&
+                                "bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-[1.02] active:scale-[0.98]",
+                            )}
+                            disabled={approveDisabled}
+                            onClick={() =>
+                              approveMutation.mutate({ id: req.id, approver: approverId })
+                            }
+                          >
+                            {isMutating && approveMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                            ) : (
+                              <Check className="h-4 w-4 mr-1.5" />
+                            )}
+                            Approve
+                          </Button>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                className="flex-1 text-destructive hover:text-destructive"
+                              >
+                                <X className="h-4 w-4 mr-1.5" />
+                                Reject
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-72 p-3" align="end">
+                              <div className="space-y-2">
+                                <Label
+                                  htmlFor={`reject-reason-mobile-${req.id}`}
+                                  className="text-xs font-medium"
+                                >
+                                  Rejection reason (required)
+                                </Label>
+                                <Input
+                                  id={`reject-reason-mobile-${req.id}`}
+                                  value={reason}
+                                  onChange={(e) =>
+                                    setRejectionReasons((prev) => ({
+                                      ...prev,
+                                      [req.id]: e.target.value,
+                                    }))
+                                  }
+                                  placeholder="Enter reason..."
+                                  className="h-8 text-sm"
+                                />
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  className="w-full h-8"
+                                  onClick={() =>
+                                    rejectMutation.mutate({
+                                      id: req.id,
+                                      approver: approverId,
+                                      reason: trimmedReason,
+                                    })
+                                  }
+                                  disabled={!trimmedReason || isMutating}
+                                >
+                                  {isMutating && rejectMutation.isPending ? (
+                                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                                  ) : null}
+                                  Confirm Rejection
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })}
             </div>
 
             {/* Desktop Table View */}
@@ -939,7 +1055,9 @@ export default function ApprovalsPage() {
                     <TableHead scope="col">Type</TableHead>
                     <TableHead scope="col">Requested</TableHead>
                     <TableHead scope="col">Reason</TableHead>
-                    <TableHead scope="col" className="text-right">Amount</TableHead>
+                    <TableHead scope="col" className="text-right">
+                      Amount
+                    </TableHead>
                     <TableHead scope="col">Status</TableHead>
                     <TableHead scope="col">Approvals</TableHead>
                     <TableHead scope="col">Actions</TableHead>
@@ -973,7 +1091,10 @@ export default function ApprovalsPage() {
                           <p className="text-xs text-muted-foreground mt-1">
                             No approvals match the current filters.
                           </p>
-                          {(statusFilter !== "open" || typeFilter !== "all" || urgentOnly || search) && (
+                          {(statusFilter !== "open" ||
+                            typeFilter !== "all" ||
+                            urgentOnly ||
+                            search) && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -993,12 +1114,14 @@ export default function ApprovalsPage() {
                     </TableRow>
                   )}
                   <AnimatePresence mode="popLayout">
-                    {!isLoading && !tableMessage &&
+                    {!isLoading &&
+                      !tableMessage &&
                       filteredRequests.map(({ req, policy, urgent, isOpen }, index) => {
                         const reason = rejectionReasons[req.id] ?? "";
                         const trimmedReason = reason.trim();
                         const alreadyApproved =
-                          approverKeys.length > 0 && req.approvals.some((a) => approverKeys.includes(a.approver));
+                          approverKeys.length > 0 &&
+                          req.approvals.some((a) => approverKeys.includes(a.approver));
                         const isMutating = processingId === req.id;
                         const approveDisabled = !canAct || !isOpen || alreadyApproved || isMutating;
                         const rejectDisabled = approveDisabled || !trimmedReason;
@@ -1021,15 +1144,20 @@ export default function ApprovalsPage() {
                               "border-b transition-colors",
                               urgent
                                 ? "bg-amber-50/50 border-l-4 border-l-amber-400"
-                                : "hover:bg-muted/50"
+                                : "hover:bg-muted/50",
                             )}
                           >
                             <TableCell className="py-3">
                               <div className="flex items-center gap-2">
                                 <TypeIcon type={req.type} />
-                                <span className="font-medium capitalize text-foreground">{formatLabel(req.type)}</span>
+                                <span className="font-medium capitalize text-foreground">
+                                  {formatLabel(req.type)}
+                                </span>
                                 {urgent && (
-                                  <Badge variant="warning" className="text-[10px] flex items-center gap-1">
+                                  <Badge
+                                    variant="warning"
+                                    className="text-[10px] flex items-center gap-1"
+                                  >
                                     <AlertTriangle className="h-3 w-3" />
                                     Urgent
                                   </Badge>
@@ -1037,15 +1165,24 @@ export default function ApprovalsPage() {
                               </div>
                             </TableCell>
                             <TableCell className="py-3">
-                              <div className="text-sm font-medium text-foreground">{req.requester || "Unknown"}</div>
-                              <div className="text-xs text-muted-foreground">{formatRelativeTime(req.createdAt)}</div>
+                              <div className="text-sm font-medium text-foreground">
+                                {req.requester || "Unknown"}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatRelativeTime(req.createdAt)}
+                              </div>
                             </TableCell>
-                            <TableCell className="max-w-xs text-sm text-muted-foreground py-3">{req.reason}</TableCell>
+                            <TableCell className="max-w-xs text-sm text-muted-foreground py-3">
+                              {req.reason}
+                            </TableCell>
                             <TableCell className="text-right tabular-nums font-medium text-foreground py-3">
                               {formatAmount(req.amount, req.currency)}
                             </TableCell>
                             <TableCell className="py-3">
-                              <Badge variant={statusVariant(req.status)} className="flex items-center gap-1 w-fit">
+                              <Badge
+                                variant={statusVariant(req.status)}
+                                className="flex items-center gap-1 w-fit"
+                              >
                                 <StatusIcon status={req.status} />
                                 {formatLabel(req.status)}
                               </Badge>
@@ -1076,11 +1213,13 @@ export default function ApprovalsPage() {
                                     !approveDisabled && [
                                       "bg-emerald-600 hover:bg-emerald-700 text-white",
                                       "hover:scale-105 active:scale-95",
-                                    ]
+                                    ],
                                   )}
-                                  onClick={() => approveMutation.mutate({ id: req.id, approver: approverId })}
+                                  onClick={() =>
+                                    approveMutation.mutate({ id: req.id, approver: approverId })
+                                  }
                                   disabled={approveDisabled}
-                                  aria-label={`Approve ${formatLabel(req.type)} request from ${req.requester || 'Unknown'} for ${formatAmount(req.amount, req.currency)}`}
+                                  aria-label={`Approve ${formatLabel(req.type)} request from ${req.requester || "Unknown"} for ${formatAmount(req.amount, req.currency)}`}
                                 >
                                   {isMutating && approveMutation.isPending ? (
                                     <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -1097,10 +1236,11 @@ export default function ApprovalsPage() {
                                         variant="outline"
                                         className={cn(
                                           "transition-all duration-150",
-                                          !approveDisabled && "hover:bg-red-50 hover:text-red-700 hover:border-red-300 hover:scale-105 active:scale-95"
+                                          !approveDisabled &&
+                                            "hover:bg-red-50 hover:text-red-700 hover:border-red-300 hover:scale-105 active:scale-95",
                                         )}
                                         disabled={approveDisabled}
-                                        aria-label={`Reject ${formatLabel(req.type)} request from ${req.requester || 'Unknown'}`}
+                                        aria-label={`Reject ${formatLabel(req.type)} request from ${req.requester || "Unknown"}`}
                                       >
                                         <X className="h-4 w-4 mr-1" />
                                         Reject
@@ -1109,13 +1249,21 @@ export default function ApprovalsPage() {
                                     <PopoverContent className="w-72 p-3" align="end">
                                       <div className="space-y-3">
                                         <div className="space-y-1">
-                                          <Label htmlFor={`reject-reason-${req.id}`} className="text-xs font-medium">
+                                          <Label
+                                            htmlFor={`reject-reason-${req.id}`}
+                                            className="text-xs font-medium"
+                                          >
                                             Rejection reason (required)
                                           </Label>
                                           <Input
                                             id={`reject-reason-${req.id}`}
                                             value={reason}
-                                            onChange={(e) => setRejectionReasons((prev) => ({ ...prev, [req.id]: e.target.value }))}
+                                            onChange={(e) =>
+                                              setRejectionReasons((prev) => ({
+                                                ...prev,
+                                                [req.id]: e.target.value,
+                                              }))
+                                            }
                                             placeholder="Enter reason..."
                                             className="h-9"
                                             aria-required="true"
@@ -1125,7 +1273,13 @@ export default function ApprovalsPage() {
                                           size="sm"
                                           variant="destructive"
                                           className="w-full"
-                                          onClick={() => rejectMutation.mutate({ id: req.id, approver: approverId, reason: trimmedReason })}
+                                          onClick={() =>
+                                            rejectMutation.mutate({
+                                              id: req.id,
+                                              approver: approverId,
+                                              reason: trimmedReason,
+                                            })
+                                          }
                                           disabled={rejectDisabled || isMutating}
                                         >
                                           {isMutating && rejectMutation.isPending ? (
@@ -1141,10 +1295,14 @@ export default function ApprovalsPage() {
                                 )}
                               </div>
                               {actionHint && (
-                                <div className="text-xs text-muted-foreground mt-1.5">{actionHint}</div>
+                                <div className="text-xs text-muted-foreground mt-1.5">
+                                  {actionHint}
+                                </div>
                               )}
                               {!isOpen && (
-                                <div className="text-xs text-muted-foreground mt-1">No actions available.</div>
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  No actions available.
+                                </div>
                               )}
                             </TableCell>
                           </motion.tr>
@@ -1195,7 +1353,9 @@ export default function ApprovalsPage() {
                         <Input
                           id="policy-name"
                           value={policyForm.name}
-                          onChange={(e) => setPolicyForm((prev) => ({ ...prev, name: e.target.value }))}
+                          onChange={(e) =>
+                            setPolicyForm((prev) => ({ ...prev, name: e.target.value }))
+                          }
                           placeholder="e.g., Refunds over $250"
                         />
                       </div>
@@ -1210,7 +1370,7 @@ export default function ApprovalsPage() {
                                 "flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-all",
                                 policyForm.appliesTo.includes(type)
                                   ? "border-emerald-500 bg-emerald-50"
-                                  : "border-border hover:border-border"
+                                  : "border-border hover:border-border",
                               )}
                             >
                               <Checkbox
@@ -1239,16 +1399,22 @@ export default function ApprovalsPage() {
                             min="0"
                             step="0.01"
                             value={policyForm.thresholdCents}
-                            onChange={(e) => setPolicyForm((prev) => ({ ...prev, thresholdCents: e.target.value }))}
+                            onChange={(e) =>
+                              setPolicyForm((prev) => ({ ...prev, thresholdCents: e.target.value }))
+                            }
                             placeholder="e.g., 250"
                           />
-                          <p className="text-xs text-muted-foreground">Leave empty for all amounts</p>
+                          <p className="text-xs text-muted-foreground">
+                            Leave empty for all amounts
+                          </p>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="policy-approvers">Approvers Needed</Label>
                           <Select
                             value={policyForm.approversNeeded}
-                            onValueChange={(value) => setPolicyForm((prev) => ({ ...prev, approversNeeded: value }))}
+                            onValueChange={(value) =>
+                              setPolicyForm((prev) => ({ ...prev, approversNeeded: value }))
+                            }
                           >
                             <SelectTrigger id="policy-approvers">
                               <SelectValue />
@@ -1272,7 +1438,7 @@ export default function ApprovalsPage() {
                                 "flex items-center gap-2 px-3 py-1.5 rounded-md border cursor-pointer transition-all text-sm",
                                 policyForm.approverRoles.includes(role.value)
                                   ? "border-emerald-500 bg-emerald-50"
-                                  : "border-border hover:border-border"
+                                  : "border-border hover:border-border",
                               )}
                             >
                               <Checkbox
@@ -1297,7 +1463,9 @@ export default function ApprovalsPage() {
                         <Textarea
                           id="policy-description"
                           value={policyForm.description}
-                          onChange={(e) => setPolicyForm((prev) => ({ ...prev, description: e.target.value }))}
+                          onChange={(e) =>
+                            setPolicyForm((prev) => ({ ...prev, description: e.target.value }))
+                          }
                           placeholder="Explain when and why this policy applies..."
                           rows={3}
                         />
@@ -1309,7 +1477,9 @@ export default function ApprovalsPage() {
                           <Switch
                             id="policy-active"
                             checked={policyForm.isActive}
-                            onCheckedChange={(checked) => setPolicyForm((prev) => ({ ...prev, isActive: checked }))}
+                            onCheckedChange={(checked) =>
+                              setPolicyForm((prev) => ({ ...prev, isActive: checked }))
+                            }
                           />
                         </div>
                       )}
@@ -1343,12 +1513,7 @@ export default function ApprovalsPage() {
                 <Shield className="h-8 w-8 mx-auto text-muted-foreground/50 mb-2" />
                 <p className="text-sm text-muted-foreground">No policies configured</p>
                 {canAct && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-2"
-                    onClick={openPolicyCreate}
-                  >
+                  <Button size="sm" variant="outline" className="mt-2" onClick={openPolicyCreate}>
                     <Plus className="h-3.5 w-3.5 mr-1" />
                     Create your first policy
                   </Button>
@@ -1363,20 +1528,26 @@ export default function ApprovalsPage() {
                     "rounded-lg border px-3 py-2.5 space-y-1.5 transition-all",
                     policy.isActive !== false
                       ? "bg-muted/50"
-                      : "bg-muted/20 border-dashed opacity-60"
+                      : "bg-muted/20 border-dashed opacity-60",
                   )}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-foreground truncate">{policy.name}</span>
+                        <span className="text-sm font-medium text-foreground truncate">
+                          {policy.name}
+                        </span>
                         {policy.isActive === false && (
-                          <Badge variant="secondary" className="text-[10px]">Disabled</Badge>
+                          <Badge variant="secondary" className="text-[10px]">
+                            Disabled
+                          </Badge>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <Badge variant="secondary" className="text-[10px]">{policy.approversNeeded} approvers</Badge>
+                      <Badge variant="secondary" className="text-[10px]">
+                        {policy.approversNeeded} approvers
+                      </Badge>
                       {canAct && (
                         <>
                           <Button
@@ -1388,7 +1559,10 @@ export default function ApprovalsPage() {
                           >
                             <Pencil className="h-3 w-3" />
                           </Button>
-                          <Popover open={deleteConfirmId === policy.id} onOpenChange={(open) => setDeleteConfirmId(open ? policy.id : null)}>
+                          <Popover
+                            open={deleteConfirmId === policy.id}
+                            onOpenChange={(open) => setDeleteConfirmId(open ? policy.id : null)}
+                          >
                             <PopoverTrigger asChild>
                               <Button
                                 size="icon"
@@ -1430,7 +1604,10 @@ export default function ApprovalsPage() {
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {policy.appliesTo.map((type) => (
-                      <span key={type} className="text-[10px] uppercase tracking-wide text-muted-foreground bg-background px-1.5 py-0.5 rounded">
+                      <span
+                        key={type}
+                        className="text-[10px] uppercase tracking-wide text-muted-foreground bg-background px-1.5 py-0.5 rounded"
+                      >
                         {type.replace(/_/g, " ")}
                       </span>
                     ))}
@@ -1441,7 +1618,9 @@ export default function ApprovalsPage() {
                     )}
                   </div>
                   {policy.description && (
-                    <p className="text-xs text-muted-foreground leading-relaxed">{policy.description}</p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {policy.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -1455,7 +1634,9 @@ export default function ApprovalsPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="space-y-3">
-              <div className="text-xs font-semibold uppercase text-muted-foreground">Urgency rules</div>
+              <div className="text-xs font-semibold uppercase text-muted-foreground">
+                Urgency rules
+              </div>
               <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="urgent-pending-second">Pending second approvals</Label>
                 <Switch
@@ -1502,7 +1683,9 @@ export default function ApprovalsPage() {
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs text-muted-foreground">Custom amount ({sampleCurrency})</span>
+                  <span className="text-xs text-muted-foreground">
+                    Custom amount ({sampleCurrency})
+                  </span>
                   <Input
                     id="urgent-custom-amount"
                     type="number"
@@ -1538,7 +1721,9 @@ export default function ApprovalsPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="text-xs text-muted-foreground">Preferences are saved locally for this browser.</div>
+            <div className="text-xs text-muted-foreground">
+              Preferences are saved locally for this browser.
+            </div>
           </CardContent>
         </Card>
 
@@ -1560,20 +1745,22 @@ export default function ApprovalsPage() {
               <span className="text-muted-foreground">Scope</span>
               <span className="text-foreground font-medium">{scopeLabel}</span>
             </div>
-            <Badge variant={whoamiLoading ? "secondary" : canAct ? "success" : "warning"} className="mt-2">
-              {whoamiLoading ? "Checking access" : canAct ? "Can approve requests" : "Approval restricted"}
+            <Badge
+              variant={whoamiLoading ? "secondary" : canAct ? "success" : "warning"}
+              className="mt-2"
+            >
+              {whoamiLoading
+                ? "Checking access"
+                : canAct
+                  ? "Can approve requests"
+                  : "Approval restricted"}
             </Badge>
           </CardContent>
         </Card>
       </div>
 
       {/* Live region for screen reader announcements */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {announcement}
       </div>
     </DashboardShell>

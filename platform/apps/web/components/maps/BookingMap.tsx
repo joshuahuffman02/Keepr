@@ -53,7 +53,7 @@ export interface BookingMapProps {
 const STATUS_COLORS: Record<MapSite["status"], string> = {
   available: "#059669",
   occupied: "#f59e0b",
-  maintenance: "#ef4444"
+  maintenance: "#ef4444",
 };
 
 const SITE_TYPE_ICONS: Record<string, LucideIcon> = {
@@ -72,7 +72,7 @@ export function BookingMap({
   isLoading,
   height,
   variant = "card",
-  className
+  className,
 }: BookingMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -80,7 +80,7 @@ export function BookingMap({
   const [isReady, setIsReady] = useState(false);
   const [isMapLibreLoaded, setIsMapLibreLoaded] = useState(false);
   const heightStyle = {
-    height: typeof height === "number" ? `${height}px` : height ?? "420px"
+    height: typeof height === "number" ? `${height}px` : (height ?? "420px"),
   };
 
   useEffect(() => {
@@ -89,8 +89,12 @@ export function BookingMap({
   }, []);
 
   const fallbackCenter = useMemo<[number, number]>(() => {
-    const lat = Number.isFinite(campgroundCenter?.latitude) ? Number(campgroundCenter?.latitude) : 39.8283; // US centroid
-    const lng = Number.isFinite(campgroundCenter?.longitude) ? Number(campgroundCenter?.longitude) : -98.5795;
+    const lat = Number.isFinite(campgroundCenter?.latitude)
+      ? Number(campgroundCenter?.latitude)
+      : 39.8283; // US centroid
+    const lng = Number.isFinite(campgroundCenter?.longitude)
+      ? Number(campgroundCenter?.longitude)
+      : -98.5795;
     return [lng, lat];
   }, [campgroundCenter]);
 
@@ -101,12 +105,8 @@ export function BookingMap({
       .map((site, idx) => {
         const hasLat = Number.isFinite(site.latitude);
         const hasLng = Number.isFinite(site.longitude);
-        const lat = hasLat
-          ? Number(site.latitude)
-          : (fallbackLat + jitter * Math.sin(idx));
-        const lng = hasLng
-          ? Number(site.longitude)
-          : (fallbackLng + jitter * Math.cos(idx));
+        const lat = hasLat ? Number(site.latitude) : fallbackLat + jitter * Math.sin(idx);
+        const lng = hasLng ? Number(site.longitude) : fallbackLng + jitter * Math.cos(idx);
         return { ...site, latitude: lat, longitude: lng };
       })
       .filter((site) => Number.isFinite(site.latitude) && Number.isFinite(site.longitude));
@@ -114,7 +114,7 @@ export function BookingMap({
 
   const mapCenter = useMemo(() => {
     if (validSites.length > 0 && selectedSiteId) {
-      const selected = validSites.find(s => s.id === selectedSiteId);
+      const selected = validSites.find((s) => s.id === selectedSiteId);
       if (selected) return toLngLat(Number(selected.longitude), Number(selected.latitude));
     }
     if (validSites.length > 0) {
@@ -127,7 +127,15 @@ export function BookingMap({
   }, [validSites, fallbackCenter, selectedSiteId]);
 
   useEffect(() => {
-    if (!isReady || !isMapLibreLoaded || typeof window === "undefined" || !containerRef.current || mapRef.current || !maplibregl) return;
+    if (
+      !isReady ||
+      !isMapLibreLoaded ||
+      typeof window === "undefined" ||
+      !containerRef.current ||
+      mapRef.current ||
+      !maplibregl
+    )
+      return;
 
     try {
       const map = new maplibregl.Map({
@@ -135,7 +143,7 @@ export function BookingMap({
         style: "https://demotiles.maplibre.org/style.json",
         center: mapCenter,
         zoom: validSites.length > 0 ? 16 : 3,
-        attributionControl: false
+        attributionControl: false,
       });
 
       map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
@@ -173,7 +181,7 @@ export function BookingMap({
       const IconComp = SITE_TYPE_ICONS[site.siteType || ""] || MapPin;
 
       const iconHtml = renderToStaticMarkup(
-        <IconComp size={isSelected ? 20 : 16} color="white" strokeWidth={2.5} />
+        <IconComp size={isSelected ? 20 : 16} color="white" strokeWidth={2.5} />,
       );
 
       el.className = `group relative flex items-center justify-center rounded-full shadow-lg transition-all duration-300 hover:scale-125 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500`;
@@ -219,8 +227,10 @@ export function BookingMap({
     <div
       className={cn(
         "relative w-full overflow-hidden",
-        variant === "immersive" ? "border-none" : "rounded-xl border border-border bg-muted shadow-inner",
-        className
+        variant === "immersive"
+          ? "border-none"
+          : "rounded-xl border border-border bg-muted shadow-inner",
+        className,
       )}
       style={heightStyle}
     >
@@ -239,7 +249,10 @@ export function BookingMap({
         <span className="font-bold text-foreground uppercase tracking-wider">Park Map</span>
         <div className="h-4 w-px bg-muted" />
         {Object.entries(STATUS_COLORS).map(([status, color]) => (
-          <span key={status} className="flex items-center gap-1.5 font-medium text-muted-foreground capitalize">
+          <span
+            key={status}
+            className="flex items-center gap-1.5 font-medium text-muted-foreground capitalize"
+          >
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />
             {status}
           </span>

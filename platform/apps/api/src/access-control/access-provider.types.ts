@@ -46,11 +46,11 @@ export interface AccessProviderAdapter {
   readonly provider: AccessProviderType;
   provisionAccess(
     integration: AccessIntegrationConfig,
-    request: GrantRequest
+    request: GrantRequest,
   ): Promise<GrantResult>;
   revokeAccess(
     integration: AccessIntegrationConfig,
-    request: RevokeRequest
+    request: RevokeRequest,
   ): Promise<{ status: AccessGrantStatus; message?: string | null }>;
   verifyWebhookSignature(input: WebhookVerificationInput): Promise<boolean> | boolean;
 }

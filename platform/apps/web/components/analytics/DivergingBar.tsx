@@ -35,9 +35,8 @@ export function DivergingBar({
   loading = false,
 }: DivergingBarProps) {
   // Calculate max for scaling (use largest total or provided max)
-  const calculatedMax = maxValue || Math.max(
-    ...data.map(d => Math.max(d.positive, d.negative, (d.neutral || 0)))
-  );
+  const calculatedMax =
+    maxValue || Math.max(...data.map((d) => Math.max(d.positive, d.negative, d.neutral || 0)));
 
   if (loading) {
     return (
@@ -98,12 +97,16 @@ export function DivergingBar({
                     {item.label}
                   </span>
                   {showScore && item.score !== undefined && (
-                    <span className={cn(
-                      "text-xs font-semibold",
-                      item.score >= 50 ? "text-status-success-text" :
-                      item.score >= 0 ? "text-status-warning-text" :
-                      "text-status-error-text"
-                    )}>
+                    <span
+                      className={cn(
+                        "text-xs font-semibold",
+                        item.score >= 50
+                          ? "text-status-success-text"
+                          : item.score >= 0
+                            ? "text-status-warning-text"
+                            : "text-status-error-text",
+                      )}
+                    >
                       NPS: {item.score}
                     </span>
                   )}
@@ -115,7 +118,10 @@ export function DivergingBar({
                   <div className="w-1/2 flex justify-end">
                     <div
                       className="h-7 bg-status-error rounded-l-md transition-all duration-500 flex items-center justify-start pl-2"
-                      style={{ width: `${negativeWidth}%`, minWidth: item.negative > 0 ? '24px' : '0' }}
+                      style={{
+                        width: `${negativeWidth}%`,
+                        minWidth: item.negative > 0 ? "24px" : "0",
+                      }}
                     >
                       {negativeWidth > 15 && (
                         <span className="text-xs font-medium text-white">{item.negative}%</span>
@@ -130,7 +136,10 @@ export function DivergingBar({
                   <div className="w-1/2 flex justify-start">
                     <div
                       className="h-7 bg-status-success rounded-r-md transition-all duration-500 flex items-center justify-end pr-2"
-                      style={{ width: `${positiveWidth}%`, minWidth: item.positive > 0 ? '24px' : '0' }}
+                      style={{
+                        width: `${positiveWidth}%`,
+                        minWidth: item.positive > 0 ? "24px" : "0",
+                      }}
                     >
                       {positiveWidth > 15 && (
                         <span className="text-xs font-medium text-white">{item.positive}%</span>

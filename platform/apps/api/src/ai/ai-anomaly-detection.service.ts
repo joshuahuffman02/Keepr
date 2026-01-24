@@ -14,13 +14,16 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
 };
 
-const toJsonInput = (value: Record<string, unknown> | undefined): Prisma.InputJsonValue | undefined =>
+const toJsonInput = (
+  value: Record<string, unknown> | undefined,
+): Prisma.InputJsonValue | undefined =>
   value === undefined ? undefined : isJsonValue(value) ? value : undefined;
 
 @Injectable()
@@ -32,7 +35,7 @@ export class AiAnomalyDetectionService {
     private readonly anomaliesService: AnomaliesService,
     private readonly aiProvider: AiProviderService,
     private readonly configService: AiAutopilotConfigService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   // ==================== ALERT CRUD ====================
@@ -216,7 +219,7 @@ export class AiAnomalyDetectionService {
    */
   private async generateAiExplanation(
     campgroundId: string,
-    alert: AnomalyAlert
+    alert: AnomalyAlert,
   ): Promise<{ explanation: string; suggestedAction: string } | null> {
     try {
       // Get campground context
@@ -323,12 +326,16 @@ Response in JSON:
             <div style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px;">
               <p style="margin: 0; color: #334155; line-height: 1.6;">${alert.summary}</p>
 
-              ${alert.aiAnalysis ? `
+              ${
+                alert.aiAnalysis
+                  ? `
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
                   <p style="margin: 0 0 4px 0; color: #64748b; font-size: 12px; font-weight: 600;">AI ANALYSIS</p>
                   <p style="margin: 0; color: #334155;">${alert.aiAnalysis}</p>
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
             </div>
 
             <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0;">
@@ -350,12 +357,16 @@ Response in JSON:
               </tr>
             </table>
 
-            ${alert.suggestedAction ? `
+            ${
+              alert.suggestedAction
+                ? `
               <div style="background: #ecfdf5; border: 1px solid #10b981; border-radius: 12px; padding: 16px; margin-top: 24px;">
                 <p style="margin: 0 0 4px 0; color: #065f46; font-size: 12px; font-weight: 600;">SUGGESTED ACTION</p>
                 <p style="margin: 0; color: #065f46;">${alert.suggestedAction}</p>
               </div>
-            ` : ""}
+            `
+                : ""
+            }
 
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               <p style="color: #94a3b8; font-size: 11px; margin: 0;">
@@ -434,10 +445,14 @@ Response in JSON:
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #f1f5f9;">
           <span style="display: inline-block; padding: 2px 8px; border-radius: 9999px; font-size: 11px; font-weight: 600; background: ${
-            { critical: "#fef2f2", high: "#fff7ed", medium: "#fefce8", low: "#eff6ff" }[alert.severity]
+            { critical: "#fef2f2", high: "#fff7ed", medium: "#fefce8", low: "#eff6ff" }[
+              alert.severity
+            ]
           }; color: ${
-      { critical: "#dc2626", high: "#ea580c", medium: "#ca8a04", low: "#2563eb" }[alert.severity]
-    };">${alert.severity.toUpperCase()}</span>
+            { critical: "#dc2626", high: "#ea580c", medium: "#ca8a04", low: "#2563eb" }[
+              alert.severity
+            ]
+          };">${alert.severity.toUpperCase()}</span>
         </td>
         <td style="padding: 12px; color: #0f172a; border-bottom: 1px solid #f1f5f9;">${alert.title}</td>
         <td style="padding: 12px; color: #64748b; border-bottom: 1px solid #f1f5f9; font-size: 13px;">${alert.summary.substring(0, 60)}${alert.summary.length > 60 ? "..." : ""}</td>
@@ -584,7 +599,9 @@ Response in JSON:
         const result = await this.sendAnomalyDigest(config.campgroundId, "weekly");
         if (result.sent) sent++;
       } catch (error) {
-        this.logger.error(`Failed to send weekly digest for campground ${config.campgroundId}: ${error}`);
+        this.logger.error(
+          `Failed to send weekly digest for campground ${config.campgroundId}: ${error}`,
+        );
       }
     }
 

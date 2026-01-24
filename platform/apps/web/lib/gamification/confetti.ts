@@ -1,7 +1,11 @@
 "use client";
 
 // Tiny, dependency-free confetti helper for celebratory moments.
-export function launchConfetti(opts?: { particles?: number; durationMs?: number; spread?: number }) {
+export function launchConfetti(opts?: {
+  particles?: number;
+  durationMs?: number;
+  spread?: number;
+}) {
   if (typeof window === "undefined") return;
 
   const particles = opts?.particles ?? 140;
@@ -71,4 +75,3 @@ export function launchConfetti(opts?: { particles?: number; durationMs?: number;
 
   requestAnimationFrame(frame);
 }
-

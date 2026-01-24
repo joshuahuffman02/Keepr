@@ -24,7 +24,7 @@ import {
   Filter,
   Loader2,
   ChevronRight,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,7 @@ import {
   staggerContainer,
   staggerChild,
   getStaggerDelay,
-  reducedMotion as reducedMotionVariants
+  reducedMotion as reducedMotionVariants,
 } from "@/lib/animations";
 
 type NotificationType =
@@ -82,7 +82,7 @@ const isNotificationType = (value: string): value is NotificationType =>
 
 const normalizeNotification = (notification: RawNotification): Notification => ({
   ...notification,
-  type: isNotificationType(notification.type) ? notification.type : "general"
+  type: isNotificationType(notification.type) ? notification.type : "general",
 });
 
 const notificationTypes: NotificationType[] = [
@@ -90,67 +90,75 @@ const notificationTypes: NotificationType[] = [
   "departure",
   "payment_received",
   "message_received",
-  "task_assigned"
+  "task_assigned",
 ];
 
 const isTabValue = (value: string): value is "all" | "unread" =>
   value === "all" || value === "unread";
 
-const typeConfig: Record<NotificationType, { icon: React.ReactNode; color: string; label: string; href?: (data: Record<string, unknown> | null) => string }> = {
+const typeConfig: Record<
+  NotificationType,
+  {
+    icon: React.ReactNode;
+    color: string;
+    label: string;
+    href?: (data: Record<string, unknown> | null) => string;
+  }
+> = {
   arrival: {
     icon: <LogIn className="h-4 w-4" />,
     color: "bg-status-success-bg text-status-success-text",
     label: "Arrival",
-    href: () => "/check-in-out"
+    href: () => "/check-in-out",
   },
   departure: {
     icon: <LogOut className="h-4 w-4" />,
     color: "bg-status-warning-bg text-status-warning-text",
     label: "Departure",
-    href: () => "/check-in-out"
+    href: () => "/check-in-out",
   },
   task_assigned: {
     icon: <UserPlus className="h-4 w-4" />,
     color: "bg-status-info-bg text-status-info-text",
     label: "Task",
-    href: () => "/operations"
+    href: () => "/operations",
   },
   task_sla_warning: {
     icon: <AlertTriangle className="h-4 w-4" />,
     color: "bg-status-warning-bg text-status-warning-text",
     label: "SLA Warning",
-    href: () => "/operations"
+    href: () => "/operations",
   },
   maintenance_urgent: {
     icon: <Wrench className="h-4 w-4" />,
     color: "bg-status-error-bg text-status-error-text",
     label: "Maintenance",
-    href: () => "/maintenance"
+    href: () => "/maintenance",
   },
   payment_received: {
     icon: <CreditCard className="h-4 w-4" />,
     color: "bg-status-success-bg text-status-success-text",
     label: "Payment",
-    href: () => "/finance/payouts"
+    href: () => "/finance/payouts",
   },
   payment_failed: {
     icon: <CreditCard className="h-4 w-4" />,
     color: "bg-status-error-bg text-status-error-text",
     label: "Payment Failed",
-    href: () => "/billing/repeat-charges"
+    href: () => "/billing/repeat-charges",
   },
   message_received: {
     icon: <MessageSquare className="h-4 w-4" />,
     color: "bg-purple-100 text-purple-700",
     label: "Message",
-    href: () => "/messages"
+    href: () => "/messages",
   },
   general: {
     icon: <Bell className="h-4 w-4" />,
     color: "bg-muted text-muted-foreground",
     label: "General",
-    href: () => "/dashboard"
-  }
+    href: () => "/dashboard",
+  },
 };
 
 export default function NotificationsPage() {
@@ -162,7 +170,11 @@ export default function NotificationsPage() {
 
   const userId = session?.user?.id;
 
-  const { data: rawNotifications = [], isLoading, error } = useQuery<RawNotification[]>({
+  const {
+    data: rawNotifications = [],
+    isLoading,
+    error,
+  } = useQuery<RawNotification[]>({
     queryKey: ["notifications", userId],
     queryFn: () => apiClient.getNotifications(userId!, { limit: 100 }),
     enabled: !!userId,
@@ -173,14 +185,14 @@ export default function NotificationsPage() {
     mutationFn: (notificationId: string) => apiClient.markNotificationRead(notificationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-    }
+    },
   });
 
   const markAllReadMutation = useMutation({
     mutationFn: () => apiClient.markAllNotificationsRead(userId!),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-    }
+    },
   });
 
   const notifications = rawNotifications.map(normalizeNotification);
@@ -290,11 +302,18 @@ export default function NotificationsPage() {
                   <div className="text-2xl font-bold text-foreground">{unreadCount}</div>
                   <div className="text-sm text-muted-foreground">Unread</div>
                 </div>
-                <div className={cn(
-                  "h-12 w-12 rounded-full flex items-center justify-center",
-                  unreadCount > 0 ? "bg-emerald-100" : "bg-muted"
-                )}>
-                  <Bell className={cn("h-6 w-6", unreadCount > 0 ? "text-emerald-600" : "text-muted-foreground")} />
+                <div
+                  className={cn(
+                    "h-12 w-12 rounded-full flex items-center justify-center",
+                    unreadCount > 0 ? "bg-emerald-100" : "bg-muted",
+                  )}
+                >
+                  <Bell
+                    className={cn(
+                      "h-6 w-6",
+                      unreadCount > 0 ? "text-emerald-600" : "text-muted-foreground",
+                    )}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -333,7 +352,9 @@ export default function NotificationsPage() {
               <TabsTrigger value="unread" className="gap-2">
                 Unread
                 {unreadCount > 0 && (
-                  <Badge variant="secondary" className="ml-1">{unreadCount}</Badge>
+                  <Badge variant="secondary" className="ml-1">
+                    {unreadCount}
+                  </Badge>
                 )}
               </TabsTrigger>
             </TabsList>
@@ -366,10 +387,7 @@ export default function NotificationsPage() {
         </motion.div>
 
         {/* Notification List */}
-        <motion.div
-          {...animationVariants}
-          transition={{ ...SPRING_CONFIG, delay: 0.2 }}
-        >
+        <motion.div {...animationVariants} transition={{ ...SPRING_CONFIG, delay: 0.2 }}>
           <Card className="border-border bg-card">
             <CardContent className="p-0">
               {isLoading ? (
@@ -379,7 +397,9 @@ export default function NotificationsPage() {
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
-                  <p className="text-lg font-medium text-foreground">Failed to load notifications</p>
+                  <p className="text-lg font-medium text-foreground">
+                    Failed to load notifications
+                  </p>
                   <p className="text-sm text-muted-foreground">Please try again later</p>
                 </div>
               ) : filteredNotifications.length === 0 ? (
@@ -409,11 +429,16 @@ export default function NotificationsPage() {
                         transition={{ ...SPRING_CONFIG, delay: getStaggerDelay(index) }}
                         className={cn(
                           "flex items-start gap-4 p-4 transition-colors",
-                          isUnread ? "bg-emerald-50/50" : "hover:bg-muted/50"
+                          isUnread ? "bg-emerald-50/50" : "hover:bg-muted/50",
                         )}
                       >
                         {/* Icon */}
-                        <div className={cn("flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center", config.color)}>
+                        <div
+                          className={cn(
+                            "flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center",
+                            config.color,
+                          )}
+                        >
                           {config.icon}
                         </div>
 
@@ -422,16 +447,22 @@ export default function NotificationsPage() {
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-foreground">{notification.title}</span>
+                                <span className="font-medium text-foreground">
+                                  {notification.title}
+                                </span>
                                 {isUnread && (
                                   <span className="h-2 w-2 rounded-full bg-emerald-500" />
                                 )}
                               </div>
-                              <p className="text-sm text-muted-foreground mt-0.5">{notification.body}</p>
+                              <p className="text-sm text-muted-foreground mt-0.5">
+                                {notification.body}
+                              </p>
                             </div>
                             <div className="flex items-center gap-2 flex-shrink-0">
                               <span className="text-xs text-muted-foreground whitespace-nowrap">
-                                {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                                {formatDistanceToNow(new Date(notification.createdAt), {
+                                  addSuffix: true,
+                                })}
                               </span>
                             </div>
                           </div>
@@ -477,17 +508,15 @@ export default function NotificationsPage() {
 
         {/* Empty state hint for testing */}
         {notifications.length === 0 && !isLoading && (
-          <motion.div
-            {...animationVariants}
-            transition={{ ...SPRING_CONFIG, delay: 0.25 }}
-          >
+          <motion.div {...animationVariants} transition={{ ...SPRING_CONFIG, delay: 0.25 }}>
             <Card className="border-dashed border-2 border-border bg-muted/30">
               <CardContent className="py-8">
                 <div className="text-center">
                   <Sparkles className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">
-                    Notifications are triggered by system events like new bookings, payments, check-ins, and messages.
-                    As activity occurs, you'll see notifications appear here.
+                    Notifications are triggered by system events like new bookings, payments,
+                    check-ins, and messages. As activity occurs, you'll see notifications appear
+                    here.
                   </p>
                 </div>
               </CardContent>

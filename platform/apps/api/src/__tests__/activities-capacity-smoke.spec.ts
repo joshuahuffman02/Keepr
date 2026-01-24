@@ -8,10 +8,7 @@ describe("Activities capacity smoke", () => {
 
   beforeAll(async () => {
     moduleRef = await Test.createTestingModule({
-      providers: [
-        ActivitiesService,
-        { provide: PrismaService, useValue: {} },
-      ],
+      providers: [ActivitiesService, { provide: PrismaService, useValue: {} }],
     }).compile();
 
     service = moduleRef.get(ActivitiesService);
@@ -26,11 +23,17 @@ describe("Activities capacity smoke", () => {
     expect(capacity.capacity).toBeGreaterThan(0);
     expect(capacity).toHaveProperty("remaining");
 
-    const updated = await service.updateCapacitySettings("demo-activity", { capacity: 25, waitlistEnabled: true });
+    const updated = await service.updateCapacitySettings("demo-activity", {
+      capacity: 25,
+      waitlistEnabled: true,
+    });
     expect(updated.capacity).toBe(25);
     expect(updated.waitlistEnabled).toBe(true);
 
-    const waitlist = await service.addWaitlistEntry("demo-activity", { guestName: "Capacity Test", partySize: 3 });
+    const waitlist = await service.addWaitlistEntry("demo-activity", {
+      guestName: "Capacity Test",
+      partySize: 3,
+    });
     expect(waitlist.snapshot.waitlistCount).toBeGreaterThan(0);
   });
 });

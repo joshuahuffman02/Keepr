@@ -65,11 +65,13 @@ const TrendChartPropsSchema = z.object({
   description: z.string().optional(),
   dataPath: z.string(),
   xKey: z.string(),
-  series: z.array(z.object({
-    key: z.string(),
-    color: z.string(),
-    label: z.string().optional(),
-  })),
+  series: z.array(
+    z.object({
+      key: z.string(),
+      color: z.string(),
+      label: z.string().optional(),
+    }),
+  ),
   chartType: ChartTypeSchema,
   height: z.number().int().min(160).max(480).optional(),
 });
@@ -109,22 +111,25 @@ const BadgePropsSchema = z.object({
 const ActionSchema = z.object({
   name: z.string(),
   params: z.record(z.unknown()).optional(),
-  confirm: z.object({
-    title: z.string(),
-    message: z.string(),
-    confirmLabel: z.string().optional(),
-    cancelLabel: z.string().optional(),
-    variant: z.enum(["default", "danger"]).optional(),
-  }).optional(),
-  onSuccess: z.union([
-    z.object({ navigate: z.string() }),
-    z.object({ set: z.record(z.string(), z.unknown()) }),
-    z.object({ action: z.string() }),
-  ]).optional(),
-  onError: z.union([
-    z.object({ set: z.record(z.string(), z.unknown()) }),
-    z.object({ action: z.string() }),
-  ]).optional(),
+  confirm: z
+    .object({
+      title: z.string(),
+      message: z.string(),
+      confirmLabel: z.string().optional(),
+      cancelLabel: z.string().optional(),
+      variant: z.enum(["default", "danger"]).optional(),
+    })
+    .optional(),
+  onSuccess: z
+    .union([
+      z.object({ navigate: z.string() }),
+      z.object({ set: z.record(z.string(), z.unknown()) }),
+      z.object({ action: z.string() }),
+    ])
+    .optional(),
+  onError: z
+    .union([z.object({ set: z.record(z.string(), z.unknown()) }), z.object({ action: z.string() })])
+    .optional(),
 });
 
 const ButtonPropsSchema = z.object({
@@ -148,10 +153,12 @@ const TextAreaPropsSchema = z.object({
 const SelectPropsSchema = z.object({
   label: z.string(),
   valuePath: z.string(),
-  options: z.array(z.object({
-    label: z.string(),
-    value: z.string(),
-  })),
+  options: z.array(
+    z.object({
+      label: z.string(),
+      value: z.string(),
+    }),
+  ),
 });
 
 const CheckboxPropsSchema = z.object({
@@ -308,7 +315,9 @@ export class AiUiBuilderService {
       const tree = this.parseTree(response.content, builder);
       return { tree, warnings };
     } catch (error) {
-      this.logger.warn(`AI UI builder failed: ${error instanceof Error ? error.message : "unknown error"}`);
+      this.logger.warn(
+        `AI UI builder failed: ${error instanceof Error ? error.message : "unknown error"}`,
+      );
       return { tree: this.buildFallbackTree(builder), warnings };
     }
   }
@@ -351,11 +360,7 @@ export class AiUiBuilderService {
   }
 
   private buildUserPrompt(builder: UiBuilderType, prompt: string): string {
-    return [
-      `Builder: ${builder}`,
-      "User request:",
-      prompt,
-    ].join("\n");
+    return [`Builder: ${builder}`, "User request:", prompt].join("\n");
   }
 
   private parseTree(content: string, builder: UiBuilderType): UiTree {
@@ -391,7 +396,9 @@ export class AiUiBuilderService {
     try {
       return JSON.parse(slice);
     } catch (error) {
-      this.logger.warn(`Failed to parse JSON from AI response: ${error instanceof Error ? error.message : "unknown error"}`);
+      this.logger.warn(
+        `Failed to parse JSON from AI response: ${error instanceof Error ? error.message : "unknown error"}`,
+      );
       return null;
     }
   }

@@ -1,7 +1,14 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertCircle, Clock, AlertTriangle, Info, type LucideIcon } from "lucide-react";
+import {
+  CheckCircle,
+  AlertCircle,
+  Clock,
+  AlertTriangle,
+  Info,
+  type LucideIcon,
+} from "lucide-react";
 import { STATUS_VARIANTS, StatusVariant } from "@/lib/portal-constants";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +46,7 @@ export function StatusBadge({
         config.text,
         config.border,
         size === "sm" ? "text-xs px-2 py-0.5" : "text-sm px-2.5 py-0.5",
-        className
+        className,
       )}
     >
       {showIcon && <Icon className={cn("mr-1", size === "sm" ? "h-3 w-3" : "h-3.5 w-3.5")} />}

@@ -92,7 +92,13 @@ const createPosModule = async (): Promise<PosModuleMocks> => {
       { provide: IdempotencyService, useValue: idempotency },
       { provide: StoredValueService, useValue: { redeem: jest.fn() } },
       { provide: GuestWalletService, useValue: { debitForPayment: jest.fn() } },
-      { provide: StripeService, useValue: { createPaymentIntent: jest.fn(), isConfigured: jest.fn().mockReturnValue(false) } },
+      {
+        provide: StripeService,
+        useValue: {
+          createPaymentIntent: jest.fn(),
+          isConfigured: jest.fn().mockReturnValue(false),
+        },
+      },
       { provide: TillService, useValue: till },
       { provide: ObservabilityService, useValue: observability },
       { provide: PosProviderService, useValue: { routePayment: jest.fn() } },
@@ -128,7 +134,9 @@ describe("PaymentsController public intents", () => {
     stripeService = { createPaymentIntent: jest.fn() };
     idempotency = { start: jest.fn(), complete: jest.fn(), fail: jest.fn() };
     gatewayConfigService = {
-      getConfig: jest.fn().mockResolvedValue({ gateway: "stripe", mode: "test", feeMode: "absorb" }),
+      getConfig: jest
+        .fn()
+        .mockResolvedValue({ gateway: "stripe", mode: "test", feeMode: "absorb" }),
     };
 
     moduleRef = await Test.createTestingModule({
@@ -167,7 +175,10 @@ describe("PaymentsController public intents", () => {
   });
 
   it("reuses idempotent response for public intents", async () => {
-    idempotency.start.mockResolvedValue({ status: IdempotencyStatus.succeeded, responseJson: { ok: true } });
+    idempotency.start.mockResolvedValue({
+      status: IdempotencyStatus.succeeded,
+      responseJson: { ok: true },
+    });
     const resp = await controller.createPublicIntent({ reservationId: "r1" }, "abc");
     expect(resp).toEqual({ ok: true });
     expect(stripeService.createPaymentIntent).not.toHaveBeenCalled();
@@ -175,8 +186,15 @@ describe("PaymentsController public intents", () => {
 
   it("applies 3DS policy for EU currencies", async () => {
     idempotency.start.mockResolvedValue({ status: IdempotencyStatus.failed });
-    stripeService.createPaymentIntent.mockResolvedValue({ id: "pi_1", client_secret: "secret", status: "requires_action" });
-    const resp = await controller.createPublicIntent({ reservationId: "r1", currency: "EUR" }, "abc2");
+    stripeService.createPaymentIntent.mockResolvedValue({
+      id: "pi_1",
+      client_secret: "secret",
+      status: "requires_action",
+    });
+    const resp = await controller.createPublicIntent(
+      { reservationId: "r1", currency: "EUR" },
+      "abc2",
+    );
     if (!isThreeDsResponse(resp)) {
       throw new Error("Expected public intent response to be an object");
     }
@@ -191,7 +209,7 @@ describe("PaymentsController public intents", () => {
       "automatic",
       expect.anything(),
       "abc2",
-      "any" // 3DS policy for EU
+      "any", // 3DS policy for EU
     );
   });
 });
@@ -254,7 +272,10 @@ describe("Stored value taxable load validation", () => {
       providers: [
         StoredValueService,
         { provide: PrismaService, useValue: prisma },
-        { provide: IdempotencyService, useValue: { start: jest.fn(), complete: jest.fn(), fail: jest.fn() } },
+        {
+          provide: IdempotencyService,
+          useValue: { start: jest.fn(), complete: jest.fn(), fail: jest.fn() },
+        },
         { provide: ObservabilityService, useValue: { recordRedeemOutcome: jest.fn() } },
       ],
     }).compile();
@@ -268,9 +289,13 @@ describe("Stored value taxable load validation", () => {
 
   it("rejects taxable load without active tax rule", async () => {
     await expect(
-      service.issue({ amountCents: 1000, currency: "usd", taxableLoad: true, tenantId: "t1", type: "gift" }, undefined, {
-        campgroundId: "cg1",
-      })
+      service.issue(
+        { amountCents: 1000, currency: "usd", taxableLoad: true, tenantId: "t1", type: "gift" },
+        undefined,
+        {
+          campgroundId: "cg1",
+        },
+      ),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
@@ -300,7 +325,16 @@ describe("POS checkout receipts", () => {
       campgroundId: "cg1",
       terminalId: null,
       currency: "usd",
-      PosCartItem: [{ productId: "p1", totalCents: 100, taxCents: 0, feeCents: 0, qty: 1, Product: { name: "Soda" } }],
+      PosCartItem: [
+        {
+          productId: "p1",
+          totalCents: 100,
+          taxCents: 0,
+          feeCents: 0,
+          qty: 1,
+          Product: { name: "Soda" },
+        },
+      ],
       PosPayment: [],
     });
 
@@ -309,13 +343,15 @@ describe("POS checkout receipts", () => {
       tillMovement: { create: jest.fn() },
       posCart: { update: jest.fn() },
     };
-    prisma.$transaction.mockImplementation(async (fn: (client: PosTransactionMock) => Promise<unknown>) => fn(tx));
+    prisma.$transaction.mockImplementation(
+      async (fn: (client: PosTransactionMock) => Promise<unknown>) => fn(tx),
+    );
 
     await service.checkout(
       "cart1",
       { payments: [{ method: "cash", amountCents: 100, currency: "usd", idempotencyKey: "p1" }] },
       "idem-pos",
-      { campgroundId: "cg1", email: "guest@example.com", name: "Guest" }
+      { campgroundId: "cg1", email: "guest@example.com", name: "Guest" },
     );
     expect(email.sendPaymentReceipt).toHaveBeenCalled();
     expect(email.sendPaymentReceipt.mock.calls[0][0].lineItems[0].label).toBe("Soda");

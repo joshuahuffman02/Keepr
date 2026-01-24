@@ -9,18 +9,18 @@ describe("Audit quick view", () => {
 
   const prismaStub = {
     auditLog: {
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     piiFieldTag: {
       count: jest.fn(),
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     privacySetting: {
-      findUnique: jest.fn()
+      findUnique: jest.fn(),
     },
     auditExport: {
-      create: jest.fn()
-    }
+      create: jest.fn(),
+    },
   };
 
   beforeAll(async () => {
@@ -29,9 +29,9 @@ describe("Audit quick view", () => {
         AuditService,
         {
           provide: PrismaService,
-          useValue: prismaStub
-        }
-      ]
+          useValue: prismaStub,
+        },
+      ],
     }).compile();
 
     service = moduleRef.get(AuditService);
@@ -44,12 +44,12 @@ describe("Audit quick view", () => {
       redactPII: true,
       consentRequired: true,
       backupRetentionDays: 30,
-      keyRotationDays: 90
+      keyRotationDays: 90,
     });
     prismaStub.piiFieldTag.count.mockResolvedValue(3);
     prismaStub.piiFieldTag.findMany.mockResolvedValue([
       { resource: "guest", field: "email", classification: "sensitive" },
-      { resource: "guest", field: "phone", classification: "sensitive" }
+      { resource: "guest", field: "phone", classification: "sensitive" },
     ]);
     prismaStub.auditLog.findMany.mockResolvedValue([
       {
@@ -65,8 +65,8 @@ describe("Audit quick view", () => {
         prevHash: null,
         before: { email: "guest@example.com" },
         after: { email: "guest@example.com" },
-        User: { id: "user-1", email: "owner@test.com" }
-      }
+        User: { id: "user-1", email: "owner@test.com" },
+      },
     ]);
     prismaStub.auditExport.create.mockResolvedValue({});
   });
@@ -82,14 +82,14 @@ describe("Audit quick view", () => {
       redactPII: true,
       consentRequired: true,
       backupRetentionDays: 30,
-      keyRotationDays: 90
+      keyRotationDays: 90,
     });
     expect(res.piiTagCount).toBe(3);
     expect(Array.isArray(res.piiTagsPreview)).toBe(true);
     expect(Array.isArray(res.auditEvents)).toBe(true);
     expect(res.auditEvents[0]).toMatchObject({
       action: "update",
-      entity: "privacySetting"
+      entity: "privacySetting",
     });
   });
 
@@ -103,7 +103,7 @@ describe("Audit quick view", () => {
       send: (payload: string) => {
         body = String(payload);
         return payload;
-      }
+      },
     };
 
     await service.exportCsv({ campgroundId, limit: 5 }, res);

@@ -7,12 +7,12 @@ import { UpdateReferralProgramDto } from "./dto/update-referral-program.dto";
 
 @Injectable()
 export class ReferralsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   listPrograms(campgroundId: string) {
     return this.prisma.referralProgram.findMany({
       where: { campgroundId },
-      orderBy: [{ isActive: "desc" }, { createdAt: "desc" }]
+      orderBy: [{ isActive: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -24,8 +24,8 @@ export class ReferralsService {
     const exists = await this.prisma.referralProgram.findFirst({
       where: {
         campgroundId,
-        OR: orConditions
-      }
+        OR: orConditions,
+      },
     });
     if (exists) {
       throw new BadRequestException("Referral code or link already exists");
@@ -41,8 +41,8 @@ export class ReferralsService {
         incentiveType: dto.incentiveType,
         incentiveValue: dto.incentiveValue,
         isActive: dto.isActive ?? true,
-        notes: dto.notes ?? null
-      }
+        notes: dto.notes ?? null,
+      },
     });
   }
 
@@ -59,8 +59,8 @@ export class ReferralsService {
         where: {
           campgroundId,
           id: { not: id },
-          OR: conflictConditions
-        }
+          OR: conflictConditions,
+        },
       });
       if (conflict) {
         throw new BadRequestException("Referral code or link already in use");
@@ -76,8 +76,8 @@ export class ReferralsService {
         incentiveType: dto.incentiveType ?? undefined,
         incentiveValue: dto.incentiveValue ?? undefined,
         isActive: dto.isActive ?? undefined,
-        notes: dto.notes ?? undefined
-      }
+        notes: dto.notes ?? undefined,
+      },
     });
   }
 }

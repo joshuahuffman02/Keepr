@@ -25,7 +25,7 @@ import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.modu
     WebhookAdminController,
     PublicReservationsController,
     PublicGuestsController,
-    PublicSitesController
+    PublicSitesController,
   ],
   providers: [
     ApiAuthService,
@@ -35,9 +35,8 @@ import { DepositPoliciesModule } from "../deposit-policies/deposit-policies.modu
     PrismaService,
     GuestsService,
     ApiTokenGuard,
-    ApiScopeGuard
+    ApiScopeGuard,
   ],
-  exports: [WebhookService, ApiAuthService, ApiUsageService]
+  exports: [WebhookService, ApiAuthService, ApiUsageService],
 })
-export class DeveloperApiModule { }
-
+export class DeveloperApiModule {}

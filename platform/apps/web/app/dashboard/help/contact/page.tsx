@@ -85,7 +85,9 @@ export default function ContactSupportPage() {
       setTicketId(data?.id ?? null);
       setSubmitted(true);
     } catch (error) {
-      setErrorMessage("We could not send your message. Please try again or email support@keeprstay.com.");
+      setErrorMessage(
+        "We could not send your message. Please try again or email support@keeprstay.com.",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -96,28 +98,19 @@ export default function ContactSupportPage() {
       <DashboardShell>
         <div className="space-y-6">
           <Breadcrumbs
-            items={[
-              { label: "Help", href: "/dashboard/help" },
-              { label: "Contact Support" },
-            ]}
+            items={[{ label: "Help", href: "/dashboard/help" }, { label: "Contact Support" }]}
           />
 
           <Card className="p-8 text-center">
             <div className="mx-auto w-16 h-16 bg-status-success/15 rounded-full flex items-center justify-center mb-4">
               <CheckCircle2 className="h-8 w-8 text-status-success" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">
-              Message Sent
-            </h1>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Message Sent</h1>
             <p className="text-slate-600 mb-6 max-w-md mx-auto">
-              We received your support request and will respond within 24 hours.
-              Check your email for a confirmation with your ticket number.
+              We received your support request and will respond within 24 hours. Check your email
+              for a confirmation with your ticket number.
             </p>
-            {ticketId && (
-              <p className="text-sm text-slate-500 mb-6">
-                Ticket ID: {ticketId}
-              </p>
-            )}
+            {ticketId && <p className="text-sm text-slate-500 mb-6">Ticket ID: {ticketId}</p>}
             <div className="flex items-center justify-center gap-3">
               <Button
                 variant="outline"
@@ -150,31 +143,23 @@ export default function ContactSupportPage() {
     <DashboardShell>
       <div className="space-y-6">
         <Breadcrumbs
-          items={[
-            { label: "Help", href: "/dashboard/help" },
-            { label: "Contact Support" },
-          ]}
+          items={[{ label: "Help", href: "/dashboard/help" }, { label: "Contact Support" }]}
         />
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <Card className="p-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-1">
-                Contact Support
-              </h1>
+              <h1 className="text-2xl font-bold text-slate-900 mb-1">Contact Support</h1>
               <p className="text-slate-600 mb-6">
-                Have a question or need help? Fill out the form below and our
-                team will get back to you.
+                Have a question or need help? Fill out the form below and our team will get back to
+                you.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <Label
-                      htmlFor="name"
-                      className="block text-sm font-medium text-slate-700 mb-1"
-                    >
+                    <Label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-1">
                       Your Name
                     </Label>
                     <Input
@@ -182,9 +167,7 @@ export default function ContactSupportPage() {
                       type="text"
                       required
                       value={formState.name}
-                      onChange={(e) =>
-                        setFormState({ ...formState, name: e.target.value })
-                      }
+                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       placeholder="John Smith"
                     />
@@ -201,9 +184,7 @@ export default function ContactSupportPage() {
                       type="email"
                       required
                       value={formState.email}
-                      onChange={(e) =>
-                        setFormState({ ...formState, email: e.target.value })
-                      }
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                       className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                       placeholder="hello@keeprstay.com"
                     />
@@ -219,9 +200,7 @@ export default function ContactSupportPage() {
                   </Label>
                   <Select
                     value={formState.category}
-                    onValueChange={(value) =>
-                      setFormState({ ...formState, category: value })
-                    }
+                    onValueChange={(value) => setFormState({ ...formState, category: value })}
                   >
                     <SelectTrigger id="category" className="w-full">
                       <SelectValue />
@@ -249,9 +228,7 @@ export default function ContactSupportPage() {
                     type="text"
                     required
                     value={formState.subject}
-                    onChange={(e) =>
-                      setFormState({ ...formState, subject: e.target.value })
-                    }
+                    onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                     placeholder="Brief description of your question"
                   />
@@ -269,9 +246,7 @@ export default function ContactSupportPage() {
                     required
                     rows={5}
                     value={formState.message}
-                    onChange={(e) =>
-                      setFormState({ ...formState, message: e.target.value })
-                    }
+                    onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                     className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
                     placeholder="Please describe your question or issue in detail..."
                   />
@@ -283,11 +258,7 @@ export default function ContactSupportPage() {
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={submitting}
-                >
+                <Button type="submit" className="w-full" disabled={submitting}>
                   {submitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>
@@ -304,23 +275,17 @@ export default function ContactSupportPage() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-600">Standard support</span>
-                  <span className="font-medium text-slate-900">
-                    Within 1 business day
-                  </span>
+                  <span className="font-medium text-slate-900">Within 1 business day</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-600">Urgent issues</span>
-                  <span className="font-medium text-slate-900">
-                    Mark subject as urgent
-                  </span>
+                  <span className="font-medium text-slate-900">Mark subject as urgent</span>
                 </div>
               </div>
             </Card>
 
             <Card className="p-5">
-              <h2 className="font-semibold text-slate-900 mb-4">
-                Other Ways to Reach Us
-              </h2>
+              <h2 className="font-semibold text-slate-900 mb-4">Other Ways to Reach Us</h2>
               <div className="space-y-4">
                 <a
                   href="mailto:support@keeprstay.com"
@@ -359,9 +324,7 @@ export default function ContactSupportPage() {
             </Card>
 
             <Card className="p-5">
-              <h2 className="font-semibold text-slate-900 mb-4">
-                Before You Contact Us
-              </h2>
+              <h2 className="font-semibold text-slate-900 mb-4">Before You Contact Us</h2>
               <div className="space-y-3">
                 <Link
                   href="/dashboard/help/faq"

@@ -15,4 +15,3 @@ export class PerfController {
     return this.perfService.getSnapshot();
   }
 }
-

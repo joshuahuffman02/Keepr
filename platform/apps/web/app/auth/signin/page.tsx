@@ -29,7 +29,7 @@ export default function SignInPage() {
       const result = await signIn("credentials", {
         email,
         password,
-        redirect: false
+        redirect: false,
       });
 
       if (!result || result.error) {
@@ -60,9 +60,7 @@ export default function SignInPage() {
               priority
             />
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Sign in to your account
-          </p>
+          <p className="mt-2 text-sm text-muted-foreground">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} method="POST" action="" className="mt-8 space-y-6">
@@ -74,10 +72,7 @@ export default function SignInPage() {
 
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-foreground"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-foreground">
                 Email address
               </label>
               <input
@@ -93,10 +88,7 @@ export default function SignInPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-foreground"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-foreground">
                 Password
               </label>
               <input
@@ -112,11 +104,7 @@ export default function SignInPage() {
             </div>
           </div>
 
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full"
-          >
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Signing in..." : "Sign in"}
           </Button>
         </form>

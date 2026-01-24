@@ -1,4 +1,14 @@
-import { IsBoolean, IsNumber, IsOptional, IsString, IsArray, MaxLength, Min, Max, IsEnum } from "class-validator";
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsArray,
+  MaxLength,
+  Min,
+  Max,
+  IsEnum,
+} from "class-validator";
 
 // ==================== CONFIG DTOs ====================
 

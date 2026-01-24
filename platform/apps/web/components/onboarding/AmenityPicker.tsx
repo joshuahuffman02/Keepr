@@ -70,7 +70,7 @@ export function AmenityPicker({
               sizeClasses[size],
               isSelected
                 ? "border-emerald-500 bg-emerald-500/20 text-emerald-400"
-                : "border-border bg-muted/50 text-muted-foreground hover:border-border hover:bg-muted"
+                : "border-border bg-muted/50 text-muted-foreground hover:border-border hover:bg-muted",
             )}
           >
             {isSelected && (
@@ -82,7 +82,12 @@ export function AmenityPicker({
                 <Check className="w-3 h-3 text-emerald-400" />
               </motion.div>
             )}
-            <Icon className={cn(iconSize[size], isSelected ? "text-emerald-400" : "text-muted-foreground")} />
+            <Icon
+              className={cn(
+                iconSize[size],
+                isSelected ? "text-emerald-400" : "text-muted-foreground",
+              )}
+            />
             <span className={cn("mt-1 text-center leading-tight", textSize[size])}>
               {amenity.label}
             </span>

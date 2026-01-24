@@ -71,10 +71,7 @@ test.describe("Chat streaming + attachments", () => {
       await route.fulfill({ status: 200, body: "" });
     });
     await page.route("**/api/chat/stream", async (route) => {
-      const events = [
-        { type: "text", value: "Got it." },
-        { type: "done" },
-      ];
+      const events = [{ type: "text", value: "Got it." }, { type: "done" }];
       await route.fulfill({
         status: 200,
         headers: { "Content-Type": "text/event-stream" },

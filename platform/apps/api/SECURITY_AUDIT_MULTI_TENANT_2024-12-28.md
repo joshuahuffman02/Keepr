@@ -1,4 +1,5 @@
 # Multi-Tenant Security Audit Report
+
 **Date**: 2024-12-28  
 **Auditor**: Claude Code (Security Analysis)  
 **Scope**: Multi-tenant isolation vulnerabilities in NestJS API
@@ -26,19 +27,20 @@ This audit identified **CRITICAL** multi-tenant isolation vulnerabilities that c
 
 #### Affected Controllers:
 
-| Controller | Path | Line | Issue |
-|------------|------|------|-------|
-| WaitlistStatsController | `campgrounds/:campgroundId/waitlist` | src/waitlist/waitlist-stats.controller.ts:6 | Only JwtAuthGuard, missing ScopeGuard |
-| AccountingConfidenceController | `campgrounds/:campgroundId/accounting` | src/accounting/accounting-confidence.controller.ts:13 | Only JwtAuthGuard, missing ScopeGuard |
-| SystemCheckController | `campgrounds/:campgroundId/system-check` | src/system-check/system-check.controller.ts:6 | Only JwtAuthGuard, missing ScopeGuard |
-| ReferralsController | `campgrounds/:campgroundId/referral-programs` | src/referrals/referrals.controller.ts:8 | Only JwtAuthGuard, missing ScopeGuard |
-| QuickBooksController | `campgrounds/:campgroundId/integrations/quickbooks` | src/integrations/quickbooks/quickbooks.controller.ts:16 | Only JwtAuthGuard, missing ScopeGuard |
-| BatchInventoryController | `campgrounds/:campgroundId/inventory` | src/inventory/batch-inventory.controller.ts:24 | Only JwtAuthGuard, missing ScopeGuard |
-| MarkdownRulesController | `campgrounds/:campgroundId/inventory/markdown-rules` | src/inventory/markdown-rules.controller.ts:17 | Only JwtAuthGuard, missing ScopeGuard |
-| BillingDashboardController | `campgrounds/:campgroundId/billing-dashboard` | src/billing/billing-dashboard.controller.ts:11 | Only JwtAuthGuard, missing ScopeGuard |
-| LockCodesController | `campgrounds/:campgroundId/lock-codes` | src/lock-codes/lock-codes.controller.ts:7 | Only JwtAuthGuard, missing ScopeGuard |
+| Controller                     | Path                                                 | Line                                                    | Issue                                 |
+| ------------------------------ | ---------------------------------------------------- | ------------------------------------------------------- | ------------------------------------- |
+| WaitlistStatsController        | `campgrounds/:campgroundId/waitlist`                 | src/waitlist/waitlist-stats.controller.ts:6             | Only JwtAuthGuard, missing ScopeGuard |
+| AccountingConfidenceController | `campgrounds/:campgroundId/accounting`               | src/accounting/accounting-confidence.controller.ts:13   | Only JwtAuthGuard, missing ScopeGuard |
+| SystemCheckController          | `campgrounds/:campgroundId/system-check`             | src/system-check/system-check.controller.ts:6           | Only JwtAuthGuard, missing ScopeGuard |
+| ReferralsController            | `campgrounds/:campgroundId/referral-programs`        | src/referrals/referrals.controller.ts:8                 | Only JwtAuthGuard, missing ScopeGuard |
+| QuickBooksController           | `campgrounds/:campgroundId/integrations/quickbooks`  | src/integrations/quickbooks/quickbooks.controller.ts:16 | Only JwtAuthGuard, missing ScopeGuard |
+| BatchInventoryController       | `campgrounds/:campgroundId/inventory`                | src/inventory/batch-inventory.controller.ts:24          | Only JwtAuthGuard, missing ScopeGuard |
+| MarkdownRulesController        | `campgrounds/:campgroundId/inventory/markdown-rules` | src/inventory/markdown-rules.controller.ts:17           | Only JwtAuthGuard, missing ScopeGuard |
+| BillingDashboardController     | `campgrounds/:campgroundId/billing-dashboard`        | src/billing/billing-dashboard.controller.ts:11          | Only JwtAuthGuard, missing ScopeGuard |
+| LockCodesController            | `campgrounds/:campgroundId/lock-codes`               | src/lock-codes/lock-codes.controller.ts:7               | Only JwtAuthGuard, missing ScopeGuard |
 
 **Exploitation Scenario**:
+
 ```bash
 # Attacker has valid JWT for Campground A (ID: camp-aaa)
 # They discover Campground B exists (ID: camp-bbb)
@@ -54,9 +56,10 @@ curl -X GET https://api.campreserv.com/campgrounds/camp-bbb/accounting/confidenc
 
 **Remediation**:
 Add ScopeGuard to all affected controllers:
+
 ```typescript
-@Controller('campgrounds/:campgroundId/waitlist')
-@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)  // ADD ScopeGuard
+@Controller("campgrounds/:campgroundId/waitlist")
+@UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard) // ADD ScopeGuard
 export class WaitlistStatsController {
   // ...
 }
@@ -71,6 +74,7 @@ export class WaitlistStatsController {
 **Description**: Alternative controller allows update/delete of triggers by ID without campgroundId validation
 
 **Vulnerable Code**:
+
 ```typescript
 @Controller('notification-triggers')  // No campgroundId in path
 export class NotificationTriggersByIdController {
@@ -87,6 +91,7 @@ export class NotificationTriggersByIdController {
 ```
 
 **Service Implementation** (src/notification-triggers/notification-triggers.service.ts:96-120):
+
 ```typescript
 async update(id: string, data: Partial<{...}>) {
   return this.prisma.notificationTrigger.update({
@@ -102,12 +107,14 @@ async delete(id: string) {
 }
 ```
 
-**Impact**: 
+**Impact**:
+
 - User from Campground A can modify/delete notification triggers for Campground B
 - Could disable critical notifications (payment failed, check-in reminders)
 - Could redirect notifications to attacker's email/SMS
 
 **Exploitation**:
+
 ```bash
 # Attacker discovers trigger ID from Campground B: trigger-xyz-789
 curl -X DELETE https://api.campreserv.com/notification-triggers/trigger-xyz-789 \
@@ -117,18 +124,19 @@ curl -X DELETE https://api.campreserv.com/notification-triggers/trigger-xyz-789 
 ```
 
 **Remediation**:
+
 ```typescript
 async update(id: string, data: Partial<{...}>) {
   const trigger = await this.prisma.notificationTrigger.findUnique({
     where: { id },
     select: { id: true, campgroundId: true }
   });
-  
+
   if (!trigger) throw new NotFoundException('Trigger not found');
-  
+
   // Validate ownership via ScopeGuard or pass campgroundId and check
   // This requires controller to pass campgroundId or validate user membership
-  
+
   return this.prisma.notificationTrigger.update({
     where: { id },
     data: {...}
@@ -147,6 +155,7 @@ async update(id: string, data: Partial<{...}>) {
 **Description**: Update/delete operations on guarantees and bonuses lack campgroundId validation
 
 **Vulnerable Code**:
+
 ```typescript
 async updateGuarantee(id: string, data: Partial<{...}>) {
   return this.prisma.campgroundGuarantee.update({
@@ -156,7 +165,7 @@ async updateGuarantee(id: string, data: Partial<{...}>) {
 }
 
 async deleteGuarantee(id: string) {
-  return this.prisma.campgroundGuarantee.delete({ 
+  return this.prisma.campgroundGuarantee.delete({
     where: { id }  // NO campgroundId check
   });
 }
@@ -171,6 +180,7 @@ async updateBonus(id: string, data: Partial<{...}>) {
 ```
 
 **Controller** (src/value-stack/value-stack.controller.ts:46-67):
+
 ```typescript
 @Put('guarantees/:id')
 @UseGuards(JwtAuthGuard)  // Has auth but service doesn't validate ownership
@@ -182,24 +192,26 @@ async updateGuarantee(
 }
 ```
 
-**Impact**: 
+**Impact**:
+
 - User from Campground A can modify/delete value propositions for Campground B
 - Could sabotage competitor's marketing messaging
 - Could delete critical bonuses/guarantees
 
 **Remediation**:
+
 ```typescript
 async updateGuarantee(id: string, campgroundId: string, data: Partial<{...}>) {
   const guarantee = await this.prisma.campgroundGuarantee.findUnique({
     where: { id },
     select: { campgroundId: true }
   });
-  
+
   if (!guarantee) throw new NotFoundException('Guarantee not found');
   if (guarantee.campgroundId !== campgroundId) {
     throw new ForbiddenException('Not authorized to modify this guarantee');
   }
-  
+
   return this.prisma.campgroundGuarantee.update({
     where: { id, campgroundId },  // Double check with composite where
     data,
@@ -216,6 +228,7 @@ async updateGuarantee(id: string, campgroundId: string, data: Partial<{...}>) {
 **Description**: Operations on inventory batches by ID lack campgroundId validation
 
 **Vulnerable Endpoints**:
+
 ```typescript
 @Get("batches/:id")
 async getBatch(@Param("id") id: string) {
@@ -229,6 +242,7 @@ async updateBatch(@Param("id") id: string, @Body() dto: UpdateBatchDto) {
 ```
 
 **Service** (src/inventory/batch-inventory.service.ts:135-199):
+
 ```typescript
 async getBatch(id: string) {
   const batch = await this.prisma.inventoryBatch.findUnique({
@@ -240,11 +254,11 @@ async getBatch(id: string) {
 }
 
 async updateBatch(id: string, dto: UpdateBatchDto) {
-  const batch = await this.prisma.inventoryBatch.findUnique({ 
+  const batch = await this.prisma.inventoryBatch.findUnique({
     where: { id }  // NO campgroundId validation
   });
   if (!batch) throw new NotFoundException("Batch not found");
-  
+
   return this.prisma.inventoryBatch.update({
     where: { id },  // NO campgroundId validation
     data: {...}
@@ -253,24 +267,26 @@ async updateBatch(id: string, dto: UpdateBatchDto) {
 ```
 
 **Impact**:
+
 - Access to competitor inventory data (pricing, suppliers, stock levels)
 - Ability to modify/sabotage inventory records
 - Business intelligence leakage
 
 **Remediation**:
 Since the controller route is `campgrounds/:campgroundId/inventory/batches/:id`, modify service to accept and validate:
+
 ```typescript
 async getBatch(id: string, campgroundId: string) {
   const batch = await this.prisma.inventoryBatch.findUnique({
     where: { id },
     include: {...}
   });
-  
+
   if (!batch) throw new NotFoundException("Batch not found");
   if (batch.campgroundId !== campgroundId) {
     throw new ForbiddenException("Access denied");
   }
-  
+
   return batch;
 }
 ```
@@ -284,9 +300,10 @@ async getBatch(id: string, campgroundId: string) {
 **Description**: Lock codes (gate codes, door codes) can be accessed/modified across campgrounds
 
 **Vulnerable Code**:
+
 ```typescript
 async findOne(id: string) {
-  const lockCode = await this.prisma.lockCode.findUnique({ 
+  const lockCode = await this.prisma.lockCode.findUnique({
     where: { id }  // NO campgroundId check
   });
   if (!lockCode) throw new NotFoundException('Lock code not found');
@@ -301,13 +318,14 @@ async update(id: string, data: Partial<{...}>) {
 }
 
 async remove(id: string) {
-  return this.prisma.lockCode.delete({ 
+  return this.prisma.lockCode.delete({
     where: { id }  // NO campgroundId check
   });
 }
 ```
 
 **Impact**:
+
 - **PHYSICAL SECURITY BREACH**: Access to gate codes, door codes, WiFi passwords
 - Could gain physical access to competitor's property
 - Could change/delete codes, locking out legitimate users
@@ -323,17 +341,18 @@ async remove(id: string) {
 **Description**: Controller doesn't have campgroundId in path, relies on query param
 
 **Vulnerable Code**:
+
 ```typescript
-@Controller('waitlist')  // No campgroundId in path!
+@Controller("waitlist") // No campgroundId in path!
 export class WaitlistController {
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateWaitlistDto) {
-    return this.waitlistService.updateEntry(id, dto);  // No campgroundId passed
+  @Patch(":id")
+  update(@Param("id") id: string, @Body() dto: UpdateWaitlistDto) {
+    return this.waitlistService.updateEntry(id, dto); // No campgroundId passed
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.waitlistService.remove(id);  // No campgroundId passed
+  @Delete(":id")
+  remove(@Param("id") id: string) {
+    return this.waitlistService.remove(id); // No campgroundId passed
   }
 }
 ```
@@ -343,6 +362,7 @@ export class WaitlistController {
 **Impact**: Ability to manipulate waitlist entries across campgrounds
 
 **Remediation**: Change route to include campgroundId:
+
 ```typescript
 @Controller('campgrounds/:campgroundId/waitlist')
 @UseGuards(JwtAuthGuard, ScopeGuard)
@@ -357,6 +377,7 @@ export class WaitlistController {
 **Description**: When querying guests by segment, campgroundId isn't added to where clause
 
 **Vulnerable Code**:
+
 ```typescript
 async getSegmentGuests(segmentId: string, options?: {...}) {
   const segment = await this.prisma.guestSegment.findUnique({
@@ -383,11 +404,13 @@ async getSegmentGuests(segmentId: string, options?: {...}) {
 }
 ```
 
-**Impact**: 
+**Impact**:
+
 - If segment doesn't properly scope criteria by campgroundId, could return guests from all campgrounds
 - PII exposure across tenants
 
 **Remediation**:
+
 ```typescript
 async getSegmentGuests(segmentId: string, options?: {...}) {
   const segment = await this.prisma.guestSegment.findUnique({
@@ -395,12 +418,12 @@ async getSegmentGuests(segmentId: string, options?: {...}) {
   });
 
   if (!segment) return { guests: [], total: 0 };
-  
+
   // Add explicit campgroundId filter
   const whereConditions = this.buildGuestWhereFromCriteria(
     segment.criteria as SegmentCriteria[]
   );
-  
+
   // Ensure campgroundId is always in the query
   const finalWhere = {
     ...whereConditions,
@@ -458,7 +481,7 @@ async getSegmentGuests(segmentId: string, options?: {...}) {
 The following controllers are properly secured with ScopeGuard:
 
 1. **CampgroundsController** - src/campgrounds/campgrounds.controller.ts
-2. **CharityController** - src/charity/charity.controller.ts  
+2. **CharityController** - src/charity/charity.controller.ts
 3. **CommunicationsController** - src/communications/communications.controller.ts
 4. **PaymentsController** - src/payments/payments.controller.ts
 5. **SitesController** - src/sites/sites.controller.ts
@@ -480,24 +503,25 @@ The following controllers are properly secured with ScopeGuard:
 ### Short-term (Within 1 week)
 
 1. Create a **service-level validation helper**:
+
 ```typescript
 // src/common/validators/tenant-isolation.validator.ts
 export async function validateTenantOwnership<T extends { campgroundId: string }>(
   prisma: PrismaService,
   model: string,
   id: string,
-  expectedCampgroundId: string
+  expectedCampgroundId: string,
 ): Promise<T> {
   const record = await prisma[model].findUnique({
     where: { id },
-    select: { id: true, campgroundId: true }
+    select: { id: true, campgroundId: true },
   });
-  
+
   if (!record) throw new NotFoundException(`${model} not found`);
   if (record.campgroundId !== expectedCampgroundId) {
-    throw new ForbiddenException('Access denied to this resource');
+    throw new ForbiddenException("Access denied to this resource");
   }
-  
+
   return record as T;
 }
 ```
@@ -521,19 +545,19 @@ export async function validateTenantOwnership<T extends { campgroundId: string }
 Create test cases for each vulnerability:
 
 ```typescript
-describe('Multi-tenant isolation', () => {
-  it('should prevent access to other campground notifications', async () => {
+describe("Multi-tenant isolation", () => {
+  it("should prevent access to other campground notifications", async () => {
     // User from Campground A
     const tokenA = await getAuthToken(campgroundA, userA);
-    
+
     // Trigger from Campground B
     const triggerB = await createTrigger(campgroundB);
-    
+
     // Attempt cross-tenant access
     const response = await request(app)
       .delete(`/notification-triggers/${triggerB.id}`)
-      .set('Authorization', `Bearer ${tokenA}`)
-      .expect(403);  // Should be forbidden
+      .set("Authorization", `Bearer ${tokenA}`)
+      .expect(403); // Should be forbidden
   });
 
   // Add similar tests for all findings
@@ -546,13 +570,15 @@ describe('Multi-tenant isolation', () => {
 
 The codebase has **significant multi-tenant isolation vulnerabilities** that require immediate attention. While some controllers are properly secured with ScopeGuard, many are missing this critical protection. More importantly, service-layer validation is inconsistent, allowing ID-based operations to bypass tenant checks.
 
-**Estimated Impact**: 
+**Estimated Impact**:
+
 - Potential data breach affecting multiple campgrounds
 - Compliance violations (GDPR, CCPA) due to cross-tenant PII access
 - Physical security risks (lock codes)
 - Business intelligence leakage
 
-**Remediation Effort**: 
+**Remediation Effort**:
+
 - Critical fixes: 2-3 developer days
 - Complete remediation: 1-2 weeks
 - Testing and validation: 1 week
@@ -588,4 +614,3 @@ The codebase has **significant multi-tenant isolation vulnerabilities** that req
 - src/stripe-payments/refund.service.ts
 - src/admin/guest-segment.service.ts
 - src/messages/messages.service.ts
-

@@ -8,7 +8,11 @@ import { ApplyRecommendationDto } from "./dto/apply-recommendation.dto";
 import { ProposeRecommendationDto } from "./dto/propose-recommendation.dto";
 import { randomUUID } from "crypto";
 
-type RequestScope = { campgroundId?: string | null; organizationId?: string | null; userId?: string | null };
+type RequestScope = {
+  campgroundId?: string | null;
+  organizationId?: string | null;
+  userId?: string | null;
+};
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
   if (value === undefined || value === null) return undefined;
@@ -48,7 +52,10 @@ const toStringArray = (value: unknown): string[] | undefined => {
 export class AnalyticsService {
   private readonly logger = new Logger(AnalyticsService.name);
 
-  constructor(private readonly prisma: PrismaService, private readonly audit: AuditService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+  ) {}
 
   async ingest(dto: IngestAnalyticsEventDto, scope: RequestScope) {
     const occurredAt = dto.occurredAt ? new Date(dto.occurredAt) : new Date();
@@ -68,13 +75,13 @@ export class AnalyticsService {
       Campground: dto.campgroundId
         ? { connect: { id: dto.campgroundId } }
         : scope.campgroundId
-        ? { connect: { id: scope.campgroundId } }
-        : undefined,
+          ? { connect: { id: scope.campgroundId } }
+          : undefined,
       Organization: dto.organizationId
         ? { connect: { id: dto.organizationId } }
         : scope.organizationId
-        ? { connect: { id: scope.organizationId } }
-        : undefined,
+          ? { connect: { id: scope.organizationId } }
+          : undefined,
       Reservation: dto.reservationId ? { connect: { id: dto.reservationId } } : undefined,
       Site: dto.siteId ? { connect: { id: dto.siteId } } : undefined,
       SiteClass: dto.siteClassId ? { connect: { id: dto.siteClassId } } : undefined,
@@ -122,7 +129,9 @@ export class AnalyticsService {
         create: {
           id: randomUUID(),
           Campground: { connect: { id: params.campgroundId } },
-          Organization: params.organizationId ? { connect: { id: params.organizationId } } : undefined,
+          Organization: params.organizationId
+            ? { connect: { id: params.organizationId } }
+            : undefined,
           eventName: params.eventName,
           date: dayStart,
           count: 1,
@@ -176,7 +185,14 @@ export class AnalyticsService {
   @Cron(CronExpression.EVERY_HOUR)
   async refreshDailyAggregates() {
     const rows = await this.prisma.$queryRaw<
-      Array<{ campgroundId: string | null; organizationId: string | null; eventName: AnalyticsEventName; date: Date; count: bigint; uniqueSessions: bigint }>
+      Array<{
+        campgroundId: string | null;
+        organizationId: string | null;
+        eventName: AnalyticsEventName;
+        date: Date;
+        count: bigint;
+        uniqueSessions: bigint;
+      }>
     >`
       SELECT
         "campgroundId",
@@ -246,7 +262,9 @@ export class AnalyticsService {
     });
 
     const sum = (event: AnalyticsEventName) =>
-      aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
+      aggregates
+        .filter((a) => a.eventName === event)
+        .reduce((acc, cur) => acc + (cur.count || 0), 0);
 
     const addToStay = sum(AnalyticsEventName.add_to_stay);
     const completes = sum(AnalyticsEventName.reservation_completed);
@@ -292,7 +310,8 @@ export class AnalyticsService {
         id: "image-order",
         type: "images",
         title: "Reorder hero images for better engagement",
-        explanation: "Image click-through is low compared to views. Moving high-performing images earlier can lift add-to-stay.",
+        explanation:
+          "Image click-through is low compared to views. Moving high-performing images earlier can lift add-to-stay.",
         confidence: "medium",
         projectedImpact: "5–10% lift in detail clicks",
         action: "reorder_images",
@@ -307,7 +326,8 @@ export class AnalyticsService {
         id: "availability-highlight",
         type: "availability",
         title: "Highlight available alternatives for searched dates",
-        explanation: "Guests are checking availability but not committing. Highlight nearby dates or alternative site classes.",
+        explanation:
+          "Guests are checking availability but not committing. Highlight nearby dates or alternative site classes.",
         confidence: "low",
         projectedImpact: "2–5% lift in add-to-stay",
         action: "promote_alternates",
@@ -322,7 +342,8 @@ export class AnalyticsService {
         id: "deal-headline",
         type: "deals",
         title: "Rewrite underperforming deal headline",
-        explanation: "Deal views are not translating to applies. Try a clearer value statement and limited-time framing.",
+        explanation:
+          "Deal views are not translating to applies. Try a clearer value statement and limited-time framing.",
         confidence: "medium",
         projectedImpact: "5–8% lift in deal applies",
         action: "update_deal_copy",
@@ -336,7 +357,8 @@ export class AnalyticsService {
       id: "content-pool",
       type: "content",
       title: "Add pool/amenity imagery to seasonal pages",
-      explanation: "Guests often respond to amenity visuals; adding a pool/amenity image to seasonal pages can increase engagement.",
+      explanation:
+        "Guests often respond to amenity visuals; adding a pool/amenity image to seasonal pages can increase engagement.",
       confidence: "low",
       projectedImpact: "Small uplift in detail views",
       action: "add_content",
@@ -344,10 +366,27 @@ export class AnalyticsService {
       requiresApproval: true,
     });
 
-    return { recommendations, windowDays: 7, stats: { addToStay, completes, abandons, imageViews, imageClicks, availabilityChecks, dealViews, dealApplies } };
+    return {
+      recommendations,
+      windowDays: 7,
+      stats: {
+        addToStay,
+        completes,
+        abandons,
+        imageViews,
+        imageClicks,
+        availabilityChecks,
+        dealViews,
+        dealApplies,
+      },
+    };
   }
 
-  async applyRecommendation(dto: ApplyRecommendationDto, actor: { id: string; role: UserRole }, scope: RequestScope) {
+  async applyRecommendation(
+    dto: ApplyRecommendationDto,
+    actor: { id: string; role: UserRole },
+    scope: RequestScope,
+  ) {
     if (!dto.campgroundId) throw new BadRequestException("campgroundId is required");
     const payload = isRecord(dto.payload) ? dto.payload : {};
     await this.audit.record({
@@ -425,7 +464,11 @@ export class AnalyticsService {
     return { status: "applied", recommendationId: dto.recommendationId };
   }
 
-  async proposeRecommendation(dto: ProposeRecommendationDto, actor: { id: string; role: UserRole }, scope: RequestScope) {
+  async proposeRecommendation(
+    dto: ProposeRecommendationDto,
+    actor: { id: string; role: UserRole },
+    scope: RequestScope,
+  ) {
     if (!dto.campgroundId) throw new BadRequestException("campgroundId is required");
     await this.audit.record({
       campgroundId: dto.campgroundId,
@@ -453,7 +496,9 @@ export class AnalyticsService {
       where: { campgroundId, date: { gte: since } },
     });
     const sum = (event: AnalyticsEventName) =>
-      aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
+      aggregates
+        .filter((a) => a.eventName === event)
+        .reduce((acc, cur) => acc + (cur.count || 0), 0);
 
     const views = sum(AnalyticsEventName.page_view);
     const addToStay = sum(AnalyticsEventName.add_to_stay);
@@ -521,9 +566,7 @@ export class AnalyticsService {
 
   async getAttribution(campgroundId: string, days = 30) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
-    const rows = await this.prisma.$queryRaw<
-      Array<{ referrer: string | null; count: bigint }>
-    >`
+    const rows = await this.prisma.$queryRaw<Array<{ referrer: string | null; count: bigint }>>`
       SELECT COALESCE("referrer", 'direct') as referrer, COUNT(*)::bigint as count
       FROM "AnalyticsEvent"
       WHERE "campgroundId" = ${campgroundId}
@@ -548,7 +591,9 @@ export class AnalyticsService {
       where: { campgroundId, date: { gte: since } },
     });
     const sum = (event: AnalyticsEventName) =>
-      aggregates.filter((a) => a.eventName === event).reduce((acc, cur) => acc + (cur.count || 0), 0);
+      aggregates
+        .filter((a) => a.eventName === event)
+        .reduce((acc, cur) => acc + (cur.count || 0), 0);
 
     const availabilityChecks = sum(AnalyticsEventName.availability_check);
     const addToStay = sum(AnalyticsEventName.add_to_stay);
@@ -613,8 +658,16 @@ export class AnalyticsService {
       year: targetYear,
       range: { start, end },
       events: eventCounts.map((row) => ({ eventName: row.eventName, count: Number(row.count) })),
-      deals: deals.map((row) => ({ promotionId: row.promotionId, views: Number(row.views), applies: Number(row.applies) })),
-      images: images.map((row) => ({ imageId: row.imageId, views: Number(row.views), clicks: Number(row.clicks) })),
+      deals: deals.map((row) => ({
+        promotionId: row.promotionId,
+        views: Number(row.views),
+        applies: Number(row.applies),
+      })),
+      images: images.map((row) => ({
+        imageId: row.imageId,
+        views: Number(row.views),
+        clicks: Number(row.clicks),
+      })),
     };
 
     if (format === "csv") {
@@ -667,15 +720,15 @@ export class AnalyticsService {
     `;
 
     // Build device breakdown with conversion rates
-    const bookingMap = new Map(deviceBookings.map(d => [d.deviceType, Number(d.bookings)]));
-    const devices = deviceSessions.map(d => {
+    const bookingMap = new Map(deviceBookings.map((d) => [d.deviceType, Number(d.bookings)]));
+    const devices = deviceSessions.map((d) => {
       const sessions = Number(d.sessions);
       const bookings = bookingMap.get(d.deviceType) || 0;
       return {
         deviceType: d.deviceType,
         sessions,
         bookings,
-        conversionRate: sessions > 0 ? Math.round((bookings / sessions) * 1000) / 10 : 0
+        conversionRate: sessions > 0 ? Math.round((bookings / sessions) * 1000) / 10 : 0,
       };
     });
 
@@ -696,11 +749,11 @@ export class AnalyticsService {
     return {
       period: { days, since },
       devices,
-      trends: trends.map(t => ({
+      trends: trends.map((t) => ({
         date: t.date,
         deviceType: t.deviceType,
-        sessions: Number(t.sessions)
-      }))
+        sessions: Number(t.sessions),
+      })),
     };
   }
 }

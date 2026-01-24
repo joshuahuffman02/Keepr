@@ -12,7 +12,11 @@ export class RedisService implements OnModuleDestroy {
 
   constructor() {
     const url = process.env.PLATFORM_REDIS_URL || process.env.REDIS_URL;
-    const urlSource = process.env.PLATFORM_REDIS_URL ? "PLATFORM_REDIS_URL" : process.env.REDIS_URL ? "REDIS_URL" : null;
+    const urlSource = process.env.PLATFORM_REDIS_URL
+      ? "PLATFORM_REDIS_URL"
+      : process.env.REDIS_URL
+        ? "REDIS_URL"
+        : null;
 
     if (!url) {
       this.client = null;

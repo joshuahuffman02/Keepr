@@ -16,7 +16,9 @@ describe("Communications sender status", () => {
   let moduleRef: TestingModule;
   let controller: CommunicationsController;
 
-  const isDomainRow = (value: unknown): value is { domain?: string; verified?: boolean; issues?: unknown[] } =>
+  const isDomainRow = (
+    value: unknown,
+  ): value is { domain?: string; verified?: boolean; issues?: unknown[] } =>
     typeof value === "object" && value !== null;
 
   beforeAll(async () => {
@@ -34,8 +36,8 @@ describe("Communications sender status", () => {
         { provide: ObservabilityService, useValue: { recordCommsStatus: () => undefined } },
         { provide: AlertingService, useValue: { notify: () => undefined } },
         { provide: AiAutoReplyService, useValue: {} },
-        { provide: AiSentimentService, useValue: {} }
-      ]
+        { provide: AiSentimentService, useValue: {} },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -58,12 +60,16 @@ describe("Communications sender status", () => {
     expect(res.allowedDomains).toContain("example.com");
 
     const domains = Array.isArray(res.domains) ? res.domains : [];
-    const example = domains.find((entry: unknown) => isDomainRow(entry) && entry.domain === "example.com");
+    const example = domains.find(
+      (entry: unknown) => isDomainRow(entry) && entry.domain === "example.com",
+    );
     expect(example?.verified).toBe(false);
     expect(Array.isArray(example?.issues)).toBe(true);
     expect(example?.issues?.length ?? 0).toBeGreaterThan(0);
 
-    const verified = domains.find((entry: unknown) => isDomainRow(entry) && entry.domain === "campreserv.com");
+    const verified = domains.find(
+      (entry: unknown) => isDomainRow(entry) && entry.domain === "campreserv.com",
+    );
     expect(verified?.verified).toBe(true);
   });
 });

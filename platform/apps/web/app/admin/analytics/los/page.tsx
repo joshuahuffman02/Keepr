@@ -181,9 +181,7 @@ export default function LengthOfStayPage() {
             title="LOS Distribution"
             description="Number of reservations by stay length"
             data={data.distribution}
-            dataKeys={[
-              { key: "count", color: "#3b82f6", name: "Reservations" },
-            ]}
+            dataKeys={[{ key: "count", color: "#3b82f6", name: "Reservations" }]}
             xAxisKey="range"
             type="bar"
             height={300}
@@ -206,9 +204,7 @@ export default function LengthOfStayPage() {
         title="Average LOS Over Time"
         description="Monthly trends in stay length"
         data={data.monthlyTrends}
-        dataKeys={[
-          { key: "averageLos", color: "#10b981", name: "Avg LOS (nights)" },
-        ]}
+        dataKeys={[{ key: "averageLos", color: "#10b981", name: "Avg LOS (nights)" }]}
         xAxisKey="month"
         type="area"
         height={250}
@@ -235,8 +231,18 @@ export default function LengthOfStayPage() {
               ),
             },
             { key: "averageLos", label: "Avg LOS", align: "right", format: (v) => formatNights(v) },
-            { key: "medianLos", label: "Median", align: "right", format: (v) => formatNightsRaw(v) },
-            { key: "reservations", label: "Reservations", align: "right", format: (v) => formatCount(v) },
+            {
+              key: "medianLos",
+              label: "Median",
+              align: "right",
+              format: (v) => formatNightsRaw(v),
+            },
+            {
+              key: "reservations",
+              label: "Reservations",
+              align: "right",
+              format: (v) => formatCount(v),
+            },
           ]}
           data={data.byAccommodationType}
           loading={loading}
@@ -249,7 +255,12 @@ export default function LengthOfStayPage() {
             { key: "range", label: "Stay Length" },
             { key: "count", label: "Reservations", align: "right", format: (v) => formatCount(v) },
             { key: "revenue", label: "Revenue", align: "right", format: (v) => formatMoney(v) },
-            { key: "revenuePerNight", label: "Rate/Night", align: "right", format: (v) => formatMoney(v) },
+            {
+              key: "revenuePerNight",
+              label: "Rate/Night",
+              align: "right",
+              format: (v) => formatMoney(v),
+            },
           ]}
           data={data.distribution}
           loading={loading}
@@ -261,9 +272,7 @@ export default function LengthOfStayPage() {
         title="LOS Seasonality"
         description="How stay length varies throughout the year"
         data={data.seasonality}
-        dataKeys={[
-          { key: "averageLos", color: "#8b5cf6", name: "Avg LOS" },
-        ]}
+        dataKeys={[{ key: "averageLos", color: "#8b5cf6", name: "Avg LOS" }]}
         xAxisKey="month"
         type="line"
         height={250}

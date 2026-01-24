@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Put, Req, UseGuards, ForbiddenException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+  Req,
+  UseGuards,
+  ForbiddenException,
+} from "@nestjs/common";
 import { UserRole } from "@prisma/client";
 import { GatewayConfigService } from "./gateway-config.service";
 import { UpsertPaymentGatewayConfigDto } from "./dto/payment-gateway-config.dto";
@@ -13,7 +22,7 @@ type AuthRequest = Request & { user: AuthUser };
 
 @Controller()
 export class GatewayConfigController {
-  constructor(private readonly gatewayConfig: GatewayConfigService) { }
+  constructor(private readonly gatewayConfig: GatewayConfigService) {}
 
   private ensureCampgroundMembership(user: AuthUser | undefined, campgroundId: string) {
     if (!user) {
@@ -42,13 +51,13 @@ export class GatewayConfigController {
   async upsertGatewayConfig(
     @Param("campgroundId") campgroundId: string,
     @Body() body: UpsertPaymentGatewayConfigDto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     this.ensureCampgroundMembership(req.user, campgroundId);
     return this.gatewayConfig.upsertConfig(campgroundId, body, {
       userId: req.user.id,
       ip: req.ip ?? null,
-      userAgent: req.headers?.["user-agent"] ?? null
+      userAgent: req.headers?.["user-agent"] ?? null,
     });
   }
 }

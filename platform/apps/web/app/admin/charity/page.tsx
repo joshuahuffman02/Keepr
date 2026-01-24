@@ -160,7 +160,14 @@ export default function CharityAdminPage() {
 
       if (res.ok) {
         setIsCreateOpen(false);
-        setFormData({ name: "", description: "", logoUrl: "", taxId: "", website: "", category: "" });
+        setFormData({
+          name: "",
+          description: "",
+          logoUrl: "",
+          taxId: "",
+          website: "",
+          category: "",
+        });
         fetchCharities();
       }
     } catch (error) {
@@ -180,7 +187,14 @@ export default function CharityAdminPage() {
 
       if (res.ok) {
         setEditingCharity(null);
-        setFormData({ name: "", description: "", logoUrl: "", taxId: "", website: "", category: "" });
+        setFormData({
+          name: "",
+          description: "",
+          logoUrl: "",
+          taxId: "",
+          website: "",
+          category: "",
+        });
         fetchCharities();
       }
     } catch (error) {
@@ -216,7 +230,7 @@ export default function CharityAdminPage() {
   };
 
   const filteredCharities = charities.filter((c) =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -234,7 +248,10 @@ export default function CharityAdminPage() {
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/charity/reports">
-            <Button variant="outline" className="border-border text-muted-foreground hover:bg-muted">
+            <Button
+              variant="outline"
+              className="border-border text-muted-foreground hover:bg-muted"
+            >
               <FileText className="h-4 w-4 mr-2" />
               View Reports
             </Button>
@@ -339,7 +356,9 @@ export default function CharityAdminPage() {
                     <span className="text-foreground">{item.charity.name}</span>
                   </div>
                   <div className="text-right">
-                    <p className="text-foreground font-medium">{formatCurrency(item.amountCents)}</p>
+                    <p className="text-foreground font-medium">
+                      {formatCurrency(item.amountCents)}
+                    </p>
                     <p className="text-xs text-muted-foreground">{item.count} donations</p>
                   </div>
                 </div>
@@ -385,7 +404,10 @@ export default function CharityAdminPage() {
           </div>
         ) : (
           filteredCharities.map((charity) => (
-            <Card key={charity.id} className={`bg-muted border-border ${!charity.isActive ? "opacity-60" : ""}`}>
+            <Card
+              key={charity.id}
+              className={`bg-muted border-border ${!charity.isActive ? "opacity-60" : ""}`}
+            >
               <CardContent className="py-4">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
@@ -477,18 +499,26 @@ export default function CharityAdminPage() {
       </div>
 
       {/* Create/Edit Dialog */}
-      <Dialog open={isCreateOpen || !!editingCharity} onOpenChange={(open) => {
-        if (!open) {
-          setIsCreateOpen(false);
-          setEditingCharity(null);
-          setFormData({ name: "", description: "", logoUrl: "", taxId: "", website: "", category: "" });
-        }
-      }}>
+      <Dialog
+        open={isCreateOpen || !!editingCharity}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsCreateOpen(false);
+            setEditingCharity(null);
+            setFormData({
+              name: "",
+              description: "",
+              logoUrl: "",
+              taxId: "",
+              website: "",
+              category: "",
+            });
+          }
+        }}
+      >
         <DialogContent className="bg-muted border-border text-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle>
-              {editingCharity ? "Edit Charity" : "Add New Charity"}
-            </DialogTitle>
+            <DialogTitle>{editingCharity ? "Edit Charity" : "Add New Charity"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
@@ -580,7 +610,10 @@ export default function CharityAdminPage() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent className="bg-muted border-border">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">Deactivate Charity</AlertDialogTitle>
@@ -589,7 +622,9 @@ export default function CharityAdminPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="border-border text-muted-foreground hover:bg-muted">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteCharity}
               className="bg-red-600 hover:bg-red-700"

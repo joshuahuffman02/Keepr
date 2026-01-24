@@ -19,15 +19,13 @@ function getApiBase(): string {
 
   // Only fall back to localhost in development
   if (process.env.NODE_ENV === "development") {
-    console.warn(
-      "[api-config] NEXT_PUBLIC_API_BASE not set, defaulting to localhost:4000"
-    );
+    console.warn("[api-config] NEXT_PUBLIC_API_BASE not set, defaulting to localhost:4000");
     return "http://localhost:4000/api";
   }
 
   // In production/staging, this is a configuration error
   throw new Error(
-    "NEXT_PUBLIC_API_BASE environment variable is required in non-development environments"
+    "NEXT_PUBLIC_API_BASE environment variable is required in non-development environments",
   );
 }
 

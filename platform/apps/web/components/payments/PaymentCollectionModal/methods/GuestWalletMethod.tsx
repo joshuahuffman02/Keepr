@@ -35,19 +35,21 @@ export default function GuestWalletMethod({
 
   const handlePayWithWallet = async () => {
     // Extract reservationId from subject if available
-    const referenceId = props.subject.type === "reservation" || props.subject.type === "balance"
-      ? props.subject.reservationId
-      : props.subject.type === "seasonal"
-        ? props.subject.contractId
-        : null;
+    const referenceId =
+      props.subject.type === "reservation" || props.subject.type === "balance"
+        ? props.subject.reservationId
+        : props.subject.type === "seasonal"
+          ? props.subject.contractId
+          : null;
 
-    const referenceType = props.subject.type === "reservation" || props.subject.type === "balance"
-      ? "reservation"
-      : props.subject.type === "seasonal"
-        ? "seasonal_contract"
-        : props.subject.type === "cart"
-          ? "pos_cart"
-          : "custom";
+    const referenceType =
+      props.subject.type === "reservation" || props.subject.type === "balance"
+        ? "reservation"
+        : props.subject.type === "seasonal"
+          ? "seasonal_contract"
+          : props.subject.type === "cart"
+            ? "pos_cart"
+            : "custom";
 
     if (!props.guestId || !props.campgroundId || !referenceId) {
       onError("Missing required payment information");
@@ -67,7 +69,7 @@ export default function GuestWalletMethod({
         props.guestId,
         paymentAmountCents,
         referenceType,
-        referenceId
+        referenceId,
       );
 
       // Add tender entry for tracking
@@ -105,9 +107,7 @@ export default function GuestWalletMethod({
         </div>
         <div>
           <h3 className="font-semibold text-foreground">Guest Wallet</h3>
-          <p className="text-sm text-muted-foreground">
-            Pay using stored credit balance
-          </p>
+          <p className="text-sm text-muted-foreground">Pay using stored credit balance</p>
         </div>
       </div>
 
@@ -125,9 +125,7 @@ export default function GuestWalletMethod({
       <div className="p-4 bg-muted border border-border rounded-lg space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-foreground">Amount Due</span>
-          <span className="font-medium text-foreground">
-            ${(remainingCents / 100).toFixed(2)}
-          </span>
+          <span className="font-medium text-foreground">${(remainingCents / 100).toFixed(2)}</span>
         </div>
         <div className="flex items-center justify-between border-t pt-3">
           <span className="text-foreground font-medium">Pay with Wallet</span>
@@ -139,16 +137,16 @@ export default function GuestWalletMethod({
           <div className="flex items-start gap-2 mt-2 p-2 bg-amber-50 border border-amber-200 rounded">
             <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
             <p className="text-sm text-amber-800">
-              Wallet balance is less than amount due. The remaining ${((remainingCents - walletBalanceCents) / 100).toFixed(2)} will need to be paid with another method.
+              Wallet balance is less than amount due. The remaining $
+              {((remainingCents - walletBalanceCents) / 100).toFixed(2)} will need to be paid with
+              another method.
             </p>
           </div>
         )}
         {canPayFull && (
           <div className="flex items-start gap-2 mt-2 p-2 bg-green-50 border border-green-200 rounded">
             <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-green-800">
-              Wallet balance covers the full amount due.
-            </p>
+            <p className="text-sm text-green-800">Wallet balance covers the full amount due.</p>
           </div>
         )}
       </div>
@@ -161,7 +159,8 @@ export default function GuestWalletMethod({
             <div>
               <p className="font-medium text-red-800">No Wallet Balance</p>
               <p className="text-sm text-red-700 mt-1">
-                This guest does not have any credit in their wallet. Please choose another payment method.
+                This guest does not have any credit in their wallet. Please choose another payment
+                method.
               </p>
             </div>
           </div>

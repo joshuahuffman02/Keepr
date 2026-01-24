@@ -101,7 +101,7 @@ export class AttractionService {
       limit?: number;
       offset?: number;
       maxDistance?: number;
-    } = {}
+    } = {},
   ): Promise<AttractionWithCampgrounds | null> {
     const { limit = 20, offset = 0, maxDistance = 50 } = options;
 
@@ -151,9 +151,8 @@ export class AttractionService {
       activities: attraction.activities,
       bestSeason: attraction.bestSeason,
       nearbyCampgroundCount: attraction.nearbyCampgroundCount,
-      campgrounds: attraction.CampgroundAttraction
-        .filter((m) => !m.Campground.deletedAt)
-        .map((m) => ({
+      campgrounds: attraction.CampgroundAttraction.filter((m) => !m.Campground.deletedAt).map(
+        (m) => ({
           id: m.Campground.id,
           name: m.Campground.name,
           slug: m.Campground.slug,
@@ -164,7 +163,8 @@ export class AttractionService {
           reviewCount: m.Campground.reviewCount,
           amenities: m.Campground.amenities,
           distanceMiles: m.distanceMiles,
-        })),
+        }),
+      ),
     };
   }
 
@@ -173,7 +173,7 @@ export class AttractionService {
    */
   async listByType(
     type: AttractionType,
-    options: { published?: boolean; minCampgrounds?: number } = {}
+    options: { published?: boolean; minCampgrounds?: number } = {},
   ) {
     const where: Prisma.AttractionWhereInput = { type };
 
@@ -229,31 +229,206 @@ export class AttractionService {
    */
   async seedNationalParks(): Promise<number> {
     const parks = [
-      { name: "Yellowstone National Park", slug: "yellowstone-national-park", state: "WY", npsCode: "YELL", lat: 44.428, lon: -110.5885 },
-      { name: "Yosemite National Park", slug: "yosemite-national-park", state: "CA", npsCode: "YOSE", lat: 37.8651, lon: -119.5383 },
-      { name: "Grand Canyon National Park", slug: "grand-canyon-national-park", state: "AZ", npsCode: "GRCA", lat: 36.1069, lon: -112.1129 },
-      { name: "Zion National Park", slug: "zion-national-park", state: "UT", npsCode: "ZION", lat: 37.2982, lon: -113.0263 },
-      { name: "Glacier National Park", slug: "glacier-national-park", state: "MT", npsCode: "GLAC", lat: 48.7596, lon: -113.787 },
-      { name: "Rocky Mountain National Park", slug: "rocky-mountain-national-park", state: "CO", npsCode: "ROMO", lat: 40.3428, lon: -105.6836 },
-      { name: "Acadia National Park", slug: "acadia-national-park", state: "ME", npsCode: "ACAD", lat: 44.35, lon: -68.2167 },
-      { name: "Great Smoky Mountains National Park", slug: "great-smoky-mountains-national-park", state: "TN", npsCode: "GRSM", lat: 35.6532, lon: -83.5071 },
-      { name: "Joshua Tree National Park", slug: "joshua-tree-national-park", state: "CA", npsCode: "JOTR", lat: 33.8734, lon: -115.9010 },
-      { name: "Olympic National Park", slug: "olympic-national-park", state: "WA", npsCode: "OLYM", lat: 47.8021, lon: -123.6044 },
-      { name: "Mount Rainier National Park", slug: "mount-rainier-national-park", state: "WA", npsCode: "MORA", lat: 46.8800, lon: -121.7269 },
-      { name: "Crater Lake National Park", slug: "crater-lake-national-park", state: "OR", npsCode: "CRLA", lat: 42.8684, lon: -122.1685 },
-      { name: "Arches National Park", slug: "arches-national-park", state: "UT", npsCode: "ARCH", lat: 38.7331, lon: -109.5925 },
-      { name: "Bryce Canyon National Park", slug: "bryce-canyon-national-park", state: "UT", npsCode: "BRCA", lat: 37.5930, lon: -112.1871 },
-      { name: "Canyonlands National Park", slug: "canyonlands-national-park", state: "UT", npsCode: "CANY", lat: 38.3269, lon: -109.8783 },
-      { name: "Capitol Reef National Park", slug: "capitol-reef-national-park", state: "UT", npsCode: "CARE", lat: 38.2800, lon: -111.1700 },
-      { name: "Death Valley National Park", slug: "death-valley-national-park", state: "CA", npsCode: "DEVA", lat: 36.5054, lon: -117.0794 },
-      { name: "Redwood National and State Parks", slug: "redwood-national-park", state: "CA", npsCode: "REDW", lat: 41.2132, lon: -124.0046 },
-      { name: "Sequoia National Park", slug: "sequoia-national-park", state: "CA", npsCode: "SEQU", lat: 36.4864, lon: -118.5658 },
-      { name: "Kings Canyon National Park", slug: "kings-canyon-national-park", state: "CA", npsCode: "KICA", lat: 36.8879, lon: -118.5551 },
-      { name: "Denali National Park", slug: "denali-national-park", state: "AK", npsCode: "DENA", lat: 63.1148, lon: -151.1926 },
-      { name: "Grand Teton National Park", slug: "grand-teton-national-park", state: "WY", npsCode: "GRTE", lat: 43.7904, lon: -110.6818 },
-      { name: "Badlands National Park", slug: "badlands-national-park", state: "SD", npsCode: "BADL", lat: 43.8554, lon: -102.3397 },
-      { name: "Shenandoah National Park", slug: "shenandoah-national-park", state: "VA", npsCode: "SHEN", lat: 38.4755, lon: -78.4535 },
-      { name: "Big Bend National Park", slug: "big-bend-national-park", state: "TX", npsCode: "BIBE", lat: 29.2500, lon: -103.2500 },
+      {
+        name: "Yellowstone National Park",
+        slug: "yellowstone-national-park",
+        state: "WY",
+        npsCode: "YELL",
+        lat: 44.428,
+        lon: -110.5885,
+      },
+      {
+        name: "Yosemite National Park",
+        slug: "yosemite-national-park",
+        state: "CA",
+        npsCode: "YOSE",
+        lat: 37.8651,
+        lon: -119.5383,
+      },
+      {
+        name: "Grand Canyon National Park",
+        slug: "grand-canyon-national-park",
+        state: "AZ",
+        npsCode: "GRCA",
+        lat: 36.1069,
+        lon: -112.1129,
+      },
+      {
+        name: "Zion National Park",
+        slug: "zion-national-park",
+        state: "UT",
+        npsCode: "ZION",
+        lat: 37.2982,
+        lon: -113.0263,
+      },
+      {
+        name: "Glacier National Park",
+        slug: "glacier-national-park",
+        state: "MT",
+        npsCode: "GLAC",
+        lat: 48.7596,
+        lon: -113.787,
+      },
+      {
+        name: "Rocky Mountain National Park",
+        slug: "rocky-mountain-national-park",
+        state: "CO",
+        npsCode: "ROMO",
+        lat: 40.3428,
+        lon: -105.6836,
+      },
+      {
+        name: "Acadia National Park",
+        slug: "acadia-national-park",
+        state: "ME",
+        npsCode: "ACAD",
+        lat: 44.35,
+        lon: -68.2167,
+      },
+      {
+        name: "Great Smoky Mountains National Park",
+        slug: "great-smoky-mountains-national-park",
+        state: "TN",
+        npsCode: "GRSM",
+        lat: 35.6532,
+        lon: -83.5071,
+      },
+      {
+        name: "Joshua Tree National Park",
+        slug: "joshua-tree-national-park",
+        state: "CA",
+        npsCode: "JOTR",
+        lat: 33.8734,
+        lon: -115.901,
+      },
+      {
+        name: "Olympic National Park",
+        slug: "olympic-national-park",
+        state: "WA",
+        npsCode: "OLYM",
+        lat: 47.8021,
+        lon: -123.6044,
+      },
+      {
+        name: "Mount Rainier National Park",
+        slug: "mount-rainier-national-park",
+        state: "WA",
+        npsCode: "MORA",
+        lat: 46.88,
+        lon: -121.7269,
+      },
+      {
+        name: "Crater Lake National Park",
+        slug: "crater-lake-national-park",
+        state: "OR",
+        npsCode: "CRLA",
+        lat: 42.8684,
+        lon: -122.1685,
+      },
+      {
+        name: "Arches National Park",
+        slug: "arches-national-park",
+        state: "UT",
+        npsCode: "ARCH",
+        lat: 38.7331,
+        lon: -109.5925,
+      },
+      {
+        name: "Bryce Canyon National Park",
+        slug: "bryce-canyon-national-park",
+        state: "UT",
+        npsCode: "BRCA",
+        lat: 37.593,
+        lon: -112.1871,
+      },
+      {
+        name: "Canyonlands National Park",
+        slug: "canyonlands-national-park",
+        state: "UT",
+        npsCode: "CANY",
+        lat: 38.3269,
+        lon: -109.8783,
+      },
+      {
+        name: "Capitol Reef National Park",
+        slug: "capitol-reef-national-park",
+        state: "UT",
+        npsCode: "CARE",
+        lat: 38.28,
+        lon: -111.17,
+      },
+      {
+        name: "Death Valley National Park",
+        slug: "death-valley-national-park",
+        state: "CA",
+        npsCode: "DEVA",
+        lat: 36.5054,
+        lon: -117.0794,
+      },
+      {
+        name: "Redwood National and State Parks",
+        slug: "redwood-national-park",
+        state: "CA",
+        npsCode: "REDW",
+        lat: 41.2132,
+        lon: -124.0046,
+      },
+      {
+        name: "Sequoia National Park",
+        slug: "sequoia-national-park",
+        state: "CA",
+        npsCode: "SEQU",
+        lat: 36.4864,
+        lon: -118.5658,
+      },
+      {
+        name: "Kings Canyon National Park",
+        slug: "kings-canyon-national-park",
+        state: "CA",
+        npsCode: "KICA",
+        lat: 36.8879,
+        lon: -118.5551,
+      },
+      {
+        name: "Denali National Park",
+        slug: "denali-national-park",
+        state: "AK",
+        npsCode: "DENA",
+        lat: 63.1148,
+        lon: -151.1926,
+      },
+      {
+        name: "Grand Teton National Park",
+        slug: "grand-teton-national-park",
+        state: "WY",
+        npsCode: "GRTE",
+        lat: 43.7904,
+        lon: -110.6818,
+      },
+      {
+        name: "Badlands National Park",
+        slug: "badlands-national-park",
+        state: "SD",
+        npsCode: "BADL",
+        lat: 43.8554,
+        lon: -102.3397,
+      },
+      {
+        name: "Shenandoah National Park",
+        slug: "shenandoah-national-park",
+        state: "VA",
+        npsCode: "SHEN",
+        lat: 38.4755,
+        lon: -78.4535,
+      },
+      {
+        name: "Big Bend National Park",
+        slug: "big-bend-national-park",
+        state: "TX",
+        npsCode: "BIBE",
+        lat: 29.25,
+        lon: -103.25,
+      },
     ];
 
     let created = 0;
@@ -298,7 +473,13 @@ export class AttractionService {
       { name: "Lake Chelan", slug: "lake-chelan", state: "WA", lat: 47.8395, lon: -120.0164 },
       { name: "Lake Michigan", slug: "lake-michigan", state: "MI", lat: 43.9167, lon: -86.9167 },
       { name: "Lake Superior", slug: "lake-superior", state: "MN", lat: 47.7, lon: -87.5 },
-      { name: "Lake of the Ozarks", slug: "lake-of-the-ozarks", state: "MO", lat: 38.1064, lon: -92.7419 },
+      {
+        name: "Lake of the Ozarks",
+        slug: "lake-of-the-ozarks",
+        state: "MO",
+        lat: 38.1064,
+        lon: -92.7419,
+      },
       { name: "Lake George", slug: "lake-george", state: "NY", lat: 43.4228, lon: -73.7126 },
       { name: "Lake Havasu", slug: "lake-havasu", state: "AZ", lat: 34.4839, lon: -114.3225 },
     ];

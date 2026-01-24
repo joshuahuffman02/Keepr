@@ -40,10 +40,7 @@ export class CsvParserService {
   /**
    * Parse CSV content and return structured data
    */
-  parseCSV(
-    content: string,
-    fieldMappings?: FieldMapping[]
-  ): ParseResult {
+  parseCSV(content: string, fieldMappings?: FieldMapping[]): ParseResult {
     const errors: string[] = [];
 
     try {
@@ -150,7 +147,7 @@ export class CsvParserService {
    */
   suggestFieldMappings(
     sourceHeaders: string[],
-    targetFields: { name: string; aliases: string[] }[]
+    targetFields: { name: string; aliases: string[] }[],
   ): FieldSuggestion[] {
     const suggestions: FieldSuggestion[] = [];
 
@@ -175,7 +172,10 @@ export class CsvParserService {
 
         // Check partial match
         if (!bestMatch) {
-          const similarity = this.calculateSimilarity(normalized, this.normalizeFieldName(targetField.name));
+          const similarity = this.calculateSimilarity(
+            normalized,
+            this.normalizeFieldName(targetField.name),
+          );
           if (similarity > 0.6) {
             bestMatch = { target: targetField.name, confidence: similarity };
           }
@@ -233,7 +233,7 @@ export class CsvParserService {
           matrix[i][j] = Math.min(
             matrix[i - 1][j - 1] + 1,
             matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
+            matrix[i - 1][j] + 1,
           );
         }
       }

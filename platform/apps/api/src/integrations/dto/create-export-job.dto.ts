@@ -29,4 +29,3 @@ export class CreateExportJobDto {
   @IsObject()
   filters?: Record<string, unknown>;
 }
-

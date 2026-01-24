@@ -1,19 +1,19 @@
-import { Module, forwardRef } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { ChatController } from './chat.controller';
-import { ChatService } from './chat.service';
-import { ChatToolsService } from './chat-tools.service';
-import { ChatGateway } from './chat.gateway';
-import { PrismaModule } from '../prisma/prisma.module';
-import { AiModule } from '../ai/ai.module';
-import { AuthModule } from '../auth/auth.module';
-import { GuestAuthModule } from '../guest-auth/guest-auth.module';
-import { UploadsModule } from '../uploads/uploads.module';
-import { AnalyticsModule } from '../analytics/analytics.module';
-import { AuditModule } from '../audit/audit.module';
-import { HoldsModule } from '../holds/holds.module';
-import { AdminModule } from '../admin/admin.module';
+import { Module, forwardRef } from "@nestjs/common";
+import { JwtModule } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { ChatController } from "./chat.controller";
+import { ChatService } from "./chat.service";
+import { ChatToolsService } from "./chat-tools.service";
+import { ChatGateway } from "./chat.gateway";
+import { PrismaModule } from "../prisma/prisma.module";
+import { AiModule } from "../ai/ai.module";
+import { AuthModule } from "../auth/auth.module";
+import { GuestAuthModule } from "../guest-auth/guest-auth.module";
+import { UploadsModule } from "../uploads/uploads.module";
+import { AnalyticsModule } from "../analytics/analytics.module";
+import { AuditModule } from "../audit/audit.module";
+import { HoldsModule } from "../holds/holds.module";
+import { AdminModule } from "../admin/admin.module";
 
 @Module({
   imports: [
@@ -29,8 +29,8 @@ import { AdminModule } from '../admin/admin.module';
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' },
+        secret: config.get<string>("JWT_SECRET"),
+        signOptions: { expiresIn: "7d" },
       }),
     }),
   ],

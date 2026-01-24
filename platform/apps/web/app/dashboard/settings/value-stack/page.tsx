@@ -11,7 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Plus,
@@ -198,7 +204,7 @@ export default function ValueStackPage() {
       return res.json();
     },
     onSuccess: (updated) => {
-      setGuarantees(guarantees.map(g => g.id === updated.id ? updated : g));
+      setGuarantees(guarantees.map((g) => (g.id === updated.id ? updated : g)));
       toast({ title: "Guarantee updated" });
     },
   });
@@ -211,7 +217,7 @@ export default function ValueStackPage() {
       return id;
     },
     onSuccess: (id) => {
-      setGuarantees(guarantees.filter(g => g.id !== id));
+      setGuarantees(guarantees.filter((g) => g.id !== id));
       toast({ title: "Guarantee removed" });
     },
   });
@@ -242,7 +248,7 @@ export default function ValueStackPage() {
       return res.json();
     },
     onSuccess: (updated) => {
-      setBonuses(bonuses.map(b => b.id === updated.id ? updated : b));
+      setBonuses(bonuses.map((b) => (b.id === updated.id ? updated : b)));
       toast({ title: "Bonus updated" });
     },
   });
@@ -255,7 +261,7 @@ export default function ValueStackPage() {
       return id;
     },
     onSuccess: (id) => {
-      setBonuses(bonuses.filter(b => b.id !== id));
+      setBonuses(bonuses.filter((b) => b.id !== id));
       toast({ title: "Bonus removed" });
     },
   });
@@ -383,8 +389,8 @@ export default function ValueStackPage() {
                 <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No guarantees yet</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Guarantees reduce booking anxiety and increase conversions. Add weather guarantees,
-                  satisfaction guarantees, or best price promises.
+                  Guarantees reduce booking anxiety and increase conversions. Add weather
+                  guarantees, satisfaction guarantees, or best price promises.
                 </p>
                 <Button onClick={addNewGuarantee}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -399,11 +405,21 @@ export default function ValueStackPage() {
                   <CardContent className="pt-6">
                     <div className="flex gap-4">
                       <div className="flex flex-col items-center gap-1 pt-2">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === 0}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          disabled={idx === 0}
+                        >
                           <ChevronUp className="h-4 w-4" />
                         </Button>
                         <GripVertical className="h-4 w-4 text-muted-foreground" />
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === guarantees.length - 1}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          disabled={idx === guarantees.length - 1}
+                        >
                           <ChevronDown className="h-4 w-4" />
                         </Button>
                       </div>
@@ -457,7 +473,9 @@ export default function ValueStackPage() {
                           <Label>Title</Label>
                           <Input
                             value={g.title}
-                            onChange={(e) => updateGuarantee.mutate({ id: g.id, title: e.target.value })}
+                            onChange={(e) =>
+                              updateGuarantee.mutate({ id: g.id, title: e.target.value })
+                            }
                             placeholder="e.g., Rain Guarantee"
                           />
                         </div>
@@ -466,7 +484,9 @@ export default function ValueStackPage() {
                           <Label>Description</Label>
                           <Textarea
                             value={g.description}
-                            onChange={(e) => updateGuarantee.mutate({ id: g.id, description: e.target.value })}
+                            onChange={(e) =>
+                              updateGuarantee.mutate({ id: g.id, description: e.target.value })
+                            }
                             placeholder="e.g., If it rains 3+ days during your stay, get 50% credit for your next visit."
                             rows={2}
                           />
@@ -517,8 +537,8 @@ export default function ValueStackPage() {
                 <Gift className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">No bonuses yet</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Bonuses add perceived value to your offer. Include firewood, welcome kits,
-                  early check-in, or digital guides to stack value.
+                  Bonuses add perceived value to your offer. Include firewood, welcome kits, early
+                  check-in, or digital guides to stack value.
                 </p>
                 <Button onClick={addNewBonus}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -533,11 +553,21 @@ export default function ValueStackPage() {
                   <CardContent className="pt-6">
                     <div className="flex gap-4">
                       <div className="flex flex-col items-center gap-1 pt-2">
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === 0}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          disabled={idx === 0}
+                        >
                           <ChevronUp className="h-4 w-4" />
                         </Button>
                         <GripVertical className="h-4 w-4 text-muted-foreground" />
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={idx === bonuses.length - 1}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          disabled={idx === bonuses.length - 1}
+                        >
                           <ChevronDown className="h-4 w-4" />
                         </Button>
                       </div>
@@ -557,7 +587,12 @@ export default function ValueStackPage() {
                           <Input
                             type="number"
                             value={(b.valueCents / 100).toFixed(0)}
-                            onChange={(e) => updateBonus.mutate({ id: b.id, valueCents: Number(e.target.value) * 100 })}
+                            onChange={(e) =>
+                              updateBonus.mutate({
+                                id: b.id,
+                                valueCents: Number(e.target.value) * 100,
+                              })
+                            }
                             placeholder="15"
                           />
                         </div>
@@ -588,7 +623,9 @@ export default function ValueStackPage() {
                           <Label>Description</Label>
                           <Input
                             value={b.description || ""}
-                            onChange={(e) => updateBonus.mutate({ id: b.id, description: e.target.value })}
+                            onChange={(e) =>
+                              updateBonus.mutate({ id: b.id, description: e.target.value })
+                            }
                             placeholder="e.g., Includes 6 logs and kindling for your campfire"
                           />
                         </div>
@@ -636,16 +673,16 @@ export default function ValueStackPage() {
                     onCheckedChange={(v) => setLeadConfig({ ...leadConfig, eventsEnabled: v })}
                   />
                 </div>
-                <CardDescription>
-                  Shown when you have no upcoming events
-                </CardDescription>
+                <CardDescription>Shown when you have no upcoming events</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label>Headline</Label>
                   <Input
                     value={leadConfig.eventsHeadline}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, eventsHeadline: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, eventsHeadline: e.target.value })
+                    }
                     disabled={!leadConfig.eventsEnabled}
                   />
                 </div>
@@ -653,7 +690,9 @@ export default function ValueStackPage() {
                   <Label>Subtext</Label>
                   <Textarea
                     value={leadConfig.eventsSubtext}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, eventsSubtext: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, eventsSubtext: e.target.value })
+                    }
                     rows={2}
                     disabled={!leadConfig.eventsEnabled}
                   />
@@ -662,7 +701,9 @@ export default function ValueStackPage() {
                   <Label>Button Text</Label>
                   <Input
                     value={leadConfig.eventsButtonText}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, eventsButtonText: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, eventsButtonText: e.target.value })
+                    }
                     disabled={!leadConfig.eventsEnabled}
                   />
                 </div>
@@ -679,16 +720,16 @@ export default function ValueStackPage() {
                     onCheckedChange={(v) => setLeadConfig({ ...leadConfig, newsletterEnabled: v })}
                   />
                 </div>
-                <CardDescription>
-                  Footer email capture for updates
-                </CardDescription>
+                <CardDescription>Footer email capture for updates</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label>Headline</Label>
                   <Input
                     value={leadConfig.newsletterHeadline}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, newsletterHeadline: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, newsletterHeadline: e.target.value })
+                    }
                     disabled={!leadConfig.newsletterEnabled}
                   />
                 </div>
@@ -696,7 +737,9 @@ export default function ValueStackPage() {
                   <Label>Subtext</Label>
                   <Textarea
                     value={leadConfig.newsletterSubtext}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, newsletterSubtext: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, newsletterSubtext: e.target.value })
+                    }
                     rows={2}
                     disabled={!leadConfig.newsletterEnabled}
                   />
@@ -705,7 +748,9 @@ export default function ValueStackPage() {
                   <Label>Button Text</Label>
                   <Input
                     value={leadConfig.newsletterButtonText}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, newsletterButtonText: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, newsletterButtonText: e.target.value })
+                    }
                     disabled={!leadConfig.newsletterEnabled}
                   />
                 </div>
@@ -719,7 +764,9 @@ export default function ValueStackPage() {
                   <CardTitle className="text-base">First-Time Visitor Discount</CardTitle>
                   <Switch
                     checked={leadConfig.firstBookingEnabled}
-                    onCheckedChange={(v) => setLeadConfig({ ...leadConfig, firstBookingEnabled: v })}
+                    onCheckedChange={(v) =>
+                      setLeadConfig({ ...leadConfig, firstBookingEnabled: v })
+                    }
                   />
                 </div>
                 <CardDescription>
@@ -731,7 +778,9 @@ export default function ValueStackPage() {
                   <Label>Headline</Label>
                   <Input
                     value={leadConfig.firstBookingHeadline}
-                    onChange={(e) => setLeadConfig({ ...leadConfig, firstBookingHeadline: e.target.value })}
+                    onChange={(e) =>
+                      setLeadConfig({ ...leadConfig, firstBookingHeadline: e.target.value })
+                    }
                     disabled={!leadConfig.firstBookingEnabled}
                   />
                 </div>
@@ -741,7 +790,12 @@ export default function ValueStackPage() {
                     <Input
                       type="number"
                       value={leadConfig.firstBookingDiscount}
-                      onChange={(e) => setLeadConfig({ ...leadConfig, firstBookingDiscount: Number(e.target.value) })}
+                      onChange={(e) =>
+                        setLeadConfig({
+                          ...leadConfig,
+                          firstBookingDiscount: Number(e.target.value),
+                        })
+                      }
                       className="w-20"
                       disabled={!leadConfig.firstBookingEnabled}
                     />
@@ -762,7 +816,10 @@ export default function ValueStackPage() {
                 Customize copy and display settings for your public booking page
               </p>
             </div>
-            <Button onClick={() => saveBookingConfig.mutate()} disabled={saveBookingConfig.isPending}>
+            <Button
+              onClick={() => saveBookingConfig.mutate()}
+              disabled={saveBookingConfig.isPending}
+            >
               <Save className="h-4 w-4 mr-2" />
               Save Settings
             </Button>
@@ -780,7 +837,9 @@ export default function ValueStackPage() {
                 <Label>Hero Headline Override</Label>
                 <Input
                   value={bookingConfig.heroHeadline || ""}
-                  onChange={(e) => setBookingConfig({ ...bookingConfig, heroHeadline: e.target.value })}
+                  onChange={(e) =>
+                    setBookingConfig({ ...bookingConfig, heroHeadline: e.target.value })
+                  }
                   placeholder="Leave empty to use campground name"
                 />
               </div>
@@ -788,7 +847,9 @@ export default function ValueStackPage() {
                 <Label>Hero Subline Override</Label>
                 <Input
                   value={bookingConfig.heroSubline || ""}
-                  onChange={(e) => setBookingConfig({ ...bookingConfig, heroSubline: e.target.value })}
+                  onChange={(e) =>
+                    setBookingConfig({ ...bookingConfig, heroSubline: e.target.value })
+                  }
                   placeholder="Leave empty to use campground tagline"
                 />
               </div>
@@ -796,7 +857,9 @@ export default function ValueStackPage() {
                 <Label>Dream Outcome</Label>
                 <Textarea
                   value={bookingConfig.dreamOutcome || ""}
-                  onChange={(e) => setBookingConfig({ ...bookingConfig, dreamOutcome: e.target.value })}
+                  onChange={(e) =>
+                    setBookingConfig({ ...bookingConfig, dreamOutcome: e.target.value })
+                  }
                   placeholder="e.g., Wake up to the sound of the river. No emails. No traffic. Just you, nature, and 47 acres of peace."
                   rows={3}
                 />
@@ -810,30 +873,36 @@ export default function ValueStackPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Trust & Urgency Signals</CardTitle>
-              <CardDescription>
-                Toggle what elements appear on your booking page
-              </CardDescription>
+              <CardDescription>Toggle what elements appear on your booking page</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Review Count</Label>
-                    <p className="text-xs text-muted-foreground">Display star rating and review count</p>
+                    <p className="text-xs text-muted-foreground">
+                      Display star rating and review count
+                    </p>
                   </div>
                   <Switch
                     checked={bookingConfig.showReviewCount}
-                    onCheckedChange={(v) => setBookingConfig({ ...bookingConfig, showReviewCount: v })}
+                    onCheckedChange={(v) =>
+                      setBookingConfig({ ...bookingConfig, showReviewCount: v })
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Show Trust Badges</Label>
-                    <p className="text-xs text-muted-foreground">Verified photos, secure booking badges</p>
+                    <p className="text-xs text-muted-foreground">
+                      Verified photos, secure booking badges
+                    </p>
                   </div>
                   <Switch
                     checked={bookingConfig.showTrustBadges}
-                    onCheckedChange={(v) => setBookingConfig({ ...bookingConfig, showTrustBadges: v })}
+                    onCheckedChange={(v) =>
+                      setBookingConfig({ ...bookingConfig, showTrustBadges: v })
+                    }
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -853,7 +922,9 @@ export default function ValueStackPage() {
                   </div>
                   <Switch
                     checked={bookingConfig.showLiveViewers}
-                    onCheckedChange={(v) => setBookingConfig({ ...bookingConfig, showLiveViewers: v })}
+                    onCheckedChange={(v) =>
+                      setBookingConfig({ ...bookingConfig, showLiveViewers: v })
+                    }
                   />
                 </div>
               </div>
@@ -863,23 +934,25 @@ export default function ValueStackPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">Button Text</CardTitle>
-              <CardDescription>
-                Customize call-to-action button labels
-              </CardDescription>
+              <CardDescription>Customize call-to-action button labels</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
               <div>
                 <Label>Book Button</Label>
                 <Input
                   value={bookingConfig.bookButtonText}
-                  onChange={(e) => setBookingConfig({ ...bookingConfig, bookButtonText: e.target.value })}
+                  onChange={(e) =>
+                    setBookingConfig({ ...bookingConfig, bookButtonText: e.target.value })
+                  }
                 />
               </div>
               <div>
                 <Label>Check Availability Button</Label>
                 <Input
                   value={bookingConfig.checkAvailText}
-                  onChange={(e) => setBookingConfig({ ...bookingConfig, checkAvailText: e.target.value })}
+                  onChange={(e) =>
+                    setBookingConfig({ ...bookingConfig, checkAvailText: e.target.value })
+                  }
                 />
               </div>
             </CardContent>

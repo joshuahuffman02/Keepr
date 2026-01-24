@@ -42,22 +42,12 @@ export function OptimizedImage({
     portrait: "aspect-[3/4]",
   };
 
-  const aspectClass = aspectRatio
-    ? aspectClasses[aspectRatio] || `aspect-[${aspectRatio}]`
-    : "";
+  const aspectClass = aspectRatio ? aspectClasses[aspectRatio] || `aspect-[${aspectRatio}]` : "";
 
   if (hasError) {
     return (
-      <div
-        className={cn(
-          "flex items-center justify-center bg-muted",
-          aspectClass,
-          className
-        )}
-      >
-        {fallback || (
-          <div className="text-muted-foreground text-sm">Image unavailable</div>
-        )}
+      <div className={cn("flex items-center justify-center bg-muted", aspectClass, className)}>
+        {fallback || <div className="text-muted-foreground text-sm">Image unavailable</div>}
       </div>
     );
   }
@@ -65,9 +55,7 @@ export function OptimizedImage({
   return (
     <div className={cn("relative overflow-hidden", aspectClass, className)}>
       {/* Loading skeleton */}
-      {showSkeleton && isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse" />
-      )}
+      {showSkeleton && isLoading && <div className="absolute inset-0 bg-muted animate-pulse" />}
 
       <Image
         src={src}
@@ -79,7 +67,7 @@ export function OptimizedImage({
         loading={priority ? "eager" : "lazy"}
         className={cn(
           "object-cover transition-opacity duration-300",
-          isLoading ? "opacity-0" : "opacity-100"
+          isLoading ? "opacity-0" : "opacity-100",
         )}
         onLoad={() => setIsLoading(false)}
         onError={() => {
@@ -120,9 +108,7 @@ export function HeroImage({
         className="absolute inset-0"
         sizes="100vw"
       />
-      {children && (
-        <div className={cn("relative z-10", overlayClassName)}>{children}</div>
-      )}
+      {children && <div className={cn("relative z-10", overlayClassName)}>{children}</div>}
     </div>
   );
 }
@@ -145,10 +131,7 @@ export function GalleryImage({
     <button
       type="button"
       onClick={onClick}
-      className={cn(
-        "relative overflow-hidden rounded-lg group cursor-pointer",
-        className
-      )}
+      className={cn("relative overflow-hidden rounded-lg group cursor-pointer", className)}
     >
       <OptimizedImage
         src={src}
@@ -198,7 +181,7 @@ export function AvatarImage({
         className={cn(
           "rounded-full bg-status-success/15 text-status-success flex items-center justify-center font-semibold",
           sizeClasses[size],
-          className
+          className,
         )}
       >
         {initials || "?"}

@@ -55,7 +55,7 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
       const now = new Date();
       const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const res = await fetch(
-        `/api/staff/shifts?campgroundId=${params.campgroundId}&startDate=${lastWeek.toISOString()}&endDate=${now.toISOString()}&status=submitted`
+        `/api/staff/shifts?campgroundId=${params.campgroundId}&startDate=${lastWeek.toISOString()}&endDate=${now.toISOString()}&status=submitted`,
       );
       if (!res.ok) throw new Error("Failed to load");
       setShifts(await res.json());
@@ -81,7 +81,7 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
       await fetch(`/api/staff/shifts/${shiftId}/${status}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approverId: currentUserId })
+        body: JSON.stringify({ approverId: currentUserId }),
       });
       setSuccessMessage(status === "approve" ? "Shift approved!" : "Shift rejected.");
       setTimeout(() => setSuccessMessage(null), 3000);
@@ -141,13 +141,17 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
           <div className="bg-card rounded-xl border border-border p-5 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Approval</div>
+                <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Pending Approval
+                </div>
                 <div className="text-3xl font-bold text-foreground mt-1">{submittedCount}</div>
               </div>
-              <div className={cn(
-                "w-12 h-12 rounded-xl flex items-center justify-center",
-                submittedCount > 0 ? "bg-status-warning/15" : "bg-status-success/15"
-              )}>
+              <div
+                className={cn(
+                  "w-12 h-12 rounded-xl flex items-center justify-center",
+                  submittedCount > 0 ? "bg-status-warning/15" : "bg-status-success/15",
+                )}
+              >
                 {submittedCount > 0 ? (
                   <Clock className="w-6 h-6 text-status-warning" />
                 ) : (
@@ -168,7 +172,8 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
               Quick Tip
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Review timesheets promptly to ensure accurate payroll processing. Check hours against scheduled times.
+              Review timesheets promptly to ensure accurate payroll processing. Check hours against
+              scheduled times.
             </p>
           </div>
 
@@ -215,7 +220,9 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-foreground">Submitted Timesheets</h2>
-                <p className="text-sm text-muted-foreground">Approve or reject staff timesheet submissions</p>
+                <p className="text-sm text-muted-foreground">
+                  Approve or reject staff timesheet submissions
+                </p>
               </div>
             </div>
           </div>
@@ -233,7 +240,8 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">All caught up!</h3>
                 <p className="text-sm text-muted-foreground mt-1 max-w-md">
-                  No timesheets waiting for approval. When staff submit their timesheets, they'll appear here.
+                  No timesheets waiting for approval. When staff submit their timesheets, they'll
+                  appear here.
                 </p>
               </div>
             ) : (
@@ -253,15 +261,27 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
                         <User className="w-5 h-5 text-muted-foreground" />
                       </div>
                       <div>
-                        <div className="font-semibold text-foreground">
-                          {shift.role || "Shift"}
-                        </div>
+                        <div className="font-semibold text-foreground">{shift.role || "Shift"}</div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="w-3.5 h-3.5" />
-                          <span>{new Date(shift.shiftDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</span>
+                          <span>
+                            {new Date(shift.shiftDate).toLocaleDateString(undefined, {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                            })}
+                          </span>
                           <span>&middot;</span>
                           <span>
-                            {new Date(shift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} - {new Date(shift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                            {new Date(shift.startTime).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}{" "}
+                            -{" "}
+                            {new Date(shift.endTime).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
                           </span>
                         </div>
                         {(shift.scheduledMinutes || shift.actualMinutes) && (
@@ -270,7 +290,9 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
                               <span>Scheduled: {formatDuration(shift.scheduledMinutes)}</span>
                             )}
                             {shift.actualMinutes && (
-                              <span className="text-status-success font-medium">Actual: {formatDuration(shift.actualMinutes)}</span>
+                              <span className="text-status-success font-medium">
+                                Actual: {formatDuration(shift.actualMinutes)}
+                              </span>
                             )}
                           </div>
                         )}

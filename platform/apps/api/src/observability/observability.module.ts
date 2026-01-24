@@ -38,7 +38,7 @@ import { SyntheticsService } from "./synthetics.service";
 export class ObservabilityModule implements OnModuleInit {
   constructor(
     private readonly moduleRef: ModuleRef,
-    private readonly syntheticChecks: SyntheticChecksService
+    private readonly syntheticChecks: SyntheticChecksService,
   ) {}
 
   async onModuleInit() {
@@ -61,4 +61,3 @@ export class ObservabilityModule implements OnModuleInit {
     }
   }
 }
-

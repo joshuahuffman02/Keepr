@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../../prisma/prisma.service";
 import {
   OpBadge,
   OpBadgeCategory,
@@ -14,14 +10,14 @@ import {
   OpStaffDailyStats,
   OpTaskState,
   OpSlaStatus,
-} from '@prisma/client';
-import type { Prisma } from '@prisma/client';
+} from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
 interface BadgeCriteria {
-  type: 'task_count' | 'streak' | 'sla_compliance' | 'speed' | 'special';
+  type: "task_count" | "streak" | "sla_compliance" | "speed" | "special";
   threshold: number;
-  timeframe?: 'day' | 'week' | 'month' | 'all_time';
+  timeframe?: "day" | "week" | "month" | "all_time";
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -35,10 +31,7 @@ const isBadgeType = (value: unknown): value is BadgeCriteria["type"] =>
   value === "special";
 
 const isBadgeTimeframe = (value: unknown): value is NonNullable<BadgeCriteria["timeframe"]> =>
-  value === "day" ||
-  value === "week" ||
-  value === "month" ||
-  value === "all_time";
+  value === "day" || value === "week" || value === "month" || value === "all_time";
 
 const parseBadgeCriteria = (value: unknown): BadgeCriteria | null => {
   if (!isRecord(value)) return null;
@@ -72,11 +65,11 @@ export class OpGamificationService {
   // Points configuration
   private readonly POINTS = {
     TASK_COMPLETED: 10,
-    TASK_ON_TIME: 5,      // Bonus for completing before SLA
-    TASK_EARLY: 10,       // Bonus for completing well before SLA (>30min early)
-    STREAK_DAY: 20,       // Bonus for maintaining streak
-    PERFECT_DAY: 50,      // All tasks on time in a day
-    LEVEL_UP: 100,        // Bonus when leveling up
+    TASK_ON_TIME: 5, // Bonus for completing before SLA
+    TASK_EARLY: 10, // Bonus for completing well before SLA (>30min early)
+    STREAK_DAY: 20, // Bonus for maintaining streak
+    PERFECT_DAY: 50, // All tasks on time in a day
+    LEVEL_UP: 100, // Bonus when leveling up
   };
 
   // XP thresholds for levels
@@ -102,7 +95,7 @@ export class OpGamificationService {
         ],
         isActive: true,
       },
-      orderBy: [{ tier: 'asc' }, { category: 'asc' }, { name: 'asc' }],
+      orderBy: [{ tier: "asc" }, { category: "asc" }, { name: "asc" }],
     });
   }
 
@@ -154,151 +147,151 @@ export class OpGamificationService {
     }> = [
       // Speed badges
       {
-        code: 'speed_demon',
-        name: 'Speed Demon',
-        description: 'Complete 5 tasks in under 30 minutes each',
-        icon: 'bolt',
+        code: "speed_demon",
+        name: "Speed Demon",
+        description: "Complete 5 tasks in under 30 minutes each",
+        icon: "bolt",
         category: OpBadgeCategory.speed,
         tier: OpBadgeTier.bronze,
-        criteria: { type: 'speed', threshold: 5, timeframe: 'day' },
+        criteria: { type: "speed", threshold: 5, timeframe: "day" },
         points: 25,
       },
       {
-        code: 'lightning_fast',
-        name: 'Lightning Fast',
-        description: 'Complete 20 tasks in under 30 minutes each',
-        icon: 'zap',
+        code: "lightning_fast",
+        name: "Lightning Fast",
+        description: "Complete 20 tasks in under 30 minutes each",
+        icon: "zap",
         category: OpBadgeCategory.speed,
         tier: OpBadgeTier.silver,
-        criteria: { type: 'speed', threshold: 20, timeframe: 'week' },
+        criteria: { type: "speed", threshold: 20, timeframe: "week" },
         points: 50,
       },
 
       // Volume badges
       {
-        code: 'task_starter',
-        name: 'Task Starter',
-        description: 'Complete your first 10 tasks',
-        icon: 'target',
+        code: "task_starter",
+        name: "Task Starter",
+        description: "Complete your first 10 tasks",
+        icon: "target",
         category: OpBadgeCategory.volume,
         tier: OpBadgeTier.bronze,
-        criteria: { type: 'task_count', threshold: 10, timeframe: 'all_time' },
+        criteria: { type: "task_count", threshold: 10, timeframe: "all_time" },
         points: 20,
       },
       {
-        code: 'task_crusher',
-        name: 'Task Crusher',
-        description: 'Complete 50 tasks',
-        icon: 'hammer',
+        code: "task_crusher",
+        name: "Task Crusher",
+        description: "Complete 50 tasks",
+        icon: "hammer",
         category: OpBadgeCategory.volume,
         tier: OpBadgeTier.silver,
-        criteria: { type: 'task_count', threshold: 50, timeframe: 'all_time' },
+        criteria: { type: "task_count", threshold: 50, timeframe: "all_time" },
         points: 50,
       },
       {
-        code: 'task_master',
-        name: 'Task Master',
-        description: 'Complete 200 tasks',
-        icon: 'crown',
+        code: "task_master",
+        name: "Task Master",
+        description: "Complete 200 tasks",
+        icon: "crown",
         category: OpBadgeCategory.volume,
         tier: OpBadgeTier.gold,
-        criteria: { type: 'task_count', threshold: 200, timeframe: 'all_time' },
+        criteria: { type: "task_count", threshold: 200, timeframe: "all_time" },
         points: 100,
       },
       {
-        code: 'daily_warrior',
-        name: 'Daily Warrior',
-        description: 'Complete 10 tasks in a single day',
-        icon: 'swords',
+        code: "daily_warrior",
+        name: "Daily Warrior",
+        description: "Complete 10 tasks in a single day",
+        icon: "swords",
         category: OpBadgeCategory.volume,
         tier: OpBadgeTier.silver,
-        criteria: { type: 'task_count', threshold: 10, timeframe: 'day' },
+        criteria: { type: "task_count", threshold: 10, timeframe: "day" },
         points: 30,
       },
 
       // Quality badges
       {
-        code: 'perfect_day',
-        name: 'Perfect Day',
-        description: 'Complete all your tasks on time for a full day',
-        icon: 'sparkles',
+        code: "perfect_day",
+        name: "Perfect Day",
+        description: "Complete all your tasks on time for a full day",
+        icon: "sparkles",
         category: OpBadgeCategory.quality,
         tier: OpBadgeTier.bronze,
-        criteria: { type: 'sla_compliance', threshold: 100, timeframe: 'day' },
+        criteria: { type: "sla_compliance", threshold: 100, timeframe: "day" },
         points: 25,
       },
       {
-        code: 'perfect_week',
-        name: 'Perfect Week',
-        description: 'Maintain 100% SLA compliance for a week',
-        icon: 'star',
+        code: "perfect_week",
+        name: "Perfect Week",
+        description: "Maintain 100% SLA compliance for a week",
+        icon: "star",
         category: OpBadgeCategory.quality,
         tier: OpBadgeTier.gold,
-        criteria: { type: 'sla_compliance', threshold: 100, timeframe: 'week' },
+        criteria: { type: "sla_compliance", threshold: 100, timeframe: "week" },
         points: 100,
       },
       {
-        code: 'reliability_star',
-        name: 'Reliability Star',
-        description: 'Maintain 95%+ SLA compliance over 50 tasks',
-        icon: 'award',
+        code: "reliability_star",
+        name: "Reliability Star",
+        description: "Maintain 95%+ SLA compliance over 50 tasks",
+        icon: "award",
         category: OpBadgeCategory.quality,
         tier: OpBadgeTier.silver,
-        criteria: { type: 'sla_compliance', threshold: 95, timeframe: 'all_time' },
+        criteria: { type: "sla_compliance", threshold: 95, timeframe: "all_time" },
         points: 75,
       },
 
       // Streak badges
       {
-        code: 'on_fire',
-        name: 'On Fire',
-        description: 'Complete tasks 5 days in a row',
-        icon: 'flame',
+        code: "on_fire",
+        name: "On Fire",
+        description: "Complete tasks 5 days in a row",
+        icon: "flame",
         category: OpBadgeCategory.streak,
         tier: OpBadgeTier.bronze,
-        criteria: { type: 'streak', threshold: 5 },
+        criteria: { type: "streak", threshold: 5 },
         points: 30,
       },
       {
-        code: 'unstoppable',
-        name: 'Unstoppable',
-        description: 'Complete tasks 14 days in a row',
-        icon: 'rocket',
+        code: "unstoppable",
+        name: "Unstoppable",
+        description: "Complete tasks 14 days in a row",
+        icon: "rocket",
         category: OpBadgeCategory.streak,
         tier: OpBadgeTier.silver,
-        criteria: { type: 'streak', threshold: 14 },
+        criteria: { type: "streak", threshold: 14 },
         points: 75,
       },
       {
-        code: 'legend',
-        name: 'Legend',
-        description: 'Complete tasks 30 days in a row',
-        icon: 'trophy',
+        code: "legend",
+        name: "Legend",
+        description: "Complete tasks 30 days in a row",
+        icon: "trophy",
         category: OpBadgeCategory.streak,
         tier: OpBadgeTier.platinum,
-        criteria: { type: 'streak', threshold: 30 },
+        criteria: { type: "streak", threshold: 30 },
         points: 200,
       },
 
       // Milestone badges
       {
-        code: 'first_task',
-        name: 'First Steps',
-        description: 'Complete your very first task',
-        icon: 'footprints',
+        code: "first_task",
+        name: "First Steps",
+        description: "Complete your very first task",
+        icon: "footprints",
         category: OpBadgeCategory.milestone,
         tier: OpBadgeTier.bronze,
-        criteria: { type: 'task_count', threshold: 1, timeframe: 'all_time' },
+        criteria: { type: "task_count", threshold: 1, timeframe: "all_time" },
         points: 10,
       },
       {
-        code: 'century_club',
-        name: 'Century Club',
-        description: 'Complete 100 tasks',
-        icon: 'badge-check',
+        code: "century_club",
+        name: "Century Club",
+        description: "Complete 100 tasks",
+        icon: "badge-check",
         category: OpBadgeCategory.milestone,
         tier: OpBadgeTier.gold,
-        criteria: { type: 'task_count', threshold: 100, timeframe: 'all_time' },
+        criteria: { type: "task_count", threshold: 100, timeframe: "all_time" },
         points: 100,
       },
     ];
@@ -324,7 +317,9 @@ export class OpGamificationService {
         });
         badges.push(created);
       } catch (error: unknown) {
-        this.logger.warn(`Failed to create badge ${badge.code}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        this.logger.warn(
+          `Failed to create badge ${badge.code}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
     }
 
@@ -360,21 +355,19 @@ export class OpGamificationService {
   async getLeaderboard(
     campgroundId: string,
     options?: {
-      period?: 'week' | 'month' | 'all_time';
+      period?: "week" | "month" | "all_time";
       limit?: number;
     },
   ): Promise<Array<OpStaffStats & { user: { id: string; firstName: string; lastName: string } }>> {
-    const period = options?.period || 'week';
+    const period = options?.period || "week";
     const limit = options?.limit || 10;
 
     const orderByField =
-      period === 'week' ? 'weekPoints' :
-      period === 'month' ? 'monthPoints' :
-      'totalPoints';
+      period === "week" ? "weekPoints" : period === "month" ? "monthPoints" : "totalPoints";
 
     const leaderboard = await this.prisma.opStaffStats.findMany({
       where: { campgroundId },
-      orderBy: { [orderByField]: 'desc' },
+      orderBy: { [orderByField]: "desc" },
       take: limit,
       include: {
         User: {
@@ -388,7 +381,10 @@ export class OpGamificationService {
   /**
    * Get staff profile with stats and badges
    */
-  async getStaffProfile(userId: string, campgroundId: string): Promise<{
+  async getStaffProfile(
+    userId: string,
+    campgroundId: string,
+  ): Promise<{
     stats: OpStaffStats;
     badges: Array<OpStaffBadge & { badge: OpBadge }>;
     recentActivity: OpStaffDailyStats[];
@@ -400,7 +396,7 @@ export class OpGamificationService {
     const badges = await this.prisma.opStaffBadge.findMany({
       where: { userId, campgroundId },
       include: { OpBadge: true },
-      orderBy: { earnedAt: 'desc' },
+      orderBy: { earnedAt: "desc" },
     });
     const mappedBadges = badges.map(({ OpBadge, ...rest }) => ({ ...rest, badge: OpBadge }));
 
@@ -414,7 +410,7 @@ export class OpGamificationService {
         campgroundId,
         date: { gte: fourteenDaysAgo },
       },
-      orderBy: { date: 'desc' },
+      orderBy: { date: "desc" },
     });
 
     // Calculate level
@@ -428,9 +424,11 @@ export class OpGamificationService {
    * Get all staff with their stats for a campground
    */
   async getAllStaffStats(campgroundId: string): Promise<
-    Array<OpStaffStats & {
-      user: { id: string; firstName: string; lastName: string };
-    }>
+    Array<
+      OpStaffStats & {
+        user: { id: string; firstName: string; lastName: string };
+      }
+    >
   > {
     const stats = await this.prisma.opStaffStats.findMany({
       where: { campgroundId },
@@ -440,7 +438,7 @@ export class OpGamificationService {
         },
         // Note: This relation might not exist directly - we may need to query badges separately
       },
-      orderBy: { totalPoints: 'desc' },
+      orderBy: { totalPoints: "desc" },
     });
     return stats.map(({ User, ...rest }) => ({ ...rest, user: User }));
   }
@@ -496,7 +494,9 @@ export class OpGamificationService {
 
     // Track fast completions (under 30 minutes)
     const FAST_COMPLETION_THRESHOLD_MINUTES = 30;
-    const isFastCompletion = completionTimeMinutes !== undefined && completionTimeMinutes < FAST_COMPLETION_THRESHOLD_MINUTES;
+    const isFastCompletion =
+      completionTimeMinutes !== undefined &&
+      completionTimeMinutes < FAST_COMPLETION_THRESHOLD_MINUTES;
 
     const dailyStats = await this.prisma.opStaffDailyStats.upsert({
       where: {
@@ -555,7 +555,7 @@ export class OpGamificationService {
       // For simplicity, if there's no yesterday record, don't break streak on first task of day
       if (stats.lastTaskAt) {
         const daysSinceLastTask = Math.floor(
-          (today.getTime() - new Date(stats.lastTaskAt).getTime()) / (1000 * 60 * 60 * 24)
+          (today.getTime() - new Date(stats.lastTaskAt).getTime()) / (1000 * 60 * 60 * 24),
         );
         if (daysSinceLastTask > 1) {
           newStreak = 1; // Reset streak
@@ -582,7 +582,10 @@ export class OpGamificationService {
         currentStreak: newStreak,
         longestStreak: Math.max(stats.longestStreak, newStreak),
         currentPerfectStreak: wasOnTime ? newPerfectStreak + 1 : 0,
-        longestPerfectStreak: Math.max(stats.longestPerfectStreak, wasOnTime ? newPerfectStreak + 1 : newPerfectStreak),
+        longestPerfectStreak: Math.max(
+          stats.longestPerfectStreak,
+          wasOnTime ? newPerfectStreak + 1 : newPerfectStreak,
+        ),
         lastTaskAt: new Date(),
       },
     });
@@ -647,36 +650,35 @@ export class OpGamificationService {
       let qualified = false;
 
       switch (criteria.type) {
-        case 'task_count':
-          if (criteria.timeframe === 'day') {
+        case "task_count":
+          if (criteria.timeframe === "day") {
             qualified = (dailyStats?.tasksCompleted || 0) >= criteria.threshold;
           } else {
             qualified = stats.totalTasksCompleted >= criteria.threshold;
           }
           break;
 
-        case 'streak':
+        case "streak":
           qualified = stats.currentStreak >= criteria.threshold;
           break;
 
-        case 'sla_compliance':
-          if (criteria.timeframe === 'day') {
+        case "sla_compliance":
+          if (criteria.timeframe === "day") {
             qualified =
               !!dailyStats &&
               dailyStats.tasksCompleted > 0 &&
               dailyStats.tasksOnTime === dailyStats.tasksCompleted;
           } else {
             qualified =
-              stats.totalTasksCompleted > 0 &&
-              stats.slaComplianceRate >= criteria.threshold;
+              stats.totalTasksCompleted > 0 && stats.slaComplianceRate >= criteria.threshold;
           }
           break;
 
-        case 'speed':
+        case "speed":
           // Check fast completions (tasks completed in under 30 minutes)
-          if (criteria.timeframe === 'day') {
+          if (criteria.timeframe === "day") {
             qualified = (dailyStats?.fastCompletions || 0) >= criteria.threshold;
-          } else if (criteria.timeframe === 'week') {
+          } else if (criteria.timeframe === "week") {
             qualified = stats.weekFastCompletions >= criteria.threshold;
           } else {
             qualified = stats.totalFastCompletions >= criteria.threshold;
@@ -714,7 +716,9 @@ export class OpGamificationService {
           this.logger.log(`User ${userId} earned badge: ${badge.name}`);
         } catch (error: unknown) {
           // Unique constraint violation means already earned
-          this.logger.debug(`Badge ${badge.code} already earned or error: ${error instanceof Error ? error.message : 'Unknown'}`);
+          this.logger.debug(
+            `Badge ${badge.code} already earned or error: ${error instanceof Error ? error.message : "Unknown"}`,
+          );
         }
       }
     }
@@ -729,9 +733,9 @@ export class OpGamificationService {
   /**
    * Reset weekly stats (runs Monday at midnight)
    */
-  @Cron('0 0 * * 1') // Every Monday at midnight
+  @Cron("0 0 * * 1") // Every Monday at midnight
   async resetWeeklyStats(): Promise<void> {
-    this.logger.log('Resetting weekly stats...');
+    this.logger.log("Resetting weekly stats...");
 
     await this.prisma.opStaffStats.updateMany({
       data: {
@@ -747,9 +751,9 @@ export class OpGamificationService {
   /**
    * Reset monthly stats (runs 1st of month at midnight)
    */
-  @Cron('0 0 1 * *') // First day of month at midnight
+  @Cron("0 0 1 * *") // First day of month at midnight
   async resetMonthlyStats(): Promise<void> {
-    this.logger.log('Resetting monthly stats...');
+    this.logger.log("Resetting monthly stats...");
 
     await this.prisma.opStaffStats.updateMany({
       data: {
@@ -766,7 +770,7 @@ export class OpGamificationService {
    */
   @Cron(CronExpression.EVERY_HOUR)
   async updateRankings(): Promise<void> {
-    this.logger.log('Updating rankings...');
+    this.logger.log("Updating rankings...");
 
     // Get all campgrounds with staff stats
     const campgrounds = await this.prisma.campground.findMany({
@@ -780,7 +784,7 @@ export class OpGamificationService {
       // Update weekly rankings
       const weeklyStats = await this.prisma.opStaffStats.findMany({
         where: { campgroundId: campground.id },
-        orderBy: { weekPoints: 'desc' },
+        orderBy: { weekPoints: "desc" },
       });
 
       for (let i = 0; i < weeklyStats.length; i++) {
@@ -793,7 +797,7 @@ export class OpGamificationService {
       // Update monthly rankings
       const monthlyStats = await this.prisma.opStaffStats.findMany({
         where: { campgroundId: campground.id },
-        orderBy: { monthPoints: 'desc' },
+        orderBy: { monthPoints: "desc" },
       });
 
       for (let i = 0; i < monthlyStats.length; i++) {
@@ -806,7 +810,7 @@ export class OpGamificationService {
       // Update all-time rankings
       const allTimeStats = await this.prisma.opStaffStats.findMany({
         where: { campgroundId: campground.id },
-        orderBy: { totalPoints: 'desc' },
+        orderBy: { totalPoints: "desc" },
       });
 
       for (let i = 0; i < allTimeStats.length; i++) {
@@ -826,7 +830,7 @@ export class OpGamificationService {
       }
     }
 
-    this.logger.log('Rankings updated successfully');
+    this.logger.log("Rankings updated successfully");
   }
 
   // ============================================================

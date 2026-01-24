@@ -64,7 +64,7 @@ export class SeedJobService {
     });
 
     this.logger.log(
-      `Created seed job ${job.id} for ${dto.dataSource}${dto.targetState ? ` (${dto.targetState})` : ""}`
+      `Created seed job ${job.id} for ${dto.dataSource}${dto.targetState ? ` (${dto.targetState})` : ""}`,
     );
 
     return job.id;
@@ -96,7 +96,7 @@ export class SeedJobService {
       recordsCreated?: number;
       recordsUpdated?: number;
       recordsFailed?: number;
-    }
+    },
   ): Promise<void> {
     const data: Prisma.CampgroundSeedJobUpdateInput = {};
 
@@ -129,7 +129,7 @@ export class SeedJobService {
       recordsCreated: number;
       recordsUpdated: number;
       recordsFailed: number;
-    }
+    },
   ): Promise<void> {
     await this.prisma.campgroundSeedJob.update({
       where: { id: jobId },
@@ -145,7 +145,7 @@ export class SeedJobService {
     });
 
     this.logger.log(
-      `Completed seed job ${jobId}: processed=${stats.recordsProcessed}, created=${stats.recordsCreated}, updated=${stats.recordsUpdated}, failed=${stats.recordsFailed}`
+      `Completed seed job ${jobId}: processed=${stats.recordsProcessed}, created=${stats.recordsCreated}, updated=${stats.recordsUpdated}, failed=${stats.recordsFailed}`,
     );
   }
 
@@ -186,10 +186,7 @@ export class SeedJobService {
     } else if (job.status === "running" && job.processedRecords > 0) {
       // Estimate based on typical state size (~500 campgrounds avg)
       const estimatedTotal = targetState ? 500 : 25000;
-      progress = Math.min(
-        99,
-        Math.round((job.processedRecords / estimatedTotal) * 100)
-      );
+      progress = Math.min(99, Math.round((job.processedRecords / estimatedTotal) * 100));
     }
 
     const errorMessage = (() => {
@@ -240,10 +237,7 @@ export class SeedJobService {
   /**
    * Get the last successful job for a data source/state
    */
-  async getLastSuccessfulJob(
-    dataSource: CampgroundDataSource,
-    targetState?: string
-  ) {
+  async getLastSuccessfulJob(dataSource: CampgroundDataSource, targetState?: string) {
     const jobs = await this.prisma.campgroundSeedJob.findMany({
       where: {
         source: dataSource,
@@ -259,10 +253,7 @@ export class SeedJobService {
   /**
    * Check if a job is currently running for a data source/state
    */
-  async isJobRunning(
-    dataSource: CampgroundDataSource,
-    targetState?: string
-  ): Promise<boolean> {
+  async isJobRunning(dataSource: CampgroundDataSource, targetState?: string): Promise<boolean> {
     const jobs = await this.prisma.campgroundSeedJob.findMany({
       where: {
         source: dataSource,

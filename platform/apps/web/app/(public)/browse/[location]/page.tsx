@@ -24,9 +24,16 @@ function parseLocationSlug(slug: string): { state: string; city?: string } {
   // Try to identify state (usually last 1-2 parts)
   // Common 2-word states: new-york, new-jersey, new-mexico, etc.
   const twoWordStates = [
-    "new-york", "new-jersey", "new-mexico", "new-hampshire",
-    "north-carolina", "north-dakota", "south-carolina", "south-dakota",
-    "west-virginia", "rhode-island"
+    "new-york",
+    "new-jersey",
+    "new-mexico",
+    "new-hampshire",
+    "north-carolina",
+    "north-dakota",
+    "south-carolina",
+    "south-dakota",
+    "west-virginia",
+    "rhode-island",
   ];
 
   const lastTwo = parts.slice(-2).join("-");
@@ -123,14 +130,12 @@ export default async function LocationPage({ params }: Props) {
   }
 
   // Build breadcrumbs
-  const breadcrumbs: BreadcrumbItem[] = [
-    { name: "Browse Campgrounds", path: "/browse" },
-  ];
+  const breadcrumbs: BreadcrumbItem[] = [{ name: "Browse Campgrounds", path: "/browse" }];
 
   if (cityName) {
     breadcrumbs.push(
       { name: stateName, path: `/browse/${parsed.state}` },
-      { name: cityName, path: `/browse/${location}` }
+      { name: cityName, path: `/browse/${location}` },
     );
   } else {
     breadcrumbs.push({ name: stateName, path: `/browse/${location}` });
@@ -149,8 +154,8 @@ export default async function LocationPage({ params }: Props) {
                 slug: `${cg.city!.toLowerCase().replace(/\s+/g, "-")}-${parsed.state}`,
                 count: campgrounds.filter((c) => c.city === cg.city).length,
               },
-            ])
-        ).values()
+            ]),
+        ).values(),
       ).sort((a, b) => b.count - a.count)
     : [];
 
@@ -177,9 +182,7 @@ export default async function LocationPage({ params }: Props) {
       {/* Header */}
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900">
-          {cityName
-            ? `Campgrounds in ${cityName}, ${stateName}`
-            : `Campgrounds in ${stateName}`}
+          {cityName ? `Campgrounds in ${cityName}, ${stateName}` : `Campgrounds in ${stateName}`}
         </h1>
         <p className="text-lg text-slate-600 mt-2">
           {campgrounds.length} campground{campgrounds.length !== 1 ? "s" : ""} available
@@ -237,9 +240,7 @@ export default async function LocationPage({ params }: Props) {
                   )}
 
                   {campground.tagline && (
-                    <p className="text-sm text-slate-500 mt-2 line-clamp-2">
-                      {campground.tagline}
-                    </p>
+                    <p className="text-sm text-slate-500 mt-2 line-clamp-2">{campground.tagline}</p>
                   )}
 
                   <div className="flex items-center justify-between mt-3">
@@ -250,9 +251,7 @@ export default async function LocationPage({ params }: Props) {
                           {Number(campground.reviewScore).toFixed(1)}
                         </span>
                         {campground.reviewCount && (
-                          <span className="text-xs text-slate-500">
-                            ({campground.reviewCount})
-                          </span>
+                          <span className="text-xs text-slate-500">({campground.reviewCount})</span>
                         )}
                       </div>
                     ) : (
@@ -283,7 +282,8 @@ export default async function LocationPage({ params }: Props) {
               : `${stateName} offers diverse camping experiences across its beautiful landscapes. Whether you're looking for beachfront RV parks, mountain cabins, or family-friendly campgrounds, you'll find it here.`}
           </p>
           <p>
-            All campgrounds listed on Keepr offer online booking with instant confirmation. Compare amenities, read guest reviews, and find available dates for your preferred travel dates.
+            All campgrounds listed on Keepr offer online booking with instant confirmation. Compare
+            amenities, read guest reviews, and find available dates for your preferred travel dates.
           </p>
         </div>
       </section>
@@ -291,9 +291,7 @@ export default async function LocationPage({ params }: Props) {
       {/* Nearby states */}
       {!cityName && nearbyStates.length > 0 && (
         <section className="mb-12">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
-            Explore More States
-          </h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-4">Explore More States</h2>
           <div className="flex flex-wrap gap-3">
             {nearbyStates.map((state) => (
               <Link
@@ -311,9 +309,7 @@ export default async function LocationPage({ params }: Props) {
 
       {/* CTA */}
       <section className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 md:p-8 text-center">
-        <h2 className="text-2xl font-bold text-slate-900">
-          Can't find what you're looking for?
-        </h2>
+        <h2 className="text-2xl font-bold text-slate-900">Can't find what you're looking for?</h2>
         <p className="text-slate-600 mt-2 mb-4">
           Search all campgrounds or contact us for personalized recommendations.
         </p>

@@ -36,7 +36,9 @@ export class ApiUsageService {
   }
 
   // Check if client has exceeded rate limit
-  async checkRateLimit(apiClientId: string): Promise<{ allowed: boolean; remaining: number; resetAt: Date }> {
+  async checkRateLimit(
+    apiClientId: string,
+  ): Promise<{ allowed: boolean; remaining: number; resetAt: Date }> {
     const client = await this.prisma.apiClient.findUnique({
       where: { id: apiClientId },
       select: { rateLimit: true },
@@ -67,36 +69,37 @@ export class ApiUsageService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const [totalRequests, avgResponseTime, statusBreakdown, topEndpoints, dailyUsage] = await Promise.all([
-      // Total requests
-      this.prisma.apiUsage.count({
-        where: { apiClientId, createdAt: { gte: startDate } },
-      }),
+    const [totalRequests, avgResponseTime, statusBreakdown, topEndpoints, dailyUsage] =
+      await Promise.all([
+        // Total requests
+        this.prisma.apiUsage.count({
+          where: { apiClientId, createdAt: { gte: startDate } },
+        }),
 
-      // Average response time
-      this.prisma.apiUsage.aggregate({
-        where: { apiClientId, createdAt: { gte: startDate } },
-        _avg: { responseTime: true },
-      }),
+        // Average response time
+        this.prisma.apiUsage.aggregate({
+          where: { apiClientId, createdAt: { gte: startDate } },
+          _avg: { responseTime: true },
+        }),
 
-      // Status code breakdown
-      this.prisma.apiUsage.groupBy({
-        by: ["statusCode"],
-        where: { apiClientId, createdAt: { gte: startDate } },
-        _count: true,
-      }),
+        // Status code breakdown
+        this.prisma.apiUsage.groupBy({
+          by: ["statusCode"],
+          where: { apiClientId, createdAt: { gte: startDate } },
+          _count: true,
+        }),
 
-      // Top endpoints
-      this.prisma.apiUsage.groupBy({
-        by: ["endpoint", "method"],
-        where: { apiClientId, createdAt: { gte: startDate } },
-        _count: true,
-        orderBy: { _count: { endpoint: "desc" } },
-        take: 10,
-      }),
+        // Top endpoints
+        this.prisma.apiUsage.groupBy({
+          by: ["endpoint", "method"],
+          where: { apiClientId, createdAt: { gte: startDate } },
+          _count: true,
+          orderBy: { _count: { endpoint: "desc" } },
+          take: 10,
+        }),
 
-      // Daily usage (raw query for date grouping)
-      this.prisma.$queryRaw<{ date: string; count: bigint }[]>`
+        // Daily usage (raw query for date grouping)
+        this.prisma.$queryRaw<{ date: string; count: bigint }[]>`
         SELECT DATE(created_at) as date, COUNT(*) as count
         FROM "ApiUsage"
         WHERE api_client_id = ${apiClientId}
@@ -104,16 +107,18 @@ export class ApiUsageService {
         GROUP BY DATE(created_at)
         ORDER BY date DESC
       `,
-    ]);
+      ]);
 
-    const successRate = statusBreakdown.length > 0
-      ? Math.round(
-          (statusBreakdown.filter((s) => s.statusCode >= 200 && s.statusCode < 300)
-            .reduce((sum, s) => sum + s._count, 0) /
-            totalRequests) *
-            100
-        )
-      : 100;
+    const successRate =
+      statusBreakdown.length > 0
+        ? Math.round(
+            (statusBreakdown
+              .filter((s) => s.statusCode >= 200 && s.statusCode < 300)
+              .reduce((sum, s) => sum + s._count, 0) /
+              totalRequests) *
+              100,
+          )
+        : 100;
 
     return {
       totalRequests,

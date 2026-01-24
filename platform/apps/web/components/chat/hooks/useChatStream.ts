@@ -127,7 +127,11 @@ const isActionRequired = (value: unknown): value is ActionRequired => {
   if (!isRecord(value)) return false;
   const type = value.type;
   if (type !== "confirmation" && type !== "form" && type !== "selection") return false;
-  return typeof value.actionId === "string" && typeof value.title === "string" && typeof value.description === "string";
+  return (
+    typeof value.actionId === "string" &&
+    typeof value.title === "string" &&
+    typeof value.description === "string"
+  );
 };
 
 const toSendMessageResponse = (value: unknown): SendMessageResponse => {
@@ -174,7 +178,9 @@ const toRegenerateResponse = (value: unknown): RegenerateResponse | null => {
     messageId,
     content,
     toolCalls: Array.isArray(value.toolCalls) ? value.toolCalls.filter(isToolCall) : undefined,
-    toolResults: Array.isArray(value.toolResults) ? value.toolResults.filter(isToolResult) : undefined,
+    toolResults: Array.isArray(value.toolResults)
+      ? value.toolResults.filter(isToolResult)
+      : undefined,
     actionRequired: isActionRequired(value.actionRequired) ? value.actionRequired : undefined,
     createdAt: getString(value.createdAt),
   };
@@ -188,7 +194,13 @@ interface UseChatStreamOptions {
   sessionId?: string;
 }
 
-export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessionId }: UseChatStreamOptions) {
+export function useChatStream({
+  campgroundId,
+  isGuest,
+  guestId,
+  authToken,
+  sessionId,
+}: UseChatStreamOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -242,20 +254,18 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
 
     const handleToken = (data: StreamToken) => {
       if (data.token) {
-        setStreamingContent(prev => prev + data.token);
+        setStreamingContent((prev) => prev + data.token);
       }
 
       const toolCall = data.toolCall;
       if (toolCall) {
         // Handle tool call notification with immutable update
-        setMessages(prev => {
+        setMessages((prev) => {
           const lastIndex = prev.length - 1;
           if (lastIndex < 0 || !prev[lastIndex]?.isStreaming) return prev;
 
           return prev.map((msg, idx) =>
-            idx === lastIndex
-              ? { ...msg, toolCalls: [...(msg.toolCalls || []), toolCall] }
-              : msg
+            idx === lastIndex ? { ...msg, toolCalls: [...(msg.toolCalls || []), toolCall] } : msg,
           );
         });
       }
@@ -263,28 +273,26 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
       const toolResult = data.toolResult;
       if (toolResult) {
         // Handle tool result notification with immutable update
-        setMessages(prev => {
+        setMessages((prev) => {
           const lastIndex = prev.length - 1;
           if (lastIndex < 0 || !prev[lastIndex]?.isStreaming) return prev;
 
           return prev.map((msg, idx) =>
             idx === lastIndex
               ? { ...msg, toolResults: [...(msg.toolResults || []), toolResult] }
-              : msg
+              : msg,
           );
         });
       }
 
       if (data.actionRequired) {
         // Handle action required with immutable update
-        setMessages(prev => {
+        setMessages((prev) => {
           const lastIndex = prev.length - 1;
           if (lastIndex < 0 || !prev[lastIndex]?.isStreaming) return prev;
 
           return prev.map((msg, idx) =>
-            idx === lastIndex
-              ? { ...msg, actionRequired: data.actionRequired }
-              : msg
+            idx === lastIndex ? { ...msg, actionRequired: data.actionRequired } : msg,
           );
         });
       }
@@ -292,7 +300,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
 
     const handleComplete = (data: CompleteEvent) => {
       // Finalize the streaming message with immutable update
-      setMessages(prev => {
+      setMessages((prev) => {
         const lastIndex = prev.length - 1;
         if (lastIndex < 0 || !prev[lastIndex]?.isStreaming) return prev;
 
@@ -308,7 +316,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
                 visibility: data.visibility,
                 isStreaming: false,
               }
-            : msg
+            : msg,
         );
       });
 
@@ -325,7 +333,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
         content: data.error || "Something went wrong. Please try again.",
         createdAt: new Date().toISOString(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
       setIsTyping(false);
       setStreamingContent("");
     };
@@ -367,14 +375,12 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
   // Update streaming message content with immutable update
   useEffect(() => {
     if (streamingContent && streamingMessageIdRef.current) {
-      setMessages(prev => {
+      setMessages((prev) => {
         const lastIndex = prev.length - 1;
         if (lastIndex < 0 || !prev[lastIndex]?.isStreaming) return prev;
 
         return prev.map((msg, idx) =>
-          idx === lastIndex
-            ? { ...msg, content: streamingContent }
-            : msg
+          idx === lastIndex ? { ...msg, content: streamingContent } : msg,
         );
       });
     }
@@ -459,13 +465,14 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
     },
     onError: (error) => {
       // Remove streaming message and add error with immutable update
-      setMessages(prev => {
-        const filtered = prev.filter(m => !m.isStreaming);
+      setMessages((prev) => {
+        const filtered = prev.filter((m) => !m.isStreaming);
         const errorMessage: ChatMessage = {
           id: `error_${Date.now()}`,
           conversationId: conversationIdRef.current || "",
           role: "system",
-          content: error instanceof Error ? error.message : "Something went wrong. Please try again.",
+          content:
+            error instanceof Error ? error.message : "Something went wrong. Please try again.",
           createdAt: new Date().toISOString(),
         };
         return [...filtered, errorMessage];
@@ -575,13 +582,11 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
     },
     onSuccess: (data, variables) => {
       const toolCallId = `tool_${Date.now()}`;
-      const resultPayload =
-        data.result ??
-        {
-          success: data.success,
-          message: data.message,
-          prevalidateFailed: data.prevalidateFailed,
-        };
+      const resultPayload = data.result ?? {
+        success: data.success,
+        message: data.message,
+        prevalidateFailed: data.prevalidateFailed,
+      };
       const resultMessage: ChatMessage = {
         id: `tool_${Date.now()}`,
         conversationId: conversationIdRef.current || "",
@@ -715,7 +720,10 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
   });
 
   const sendMessage = useCallback(
-    (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
+    (
+      message: string,
+      options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility },
+    ) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if (!trimmed && (!attachments || attachments.length === 0)) return;
@@ -725,35 +733,35 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
         visibility: options?.visibility,
       });
     },
-    [sendMessageMutation]
+    [sendMessageMutation],
   );
 
   const executeAction = useCallback(
     (actionId: string, optionId: string) => {
       executeActionMutation.mutate({ actionId, optionId });
     },
-    [executeActionMutation]
+    [executeActionMutation],
   );
 
   const executeTool = useCallback(
     (tool: string, args?: Record<string, unknown>) => {
       executeToolMutation.mutate({ tool, args });
     },
-    [executeToolMutation]
+    [executeToolMutation],
   );
 
   const submitFeedback = useCallback(
     (messageId: string, value: "up" | "down") => {
       feedbackMutation.mutate({ messageId, value });
     },
-    [feedbackMutation]
+    [feedbackMutation],
   );
 
   const regenerateMessage = useCallback(
     (messageId: string) => {
       regenerateMutation.mutate(messageId);
     },
-    [regenerateMutation]
+    [regenerateMutation],
   );
 
   const clearMessages = useCallback(() => {
@@ -762,27 +770,24 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
     setStreamingContent("");
   }, []);
 
-  const replaceMessages = useCallback(
-    (nextMessages: UnifiedChatMessage[]) => {
-      streamingMessageIdRef.current = null;
-      const mapped = nextMessages.map((message) => ({
-        id: message.id,
-        conversationId: conversationIdRef.current || "",
-        role: message.role,
-        content: message.content,
-        attachments: message.attachments,
-        toolCalls: message.toolCalls,
-        toolResults: message.toolResults,
-        actionRequired: message.actionRequired,
-        createdAt: message.createdAt ?? new Date().toISOString(),
-        visibility: message.visibility,
-      }));
-      setMessages(mapped);
-      setIsTyping(false);
-      setStreamingContent("");
-    },
-    []
-  );
+  const replaceMessages = useCallback((nextMessages: UnifiedChatMessage[]) => {
+    streamingMessageIdRef.current = null;
+    const mapped = nextMessages.map((message) => ({
+      id: message.id,
+      conversationId: conversationIdRef.current || "",
+      role: message.role,
+      content: message.content,
+      attachments: message.attachments,
+      toolCalls: message.toolCalls,
+      toolResults: message.toolResults,
+      actionRequired: message.actionRequired,
+      createdAt: message.createdAt ?? new Date().toISOString(),
+      visibility: message.visibility,
+    }));
+    setMessages(mapped);
+    setIsTyping(false);
+    setStreamingContent("");
+  }, []);
 
   const setActiveConversation = useCallback((id: string | null) => {
     setConversationId(id);

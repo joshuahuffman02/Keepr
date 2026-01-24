@@ -11,19 +11,19 @@ const isSiteType = (value: string): value is SiteType => SITE_TYPES.has(value);
 
 @Injectable()
 export class SitesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async findOne(id: string) {
     const site = await this.prisma.site.findUnique({
       where: { id },
       include: {
         SiteClass: true,
-        Campground: true
-      }
+        Campground: true,
+      },
     });
 
     if (!site) {
-      throw new NotFoundException('Site not found');
+      throw new NotFoundException("Site not found");
     }
 
     return site;
@@ -31,7 +31,7 @@ export class SitesService {
 
   listByCampground(
     campgroundId: string,
-    options?: { limit?: number; offset?: number; isActive?: boolean }
+    options?: { limit?: number; offset?: number; isActive?: boolean },
   ) {
     const limit = Math.min(options?.limit ?? 200, 500);
     const offset = options?.offset ?? 0;
@@ -39,12 +39,12 @@ export class SitesService {
     return this.prisma.site.findMany({
       where: {
         campgroundId,
-        ...(options?.isActive !== undefined ? { isActive: options.isActive } : {})
+        ...(options?.isActive !== undefined ? { isActive: options.isActive } : {}),
       },
       include: { SiteClass: true },
-      orderBy: { siteNumber: 'asc' },
+      orderBy: { siteNumber: "asc" },
       take: limit,
-      skip: offset
+      skip: offset,
     });
   }
 
@@ -60,7 +60,7 @@ export class SitesService {
     const existing = await this.prisma.site.findUnique({ where: { id } });
 
     if (!existing) {
-      throw new NotFoundException('Site not found');
+      throw new NotFoundException("Site not found");
     }
 
     const { campgroundId, siteType, siteClassId, ...rest } = data;
@@ -68,14 +68,14 @@ export class SitesService {
     if (siteType && !siteTypeValue) throw new BadRequestException("Invalid siteType");
     const updateData: Prisma.SiteUpdateInput = {
       ...rest,
-      ...(siteTypeValue ? { siteType: siteTypeValue } : {})
+      ...(siteTypeValue ? { siteType: siteTypeValue } : {}),
     };
     if (siteClassId !== undefined) {
       updateData.SiteClass = siteClassId ? { connect: { id: siteClassId } } : { disconnect: true };
     }
     return this.prisma.site.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
   }
 
@@ -83,7 +83,7 @@ export class SitesService {
     const existing = await this.prisma.site.findUnique({ where: { id } });
 
     if (!existing) {
-      throw new NotFoundException('Site not found');
+      throw new NotFoundException("Site not found");
     }
 
     return this.prisma.site.delete({ where: { id } });
@@ -97,15 +97,15 @@ export class SitesService {
         siteId: id,
         status: { not: ReservationStatus.cancelled },
         arrivalDate: { lte: now },
-        departureDate: { gt: now }
+        departureDate: { gt: now },
       },
       select: {
         id: true,
         status: true,
         arrivalDate: true,
         departureDate: true,
-        guestId: true
-      }
+        guestId: true,
+      },
     });
 
     if (activeReservation) {

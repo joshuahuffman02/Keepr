@@ -3,12 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Check, Circle, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  onboardingSteps,
-  phaseLabels,
-  OnboardingStepKey,
-  OnboardingPhase,
-} from "@/lib/onboarding";
+import { onboardingSteps, phaseLabels, OnboardingStepKey, OnboardingPhase } from "@/lib/onboarding";
 
 interface SetupProgressProps {
   currentStep: OnboardingStepKey;
@@ -75,7 +70,8 @@ export function SetupProgress({
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-white mb-1">Setup Wizard</h2>
         <p className="text-sm text-slate-400">
-          {completedSteps.length} of {visibleSteps.filter(s => s.required || completedSet.has(s.key)).length} steps complete
+          {completedSteps.length} of{" "}
+          {visibleSteps.filter((s) => s.required || completedSet.has(s.key)).length} steps complete
         </p>
       </div>
 
@@ -85,9 +81,7 @@ export function SetupProgress({
           const phaseSteps = visibleSteps.filter((s) => s.phase === phase);
           if (phaseSteps.length === 0) return null;
 
-          const phaseComplete = phaseSteps.every(
-            (s) => completedSet.has(s.key) || !s.required
-          );
+          const phaseComplete = phaseSteps.every((s) => completedSet.has(s.key) || !s.required);
 
           return (
             <div key={phase}>
@@ -96,13 +90,13 @@ export function SetupProgress({
                 <div
                   className={cn(
                     "w-2 h-2 rounded-full transition-colors",
-                    phaseComplete ? "bg-emerald-500" : "bg-slate-600"
+                    phaseComplete ? "bg-emerald-500" : "bg-slate-600",
                   )}
                 />
                 <span
                   className={cn(
                     "text-xs font-medium uppercase tracking-wider transition-colors",
-                    phaseComplete ? "text-emerald-400" : "text-slate-500"
+                    phaseComplete ? "text-emerald-400" : "text-slate-500",
                   )}
                 >
                   {phaseLabels[phase]}
@@ -122,12 +116,9 @@ export function SetupProgress({
                       disabled={!accessible}
                       className={cn(
                         "w-full text-left px-3 py-2 rounded-lg transition-all flex items-center gap-3 group",
-                        status === "current" &&
-                          "bg-emerald-500/10 border border-emerald-500/30",
-                        status === "completed" &&
-                          "hover:bg-slate-800/50 cursor-pointer",
-                        status === "upcoming" &&
-                          "opacity-50 cursor-not-allowed"
+                        status === "current" && "bg-emerald-500/10 border border-emerald-500/30",
+                        status === "completed" && "hover:bg-slate-800/50 cursor-pointer",
+                        status === "upcoming" && "opacity-50 cursor-not-allowed",
                       )}
                       initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
                       animate={prefersReducedMotion ? {} : { opacity: 1, x: 0 }}
@@ -139,7 +130,7 @@ export function SetupProgress({
                           "w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-colors",
                           status === "completed" && "bg-emerald-500",
                           status === "current" && "bg-emerald-500/20 border-2 border-emerald-500",
-                          status === "upcoming" && "bg-slate-700"
+                          status === "upcoming" && "bg-slate-700",
                         )}
                       >
                         {status === "completed" ? (
@@ -169,15 +160,13 @@ export function SetupProgress({
                             "text-sm font-medium truncate transition-colors",
                             status === "current" && "text-emerald-400",
                             status === "completed" && "text-slate-300 group-hover:text-white",
-                            status === "upcoming" && "text-slate-500"
+                            status === "upcoming" && "text-slate-500",
                           )}
                         >
                           {step.title}
                         </p>
                         {status === "current" && (
-                          <p className="text-xs text-slate-400 truncate">
-                            {step.description}
-                          </p>
+                          <p className="text-xs text-slate-400 truncate">{step.description}</p>
                         )}
                       </div>
 
@@ -188,9 +177,7 @@ export function SetupProgress({
 
                       {/* Optional badge */}
                       {!step.required && status === "upcoming" && (
-                        <span className="text-xs text-slate-600 flex-shrink-0">
-                          optional
-                        </span>
+                        <span className="text-xs text-slate-600 flex-shrink-0">optional</span>
                       )}
                     </motion.button>
                   );

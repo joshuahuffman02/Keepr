@@ -19,6 +19,7 @@ Your website is your digital storefront. Visitors decide within seconds whether 
 ### 1. Clear Value Proposition
 
 Within 5 seconds, visitors should understand:
+
 - What you are (campground type)
 - Where you are (location)
 - Why they should stay (unique benefits)
@@ -55,24 +56,28 @@ Within 5 seconds, visitors should understand:
 ## Conversion Optimization Tips
 
 ### Speed Matters
+
 - Compress images
 - Use fast hosting
 - Test on mobile devices
 - Target under 3-second load
 
 ### Mobile-First Design
+
 - 60%+ visitors are on mobile
 - Tap-friendly buttons
 - Readable text without zooming
 - Simplified navigation
 
 ### Trust Signals
+
 - Reviews and testimonials
 - Awards and certifications
 - Photos of real guests
 - Clear policies
 
 ### Clear CTAs
+
 - "Book Now" buttons everywhere
 - Contrasting colors for buttons
 - Urgency when appropriate
@@ -83,6 +88,7 @@ Within 5 seconds, visitors should understand:
 ## Content That Converts
 
 ### Homepage
+
 - Hero image + booking widget
 - Brief value proposition
 - Photo highlights
@@ -90,18 +96,21 @@ Within 5 seconds, visitors should understand:
 - Call to action
 
 ### Site Types Page
+
 - Photos of each type
 - Amenity lists
 - Pricing (or "from $X")
 - Booking buttons per type
 
 ### Location/Directions
+
 - Interactive map
 - Written directions
 - Nearby attractions
 - GPS coordinates
 
 ### FAQ Page
+
 - Common questions addressed
 - Reduces service calls
 - Builds confidence
@@ -118,4 +127,4 @@ Within 5 seconds, visitors should understand:
 
 ---
 
-*Keepr provides embeddable booking widgets that integrate seamlessly with any website. [Convert more visitors at campreserv.com](https://campreserv.com)*
+_Keepr provides embeddable booking widgets that integrate seamlessly with any website. [Convert more visitors at campreserv.com](https://campreserv.com)_

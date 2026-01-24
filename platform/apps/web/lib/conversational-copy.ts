@@ -202,7 +202,7 @@ export const conversationalCopy = {
 // Helper function to get a copy value with fallback
 export function getCopy<
   T extends keyof typeof conversationalCopy,
-  K extends keyof (typeof conversationalCopy)[T]
+  K extends keyof (typeof conversationalCopy)[T],
 >(category: T, key: K): string {
   const value = conversationalCopy[category]?.[key];
   if (typeof value === "function") {
@@ -216,22 +216,21 @@ export function getCopy<
 
 // Type-safe helper for getting loading messages
 export function getLoadingMessage(
-  context: keyof typeof conversationalCopy.loading = "default"
+  context: keyof typeof conversationalCopy.loading = "default",
 ): string {
   return conversationalCopy.loading[context] || conversationalCopy.loading.default;
 }
 
 // Type-safe helper for getting error messages
-export function getErrorMessage(
-  type: keyof typeof conversationalCopy.errors = "generic"
-): string {
+export function getErrorMessage(type: keyof typeof conversationalCopy.errors = "generic"): string {
   return conversationalCopy.errors[type] || conversationalCopy.errors.generic;
 }
 
 // Get empty state message with hint
-export function getEmptyState(
-  type: keyof typeof conversationalCopy.empty
-): { message: string; hint?: string } {
+export function getEmptyState(type: keyof typeof conversationalCopy.empty): {
+  message: string;
+  hint?: string;
+} {
   const emptyCopy: Record<string, string> = conversationalCopy.empty;
   const message = emptyCopy[type] || emptyCopy.noResults;
   const hintKey = `${type}Hint`;
@@ -240,9 +239,7 @@ export function getEmptyState(
 }
 
 // Get a celebration message for scroll milestones
-export function getScrollCelebration(
-  percentage: number
-): string | null {
+export function getScrollCelebration(percentage: number): string | null {
   if (percentage >= 100) return conversationalCopy.celebrations.scrollMilestone100;
   if (percentage >= 50) return conversationalCopy.celebrations.scrollMilestone50;
   if (percentage >= 25) return conversationalCopy.celebrations.scrollMilestone25;

@@ -61,7 +61,9 @@ export default function AccommodationsPage() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/admin/platform-analytics/accommodations?range=${dateRange}`);
+        const response = await fetch(
+          `/api/admin/platform-analytics/accommodations?range=${dateRange}`,
+        );
         if (response.ok) {
           const result = await response.json();
           setData(result);
@@ -130,9 +132,12 @@ export default function AccommodationsPage() {
         </div>
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Building2 className="h-16 w-16 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No Accommodation Data Available</h3>
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            No Accommodation Data Available
+          </h3>
           <p className="text-muted-foreground max-w-md">
-            There is no accommodation data for the selected time period. Data will appear here once sites are configured.
+            There is no accommodation data for the selected time period. Data will appear here once
+            sites are configured.
           </p>
         </div>
       </div>
@@ -193,7 +198,9 @@ export default function AccommodationsPage() {
                 label: "Type",
                 format: (v) => (
                   <div className="flex items-center gap-2">
-                    {typeIcons[typeof v === "string" ? v : ""] || <Building2 className="h-5 w-5 text-slate-400" />}
+                    {typeIcons[typeof v === "string" ? v : ""] || (
+                      <Building2 className="h-5 w-5 text-slate-400" />
+                    )}
                     <span className="capitalize">{typeof v === "string" ? v : "Unknown"}</span>
                   </div>
                 ),
@@ -269,9 +276,24 @@ export default function AccommodationsPage() {
         columns={[
           { key: "rigType", label: "RV Type" },
           { key: "count", label: "Reservations", align: "right", format: (v) => formatCount(v) },
-          { key: "percentage", label: "% of Total", align: "right", format: (v) => formatPercent(v) },
-          { key: "averageLength", label: "Avg Length (ft)", align: "right", format: (v) => formatLength(v) },
-          { key: "averageSpend", label: "Avg Spend", align: "right", format: (v) => formatMoney(v) },
+          {
+            key: "percentage",
+            label: "% of Total",
+            align: "right",
+            format: (v) => formatPercent(v),
+          },
+          {
+            key: "averageLength",
+            label: "Avg Length (ft)",
+            align: "right",
+            format: (v) => formatLength(v),
+          },
+          {
+            key: "averageSpend",
+            label: "Avg Spend",
+            align: "right",
+            format: (v) => formatMoney(v),
+          },
         ]}
         data={data?.rigTypes || []}
         loading={loading}

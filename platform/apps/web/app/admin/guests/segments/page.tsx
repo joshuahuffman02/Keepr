@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,7 +94,12 @@ const criteriaTypeOptions = [
   { value: "arrival_day", label: "Arrival Day", icon: Calendar },
 ];
 
-function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
+function SegmentCard({
+  segment,
+  onEdit,
+  onCopy,
+  onArchive,
+}: {
   segment: GuestSegment;
   onEdit: (segment: GuestSegment) => void;
   onCopy: (segment: GuestSegment) => void;
@@ -169,7 +168,7 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
           {/* Criteria pills */}
           <div className="flex flex-wrap gap-2">
             {segment.criteria.map((criterion, i) => {
-              const criteriaType = criteriaTypeOptions.find(c => c.value === criterion.type);
+              const criteriaType = criteriaTypeOptions.find((c) => c.value === criterion.type);
               const Icon = criteriaType?.icon || Filter;
               return (
                 <Badge
@@ -178,11 +177,11 @@ function SegmentCard({ segment, onEdit, onCopy, onArchive }: {
                   className="bg-muted text-foreground flex items-center gap-1"
                 >
                   <Icon className="h-3 w-3" />
-                  {criteriaType?.label || criterion.type}: {
-                    Array.isArray(criterion.value)
-                      ? criterion.value.slice(0, 2).join(", ") + (criterion.value.length > 2 ? "..." : "")
-                      : String(criterion.value)
-                  }
+                  {criteriaType?.label || criterion.type}:{" "}
+                  {Array.isArray(criterion.value)
+                    ? criterion.value.slice(0, 2).join(", ") +
+                      (criterion.value.length > 2 ? "..." : "")
+                    : String(criterion.value)}
                 </Badge>
               );
             })}
@@ -230,7 +229,8 @@ export default function GuestSegmentsPage() {
   });
 
   const platformRole = whoami?.user?.platformRole;
-  const canManageSegments = platformRole === "platform_admin" || platformRole === "platform_support";
+  const canManageSegments =
+    platformRole === "platform_admin" || platformRole === "platform_support";
 
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
@@ -245,7 +245,7 @@ export default function GuestSegmentsPage() {
 
       const res = await fetch(`${apiUrl}/admin/guest-segments?${params}`, {
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -285,9 +285,11 @@ export default function GuestSegmentsPage() {
     }
   }, [whoamiLoading, fetchSegments]);
 
-  const filteredSegments = segments.filter(segment => {
-    const matchesSearch = segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (segment.description?.toLowerCase().includes(searchQuery.toLowerCase()) || false);
+  const filteredSegments = segments.filter((segment) => {
+    const matchesSearch =
+      segment.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      segment.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      false;
     return matchesSearch && segment.status === "active";
   });
 
@@ -301,7 +303,7 @@ export default function GuestSegmentsPage() {
       const res = await fetch(`${apiUrl}/admin/guest-segments/${segment.id}/duplicate`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
@@ -335,16 +337,14 @@ export default function GuestSegmentsPage() {
       const res = await fetch(`${apiUrl}/admin/guest-segments/${segment.id}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
       if (!res.ok) {
         // Fall back to local archive
-        setSegments(segments.map(s =>
-          s.id === segment.id ? { ...s, status: "archived" } : s
-        ));
+        setSegments(segments.map((s) => (s.id === segment.id ? { ...s, status: "archived" } : s)));
         return;
       }
 
@@ -363,7 +363,7 @@ export default function GuestSegmentsPage() {
       const res = await fetch(`${apiUrl}/admin/guest-segments`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
@@ -413,7 +413,7 @@ export default function GuestSegmentsPage() {
         <div className="animate-pulse space-y-6">
           <div className="h-8 bg-muted rounded w-64" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => (
+            {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="h-48 bg-muted rounded-lg" />
             ))}
           </div>
@@ -528,26 +528,26 @@ export default function GuestSegmentsPage() {
               <div className="space-y-2">
                 <Label>Criteria (select conditions to match)</Label>
                 <div className="grid grid-cols-2 gap-2">
-                  {criteriaTypeOptions.slice(0, 6).map(option => (
+                  {criteriaTypeOptions.slice(0, 6).map((option) => (
                     <label
                       key={option.value}
                       className="flex items-center gap-2 p-2 rounded border border-border hover:border-border cursor-pointer"
                     >
                       <Checkbox
-                        checked={newSegment.criteria.some(c => c.type === option.value)}
+                        checked={newSegment.criteria.some((c) => c.type === option.value)}
                         onCheckedChange={(checked) => {
                           if (checked) {
                             setNewSegment({
                               ...newSegment,
                               criteria: [
                                 ...newSegment.criteria,
-                                { type: option.value, operator: "equals", value: "" }
-                              ]
+                                { type: option.value, operator: "equals", value: "" },
+                              ],
                             });
                           } else {
                             setNewSegment({
                               ...newSegment,
-                              criteria: newSegment.criteria.filter(c => c.type !== option.value)
+                              criteria: newSegment.criteria.filter((c) => c.type !== option.value),
                             });
                           }
                         }}
@@ -587,7 +587,7 @@ export default function GuestSegmentsPage() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-bold text-foreground">
-                {segments.filter(s => s.status === "active").length}
+                {segments.filter((s) => s.status === "active").length}
               </div>
               <div className="text-sm text-muted-foreground">Active Segments</div>
             </div>
@@ -604,7 +604,7 @@ export default function GuestSegmentsPage() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-bold text-foreground">
-                {segments.filter(s => s.scope === "global" && s.isTemplate).length}
+                {segments.filter((s) => s.scope === "global" && s.isTemplate).length}
               </div>
               <div className="text-sm text-muted-foreground">Global Templates</div>
             </div>
@@ -621,7 +621,7 @@ export default function GuestSegmentsPage() {
             </div>
             <div className="mt-3">
               <div className="text-2xl font-bold text-foreground">
-                {segments.filter(s => !s.isTemplate).length}
+                {segments.filter((s) => !s.isTemplate).length}
               </div>
               <div className="text-sm text-muted-foreground">Custom Segments</div>
             </div>

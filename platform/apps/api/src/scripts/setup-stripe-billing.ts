@@ -305,12 +305,16 @@ async function main() {
     console.log("");
     console.log("# Stripe Prices - Pioneer");
     console.log(`STRIPE_PRICE_PIONEER_MONTHLY=${created.prices.pioneerMonthly}`);
-    console.log(`STRIPE_PRICE_PIONEER_POST_PROMO_MONTHLY=${created.prices.pioneerPostPromoMonthly}`);
+    console.log(
+      `STRIPE_PRICE_PIONEER_POST_PROMO_MONTHLY=${created.prices.pioneerPostPromoMonthly}`,
+    );
     console.log(`STRIPE_PRICE_PIONEER_BOOKING_FEE=${created.prices.pioneerBookingFee}`);
     console.log("");
     console.log("# Stripe Prices - Trailblazer");
     console.log(`STRIPE_PRICE_TRAILBLAZER_MONTHLY=${created.prices.trailblazerMonthly}`);
-    console.log(`STRIPE_PRICE_TRAILBLAZER_POST_PROMO_MONTHLY=${created.prices.trailblazerPostPromoMonthly}`);
+    console.log(
+      `STRIPE_PRICE_TRAILBLAZER_POST_PROMO_MONTHLY=${created.prices.trailblazerPostPromoMonthly}`,
+    );
     console.log(`STRIPE_PRICE_TRAILBLAZER_BOOKING_FEE=${created.prices.trailblazerBookingFee}`);
     console.log("");
     console.log("# Stripe Prices - SMS");
@@ -321,7 +325,6 @@ async function main() {
     console.log(`STRIPE_COUPON_FOUNDERS=${created.coupons.founders}`);
     console.log(`STRIPE_COUPON_PIONEER=${created.coupons.pioneer}`);
     console.log(`STRIPE_COUPON_TRAILBLAZER=${created.coupons.trailblazer}`);
-
   } catch (error) {
     console.error("\nERROR setting up Stripe:", error);
     process.exit(1);

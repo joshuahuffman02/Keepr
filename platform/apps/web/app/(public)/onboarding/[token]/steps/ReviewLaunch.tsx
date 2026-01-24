@@ -120,7 +120,7 @@ function SummaryItem({
           "w-10 h-10 rounded-lg flex items-center justify-center",
           status === "complete" && "bg-emerald-500/20",
           status === "warning" && "bg-amber-500/20",
-          status === "pending" && "bg-slate-700"
+          status === "pending" && "bg-slate-700",
         )}
       >
         <Icon
@@ -128,7 +128,7 @@ function SummaryItem({
             "w-5 h-5",
             status === "complete" && "text-emerald-400",
             status === "warning" && "text-amber-400",
-            status === "pending" && "text-slate-400"
+            status === "pending" && "text-slate-400",
           )}
         />
       </div>
@@ -136,9 +136,7 @@ function SummaryItem({
         <p className="text-sm text-slate-400">{label}</p>
         <p className="font-medium text-white">{value}</p>
       </div>
-      {status === "complete" && (
-        <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-      )}
+      {status === "complete" && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
     </motion.div>
   );
 }
@@ -181,7 +179,7 @@ export function ReviewLaunch({
     ? importSystemLabels[dataImport.importSystemKey] || dataImport.importSystemKey
     : null;
   const hasMissingRequired = Boolean(
-    dataImport?.missingRequired?.some((entry) => entry.missingFields.length > 0)
+    dataImport?.missingRequired?.some((entry) => entry.missingFields.length > 0),
   );
   const importStatus = dataImport?.requiredComplete
     ? { label: "Complete", color: "text-emerald-400", badge: "bg-emerald-500/20" }
@@ -193,7 +191,7 @@ export function ReviewLaunch({
     .map((entry) => coverageLabels[entry.key] || entry.key)
     .filter((label) => label.length > 0);
   const shouldWarnImport = Boolean(
-    dataImport && (dataImport.requiredComplete === false || hasMissingRequired)
+    dataImport && (dataImport.requiredComplete === false || hasMissingRequired),
   );
   const importWarningMessage = shouldWarnImport
     ? hasMissingRequired
@@ -226,7 +224,7 @@ export function ReviewLaunch({
           `${apiBase}/onboarding/session/${sessionId}/go-live-check?token=${token}`,
           {
             headers: { "x-onboarding-token": token },
-          }
+          },
         );
         if (response.ok) {
           const data = await response.json();
@@ -284,12 +282,8 @@ export function ReviewLaunch({
           >
             <Rocket className="w-10 h-10 text-emerald-400" />
           </motion.div>
-          <h2 className="text-2xl font-bold text-white mb-2">
-            Ready for Launch!
-          </h2>
-          <p className="text-slate-400">
-            Review your setup and go live when you're ready
-          </p>
+          <h2 className="text-2xl font-bold text-white mb-2">Ready for Launch!</h2>
+          <p className="text-slate-400">Review your setup and go live when you're ready</p>
         </motion.div>
 
         {/* Summary */}
@@ -345,9 +339,7 @@ export function ReviewLaunch({
                   <p className="text-xs uppercase tracking-wide text-slate-500">
                     Data import source
                   </p>
-                  <p className="font-medium text-white">
-                    {importSourceLabel || "Not captured"}
-                  </p>
+                  <p className="font-medium text-white">{importSourceLabel || "Not captured"}</p>
                   {(dataImport.sitesCreated || dataImport.siteClassesCreated) && (
                     <p className="text-xs text-slate-400">
                       Imported {dataImport.sitesCreated ?? 0} sites ·{" "}
@@ -360,7 +352,7 @@ export function ReviewLaunch({
                 className={cn(
                   "text-xs font-semibold uppercase px-2 py-1 rounded-full w-fit",
                   importStatus.badge,
-                  importStatus.color
+                  importStatus.color,
                 )}
               >
                 {importStatus.label}
@@ -427,16 +419,11 @@ export function ReviewLaunch({
               <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle className="w-5 h-5 text-red-400" />
-                  <h3 className="font-medium text-red-400">
-                    Required Before Launch
-                  </h3>
+                  <h3 className="font-medium text-red-400">Required Before Launch</h3>
                 </div>
                 <ul className="space-y-2">
                   {blockers.map((blocker) => (
-                    <li
-                      key={blocker.code}
-                      className="flex items-center justify-between text-sm"
-                    >
+                    <li key={blocker.code} className="flex items-center justify-between text-sm">
                       <span className="text-red-300">{blocker.message}</span>
                       {onGoToStep && (
                         <button
@@ -457,16 +444,11 @@ export function ReviewLaunch({
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400" />
-                  <h3 className="font-medium text-amber-400">
-                    Recommended (Optional)
-                  </h3>
+                  <h3 className="font-medium text-amber-400">Recommended (Optional)</h3>
                 </div>
                 <ul className="space-y-2">
                   {warnings.map((warning) => (
-                    <li
-                      key={warning.code}
-                      className="flex items-center justify-between text-sm"
-                    >
+                    <li key={warning.code} className="flex items-center justify-between text-sm">
                       <span className="text-amber-300">{warning.message}</span>
                       {onGoToStep && (
                         <button
@@ -536,8 +518,8 @@ export function ReviewLaunch({
               <div className="px-4 pb-4 border-t border-slate-700/50">
                 <div className="pt-4 space-y-4">
                   <p className="text-sm text-slate-400">
-                    Have existing reservations in another system? Import them now so they appear
-                    on your calendar and guests can see their bookings.
+                    Have existing reservations in another system? Import them now so they appear on
+                    your calendar and guests can see their bookings.
                   </p>
                   <Button
                     variant="outline"
@@ -572,7 +554,7 @@ export function ReviewLaunch({
                 canLaunch
                   ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 hover:from-emerald-400 hover:via-teal-400 hover:to-emerald-400 shadow-lg shadow-emerald-500/25"
                   : "bg-slate-700 cursor-not-allowed",
-                "disabled:opacity-50"
+                "disabled:opacity-50",
               )}
               style={{
                 backgroundSize: "200% 100%",
@@ -610,8 +592,8 @@ export function ReviewLaunch({
           className="bg-slate-800/30 border border-slate-700 rounded-lg p-4 text-center"
         >
           <p className="text-sm text-slate-400">
-            Don't worry - you can always adjust settings, add more sites, or
-            pause bookings from your dashboard.
+            Don't worry - you can always adjust settings, add more sites, or pause bookings from
+            your dashboard.
           </p>
         </motion.div>
       </motion.div>

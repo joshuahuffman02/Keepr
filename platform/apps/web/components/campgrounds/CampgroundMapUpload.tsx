@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 export function CampgroundMapUpload({
   campgroundId,
   initialUrl,
-  onUploaded
+  onUploaded,
 }: {
   campgroundId: string;
   initialUrl?: string | null;
@@ -54,7 +54,11 @@ export function CampgroundMapUpload({
   const handleUpload = async () => {
     if (!file) return;
     if (file.size > MAX_FILE_SIZE) {
-      toast({ title: "Upload failed", description: "File is too large. Max 18MB.", variant: "destructive" });
+      toast({
+        title: "Upload failed",
+        description: "File is too large. Max 18MB.",
+        variant: "destructive",
+      });
       return;
     }
     setIsUploading(true);
@@ -63,34 +67,50 @@ export function CampgroundMapUpload({
       const res = await apiClient.uploadCampgroundMap(campgroundId, {
         dataUrl,
         contentType: file.type || "application/octet-stream",
-        filename: file.name
+        filename: file.name,
       });
       setPreview(res.url);
       toast({ title: "Map uploaded" });
       onUploaded?.(res.url);
     } catch (e) {
-      const message = e instanceof Error ? e.message : "Uploads may be disabled. Check storage settings.";
+      const message =
+        e instanceof Error ? e.message : "Uploads may be disabled. Check storage settings.";
       toast({ title: "Upload failed", description: message, variant: "destructive" });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const isPdf = file?.type === "application/pdf" || (!file && !!preview && preview.toLowerCase().endsWith(".pdf"));
+  const isPdf =
+    file?.type === "application/pdf" ||
+    (!file && !!preview && preview.toLowerCase().endsWith(".pdf"));
 
   return (
     <div className="space-y-3">
       <div className="space-y-1">
         <Label htmlFor="map-upload">Campground map (image or PDF)</Label>
-        <Input id="map-upload" type="file" accept="image/*,application/pdf" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+        <Input
+          id="map-upload"
+          type="file"
+          accept="image/*,application/pdf"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+        />
         <p className="text-xs text-muted-foreground">Used on the public page map section.</p>
       </div>
       {preview && (
         <div className="relative h-48 w-full overflow-hidden rounded-lg border border-border bg-muted">
           {isPdf ? (
-            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">PDF uploaded</div>
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+              PDF uploaded
+            </div>
           ) : (
-            <Image src={preview} alt="Campground map preview" fill className="object-contain" unoptimized />
+            <Image
+              src={preview}
+              alt="Campground map preview"
+              fill
+              className="object-contain"
+              unoptimized
+            />
           )}
         </div>
       )}
@@ -98,7 +118,9 @@ export function CampgroundMapUpload({
         <Button onClick={handleUpload} disabled={!file || isUploading}>
           {isUploading ? "Uploading..." : "Upload"}
         </Button>
-        {preview && !isUploading && <span className="text-xs text-muted-foreground">Saved preview shown above.</span>}
+        {preview && !isUploading && (
+          <span className="text-xs text-muted-foreground">Saved preview shown above.</span>
+        )}
       </div>
     </div>
   );

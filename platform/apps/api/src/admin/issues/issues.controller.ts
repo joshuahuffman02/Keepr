@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Patch, Param, Query, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard, RolesGuard, Roles } from "../../auth/guards";
 import { PlatformRole } from "@prisma/client";
 import { IssuesService } from "./issues.service";
@@ -32,7 +23,7 @@ export class IssuesController {
   async list(
     @Query("category") category?: string,
     @Query("status") status?: string,
-    @Query("priority") priority?: string
+    @Query("priority") priority?: string,
   ) {
     return this.issues.findAll({ category, status, priority });
   }

@@ -20,7 +20,7 @@ export default function SocialPlannerBuilder() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
@@ -35,14 +35,14 @@ export default function SocialPlannerBuilder() {
         caption: applyTone(caption, tone),
         hashtags: hashtags
           .split(" ")
-          .map(h => h.trim())
+          .map((h) => h.trim())
           .filter(Boolean),
         imagePrompt,
-        notes
+        notes,
       }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] });
-    }
+    },
   });
 
   if (!campgroundId) {
@@ -60,35 +60,48 @@ export default function SocialPlannerBuilder() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Post builder</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Post builder
+          </p>
           <h1 className="text-2xl font-bold text-foreground">Compose and save posts</h1>
-          <p className="text-muted-foreground">Tone toggles are rule-based — no external AI calls. Pick platform, captions, hashtags, and image prompts.</p>
+          <p className="text-muted-foreground">
+            Tone toggles are rule-based — no external AI calls. Pick platform, captions, hashtags,
+            and image prompts.
+          </p>
         </div>
       </div>
 
       <div className="card p-4 space-y-3">
         <div className="grid md:grid-cols-2 gap-3">
-          <input className="input" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} />
-          <select className="input" value={platform} onChange={e => setPlatform(e.target.value)}>
+          <input
+            className="input"
+            placeholder="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <select className="input" value={platform} onChange={(e) => setPlatform(e.target.value)}>
             <option value="facebook">Facebook</option>
             <option value="instagram">Instagram</option>
             <option value="tiktok">TikTok</option>
             <option value="email">Email</option>
             <option value="blog">Website Blog</option>
           </select>
-          <select className="input" value={category} onChange={e => setCategory(e.target.value)}>
+          <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="promo">Promotional</option>
             <option value="engagement">Engagement / fun</option>
             <option value="behind_the_scenes">Behind the scenes</option>
             <option value="events">Events</option>
             <option value="deals">Deals</option>
           </select>
-          <select className="input" value={tone} onChange={e => setTone(e.target.value)}>
+          <select className="input" value={tone} onChange={(e) => setTone(e.target.value)}>
             <option value="short">Short</option>
             <option value="warm">Warm</option>
             <option value="funny">Funny</option>
@@ -100,10 +113,15 @@ export default function SocialPlannerBuilder() {
           className="input min-h-[120px]"
           placeholder="Caption"
           value={caption}
-          onChange={e => setCaption(e.target.value)}
+          onChange={(e) => setCaption(e.target.value)}
         />
         <div className="flex flex-wrap gap-2 items-center">
-          <input className="input flex-1" placeholder="Hashtags" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+          <input
+            className="input flex-1"
+            placeholder="Hashtags"
+            value={hashtags}
+            onChange={(e) => setHashtags(e.target.value)}
+          />
           <button
             type="button"
             className="btn-secondary whitespace-nowrap"
@@ -116,9 +134,14 @@ export default function SocialPlannerBuilder() {
           className="input min-h-[80px]"
           placeholder="Image prompt (for Canva/MidJourney)"
           value={imagePrompt}
-          onChange={e => setImagePrompt(e.target.value)}
+          onChange={(e) => setImagePrompt(e.target.value)}
         />
-        <textarea className="input min-h-[80px]" placeholder="Notes for posting human" value={notes} onChange={e => setNotes(e.target.value)} />
+        <textarea
+          className="input min-h-[80px]"
+          placeholder="Notes for posting human"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+        />
 
         <div className="grid md:grid-cols-3 gap-3">
           <button
@@ -138,7 +161,9 @@ export default function SocialPlannerBuilder() {
           <button
             type="button"
             className="btn-secondary w-full"
-            onClick={() => setImagePrompt(`Photo for ${platform}: ${imagePrompt || "campground hero"}`)}
+            onClick={() =>
+              setImagePrompt(`Photo for ${platform}: ${imagePrompt || "campground hero"}`)
+            }
           >
             Image prompt nudge
           </button>
@@ -146,7 +171,9 @@ export default function SocialPlannerBuilder() {
 
         <div className="card bg-muted border border-border p-3">
           <div className="text-xs uppercase text-muted-foreground mb-1">Preview (local stub)</div>
-          <div className="text-sm font-semibold text-foreground">{applyTone(caption || captionStarter(category), tone)}</div>
+          <div className="text-sm font-semibold text-foreground">
+            {applyTone(caption || captionStarter(category), tone)}
+          </div>
           <div className="text-xs text-muted-foreground mt-2">Hashtags: {hashtags}</div>
         </div>
 
@@ -204,4 +231,3 @@ function buildHashtags(platform: string, category: string) {
   if (platform === "instagram") base.push("#instacamping");
   return base.join(" ");
 }
-

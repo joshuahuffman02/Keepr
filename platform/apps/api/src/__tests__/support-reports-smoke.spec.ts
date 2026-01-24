@@ -17,11 +17,11 @@ describe("Support reports smoke", () => {
   const requestApp = express();
   const prismaMock = {
     supportReport: {
-      findMany: jest.fn()
+      findMany: jest.fn(),
     },
     ticket: {
-      findMany: jest.fn()
-    }
+      findMany: jest.fn(),
+    },
   };
   type AuthedRequest = Request & { user: AuthUser };
 
@@ -32,13 +32,13 @@ describe("Support reports smoke", () => {
         SupportService,
         {
           provide: PrismaService,
-          useValue: prismaMock
+          useValue: prismaMock,
         },
         {
           provide: EmailService,
-          useValue: { sendEmail: jest.fn().mockResolvedValue(true) }
-        }
-      ]
+          useValue: { sendEmail: jest.fn().mockResolvedValue(true) },
+        },
+      ],
     })
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -58,8 +58,8 @@ describe("Support reports smoke", () => {
         id: "r-1",
         rawContext: { region: "north" },
         campgroundId,
-        status: "open"
-      }
+        status: "open",
+      },
     ];
     prismaMock.supportReport.findMany.mockResolvedValue(sample);
     prismaMock.ticket.findMany.mockResolvedValue([]);
@@ -91,14 +91,14 @@ describe("Support reports smoke", () => {
             expect.objectContaining({
               rawContext: expect.objectContaining({
                 path: ["region"],
-                equals: "north"
-              })
-            })
-          ])
+                equals: "north",
+              }),
+            }),
+          ]),
         }),
         orderBy: { createdAt: "desc" },
-        include: expect.any(Object)
-      })
+        include: expect.any(Object),
+      }),
     );
   });
 });

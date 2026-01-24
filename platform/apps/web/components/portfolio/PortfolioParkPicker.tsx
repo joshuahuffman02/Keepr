@@ -9,7 +9,10 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 
 const authHeaders = () => {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : process.env.NEXT_PUBLIC_STAFF_TOKEN;
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem("campreserv:authToken")
+      : process.env.NEXT_PUBLIC_STAFF_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
 };
@@ -67,7 +70,9 @@ const toPortfolioResponse = (value: unknown): PortfolioResponse => {
     return { portfolios: [] };
   }
   const portfolios = Array.isArray(value.portfolios)
-    ? value.portfolios.map(toPortfolio).filter((portfolio): portfolio is Portfolio => portfolio !== null)
+    ? value.portfolios
+        .map(toPortfolio)
+        .filter((portfolio): portfolio is Portfolio => portfolio !== null)
     : [];
   return {
     portfolios,
@@ -86,8 +91,7 @@ const toPortfolioSelectResponse = (value: unknown): PortfolioSelectResponse => {
   };
 };
 
-const getErrorMessage = (err: unknown) =>
-  err instanceof Error ? err.message : "Please try again";
+const getErrorMessage = (err: unknown) => (err instanceof Error ? err.message : "Please try again");
 
 const portfolioApi = {
   async getPortfolios(): Promise<PortfolioResponse> {
@@ -96,7 +100,10 @@ const portfolioApi = {
     const data: unknown = await res.json();
     return toPortfolioResponse(data);
   },
-  async selectPortfolio(payload: { portfolioId: string; parkId?: string | null }): Promise<PortfolioSelectResponse> {
+  async selectPortfolio(payload: {
+    portfolioId: string;
+    parkId?: string | null;
+  }): Promise<PortfolioSelectResponse> {
     const res = await fetch(`${API_BASE}/portfolios/select`, {
       method: "POST",
       headers: authHeaders(),
@@ -108,23 +115,35 @@ const portfolioApi = {
     }
     const data: unknown = await res.json();
     return toPortfolioSelectResponse(data);
-  }
+  },
 };
 
 type PickerTone = "dark" | "light";
 
 type PortfolioParkPickerProps = {
-  onContextChange?: (ctx: { portfolioId: string | null; parkId: string | null; source: "init" | "user" }) => void;
+  onContextChange?: (ctx: {
+    portfolioId: string | null;
+    parkId: string | null;
+    source: "init" | "user";
+  }) => void;
   tone?: PickerTone;
   compact?: boolean;
   className?: string;
 };
 
-export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = false, className }: PortfolioParkPickerProps) {
+export function PortfolioParkPicker({
+  onContextChange,
+  tone = "dark",
+  compact = false,
+  className,
+}: PortfolioParkPickerProps) {
   const { toast } = useToast();
   const [portfolioId, setPortfolioId] = useState<string | null>(null);
   const [parkId, setParkId] = useState<string | null>(null);
-  const [appliedContext, setAppliedContext] = useState<{ portfolioId: string | null; parkId: string | null }>({
+  const [appliedContext, setAppliedContext] = useState<{
+    portfolioId: string | null;
+    parkId: string | null;
+  }>({
     portfolioId: null,
     parkId: null,
   });
@@ -148,14 +167,16 @@ export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = 
       }
       onContextChange?.({ portfolioId: nextPortfolioId, parkId: nextParkId, source });
     },
-    [onContextChange]
+    [onContextChange],
   );
 
   // Hydrate from localStorage on first render
   useEffect(() => {
     if (typeof window === "undefined") return;
     const storedPortfolio = localStorage.getItem("campreserv:selectedPortfolio");
-    const storedPark = localStorage.getItem("campreserv:selectedPark") || localStorage.getItem("campreserv:selectedCampground");
+    const storedPark =
+      localStorage.getItem("campreserv:selectedPark") ||
+      localStorage.getItem("campreserv:selectedCampground");
     if (storedPortfolio) setPortfolioId(storedPortfolio);
     if (storedPark) setParkId(storedPark);
     if (storedPortfolio) {
@@ -180,7 +201,11 @@ export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = 
     }
   }, [applyLocalContext, parkId, portfolioId, portfoliosQuery.data, onContextChange]);
 
-  const selectMutation = useMutation<PortfolioSelectResponse, Error, { portfolioId: string; parkId?: string | null }>({
+  const selectMutation = useMutation<
+    PortfolioSelectResponse,
+    Error,
+    { portfolioId: string; parkId?: string | null }
+  >({
     mutationFn: portfolioApi.selectPortfolio,
     onSuccess: (data, variables) => {
       const confirmedPark = variables.parkId ?? data.activeParkId ?? parkId ?? null;
@@ -200,11 +225,17 @@ export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = 
 
   const activePortfolio = useMemo(() => {
     const portfolios = portfoliosQuery.data?.portfolios ?? [];
-    return portfolios.find((p) => p.id === portfolioId) ?? portfolios.find((p) => p.id === portfoliosQuery.data?.activePortfolioId) ?? portfolios[0];
+    return (
+      portfolios.find((p) => p.id === portfolioId) ??
+      portfolios.find((p) => p.id === portfoliosQuery.data?.activePortfolioId) ??
+      portfolios[0]
+    );
   }, [portfolioId, portfoliosQuery.data]);
 
   const handlePortfolioChange = (nextPortfolioId: string) => {
-    const fallbackPark = portfoliosQuery.data?.portfolios.find((p) => p.id === nextPortfolioId)?.parks?.[0]?.id ?? null;
+    const fallbackPark =
+      portfoliosQuery.data?.portfolios.find((p) => p.id === nextPortfolioId)?.parks?.[0]?.id ??
+      null;
     setPortfolioId(nextPortfolioId);
     if (fallbackPark) setParkId(fallbackPark);
     selectMutation.mutate({ portfolioId: nextPortfolioId, parkId: fallbackPark ?? undefined });
@@ -219,7 +250,10 @@ export function PortfolioParkPicker({ onContextChange, tone = "dark", compact = 
     selectMutation.mutate({ portfolioId, parkId: nextParkId });
   };
 
-  const labelClass = tone === "dark" ? "text-[11px] uppercase tracking-wide text-muted-foreground" : "text-[11px] uppercase tracking-wide text-muted-foreground";
+  const labelClass =
+    tone === "dark"
+      ? "text-[11px] uppercase tracking-wide text-muted-foreground"
+      : "text-[11px] uppercase tracking-wide text-muted-foreground";
   const selectClass =
     tone === "dark"
       ? "w-full rounded-md border border-border bg-muted px-2 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-emerald-400"

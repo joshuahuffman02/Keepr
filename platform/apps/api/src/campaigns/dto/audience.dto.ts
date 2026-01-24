@@ -53,4 +53,3 @@ export class AudienceFiltersDto {
   @IsString()
   stayTo?: string; // future stays to date
 }
-

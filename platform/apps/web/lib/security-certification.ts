@@ -39,32 +39,33 @@ export type SecurityCategory =
   | "privacy_practices"
   | "vendor_management";
 
-export const SECURITY_CATEGORIES: Record<SecurityCategory, { label: string; description: string }> = {
-  access_management: {
-    label: "Access Management",
-    description: "How you manage who can access your Campreserv account"
-  },
-  physical_security: {
-    label: "Physical Security",
-    description: "Protecting devices, documents, and your physical workspace"
-  },
-  employee_training: {
-    label: "Employee Training",
-    description: "Security awareness and education for your staff"
-  },
-  incident_response: {
-    label: "Incident Response",
-    description: "Your procedures for handling security incidents"
-  },
-  privacy_practices: {
-    label: "Privacy Practices",
-    description: "How you handle guest privacy and data requests"
-  },
-  vendor_management: {
-    label: "Vendor Management",
-    description: "Managing third-party services that access your data"
-  }
-};
+export const SECURITY_CATEGORIES: Record<SecurityCategory, { label: string; description: string }> =
+  {
+    access_management: {
+      label: "Access Management",
+      description: "How you manage who can access your Campreserv account",
+    },
+    physical_security: {
+      label: "Physical Security",
+      description: "Protecting devices, documents, and your physical workspace",
+    },
+    employee_training: {
+      label: "Employee Training",
+      description: "Security awareness and education for your staff",
+    },
+    incident_response: {
+      label: "Incident Response",
+      description: "Your procedures for handling security incidents",
+    },
+    privacy_practices: {
+      label: "Privacy Practices",
+      description: "How you handle guest privacy and data requests",
+    },
+    vendor_management: {
+      label: "Vendor Management",
+      description: "Managing third-party services that access your data",
+    },
+  };
 
 const SECURITY_CATEGORY_KEYS: SecurityCategory[] = [
   "access_management",
@@ -84,50 +85,50 @@ export const PLATFORM_PROTECTIONS: PlatformProtection[] = [
     id: "platform_encryption_rest",
     label: "Data Encryption at Rest",
     description: "All customer data is encrypted in our database using AES-256",
-    icon: "database"
+    icon: "database",
   },
   {
     id: "platform_encryption_transit",
     label: "Data Encryption in Transit",
     description: "All connections use TLS 1.3 encryption (HTTPS)",
-    icon: "lock"
+    icon: "lock",
   },
   {
     id: "platform_pci",
     label: "PCI-DSS Compliance",
     description: "Payment processing through Stripe, a PCI Level 1 certified provider",
-    icon: "shield"
+    icon: "shield",
   },
   {
     id: "platform_backups",
     label: "Automated Encrypted Backups",
     description: "Daily encrypted backups with 30-day retention",
-    icon: "server"
+    icon: "server",
   },
   {
     id: "platform_logging",
     label: "Security Event Logging",
     description: "All access and changes are logged with tamper-proof audit trails",
-    icon: "server"
+    icon: "server",
   },
   {
     id: "platform_infrastructure",
     label: "Secure Infrastructure",
     description: "Hosted on Railway with enterprise-grade firewalls and DDoS protection",
-    icon: "shield"
+    icon: "shield",
   },
   {
     id: "platform_session",
     label: "Secure Session Management",
     description: "Automatic session timeouts and secure token handling",
-    icon: "key"
+    icon: "key",
   },
   {
     id: "platform_passwords",
     label: "Password Security",
     description: "Passwords hashed with bcrypt, minimum 12 characters required",
-    icon: "lock"
-  }
+    icon: "lock",
+  },
 ];
 
 /**
@@ -142,7 +143,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Unique user accounts for each employee",
     description: "Each staff member has their own login - no shared accounts",
     required: true,
-    points: 12
+    points: 12,
   },
   {
     id: "access_mfa_enabled",
@@ -150,7 +151,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Multi-factor authentication enabled",
     description: "MFA is turned on for all user accounts in your organization",
     required: true,
-    points: 15
+    points: 15,
   },
   {
     id: "access_roles_configured",
@@ -158,7 +159,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "User roles properly configured",
     description: "Staff have appropriate permission levels (not everyone is admin)",
     required: true,
-    points: 10
+    points: 10,
   },
   {
     id: "access_reviews_quarterly",
@@ -166,7 +167,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Quarterly access reviews",
     description: "Review who has access to your account at least every 90 days",
     required: false,
-    points: 8
+    points: 8,
   },
   {
     id: "access_offboarding",
@@ -175,7 +176,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Documented process to revoke access when employees leave",
     required: true,
     points: 12,
-    templateId: "offboarding-checklist"
+    templateId: "offboarding-checklist",
   },
   {
     id: "access_onboarding",
@@ -184,7 +185,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "New employees receive security training before getting access",
     required: true,
     points: 10,
-    templateId: "onboarding-checklist"
+    templateId: "onboarding-checklist",
   },
   {
     id: "access_password_policy",
@@ -193,7 +194,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Staff know not to reuse passwords or share credentials",
     required: false,
     points: 6,
-    templateId: "password-policy"
+    templateId: "password-policy",
   },
 
   // Physical Security (6 items)
@@ -203,7 +204,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Devices lock automatically",
     description: "Computers and tablets lock after brief inactivity",
     required: true,
-    points: 8
+    points: 8,
   },
   {
     id: "physical_secure_storage",
@@ -211,7 +212,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Secure device storage",
     description: "Laptops and devices stored securely when office is closed",
     required: true,
-    points: 8
+    points: 8,
   },
   {
     id: "physical_document_disposal",
@@ -219,7 +220,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Secure document disposal",
     description: "Guest info and financial documents are shredded, not trashed",
     required: true,
-    points: 10
+    points: 10,
   },
   {
     id: "physical_clean_desk",
@@ -227,7 +228,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Clean desk policy",
     description: "Sensitive documents not left visible on desks",
     required: false,
-    points: 5
+    points: 5,
   },
   {
     id: "physical_visitor_policy",
@@ -235,7 +236,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Visitor access policy",
     description: "Non-employees don't have unsupervised access to computers",
     required: false,
-    points: 6
+    points: 6,
   },
   {
     id: "physical_wifi_separate",
@@ -243,7 +244,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Separate guest and business WiFi",
     description: "Guest WiFi network is separate from your office network",
     required: true,
-    points: 10
+    points: 10,
   },
 
   // Employee Training (5 items)
@@ -255,7 +256,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     required: true,
     points: 15,
     templateId: "security-training-checklist",
-    resourceUrl: "https://www.cisa.gov/free-cybersecurity-services-and-tools"
+    resourceUrl: "https://www.cisa.gov/free-cybersecurity-services-and-tools",
   },
   {
     id: "training_phishing",
@@ -264,7 +265,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Staff trained to recognize and report suspicious emails",
     required: true,
     points: 12,
-    resourceUrl: "https://www.ftc.gov/business-guidance/small-businesses/cybersecurity/phishing"
+    resourceUrl: "https://www.ftc.gov/business-guidance/small-businesses/cybersecurity/phishing",
   },
   {
     id: "training_new_hire",
@@ -273,7 +274,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Security policies covered during employee onboarding",
     required: true,
     points: 10,
-    templateId: "onboarding-checklist"
+    templateId: "onboarding-checklist",
   },
   {
     id: "training_social_engineering",
@@ -281,7 +282,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Social engineering awareness",
     description: "Staff know not to give out info to unverified callers",
     required: false,
-    points: 8
+    points: 8,
   },
   {
     id: "training_incident_reporting",
@@ -289,7 +290,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Incident reporting training",
     description: "Staff know who to contact and what to do if something seems wrong",
     required: true,
-    points: 8
+    points: 8,
   },
 
   // Incident Response (5 items)
@@ -300,7 +301,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Written plan for what to do if there's a security incident",
     required: true,
     points: 15,
-    templateId: "incident-response-plan"
+    templateId: "incident-response-plan",
   },
   {
     id: "incident_contact",
@@ -308,7 +309,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Security contact designated",
     description: "Specific person responsible for security issues",
     required: true,
-    points: 8
+    points: 8,
   },
   {
     id: "incident_notification",
@@ -317,7 +318,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Know how and when to notify guests if their data is compromised",
     required: true,
     points: 10,
-    templateId: "breach-notification-template"
+    templateId: "breach-notification-template",
   },
   {
     id: "incident_backup_tested",
@@ -325,7 +326,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Data export/backup tested",
     description: "You've tested exporting your data from Campreserv",
     required: false,
-    points: 8
+    points: 8,
   },
   {
     id: "incident_review_process",
@@ -333,7 +334,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Post-incident review process",
     description: "Learn from incidents to prevent them from happening again",
     required: false,
-    points: 6
+    points: 6,
   },
 
   // Privacy Practices (6 items)
@@ -344,7 +345,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Clear privacy policy available on your campground website",
     required: true,
     points: 12,
-    templateId: "privacy-policy"
+    templateId: "privacy-policy",
   },
   {
     id: "privacy_consent_documented",
@@ -352,7 +353,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Marketing consent documented",
     description: "You have records of guests opting in to marketing emails",
     required: true,
-    points: 8
+    points: 8,
   },
   {
     id: "privacy_data_requests",
@@ -361,7 +362,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "You can handle guest requests to see or delete their data",
     required: true,
     points: 10,
-    templateId: "data-subject-request-form"
+    templateId: "data-subject-request-form",
   },
   {
     id: "privacy_retention_policy",
@@ -370,7 +371,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Documented policy for how long you keep guest data",
     required: false,
     points: 8,
-    templateId: "data-retention-policy"
+    templateId: "data-retention-policy",
   },
   {
     id: "privacy_third_party_disclosure",
@@ -378,7 +379,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Third-party sharing disclosed",
     description: "Guests informed about data shared with partners",
     required: false,
-    points: 6
+    points: 6,
   },
   {
     id: "privacy_optout_easy",
@@ -386,7 +387,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Easy marketing opt-out",
     description: "One-click unsubscribe available on all marketing emails",
     required: true,
-    points: 6
+    points: 6,
   },
 
   // Vendor Management (4 items)
@@ -396,7 +397,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Vendor inventory maintained",
     description: "List of all services that have access to your data (booking sites, etc.)",
     required: true,
-    points: 8
+    points: 8,
   },
   {
     id: "vendor_security_review",
@@ -405,7 +406,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "You've checked that key vendors have reasonable security",
     required: false,
     points: 10,
-    templateId: "vendor-security-questionnaire"
+    templateId: "vendor-security-questionnaire",
   },
   {
     id: "vendor_contracts",
@@ -414,7 +415,7 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     description: "Contracts with vendors specify how they must protect your data",
     required: false,
     points: 10,
-    templateId: "data-processing-agreement"
+    templateId: "data-processing-agreement",
   },
   {
     id: "vendor_access_minimal",
@@ -422,8 +423,8 @@ export const SECURITY_CHECKLIST: SecurityChecklistItem[] = [
     label: "Minimal vendor access",
     description: "Third parties only have access they actually need",
     required: false,
-    points: 6
-  }
+    points: 6,
+  },
 ];
 
 /**
@@ -435,29 +436,29 @@ export const SECURITY_CERTIFICATION_THRESHOLDS = {
     requiredItemsRatio: 0.3,
     label: "Basic Security",
     description: "Foundational security practices in place",
-    badgeColor: "from-amber-600 to-amber-700"
+    badgeColor: "from-amber-600 to-amber-700",
   },
   standard: {
     minPoints: 100,
     requiredItemsRatio: 0.6,
     label: "Standard Security",
     description: "Strong security practices implemented",
-    badgeColor: "from-slate-400 to-slate-500"
+    badgeColor: "from-slate-400 to-slate-500",
   },
   advanced: {
     minPoints: 160,
     requiredItemsRatio: 0.85,
     label: "Advanced Security",
     description: "Comprehensive security program in place",
-    badgeColor: "from-yellow-400 to-amber-500"
+    badgeColor: "from-yellow-400 to-amber-500",
   },
   excellence: {
     minPoints: 220,
     requiredItemsRatio: 1.0,
     label: "Security Excellence",
     description: "Industry-leading security and privacy practices",
-    badgeColor: "from-cyan-400 to-blue-500"
-  }
+    badgeColor: "from-cyan-400 to-blue-500",
+  },
 };
 
 export interface SecurityAssessmentData {
@@ -477,18 +478,20 @@ export interface SecurityAuditorInfo {
 /**
  * Calculate certification level based on assessment data
  */
-export function calculateSecurityCertificationLevel(assessment: SecurityAssessmentData): SecurityCertificationLevel {
+export function calculateSecurityCertificationLevel(
+  assessment: SecurityAssessmentData,
+): SecurityCertificationLevel {
   const completedSet = new Set(assessment.completedItems);
 
-  const totalPoints = SECURITY_CHECKLIST
-    .filter(item => completedSet.has(item.id))
-    .reduce((sum, item) => sum + item.points, 0);
+  const totalPoints = SECURITY_CHECKLIST.filter((item) => completedSet.has(item.id)).reduce(
+    (sum, item) => sum + item.points,
+    0,
+  );
 
-  const requiredItems = SECURITY_CHECKLIST.filter(item => item.required);
-  const completedRequired = requiredItems.filter(item => completedSet.has(item.id));
-  const requiredRatio = requiredItems.length > 0
-    ? completedRequired.length / requiredItems.length
-    : 0;
+  const requiredItems = SECURITY_CHECKLIST.filter((item) => item.required);
+  const completedRequired = requiredItems.filter((item) => completedSet.has(item.id));
+  const requiredRatio =
+    requiredItems.length > 0 ? completedRequired.length / requiredItems.length : 0;
 
   if (
     totalPoints >= SECURITY_CERTIFICATION_THRESHOLDS.excellence.minPoints &&
@@ -532,19 +535,26 @@ export function getSecurityAssessmentStats(assessment: SecurityAssessmentData): 
   requiredCompleted: number;
   requiredTotal: number;
   requiredRatio: number;
-  categoryProgress: Record<SecurityCategory, { completed: number; total: number; points: number; maxPoints: number }>;
+  categoryProgress: Record<
+    SecurityCategory,
+    { completed: number; total: number; points: number; maxPoints: number }
+  >;
 } {
   const completedSet = new Set(assessment.completedItems);
 
   const maxPoints = SECURITY_CHECKLIST.reduce((sum, item) => sum + item.points, 0);
-  const totalPoints = SECURITY_CHECKLIST
-    .filter(item => completedSet.has(item.id))
-    .reduce((sum, item) => sum + item.points, 0);
+  const totalPoints = SECURITY_CHECKLIST.filter((item) => completedSet.has(item.id)).reduce(
+    (sum, item) => sum + item.points,
+    0,
+  );
 
-  const requiredItems = SECURITY_CHECKLIST.filter(item => item.required);
-  const completedRequired = requiredItems.filter(item => completedSet.has(item.id));
+  const requiredItems = SECURITY_CHECKLIST.filter((item) => item.required);
+  const completedRequired = requiredItems.filter((item) => completedSet.has(item.id));
 
-  const categoryProgress: Record<SecurityCategory, { completed: number; total: number; points: number; maxPoints: number }> = {
+  const categoryProgress: Record<
+    SecurityCategory,
+    { completed: number; total: number; points: number; maxPoints: number }
+  > = {
     access_management: { completed: 0, total: 0, points: 0, maxPoints: 0 },
     physical_security: { completed: 0, total: 0, points: 0, maxPoints: 0 },
     employee_training: { completed: 0, total: 0, points: 0, maxPoints: 0 },
@@ -554,14 +564,14 @@ export function getSecurityAssessmentStats(assessment: SecurityAssessmentData): 
   };
 
   for (const category of SECURITY_CATEGORY_KEYS) {
-    const categoryItems = SECURITY_CHECKLIST.filter(item => item.category === category);
-    const completedCategoryItems = categoryItems.filter(item => completedSet.has(item.id));
+    const categoryItems = SECURITY_CHECKLIST.filter((item) => item.category === category);
+    const completedCategoryItems = categoryItems.filter((item) => completedSet.has(item.id));
 
     categoryProgress[category] = {
       completed: completedCategoryItems.length,
       total: categoryItems.length,
       points: completedCategoryItems.reduce((sum, item) => sum + item.points, 0),
-      maxPoints: categoryItems.reduce((sum, item) => sum + item.points, 0)
+      maxPoints: categoryItems.reduce((sum, item) => sum + item.points, 0),
     };
   }
 
@@ -573,7 +583,7 @@ export function getSecurityAssessmentStats(assessment: SecurityAssessmentData): 
     requiredCompleted: completedRequired.length,
     requiredTotal: requiredItems.length,
     requiredRatio: requiredItems.length > 0 ? completedRequired.length / requiredItems.length : 0,
-    categoryProgress
+    categoryProgress,
   };
 }
 
@@ -592,28 +602,28 @@ export function getSecurityBadgeInfo(level: SecurityCertificationLevel): {
         label: SECURITY_CERTIFICATION_THRESHOLDS.basic.label,
         description: SECURITY_CERTIFICATION_THRESHOLDS.basic.description,
         gradient: SECURITY_CERTIFICATION_THRESHOLDS.basic.badgeColor,
-        tier: "Bronze"
+        tier: "Bronze",
       };
     case "standard":
       return {
         label: SECURITY_CERTIFICATION_THRESHOLDS.standard.label,
         description: SECURITY_CERTIFICATION_THRESHOLDS.standard.description,
         gradient: SECURITY_CERTIFICATION_THRESHOLDS.standard.badgeColor,
-        tier: "Silver"
+        tier: "Silver",
       };
     case "advanced":
       return {
         label: SECURITY_CERTIFICATION_THRESHOLDS.advanced.label,
         description: SECURITY_CERTIFICATION_THRESHOLDS.advanced.description,
         gradient: SECURITY_CERTIFICATION_THRESHOLDS.advanced.badgeColor,
-        tier: "Gold"
+        tier: "Gold",
       };
     case "excellence":
       return {
         label: SECURITY_CERTIFICATION_THRESHOLDS.excellence.label,
         description: SECURITY_CERTIFICATION_THRESHOLDS.excellence.description,
         gradient: SECURITY_CERTIFICATION_THRESHOLDS.excellence.badgeColor,
-        tier: "Platinum"
+        tier: "Platinum",
       };
     default:
       return null;
@@ -623,11 +633,13 @@ export function getSecurityBadgeInfo(level: SecurityCertificationLevel): {
 /**
  * Get quick wins - highest point items not yet completed
  */
-export function getQuickWins(assessment: SecurityAssessmentData, limit: number = 5): SecurityChecklistItem[] {
+export function getQuickWins(
+  assessment: SecurityAssessmentData,
+  limit: number = 5,
+): SecurityChecklistItem[] {
   const completedSet = new Set(assessment.completedItems);
 
-  return SECURITY_CHECKLIST
-    .filter(item => !completedSet.has(item.id))
+  return SECURITY_CHECKLIST.filter((item) => !completedSet.has(item.id))
     .sort((a, b) => b.points - a.points)
     .slice(0, limit);
 }
@@ -636,7 +648,7 @@ export function getQuickWins(assessment: SecurityAssessmentData, limit: number =
  * Get items with templates available
  */
 export function getItemsWithTemplates(): SecurityChecklistItem[] {
-  return SECURITY_CHECKLIST.filter(item => item.templateId);
+  return SECURITY_CHECKLIST.filter((item) => item.templateId);
 }
 
 /**
@@ -646,86 +658,89 @@ export const SECURITY_RESOURCES = [
   {
     title: "NIST Cybersecurity Framework",
     url: "https://www.nist.gov/cyberframework",
-    description: "Comprehensive security framework from the National Institute of Standards"
+    description: "Comprehensive security framework from the National Institute of Standards",
   },
   {
     title: "CIS Controls",
     url: "https://www.cisecurity.org/controls",
-    description: "Prioritized security actions from the Center for Internet Security"
+    description: "Prioritized security actions from the Center for Internet Security",
   },
   {
     title: "FTC Small Business Cybersecurity",
     url: "https://www.ftc.gov/business-guidance/small-businesses/cybersecurity",
-    description: "Free resources from the Federal Trade Commission"
+    description: "Free resources from the Federal Trade Commission",
   },
   {
     title: "CISA Free Tools & Services",
     url: "https://www.cisa.gov/free-cybersecurity-services-and-tools",
-    description: "Free security tools from the Cybersecurity & Infrastructure Security Agency"
-  }
+    description: "Free security tools from the Cybersecurity & Infrastructure Security Agency",
+  },
 ];
 
 /**
  * Template metadata for downloadable templates
  */
-export const SECURITY_TEMPLATES: Record<string, {
-  title: string;
-  description: string;
-  filename: string;
-}> = {
+export const SECURITY_TEMPLATES: Record<
+  string,
+  {
+    title: string;
+    description: string;
+    filename: string;
+  }
+> = {
   "data-retention-policy": {
     title: "Data Retention Policy",
     description: "Template for defining how long data is kept and when it's deleted",
-    filename: "data-retention-policy.md"
+    filename: "data-retention-policy.md",
   },
   "password-policy": {
     title: "Password Policy",
     description: "Guidelines for strong passwords and credential management",
-    filename: "password-policy.md"
+    filename: "password-policy.md",
   },
   "offboarding-checklist": {
     title: "Employee Offboarding Checklist",
     description: "Checklist for revoking access when employees leave",
-    filename: "offboarding-checklist.md"
+    filename: "offboarding-checklist.md",
   },
   "onboarding-checklist": {
     title: "Employee Onboarding Checklist",
     description: "Security checklist for new employee setup",
-    filename: "onboarding-checklist.md"
+    filename: "onboarding-checklist.md",
   },
   "incident-response-plan": {
     title: "Incident Response Plan",
     description: "Step-by-step guide for responding to security incidents",
-    filename: "incident-response-plan.md"
+    filename: "incident-response-plan.md",
   },
   "breach-notification-template": {
     title: "Breach Notification Template",
     description: "Template letters for notifying affected parties",
-    filename: "breach-notification-template.md"
+    filename: "breach-notification-template.md",
   },
   "security-training-checklist": {
     title: "Security Training Checklist",
     description: "Topics to cover in annual security awareness training",
-    filename: "security-training-checklist.md"
+    filename: "security-training-checklist.md",
   },
   "privacy-policy": {
     title: "Privacy Policy Template",
     description: "Customizable privacy policy for your website",
-    filename: "privacy-policy.md"
+    filename: "privacy-policy.md",
   },
   "data-subject-request-form": {
     title: "Data Subject Request Form",
     description: "Form for customers to request access to their data",
-    filename: "data-subject-request-form.md"
+    filename: "data-subject-request-form.md",
   },
   "vendor-security-questionnaire": {
     title: "Vendor Security Questionnaire",
     description: "Questions to assess vendor security practices",
-    filename: "vendor-security-questionnaire.md"
+    filename: "vendor-security-questionnaire.md",
   },
   "data-processing-agreement": {
     title: "Data Processing Agreement",
     description: "Contract template for vendors handling customer data",
-    filename: "data-processing-agreement.md"
-  }
+    filename: "data-processing-agreement.md",
+  },
 };

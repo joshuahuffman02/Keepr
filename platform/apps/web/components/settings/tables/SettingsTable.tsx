@@ -148,9 +148,7 @@ export function SettingsTable<T extends { id: string }>({
           )}
         </div>
 
-        {getItemStatus && (
-          <StatusFilter value={status} onChange={handleStatusChange} />
-        )}
+        {getItemStatus && <StatusFilter value={status} onChange={handleStatusChange} />}
       </div>
 
       {/* Table or Empty State */}
@@ -165,7 +163,7 @@ export function SettingsTable<T extends { id: string }>({
                     scope="col"
                     className={cn(
                       "px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider",
-                      column.className
+                      column.className,
                     )}
                   >
                     {column.label}
@@ -186,10 +184,7 @@ export function SettingsTable<T extends { id: string }>({
                 <tr
                   key={item.id}
                   onClick={() => onRowClick?.(item)}
-                  className={cn(
-                    "hover:bg-muted transition-colors",
-                    onRowClick && "cursor-pointer"
-                  )}
+                  className={cn("hover:bg-muted transition-colors", onRowClick && "cursor-pointer")}
                 >
                   {columns.map((column) => (
                     <td
@@ -203,11 +198,7 @@ export function SettingsTable<T extends { id: string }>({
                           : ""}
                     </td>
                   ))}
-                  {getRowActions && (
-                    <td className="px-4 py-3 text-right">
-                      {getRowActions(item)}
-                    </td>
-                  )}
+                  {getRowActions && <td className="px-4 py-3 text-right">{getRowActions(item)}</td>}
                 </tr>
               ))}
             </tbody>
@@ -215,7 +206,8 @@ export function SettingsTable<T extends { id: string }>({
         </div>
       ) : (
         // Empty state
-        emptyState && EmptyIcon && (
+        emptyState &&
+        EmptyIcon && (
           <div className="text-center py-12 border-2 border-dashed rounded-lg bg-card">
             <EmptyIcon className="h-10 w-10 mx-auto text-muted-foreground" aria-hidden="true" />
             <h3 className="mt-3 font-medium text-foreground">{emptyState.title}</h3>

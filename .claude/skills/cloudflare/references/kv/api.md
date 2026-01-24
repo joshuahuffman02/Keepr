@@ -34,7 +34,7 @@ await env.MY_KV.put("config", JSON.stringify({ theme: "dark" }));
 
 // With expiration (UNIX timestamp)
 await env.MY_KV.put("session", token, {
-  expiration: Math.floor(Date.now() / 1000) + 3600
+  expiration: Math.floor(Date.now() / 1000) + 3600,
 });
 
 // With TTL (seconds from now, min 60)
@@ -42,13 +42,13 @@ await env.MY_KV.put("cache", data, { expirationTtl: 300 });
 
 // With metadata (max 1024 bytes)
 await env.MY_KV.put("user:profile", userData, {
-  metadata: { version: 2, lastUpdated: Date.now() }
+  metadata: { version: 2, lastUpdated: Date.now() },
 });
 
 // Combined
 await env.MY_KV.put("temp", value, {
   expirationTtl: 3600,
-  metadata: { temporary: true }
+  metadata: { temporary: true },
 });
 ```
 
@@ -99,16 +99,16 @@ do {
 
 ## Limits
 
-| Limit | Free | Paid |
-|-------|------|------|
-| Reads/day | 100,000 | Unlimited |
-| Writes/day | 1,000 | Unlimited |
-| Writes/second per key | 1 | 1 |
-| Operations per Worker | 1,000 | 1,000 |
-| Key size | 512 bytes | 512 bytes |
-| Value size | 25 MiB | 25 MiB |
-| Metadata size | 1024 bytes | 1024 bytes |
-| Min cacheTtl | 60s | 60s |
-| Bulk get max | 100 keys | 100 keys |
+| Limit                 | Free       | Paid       |
+| --------------------- | ---------- | ---------- |
+| Reads/day             | 100,000    | Unlimited  |
+| Writes/day            | 1,000      | Unlimited  |
+| Writes/second per key | 1          | 1          |
+| Operations per Worker | 1,000      | 1,000      |
+| Key size              | 512 bytes  | 512 bytes  |
+| Value size            | 25 MiB     | 25 MiB     |
+| Metadata size         | 1024 bytes | 1024 bytes |
+| Min cacheTtl          | 60s        | 60s        |
+| Bulk get max          | 100 keys   | 100 keys   |
 
 **Note:** Bulk requests count as 1 operation against 1,000 limit.

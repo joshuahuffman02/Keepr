@@ -37,4 +37,3 @@ export class CreateReviewRequestDto {
   @IsDateString()
   sendAfter?: string;
 }
-

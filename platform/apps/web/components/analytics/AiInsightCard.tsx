@@ -107,11 +107,7 @@ export function AiInsightCard({
                 onClick={() => setExpanded(!expanded)}
                 className="h-8 w-8 p-0"
               >
-                {expanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             )}
           </div>
@@ -131,16 +127,11 @@ export function AiInsightCard({
               </p>
               <div className="grid gap-2">
                 {insights.map((insight, idx) => (
-                  <div
-                    key={idx}
-                    className={`p-3 rounded-lg border ${getInsightBg(insight.type)}`}
-                  >
+                  <div key={idx} className={`p-3 rounded-lg border ${getInsightBg(insight.type)}`}>
                     <div className="flex items-start gap-2">
                       {getInsightIcon(insight.type)}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-foreground">
-                          {insight.title}
-                        </p>
+                        <p className="text-sm font-medium text-foreground">{insight.title}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           {insight.description}
                         </p>
@@ -182,10 +173,7 @@ export function AiInsightCard({
               </p>
               <ul className="space-y-1.5">
                 {recommendations.map((rec, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2 text-sm text-muted-foreground"
-                  >
+                  <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
                     <span className="text-action-primary mt-1">→</span>
                     {rec}
                   </li>

@@ -43,9 +43,23 @@ export function useAnalyticsEmitters({
     trackEvent("availability_check", {
       campgroundId,
       page: `/park/${slug}/book`,
-      metadata: { arrivalDate, departureDate, rigType: equipment.type, rigLength: equipment.length }
+      metadata: {
+        arrivalDate,
+        departureDate,
+        rigType: equipment.type,
+        rigLength: equipment.length,
+      },
     });
-  }, [availableSites, campgroundId, arrivalDate, departureDate, equipment.type, equipment.length, slug, lastAvailabilityKey]);
+  }, [
+    availableSites,
+    campgroundId,
+    arrivalDate,
+    departureDate,
+    equipment.type,
+    equipment.length,
+    slug,
+    lastAvailabilityKey,
+  ]);
 
   useEffect(() => {
     if (!campgroundId || !selectedSiteId) return;
@@ -54,7 +68,7 @@ export function useAnalyticsEmitters({
       campgroundId,
       siteId: selectedSiteId,
       siteClassId: site?.siteClass?.id,
-      page: `/park/${slug}/book`
+      page: `/park/${slug}/book`,
     });
   }, [selectedSiteId, availableSites, campgroundId, slug]);
 
@@ -64,7 +78,7 @@ export function useAnalyticsEmitters({
     trackEvent("reservation_start", {
       campgroundId,
       siteId: selectedSiteId || undefined,
-      page: `/park/${slug}/book`
+      page: `/park/${slug}/book`,
     });
   }, [campgroundId, step, selectedSiteId, slug, reservationStartLogged]);
 }

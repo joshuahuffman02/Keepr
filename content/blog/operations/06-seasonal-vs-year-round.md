@@ -38,15 +38,15 @@ Year-round campgrounds stay open 365 days. They maintain operations through wint
 
 ## Comparing the Models
 
-| Factor | Seasonal | Year-Round |
-|--------|----------|------------|
-| Annual Revenue Potential | Lower ceiling, concentrated | Higher ceiling, spread out |
-| Staffing Complexity | Simpler, seasonal hiring | More complex, year-round needs |
-| Facility Wear | Time to repair/upgrade | Continuous maintenance |
-| Personal Time Off | Built-in off-season break | Must schedule actively |
-| Cash Flow | Feast or famine | More consistent |
-| Utility Costs | Lower annual total | Higher, but winter can be challenging |
-| Guest Demographics | Vacation campers | Mix of vacation, long-term, snowbirds |
+| Factor                   | Seasonal                    | Year-Round                            |
+| ------------------------ | --------------------------- | ------------------------------------- |
+| Annual Revenue Potential | Lower ceiling, concentrated | Higher ceiling, spread out            |
+| Staffing Complexity      | Simpler, seasonal hiring    | More complex, year-round needs        |
+| Facility Wear            | Time to repair/upgrade      | Continuous maintenance                |
+| Personal Time Off        | Built-in off-season break   | Must schedule actively                |
+| Cash Flow                | Feast or famine             | More consistent                       |
+| Utility Costs            | Lower annual total          | Higher, but winter can be challenging |
+| Guest Demographics       | Vacation campers            | Mix of vacation, long-term, snowbirds |
 
 ---
 
@@ -57,18 +57,21 @@ Year-round campgrounds stay open 365 days. They maintain operations through wint
 The weeks before opening are critical. Plan for:
 
 **6 Weeks Before Opening:**
+
 - [ ] Inspect all utility systems (water, electric, septic)
 - [ ] Test and repair any damaged equipment
 - [ ] Clear debris from sites and common areas
 - [ ] Re-staff or bring back seasonal employees
 
 **2 Weeks Before Opening:**
+
 - [ ] Complete grounds beautification (mowing, planting)
 - [ ] Stock store and supplies
 - [ ] Test reservation system and payment processing
 - [ ] Launch pre-season marketing push
 
 **Opening Day:**
+
 - [ ] Staff training and refresher
 - [ ] Soft opening with reduced capacity (optional)
 - [ ] Be prepared for the inevitable surprises
@@ -87,6 +90,7 @@ During your operating months, you're running at full intensity:
 Closing properly protects your investment:
 
 **Winterization Checklist:**
+
 - [ ] Drain and blow out all water lines
 - [ ] Winterize pump houses and restrooms
 - [ ] Store removable equipment and signage
@@ -113,18 +117,21 @@ The off-season isn't truly "off":
 Running through winter requires additional considerations:
 
 **Infrastructure Needs:**
+
 - Heated/insulated water lines or heated buildings
 - Snow removal equipment and plans
 - Weatherized restroom facilities
 - Reliable heating for staff areas
 
 **Staffing Adjustments:**
+
 - Reduced staff levels match lower occupancy
 - Cross-training for skeleton crews
 - Snow removal responsibilities
 - Cold-weather emergency procedures
 
 **Guest Expectations:**
+
 - Some guests specifically seek winter camping
 - Snowbirds fleeing cold weather (depends on your climate)
 - Long-term guests who live on-site
@@ -134,24 +141,26 @@ Running through winter requires additional considerations:
 
 Year-round campgrounds typically see this occupancy pattern:
 
-| Season | Expected Occupancy | Strategy |
-|--------|-------------------|----------|
-| Summer Peak | 80-100% | Maximize rate, minimum stays |
-| Shoulder (Spring/Fall) | 40-60% | Events, promotions, weekday deals |
-| Winter | 10-40% | Long-term rates, extended stays |
-| Holidays | Variable | Target specific segments |
+| Season                 | Expected Occupancy | Strategy                          |
+| ---------------------- | ------------------ | --------------------------------- |
+| Summer Peak            | 80-100%            | Maximize rate, minimum stays      |
+| Shoulder (Spring/Fall) | 40-60%             | Events, promotions, weekday deals |
+| Winter                 | 10-40%             | Long-term rates, extended stays   |
+| Holidays               | Variable           | Target specific segments          |
 
 ### Long-Term and Extended Stay Guests
 
 Year-round campgrounds often rely on long-term guests:
 
 **Benefits of long-term guests:**
+
 - Predictable, stable revenue
 - Lower turnover costs
 - Site maintenance partnership
 - Word-of-mouth referrals
 
 **Considerations:**
+
 - Lower nightly rate (30-50% discount for monthly)
 - State/local regulations on residency
 - Balance with transient capacity
@@ -222,12 +231,14 @@ Higher revenue but ongoing expenses year-round
 ### Extending a Seasonal Season
 
 Consider extending your season if:
+
 - Shoulder season bookings are strong
 - Weather in your area is getting milder
 - You've invested in winterized facilities
 - Staff is willing to work longer
 
 **Start gradually:**
+
 1. Add one weekend in each direction
 2. Market specifically to fall/spring travelers
 3. Offer incentive pricing initially
@@ -236,12 +247,14 @@ Consider extending your season if:
 ### Converting to Year-Round
 
 Full conversion requires:
+
 - Significant infrastructure investment
 - Different business model (long-term focus)
 - Revised staffing strategy
 - Understanding of winter guest market
 
 **Return on investment considerations:**
+
 - Calculate additional revenue potential
 - Compare against infrastructure costs
 - Model break-even scenarios
@@ -295,4 +308,4 @@ The most successful campground owners align their operational model with their l
 
 ---
 
-*Keepr supports both seasonal and year-round operations with flexible pricing rules, seasonal date management, and long-term booking options. [Configure your seasons at campreserv.com](https://campreserv.com)*
+_Keepr supports both seasonal and year-round operations with flexible pricing rules, seasonal date management, and long-term booking options. [Configure your seasons at campreserv.com](https://campreserv.com)_

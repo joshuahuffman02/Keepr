@@ -88,7 +88,11 @@ export default function SystemCheckPage() {
   const { selectedCampground, isHydrated } = useCampground();
   const [filter, setFilter] = useState<FilterValue>("actionable");
 
-  const { data: issues = [], isLoading, refetch } = useQuery({
+  const {
+    data: issues = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["system-check", selectedCampground?.id],
     queryFn: () => fetchSystemIssues(selectedCampground!.id),
     enabled: isHydrated && !!selectedCampground?.id,
@@ -108,7 +112,7 @@ export default function SystemCheckPage() {
 
   // Sort by severity priority
   const sortedIssues = [...issues].sort(
-    (a, b) => severityConfig[a.severity].priority - severityConfig[b.severity].priority
+    (a, b) => severityConfig[a.severity].priority - severityConfig[b.severity].priority,
   );
 
   // Filter issues
@@ -151,14 +155,18 @@ export default function SystemCheckPage() {
         <Card className={cn(errorCount > 0 ? "border-status-error/30 bg-status-error/15" : "")}>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={cn(
-                "h-10 w-10 rounded-lg flex items-center justify-center",
-                errorCount > 0 ? "bg-status-error/15" : "bg-muted"
-              )}>
-                <XCircle className={cn(
-                  "h-5 w-5",
-                  errorCount > 0 ? "text-status-error" : "text-muted-foreground"
-                )} />
+              <div
+                className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center",
+                  errorCount > 0 ? "bg-status-error/15" : "bg-muted",
+                )}
+              >
+                <XCircle
+                  className={cn(
+                    "h-5 w-5",
+                    errorCount > 0 ? "text-status-error" : "text-muted-foreground",
+                  )}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{errorCount}</p>
@@ -169,17 +177,23 @@ export default function SystemCheckPage() {
         </Card>
 
         {/* Warnings */}
-        <Card className={cn(warningCount > 0 ? "border-status-warning/30 bg-status-warning/15" : "")}>
+        <Card
+          className={cn(warningCount > 0 ? "border-status-warning/30 bg-status-warning/15" : "")}
+        >
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className={cn(
-                "h-10 w-10 rounded-lg flex items-center justify-center",
-                warningCount > 0 ? "bg-status-warning/15" : "bg-muted"
-              )}>
-                <AlertTriangle className={cn(
-                  "h-5 w-5",
-                  warningCount > 0 ? "text-status-warning" : "text-muted-foreground"
-                )} />
+              <div
+                className={cn(
+                  "h-10 w-10 rounded-lg flex items-center justify-center",
+                  warningCount > 0 ? "bg-status-warning/15" : "bg-muted",
+                )}
+              >
+                <AlertTriangle
+                  className={cn(
+                    "h-5 w-5",
+                    warningCount > 0 ? "text-status-warning" : "text-muted-foreground",
+                  )}
+                />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{warningCount}</p>
@@ -255,8 +269,8 @@ export default function SystemCheckPage() {
               {filter === "actionable"
                 ? "No errors or warnings to address."
                 : filter === "info"
-                ? "No additional suggestions at this time."
-                : "Your system configuration looks great."}
+                  ? "No additional suggestions at this time."
+                  : "Your system configuration looks great."}
             </p>
           </CardContent>
         </Card>
@@ -271,10 +285,7 @@ export default function SystemCheckPage() {
             return (
               <Card
                 key={issue.id}
-                className={cn(
-                  "transition-all duration-200 hover:shadow-md group",
-                  severity.border
-                )}
+                className={cn("transition-all duration-200 hover:shadow-md group", severity.border)}
               >
                 <CardContent className="py-4">
                   <div className="flex items-start gap-4">
@@ -286,9 +297,7 @@ export default function SystemCheckPage() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="font-medium text-foreground">
-                          {issue.message}
-                        </h4>
+                        <h4 className="font-medium text-foreground">{issue.message}</h4>
                         <Badge variant="outline" className={cn("text-xs", severity.badge)}>
                           {severity.label}
                         </Badge>
@@ -297,9 +306,7 @@ export default function SystemCheckPage() {
                           {category.label}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {issue.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{issue.description}</p>
                     </div>
 
                     {/* Action */}

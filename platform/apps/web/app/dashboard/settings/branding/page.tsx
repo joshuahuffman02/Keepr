@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
 import { Label } from "../../../../components/ui/label";
@@ -35,7 +41,7 @@ const emptyForm: BrandingForm = {
   brandFont: "",
   emailHeader: "",
   receiptFooter: "",
-  brandingNote: ""
+  brandingNote: "",
 };
 
 // Field validation configuration
@@ -67,14 +73,15 @@ export default function BrandingPage() {
   } = useFormValidation(fieldConfigs, emptyForm);
 
   useEffect(() => {
-    const cg = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const cg =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     setCampgroundId(cg);
   }, []);
 
   const campgroundQuery = useQuery({
     queryKey: ["campground", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   useEffect(() => {
@@ -100,7 +107,7 @@ export default function BrandingPage() {
       brandFont: cgWithBranding.brandFont || "",
       emailHeader: cgWithBranding.emailHeader || "",
       receiptFooter: cgWithBranding.receiptFooter || "",
-      brandingNote: cg.brandingNote || ""
+      brandingNote: cg.brandingNote || "",
     });
   }, [campgroundQuery.data, resetForm]);
 
@@ -115,13 +122,13 @@ export default function BrandingPage() {
         brandFont: form.brandFont || null,
         emailHeader: form.emailHeader || null,
         receiptFooter: form.receiptFooter || null,
-        brandingNote: form.brandingNote || null
+        brandingNote: form.brandingNote || null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campground", campgroundId] });
       toast({ title: "Branding updated" });
     },
-    onError: () => toast({ title: "Failed to update branding", variant: "destructive" })
+    onError: () => toast({ title: "Failed to update branding", variant: "destructive" }),
   });
 
   const handleSave = () => {
@@ -144,7 +151,9 @@ export default function BrandingPage() {
       <Card>
         <CardHeader>
           <CardTitle>Colors & Logo</CardTitle>
-          <CardDescription>Define your brand colors and logo for guest-facing pages.</CardDescription>
+          <CardDescription>
+            Define your brand colors and logo for guest-facing pages.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">

@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { Roles, RolesGuard } from "../auth/guards/roles.guard";
@@ -42,7 +42,9 @@ export class PoliciesController {
     }
 
     const platformRole = user.platformRole ?? "";
-    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(platformRole);
+    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(
+      platformRole,
+    );
     if (isPlatformStaff) {
       return;
     }
@@ -65,7 +67,7 @@ export class PoliciesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreatePolicyTemplateDto,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.policies.createTemplate(campgroundId, dto);
@@ -77,7 +79,7 @@ export class PoliciesController {
     @Param("id") id: string,
     @Body() dto: UpdatePolicyTemplateDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -89,7 +91,7 @@ export class PoliciesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

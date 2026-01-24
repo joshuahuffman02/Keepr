@@ -1,10 +1,5 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import {
-  EvidenceType,
-  IncidentStatus,
-  IncidentTaskStatus,
-  Prisma,
-} from "@prisma/client";
+import { EvidenceType, IncidentStatus, IncidentTaskStatus, Prisma } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateIncidentDto } from "./dto/create-incident.dto";
 import { UpdateIncidentDto } from "./dto/update-incident.dto";
@@ -12,15 +7,12 @@ import { AddEvidenceDto } from "./dto/add-evidence.dto";
 import { LinkClaimDto } from "./dto/link-claim.dto";
 import { SetReminderDto } from "./dto/set-reminder.dto";
 import { CloseIncidentDto } from "./dto/close-incident.dto";
-import {
-  CreateIncidentTaskDto,
-  UpdateIncidentTaskDto,
-} from "./dto/task.dto";
+import { CreateIncidentTaskDto, UpdateIncidentTaskDto } from "./dto/task.dto";
 import { CreateCoiDto } from "./dto/create-coi.dto";
 import { randomUUID } from "crypto";
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -185,11 +177,7 @@ export class IncidentsService {
         dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
         reminderAt: dto.reminderAt ? new Date(dto.reminderAt) : undefined,
         completedAt:
-          dto.status === IncidentTaskStatus.done
-            ? new Date()
-            : dto.status
-              ? null
-              : undefined,
+          dto.status === IncidentTaskStatus.done ? new Date() : dto.status ? null : undefined,
       },
     });
   }

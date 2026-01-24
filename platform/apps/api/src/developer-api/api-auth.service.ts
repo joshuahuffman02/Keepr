@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, UnauthorizedException, Logger, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ApiScope, ApiClientTier, TIER_LIMITS, DEFAULT_TIER_SCOPES } from "./types";
 import { randomBytes, createHash, randomUUID } from "crypto";
@@ -22,7 +28,7 @@ export class ApiAuthService {
   private readonly logger = new Logger(ApiAuthService.name);
   private accessTtlSeconds = 3600;
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   private hashToken(token: string) {
     return createHash("sha256").update(token).digest("hex");
@@ -30,9 +36,12 @@ export class ApiAuthService {
 
   private pickScopes(requested: string | undefined, allowed: string[]): string[] {
     if (!requested) return allowed;
-    const requestedList = requested.split(" ").map(s => s.trim()).filter(Boolean);
+    const requestedList = requested
+      .split(" ")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const allowedSet = new Set(allowed);
-    const filtered = requestedList.filter(scope => allowedSet.has(scope));
+    const filtered = requestedList.filter((scope) => allowedSet.has(scope));
     return filtered.length ? filtered : allowed;
   }
 
@@ -57,14 +66,18 @@ export class ApiAuthService {
         accessTokenHash: this.hashToken(accessToken),
         refreshTokenHash: this.hashToken(refreshToken),
         scopes,
-        expiresAt
-      }
+        expiresAt,
+      },
     });
 
     return { accessToken, refreshToken, expiresAt };
   }
 
-  async issueClientCredentialsToken(opts: { clientId: string; clientSecret: string; scope?: string }) {
+  async issueClientCredentialsToken(opts: {
+    clientId: string;
+    clientSecret: string;
+    scope?: string;
+  }) {
     const client = await this.validateClient(opts.clientId, opts.clientSecret);
     const scopes = this.pickScopes(opts.scope, client.scopes || []);
     const tokens = await this.persistToken(client.id, scopes);
@@ -75,7 +88,7 @@ export class ApiAuthService {
       refresh_token: tokens.refreshToken,
       expires_in: this.accessTtlSeconds,
       scope: scopes.join(" "),
-      campground_id: client.campgroundId
+      campground_id: client.campgroundId,
     };
   }
 
@@ -83,7 +96,7 @@ export class ApiAuthService {
     const tokenHash = this.hashToken(refreshToken);
     const token = await this.prisma.apiToken.findFirst({
       where: { refreshTokenHash: tokenHash, revokedAt: null },
-      include: { ApiClient: true }
+      include: { ApiClient: true },
     });
     if (!token || !token.ApiClient || !token.ApiClient.isActive) {
       throw new UnauthorizedException("Invalid refresh token");
@@ -97,7 +110,7 @@ export class ApiAuthService {
       refresh_token: tokens.refreshToken,
       expires_in: this.accessTtlSeconds,
       scope: scopes.join(" "),
-      campground_id: token.ApiClient.campgroundId
+      campground_id: token.ApiClient.campgroundId,
     };
   }
 
@@ -121,7 +134,7 @@ export class ApiAuthService {
     if (input.scopes && input.scopes.length) {
       // Filter scopes to only those allowed for the tier
       const allowedSet = new Set(allowedTierScopes);
-      scopes = input.scopes.filter(s => allowedSet.has(s));
+      scopes = input.scopes.filter((s) => allowedSet.has(s));
       if (scopes.length === 0) {
         scopes = allowedTierScopes;
       }
@@ -140,17 +153,19 @@ export class ApiAuthService {
         tier,
         rateLimit: tierLimits.requestsPerHour,
         updatedAt: new Date(),
-      }
+      },
     });
 
-    this.logger.log(`Created API client ${clientId} for campground ${input.campgroundId} with tier ${tier}`);
+    this.logger.log(
+      `Created API client ${clientId} for campground ${input.campgroundId} with tier ${tier}`,
+    );
 
     return { client, clientSecret };
   }
 
   private async requireClient(campgroundId: string, clientId: string) {
     const client = await this.prisma.apiClient.findFirst({
-      where: { id: clientId, campgroundId }
+      where: { id: clientId, campgroundId },
     });
     if (!client) {
       throw new NotFoundException("API client not found");
@@ -195,7 +210,7 @@ export class ApiAuthService {
   async listClients(campgroundId: string) {
     return this.prisma.apiClient.findMany({
       where: { campgroundId },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -205,7 +220,7 @@ export class ApiAuthService {
     await this.requireClient(campgroundId, clientId);
     const client = await this.prisma.apiClient.update({
       where: { id: clientId },
-      data: { clientSecretHash: hashedSecret }
+      data: { clientSecretHash: hashedSecret },
     });
     return { client, clientSecret: secret };
   }
@@ -214,21 +229,21 @@ export class ApiAuthService {
     await this.requireClient(campgroundId, clientId);
     return this.prisma.apiClient.update({
       where: { id: clientId },
-      data: { isActive }
+      data: { isActive },
     });
   }
 
   async revokeToken(campgroundId: string, tokenId: string) {
     const token = await this.prisma.apiToken.findFirst({
       where: { id: tokenId, ApiClient: { campgroundId } },
-      select: { id: true }
+      select: { id: true },
     });
     if (!token) {
       throw new NotFoundException("API token not found");
     }
     return this.prisma.apiToken.update({
       where: { id: tokenId },
-      data: { revokedAt: new Date() }
+      data: { revokedAt: new Date() },
     });
   }
 

@@ -7,11 +7,13 @@ A comprehensive contextual help tooltip system has been implemented for the Camp
 ## Components Created
 
 ### 1. HelpTooltip Component
+
 **Location:** `/components/help/HelpTooltip.tsx`
 
 A flexible tooltip component that displays contextual help information.
 
 **Features:**
+
 - [OK] Small "?" icon button that shows help on hover/click
 - [OK] Mobile-friendly (tap to show, tap outside to dismiss)
 - [OK] Desktop hover support
@@ -22,17 +24,20 @@ A flexible tooltip component that displays contextual help information.
 - [OK] Arrow indicators for better UX
 
 **Helper Components:**
+
 - `HelpTooltipContent` - Wrapper for structured tooltip content
 - `HelpTooltipSection` - Sections with optional titles
 - `HelpTooltipList` - Bulleted lists
 - `HelpTooltipLink` - External links with proper styling
 
 ### 2. OnboardingHint Component
+
 **Location:** `/components/help/OnboardingHint.tsx`
 
 First-time user hints that appear on key pages.
 
 **Features:**
+
 - [OK] Shows only on first visit (localStorage persistence)
 - [OK] Dismissible with "Got it!" button
 - [OK] Optional action buttons
@@ -41,15 +46,18 @@ First-time user hints that appear on key pages.
 - [OK] Customizable delay and trigger options
 
 **Variants:**
+
 - `OnboardingHint` - Positioned relative to a specific element
 - `PageOnboardingHint` - Page-level banner at top of content
 
 ### 3. useOnboardingHints Hook
+
 **Location:** `/hooks/use-onboarding-hints.ts`
 
 Programmatic control over onboarding hints.
 
 **Features:**
+
 - [OK] Check if hints are dismissed
 - [OK] Manually dismiss hints
 - [OK] Reset individual hints
@@ -57,21 +65,25 @@ Programmatic control over onboarding hints.
 - [OK] localStorage persistence
 
 **Exports:**
+
 - `useOnboardingHints()` - Manage multiple hints
 - `useOnboardingHint(id)` - Manage a single hint
 
 ## Implementation Locations
 
 ### Dashboard Page
+
 **File:** `/app/dashboard/page.tsx`
 
 **Added:**
+
 - [OK] Page-level onboarding hint (first visit welcome)
 - [OK] Today's Numbers section tooltip (explains all metrics)
 - [OK] Quick Actions section tooltip
 - [OK] Needs Attention section tooltip
 
 **Tooltips explain:**
+
 - Arrivals metric
 - Departures metric
 - In-house guests metric
@@ -79,22 +91,27 @@ Programmatic control over onboarding hints.
 - Balance due meaning
 
 ### Calendar Page
+
 **File:** `/app/calendar/page.tsx`
 
 **Added:**
+
 - [OK] Page-level onboarding hint (drag-to-book feature)
 - [OK] Statistics tooltips for all metrics
 
 **Tooltips explain:**
+
 - Reservations count
 - Revenue calculation
 - Occupancy rate formula
 - Average Daily Rate (ADR) calculation
 
 ### Pricing Rules Page
+
 **File:** `/app/settings/pricing-rules/page.tsx`
 
 **Added:**
+
 - [OK] Page-level onboarding hint (dynamic pricing intro)
 - [OK] Priority field tooltip with examples
 - [OK] Stacking mode tooltip with detailed explanations
@@ -102,6 +119,7 @@ Programmatic control over onboarding hints.
 - [OK] Max rate cap tooltip with examples
 
 **Tooltips explain:**
+
 - How priority order works
 - How stacking modes combine (additive, max, override)
 - When to use rate caps
@@ -110,9 +128,11 @@ Programmatic control over onboarding hints.
 ## Styling Updates
 
 ### Global CSS
+
 **File:** `/app/globals.css`
 
 **Added:**
+
 - [OK] Fade-in animation for onboarding hints
 - [OK] Smooth animation timing (0.3s ease-out)
 - [OK] Respects user motion preferences
@@ -120,9 +140,11 @@ Programmatic control over onboarding hints.
 ## Documentation Created
 
 ### 1. Help Tooltip System Guide
+
 **File:** `/HELP_TOOLTIP_SYSTEM.md`
 
 Comprehensive documentation covering:
+
 - Component overview and features
 - Props and API reference
 - Implementation examples
@@ -132,9 +154,11 @@ Comprehensive documentation covering:
 - Future enhancement ideas
 
 ### 2. Usage Examples
+
 **File:** `/components/help/USAGE_EXAMPLES.md`
 
 Detailed code examples for:
+
 - Simple tooltips
 - Advanced multi-section tooltips
 - Form field tooltips
@@ -148,12 +172,14 @@ Detailed code examples for:
 ## Key Features
 
 ### Mobile-First Design
+
 - Touch-friendly tap interactions
 - Tap outside to dismiss
 - Optimized tooltip sizes for mobile screens
 - Responsive positioning
 
 ### Accessibility
+
 - Keyboard navigation support (Esc to close)
 - ARIA labels for screen readers
 - High-contrast borders and colors
@@ -161,6 +187,7 @@ Detailed code examples for:
 - Semantic HTML
 
 ### User Experience
+
 - Non-intrusive help icons
 - Clear visual hierarchy
 - Consistent styling throughout app
@@ -168,6 +195,7 @@ Detailed code examples for:
 - Smart positioning to avoid screen edges
 
 ### Developer Experience
+
 - Simple, intuitive API
 - Reusable components
 - TypeScript support
@@ -185,17 +213,20 @@ The system uses these localStorage keys:
 ## Statistics
 
 ### Components Created
+
 - 3 main components (HelpTooltip, OnboardingHint, PageOnboardingHint)
 - 4 helper components (Content, Section, List, Link)
 - 1 custom hook
 - 3 documentation files
 
 ### Pages Enhanced
+
 - Dashboard (5 tooltips + 1 onboarding hint)
 - Calendar (4 tooltips + 1 onboarding hint)
 - Pricing Rules (5 tooltips + 1 onboarding hint)
 
 ### Total Help Elements
+
 - 14 contextual tooltips
 - 3 page-level onboarding hints
 - Ready to expand to 50+ locations
@@ -203,31 +234,27 @@ The system uses these localStorage keys:
 ## Usage Examples
 
 ### Simple Tooltip
+
 ```tsx
-<HelpTooltip
-  content={<div>What this metric means</div>}
-  side="top"
-/>
+<HelpTooltip content={<div>What this metric means</div>} side="top" />
 ```
 
 ### Multi-Section Tooltip
+
 ```tsx
 <HelpTooltip
   title="Advanced Feature"
   content={
     <HelpTooltipContent>
-      <HelpTooltipSection>
-        Main explanation here
-      </HelpTooltipSection>
-      <HelpTooltipSection title="Example">
-        Specific example here
-      </HelpTooltipSection>
+      <HelpTooltipSection>Main explanation here</HelpTooltipSection>
+      <HelpTooltipSection title="Example">Specific example here</HelpTooltipSection>
     </HelpTooltipContent>
   }
 />
 ```
 
 ### Onboarding Hint
+
 ```tsx
 <PageOnboardingHint
   id="unique-feature-id"
@@ -237,8 +264,8 @@ The system uses these localStorage keys:
     {
       label: "Learn More",
       onClick: () => navigate("/help"),
-      variant: "ghost"
-    }
+      variant: "ghost",
+    },
   ]}
 />
 ```
@@ -292,11 +319,13 @@ Recommended additions:
 To add tooltips to a new page:
 
 1. Import the component:
+
    ```tsx
    import { HelpTooltip } from "@/components/help/HelpTooltip";
    ```
 
 2. Add to your UI:
+
    ```tsx
    <div className="flex items-center gap-2">
      <label>Field Name</label>
@@ -305,14 +334,11 @@ To add tooltips to a new page:
    ```
 
 3. For first-time hints:
+
    ```tsx
    import { PageOnboardingHint } from "@/components/help/OnboardingHint";
 
-   <PageOnboardingHint
-     id="page-feature-name"
-     title="Welcome!"
-     content={<div>...</div>}
-   />
+   <PageOnboardingHint id="page-feature-name" title="Welcome!" content={<div>...</div>} />;
    ```
 
 ## Testing Checklist
@@ -333,6 +359,7 @@ When adding new tooltips:
 ## Support
 
 For questions or issues:
+
 - See documentation: `/HELP_TOOLTIP_SYSTEM.md`
 - See examples: `/components/help/USAGE_EXAMPLES.md`
 - Check existing implementations in Dashboard, Calendar, or Pricing Rules pages

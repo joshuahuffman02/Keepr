@@ -172,10 +172,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
   };
 
   const addShiftToForm = () => {
-    setFormShifts([
-      ...formShifts,
-      { dayOfWeek: 1, startTime: "09:00", endTime: "17:00" },
-    ]);
+    setFormShifts([...formShifts, { dayOfWeek: 1, startTime: "09:00", endTime: "17:00" }]);
   };
 
   const updateFormShift = (index: number, updates: Partial<TemplateShift>) => {
@@ -196,9 +193,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
     setError(null);
 
     try {
-      const url = editingId
-        ? `/api/staff/templates/${editingId}`
-        : "/api/staff/templates";
+      const url = editingId ? `/api/staff/templates/${editingId}` : "/api/staff/templates";
       const method = editingId ? "PATCH" : "POST";
 
       const res = await fetch(url, {
@@ -325,7 +320,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
   const getStaffName = (userId?: string) => {
     if (!userId) return "Unassigned";
     const member = staffMembers.find((m) => m.id === userId);
-    return member ? `${member.firstName || ""} ${member.lastName || ""}`.trim() || member.email : "Unknown";
+    return member
+      ? `${member.firstName || ""} ${member.lastName || ""}`.trim() || member.email
+      : "Unknown";
   };
 
   const getRoleName = (roleCode?: string) => {
@@ -427,7 +424,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="template-name" className="block text-sm font-medium text-foreground mb-1">
+                      <Label
+                        htmlFor="template-name"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Template Name
                       </Label>
                       <Input
@@ -442,7 +442,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                     </div>
 
                     <div>
-                      <Label htmlFor="template-description" className="block text-sm font-medium text-foreground mb-1">
+                      <Label
+                        htmlFor="template-description"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Description (optional)
                       </Label>
                       <Textarea
@@ -505,7 +508,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               <Input
                                 type="time"
                                 value={shift.startTime}
-                                onChange={(e) => updateFormShift(idx, { startTime: e.target.value })}
+                                onChange={(e) =>
+                                  updateFormShift(idx, { startTime: e.target.value })
+                                }
                                 aria-label={`Start time for shift ${idx + 1}`}
                                 className="h-8 w-[120px] text-sm"
                               />
@@ -522,7 +527,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                                 <Select
                                   value={shift.roleCode || EMPTY_SELECT_VALUE}
                                   onValueChange={(value) =>
-                                    updateFormShift(idx, { roleCode: value === EMPTY_SELECT_VALUE ? undefined : value })
+                                    updateFormShift(idx, {
+                                      roleCode: value === EMPTY_SELECT_VALUE ? undefined : value,
+                                    })
                                   }
                                 >
                                   <SelectTrigger
@@ -545,7 +552,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               <Select
                                 value={shift.userId || EMPTY_SELECT_VALUE}
                                 onValueChange={(value) =>
-                                  updateFormShift(idx, { userId: value === EMPTY_SELECT_VALUE ? undefined : value })
+                                  updateFormShift(idx, {
+                                    userId: value === EMPTY_SELECT_VALUE ? undefined : value,
+                                  })
                                 }
                               >
                                 <SelectTrigger
@@ -594,7 +603,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                         "flex-1 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2",
                         "bg-indigo-600 text-white hover:bg-indigo-700",
                         (processing || !formName.trim() || formShifts.length === 0) &&
-                          "opacity-50 cursor-not-allowed"
+                          "opacity-50 cursor-not-allowed",
                       )}
                     >
                       {processing ? (
@@ -643,7 +652,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="recurring-day" className="block text-sm font-medium text-foreground mb-1">
+                      <Label
+                        htmlFor="recurring-day"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Run on
                       </Label>
                       <Select
@@ -667,7 +679,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                     </div>
 
                     <div>
-                      <Label htmlFor="recurring-weeks" className="block text-sm font-medium text-foreground mb-1">
+                      <Label
+                        htmlFor="recurring-weeks"
+                        className="block text-sm font-medium text-foreground mb-1"
+                      >
                         Schedule for
                       </Label>
                       <Select
@@ -703,7 +718,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                       className={cn(
                         "flex-1 px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2",
                         "bg-violet-600 text-white hover:bg-violet-700",
-                        processing && "opacity-50 cursor-not-allowed"
+                        processing && "opacity-50 cursor-not-allowed",
                       )}
                     >
                       {processing ? (
@@ -758,7 +773,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                     acc[shift.dayOfWeek].push(shift);
                     return acc;
                   },
-                  {}
+                  {},
                 );
 
                 return (
@@ -825,9 +840,13 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               "px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1",
                               template.isRecurring
                                 ? "bg-violet-600 text-white hover:bg-violet-700"
-                                : "bg-violet-100 text-violet-700 hover:bg-violet-200"
+                                : "bg-violet-100 text-violet-700 hover:bg-violet-200",
                             )}
-                            title={template.isRecurring ? "Disable auto-schedule" : "Enable auto-schedule"}
+                            title={
+                              template.isRecurring
+                                ? "Disable auto-schedule"
+                                : "Enable auto-schedule"
+                            }
                           >
                             <RefreshCw className="w-4 h-4" />
                             <span className="hidden sm:inline">Auto</span>
@@ -861,7 +880,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                       </div>
 
                       {template.description && (
-                        <p className="mt-2 text-sm text-muted-foreground ml-14">{template.description}</p>
+                        <p className="mt-2 text-sm text-muted-foreground ml-14">
+                          {template.description}
+                        </p>
                       )}
                     </div>
 
@@ -877,7 +898,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                         >
                           <div className="p-4 flex items-center gap-4">
                             <div className="flex-1">
-                              <Label htmlFor={`apply-week-${template.id}`} className="block text-sm font-medium text-foreground mb-1">
+                              <Label
+                                htmlFor={`apply-week-${template.id}`}
+                                className="block text-sm font-medium text-foreground mb-1"
+                              >
                                 Apply to week starting:
                               </Label>
                               <Input
@@ -894,7 +918,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               className={cn(
                                 "px-4 py-2 bg-status-success text-white rounded-lg font-medium flex items-center gap-2",
                                 "hover:bg-status-success/90",
-                                (processing || !applyWeekStart) && "opacity-50 cursor-not-allowed"
+                                (processing || !applyWeekStart) && "opacity-50 cursor-not-allowed",
                               )}
                             >
                               {processing ? (
@@ -933,10 +957,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                                   ) : (
                                     <div className="space-y-1">
                                       {dayShifts.map((shift, i) => (
-                                        <div
-                                          key={i}
-                                          className="p-2 bg-indigo-50 rounded text-xs"
-                                        >
+                                        <div key={i} className="p-2 bg-indigo-50 rounded text-xs">
                                           <p className="font-medium text-indigo-700">
                                             {shift.startTime}-{shift.endTime}
                                           </p>
@@ -967,7 +988,10 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
         )}
       </div>
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Template</AlertDialogTitle>

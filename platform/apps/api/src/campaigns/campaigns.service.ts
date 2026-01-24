@@ -14,7 +14,7 @@ type ChannelType = "email" | "sms" | "both";
 const ChannelTypeValues: Record<ChannelType, ChannelType> = {
   email: "email",
   sms: "sms",
-  both: "both"
+  both: "both",
 };
 
 const isChannelType = (value: string): value is ChannelType =>
@@ -31,7 +31,7 @@ const CampaignStatusValues: Record<CampaignStatus, CampaignStatus> = {
   scheduled: "scheduled",
   sending: "sending",
   sent: "sent",
-  cancelled: "cancelled"
+  cancelled: "cancelled",
 };
 
 const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
@@ -48,8 +48,8 @@ export class CampaignsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly emailService: EmailService,
-    private readonly smsService: SmsService
-  ) { }
+    private readonly smsService: SmsService,
+  ) {}
 
   private appendEmailFooter(html: string) {
     const footer = `
@@ -82,8 +82,8 @@ export class CampaignsService {
         channel: dto.channel || ChannelTypeValues.email,
         status: CampaignStatusValues.draft,
         variables: toJsonValue(dto.variables),
-        scheduledAt
-      }
+        scheduledAt,
+      },
     });
   }
 
@@ -99,8 +99,8 @@ export class CampaignsService {
         category: dto.category || "general",
         subject: dto.subject || null,
         html: dto.html || null,
-        textBody: dto.textBody || null
-      }
+        textBody: dto.textBody || null,
+      },
     });
   }
 
@@ -109,18 +109,21 @@ export class CampaignsService {
     if (!templateClient?.findMany) return [];
     return templateClient.findMany({
       where: { campgroundId },
-      orderBy: { updatedAt: "desc" }
+      orderBy: { updatedAt: "desc" },
     });
   }
 
-  async updateTemplate(id: string, data: Partial<{
-    name: string;
-    channel: string;
-    category: string;
-    subject: string | null;
-    html: string | null;
-    textBody: string | null;
-  }>) {
+  async updateTemplate(
+    id: string,
+    data: Partial<{
+      name: string;
+      channel: string;
+      category: string;
+      subject: string | null;
+      html: string | null;
+      textBody: string | null;
+    }>,
+  ) {
     const templateClient = this.prisma.campaignTemplate;
     if (!templateClient?.update) throw new NotFoundException("Template model not available");
     const existing = await templateClient.findUnique({ where: { id } });
@@ -138,11 +141,11 @@ export class CampaignsService {
       ...(data.category !== undefined ? { category: data.category } : {}),
       ...(data.subject !== undefined ? { subject: data.subject } : {}),
       ...(data.html !== undefined ? { html: data.html } : {}),
-      ...(data.textBody !== undefined ? { textBody: data.textBody } : {})
+      ...(data.textBody !== undefined ? { textBody: data.textBody } : {}),
     };
     return templateClient.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
   }
 
@@ -157,7 +160,7 @@ export class CampaignsService {
 
   async audiencePreview(filters: AudienceFiltersDto) {
     const whereReservation: Prisma.ReservationWhereInput = {
-      ...(filters.campgroundId ? { campgroundId: filters.campgroundId } : {})
+      ...(filters.campgroundId ? { campgroundId: filters.campgroundId } : {}),
     };
     if (filters.stayedFrom || filters.stayedTo) {
       const departureDate: Prisma.DateTimeFilter = {};
@@ -188,12 +191,12 @@ export class CampaignsService {
           some: {
             ...whereReservation,
             ...(siteType ? { Site: { siteType } } : {}),
-            ...(filters.siteClassId ? { siteClassId: filters.siteClassId } : {})
-          }
+            ...(filters.siteClassId ? { siteClassId: filters.siteClassId } : {}),
+          },
         },
         ...(filters.state ? { state: filters.state } : {}),
         ...(filters.vip ? { vip: true } : {}),
-        ...(filters.loyaltyTier ? { loyaltyProfile: { tier: filters.loyaltyTier } } : {})
+        ...(filters.loyaltyTier ? { loyaltyProfile: { tier: filters.loyaltyTier } } : {}),
       },
       select: {
         id: true,
@@ -204,17 +207,23 @@ export class CampaignsService {
         Reservation: {
           select: { arrivalDate: true, departureDate: true, promoCode: true },
           orderBy: { arrivalDate: "desc" },
-          take: 1
-        }
+          take: 1,
+        },
       },
-      take: 200
+      take: 200,
     });
 
     const currentYear = new Date().getFullYear();
     const filtered = guests.filter((g) => {
       const lastStay = g.Reservation[0]?.departureDate;
-      if (filters.lastStayBefore && lastStay && new Date(lastStay) >= new Date(filters.lastStayBefore)) return false;
-      if (filters.notStayedThisYear && lastStay && new Date(lastStay).getFullYear() === currentYear) return false;
+      if (
+        filters.lastStayBefore &&
+        lastStay &&
+        new Date(lastStay) >= new Date(filters.lastStayBefore)
+      )
+        return false;
+      if (filters.notStayedThisYear && lastStay && new Date(lastStay).getFullYear() === currentYear)
+        return false;
       if (filters.promoUsed && !g.Reservation[0]?.promoCode) return false;
       return true;
     });
@@ -226,8 +235,8 @@ export class CampaignsService {
         name: `${g.primaryFirstName || ""} ${g.primaryLastName || ""}`.trim(),
         email: g.email,
         phone: g.phone,
-        lastStay: g.Reservation[0]?.departureDate || null
-      }))
+        lastStay: g.Reservation[0]?.departureDate || null,
+      })),
     };
   }
 
@@ -242,7 +251,7 @@ export class CampaignsService {
     const siteCounts = await this.prisma.site.groupBy({
       by: ["siteType"],
       where: { campgroundId, isActive: true },
-      _count: { _all: true }
+      _count: { _all: true },
     });
 
     const reservations = await this.prisma.reservation.findMany({
@@ -250,9 +259,9 @@ export class CampaignsService {
         campgroundId,
         status: { not: "cancelled" },
         arrivalDate: { lt: end14 },
-        departureDate: { gt: now }
+        departureDate: { gt: now },
       },
-      select: { Site: { select: { siteType: true } } }
+      select: { Site: { select: { siteType: true } } },
     });
 
     const activeByType: Record<string, number> = {};
@@ -275,8 +284,8 @@ export class CampaignsService {
         filters: {
           campgroundId,
           siteType: s.type,
-          notStayedThisYear: true
-        }
+          notStayedThisYear: true,
+        },
       }));
 
     // 30-day softer occupancy
@@ -285,9 +294,9 @@ export class CampaignsService {
         campgroundId,
         status: { not: "cancelled" },
         arrivalDate: { lt: end30 },
-        departureDate: { gt: now }
+        departureDate: { gt: now },
       },
-      select: { Site: { select: { siteType: true } } }
+      select: { Site: { select: { siteType: true } } },
     });
     const activeByType30: Record<string, number> = {};
     reservations30.forEach((r) => {
@@ -307,8 +316,8 @@ export class CampaignsService {
         reason: `${s.type.toUpperCase()} soft occupancy in next 30 days (${Math.round(s.occ * 100)}%)`,
         filters: {
           campgroundId,
-          siteType: s.type
-        }
+          siteType: s.type,
+        },
       }));
 
     // Lapsed guests 12 months
@@ -319,9 +328,9 @@ export class CampaignsService {
         reason: "Lapsed guests: no stay in 12 months",
         filters: {
           campgroundId,
-          lastStayBefore: oneYearAgo.toISOString().slice(0, 10)
-        }
-      }
+          lastStayBefore: oneYearAgo.toISOString().slice(0, 10),
+        },
+      },
     ];
 
     // Repeat month last year but not this year
@@ -335,9 +344,9 @@ export class CampaignsService {
           campgroundId,
           stayedFrom: new Date(lastYear.getFullYear(), month - 1, 1).toISOString().slice(0, 10),
           stayedTo: new Date(lastYear.getFullYear(), month, 0).toISOString().slice(0, 10),
-          notStayedThisYear: true
-        }
-      }
+          notStayedThisYear: true,
+        },
+      },
     ];
 
     const promoUsers = [
@@ -346,9 +355,9 @@ export class CampaignsService {
         filters: {
           campgroundId,
           promoUsed: true,
-          notStayedThisYear: true
-        }
-      }
+          notStayedThisYear: true,
+        },
+      },
     ];
 
     const vip = [
@@ -357,9 +366,9 @@ export class CampaignsService {
         filters: {
           campgroundId,
           vip: true,
-          notStayedThisYear: true
-        }
-      }
+          notStayedThisYear: true,
+        },
+      },
     ];
 
     return [...suggestions14, ...suggestions30, ...lapsed, ...repeatMonth, ...promoUsers, ...vip];
@@ -370,14 +379,19 @@ export class CampaignsService {
     if (!campaignClient?.findMany) return [];
     return campaignClient.findMany({
       where: campgroundId ? { campgroundId } : {},
-      orderBy: { updatedAt: "desc" }
+      orderBy: { updatedAt: "desc" },
     });
   }
 
   async update(id: string, dto: UpdateCampaignDto) {
     const campaign = await this.prisma.campaign.findUnique({ where: { id } });
     if (!campaign) throw new NotFoundException("Campaign not found");
-    const scheduledAt = dto.scheduledAt === undefined ? undefined : dto.scheduledAt ? new Date(dto.scheduledAt) : null;
+    const scheduledAt =
+      dto.scheduledAt === undefined
+        ? undefined
+        : dto.scheduledAt
+          ? new Date(dto.scheduledAt)
+          : null;
     return this.prisma.campaign.update({
       where: { id },
       data: {
@@ -387,18 +401,24 @@ export class CampaignsService {
         fromName: dto.fromName ?? campaign.fromName,
         html: dto.html ?? campaign.html,
         status: dto.status ?? campaign.status,
-        scheduledAt
-      }
+        scheduledAt,
+      },
     });
   }
 
-  async sendNow(id: string, opts?: { scheduledAt?: string | null; batchPerMinute?: string | null }) {
+  async sendNow(
+    id: string,
+    opts?: { scheduledAt?: string | null; batchPerMinute?: string | null },
+  ) {
     const campaign = await this.prisma.campaign.findUnique({
       where: { id },
-      include: { Campground: true }
+      include: { Campground: true },
     });
     if (!campaign) throw new NotFoundException("Campaign not found");
-    if (campaign.status !== CampaignStatusValues.draft && campaign.status !== CampaignStatusValues.scheduled) {
+    if (
+      campaign.status !== CampaignStatusValues.draft &&
+      campaign.status !== CampaignStatusValues.scheduled
+    ) {
       throw new BadRequestException("Campaign cannot be sent from current status");
     }
 
@@ -407,26 +427,26 @@ export class CampaignsService {
       if (sched > new Date()) {
         await this.prisma.campaign.update({
           where: { id },
-          data: { status: CampaignStatusValues.scheduled, scheduledAt: sched }
+          data: { status: CampaignStatusValues.scheduled, scheduledAt: sched },
         });
         return { scheduledAt: sched };
       }
     }
 
-    await this.prisma.campaign.update({ where: { id }, data: { status: CampaignStatusValues.sending, scheduledAt: null } });
+    await this.prisma.campaign.update({
+      where: { id },
+      data: { status: CampaignStatusValues.sending, scheduledAt: null },
+    });
 
     const guests = await this.prisma.guest.findMany({
       where: {
         marketingOptIn: true,
-        OR: [
-          { email: { not: "" } },
-          { phone: { not: "" } }
-        ],
+        OR: [{ email: { not: "" } }, { phone: { not: "" } }],
         Reservation: {
-          some: { campgroundId: campaign.campgroundId }
-        }
+          some: { campgroundId: campaign.campgroundId },
+        },
       },
-      select: { id: true, email: true, phone: true, primaryFirstName: true, primaryLastName: true }
+      select: { id: true, email: true, phone: true, primaryFirstName: true, primaryLastName: true },
     });
 
     const batch = opts?.batchPerMinute ? Number(opts.batchPerMinute) : 0;
@@ -437,7 +457,11 @@ export class CampaignsService {
       const targetPhone = guest.phone;
 
       // send email if channel includes email and we have an address
-      if ((campaign.channel === ChannelTypeValues.email || campaign.channel === ChannelTypeValues.both) && targetEmail) {
+      if (
+        (campaign.channel === ChannelTypeValues.email ||
+          campaign.channel === ChannelTypeValues.both) &&
+        targetEmail
+      ) {
         const send = await this.prisma.campaignSend.create({
           data: {
             id: randomUUID(),
@@ -447,23 +471,23 @@ export class CampaignsService {
             email: targetEmail,
             phone: "",
             channel: ChannelTypeValues.email,
-            status: CampaignSendStatus.queued
-          }
+            status: CampaignSendStatus.queued,
+          },
         });
         try {
           const html = this.appendEmailFooter(campaign.html);
           const result = await this.emailService.sendEmail({
             to: targetEmail,
             subject: campaign.subject,
-            html
+            html,
           });
           await this.prisma.campaignSend.update({
             where: { id: send.id },
             data: {
               status: CampaignSendStatus.sent,
               providerMessageId: result.providerMessageId || null,
-              sentAt: new Date()
-            }
+              sentAt: new Date(),
+            },
           });
           sent += 1;
         } catch (err) {
@@ -471,14 +495,18 @@ export class CampaignsService {
             where: { id: send.id },
             data: {
               status: CampaignSendStatus.failed,
-              error: err instanceof Error ? err.message : "Failed to send"
-            }
+              error: err instanceof Error ? err.message : "Failed to send",
+            },
           });
         }
       }
 
       // send sms if channel includes sms and we have a phone
-      if ((campaign.channel === ChannelTypeValues.sms || campaign.channel === ChannelTypeValues.both) && targetPhone) {
+      if (
+        (campaign.channel === ChannelTypeValues.sms ||
+          campaign.channel === ChannelTypeValues.both) &&
+        targetPhone
+      ) {
         const send = await this.prisma.campaignSend.create({
           data: {
             id: randomUUID(),
@@ -488,22 +516,22 @@ export class CampaignsService {
             phone: targetPhone,
             email: "",
             channel: ChannelTypeValues.sms,
-            status: CampaignSendStatus.queued
-          }
+            status: CampaignSendStatus.queued,
+          },
         });
         try {
           const body = this.appendSmsFooter(campaign.textBody || "");
           const result = await this.smsService.sendSms({
             to: targetPhone,
-            body
+            body,
           });
           await this.prisma.campaignSend.update({
             where: { id: send.id },
             data: {
               status: CampaignSendStatus.sent,
               providerMessageId: result.providerMessageId || null,
-              sentAt: new Date()
-            }
+              sentAt: new Date(),
+            },
           });
           sent += 1;
         } catch (err) {
@@ -511,8 +539,8 @@ export class CampaignsService {
             where: { id: send.id },
             data: {
               status: CampaignSendStatus.failed,
-              error: err instanceof Error ? err.message : "Failed to send SMS"
-            }
+              error: err instanceof Error ? err.message : "Failed to send SMS",
+            },
           });
         }
       }
@@ -522,7 +550,10 @@ export class CampaignsService {
       }
     }
 
-    await this.prisma.campaign.update({ where: { id }, data: { status: CampaignStatusValues.sent } });
+    await this.prisma.campaign.update({
+      where: { id },
+      data: { status: CampaignStatusValues.sent },
+    });
     return { sent };
   }
 
@@ -530,10 +561,17 @@ export class CampaignsService {
     const campaign = await this.prisma.campaign.findUnique({ where: { id } });
     if (!campaign) throw new NotFoundException("Campaign not found");
     const targets: { channel: ChannelType; email?: string; phone?: string }[] = [];
-    if ((campaign.channel === ChannelTypeValues.email || campaign.channel === ChannelTypeValues.both) && opts.email) {
+    if (
+      (campaign.channel === ChannelTypeValues.email ||
+        campaign.channel === ChannelTypeValues.both) &&
+      opts.email
+    ) {
       targets.push({ channel: ChannelTypeValues.email, email: opts.email });
     }
-    if ((campaign.channel === ChannelTypeValues.sms || campaign.channel === ChannelTypeValues.both) && opts.phone) {
+    if (
+      (campaign.channel === ChannelTypeValues.sms || campaign.channel === ChannelTypeValues.both) &&
+      opts.phone
+    ) {
       targets.push({ channel: ChannelTypeValues.sms, phone: opts.phone });
     }
     let sent = 0;
@@ -543,7 +581,7 @@ export class CampaignsService {
         await this.emailService.sendEmail({
           to: t.email,
           subject: `[TEST] ${campaign.subject}`,
-          html
+          html,
         });
         sent += 1;
       }

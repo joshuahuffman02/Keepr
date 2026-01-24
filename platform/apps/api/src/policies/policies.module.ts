@@ -9,6 +9,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PrismaModule, SignaturesModule, PermissionsModule],
   controllers: [PoliciesController],
   providers: [PoliciesService],
-  exports: [PoliciesService]
+  exports: [PoliciesService],
 })
 export class PoliciesModule {}

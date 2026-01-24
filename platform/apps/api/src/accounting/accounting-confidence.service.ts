@@ -69,7 +69,9 @@ export class AccountingConfidenceService {
     return this.monthEndCloseStore.get(this.getMonthEndKey(campgroundId, month)) ?? null;
   }
 
-  private upsertMonthEndClose(data: Omit<MonthEndCloseRecord, "id"> & { id?: string }): MonthEndCloseRecord {
+  private upsertMonthEndClose(
+    data: Omit<MonthEndCloseRecord, "id"> & { id?: string },
+  ): MonthEndCloseRecord {
     const record: MonthEndCloseRecord = {
       id: data.id ?? randomUUID(),
       campgroundId: data.campgroundId,
@@ -134,13 +136,18 @@ export class AccountingConfidenceService {
   /**
    * Get payout reconciliation status
    */
-  async getPayoutReconciliation(campgroundId: string, month?: string): Promise<ReconciliationStatus> {
+  async getPayoutReconciliation(
+    campgroundId: string,
+    month?: string,
+  ): Promise<ReconciliationStatus> {
     const targetMonth = month ?? this.getCurrentMonth();
     const { start, end } = this.getMonthBounds(targetMonth);
 
     // Get expected payouts from successful payments using raw SQL
     // This avoids Prisma 7 + PrismaPg adapter aggregate query issues
-    const paymentSums = await this.prisma.$queryRaw<[{ total_amount: bigint | null; total_fees: bigint | null }]>`
+    const paymentSums = await this.prisma.$queryRaw<
+      [{ total_amount: bigint | null; total_fees: bigint | null }]
+    >`
       SELECT
         COALESCE(SUM(p."amountCents"), 0) as total_amount,
         COALESCE(SUM(COALESCE(p."stripeFeeCents", 0) + COALESCE(p."applicationFeeCents", 0)), 0) as total_fees
@@ -152,7 +159,8 @@ export class AccountingConfidenceService {
         AND p.direction = 'charge'
     `;
 
-    const expectedCents = Number(paymentSums[0]?.total_amount ?? 0) - Number(paymentSums[0]?.total_fees ?? 0);
+    const expectedCents =
+      Number(paymentSums[0]?.total_amount ?? 0) - Number(paymentSums[0]?.total_fees ?? 0);
 
     // Get actual payouts using raw SQL
     const payoutSums = await this.prisma.$queryRaw<[{ total_amount: bigint | null }]>`
@@ -256,7 +264,7 @@ export class AccountingConfidenceService {
     // Validate all checklist items are complete
     const { start, end } = this.getMonthBounds(month);
     const checklist = await this.buildMonthEndChecklist(campgroundId, start, end);
-    const incompleteTasks = checklist.filter(item => item.status !== "completed");
+    const incompleteTasks = checklist.filter((item) => item.status !== "completed");
 
     if (incompleteTasks.length > 0) {
       return {
@@ -320,8 +328,15 @@ export class AccountingConfidenceService {
 
   // Helper methods
 
-  private async checkPayoutReconciliation(campgroundId: string, start: Date, end: Date): Promise<ConfidenceScore["factors"][0]> {
-    const recon = await this.getPayoutReconciliation(campgroundId, `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`);
+  private async checkPayoutReconciliation(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<ConfidenceScore["factors"][0]> {
+    const recon = await this.getPayoutReconciliation(
+      campgroundId,
+      `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, "0")}`,
+    );
 
     if (recon.status === "reconciled") {
       return {
@@ -333,9 +348,10 @@ export class AccountingConfidenceService {
       };
     }
 
-    const discrepancyPct = recon.details.expectedCents > 0
-      ? Math.abs(recon.discrepancyCents) / recon.details.expectedCents
-      : 0;
+    const discrepancyPct =
+      recon.details.expectedCents > 0
+        ? Math.abs(recon.discrepancyCents) / recon.details.expectedCents
+        : 0;
 
     if (discrepancyPct < 0.05) {
       return {
@@ -356,7 +372,11 @@ export class AccountingConfidenceService {
     };
   }
 
-  private async checkPaymentReservationMatch(campgroundId: string, start: Date, end: Date): Promise<ConfidenceScore["factors"][0]> {
+  private async checkPaymentReservationMatch(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<ConfidenceScore["factors"][0]> {
     // Check if all payments have linked reservations using raw SQL
     const orphanResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(*) as count
@@ -387,7 +407,8 @@ export class AccountingConfidenceService {
       };
     }
 
-    const matchRate = totalPayments > 0 ? ((totalPayments - orphanPayments) / totalPayments) * 100 : 100;
+    const matchRate =
+      totalPayments > 0 ? ((totalPayments - orphanPayments) / totalPayments) * 100 : 100;
 
     if (matchRate >= 95) {
       return {
@@ -408,7 +429,11 @@ export class AccountingConfidenceService {
     };
   }
 
-  private async checkPendingTransactions(campgroundId: string, start: Date, end: Date): Promise<ConfidenceScore["factors"][0]> {
+  private async checkPendingTransactions(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<ConfidenceScore["factors"][0]> {
     // Payment model doesn't have status - all payments in DB are captured
     // Only check pending payouts using raw SQL
     const pendingPayoutsResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
@@ -451,7 +476,11 @@ export class AccountingConfidenceService {
     };
   }
 
-  private async checkDisputesAndRefunds(campgroundId: string, start: Date, end: Date): Promise<ConfidenceScore["factors"][0]> {
+  private async checkDisputesAndRefunds(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<ConfidenceScore["factors"][0]> {
     // Use raw SQL for consistency with other methods
     const openDisputesResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
       SELECT COUNT(*) as count
@@ -492,7 +521,10 @@ export class AccountingConfidenceService {
     };
   }
 
-  private async checkMonthEndClose(campgroundId: string, month: string): Promise<ConfidenceScore["factors"][0]> {
+  private async checkMonthEndClose(
+    campgroundId: string,
+    month: string,
+  ): Promise<ConfidenceScore["factors"][0]> {
     const closeRecord = this.getMonthEndClose(campgroundId, month);
 
     if (closeRecord?.status === "closed" || closeRecord?.status === "locked") {
@@ -536,7 +568,11 @@ export class AccountingConfidenceService {
     };
   }
 
-  private async buildMonthEndChecklist(campgroundId: string, start: Date, end: Date): Promise<MonthEndCloseStatus["checklistItems"]> {
+  private async buildMonthEndChecklist(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<MonthEndCloseStatus["checklistItems"]> {
     const items: MonthEndCloseStatus["checklistItems"] = [];
 
     // Check 1: All payments processed (Payment model has no status - all recorded are captured)
@@ -595,14 +631,21 @@ export class AccountingConfidenceService {
       });
       items.push({
         name: "Platform billing invoiced",
-        status: billingPeriod?.status === "invoiced" || billingPeriod?.status === "paid" ? "completed" : "pending",
+        status:
+          billingPeriod?.status === "invoiced" || billingPeriod?.status === "paid"
+            ? "completed"
+            : "pending",
       });
     }
 
     return items;
   }
 
-  private async getPlatformFeesForPeriod(campgroundId: string, start: Date, end: Date): Promise<number> {
+  private async getPlatformFeesForPeriod(
+    campgroundId: string,
+    start: Date,
+    end: Date,
+  ): Promise<number> {
     // Use raw SQL to avoid Prisma 7 + PrismaPg aggregate issues
     const result = await this.prisma.$queryRaw<[{ total: bigint | null }]>`
       SELECT COALESCE(SUM("unitCents"), 0) as total

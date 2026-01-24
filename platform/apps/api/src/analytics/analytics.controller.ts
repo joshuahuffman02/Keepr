@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards, UnauthorizedException, BadRequestException } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+  BadRequestException,
+} from "@nestjs/common";
 import { AnalyticsService } from "./analytics.service";
 import { IngestAnalyticsEventDto } from "./dto/ingest-analytics-event.dto";
 import { ApplyRecommendationDto } from "./dto/apply-recommendation.dto";
@@ -19,7 +29,10 @@ const getHeaderValue = (req: Request, key: string): string | undefined => {
   return Array.isArray(value) ? value[0] : value;
 };
 
-const resolveCampgroundId = (campgroundId: string | undefined, req: AnalyticsRequest): string | null => {
+const resolveCampgroundId = (
+  campgroundId: string | undefined,
+  req: AnalyticsRequest,
+): string | null => {
   const headerValue = getHeaderValue(req, "x-campground-id");
   const cgId = campgroundId || req.campgroundId || headerValue;
   return typeof cgId === "string" && cgId ? cgId : null;
@@ -41,7 +54,10 @@ export class AnalyticsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("recommendations")
-  async listRecommendations(@Query("campgroundId") campgroundId: string, @Req() req: AnalyticsRequest) {
+  async listRecommendations(
+    @Query("campgroundId") campgroundId: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getRecommendations(cgId);
@@ -56,11 +72,15 @@ export class AnalyticsController {
     if (!user.role) throw new UnauthorizedException("User role required");
     const campId = resolveCampgroundId(dto.campgroundId, req);
     if (!campId) throw new BadRequestException("campgroundId required");
-    return this.analyticsService.applyRecommendation(dto, { id: user.id, role: user.role }, {
-      campgroundId: campId,
-      organizationId: req?.organizationId || null,
-      userId: req?.user?.id || null,
-    });
+    return this.analyticsService.applyRecommendation(
+      dto,
+      { id: user.id, role: user.role },
+      {
+        campgroundId: campId,
+        organizationId: req?.organizationId || null,
+        userId: req?.user?.id || null,
+      },
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -70,16 +90,24 @@ export class AnalyticsController {
     const user = req.user;
     if (!user) throw new UnauthorizedException("Unauthorized");
     if (!user.role) throw new UnauthorizedException("User role required");
-    return this.analyticsService.proposeRecommendation(dto, { id: user.id, role: user.role }, {
-      campgroundId: req?.campgroundId || null,
-      organizationId: req?.organizationId || null,
-      userId: req?.user?.id || null,
-    });
+    return this.analyticsService.proposeRecommendation(
+      dto,
+      { id: user.id, role: user.role },
+      {
+        campgroundId: req?.campgroundId || null,
+        organizationId: req?.organizationId || null,
+        userId: req?.user?.id || null,
+      },
+    );
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/funnel")
-  async getFunnel(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: AnalyticsRequest) {
+  async getFunnel(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getFunnel(cgId, days ? parseInt(days, 10) : 30);
@@ -87,7 +115,11 @@ export class AnalyticsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/images")
-  async getImagePerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: AnalyticsRequest) {
+  async getImagePerformance(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getImagePerformance(cgId, days ? parseInt(days, 10) : 30);
@@ -95,7 +127,11 @@ export class AnalyticsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/deals")
-  async getDealPerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: AnalyticsRequest) {
+  async getDealPerformance(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getDealPerformance(cgId, days ? parseInt(days, 10) : 30);
@@ -103,7 +139,11 @@ export class AnalyticsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/attribution")
-  async getAttribution(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: AnalyticsRequest) {
+  async getAttribution(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getAttribution(cgId, days ? parseInt(days, 10) : 30);
@@ -111,7 +151,11 @@ export class AnalyticsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/pricing")
-  async getPricingSignals(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: AnalyticsRequest) {
+  async getPricingSignals(
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days: string,
+    @Req() req: AnalyticsRequest,
+  ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.getPricingSignals(cgId, days ? parseInt(days, 10) : 30);
@@ -123,7 +167,7 @@ export class AnalyticsController {
     @Query("campgroundId") campgroundId: string,
     @Query("year") year: string,
     @Query("format") format: string,
-    @Req() req: AnalyticsRequest
+    @Req() req: AnalyticsRequest,
   ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");
@@ -136,7 +180,7 @@ export class AnalyticsController {
   async getDeviceBreakdown(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: AnalyticsRequest
+    @Req() req: AnalyticsRequest,
   ) {
     const cgId = resolveCampgroundId(campgroundId, req);
     if (!cgId) throw new BadRequestException("campgroundId required");

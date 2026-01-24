@@ -5,7 +5,7 @@ See [README.md](./README.md), [configuration.md](./configuration.md), [api.md](.
 ## High-Traffic Read-Heavy
 
 ```typescript
-const sql = postgres(env.HYPERDRIVE.connectionString, {max: 5, prepare: true});
+const sql = postgres(env.HYPERDRIVE.connectionString, { max: 5, prepare: true });
 
 // Cacheable: popular content
 const posts = await sql`SELECT * FROM posts WHERE published = true ORDER BY views DESC LIMIT 20`;
@@ -20,19 +20,19 @@ const [user] = await sql`SELECT id, username, bio FROM users WHERE id = ${userId
 
 ```typescript
 interface Env {
-  HYPERDRIVE_CACHED: Hyperdrive;    // max_age=120
-  HYPERDRIVE_REALTIME: Hyperdrive;  // caching disabled
+  HYPERDRIVE_CACHED: Hyperdrive; // max_age=120
+  HYPERDRIVE_REALTIME: Hyperdrive; // caching disabled
 }
 
 // Reads: cached
 if (req.method === "GET") {
-  const sql = postgres(env.HYPERDRIVE_CACHED.connectionString, {prepare: true});
+  const sql = postgres(env.HYPERDRIVE_CACHED.connectionString, { prepare: true });
   const products = await sql`SELECT * FROM products WHERE category = ${cat}`;
 }
 
 // Writes: no cache (immediate consistency)
 if (req.method === "POST") {
-  const sql = postgres(env.HYPERDRIVE_REALTIME.connectionString, {prepare: true});
+  const sql = postgres(env.HYPERDRIVE_REALTIME.connectionString, { prepare: true });
   await sql`INSERT INTO orders ${sql(data)}`;
 }
 ```
@@ -40,7 +40,7 @@ if (req.method === "POST") {
 ## Analytics Dashboard
 
 ```typescript
-const client = new Client({connectionString: env.HYPERDRIVE.connectionString});
+const client = new Client({ connectionString: env.HYPERDRIVE.connectionString });
 await client.connect();
 
 // Aggregate queries cached
@@ -64,7 +64,7 @@ const topProducts = await client.query(`
 
 ```typescript
 const tenantId = req.headers.get("X-Tenant-ID");
-const sql = postgres(env.HYPERDRIVE.connectionString, {prepare: true});
+const sql = postgres(env.HYPERDRIVE.connectionString, { prepare: true });
 
 // Tenant-scoped queries cached separately
 const docs = await sql`
@@ -81,12 +81,12 @@ const docs = await sql`
 ```typescript
 // Worker runs at edge nearest user
 // Connection setup at edge (fast), pooling near DB (efficient)
-const sql = postgres(env.HYPERDRIVE.connectionString, {prepare: true});
+const sql = postgres(env.HYPERDRIVE.connectionString, { prepare: true });
 const [user] = await sql`SELECT * FROM users WHERE id = ${userId}`;
 
 return Response.json({
   user,
-  serverRegion: req.cf?.colo,  // Edge location
+  serverRegion: req.cf?.colo, // Edge location
 });
 ```
 
@@ -97,26 +97,28 @@ return Response.json({
 Operates in **transaction mode**: connection acquired per transaction, `RESET` on return.
 
 **SET statements:**
+
 ```typescript
 // ✅ Within transaction
 await client.query("BEGIN");
 await client.query("SET work_mem = '256MB'");
-await client.query("SELECT * FROM large_table");  // Uses SET
-await client.query("COMMIT");  // RESET after
+await client.query("SELECT * FROM large_table"); // Uses SET
+await client.query("COMMIT"); // RESET after
 
 // ✅ Single statement
 await client.query("SET work_mem = '256MB'; SELECT * FROM large_table");
 
 // ❌ Across queries (may get different connection)
 await client.query("SET work_mem = '256MB'");
-await client.query("SELECT * FROM large_table");  // SET not applied
+await client.query("SELECT * FROM large_table"); // SET not applied
 ```
 
 **Best practices:**
+
 ```typescript
 // ❌ Long transactions block pooling
 await client.query("BEGIN");
-await processThousands();  // Connection held entire time
+await processThousands(); // Connection held entire time
 await client.query("COMMIT");
 
 // ✅ Short transactions
@@ -134,25 +136,28 @@ await client.query("COMMIT");
 ## Performance Tips
 
 **1. Enable prepared statements:**
+
 ```typescript
 // ✅ Best
-const sql = postgres(connectionString, {prepare: true});  // Caching enabled
+const sql = postgres(connectionString, { prepare: true }); // Caching enabled
 
 // ❌ Slower
-const sql = postgres(connectionString, {prepare: false}); // Extra round-trips
+const sql = postgres(connectionString, { prepare: false }); // Extra round-trips
 ```
 
 **2. Optimize settings:**
+
 ```typescript
 const sql = postgres(connectionString, {
-  max: 5,             // Limit per Worker
+  max: 5, // Limit per Worker
   fetch_types: false, // Skip if not using arrays
   prepare: true,
-  idle_timeout: 60,   // Match Worker lifetime
+  idle_timeout: 60, // Match Worker lifetime
 });
 ```
 
 **3. Cache-friendly queries:**
+
 ```typescript
 // ✅ Cacheable (deterministic)
 await sql`SELECT * FROM products WHERE category = 'electronics' LIMIT 10`;
@@ -166,11 +171,12 @@ await sql`SELECT * FROM logs WHERE created_at > ${ts}`;
 ```
 
 **4. Monitor cache hits:**
+
 ```typescript
 const start = Date.now();
 const result = await sql`SELECT * FROM users LIMIT 10`;
 const duration = Date.now() - start;
-console.log({duration, likelyCached: duration < 10});  // <10ms = cache hit
+console.log({ duration, likelyCached: duration < 10 }); // <10ms = cache hit
 ```
 
 See [gotchas.md](./gotchas.md) for limits, troubleshooting.

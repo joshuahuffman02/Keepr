@@ -3,6 +3,7 @@
 This document provides real-world examples of how to implement the help tooltip system in your components.
 
 ## Table of Contents
+
 - [Simple Tooltips](#simple-tooltips)
 - [Advanced Tooltips](#advanced-tooltips)
 - [Form Field Tooltips](#form-field-tooltips)
@@ -20,10 +21,8 @@ import { HelpTooltip } from "@/components/help/HelpTooltip";
 
 <div className="flex items-center gap-2">
   <span>Occupancy Rate</span>
-  <HelpTooltip
-    content={<div>Percentage of sites currently occupied</div>}
-  />
-</div>
+  <HelpTooltip content={<div>Percentage of sites currently occupied</div>} />
+</div>;
 ```
 
 ### Tooltip with Title
@@ -32,9 +31,7 @@ import { HelpTooltip } from "@/components/help/HelpTooltip";
 <HelpTooltip
   title="What is ADR?"
   content={
-    <div>
-      Average Daily Rate (ADR) is the average revenue earned per occupied site per night.
-    </div>
+    <div>Average Daily Rate (ADR) is the average revenue earned per occupied site per night.</div>
   }
   side="top"
   maxWidth={280}
@@ -60,11 +57,7 @@ import { HelpTooltip } from "@/components/help/HelpTooltip";
 ### Multi-Section Tooltip
 
 ```tsx
-import {
-  HelpTooltip,
-  HelpTooltipContent,
-  HelpTooltipSection
-} from "@/components/help/HelpTooltip";
+import { HelpTooltip, HelpTooltipContent, HelpTooltipSection } from "@/components/help/HelpTooltip";
 
 <HelpTooltip
   title="Pricing Rules"
@@ -75,10 +68,8 @@ import {
       </HelpTooltipSection>
 
       <HelpTooltipSection title="Stacking Modes">
-        Choose how adjustments combine:
-        • Additive: Add all adjustments together
-        • Max: Use the highest adjustment
-        • Override: Use only this rule
+        Choose how adjustments combine: • Additive: Add all adjustments together • Max: Use the
+        highest adjustment • Override: Use only this rule
       </HelpTooltipSection>
 
       <HelpTooltipSection title="Priority">
@@ -88,7 +79,7 @@ import {
   }
   side="right"
   maxWidth={360}
-/>
+/>;
 ```
 
 ### Tooltip with List
@@ -101,16 +92,18 @@ import { HelpTooltip, HelpTooltipList } from "@/components/help/HelpTooltip";
   content={
     <div className="space-y-2">
       <p>Use these shortcuts to speed up common tasks:</p>
-      <HelpTooltipList items={[
-        "Cmd/Ctrl + N: New booking",
-        "Cmd/Ctrl + S: Save changes",
-        "Cmd/Ctrl + F: Search reservations",
-        "Esc: Close dialogs"
-      ]} />
+      <HelpTooltipList
+        items={[
+          "Cmd/Ctrl + N: New booking",
+          "Cmd/Ctrl + S: Save changes",
+          "Cmd/Ctrl + F: Search reservations",
+          "Esc: Close dialogs",
+        ]}
+      />
     </div>
   }
   side="bottom"
-/>
+/>;
 ```
 
 ### Tooltip with Links
@@ -120,31 +113,25 @@ import {
   HelpTooltip,
   HelpTooltipContent,
   HelpTooltipSection,
-  HelpTooltipLink
+  HelpTooltipLink,
 } from "@/components/help/HelpTooltip";
 
 <HelpTooltip
   title="Need More Help?"
   content={
     <HelpTooltipContent>
+      <HelpTooltipSection>Check out these resources:</HelpTooltipSection>
+
       <HelpTooltipSection>
-        Check out these resources:
+        <HelpTooltipLink href="/help/pricing-rules">Pricing Rules Guide</HelpTooltipLink>
       </HelpTooltipSection>
 
       <HelpTooltipSection>
-        <HelpTooltipLink href="/help/pricing-rules">
-          Pricing Rules Guide
-        </HelpTooltipLink>
-      </HelpTooltipSection>
-
-      <HelpTooltipSection>
-        <HelpTooltipLink href="/help/getting-started">
-          Getting Started Tutorial
-        </HelpTooltipLink>
+        <HelpTooltipLink href="/help/getting-started">Getting Started Tutorial</HelpTooltipLink>
       </HelpTooltipSection>
     </HelpTooltipContent>
   }
-/>
+/>;
 ```
 
 ## Form Field Tooltips
@@ -154,9 +141,7 @@ import {
 ```tsx
 <div className="space-y-1">
   <div className="flex items-center gap-2">
-    <label className="text-sm font-medium text-slate-700">
-      Site Name
-    </label>
+    <label className="text-sm font-medium text-slate-700">Site Name</label>
     <HelpTooltip
       content={
         <div>
@@ -180,9 +165,7 @@ import {
 ```tsx
 <div className="space-y-1">
   <div className="flex items-center gap-2">
-    <label className="text-sm font-medium text-slate-700">
-      Deposit Percentage
-    </label>
+    <label className="text-sm font-medium text-slate-700">Deposit Percentage</label>
     <HelpTooltip
       title="How Deposits Work"
       content={
@@ -223,9 +206,7 @@ import {
 ```tsx
 <div className="space-y-1">
   <div className="flex items-center gap-2">
-    <label className="text-sm font-medium text-slate-700">
-      Payment Method
-    </label>
+    <label className="text-sm font-medium text-slate-700">Payment Method</label>
     <HelpTooltip
       title="Payment Options"
       content={
@@ -270,9 +251,7 @@ export default function DashboardPage() {
         title="Welcome to Keepr Host!"
         content={
           <div>
-            <p className="mb-2">
-              You're all set! Here's what you can do from your dashboard:
-            </p>
+            <p className="mb-2">You're all set! Here's what you can do from your dashboard:</p>
             <ul className="list-disc list-inside space-y-1 text-sm">
               <li>View today's check-ins and check-outs</li>
               <li>Monitor your occupancy rates</li>
@@ -288,13 +267,13 @@ export default function DashboardPage() {
           {
             label: "View Calendar",
             onClick: () => router.push("/calendar"),
-            variant: "ghost"
+            variant: "ghost",
           },
           {
             label: "Watch Tutorial",
             onClick: () => window.open("/help/tutorial", "_blank"),
-            variant: "ghost"
-          }
+            variant: "ghost",
+          },
         ]}
       />
 
@@ -312,9 +291,7 @@ export default function DashboardPage() {
   title="New Feature: Drag-to-Book!"
   content={
     <div>
-      <p className="mb-2">
-        You can now create bookings by dragging on the calendar:
-      </p>
+      <p className="mb-2">You can now create bookings by dragging on the calendar:</p>
       <ol className="list-decimal list-inside space-y-1 text-sm ml-2">
         <li>Click on an empty cell for your desired site</li>
         <li>Drag across the dates you want to book</li>
@@ -346,15 +323,15 @@ import { OnboardingHint } from "@/components/help/OnboardingHint";
     title="Filter Your View"
     content={
       <div>
-        Use the filters above to show only specific site types, amenities, or availability.
-        This makes it easier to find the perfect site for your guests!
+        Use the filters above to show only specific site types, amenities, or availability. This
+        makes it easier to find the perfect site for your guests!
       </div>
     }
     placement="bottom"
     trigger="delay"
     delayMs={2000}
   />
-</div>
+</div>;
 ```
 
 ## Dashboard Examples
@@ -369,8 +346,8 @@ import { OnboardingHint } from "@/components/help/OnboardingHint";
       <HelpTooltip
         content={
           <div>
-            Number of guests checking in today. Click to view the full check-in list
-            and mark arrivals as complete.
+            Number of guests checking in today. Click to view the full check-in list and mark
+            arrivals as complete.
           </div>
         }
         side="top"
@@ -396,8 +373,8 @@ import { OnboardingHint } from "@/components/help/OnboardingHint";
     <HelpTooltip
       content={
         <div>
-          These buttons let you perform common tasks without navigating through menus.
-          Most actions also have keyboard shortcuts - press ? to view them.
+          These buttons let you perform common tasks without navigating through menus. Most actions
+          also have keyboard shortcuts - press ? to view them.
         </div>
       }
       side="right"
@@ -440,9 +417,7 @@ import { OnboardingHint } from "@/components/help/OnboardingHint";
         maxWidth={300}
       />
     </div>
-    <div className="text-2xl font-bold text-blue-600">
-      {occupancyRate.toFixed(1)}%
-    </div>
+    <div className="text-2xl font-bold text-blue-600">{occupancyRate.toFixed(1)}%</div>
   </div>
 </div>
 ```
@@ -462,8 +437,8 @@ export default function PricingRulesForm() {
           <HelpTooltip
             content={
               <div>
-                Give this rule a descriptive name. Examples: "Summer Peak Season",
-                "Weekend Premium", "Holiday Markup"
+                Give this rule a descriptive name. Examples: "Summer Peak Season", "Weekend
+                Premium", "Holiday Markup"
               </div>
             }
             side="right"
@@ -486,13 +461,13 @@ export default function PricingRulesForm() {
                 </HelpTooltipSection>
 
                 <HelpTooltipSection title="Example">
-                  If you have a "Summer" rule (priority 10) and a "Weekend" rule
-                  (priority 20), summer pricing applies first, then weekend pricing.
+                  If you have a "Summer" rule (priority 10) and a "Weekend" rule (priority 20),
+                  summer pricing applies first, then weekend pricing.
                 </HelpTooltipSection>
 
                 <HelpTooltipSection title="Best Practice">
-                  Use increments of 10 (10, 20, 30) to leave room for inserting
-                  new rules between existing ones.
+                  Use increments of 10 (10, 20, 30) to leave room for inserting new rules between
+                  existing ones.
                 </HelpTooltipSection>
               </HelpTooltipContent>
             }
@@ -512,23 +487,23 @@ export default function PricingRulesForm() {
             content={
               <HelpTooltipContent>
                 <HelpTooltipSection>
-                  Controls how this rule combines with others when multiple rules
-                  apply to the same date:
+                  Controls how this rule combines with others when multiple rules apply to the same
+                  date:
                 </HelpTooltipSection>
 
                 <HelpTooltipSection title="Additive">
-                  Adds this adjustment to the base rate and other additive rules.
-                  Perfect for combining seasonal + weekend pricing.
+                  Adds this adjustment to the base rate and other additive rules. Perfect for
+                  combining seasonal + weekend pricing.
                 </HelpTooltipSection>
 
                 <HelpTooltipSection title="Max">
-                  Uses the highest adjustment among all overlapping rules.
-                  Prevents over-pricing from stacking too many increases.
+                  Uses the highest adjustment among all overlapping rules. Prevents over-pricing
+                  from stacking too many increases.
                 </HelpTooltipSection>
 
                 <HelpTooltipSection title="Override">
-                  Ignores all other rules and uses only this adjustment.
-                  Great for special events with fixed pricing.
+                  Ignores all other rules and uses only this adjustment. Great for special events
+                  with fixed pricing.
                 </HelpTooltipSection>
               </HelpTooltipContent>
             }

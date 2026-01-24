@@ -46,7 +46,7 @@ describe("Perf/Observability smoke", () => {
         p95: expect.any(Number),
         p99: expect.any(Number),
         errors: expect.any(Number),
-      })
+      }),
     );
     expect(res.jobs).toEqual(
       expect.objectContaining({
@@ -55,7 +55,7 @@ describe("Perf/Observability smoke", () => {
         p99: expect.any(Number),
         errors: expect.any(Number),
         queues: expect.any(Object),
-      })
+      }),
     );
   });
 

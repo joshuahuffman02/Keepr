@@ -59,7 +59,10 @@ interface GroupDetail {
 }
 
 export default function GroupsPage() {
-  const [selectedCampground, setSelectedCampground] = useState<{ id: string; name?: string | null } | null>(null);
+  const [selectedCampground, setSelectedCampground] = useState<{
+    id: string;
+    name?: string | null;
+  } | null>(null);
   const [groups, setGroups] = useState<GroupSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState<GroupDetail | null>(null);
@@ -145,7 +148,9 @@ export default function GroupsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Group Bookings</h1>
-            <p className="text-muted-foreground mt-1">Manage linked reservations for families, events, and group stays</p>
+            <p className="text-muted-foreground mt-1">
+              Manage linked reservations for families, events, and group stays
+            </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -172,12 +177,14 @@ export default function GroupsPage() {
                     No groups created yet. Create a group to link reservations together.
                   </InlineEmpty>
                 ) : (
-                  groups.map(group => (
+                  groups.map((group) => (
                     <button
                       key={group.id}
                       onClick={() => loadGroupDetail(group.id)}
                       className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors ${
-                        selectedGroup?.id === group.id ? "bg-indigo-50 border-l-2 border-indigo-500" : ""
+                        selectedGroup?.id === group.id
+                          ? "bg-indigo-50 border-l-2 border-indigo-500"
+                          : ""
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -186,15 +193,20 @@ export default function GroupsPage() {
                             Group #{group.id.slice(0, 8)}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {group.reservationCount} reservation{group.reservationCount !== 1 ? "s" : ""}
+                            {group.reservationCount} reservation
+                            {group.reservationCount !== 1 ? "s" : ""}
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {group.sharedPayment && (
-                            <span className="px-2 py-0.5 bg-status-success/15 text-status-success border border-status-success/30 rounded text-xs">Shared Pay</span>
+                            <span className="px-2 py-0.5 bg-status-success/15 text-status-success border border-status-success/30 rounded text-xs">
+                              Shared Pay
+                            </span>
                           )}
                           {group.sharedComm && (
-                            <span className="px-2 py-0.5 bg-status-info/15 text-status-info border border-status-info/30 rounded text-xs">Shared Comm</span>
+                            <span className="px-2 py-0.5 bg-status-info/15 text-status-info border border-status-info/30 rounded text-xs">
+                              Shared Comm
+                            </span>
                           )}
                         </div>
                       </div>
@@ -211,8 +223,12 @@ export default function GroupsPage() {
               <div className="bg-card rounded-xl border border-border">
                 <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-foreground">Group #{selectedGroup.id.slice(0, 8)}</h3>
-                    <p className="text-sm text-muted-foreground">Created {formatDate(selectedGroup.createdAt)}</p>
+                    <h3 className="font-semibold text-foreground">
+                      Group #{selectedGroup.id.slice(0, 8)}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Created {formatDate(selectedGroup.createdAt)}
+                    </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
@@ -231,7 +247,9 @@ export default function GroupsPage() {
                       type="checkbox"
                       checked={selectedGroup.sharedPayment}
                       onChange={async (e) => {
-                        await apiClient.updateGroup(selectedGroup.id, { sharedPayment: e.target.checked });
+                        await apiClient.updateGroup(selectedGroup.id, {
+                          sharedPayment: e.target.checked,
+                        });
                         loadGroupDetail(selectedGroup.id);
                       }}
                       className="rounded border-border"
@@ -244,7 +262,9 @@ export default function GroupsPage() {
                       type="checkbox"
                       checked={selectedGroup.sharedComm}
                       onChange={async (e) => {
-                        await apiClient.updateGroup(selectedGroup.id, { sharedComm: e.target.checked });
+                        await apiClient.updateGroup(selectedGroup.id, {
+                          sharedComm: e.target.checked,
+                        });
                         loadGroupDetail(selectedGroup.id);
                       }}
                       className="rounded border-border"
@@ -263,7 +283,7 @@ export default function GroupsPage() {
                     </InlineEmpty>
                   ) : (
                     <div className="space-y-3">
-                      {selectedGroup.reservations.map(res => (
+                      {selectedGroup.reservations.map((res) => (
                         <div
                           key={res.id}
                           className={`p-4 rounded-lg border ${
@@ -276,7 +296,8 @@ export default function GroupsPage() {
                             <div>
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-foreground">
-                                  {res.guest?.primaryFirstName} {res.guest?.primaryLastName || "Guest"}
+                                  {res.guest?.primaryFirstName}{" "}
+                                  {res.guest?.primaryLastName || "Guest"}
                                 </span>
                                 {res.groupRole === "primary" && (
                                   <span className="px-2 py-0.5 bg-status-info/15 text-status-info border border-status-info/30 rounded text-xs font-medium">
@@ -285,18 +306,25 @@ export default function GroupsPage() {
                                 )}
                               </div>
                               <div className="text-sm text-muted-foreground mt-1">
-                                Site {res.site?.siteNumber} • {formatDate(res.arrivalDate)} → {formatDate(res.departureDate)}
+                                Site {res.site?.siteNumber} • {formatDate(res.arrivalDate)} →{" "}
+                                {formatDate(res.departureDate)}
                               </div>
                               {res.guest?.email && (
-                                <div className="text-xs text-muted-foreground mt-1">{res.guest.email}</div>
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  {res.guest.email}
+                                </div>
                               )}
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className={`px-2 py-0.5 rounded text-xs border ${
-                                res.status === "confirmed" ? "bg-status-success/15 text-status-success border-status-success/30" :
-                                res.status === "checked_in" ? "bg-status-info/15 text-status-info border-status-info/30" :
-                                "bg-muted text-muted-foreground border-border"
-                              }`}>
+                              <span
+                                className={`px-2 py-0.5 rounded text-xs border ${
+                                  res.status === "confirmed"
+                                    ? "bg-status-success/15 text-status-success border-status-success/30"
+                                    : res.status === "checked_in"
+                                      ? "bg-status-info/15 text-status-info border-status-info/30"
+                                      : "bg-muted text-muted-foreground border-border"
+                                }`}
+                              >
                                 {res.status}
                               </span>
                               <Link
@@ -336,12 +364,16 @@ export default function GroupsPage() {
           />
         )}
 
-        <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+        <AlertDialog
+          open={!!deleteConfirmId}
+          onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Delete Group</AlertDialogTitle>
               <AlertDialogDescription>
-                Are you sure you want to delete this group? Reservations will be unlinked but not deleted.
+                Are you sure you want to delete this group? Reservations will be unlinked but not
+                deleted.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -394,7 +426,9 @@ function CreateGroupModal({
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-foreground">Create Group</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">✕</button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground">
+            ✕
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -403,12 +437,14 @@ function CreateGroupModal({
               <input
                 type="checkbox"
                 checked={sharedPayment}
-                onChange={e => setSharedPayment(e.target.checked)}
+                onChange={(e) => setSharedPayment(e.target.checked)}
                 className="rounded border-border"
               />
               <div>
                 <div className="font-medium text-foreground">Shared Payment</div>
-                <div className="text-sm text-muted-foreground">Primary guest pays for all reservations</div>
+                <div className="text-sm text-muted-foreground">
+                  Primary guest pays for all reservations
+                </div>
               </div>
             </label>
 
@@ -416,18 +452,21 @@ function CreateGroupModal({
               <input
                 type="checkbox"
                 checked={sharedComm}
-                onChange={e => setSharedComm(e.target.checked)}
+                onChange={(e) => setSharedComm(e.target.checked)}
                 className="rounded border-border"
               />
               <div>
                 <div className="font-medium text-foreground">Shared Communications</div>
-                <div className="text-sm text-muted-foreground">Only primary guest receives emails/texts</div>
+                <div className="text-sm text-muted-foreground">
+                  Only primary guest receives emails/texts
+                </div>
               </div>
             </label>
           </div>
 
           <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
-            Tip: After creating, you can link existing reservations to this group from the reservation detail page.
+            Tip: After creating, you can link existing reservations to this group from the
+            reservation detail page.
           </p>
 
           <div className="flex gap-3 pt-4">
@@ -451,4 +490,3 @@ function CreateGroupModal({
     </div>
   );
 }
-

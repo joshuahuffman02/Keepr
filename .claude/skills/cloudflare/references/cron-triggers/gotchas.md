@@ -16,10 +16,10 @@
 
 ## Limits
 
-| Plan | Triggers/Worker | CPU Time | Execution |
-|------|----------------|----------|-----------|
-| Free | 3 | 10ms | At-least-once |
-| Paid | Unlimited | 50ms | At-least-once |
+| Plan | Triggers/Worker | CPU Time | Execution     |
+| ---- | --------------- | -------- | ------------- |
+| Free | 3               | 10ms     | At-least-once |
+| Paid | Unlimited       | 50ms     | At-least-once |
 
 ```typescript
 // ❌ BAD: await processLargeDataset(); // May exceed CPU
@@ -50,7 +50,11 @@ export default {
 ```typescript
 export default {
   async scheduled(controller, env, ctx) {
-    console.log("EXECUTED", {time: new Date().toISOString(), scheduledTime: new Date(controller.scheduledTime).toISOString(), cron: controller.cron});
+    console.log("EXECUTED", {
+      time: new Date().toISOString(),
+      scheduledTime: new Date(controller.scheduledTime).toISOString(),
+      cron: controller.cron,
+    });
     ctx.waitUntil(env.KV.put("last_execution", Date.now().toString()));
   },
 };
@@ -66,12 +70,12 @@ export default {
     try {
       const abortCtrl = new AbortController();
       const timeout = setTimeout(() => abortCtrl.abort(), 5000);
-      const response = await fetch("https://api.example.com/data", {signal: abortCtrl.signal});
+      const response = await fetch("https://api.example.com/data", { signal: abortCtrl.signal });
       clearTimeout(timeout);
       if (!response.ok) throw new Error(`API: ${response.status}`);
       await processData(await response.json(), env);
     } catch (error) {
-      console.error("Failed", {error: error.message, cron: controller.cron});
+      console.error("Failed", { error: error.message, cron: controller.cron });
       // Don't re-throw to mark success despite errors
     }
   },
@@ -96,7 +100,15 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === "/__scheduled") {
       if (env.ENVIRONMENT === "production") return new Response("Not found", { status: 404 });
-      await this.scheduled({scheduledTime: Date.now(), cron: url.searchParams.get("cron") || "* * * * *", type: "scheduled"}, env, ctx);
+      await this.scheduled(
+        {
+          scheduledTime: Date.now(),
+          cron: url.searchParams.get("cron") || "* * * * *",
+          type: "scheduled",
+        },
+        env,
+        ctx,
+      );
       return new Response("OK");
     }
     return new Response("Hello");

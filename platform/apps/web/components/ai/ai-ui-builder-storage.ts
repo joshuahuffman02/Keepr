@@ -53,10 +53,7 @@ const saveAll = (layouts: SavedAiUiLayout[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(layouts));
 };
 
-export const listAiUiLayouts = (
-  builderId?: AiUiBuilderId,
-  campgroundId?: string | null
-) => {
+export const listAiUiLayouts = (builderId?: AiUiBuilderId, campgroundId?: string | null) => {
   const layouts = loadAll();
   return layouts.filter((layout) => {
     if (builderId && layout.builderId !== builderId) return false;
@@ -66,7 +63,7 @@ export const listAiUiLayouts = (
 };
 
 export const saveAiUiLayout = (
-  layout: Omit<SavedAiUiLayout, "id" | "createdAt" | "updatedAt"> & { id?: string }
+  layout: Omit<SavedAiUiLayout, "id" | "createdAt" | "updatedAt"> & { id?: string },
 ) => {
   const all = loadAll();
   const now = new Date().toISOString();

@@ -8,7 +8,7 @@ import { UpdateReferralProgramDto } from "./dto/update-referral-program.dto";
 @UseGuards(JwtAuthGuard, ScopeGuard)
 @Controller("campgrounds/:campgroundId/referral-programs")
 export class ReferralsController {
-  constructor(private readonly referrals: ReferralsService) { }
+  constructor(private readonly referrals: ReferralsService) {}
 
   @Get()
   list(@Param("campgroundId") campgroundId: string) {
@@ -16,10 +16,7 @@ export class ReferralsController {
   }
 
   @Post()
-  create(
-    @Param("campgroundId") campgroundId: string,
-    @Body() dto: CreateReferralProgramDto
-  ) {
+  create(@Param("campgroundId") campgroundId: string, @Body() dto: CreateReferralProgramDto) {
     return this.referrals.createProgram(campgroundId, dto);
   }
 
@@ -27,7 +24,7 @@ export class ReferralsController {
   update(
     @Param("campgroundId") campgroundId: string,
     @Param("id") id: string,
-    @Body() dto: UpdateReferralProgramDto
+    @Body() dto: UpdateReferralProgramDto,
   ) {
     return this.referrals.updateProgram(campgroundId, id, dto);
   }

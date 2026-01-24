@@ -23,26 +23,27 @@ export default function UpsellsPage() {
 
   return (
     <div className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Upsells & Add-ons</h1>
-            <p className="text-muted-foreground">
-              Upsells now use your Store add-ons for booking extras and guest portal offers.
-            </p>
-          </div>
-          <Button asChild variant="outline">
-            <Link href="/store">Manage products</Link>
-          </Button>
-        </div>
-
-        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-          <div className="font-semibold">Unified catalog</div>
-          <p className="mt-1">
-            Add-ons here appear in checkout and the guest portal. Inventory products and POS items live in Store.
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Upsells & Add-ons</h1>
+          <p className="text-muted-foreground">
+            Upsells now use your Store add-ons for booking extras and guest portal offers.
           </p>
         </div>
-
-        <AddOnList campgroundId={campgroundId} />
+        <Button asChild variant="outline">
+          <Link href="/store">Manage products</Link>
+        </Button>
       </div>
+
+      <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        <div className="font-semibold">Unified catalog</div>
+        <p className="mt-1">
+          Add-ons here appear in checkout and the guest portal. Inventory products and POS items
+          live in Store.
+        </p>
+      </div>
+
+      <AddOnList campgroundId={campgroundId} />
+    </div>
   );
 }

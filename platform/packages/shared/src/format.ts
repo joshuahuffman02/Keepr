@@ -20,24 +20,19 @@ export function formatCurrency(
     locale?: string;
     showCents?: boolean;
     showSign?: boolean;
-  } = {}
+  } = {},
 ): string {
-  const {
-    currency = 'USD',
-    locale = 'en-US',
-    showCents = true,
-    showSign = false
-  } = options;
+  const { currency = "USD", locale = "en-US", showCents = true, showSign = false } = options;
 
   if (cents === null || cents === undefined) {
-    return showCents ? '$0.00' : '$0';
+    return showCents ? "$0.00" : "$0";
   }
 
   const dollars = cents / 100;
-  const sign = showSign && cents > 0 ? '+' : '';
+  const sign = showSign && cents > 0 ? "+" : "";
 
   const formatted = new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency,
     minimumFractionDigits: showCents ? 2 : 0,
     maximumFractionDigits: showCents ? 2 : 0,
@@ -76,7 +71,7 @@ export function dollarsToCents(dollars: number | null | undefined): number {
  * Useful for input fields
  */
 export function formatCentsAsDecimal(cents: number | null | undefined): string {
-  if (cents === null || cents === undefined) return '0.00';
+  if (cents === null || cents === undefined) return "0.00";
   return (cents / 100).toFixed(2);
 }
 
@@ -87,7 +82,7 @@ export function formatCentsAsDecimal(cents: number | null | undefined): string {
 export function parseDollarsToCents(value: string): number {
   if (!value) return 0;
   // Remove currency symbols and whitespace
-  const cleaned = value.replace(/[$,\s]/g, '');
+  const cleaned = value.replace(/[$,\s]/g, "");
   const parsed = parseFloat(cleaned);
   if (isNaN(parsed)) return 0;
   return Math.round(parsed * 100);
@@ -124,12 +119,12 @@ export function parseDate(date: DateInput): Date | null {
     return isNaN(date.getTime()) ? null : date;
   }
 
-  if (typeof date === 'number') {
+  if (typeof date === "number") {
     const d = new Date(date);
     return isNaN(d.getTime()) ? null : d;
   }
 
-  if (typeof date === 'string') {
+  if (typeof date === "string") {
     // Handle ISO date strings and common formats
     const d = new Date(date);
     return isNaN(d.getTime()) ? null : d;
@@ -158,32 +153,32 @@ export function isValidDate(date: DateInput): boolean {
  */
 export function formatDate(date: DateInput, options: DateFormatOptions = {}): string {
   const parsed = parseDate(date);
-  if (!parsed) return '';
+  if (!parsed) return "";
 
   const {
     includeWeekday = false,
     includeYear = true,
     includeTime = false,
     shortMonth = true,
-    locale = 'en-US',
+    locale = "en-US",
   } = options;
 
   const formatOptions: Intl.DateTimeFormatOptions = {
-    month: shortMonth ? 'short' : 'long',
-    day: 'numeric',
+    month: shortMonth ? "short" : "long",
+    day: "numeric",
   };
 
   if (includeWeekday) {
-    formatOptions.weekday = 'short';
+    formatOptions.weekday = "short";
   }
 
   if (includeYear) {
-    formatOptions.year = 'numeric';
+    formatOptions.year = "numeric";
   }
 
   if (includeTime) {
-    formatOptions.hour = 'numeric';
-    formatOptions.minute = '2-digit';
+    formatOptions.hour = "numeric";
+    formatOptions.minute = "2-digit";
   }
 
   return parsed.toLocaleDateString(locale, formatOptions);
@@ -203,19 +198,19 @@ export function formatDateRange(startDate: DateInput, endDate: DateInput): strin
   const start = parseDate(startDate);
   const end = parseDate(endDate);
 
-  if (!start || !end) return '';
+  if (!start || !end) return "";
 
   const sameYear = start.getFullYear() === end.getFullYear();
   const sameMonth = sameYear && start.getMonth() === end.getMonth();
 
   if (sameMonth) {
     // "Dec 20 - 25, 2024"
-    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.getDate()}, ${end.getFullYear()}`;
+    return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${end.getDate()}, ${end.getFullYear()}`;
   }
 
   if (sameYear) {
     // "Nov 28 - Dec 5, 2024"
-    return `${start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, ${end.getFullYear()}`;
+    return `${start.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${end.toLocaleDateString("en-US", { month: "short", day: "numeric" })}, ${end.getFullYear()}`;
   }
 
   // "Dec 28, 2024 - Jan 5, 2025"
@@ -228,8 +223,8 @@ export function formatDateRange(startDate: DateInput, endDate: DateInput): strin
  */
 export function formatISODate(date: DateInput): string {
   const parsed = parseDate(date);
-  if (!parsed) return '';
-  return parsed.toISOString().split('T')[0];
+  if (!parsed) return "";
+  return parsed.toISOString().split("T")[0];
 }
 
 /**
@@ -259,14 +254,14 @@ export function getRelativeTime(date: DateInput, referenceDate: DateInput = new 
   const target = parseDate(date);
   const reference = parseDate(referenceDate);
 
-  if (!target || !reference) return '';
+  if (!target || !reference) return "";
 
   const diffMs = target.getTime() - reference.getTime();
   const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'today';
-  if (diffDays === 1) return 'tomorrow';
-  if (diffDays === -1) return 'yesterday';
+  if (diffDays === 0) return "today";
+  if (diffDays === 1) return "tomorrow";
+  if (diffDays === -1) return "yesterday";
   if (diffDays > 0) return `in ${diffDays} days`;
   return `${Math.abs(diffDays)} days ago`;
 }
@@ -278,11 +273,11 @@ export function getRelativeTime(date: DateInput, referenceDate: DateInput = new 
  */
 export function formatTime(date: DateInput, use24Hour = false): string {
   const parsed = parseDate(date);
-  if (!parsed) return '';
+  if (!parsed) return "";
 
-  return parsed.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
+  return parsed.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
     hour12: !use24Hour,
   });
 }
@@ -332,10 +327,10 @@ export function addDays(date: DateInput, days: number): Date | null {
  * e.g., 150000 -> "$1.5K", 1500000 -> "$15K"
  */
 export function formatCurrencyCompact(cents: number | null | undefined): string {
-  if (cents === null || cents === undefined) return '$0';
+  if (cents === null || cents === undefined) return "$0";
 
   const dollars = Math.abs(cents / 100);
-  const sign = cents < 0 ? '-' : '';
+  const sign = cents < 0 ? "-" : "";
 
   if (dollars >= 1000000) {
     return `${sign}$${(dollars / 1000000).toFixed(1)}M`;
@@ -349,18 +344,15 @@ export function formatCurrencyCompact(cents: number | null | undefined): string 
 /**
  * Format number with commas (e.g., 1234567 -> "1,234,567")
  */
-export function formatNumber(value: number | null | undefined, locale = 'en-US'): string {
-  if (value === null || value === undefined) return '0';
+export function formatNumber(value: number | null | undefined, locale = "en-US"): string {
+  if (value === null || value === undefined) return "0";
   return new Intl.NumberFormat(locale).format(value);
 }
 
 /**
  * Format percentage (e.g., 0.156 -> "15.6%")
  */
-export function formatPercentage(
-  value: number | null | undefined,
-  decimals = 1
-): string {
-  if (value === null || value === undefined) return '0%';
+export function formatPercentage(value: number | null | undefined, decimals = 1): string {
+  if (value === null || value === undefined) return "0%";
   return `${(value * 100).toFixed(decimals)}%`;
 }

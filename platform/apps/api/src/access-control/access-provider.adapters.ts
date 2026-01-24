@@ -6,13 +6,17 @@ import {
   AccessProviderAdapter,
   GrantRequest,
   RevokeRequest,
-  WebhookVerificationInput
+  WebhookVerificationInput,
 } from "./access-provider.types";
 
 abstract class BaseAdapter implements AccessProviderAdapter {
   abstract readonly provider: AccessProviderType;
 
-  protected hmacValid(secret: string | null | undefined, payload: string, signature?: string | null) {
+  protected hmacValid(
+    secret: string | null | undefined,
+    payload: string,
+    signature?: string | null,
+  ) {
     if (!secret || !signature) return false;
     const digest = crypto.createHmac("sha256", secret).update(payload).digest("hex");
     return digest === signature;
@@ -20,17 +24,17 @@ abstract class BaseAdapter implements AccessProviderAdapter {
 
   async provisionAccess(
     _integration: AccessIntegrationConfig,
-    request: GrantRequest
+    request: GrantRequest,
   ): Promise<{ providerAccessId?: string | null; status: AccessGrantStatus }> {
     return {
       providerAccessId: `${this.provider}-${request.reservationId}`,
-      status: AccessGrantStatus.active
+      status: AccessGrantStatus.active,
     };
   }
 
   async revokeAccess(
     _integration: AccessIntegrationConfig,
-    _request: RevokeRequest
+    _request: RevokeRequest,
   ): Promise<{ status: AccessGrantStatus; message?: string | null }> {
     return { status: AccessGrantStatus.revoked };
   }

@@ -1,9 +1,5 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
 import {
   OpTaskTrigger,
   OpTriggerEvent,
@@ -12,14 +8,14 @@ import {
   Site,
   OpTaskState,
   Prisma,
-} from '@prisma/client';
-import type { OpTaskTemplate } from '@prisma/client';
-import { randomUUID } from 'crypto';
+} from "@prisma/client";
+import type { OpTaskTemplate } from "@prisma/client";
+import { randomUUID } from "crypto";
 import {
   CreateOpTaskTriggerDto,
   UpdateOpTaskTriggerDto,
   TriggerConditionsDto,
-} from '../dto/op-task.dto';
+} from "../dto/op-task.dto";
 
 type TriggerWithTemplate = OpTaskTrigger & { OpTaskTemplate: OpTaskTemplate };
 
@@ -48,7 +44,8 @@ const normalizeChecklistTemplate = (value: unknown): ChecklistTemplateItem[] => 
       text: item.text,
       required: item.required === true ? true : undefined,
       category: typeof item.category === "string" ? item.category : undefined,
-      estimatedMinutes: typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
+      estimatedMinutes:
+        typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
     });
   }
   return items;
@@ -97,16 +94,13 @@ export class OpTriggerService {
   /**
    * Create a new trigger
    */
-  async create(
-    campgroundId: string,
-    dto: CreateOpTaskTriggerDto,
-  ): Promise<OpTaskTrigger> {
+  async create(campgroundId: string, dto: CreateOpTaskTriggerDto): Promise<OpTaskTrigger> {
     // Verify template exists and belongs to campground
     const template = await this.prisma.opTaskTemplate.findFirst({
       where: { id: dto.templateId, campgroundId },
     });
     if (!template) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     return this.prisma.opTaskTrigger.create({
@@ -144,7 +138,7 @@ export class OpTriggerService {
         ...(options?.triggerEvent && { triggerEvent: options.triggerEvent }),
         ...(options?.isActive !== undefined && { isActive: options.isActive }),
       },
-      orderBy: [{ triggerEvent: 'asc' }, { name: 'asc' }],
+      orderBy: [{ triggerEvent: "asc" }, { name: "asc" }],
       include: {
         OpTaskTemplate: true,
         OpTeam: true,
@@ -169,7 +163,7 @@ export class OpTriggerService {
     });
 
     if (!trigger) {
-      throw new NotFoundException('Trigger not found');
+      throw new NotFoundException("Trigger not found");
     }
 
     return trigger;
@@ -181,7 +175,7 @@ export class OpTriggerService {
   async update(id: string, dto: UpdateOpTaskTriggerDto): Promise<OpTaskTrigger> {
     const existing = await this.prisma.opTaskTrigger.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Trigger not found');
+      throw new NotFoundException("Trigger not found");
     }
 
     if (dto.templateId) {
@@ -189,7 +183,7 @@ export class OpTriggerService {
         where: { id: dto.templateId, campgroundId: existing.campgroundId },
       });
       if (!template) {
-        throw new NotFoundException('Template not found');
+        throw new NotFoundException("Template not found");
       }
     }
 
@@ -222,7 +216,7 @@ export class OpTriggerService {
   async delete(id: string): Promise<void> {
     const existing = await this.prisma.opTaskTrigger.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Trigger not found');
+      throw new NotFoundException("Trigger not found");
     }
 
     await this.prisma.opTaskTrigger.delete({ where: { id } });
@@ -289,16 +283,17 @@ export class OpTriggerService {
             assignedToUserId: trigger.assignToUserId ?? template.defaultAssigneeId,
             assignedToTeamId: trigger.assignToTeamId ?? template.defaultTeamId,
             slaDueAt,
-            slaStatus: 'on_track',
+            slaStatus: "on_track",
             checklist: toNullableJsonInput(checklist),
             checklistProgress: 0,
             templateId: trigger.templateId,
             triggerId: trigger.id,
             sourceEvent: event,
-            createdById: context.userId ?? 'system',
-            state: trigger.assignToUserId || trigger.assignToTeamId
-              ? OpTaskState.assigned
-              : OpTaskState.pending,
+            createdById: context.userId ?? "system",
+            state:
+              trigger.assignToUserId || trigger.assignToTeamId
+                ? OpTaskState.assigned
+                : OpTaskState.pending,
             updatedAt: new Date(),
           },
         });
@@ -370,23 +365,16 @@ export class OpTriggerService {
   /**
    * Calculate SLA due time based on trigger offset and context
    */
-  private calculateSlaDueTime(
-    trigger: TriggerWithTemplate,
-    context: TriggerContext,
-  ): Date {
+  private calculateSlaDueTime(trigger: TriggerWithTemplate, context: TriggerContext): Date {
     // Get reference time based on event type
     let referenceTime: Date;
 
     switch (trigger.triggerEvent) {
       case OpTriggerEvent.reservation_checkout:
-        referenceTime = context.departureDate
-          ? new Date(context.departureDate)
-          : new Date();
+        referenceTime = context.departureDate ? new Date(context.departureDate) : new Date();
         break;
       case OpTriggerEvent.reservation_checkin:
-        referenceTime = context.arrivalDate
-          ? new Date(context.arrivalDate)
-          : new Date();
+        referenceTime = context.arrivalDate ? new Date(context.arrivalDate) : new Date();
         break;
       default:
         referenceTime = new Date();
@@ -398,9 +386,7 @@ export class OpTriggerService {
 
     // If template has SLA minutes, use whichever is sooner
     if (trigger.OpTaskTemplate.slaMinutes) {
-      const slaFromTemplate = new Date(
-        Date.now() + trigger.OpTaskTemplate.slaMinutes * 60 * 1000,
-      );
+      const slaFromTemplate = new Date(Date.now() + trigger.OpTaskTemplate.slaMinutes * 60 * 1000);
       return slaFromOffset < slaFromTemplate ? slaFromOffset : slaFromTemplate;
     }
 
@@ -429,17 +415,17 @@ export class OpTriggerService {
   getSuggestedTriggers(): Partial<CreateOpTaskTriggerDto>[] {
     return [
       {
-        name: 'Checkout Cleaning',
+        name: "Checkout Cleaning",
         triggerEvent: OpTriggerEvent.reservation_checkout,
         slaOffsetMinutes: 120, // 2 hours after checkout
       },
       {
-        name: 'Check-in Prep',
+        name: "Check-in Prep",
         triggerEvent: OpTriggerEvent.reservation_checkin,
         slaOffsetMinutes: -120, // 2 hours before check-in
       },
       {
-        name: 'Long-Stay Deep Clean',
+        name: "Long-Stay Deep Clean",
         triggerEvent: OpTriggerEvent.reservation_checkout,
         conditions: { minNights: 14 },
         slaOffsetMinutes: 180, // 3 hours for deep clean

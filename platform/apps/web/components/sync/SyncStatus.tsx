@@ -11,13 +11,24 @@ interface SyncStatusProps {
   onClick?: () => void;
 }
 
-export function SyncStatus({ variant = "compact", showDetails = true, className, onClick }: SyncStatusProps) {
+export function SyncStatus({
+  variant = "compact",
+  showDetails = true,
+  className,
+  onClick,
+}: SyncStatusProps) {
   const { status } = useSyncStatus();
 
   const stateConfig = {
     synced: {
       icon: (
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ),
@@ -27,7 +38,13 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
     },
     syncing: {
       icon: (
-        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-4 w-4 animate-spin"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M21 12a9 9 0 1 1-6.219-8.56" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       ),
@@ -37,7 +54,13 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
     },
     pending: {
       icon: (
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -48,8 +71,18 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
     },
     offline: {
       icon: (
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" strokeLinecap="round" strokeLinejoin="round" />
+        <svg
+          className="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path
+            d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
           <path d="M9 22V12h6v10" strokeLinecap="round" strokeLinejoin="round" />
           <line x1="2" x2="22" y1="2" y2="22" strokeLinecap="round" />
         </svg>
@@ -60,7 +93,13 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
     },
     error: {
       icon: (
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          className="h-4 w-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <circle cx="12" cy="12" r="10" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M12 8v4M12 16h.01" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
@@ -82,7 +121,7 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
           config.color,
           onClick && "cursor-pointer hover:opacity-80",
-          className
+          className,
         )}
       >
         {config.icon}
@@ -100,7 +139,7 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
           "inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
           config.color,
           onClick && "cursor-pointer hover:opacity-80",
-          className
+          className,
         )}
       >
         <span className={cn("h-2 w-2 rounded-full", config.dotColor)} />
@@ -123,7 +162,7 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
         "flex items-start gap-3 rounded-lg border p-3 transition-colors",
         config.color,
         onClick && "cursor-pointer hover:opacity-80",
-        className
+        className,
       )}
     >
       <div className="flex-shrink-0 mt-0.5">{config.icon}</div>
@@ -146,9 +185,7 @@ export function SyncStatus({ variant = "compact", showDetails = true, className,
             {status.lastSyncTime && (
               <div>Last sync: {formatDistanceToNow(status.lastSyncTime, { addSuffix: true })}</div>
             )}
-            {status.state === "offline" && (
-              <div>Changes will sync when connection is restored</div>
-            )}
+            {status.state === "offline" && <div>Changes will sync when connection is restored</div>}
             {status.state === "error" && status.errors.length > 0 && (
               <div className="truncate">{status.errors[0]}</div>
             )}

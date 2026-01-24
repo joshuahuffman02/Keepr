@@ -6,8 +6,14 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import Link from "next/link";
 import {
-  PlaneLanding, PlaneTakeoff, CalendarDays, DollarSign, Tent,
-  BarChart3, ScrollText, Landmark
+  PlaneLanding,
+  PlaneTakeoff,
+  CalendarDays,
+  DollarSign,
+  Tent,
+  BarChart3,
+  ScrollText,
+  Landmark,
 } from "lucide-react";
 
 type ExportStatus = "idle" | "queued" | "processing" | "ready" | "error";
@@ -16,7 +22,11 @@ type ExportFormat = "csv" | "xlsx";
 const PERIODS: Array<7 | 30 | 90> = [7, 30, 90];
 
 const isExportStatus = (value: string): value is ExportStatus =>
-  value === "idle" || value === "queued" || value === "processing" || value === "ready" || value === "error";
+  value === "idle" ||
+  value === "queued" ||
+  value === "processing" ||
+  value === "ready" ||
+  value === "error";
 
 const isExportFormat = (value: string): value is ExportFormat =>
   value === "csv" || value === "xlsx";
@@ -88,26 +98,26 @@ export default function AnalyticsPage() {
     queryKey: ["dashboard-metrics", selectedCampgroundId, period],
     queryFn: () => apiClient.getDashboardMetrics(selectedCampgroundId!, period),
     enabled: !!selectedCampgroundId,
-    refetchInterval: 60000 // Refresh every minute
+    refetchInterval: 60000, // Refresh every minute
   });
 
   const trendQuery = useQuery({
     queryKey: ["revenue-trend", selectedCampgroundId],
     queryFn: () => apiClient.getRevenueTrend(selectedCampgroundId!, 12),
-    enabled: !!selectedCampgroundId
+    enabled: !!selectedCampgroundId,
   });
 
   const forecastQuery = useQuery({
     queryKey: ["occupancy-forecast", selectedCampgroundId],
     queryFn: () => apiClient.getOccupancyForecast(selectedCampgroundId!, 30),
-    enabled: !!selectedCampgroundId
+    enabled: !!selectedCampgroundId,
   });
 
   const taskMetricsQuery = useQuery({
     queryKey: ["task-metrics", selectedCampgroundId],
     queryFn: () => apiClient.getTaskMetrics(selectedCampgroundId!),
     enabled: !!selectedCampgroundId,
-    refetchInterval: 30000 // Refresh every 30 seconds
+    refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   const formatCurrency = (cents: number) => {
@@ -122,7 +132,7 @@ export default function AnalyticsPage() {
   // Calculate max for chart scaling
   const maxRevenue = useMemo(() => {
     if (!trend) return 0;
-    return Math.max(...trend.map(t => t.revenueCents));
+    return Math.max(...trend.map((t) => t.revenueCents));
   }, [trend]);
 
   if (!selectedCampgroundId) {
@@ -143,7 +153,8 @@ export default function AnalyticsPage() {
           <div>
             <h1 className="text-2xl font-bold text-foreground">Analytics Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              Real-time performance metrics for {selectedCampgroundName ?? "your selected campground"}
+              Real-time performance metrics for{" "}
+              {selectedCampgroundName ?? "your selected campground"}
             </p>
           </div>
           <div className="flex gap-2 items-center">
@@ -151,10 +162,11 @@ export default function AnalyticsPage() {
               <button
                 key={d}
                 onClick={() => setPeriod(d)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${period === d
-                  ? "bg-emerald-600 text-white"
-                  : "bg-card border border-border text-foreground hover:border-emerald-300"
-                  }`}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  period === d
+                    ? "bg-emerald-600 text-white"
+                    : "bg-card border border-border text-foreground hover:border-emerald-300"
+                }`}
               >
                 {d}d
               </button>
@@ -185,9 +197,13 @@ export default function AnalyticsPage() {
                   setExportStatus("queued");
                   setExportError(null);
                   setExportUrl(null);
-                  const payload: { format: "csv" | "xlsx"; filters: Record<string, unknown>; emailTo?: string[] } = {
+                  const payload: {
+                    format: "csv" | "xlsx";
+                    filters: Record<string, unknown>;
+                    emailTo?: string[];
+                  } = {
                     format: exportFormat,
-                    filters: { range: `last_${period}_days`, days: period }
+                    filters: { range: `last_${period}_days`, days: period },
                   };
                   const trimmedEmail = exportEmail.trim();
                   if (trimmedEmail) {
@@ -201,7 +217,9 @@ export default function AnalyticsPage() {
                 }
               }}
               className="px-3 py-1.5 rounded-lg text-sm font-medium bg-emerald-600 text-white hover:bg-emerald-700 transition-colors disabled:opacity-60"
-              disabled={!selectedCampgroundId || exportStatus === "processing" || exportStatus === "queued"}
+              disabled={
+                !selectedCampgroundId || exportStatus === "processing" || exportStatus === "queued"
+              }
             >
               {exportStatus === "processing" || exportStatus === "queued"
                 ? "Exporting..."
@@ -213,15 +231,16 @@ export default function AnalyticsPage() {
         {exportStatus !== "idle" && (
           <div className="text-sm text-muted-foreground flex items-center gap-3">
             {exportStatus === "ready" && exportUrl && (
-              <a
-                href={exportUrl}
-                className="text-emerald-700 underline font-medium"
-              >
+              <a href={exportUrl} className="text-emerald-700 underline font-medium">
                 Download export
               </a>
             )}
-            {exportStatus === "error" && <span className="text-red-600">{exportError ?? "Export failed"}</span>}
-            {(exportStatus === "queued" || exportStatus === "processing") && <span>Preparing export…</span>}
+            {exportStatus === "error" && (
+              <span className="text-red-600">{exportError ?? "Export failed"}</span>
+            )}
+            {(exportStatus === "queued" || exportStatus === "processing") && (
+              <span>Preparing export…</span>
+            )}
           </div>
         )}
 
@@ -259,11 +278,36 @@ export default function AnalyticsPage() {
 
         {/* Operations Quick Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          <QuickStat label="Today's Arrivals" value={metrics?.today.arrivals ?? 0} icon={<PlaneLanding className="h-6 w-6" />} href="/check-in-out" />
-          <QuickStat label="Today's Departures" value={metrics?.today.departures ?? 0} icon={<PlaneTakeoff className="h-6 w-6" />} href="/check-in-out" />
-          <QuickStat label="Future Bookings" value={metrics?.futureBookings ?? 0} icon={<CalendarDays className="h-6 w-6" />} href="/reservations" />
-          <QuickStat label="Outstanding Balance" value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"} icon={<DollarSign className="h-6 w-6" />} href="/billing/repeat-charges" />
-          <QuickStat label="Total Sites" value={metrics?.totalSites ?? 0} icon={<Tent className="h-6 w-6" />} href="/campgrounds" />
+          <QuickStat
+            label="Today's Arrivals"
+            value={metrics?.today.arrivals ?? 0}
+            icon={<PlaneLanding className="h-6 w-6" />}
+            href="/check-in-out"
+          />
+          <QuickStat
+            label="Today's Departures"
+            value={metrics?.today.departures ?? 0}
+            icon={<PlaneTakeoff className="h-6 w-6" />}
+            href="/check-in-out"
+          />
+          <QuickStat
+            label="Future Bookings"
+            value={metrics?.futureBookings ?? 0}
+            icon={<CalendarDays className="h-6 w-6" />}
+            href="/reservations"
+          />
+          <QuickStat
+            label="Outstanding Balance"
+            value={metrics ? formatCurrency(metrics.balances.outstandingCents) : "—"}
+            icon={<DollarSign className="h-6 w-6" />}
+            href="/billing/repeat-charges"
+          />
+          <QuickStat
+            label="Total Sites"
+            value={metrics?.totalSites ?? 0}
+            icon={<Tent className="h-6 w-6" />}
+            href="/campgrounds"
+          />
         </div>
 
         {/* Tasks Widget */}
@@ -352,16 +396,25 @@ export default function AnalyticsPage() {
                     <div key={i} className="flex-1 flex flex-col items-center group">
                       <div className="relative w-full flex justify-center">
                         <div
-                          className={`w-full rounded-t transition-all ${f.pct >= 90 ? "bg-red-500" :
-                            f.pct >= 70 ? "bg-amber-500" :
-                              f.pct >= 50 ? "bg-emerald-500" :
-                                "bg-muted"
-                            } ${isWeekend ? "opacity-80" : ""}`}
+                          className={`w-full rounded-t transition-all ${
+                            f.pct >= 90
+                              ? "bg-red-500"
+                              : f.pct >= 70
+                                ? "bg-amber-500"
+                                : f.pct >= 50
+                                  ? "bg-emerald-500"
+                                  : "bg-muted"
+                          } ${isWeekend ? "opacity-80" : ""}`}
                           style={{ height: `${Math.max(f.pct, 2)}%` }}
                         />
                         <div className="absolute bottom-full mb-1 hidden group-hover:block bg-muted text-foreground text-xs px-2 py-1 rounded whitespace-nowrap z-10">
-                          {new Date(f.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}
-                          <br />{f.pct}% ({f.occupiedSites}/{f.totalSites})
+                          {new Date(f.date).toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                          <br />
+                          {f.pct}% ({f.occupiedSites}/{f.totalSites})
                         </div>
                       </div>
                     </div>
@@ -374,20 +427,44 @@ export default function AnalyticsPage() {
               </div>
             )}
             <div className="flex justify-center gap-4 mt-3 text-xs">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> 90%+</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> 70-89%</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> 50-69%</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted" /> &lt;50%</span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-red-500" /> 90%+
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-amber-500" /> 70-89%
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" /> 50-69%
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-muted" /> &lt;50%
+              </span>
             </div>
           </div>
         </div>
 
         {/* Quick Links */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <QuickLink href="/reports" label="Full Reports" icon={<BarChart3 className="h-5 w-5" />} />
-          <QuickLink href="/reports/audit" label="Audit Log" icon={<ScrollText className="h-5 w-5" />} />
-          <QuickLink href="/settings/pricing-rules" label="Pricing Rules" icon={<DollarSign className="h-5 w-5" />} />
-          <QuickLink href="/settings/deposit-policies" label="Deposit Policies" icon={<Landmark className="h-5 w-5" />} />
+          <QuickLink
+            href="/reports"
+            label="Full Reports"
+            icon={<BarChart3 className="h-5 w-5" />}
+          />
+          <QuickLink
+            href="/reports/audit"
+            label="Audit Log"
+            icon={<ScrollText className="h-5 w-5" />}
+          />
+          <QuickLink
+            href="/settings/pricing-rules"
+            label="Pricing Rules"
+            icon={<DollarSign className="h-5 w-5" />}
+          />
+          <QuickLink
+            href="/settings/deposit-policies"
+            label="Deposit Policies"
+            icon={<Landmark className="h-5 w-5" />}
+          />
         </div>
       </div>
     </DashboardShell>
@@ -400,7 +477,7 @@ function KpiCard({
   change,
   subtitle,
   loading,
-  color
+  color,
 }: {
   label: string;
   value: string;
@@ -413,7 +490,7 @@ function KpiCard({
     emerald: "border-emerald-200 bg-emerald-50",
     blue: "border-blue-200 bg-blue-50",
     violet: "border-violet-200 bg-violet-50",
-    amber: "border-amber-200 bg-amber-50"
+    amber: "border-amber-200 bg-amber-50",
   };
 
   return (
@@ -429,7 +506,9 @@ function KpiCard({
           <div className="flex items-baseline gap-2">
             <div className="text-2xl font-bold text-foreground">{value}</div>
             {change !== undefined && (
-              <span className={`text-xs font-medium ${change >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+              <span
+                className={`text-xs font-medium ${change >= 0 ? "text-emerald-600" : "text-red-600"}`}
+              >
                 {change >= 0 ? "↑" : "↓"} {Math.abs(change)}%
               </span>
             )}
@@ -445,7 +524,7 @@ function QuickStat({
   label,
   value,
   icon,
-  href
+  href,
 }: {
   label: string;
   value: string | number;
@@ -468,15 +547,7 @@ function QuickStat({
   );
 }
 
-function QuickLink({
-  href,
-  label,
-  icon
-}: {
-  href: string;
-  label: string;
-  icon: React.ReactNode;
-}) {
+function QuickLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   return (
     <Link
       href={href}

@@ -102,7 +102,14 @@ export function useSavedCards(): UseSavedCardsResult {
         setLoading(false);
       }
     },
-    [selectedCard, props.guestId, props.campgroundId, props.subject, props.context, state.remainingCents]
+    [
+      selectedCard,
+      props.guestId,
+      props.campgroundId,
+      props.subject,
+      props.context,
+      state.remainingCents,
+    ],
   );
 
   const refreshCards = useCallback(async () => {

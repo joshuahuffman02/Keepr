@@ -53,16 +53,11 @@ export class GuestJourneyService {
 
     const totalGuests = guestsWithReservations.length;
     const newGuests = guestsWithReservations.filter(
-      (g) => g.createdAt >= start && g.createdAt <= end
+      (g) => g.createdAt >= start && g.createdAt <= end,
     ).length;
-    const returningGuests = guestsWithReservations.filter(
-      (g) => g._count.Reservation > 1
-    ).length;
+    const returningGuests = guestsWithReservations.filter((g) => g._count.Reservation > 1).length;
 
-    const totalStays = guestsWithReservations.reduce(
-      (sum, g) => sum + g._count.Reservation,
-      0
-    );
+    const totalStays = guestsWithReservations.reduce((sum, g) => sum + g._count.Reservation, 0);
 
     return {
       totalGuests,
@@ -164,15 +159,17 @@ export class GuestJourneyService {
     }
 
     return {
-      progressions: Object.entries(progressions).map(([key, count]) => {
-        const [fromType, toType] = key.split("→");
-        return {
-          fromType,
-          toType,
-          count,
-          percentage: totalTransitions > 0 ? (count / totalTransitions) * 100 : 0,
-        };
-      }).sort((a, b) => b.count - a.count),
+      progressions: Object.entries(progressions)
+        .map(([key, count]) => {
+          const [fromType, toType] = key.split("→");
+          return {
+            fromType,
+            toType,
+            count,
+            percentage: totalTransitions > 0 ? (count / totalTransitions) * 100 : 0,
+          };
+        })
+        .sort((a, b) => b.count - a.count),
       upgradeRate: totalTransitions > 0 ? (upgradeCount / totalTransitions) * 100 : 0,
       downgradeRate: totalTransitions > 0 ? (downgradeCount / totalTransitions) * 100 : 0,
     };
@@ -211,11 +208,13 @@ export class GuestJourneyService {
     });
 
     // Calculate LTV for each guest
-    const guestLtvs = guests.map((g) => ({
-      id: g.id,
-      ltv: g.Reservation.reduce((sum, r) => sum + (r.totalAmount || 0), 0),
-      stayCount: g.Reservation.length,
-    })).sort((a, b) => b.ltv - a.ltv);
+    const guestLtvs = guests
+      .map((g) => ({
+        id: g.id,
+        ltv: g.Reservation.reduce((sum, r) => sum + (r.totalAmount || 0), 0),
+        stayCount: g.Reservation.length,
+      }))
+      .sort((a, b) => b.ltv - a.ltv);
 
     if (guestLtvs.length === 0) {
       return {
@@ -278,13 +277,21 @@ export class GuestJourneyService {
     });
 
     // Group by cohort month
-    const cohorts: Record<string, { total: number; returnedMonth1: number; returnedMonth3: number; returnedMonth6: number }> = {};
+    const cohorts: Record<
+      string,
+      { total: number; returnedMonth1: number; returnedMonth3: number; returnedMonth6: number }
+    > = {};
 
     for (const guest of guests) {
       const cohortMonth = guest.createdAt.toISOString().slice(0, 7);
 
       if (!cohorts[cohortMonth]) {
-        cohorts[cohortMonth] = { total: 0, returnedMonth1: 0, returnedMonth3: 0, returnedMonth6: 0 };
+        cohorts[cohortMonth] = {
+          total: 0,
+          returnedMonth1: 0,
+          returnedMonth3: 0,
+          returnedMonth6: 0,
+        };
       }
 
       cohorts[cohortMonth].total++;
@@ -296,7 +303,7 @@ export class GuestJourneyService {
       const subsequentReservations = guest.Reservation.slice(1);
       for (const res of subsequentReservations) {
         const daysSinceFirst = Math.floor(
-          (res.createdAt.getTime() - firstReservation.getTime()) / (1000 * 60 * 60 * 24)
+          (res.createdAt.getTime() - firstReservation.getTime()) / (1000 * 60 * 60 * 24),
         );
 
         if (daysSinceFirst <= 30) cohorts[cohortMonth].returnedMonth1++;
@@ -305,15 +312,17 @@ export class GuestJourneyService {
       }
     }
 
-    return Object.entries(cohorts).map(([month, data]) => ({
-      cohortMonth: month,
-      totalGuests: data.total,
-      returnedIn30Days: data.returnedMonth1,
-      returnedIn90Days: data.returnedMonth3,
-      returnedIn180Days: data.returnedMonth6,
-      retention30: data.total > 0 ? (data.returnedMonth1 / data.total) * 100 : 0,
-      retention90: data.total > 0 ? (data.returnedMonth3 / data.total) * 100 : 0,
-      retention180: data.total > 0 ? (data.returnedMonth6 / data.total) * 100 : 0,
-    })).sort((a, b) => a.cohortMonth.localeCompare(b.cohortMonth));
+    return Object.entries(cohorts)
+      .map(([month, data]) => ({
+        cohortMonth: month,
+        totalGuests: data.total,
+        returnedIn30Days: data.returnedMonth1,
+        returnedIn90Days: data.returnedMonth3,
+        returnedIn180Days: data.returnedMonth6,
+        retention30: data.total > 0 ? (data.returnedMonth1 / data.total) * 100 : 0,
+        retention90: data.total > 0 ? (data.returnedMonth3 / data.total) * 100 : 0,
+        retention180: data.total > 0 ? (data.returnedMonth6 / data.total) * 100 : 0,
+      }))
+      .sort((a, b) => a.cohortMonth.localeCompare(b.cohortMonth));
   }
 }

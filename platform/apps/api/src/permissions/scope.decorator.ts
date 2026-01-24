@@ -8,4 +8,3 @@ export type ScopeDescriptor = {
 };
 
 export const RequireScope = (descriptor: ScopeDescriptor) => SetMetadata(SCOPE_KEY, descriptor);
-

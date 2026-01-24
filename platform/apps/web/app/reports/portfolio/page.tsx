@@ -8,10 +8,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { apiClient } from "@/lib/api-client";
 import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
 
@@ -19,7 +32,11 @@ type FxRate = { base: string; quote: string; rate: number };
 
 function formatCurrency(value: number | null | undefined, currency: string, locale: string) {
   if (value === null || value === undefined) return "—";
-  return new Intl.NumberFormat(locale, { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+  return new Intl.NumberFormat(locale, {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 
 function formatPercent(value: number | null | undefined) {
@@ -27,7 +44,12 @@ function formatPercent(value: number | null | undefined) {
   return `${(value * 100).toFixed(0)}%`;
 }
 
-function resolveRate(fxRates: FxRate[], baseCurrency: string | undefined, from: string, to: string): number {
+function resolveRate(
+  fxRates: FxRate[],
+  baseCurrency: string | undefined,
+  from: string,
+  to: string,
+): number {
   if (from === to) return 1;
   const direct = fxRates.find((r) => r.base === from && r.quote === to);
   if (direct) return direct.rate;
@@ -89,7 +111,12 @@ export default function PortfolioFxReportPage() {
   });
 
   useEffect(() => {
-    if (localesQuery.data && !localesQuery.isFetching && !localesQuery.isRefetching && !localStorage.getItem("campreserv:locale")) {
+    if (
+      localesQuery.data &&
+      !localesQuery.isFetching &&
+      !localesQuery.isRefetching &&
+      !localStorage.getItem("campreserv:locale")
+    ) {
       setLocale(localesQuery.data[0]?.code ?? "en-US");
     }
   }, [localesQuery.data, localesQuery.isFetching, localesQuery.isRefetching]);
@@ -122,7 +149,9 @@ export default function PortfolioFxReportPage() {
   })();
 
   const rows = metrics.map((m) => {
-    const rate = fxEnabled ? resolveRate(fxRates, baseCurrency, m.currency, resolvedReportingCurrency) : 1;
+    const rate = fxEnabled
+      ? resolveRate(fxRates, baseCurrency, m.currency, resolvedReportingCurrency)
+      : 1;
     return {
       ...m,
       displayCurrency: fxEnabled ? resolvedReportingCurrency : m.currency,
@@ -149,25 +178,39 @@ export default function PortfolioFxReportPage() {
 
   const activePortfolio = useMemo(() => {
     if (!portfoliosQuery.data || !portfolioId) return null;
-    return portfoliosQuery.data.portfolios.find((p) => p.id === portfolioId) ?? portfoliosQuery.data.portfolios[0];
+    return (
+      portfoliosQuery.data.portfolios.find((p) => p.id === portfolioId) ??
+      portfoliosQuery.data.portfolios[0]
+    );
   }, [portfolioId, portfoliosQuery.data]);
 
   const isLoading = portfoliosQuery.isLoading || reportQuery.isLoading;
 
   const reportNavLinks = [
     { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
-    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
-    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+    {
+      label: "Portfolio",
+      href: "/reports/portfolio",
+      active: pathname.startsWith("/reports/portfolio"),
+    },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") },
   ];
 
   return (
     <DashboardShell>
-      <Breadcrumbs items={[{ label: "Reports", href: "/reports" }, { label: "Portfolio FX", href: "/reports/portfolio" }]} />
+      <Breadcrumbs
+        items={[
+          { label: "Reports", href: "/reports" },
+          { label: "Portfolio FX", href: "/reports/portfolio" },
+        ]}
+      />
 
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold text-foreground">Cross-park reporting</h1>
-          <p className="text-sm text-muted-foreground">Occupancy, ADR, and RevPAR per portfolio with currency conversion helpers.</p>
+          <p className="text-sm text-muted-foreground">
+            Occupancy, ADR, and RevPAR per portfolio with currency conversion helpers.
+          </p>
         </div>
 
         <ReportsNavBar activeTab={null} extraLinks={reportNavLinks} />
@@ -185,7 +228,8 @@ export default function PortfolioFxReportPage() {
                   value={portfolioId ?? ""}
                   onValueChange={(value) => {
                     setPortfolioId(value);
-                    if (typeof window !== "undefined") localStorage.setItem("campreserv:selectedPortfolio", value);
+                    if (typeof window !== "undefined")
+                      localStorage.setItem("campreserv:selectedPortfolio", value);
                     qc.invalidateQueries({ queryKey: ["portfolio-report"] });
                   }}
                 >
@@ -203,12 +247,15 @@ export default function PortfolioFxReportPage() {
               </div>
 
               <div className="flex flex-col gap-1">
-                <span className="text-xs font-semibold text-muted-foreground">Reporting currency</span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Reporting currency
+                </span>
                 <Select
                   value={resolvedReportingCurrency}
                   onValueChange={(val) => {
                     setReportingCurrency(val);
-                    if (typeof window !== "undefined") localStorage.setItem("campreserv:reportingCurrency", val);
+                    if (typeof window !== "undefined")
+                      localStorage.setItem("campreserv:reportingCurrency", val);
                   }}
                 >
                   <SelectTrigger className="w-48" aria-label="Reporting currency">
@@ -225,14 +272,25 @@ export default function PortfolioFxReportPage() {
               </div>
 
               <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
-                <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} aria-label="Toggle FX conversion" />
+                <Switch
+                  checked={fxEnabled}
+                  onCheckedChange={setFxEnabled}
+                  aria-label="Toggle FX conversion"
+                />
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-foreground">FX toggle</span>
-                  <span className="text-[11px] text-muted-foreground">Convert to {resolvedReportingCurrency}</span>
+                  <span className="text-[11px] text-muted-foreground">
+                    Convert to {resolvedReportingCurrency}
+                  </span>
                 </div>
               </div>
 
-              <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })} disabled={!portfolioId}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })}
+                disabled={!portfolioId}
+              >
                 Refresh report
               </Button>
             </div>
@@ -244,28 +302,45 @@ export default function PortfolioFxReportPage() {
             <CardHeader>
               <CardTitle>Rollup</CardTitle>
               <CardDescription>
-                Home: {reportQuery.data?.homeCurrency ?? "—"} · Reporting: {resolvedReportingCurrency}
+                Home: {reportQuery.data?.homeCurrency ?? "—"} · Reporting:{" "}
+                {resolvedReportingCurrency}
               </CardDescription>
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div>
                 <div className="text-xs uppercase text-muted-foreground">Revenue</div>
-                <div className="text-xl font-semibold">{formatCurrency(rollup?.revenueHome ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}</div>
+                <div className="text-xl font-semibold">
+                  {formatCurrency(
+                    rollup?.revenueHome ?? null,
+                    rollup?.currency ?? resolvedReportingCurrency,
+                    locale,
+                  )}
+                </div>
               </div>
               <div>
                 <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
-                <div className="text-xl font-semibold">{formatPercent(rollup?.occupancy ?? null)}</div>
+                <div className="text-xl font-semibold">
+                  {formatPercent(rollup?.occupancy ?? null)}
+                </div>
               </div>
               <div>
                 <div className="text-xs uppercase text-muted-foreground">ADR</div>
                 <div className="text-lg font-semibold">
-                  {formatCurrency(rollup?.adr ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
+                  {formatCurrency(
+                    rollup?.adr ?? null,
+                    rollup?.currency ?? resolvedReportingCurrency,
+                    locale,
+                  )}
                 </div>
               </div>
               <div>
                 <div className="text-xs uppercase text-muted-foreground">RevPAR</div>
                 <div className="text-lg font-semibold">
-                  {formatCurrency(rollup?.revpar ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
+                  {formatCurrency(
+                    rollup?.revpar ?? null,
+                    rollup?.currency ?? resolvedReportingCurrency,
+                    locale,
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -275,23 +350,32 @@ export default function PortfolioFxReportPage() {
             <CardHeader>
               <CardTitle>FX context</CardTitle>
               <CardDescription>
-                {currencyTaxQuery.data?.fxProvider?.toUpperCase?.() ?? "Default"} · Updated {currencyTaxQuery.data?.updatedAt ? new Date(currencyTaxQuery.data.updatedAt).toLocaleString() : "—"}
+                {currencyTaxQuery.data?.fxProvider?.toUpperCase?.() ?? "Default"} · Updated{" "}
+                {currencyTaxQuery.data?.updatedAt
+                  ? new Date(currencyTaxQuery.data.updatedAt).toLocaleString()
+                  : "—"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-sm text-foreground">
-                Base: {currencyTaxQuery.data?.baseCurrency ?? "USD"} · Reporting: {resolvedReportingCurrency}
+                Base: {currencyTaxQuery.data?.baseCurrency ?? "USD"} · Reporting:{" "}
+                {resolvedReportingCurrency}
               </div>
               <div className="space-y-1">
                 {(currencyTaxQuery.data?.fxRates ?? []).map((r) => (
-                  <div key={`${r.base}-${r.quote}`} className="flex items-center justify-between rounded border border-border px-3 py-2">
+                  <div
+                    key={`${r.base}-${r.quote}`}
+                    className="flex items-center justify-between rounded border border-border px-3 py-2"
+                  >
                     <span className="text-sm font-semibold">
                       {r.base} → {r.quote}
                     </span>
                     <span className="text-sm text-foreground">{r.rate}</span>
                   </div>
                 ))}
-                {!currencyTaxQuery.data?.fxRates?.length && <div className="text-sm text-muted-foreground">No exchange rates configured.</div>}
+                {!currencyTaxQuery.data?.fxRates?.length && (
+                  <div className="text-sm text-muted-foreground">No exchange rates configured.</div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -305,12 +389,20 @@ export default function PortfolioFxReportPage() {
               {(reportQuery.data?.routing ?? []).map((route) => (
                 <div key={route.parkId} className="rounded-lg border border-border px-3 py-2">
                   <div className="text-sm font-semibold">{route.parkId}</div>
-                  <div className="text-xs text-muted-foreground">Admin: {route.adminHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Guest: {route.guestHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Path: {route.path || "/campgrounds/:id"}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Admin: {route.adminHost || "Not configured"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Guest: {route.guestHost || "Not configured"}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Path: {route.path || "/campgrounds/:id"}
+                  </div>
                 </div>
               ))}
-              {!reportQuery.data?.routing?.length && <div className="text-sm text-muted-foreground">No routing configuration found.</div>}
+              {!reportQuery.data?.routing?.length && (
+                <div className="text-sm text-muted-foreground">No routing configuration found.</div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -319,7 +411,8 @@ export default function PortfolioFxReportPage() {
           <CardHeader className="flex flex-col gap-1">
             <CardTitle>Per-park metrics</CardTitle>
             <CardDescription>
-              Occupancy and ADR stay local; amounts convert when FX toggle is on. As of {reportQuery.data?.asOf ? new Date(reportQuery.data.asOf).toLocaleString() : "—"}.
+              Occupancy and ADR stay local; amounts convert when FX toggle is on. As of{" "}
+              {reportQuery.data?.asOf ? new Date(reportQuery.data.asOf).toLocaleString() : "—"}.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -350,9 +443,15 @@ export default function PortfolioFxReportPage() {
                         <TableCell className="font-semibold">{m.name}</TableCell>
                         <TableCell>{m.region}</TableCell>
                         <TableCell>{formatPercent(m.occupancy)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayAdr, m.displayCurrency, locale)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayRevpar, m.displayCurrency, locale)}</TableCell>
-                        <TableCell>{formatCurrency(m.displayRevenue, m.displayCurrency, locale)}</TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayAdr, m.displayCurrency, locale)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayRevpar, m.displayCurrency, locale)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(m.displayRevenue, m.displayCurrency, locale)}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">{m.displayCurrency}</Badge>
@@ -383,7 +482,8 @@ export default function PortfolioFxReportPage() {
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <Badge variant="secondary">Beta</Badge>
           <span>
-            Cross-park FX uses the existing portfolio and localization endpoints. Toggle currencies to preview conversions per park.
+            Cross-park FX uses the existing portfolio and localization endpoints. Toggle currencies
+            to preview conversions per park.
           </span>
         </div>
       </div>

@@ -7,7 +7,10 @@ interface ProgressBarProps {
   steps?: string[];
 }
 
-export function ProgressBar({ progress, steps = ["Choose Tier", "Details", "Confirm"] }: ProgressBarProps) {
+export function ProgressBar({
+  progress,
+  steps = ["Choose Tier", "Details", "Confirm"],
+}: ProgressBarProps) {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -17,11 +20,7 @@ export function ProgressBar({ progress, steps = ["Choose Tier", "Details", "Conf
           className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-teal-500"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
-          transition={
-            prefersReducedMotion
-              ? { duration: 0 }
-              : { duration: 0.5, ease: "easeOut" }
-          }
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5, ease: "easeOut" }}
         />
       </div>
       <div className="flex justify-between mt-2 text-xs text-muted-foreground">
@@ -29,10 +28,7 @@ export function ProgressBar({ progress, steps = ["Choose Tier", "Details", "Conf
           const stepProgress = ((i + 1) / steps.length) * 100;
           const isActive = progress >= stepProgress - 10;
           return (
-            <span
-              key={step}
-              className={isActive ? "text-emerald-400" : "text-muted-foreground"}
-            >
+            <span key={step} className={isActive ? "text-emerald-400" : "text-muted-foreground"}>
               {step}
             </span>
           );

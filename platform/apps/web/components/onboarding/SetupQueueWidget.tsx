@@ -44,9 +44,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 function getAuthHeaders(): HeadersInit {
-  const token = typeof window !== "undefined"
-    ? localStorage.getItem("campreserv:authToken")
-    : null;
+  const token = typeof window !== "undefined" ? localStorage.getItem("campreserv:authToken") : null;
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -169,14 +167,18 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
   const queryClient = useQueryClient();
 
   // Fetch queue items
-  const { data: queueData, isLoading, isError } = useQuery({
+  const {
+    data: queueData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["setup-queue", campgroundId],
     queryFn: async () => {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE}/campgrounds/${campgroundId}/setup-queue/pending`,
         {
           headers: getAuthHeaders(),
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to fetch queue");
       const data = await response.json();
@@ -195,7 +197,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
         {
           method: "POST",
           headers: getAuthHeaders(),
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to complete feature");
       return response.json();
@@ -213,7 +215,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
         {
           method: "POST",
           headers: getAuthHeaders(),
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to skip feature");
       return response.json();
@@ -236,19 +238,21 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
     <motion.div
       className={cn(
         "rounded-2xl border backdrop-blur-sm transition-colors overflow-hidden",
-        "bg-status-success-bg border-status-success-border"
+        "bg-status-success-bg border-status-success-border",
       )}
       initial={prefersReducedMotion ? undefined : { opacity: 0, y: 20 }}
       animate={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
       exit={prefersReducedMotion ? undefined : { opacity: 0, y: -10 }}
-      transition={prefersReducedMotion ? undefined : { type: "spring", stiffness: 300, damping: 25 }}
+      transition={
+        prefersReducedMotion ? undefined : { type: "spring", stiffness: 300, damping: 25 }
+      }
     >
       {/* Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
           "w-full flex items-center justify-between p-4",
-          "hover:bg-status-success-bg/70 transition-colors"
+          "hover:bg-status-success-bg/70 transition-colors",
         )}
       >
         <div className="flex items-center gap-3">
@@ -305,7 +309,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl",
                       "bg-card/70",
-                      "border border-status-success-border"
+                      "border border-status-success-border",
                     )}
                   >
                     <div className="w-8 h-8 rounded-lg bg-status-success/10 flex items-center justify-center flex-shrink-0">
@@ -351,7 +355,7 @@ export function SetupQueueWidget({ campgroundId }: SetupQueueWidgetProps) {
                   className={cn(
                     "flex items-center justify-center gap-2 p-2.5 rounded-xl text-sm font-medium",
                     "text-action-primary",
-                    "hover:bg-action-primary/10 transition-colors"
+                    "hover:bg-action-primary/10 transition-colors",
                   )}
                 >
                   View all {queueData.length} features

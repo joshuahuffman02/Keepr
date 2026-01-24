@@ -12,7 +12,8 @@ const pillars = [
     image: "/images/icons/trust-security.png",
     fallbackIcon: Shield,
     title: "Book with Peace of Mind",
-    description: "Your payment and personal details are protected with the same security used by banks. Focus on the fun, we'll handle the rest.",
+    description:
+      "Your payment and personal details are protected with the same security used by banks. Focus on the fun, we'll handle the rest.",
     guarantee: "Safe & Secure",
     color: "text-keepr-evergreen",
     bgColor: "bg-keepr-evergreen/10",
@@ -21,7 +22,8 @@ const pillars = [
     image: "/images/icons/best-price.png",
     fallbackIcon: Sparkles,
     title: "Prices You Can Count On",
-    description: "What you see is what you pay. No surprise fees at checkout, no hidden costs. Just honest, transparent pricing.",
+    description:
+      "What you see is what you pay. No surprise fees at checkout, no hidden costs. Just honest, transparent pricing.",
     guarantee: "No Hidden Fees",
     color: "text-amber-600",
     bgColor: "bg-amber-50",
@@ -30,7 +32,8 @@ const pillars = [
     image: "/images/icons/support.png",
     fallbackIcon: Heart,
     title: "Real People, Real Care",
-    description: "Questions? Concerns? Our friendly team of camping enthusiasts is here to help you every step of the way.",
+    description:
+      "Questions? Concerns? Our friendly team of camping enthusiasts is here to help you every step of the way.",
     guarantee: "We're Here for You",
     color: "text-rose-500",
     bgColor: "bg-rose-50",
@@ -69,7 +72,7 @@ export function ValueStack({ className }: ValueStackProps) {
       ref={ref}
       className={cn(
         "py-16 md:py-20 bg-gradient-to-br from-rose-50/40 via-amber-50/30 to-white",
-        className
+        className,
       )}
     >
       <div className="max-w-7xl mx-auto px-6">
@@ -88,8 +91,8 @@ export function ValueStack({ className }: ValueStackProps) {
             Why Families Choose Keepr
           </h2>
           <p className="text-slate-600 max-w-2xl mx-auto text-lg">
-            Creating memories shouldn't come with stress. Here's how we make
-            your camping experience easy, safe, and joyful.
+            Creating memories shouldn't come with stress. Here's how we make your camping experience
+            easy, safe, and joyful.
           </p>
         </motion.div>
 
@@ -109,7 +112,12 @@ export function ValueStack({ className }: ValueStackProps) {
                 className="bg-white rounded-2xl p-6 md:p-8 shadow-lg shadow-slate-900/5 hover:shadow-xl hover:shadow-slate-900/10 transition-all duration-300 hover:-translate-y-1 border border-slate-100"
               >
                 {/* Icon */}
-                <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-6", pillar.bgColor)}>
+                <div
+                  className={cn(
+                    "w-14 h-14 rounded-xl flex items-center justify-center mb-6",
+                    pillar.bgColor,
+                  )}
+                >
                   <div className="relative w-8 h-8">
                     <Image
                       src={pillar.image}
@@ -123,7 +131,10 @@ export function ValueStack({ className }: ValueStackProps) {
                       }}
                     />
                   </div>
-                  <FallbackIcon className={cn("w-7 h-7 absolute", pillar.color)} style={{ display: "none" }} />
+                  <FallbackIcon
+                    className={cn("w-7 h-7 absolute", pillar.color)}
+                    style={{ display: "none" }}
+                  />
                 </div>
 
                 {/* Content */}
@@ -131,11 +142,13 @@ export function ValueStack({ className }: ValueStackProps) {
                 <p className="text-slate-600 mb-5 leading-relaxed">{pillar.description}</p>
 
                 {/* Guarantee badge */}
-                <div className={cn(
-                  "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
-                  pillar.bgColor,
-                  pillar.color
-                )}>
+                <div
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
+                    pillar.bgColor,
+                    pillar.color,
+                  )}
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   <span>{pillar.guarantee}</span>
                 </div>

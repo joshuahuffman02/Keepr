@@ -8,6 +8,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PrismaModule, PermissionsModule],
   controllers: [LedgerController],
   providers: [LedgerService],
-  exports: [LedgerService]
+  exports: [LedgerService],
 })
 export class LedgerModule {}

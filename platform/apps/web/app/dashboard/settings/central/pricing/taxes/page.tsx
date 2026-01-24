@@ -18,15 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Plus,
-  Percent,
-  Info,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Loader2,
-} from "lucide-react";
+import { Plus, Percent, Info, MoreHorizontal, Pencil, Trash2, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,10 +51,13 @@ async function fetchTaxRules(campgroundId: string): Promise<TaxRule[]> {
 }
 
 async function deleteTaxRule(taxRuleId: string, campgroundId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/tax-rules/${taxRuleId}?campgroundId=${encodeURIComponent(campgroundId)}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
+  const response = await fetch(
+    `${API_BASE}/tax-rules/${taxRuleId}?campgroundId=${encodeURIComponent(campgroundId)}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    },
+  );
   if (!response.ok) {
     throw new Error("Failed to delete tax rule");
   }
@@ -128,8 +123,8 @@ export default function TaxRulesPage() {
       <Alert className="bg-amber-50 border-amber-200">
         <Info className="h-4 w-4 text-amber-500" />
         <AlertDescription className="text-amber-800">
-          Tax rules are automatically applied to invoices based on the charge type.
-          Consult with your accountant to ensure compliance with local tax regulations.
+          Tax rules are automatically applied to invoices based on the charge type. Consult with
+          your accountant to ensure compliance with local tax regulations.
         </AlertDescription>
       </Alert>
 
@@ -158,9 +153,7 @@ export default function TaxRulesPage() {
                 <Percent className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {totalStoreTax.toFixed(1)}%
-                </p>
+                <p className="text-2xl font-bold text-foreground">{totalStoreTax.toFixed(1)}%</p>
                 <p className="text-sm text-muted-foreground">Total Store Tax</p>
               </div>
             </div>
@@ -170,9 +163,7 @@ export default function TaxRulesPage() {
 
       {/* Tax Rules List */}
       <div className="space-y-3">
-        <h3 className="text-sm font-medium text-foreground">
-          Tax Rules ({taxRules.length})
-        </h3>
+        <h3 className="text-sm font-medium text-foreground">Tax Rules ({taxRules.length})</h3>
 
         {taxRules.length === 0 ? (
           <Card className="border-dashed">
@@ -192,88 +183,83 @@ export default function TaxRulesPage() {
           </Card>
         ) : (
           taxRules.map((rule) => (
-          <Card
-            key={rule.id}
-            className={cn(
-              "transition-all hover:shadow-md group",
-              !rule.isActive && "opacity-60"
-            )}
-          >
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <Percent className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-foreground">{rule.name}</p>
-                      {!rule.isActive && (
-                        <Badge variant="secondary" className="text-xs">
-                          Inactive
-                        </Badge>
-                      )}
+            <Card
+              key={rule.id}
+              className={cn("transition-all hover:shadow-md group", !rule.isActive && "opacity-60")}
+            >
+              <CardContent className="py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-muted">
+                      <Percent className="h-5 w-5 text-muted-foreground" />
                     </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      {rule.appliesToAccommodation && (
-                        <Badge variant="outline" className="text-xs">
-                          Accommodation
-                        </Badge>
-                      )}
-                      {rule.appliesToStore && (
-                        <Badge variant="outline" className="text-xs">
-                          Store
-                        </Badge>
-                      )}
-                      {rule.appliesToServices && (
-                        <Badge variant="outline" className="text-xs">
-                          Services
-                        </Badge>
-                      )}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-foreground">{rule.name}</p>
+                        {!rule.isActive && (
+                          <Badge variant="secondary" className="text-xs">
+                            Inactive
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        {rule.appliesToAccommodation && (
+                          <Badge variant="outline" className="text-xs">
+                            Accommodation
+                          </Badge>
+                        )}
+                        {rule.appliesToStore && (
+                          <Badge variant="outline" className="text-xs">
+                            Store
+                          </Badge>
+                        )}
+                        {rule.appliesToServices && (
+                          <Badge variant="outline" className="text-xs">
+                            Services
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-semibold text-foreground">
-                    {rule.rate}%
-                  </span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-lg font-semibold text-foreground">{rule.rate}%</span>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="More options"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Pencil className="h-4 w-4 mr-2" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        {rule.isActive ? "Deactivate" : "Activate"}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={() => deleteMutation.mutate(rule.id)}
-                        disabled={deleteMutation.isPending}
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="More options"
+                          className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                          <Pencil className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          {rule.isActive ? "Deactivate" : "Activate"}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => deleteMutation.mutate(rule.id)}
+                          disabled={deleteMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))
+              </CardContent>
+            </Card>
+          ))
         )}
       </div>
 
@@ -282,9 +268,7 @@ export default function TaxRulesPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add Tax Rule</DialogTitle>
-            <DialogDescription>
-              Configure a new tax rate and where it applies
-            </DialogDescription>
+            <DialogDescription>Configure a new tax rate and where it applies</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -331,9 +315,7 @@ export default function TaxRulesPage() {
             <Button variant="outline" onClick={() => setIsEditorOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={() => setIsEditorOpen(false)}>
-              Add Tax Rule
-            </Button>
+            <Button onClick={() => setIsEditorOpen(false)}>Add Tax Rule</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

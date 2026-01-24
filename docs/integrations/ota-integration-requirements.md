@@ -10,30 +10,30 @@ Online Travel Agencies (OTAs) represent a significant distribution channel for c
 
 ### Tier 1: High Priority
 
-| Platform | Type | Market Share | Integration Method |
-|----------|------|--------------|-------------------|
-| **RoverPass** | Campground OTA | Growing | API (REST) |
-| **Hipcamp** | Alternative camping | Significant | API + iCal |
-| **Campspot Marketplace** | Campground OTA | Large | Proprietary |
-| **Harvest Hosts** | Membership | Niche | Manual/API |
+| Platform                 | Type                | Market Share | Integration Method |
+| ------------------------ | ------------------- | ------------ | ------------------ |
+| **RoverPass**            | Campground OTA      | Growing      | API (REST)         |
+| **Hipcamp**              | Alternative camping | Significant  | API + iCal         |
+| **Campspot Marketplace** | Campground OTA      | Large        | Proprietary        |
+| **Harvest Hosts**        | Membership          | Niche        | Manual/API         |
 
 ### Tier 2: Medium Priority
 
-| Platform | Type | Market Share | Integration Method |
-|----------|------|--------------|-------------------|
-| **Booking.com** | General OTA | Huge (exploring camping) | Channel Manager |
-| **Airbnb** | Short-term rental | Large (glamping) | API |
-| **Google Things to Do** | Discovery | Growing | Feed |
-| **Tripadvisor** | Reviews + Booking | Medium | API |
+| Platform                | Type              | Market Share             | Integration Method |
+| ----------------------- | ----------------- | ------------------------ | ------------------ |
+| **Booking.com**         | General OTA       | Huge (exploring camping) | Channel Manager    |
+| **Airbnb**              | Short-term rental | Large (glamping)         | API                |
+| **Google Things to Do** | Discovery         | Growing                  | Feed               |
+| **Tripadvisor**         | Reviews + Booking | Medium                   | API                |
 
 ### Tier 3: Future Consideration
 
-| Platform | Type | Notes |
-|----------|------|-------|
-| **Expedia** | General OTA | Exploring outdoor |
-| **VRBO** | Vacation rental | Cabin/glamping focus |
+| Platform      | Type                | Notes                 |
+| ------------- | ------------------- | --------------------- |
+| **Expedia**   | General OTA         | Exploring outdoor     |
+| **VRBO**      | Vacation rental     | Cabin/glamping focus  |
 | **Outdoorsy** | RV rental + camping | Partnership potential |
-| **The Dyrt** | Discovery + booking | Growing platform |
+| **The Dyrt**  | Discovery + booking | Growing platform      |
 
 ---
 
@@ -44,17 +44,20 @@ Online Travel Agencies (OTAs) represent a significant distribution channel for c
 #### 1. Availability Sync (Required for all)
 
 **Outbound (Push to OTA):**
+
 - Real-time availability updates
 - Support for date ranges
 - Site-type level granularity
 - Rate updates
 
 **Inbound (Receive from OTA):**
+
 - Booking notifications
 - Modification requests
 - Cancellation notifications
 
 **Sync Methods:**
+
 - REST API (preferred)
 - Webhook notifications
 - iCal feed (basic)
@@ -63,6 +66,7 @@ Online Travel Agencies (OTAs) represent a significant distribution channel for c
 #### 2. Rate Management
 
 **Required Capabilities:**
+
 - Base rate sync
 - Date-specific rates
 - Minimum stay requirements
@@ -70,6 +74,7 @@ Online Travel Agencies (OTAs) represent a significant distribution channel for c
 - Rate plans/packages
 
 **Nice-to-Have:**
+
 - Dynamic rate rules
 - Last-minute discounts
 - Length-of-stay pricing
@@ -105,7 +110,7 @@ interface OTABooking {
   commission?: number;
 
   // Status
-  status: 'pending' | 'confirmed' | 'cancelled' | 'modified';
+  status: "pending" | "confirmed" | "cancelled" | "modified";
 
   // Metadata
   guestNotes?: string;
@@ -116,6 +121,7 @@ interface OTABooking {
 #### 4. Content Sync
 
 **Property Information:**
+
 - Name and description
 - Location (coordinates, address)
 - Amenities list
@@ -123,6 +129,7 @@ interface OTABooking {
 - Photos
 
 **Site/Unit Information:**
+
 - Site types/categories
 - Capacity limits
 - Amenities per site type
@@ -137,6 +144,7 @@ interface OTABooking {
 **API Documentation:** Partner API access required
 
 **Endpoints Needed:**
+
 - Property listing management
 - Availability calendar
 - Rate management
@@ -144,11 +152,13 @@ interface OTABooking {
 - Booking confirmation
 
 **Data Requirements:**
+
 - Property ID mapping
 - Site type mapping to RoverPass categories
 - Commission structure (typically 15-20%)
 
 **Technical Notes:**
+
 - REST API
 - OAuth 2.0 authentication
 - Webhook for booking notifications
@@ -161,6 +171,7 @@ interface OTABooking {
 **API Documentation:** Request partnership access
 
 **Integration Options:**
+
 1. **iCal Sync** (Basic)
    - One-way availability block
    - Manual booking entry required
@@ -174,6 +185,7 @@ interface OTABooking {
 **Commission:** 10-15% typically
 
 **Unique Requirements:**
+
 - Eco-friendly focus in listings
 - Host verification process
 - Photo quality standards
@@ -183,10 +195,12 @@ interface OTABooking {
 ### Booking.com Integration
 
 **Channel Manager Required:**
+
 - Direct API access restricted to channel managers
 - Consider: Cloudbeds, SiteMinder, or similar
 
 **Data Requirements:**
+
 - Property registration
 - Rate plans
 - Room types (mapped to site classes)
@@ -195,6 +209,7 @@ interface OTABooking {
 **Commission:** 15-18% typically
 
 **Certification Process:**
+
 - Technical integration test
 - Content review
 - Booking flow testing
@@ -208,6 +223,7 @@ interface OTABooking {
 **API Access:** Apply for Professional Hosting API
 
 **Integration Components:**
+
 - Listings management
 - Calendar sync
 - Pricing sync
@@ -217,6 +233,7 @@ interface OTABooking {
 **Commission:** 3% host fee + guest fee
 
 **Requirements:**
+
 - High-quality photos
 - Response time requirements
 - Cancellation policy compliance
@@ -228,6 +245,7 @@ interface OTABooking {
 **Integration Method:** Structured data feed
 
 **Feed Format:**
+
 ```json
 {
   "@context": "https://schema.org",
@@ -242,6 +260,7 @@ interface OTABooking {
 ```
 
 **Requirements:**
+
 - Schema.org structured data
 - Google Business Profile
 - Review integration
@@ -254,12 +273,14 @@ interface OTABooking {
 ### Why Channel Manager?
 
 Direct integration with each OTA requires:
+
 - Individual API implementations
 - Separate rate management
 - Multiple booking reconciliation
 - Per-platform maintenance
 
 Channel manager provides:
+
 - Single integration point
 - Unified rate/availability management
 - Aggregated booking inbox
@@ -268,11 +289,13 @@ Channel manager provides:
 ### Recommended Approach
 
 **Phase 1: Direct Integration**
+
 - RoverPass (campground-specific)
 - Hipcamp (alternative camping)
 - Google structured data
 
 **Phase 2: Channel Manager**
+
 - Evaluate SiteMinder, Cloudbeds, or STAAH
 - Add Booking.com, Airbnb through channel manager
 - Unified dashboard for all channels
@@ -420,18 +443,16 @@ class OTASyncService {
   async pushAvailabilityChange(
     campgroundId: string,
     siteClassId: string,
-    dates: Date[]
+    dates: Date[],
   ): Promise<void>;
 
   // Booking import
-  async importOTABooking(
-    otaBooking: OTABooking
-  ): Promise<Reservation>;
+  async importOTABooking(otaBooking: OTABooking): Promise<Reservation>;
 
   // Conflict resolution
   async resolveDoubleBooking(
     otaBooking: OTABooking,
-    existingReservation: Reservation
+    existingReservation: Reservation,
   ): Promise<ConflictResolution>;
 }
 ```
@@ -481,6 +502,7 @@ class OTASyncService {
 ### Commission Handling
 
 **Options:**
+
 1. **Pass-through** - Show commission separately, guest pays
 2. **Absorbed** - Park absorbs commission as marketing cost
 3. **Markup** - OTA rate higher to cover commission
@@ -490,6 +512,7 @@ class OTASyncService {
 ### Rate Parity
 
 Many OTAs require rate parity (same price on all channels):
+
 - Monitor for violations
 - Consider OTA-specific rate adjustments
 - Document any rate differences
@@ -497,6 +520,7 @@ Many OTAs require rate parity (same price on all channels):
 ### Inventory Allocation
 
 **Strategies:**
+
 1. **Full sync** - All inventory on all channels (overbooking risk)
 2. **Allocated** - X sites per channel (underutilization risk)
 3. **Dynamic** - Adjust based on demand (complex)
@@ -506,6 +530,7 @@ Many OTAs require rate parity (same price on all channels):
 ### Cancellation Policies
 
 OTA policies may differ from direct booking:
+
 - Map OTA cancellation rules
 - Handle refunds per channel
 - Track cancellation patterns by channel
@@ -514,14 +539,14 @@ OTA policies may differ from direct booking:
 
 ## Success Metrics
 
-| Metric | Target | Tracking |
-|--------|--------|----------|
-| OTA booking volume | 20% of total | Database |
-| Sync reliability | 99.5% uptime | Monitoring |
-| Booking import time | <5 minutes | Logs |
-| Double booking rate | <0.1% | Alerts |
-| Revenue from OTA | Track | Reports |
-| Commission cost | Track | Reports |
+| Metric              | Target       | Tracking   |
+| ------------------- | ------------ | ---------- |
+| OTA booking volume  | 20% of total | Database   |
+| Sync reliability    | 99.5% uptime | Monitoring |
+| Booking import time | <5 minutes   | Logs       |
+| Double booking rate | <0.1%        | Alerts     |
+| Revenue from OTA    | Track        | Reports    |
+| Commission cost     | Track        | Reports    |
 
 ---
 

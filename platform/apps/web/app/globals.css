@@ -17,39 +17,39 @@
     ============================================ */
 
     /* Keepr Brand Colors (HSL) */
-    --keepr-evergreen: 187 71% 19%;        /* #0E4A52 */
-    --keepr-evergreen-light: 186 66% 23%;  /* #145B63 */
-    --keepr-evergreen-dark: 187 76% 13%;   /* #08353B */
-    --keepr-charcoal: 222 47% 11%;         /* #0F172A */
-    --keepr-charcoal-muted: 209 15% 42%;   /* #5B6B7A */
-    --keepr-charcoal-light: 209 13% 60%;   /* #8C9AA7 */
-    --keepr-clay: 9 60% 50%;               /* #CC4A34 */
-    --keepr-clay-light: 9 66% 65%;         /* #E07C6A */
-    --keepr-clay-subtle: 13 75% 94%;       /* #FBE8E3 */
-    --keepr-off-white: 197 54% 97%;        /* #F5FAFC */
-    --keepr-white: 0 0% 100%;              /* Pure white for cards */
+    --keepr-evergreen: 187 71% 19%; /* #0E4A52 */
+    --keepr-evergreen-light: 186 66% 23%; /* #145B63 */
+    --keepr-evergreen-dark: 187 76% 13%; /* #08353B */
+    --keepr-charcoal: 222 47% 11%; /* #0F172A */
+    --keepr-charcoal-muted: 209 15% 42%; /* #5B6B7A */
+    --keepr-charcoal-light: 209 13% 60%; /* #8C9AA7 */
+    --keepr-clay: 9 60% 50%; /* #CC4A34 */
+    --keepr-clay-light: 9 66% 65%; /* #E07C6A */
+    --keepr-clay-subtle: 13 75% 94%; /* #FBE8E3 */
+    --keepr-off-white: 197 54% 97%; /* #F5FAFC */
+    --keepr-white: 0 0% 100%; /* Pure white for cards */
 
     /* Base UI tokens - mapped to Keepr palette */
-    --background: 197 54% 97%;             /* Glacier */
-    --foreground: 222 47% 11%;             /* Charcoal */
-    --card: 0 0% 100%;                     /* White */
-    --card-foreground: 222 47% 11%;        /* Charcoal */
+    --background: 197 54% 97%; /* Glacier */
+    --foreground: 222 47% 11%; /* Charcoal */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 222 47% 11%; /* Charcoal */
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
-    --primary: 187 71% 19%;                /* Evergreen */
+    --primary: 187 71% 19%; /* Evergreen */
     --primary-foreground: 0 0% 100%;
-    --secondary: 202 33% 94%;              /* Cool light gray */
-    --secondary-foreground: 187 71% 19%;   /* Evergreen */
+    --secondary: 202 33% 94%; /* Cool light gray */
+    --secondary-foreground: 187 71% 19%; /* Evergreen */
     --muted: 202 33% 94%;
-    --muted-foreground: 209 15% 42%;       /* Charcoal muted */
-    --accent: 9 60% 50%;                   /* Clay */
+    --muted-foreground: 209 15% 42%; /* Charcoal muted */
+    --accent: 9 60% 50%; /* Clay */
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;              /* Red for errors */
+    --destructive: 0 72% 51%; /* Red for errors */
     --destructive-foreground: 0 0% 100%;
-    --border: 201 27% 88%;                 /* Cool gray border */
+    --border: 201 27% 88%; /* Cool gray border */
     --input: 201 27% 88%;
-    --ring: 9 60% 50%;                     /* Clay for focus rings */
-    --radius: 0.5rem;                      /* 8px for controls */
+    --ring: 9 60% 50%; /* Clay for focus rings */
+    --radius: 0.5rem; /* 8px for controls */
 
     /* Typography */
     --font-body: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -63,50 +63,50 @@
     ============================================ */
 
     /* Action tokens - using Evergreen for primary actions */
-    --action-primary: 187 71% 19%;         /* Evergreen */
+    --action-primary: 187 71% 19%; /* Evergreen */
     --action-primary-foreground: 0 0% 100%;
-    --action-primary-hover: 186 66% 23%;   /* Evergreen light */
-    --action-secondary: 202 33% 94%;       /* Cool light */
+    --action-primary-hover: 186 66% 23%; /* Evergreen light */
+    --action-secondary: 202 33% 94%; /* Cool light */
     --action-secondary-foreground: 222 47% 11%; /* Charcoal */
     --action-secondary-hover: 202 28% 90%; /* Slightly darker */
 
     /* Status tokens - warm, muted tones for calm feedback */
-    --status-success: 152 56% 40%;         /* Warm green */
+    --status-success: 152 56% 40%; /* Warm green */
     --status-success-foreground: 0 0% 100%;
     --status-success-bg: 152 40% 95%;
     --status-success-border: 152 40% 80%;
     --status-success-text: 152 56% 30%;
 
-    --status-warning: 38 92% 50%;          /* Amber */
+    --status-warning: 38 92% 50%; /* Amber */
     --status-warning-foreground: 21 55% 11%;
     --status-warning-bg: 48 100% 96%;
     --status-warning-border: 48 96% 76%;
     --status-warning-text: 26 90% 37%;
 
-    --status-error: 0 72% 51%;             /* Red */
+    --status-error: 0 72% 51%; /* Red */
     --status-error-foreground: 0 0% 100%;
     --status-error-bg: 0 86% 97%;
     --status-error-border: 0 72% 91%;
     --status-error-text: 0 72% 43%;
 
-    --status-info: 187 71% 19%;            /* Evergreen for info */
+    --status-info: 187 71% 19%; /* Evergreen for info */
     --status-info-foreground: 0 0% 100%;
     --status-info-bg: 187 40% 95%;
     --status-info-border: 187 40% 85%;
     --status-info-text: 187 71% 19%;
 
     /* Data visualization tokens - warm palette */
-    --chart-1: 187 71% 19%;                /* Evergreen */
-    --chart-2: 9 60% 50%;                  /* Clay */
-    --chart-3: 38 92% 50%;                 /* Amber */
-    --chart-4: 0 72% 51%;                  /* Red */
-    --chart-5: 262 83% 58%;                /* Violet */
-    --chart-6: 192 91% 36%;                /* Cyan */
-    --chart-7: 24 94% 50%;                 /* Orange */
-    --chart-8: 340 82% 52%;                /* Rose */
-    --heatmap-low: 202 33% 94%;            /* Cool light */
-    --heatmap-mid: 187 40% 85%;            /* Light evergreen */
-    --heatmap-high: 187 71% 19%;           /* Evergreen */
+    --chart-1: 187 71% 19%; /* Evergreen */
+    --chart-2: 9 60% 50%; /* Clay */
+    --chart-3: 38 92% 50%; /* Amber */
+    --chart-4: 0 72% 51%; /* Red */
+    --chart-5: 262 83% 58%; /* Violet */
+    --chart-6: 192 91% 36%; /* Cyan */
+    --chart-7: 24 94% 50%; /* Orange */
+    --chart-8: 340 82% 52%; /* Rose */
+    --heatmap-low: 202 33% 94%; /* Cool light */
+    --heatmap-mid: 187 40% 85%; /* Light evergreen */
+    --heatmap-high: 187 71% 19%; /* Evergreen */
   }
 
   .dark {
@@ -253,8 +253,9 @@
   }
 
   .hover-glow:hover {
-    box-shadow: 0 10px 15px -3px rgba(196, 122, 99, 0.1),
-                0 4px 6px -4px rgba(196, 122, 99, 0.1);
+    box-shadow:
+      0 10px 15px -3px rgba(196, 122, 99, 0.1),
+      0 4px 6px -4px rgba(196, 122, 99, 0.1);
   }
 
   /* Gradient backgrounds - Keepr Evergreen */
@@ -274,9 +275,11 @@
   }
 
   .gradient-overlay:hover::before {
-    background: linear-gradient(to bottom right,
+    background: linear-gradient(
+      to bottom right,
       hsla(160, 33%, 18%, 0.03),
-      hsla(14, 46%, 58%, 0.02));
+      hsla(14, 46%, 58%, 0.02)
+    );
   }
 
   /* Hide scrollbar while maintaining scroll functionality */

@@ -52,7 +52,7 @@ export interface WebhookStats {
 }
 
 const getCount = (count: { id?: number } | true | undefined): number =>
-  typeof count === "object" && count !== null ? count.id ?? 0 : 0;
+  typeof count === "object" && count !== null ? (count.id ?? 0) : 0;
 
 /**
  * Webhook Logs Service
@@ -153,10 +153,7 @@ export class WebhookLogsService {
   /**
    * Get a single delivery log entry by ID
    */
-  async getLogEntry(
-    deliveryId: string,
-    campgroundId: string
-  ): Promise<WebhookLogEntry | null> {
+  async getLogEntry(deliveryId: string, campgroundId: string): Promise<WebhookLogEntry | null> {
     const entry = await this.prisma.webhookDelivery.findFirst({
       where: {
         id: deliveryId,
@@ -200,29 +197,28 @@ export class WebhookLogsService {
       createdAt: { gte: startDate },
     };
 
-    const [total, delivered, failed, retrying, deadLetter, pending, avgResult] =
-      await Promise.all([
-        this.prisma.webhookDelivery.count({ where: whereClause }),
-        this.prisma.webhookDelivery.count({
-          where: { ...whereClause, status: "delivered" },
-        }),
-        this.prisma.webhookDelivery.count({
-          where: { ...whereClause, status: "failed" },
-        }),
-        this.prisma.webhookDelivery.count({
-          where: { ...whereClause, status: "retrying" },
-        }),
-        this.prisma.webhookDelivery.count({
-          where: { ...whereClause, status: "dead_letter" },
-        }),
-        this.prisma.webhookDelivery.count({
-          where: { ...whereClause, status: "pending" },
-        }),
-        this.prisma.webhookDelivery.aggregate({
-          where: { ...whereClause, status: "delivered" },
-          _avg: { attempt: true },
-        }),
-      ]);
+    const [total, delivered, failed, retrying, deadLetter, pending, avgResult] = await Promise.all([
+      this.prisma.webhookDelivery.count({ where: whereClause }),
+      this.prisma.webhookDelivery.count({
+        where: { ...whereClause, status: "delivered" },
+      }),
+      this.prisma.webhookDelivery.count({
+        where: { ...whereClause, status: "failed" },
+      }),
+      this.prisma.webhookDelivery.count({
+        where: { ...whereClause, status: "retrying" },
+      }),
+      this.prisma.webhookDelivery.count({
+        where: { ...whereClause, status: "dead_letter" },
+      }),
+      this.prisma.webhookDelivery.count({
+        where: { ...whereClause, status: "pending" },
+      }),
+      this.prisma.webhookDelivery.aggregate({
+        where: { ...whereClause, status: "delivered" },
+        _avg: { attempt: true },
+      }),
+    ]);
 
     const successRate = total > 0 ? Math.round((delivered / total) * 100) : 100;
     const averageAttempts = avgResult._avg.attempt || 1;
@@ -244,7 +240,7 @@ export class WebhookLogsService {
    */
   async getStatsByEventType(
     campgroundId: string,
-    days = 30
+    days = 30,
   ): Promise<Array<{ eventType: string; total: number; delivered: number; failed: number }>> {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
@@ -259,10 +255,7 @@ export class WebhookLogsService {
     });
 
     // Aggregate by event type
-    const eventMap = new Map<
-      string,
-      { total: number; delivered: number; failed: number }
-    >();
+    const eventMap = new Map<string, { total: number; delivered: number; failed: number }>();
 
     for (const d of deliveries) {
       const existing = eventMap.get(d.eventType) || {
@@ -290,7 +283,7 @@ export class WebhookLogsService {
    */
   async getStatsByEndpoint(
     campgroundId: string,
-    days = 30
+    days = 30,
   ): Promise<
     Array<{
       endpointId: string;
@@ -342,7 +335,7 @@ export class WebhookLogsService {
           failed,
           successRate: total > 0 ? Math.round((delivered / total) * 100) : 100,
         };
-      })
+      }),
     );
 
     return stats.sort((a, b) => b.total - a.total);
@@ -367,9 +360,7 @@ export class WebhookLogsService {
       },
     });
 
-    this.logger.log(
-      `Purged ${result.count} webhook delivery logs older than ${days} days`
-    );
+    this.logger.log(`Purged ${result.count} webhook delivery logs older than ${days} days`);
 
     return { deleted: result.count };
   }
@@ -379,7 +370,7 @@ export class WebhookLogsService {
    */
   async getRecentFailures(
     campgroundId: string,
-    minutes = 60
+    minutes = 60,
   ): Promise<Array<{ endpointId: string; url: string; failureCount: number }>> {
     const startTime = new Date();
     startTime.setMinutes(startTime.getMinutes() - minutes);

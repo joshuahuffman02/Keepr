@@ -1,22 +1,22 @@
 # Audit & Roadmap Checklist
 
 - [x] Granular Research
-    - [x] Audit "Marketing & Growth" modules (abandoned-cart, campaigns, gamification, referrals)
-    - [x] Audit "Guest Experience" modules (loyalty, memberships, reviews, nps, waivers, signatures)
-    - [x] Audit "Financial & Enterprise" modules (gift-cards, stored-value, org-billing, portfolio, data-import)
-    - [x] Audit "Operations & Compliance" modules (incidents, compliance, privacy, workflows, anomalies)
-    - [x] Audit "Integrations & IoT" modules (ota, iot, developer-api, integrations)
+  - [x] Audit "Marketing & Growth" modules (abandoned-cart, campaigns, gamification, referrals)
+  - [x] Audit "Guest Experience" modules (loyalty, memberships, reviews, nps, waivers, signatures)
+  - [x] Audit "Financial & Enterprise" modules (gift-cards, stored-value, org-billing, portfolio, data-import)
+  - [x] Audit "Operations & Compliance" modules (incidents, compliance, privacy, workflows, anomalies)
+  - [x] Audit "Integrations & IoT" modules (ota, iot, developer-api, integrations)
 - [x] Expand Audit Report
-    - [x] Categorize features into specialized blocks
-    - [x] Add specific grades for sub-features
-    - [x] Update summary and recommendations
+  - [x] Categorize features into specialized blocks
+  - [x] Add specific grades for sub-features
+  - [x] Update summary and recommendations
 - [x] Define Roadmap to A+
-    - [x] Analyze upgrade paths for "B" and "A-" level features
-    - [x] Synthesize technical and operational requirements for A+ status
+  - [x] Analyze upgrade paths for "B" and "A-" level features
+  - [x] Synthesize technical and operational requirements for A+ status
 - [x] UI/UX Audit
-    - [x] Research User Flows (Guest & Staff)
-    - [x] Conduct Visual Audit (Branding, Consistency)
-    - [x] Evaluate Mobile Responsiveness
-    - [x] Draft UI/UX Audit Report
+  - [x] Research User Flows (Guest & Staff)
+  - [x] Conduct Visual Audit (Branding, Consistency)
+  - [x] Evaluate Mobile Responsiveness
+  - [x] Draft UI/UX Audit Report
 - [x] Incorporate Known Issues
-    - [x] Mark Map component as "Broken" in all documents
+  - [x] Mark Map component as "Broken" in all documents

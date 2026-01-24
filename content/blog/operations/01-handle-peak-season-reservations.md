@@ -85,6 +85,7 @@ Everyone on your team should follow the same booking procedures:
 - **Require deposits** to lock in reservations and reduce no-shows
 
 Create a simple checklist for staff to follow with every booking:
+
 1. Check availability in the system
 2. Collect guest information and payment
 3. Confirm the booking in the system
@@ -106,6 +107,7 @@ This technology catches human error before it becomes a guest problem.
 If you list your campground on sites like Hipcamp, Recreation.gov, or other OTAs, ensure they're fully synced with your primary system. Delays in synchronization are one of the most common causes of overbooking.
 
 **Important considerations:**
+
 - Use a system with native OTA integrations
 - Set sync intervals to the fastest available (ideally instant)
 - Regularly audit your listings for accuracy
@@ -138,7 +140,7 @@ Despite your best efforts, mistakes can still occur—especially if you're trans
 
 Believe it or not, how you handle an overbooking situation can actually create loyal customers:
 
-> *"They made a mistake with our reservation, but the owner personally called us, found us a better site at their sister property, refunded our deposit, and gave us 50% off our next visit. Mistakes happen, but their response was incredible."* — Example of turning a negative into a positive
+> _"They made a mistake with our reservation, but the owner personally called us, found us a better site at their sister property, refunded our deposit, and gave us 50% off our next visit. Mistakes happen, but their response was incredible."_ — Example of turning a negative into a positive
 
 ---
 
@@ -190,4 +192,4 @@ Ready to handle peak season with confidence? [LINK: technology/01-paper-to-digit
 
 ---
 
-*Keepr helps campground owners streamline their reservations with real-time availability, automated conflict prevention, and centralized booking management. [Learn more at campreserv.com](https://campreserv.com)*
+_Keepr helps campground owners streamline their reservations with real-time availability, automated conflict prevention, and centralized booking management. [Learn more at campreserv.com](https://campreserv.com)_

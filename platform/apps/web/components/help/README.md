@@ -24,15 +24,18 @@ import { HelpTooltip, PageOnboardingHint } from "@/components/help";
 ## Components
 
 ### HelpTooltip
+
 Small "?" icon that shows contextual help on hover/click.
 
 **Features:**
+
 - Desktop hover + mobile tap
 - Rich content support
 - Customizable positioning
 - Keyboard accessible
 
 **Example:**
+
 ```tsx
 <div className="flex items-center gap-2">
   <label>Occupancy Rate</label>
@@ -41,9 +44,7 @@ Small "?" icon that shows contextual help on hover/click.
     content={
       <div>
         <p>Percentage of sites currently occupied.</p>
-        <p className="text-xs text-slate-600 mt-1">
-          Formula: (occupied sites / total sites) × 100
-        </p>
+        <p className="text-xs text-slate-600 mt-1">Formula: (occupied sites / total sites) × 100</p>
       </div>
     }
     side="top"
@@ -53,15 +54,18 @@ Small "?" icon that shows contextual help on hover/click.
 ```
 
 ### OnboardingHint
+
 First-time user hints that appear on key pages.
 
 **Features:**
+
 - Shows once (localStorage)
 - Dismissible
 - Optional action buttons
 - Positioned or page-level
 
 **Example:**
+
 ```tsx
 <PageOnboardingHint
   id="dashboard-welcome"
@@ -80,8 +84,8 @@ First-time user hints that appear on key pages.
     {
       label: "View Tutorial",
       onClick: () => navigate("/help"),
-      variant: "ghost"
-    }
+      variant: "ghost",
+    },
   ]}
 />
 ```
@@ -89,6 +93,7 @@ First-time user hints that appear on key pages.
 ### Helper Components
 
 **HelpTooltipContent** - Wrapper for structured content
+
 ```tsx
 <HelpTooltipContent>
   <HelpTooltipSection>Introduction</HelpTooltipSection>
@@ -97,45 +102,42 @@ First-time user hints that appear on key pages.
 ```
 
 **HelpTooltipList** - Bulleted lists
+
 ```tsx
-<HelpTooltipList items={[
-  "First point",
-  "Second point",
-  "Third point"
-]} />
+<HelpTooltipList items={["First point", "Second point", "Third point"]} />
 ```
 
 **HelpTooltipLink** - External links
+
 ```tsx
-<HelpTooltipLink href="/help/topic">
-  Learn more
-</HelpTooltipLink>
+<HelpTooltipLink href="/help/topic">Learn more</HelpTooltipLink>
 ```
 
 ## Props
 
 ### HelpTooltip
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| content | ReactNode | - | Tooltip content (required) |
-| title | string | - | Optional title |
-| side | "top" \| "right" \| "bottom" \| "left" | "top" | Position |
-| maxWidth | number | 320 | Max width in px |
-| variant | "icon" \| "inline" | "icon" | Display style |
+| Prop     | Type                                   | Default | Description                |
+| -------- | -------------------------------------- | ------- | -------------------------- |
+| content  | ReactNode                              | -       | Tooltip content (required) |
+| title    | string                                 | -       | Optional title             |
+| side     | "top" \| "right" \| "bottom" \| "left" | "top"   | Position                   |
+| maxWidth | number                                 | 320     | Max width in px            |
+| variant  | "icon" \| "inline"                     | "icon"  | Display style              |
 
 ### PageOnboardingHint
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| id | string | - | Unique ID (required) |
-| title | string | - | Hint title (required) |
-| content | ReactNode | - | Hint content (required) |
-| actions | Array | [] | Action buttons |
+| Prop    | Type      | Default | Description             |
+| ------- | --------- | ------- | ----------------------- |
+| id      | string    | -       | Unique ID (required)    |
+| title   | string    | -       | Hint title (required)   |
+| content | ReactNode | -       | Hint content (required) |
+| actions | Array     | []      | Action buttons          |
 
 ## Hooks
 
 ### useOnboardingHints()
+
 Manage multiple hints programmatically.
 
 ```tsx
@@ -147,6 +149,7 @@ if (!isDismissed("feature-intro")) {
 ```
 
 ### useOnboardingHint(id)
+
 Manage a single hint.
 
 ```tsx
@@ -160,6 +163,7 @@ if (isVisible) {
 ## Implementation Examples
 
 ### Dashboard Metrics
+
 ```tsx
 <div className="card p-3">
   <div className="flex items-center gap-1 text-xs text-slate-600 mb-1">
@@ -168,9 +172,7 @@ if (isVisible) {
       content={
         <div>
           <p>Percentage of sites currently occupied.</p>
-          <p className="text-xs text-slate-600">
-            High occupancy (90%+) means you're nearly full!
-          </p>
+          <p className="text-xs text-slate-600">High occupancy (90%+) means you're nearly full!</p>
         </div>
       }
       side="top"
@@ -181,6 +183,7 @@ if (isVisible) {
 ```
 
 ### Settings Form
+
 ```tsx
 <div>
   <div className="flex items-center gap-2 mb-1">
@@ -203,6 +206,7 @@ if (isVisible) {
 ```
 
 ### Page Welcome
+
 ```tsx
 export default function MyPage() {
   return (
@@ -230,6 +234,7 @@ export default function MyPage() {
 ## Best Practices
 
 ### Do's
+
 - Keep tooltips concise (1-3 sentences)
 - Provide specific examples
 - Use formatting (lists, sections)
@@ -237,6 +242,7 @@ export default function MyPage() {
 - Position appropriately
 
 ### Don'ts
+
 - Don't write long paragraphs
 - Don't use for critical information
 - Don't nest tooltips
@@ -276,6 +282,7 @@ The help system is currently implemented on:
 ## Storage
 
 Hints use localStorage to remember dismissals:
+
 ```
 campreserv:onboarding:hint:{id}
 campreserv:onboarding:page-hint:{id}
@@ -284,10 +291,11 @@ campreserv:onboarding:page-hint:{id}
 ## Testing
 
 To reset all hints during development:
+
 ```js
-localStorage.clear()
+localStorage.clear();
 // or
-localStorage.removeItem('campreserv:onboarding:hint:hint-id')
+localStorage.removeItem("campreserv:onboarding:hint:hint-id");
 ```
 
 ## License

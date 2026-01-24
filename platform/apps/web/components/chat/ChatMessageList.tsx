@@ -9,7 +9,9 @@ import { cn } from "@/lib/utils";
 const isScrollable = (element: HTMLElement) => {
   const style = window.getComputedStyle(element);
   const overflowY = style.overflowY;
-  return (overflowY === "auto" || overflowY === "scroll") && element.scrollHeight > element.clientHeight;
+  return (
+    (overflowY === "auto" || overflowY === "scroll") && element.scrollHeight > element.clientHeight
+  );
 };
 
 const findScrollableAncestor = (start: HTMLElement, boundary: HTMLElement) => {
@@ -80,7 +82,9 @@ export function ChatMessageList({
 
   const getScrollContext = useCallback((container: HTMLElement, target: EventTarget | null) => {
     const targetElement = target instanceof HTMLElement ? target : null;
-    const nestedScrollable = targetElement ? findScrollableAncestor(targetElement, container) : null;
+    const nestedScrollable = targetElement
+      ? findScrollableAncestor(targetElement, container)
+      : null;
     const containerCanScroll = container.scrollHeight > container.clientHeight;
     return { nestedScrollable, containerCanScroll };
   }, []);
@@ -93,29 +97,32 @@ export function ChatMessageList({
     return true;
   }, []);
 
-  const handleWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
-    const container = event.currentTarget;
-    const { nestedScrollable, containerCanScroll } = getScrollContext(container, event.target);
+  const handleWheel = useCallback(
+    (event: React.WheelEvent<HTMLDivElement>) => {
+      const container = event.currentTarget;
+      const { nestedScrollable, containerCanScroll } = getScrollContext(container, event.target);
 
-    if (nestedScrollable && canScrollInDirection(nestedScrollable, event.deltaY)) {
-      applyScrollDelta(nestedScrollable, event.deltaY);
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
+      if (nestedScrollable && canScrollInDirection(nestedScrollable, event.deltaY)) {
+        applyScrollDelta(nestedScrollable, event.deltaY);
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
 
-    if (containerCanScroll && canScrollInDirection(container, event.deltaY)) {
-      applyScrollDelta(container, event.deltaY);
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
+      if (containerCanScroll && canScrollInDirection(container, event.deltaY)) {
+        applyScrollDelta(container, event.deltaY);
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
 
-    if (nestedScrollable || containerCanScroll) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }, [applyScrollDelta, getScrollContext]);
+      if (nestedScrollable || containerCanScroll) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    },
+    [applyScrollDelta, getScrollContext],
+  );
 
   const handleTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
     const touch = event.touches[0];
@@ -153,7 +160,7 @@ export function ChatMessageList({
         event.stopPropagation();
       }
     },
-    [applyScrollDelta, getScrollContext]
+    [applyScrollDelta, getScrollContext],
   );
 
   const handleTouchEnd = useCallback(() => {
@@ -176,7 +183,10 @@ export function ChatMessageList({
       }
     };
     container.addEventListener("wheel", handleWheelCapture, { passive: false, capture: true });
-    container.addEventListener("touchmove", handleTouchMoveCapture, { passive: false, capture: true });
+    container.addEventListener("touchmove", handleTouchMoveCapture, {
+      passive: false,
+      capture: true,
+    });
     return () => {
       container.removeEventListener("wheel", handleWheelCapture, { capture: true });
       container.removeEventListener("touchmove", handleTouchMoveCapture, { capture: true });
@@ -195,7 +205,7 @@ export function ChatMessageList({
       style={{ WebkitOverflowScrolling: "touch" }}
       className={cn(
         "flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-4 space-y-4",
-        className
+        className,
       )}
       data-testid="chat-message-list"
     >
@@ -232,13 +242,7 @@ export function ChatMessageList({
         </Fragment>
       ))}
       {isTyping && (
-        <ChatMessage
-          id="typing"
-          role="assistant"
-          content=""
-          isLoading={true}
-          accent={accent}
-        />
+        <ChatMessage id="typing" role="assistant" content="" isLoading={true} accent={accent} />
       )}
       <div ref={bottomRef} />
     </div>

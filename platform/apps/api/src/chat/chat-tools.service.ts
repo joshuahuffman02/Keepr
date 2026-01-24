@@ -1,28 +1,45 @@
-import { Injectable, Logger, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { ChatParticipantType, MaintenancePriority, ReservationStatus, SiteType, OpTaskPriority, OpTaskState } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
-import { z } from 'zod';
-import { randomUUID } from 'crypto';
+import { Injectable, Logger, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  ChatParticipantType,
+  MaintenancePriority,
+  ReservationStatus,
+  SiteType,
+  OpTaskPriority,
+  OpTaskState,
+} from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import { z } from "zod";
+import { randomUUID } from "crypto";
 import type { Request } from "express";
-import { AuditService } from '../audit/audit.service';
-import { HoldsService } from '../holds/holds.service';
-import { AiPrivacyService } from '../ai/ai-privacy.service';
+import { AuditService } from "../audit/audit.service";
+import { HoldsService } from "../holds/holds.service";
+import { AiPrivacyService } from "../ai/ai-privacy.service";
 
 // Date string validation (YYYY-MM-DD format)
-const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format. Use YYYY-MM-DD');
-const opTaskStateSchema = z.enum(['pending', 'assigned', 'in_progress', 'blocked', 'completed', 'verified', 'cancelled']);
-const opTaskStateFilterSchema = z.enum([
-  'pending',
-  'assigned',
-  'in_progress',
-  'blocked',
-  'completed',
-  'verified',
-  'cancelled',
-  'open',
+const dateStringSchema = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format. Use YYYY-MM-DD");
+const opTaskStateSchema = z.enum([
+  "pending",
+  "assigned",
+  "in_progress",
+  "blocked",
+  "completed",
+  "verified",
+  "cancelled",
 ]);
-const opTaskPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent']);
+const opTaskStateFilterSchema = z.enum([
+  "pending",
+  "assigned",
+  "in_progress",
+  "blocked",
+  "completed",
+  "verified",
+  "cancelled",
+  "open",
+]);
+const opTaskPrioritySchema = z.enum(["low", "medium", "high", "urgent"]);
 
 // Helper to get today's start/end in a specific timezone
 function getTodayInTimezone(tz: string): { todayStart: Date; todayEnd: Date } {
@@ -84,9 +101,10 @@ const getDateConfirmationError = (
   if (!parsedStart) return null;
   const parsedEnd = parseDateInput(endDate);
   if (!needsDateConfirmation(parsedStart, parsedEnd) || confirmed) return null;
-  const rangeLabel = startDate && endDate
-    ? `${startDate} to ${endDate}`
-    : startDate ?? endDate ?? "the requested dates";
+  const rangeLabel =
+    startDate && endDate
+      ? `${startDate} to ${endDate}`
+      : (startDate ?? endDate ?? "the requested dates");
   if (participantType === ChatParticipantType.guest) {
     return `That date range looks far out (${rangeLabel}). Did you mean this upcoming weekend? If not, reply with the exact dates (YYYY-MM-DD to YYYY-MM-DD).`;
   }
@@ -138,7 +156,7 @@ const parseOpTaskPriority = (value: unknown): OpTaskPriority | undefined =>
   isOpTaskPriority(value) ? value : undefined;
 
 const parseOpTaskStateFilters = (
-  value: unknown
+  value: unknown,
 ): { states: OpTaskState[]; includeOpen: boolean } | undefined => {
   if (!Array.isArray(value)) return undefined;
   const parsedStates: OpTaskState[] = [];
@@ -181,11 +199,11 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     arrivalDate: dateStringSchema,
     departureDate: dateStringSchema,
     guests: z.number().int().positive().optional(),
-    siteType: z.enum(['rv', 'tent', 'cabin']).optional(),
+    siteType: z.enum(["rv", "tent", "cabin"]).optional(),
     confirmed: z.boolean().optional(),
   }),
   get_quote: z.object({
-    siteId: z.string().min(1, 'Site ID is required'),
+    siteId: z.string().min(1, "Site ID is required"),
     arrivalDate: dateStringSchema,
     departureDate: dateStringSchema,
     guests: z.number().int().positive().optional(),
@@ -197,25 +215,27 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     reservationId: z.string().optional(),
     confirmed: z.boolean().optional(),
   }),
-  search_reservations: z.object({
-    query: z.string().optional(),
-    startDate: dateStringSchema.optional(),
-    endDate: dateStringSchema.optional(),
-    status: z.enum(['pending', 'confirmed', 'checked_in', 'checked_out', 'cancelled']).optional(),
-  }).optional(),
+  search_reservations: z
+    .object({
+      query: z.string().optional(),
+      startDate: dateStringSchema.optional(),
+      endDate: dateStringSchema.optional(),
+      status: z.enum(["pending", "confirmed", "checked_in", "checked_out", "cancelled"]).optional(),
+    })
+    .optional(),
   get_reservation: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
   }),
   check_in_guest: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
     confirmed: z.boolean().optional(),
   }),
   check_out_guest: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
     confirmed: z.boolean().optional(),
   }),
   get_balance: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
   }),
   get_occupancy: z.object({
     startDate: dateStringSchema,
@@ -228,49 +248,58 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     confirmed: z.boolean().optional(),
   }),
   create_hold: z.object({
-    siteId: z.string().min(1, 'Site ID is required'),
+    siteId: z.string().min(1, "Site ID is required"),
     arrivalDate: dateStringSchema,
     departureDate: dateStringSchema,
-    holdMinutes: z.number().int().positive().max(24 * 60).optional(),
+    holdMinutes: z
+      .number()
+      .int()
+      .positive()
+      .max(24 * 60)
+      .optional(),
     note: z.string().optional(),
   }),
   release_hold: z.object({
-    holdId: z.string().min(1, 'Hold ID is required'),
+    holdId: z.string().min(1, "Hold ID is required"),
   }),
   list_holds: z.object({}).optional(),
   block_site: z.object({
-    siteId: z.string().min(1, 'Site ID is required'),
-    reason: z.string().min(1, 'Reason is required'),
+    siteId: z.string().min(1, "Site ID is required"),
+    reason: z.string().min(1, "Reason is required"),
     startDate: dateStringSchema.optional(),
     endDate: dateStringSchema.optional(),
   }),
-  apply_discount: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
-    discountCents: z.number().int().positive().optional(),
-    discountPercent: z.number().positive().max(100).optional(),
-    reason: z.string().min(1, 'Reason is required'),
-  }).refine(
-    data => data.discountCents || data.discountPercent,
-    'Either discountCents or discountPercent is required'
-  ),
+  apply_discount: z
+    .object({
+      reservationId: z.string().min(1, "Reservation ID is required"),
+      discountCents: z.number().int().positive().optional(),
+      discountPercent: z.number().positive().max(100).optional(),
+      reason: z.string().min(1, "Reason is required"),
+    })
+    .refine(
+      (data) => data.discountCents || data.discountPercent,
+      "Either discountCents or discountPercent is required",
+    ),
   add_charge: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
-    amountCents: z.number().int().positive('Amount must be positive'),
-    description: z.string().min(1, 'Description is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
+    amountCents: z.number().int().positive("Amount must be positive"),
+    description: z.string().min(1, "Description is required"),
   }),
   move_reservation: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
-    newSiteId: z.string().min(1, 'New site ID is required'),
+    reservationId: z.string().min(1, "Reservation ID is required"),
+    newSiteId: z.string().min(1, "New site ID is required"),
     reason: z.string().optional(),
   }),
-  extend_stay: z.object({
-    reservationId: z.string().min(1, 'Reservation ID is required'),
-    additionalNights: z.number().int().positive().optional(),
-    newDepartureDate: dateStringSchema.optional(),
-  }).refine(
-    data => data.additionalNights || data.newDepartureDate,
-    'Either additionalNights or newDepartureDate is required'
-  ),
+  extend_stay: z
+    .object({
+      reservationId: z.string().min(1, "Reservation ID is required"),
+      additionalNights: z.number().int().positive().optional(),
+      newDepartureDate: dateStringSchema.optional(),
+    })
+    .refine(
+      (data) => data.additionalNights || data.newDepartureDate,
+      "Either additionalNights or newDepartureDate is required",
+    ),
   request_reservation_change: z.object({
     reservationId: z.string().optional(),
     changeType: z.string().optional(),
@@ -335,20 +364,20 @@ const buildJsonRenderTree = (root: string, elements: JsonRenderElement[]): JsonR
   return { root, elements: elementMap };
 };
 
-const AUDIT_REDACT_KEYS = new Set(['message', 'notes', 'description', 'content']);
+const AUDIT_REDACT_KEYS = new Set(["message", "notes", "description", "content"]);
 const sanitizeAuditValue = (value: unknown, depth = 0): unknown => {
-  if (depth > 4) return '[truncated]';
-  if (typeof value === 'string') {
+  if (depth > 4) return "[truncated]";
+  if (typeof value === "string") {
     return value.length > 180 ? `${value.slice(0, 180)}...` : value;
   }
-  if (typeof value !== 'object' || value === null) return value;
+  if (typeof value !== "object" || value === null) return value;
   if (Array.isArray(value)) {
     return value.slice(0, 10).map((entry) => sanitizeAuditValue(entry, depth + 1));
   }
   const result: Record<string, unknown> = {};
   for (const [key, entry] of Object.entries(value)) {
     if (AUDIT_REDACT_KEYS.has(key)) {
-      result[key] = typeof entry === 'string' ? '[redacted]' : entry;
+      result[key] = typeof entry === "string" ? "[redacted]" : entry;
       continue;
     }
     result[key] = sanitizeAuditValue(entry, depth + 1);
@@ -364,91 +393,93 @@ type AuditConfig = {
 
 const AUDITED_TOOL_ACTIONS: Record<string, AuditConfig> = {
   check_in_guest: {
-    action: 'reservation.check_in',
-    entity: 'reservation',
+    action: "reservation.check_in",
+    entity: "reservation",
     resolveEntityId: (args, result) => {
-      const reservation = isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
+      const reservation =
+        isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
       return getString(reservation?.id) ?? getString(args.reservationId);
     },
   },
   check_out_guest: {
-    action: 'reservation.check_out',
-    entity: 'reservation',
+    action: "reservation.check_out",
+    entity: "reservation",
     resolveEntityId: (args, result) => {
-      const reservation = isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
+      const reservation =
+        isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
       return getString(reservation?.id) ?? getString(args.reservationId);
     },
   },
   apply_discount: {
-    action: 'reservation.discount',
-    entity: 'reservation',
+    action: "reservation.discount",
+    entity: "reservation",
     resolveEntityId: (args) => getString(args.reservationId),
   },
   add_charge: {
-    action: 'reservation.charge',
-    entity: 'reservation',
+    action: "reservation.charge",
+    entity: "reservation",
     resolveEntityId: (args) => getString(args.reservationId),
   },
   move_reservation: {
-    action: 'reservation.move',
-    entity: 'reservation',
+    action: "reservation.move",
+    entity: "reservation",
     resolveEntityId: (args) => getString(args.reservationId),
   },
   extend_stay: {
-    action: 'reservation.extend',
-    entity: 'reservation',
+    action: "reservation.extend",
+    entity: "reservation",
     resolveEntityId: (args) => getString(args.reservationId),
   },
   request_early_checkin: {
-    action: 'reservation.request_early_checkin',
-    entity: 'reservation',
+    action: "reservation.request_early_checkin",
+    entity: "reservation",
     resolveEntityId: (args, result) => {
       const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
       return getString(request?.reservationId) ?? getString(args.reservationId);
     },
   },
   request_late_checkout: {
-    action: 'reservation.request_late_checkout',
-    entity: 'reservation',
+    action: "reservation.request_late_checkout",
+    entity: "reservation",
     resolveEntityId: (args, result) => {
       const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
       return getString(request?.reservationId) ?? getString(args.reservationId);
     },
   },
   request_reservation_change: {
-    action: 'reservation.request_change',
-    entity: 'reservation',
+    action: "reservation.request_change",
+    entity: "reservation",
     resolveEntityId: (args, result) => {
       const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
       return getString(request?.reservationId) ?? getString(args.reservationId);
     },
   },
   block_site: {
-    action: 'site.block',
-    entity: 'site',
+    action: "site.block",
+    entity: "site",
     resolveEntityId: (args) => getString(args.siteId),
   },
   unblock_site: {
-    action: 'site.unblock',
-    entity: 'site',
+    action: "site.unblock",
+    entity: "site",
     resolveEntityId: (args) => getString(args.siteId),
   },
   create_maintenance_ticket: {
-    action: 'maintenance_ticket.create',
-    entity: 'maintenance_ticket',
+    action: "maintenance_ticket.create",
+    entity: "maintenance_ticket",
     resolveEntityId: (args, result) => {
       const ticket = isRecord(result) && isRecord(result.ticket) ? result.ticket : undefined;
       return getString(ticket?.id) ?? getString(args.ticketId);
     },
   },
   send_message_to_staff: {
-    action: 'message.send_staff',
-    entity: 'message',
+    action: "message.send_staff",
+    entity: "message",
     resolveEntityId: (args, result) => getString(isRecord(result) ? result.messageId : undefined),
   },
   send_guest_message: {
-    action: 'message.send_guest',
-    entity: 'message',
+    action: "message.send_guest",
+    entity: "message",
     resolveEntityId: (args, result) => getString(isRecord(result) ? result.messageId : undefined),
   },
 };
@@ -462,8 +493,16 @@ interface ToolDefinition {
   confirmationTitle?: string;
   confirmationDescription?: string;
   // Pre-validate before showing confirmation dialog - can fail early with helpful message
-  preValidate?: (args: Record<string, unknown>, context: ChatContext, prisma: PrismaService) => Promise<PreValidateResult>;
-  execute: (args: Record<string, unknown>, context: ChatContext, prisma: PrismaService) => Promise<unknown>;
+  preValidate?: (
+    args: Record<string, unknown>,
+    context: ChatContext,
+    prisma: PrismaService,
+  ) => Promise<PreValidateResult>;
+  execute: (
+    args: Record<string, unknown>,
+    context: ChatContext,
+    prisma: PrismaService,
+  ) => Promise<unknown>;
 }
 
 @Injectable()
@@ -487,19 +526,23 @@ export class ChatToolsService {
     // ============ TIER 1: Core Operations ============
 
     // Check availability
-    this.tools.set('check_availability', {
-      name: 'check_availability',
-      description: 'Check available sites for a date range. Returns list of available sites with pricing.',
+    this.tools.set("check_availability", {
+      name: "check_availability",
+      description:
+        "Check available sites for a date range. Returns list of available sites with pricing.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          arrivalDate: { type: 'string', description: 'Arrival date (YYYY-MM-DD)' },
-          departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
-          guests: { type: 'number', description: 'Number of guests (optional)' },
-          siteType: { type: 'string', description: 'Site type filter: rv, tent, cabin (optional)' },
-          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
+          arrivalDate: { type: "string", description: "Arrival date (YYYY-MM-DD)" },
+          departureDate: { type: "string", description: "Departure date (YYYY-MM-DD)" },
+          guests: { type: "number", description: "Number of guests (optional)" },
+          siteType: { type: "string", description: "Site type filter: rv, tent, cabin (optional)" },
+          confirmed: {
+            type: "boolean",
+            description: "Set true after confirming far-future or cross-year dates",
+          },
         },
-        required: ['arrivalDate', 'departureDate'],
+        required: ["arrivalDate", "departureDate"],
       },
       guestAllowed: true,
       preValidate: async (args) => {
@@ -510,7 +553,7 @@ export class ChatToolsService {
           arrivalDate,
           departureDate,
           confirmed,
-          context.participantType
+          context.participantType,
         );
         if (confirmationError) {
           return { valid: false, message: confirmationError };
@@ -524,14 +567,14 @@ export class ChatToolsService {
         const siteType = parseSiteType(args.siteType);
 
         if (!arrivalDate || !departureDate) {
-          throw new BadRequestException('Arrival and departure dates are required');
+          throw new BadRequestException("Arrival and departure dates are required");
         }
 
         // Get all sites for this campground
         const sites = await prisma.site.findMany({
           where: {
             campgroundId: context.campgroundId,
-            status: 'active',
+            status: "active",
             ...(siteType && { siteType }),
           },
           include: {
@@ -543,7 +586,7 @@ export class ChatToolsService {
         const conflictingReservations = await prisma.reservation.findMany({
           where: {
             campgroundId: context.campgroundId,
-            status: { in: ['pending', 'confirmed', 'checked_in'] },
+            status: { in: ["pending", "confirmed", "checked_in"] },
             OR: [
               {
                 arrivalDate: { lte: new Date(departureDate) },
@@ -554,14 +597,14 @@ export class ChatToolsService {
           select: { siteId: true },
         });
 
-        const bookedSiteIds = new Set(conflictingReservations.map(r => r.siteId).filter(Boolean));
+        const bookedSiteIds = new Set(conflictingReservations.map((r) => r.siteId).filter(Boolean));
 
         // Filter to available sites
-        const availableSites = sites.filter(s => !bookedSiteIds.has(s.id));
+        const availableSites = sites.filter((s) => !bookedSiteIds.has(s.id));
 
         if (process.env.NODE_ENV === "staging") {
           this.logger.log(
-            `check_availability summary: arrival=${arrivalDate} departure=${departureDate} guests=${guests ?? "n/a"} siteType=${siteType ?? "any"} totalSites=${sites.length} bookedSites=${bookedSiteIds.size} available=${availableSites.length}`
+            `check_availability summary: arrival=${arrivalDate} departure=${departureDate} guests=${guests ?? "n/a"} siteType=${siteType ?? "any"} totalSites=${sites.length} bookedSites=${bookedSiteIds.size} available=${availableSites.length}`,
           );
         }
 
@@ -572,7 +615,7 @@ export class ChatToolsService {
 
         return {
           success: true,
-          availableSites: availableSites.slice(0, 10).map(s => {
+          availableSites: availableSites.slice(0, 10).map((s) => {
             const baseRateCents = s.SiteClass?.defaultRate;
             const hasRate = typeof baseRateCents === "number" && baseRateCents > 0;
             return {
@@ -581,34 +624,40 @@ export class ChatToolsService {
               type: s.siteType,
               className: s.SiteClass?.name,
               maxGuests: s.maxOccupancy,
-              pricePerNight: hasRate ? `$${(baseRateCents / 100).toFixed(2)}` : 'Contact for pricing',
+              pricePerNight: hasRate
+                ? `$${(baseRateCents / 100).toFixed(2)}`
+                : "Contact for pricing",
               totalEstimate: hasRate ? `$${((baseRateCents * nights) / 100).toFixed(2)}` : null,
               amenities: s.amenityTags || [],
             };
           }),
           totalAvailable: availableSites.length,
           nights,
-          message: availableSites.length > 0
-            ? `Found ${availableSites.length} available sites for ${nights} night${nights > 1 ? 's' : ''}`
-            : 'No sites available for the selected dates',
+          message:
+            availableSites.length > 0
+              ? `Found ${availableSites.length} available sites for ${nights} night${nights > 1 ? "s" : ""}`
+              : "No sites available for the selected dates",
         };
       },
     });
 
     // Get quote
-    this.tools.set('get_quote', {
-      name: 'get_quote',
-      description: 'Get a price quote for a specific site and date range.',
+    this.tools.set("get_quote", {
+      name: "get_quote",
+      description: "Get a price quote for a specific site and date range.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          siteId: { type: 'string', description: 'Site ID or name' },
-          arrivalDate: { type: 'string', description: 'Arrival date (YYYY-MM-DD)' },
-          departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
-          guests: { type: 'number', description: 'Number of guests' },
-          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
+          siteId: { type: "string", description: "Site ID or name" },
+          arrivalDate: { type: "string", description: "Arrival date (YYYY-MM-DD)" },
+          departureDate: { type: "string", description: "Departure date (YYYY-MM-DD)" },
+          guests: { type: "number", description: "Number of guests" },
+          confirmed: {
+            type: "boolean",
+            description: "Set true after confirming far-future or cross-year dates",
+          },
         },
-        required: ['siteId', 'arrivalDate', 'departureDate'],
+        required: ["siteId", "arrivalDate", "departureDate"],
       },
       guestAllowed: true,
       // Pre-validate site exists and resolve name to ID
@@ -620,7 +669,7 @@ export class ChatToolsService {
           arrivalDate,
           departureDate,
           confirmed,
-          context.participantType
+          context.participantType,
         );
         if (confirmationError) {
           return { valid: false, message: confirmationError };
@@ -628,7 +677,7 @@ export class ChatToolsService {
 
         const siteId = getString(args.siteId);
         if (!siteId) {
-          return { valid: false, message: 'Site ID is required.' };
+          return { valid: false, message: "Site ID is required." };
         }
 
         // Try to find the site by ID first
@@ -645,7 +694,7 @@ export class ChatToolsService {
               OR: [
                 { name: siteId },
                 { name: `Site ${siteId}` },
-                { name: { contains: siteId, mode: 'insensitive' } },
+                { name: { contains: siteId, mode: "insensitive" } },
               ],
             },
             include: { SiteClass: true },
@@ -655,13 +704,13 @@ export class ChatToolsService {
         if (!site) {
           // Get available sites to suggest alternatives
           const availableSites = await prisma.site.findMany({
-            where: { campgroundId: context.campgroundId, status: 'active' },
+            where: { campgroundId: context.campgroundId, status: "active" },
             select: { id: true, name: true },
-            orderBy: { name: 'asc' },
+            orderBy: { name: "asc" },
             take: 15,
           });
 
-          const siteNames = availableSites.map(s => s.name).join(', ');
+          const siteNames = availableSites.map((s) => s.name).join(", ");
           return {
             valid: false,
             message: `Site "${siteId}" was not found. Available sites: ${siteNames}. Please specify a valid site name.`,
@@ -679,7 +728,7 @@ export class ChatToolsService {
         const guests = getNumber(args.guests) ?? 2;
 
         if (!siteId || !arrivalDate || !departureDate) {
-          throw new BadRequestException('Site ID, arrival date, and departure date are required');
+          throw new BadRequestException("Site ID, arrival date, and departure date are required");
         }
 
         const site = await prisma.site.findFirst({
@@ -688,7 +737,7 @@ export class ChatToolsService {
         });
 
         if (!site) {
-          return { success: false, message: 'Site not found' };
+          return { success: false, message: "Site not found" };
         }
 
         const arrival = new Date(arrivalDate);
@@ -705,7 +754,7 @@ export class ChatToolsService {
         });
 
         if (!campground) {
-          return { success: false, message: 'Campground not found' };
+          return { success: false, message: "Campground not found" };
         }
 
         const taxRate = (Number(campground.taxState || 0) + Number(campground.taxLocal || 0)) / 100;
@@ -717,7 +766,7 @@ export class ChatToolsService {
 
         // Build response - only mention site lock fee if campground actually charges one
         const isGuest = context.participantType === ChatParticipantType.guest;
-        let siteNote = '';
+        let siteNote = "";
         let canGuaranteeSite = true;
 
         if (isGuest && site.SiteClass && siteLockFeeCents > 0) {
@@ -746,26 +795,30 @@ export class ChatToolsService {
             // Only include site lock info if campground charges for it
             siteLockFee: siteLockFeeCents > 0 ? `$${(siteLockFeeCents / 100).toFixed(2)}` : null,
             canGuaranteeSpecificSite: canGuaranteeSite,
-            siteClassGuaranteeNote: (isGuest && siteLockFeeCents > 0)
-              ? `Bookings guarantee the ${site.SiteClass?.name} class, not a specific site. Add $${(siteLockFeeCents / 100).toFixed(2)} site lock fee to guarantee ${site.name}.`
-              : null,
+            siteClassGuaranteeNote:
+              isGuest && siteLockFeeCents > 0
+                ? `Bookings guarantee the ${site.SiteClass?.name} class, not a specific site. Add $${(siteLockFeeCents / 100).toFixed(2)} site lock fee to guarantee ${site.name}.`
+                : null,
           },
-          message: `Quote for ${site.name}: ${nights} night${nights > 1 ? 's' : ''} = $${(totalCents / 100).toFixed(2)} total${siteNote}`,
+          message: `Quote for ${site.name}: ${nights} night${nights > 1 ? "s" : ""} = $${(totalCents / 100).toFixed(2)} total${siteNote}`,
         };
       },
     });
 
     // Search reservations
-    this.tools.set('search_reservations', {
-      name: 'search_reservations',
-      description: 'Search for reservations by guest name, confirmation code, or date range.',
+    this.tools.set("search_reservations", {
+      name: "search_reservations",
+      description: "Search for reservations by guest name, confirmation code, or date range.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          query: { type: 'string', description: 'Search term (name, email, confirmation code)' },
-          startDate: { type: 'string', description: 'Start date filter (YYYY-MM-DD)' },
-          endDate: { type: 'string', description: 'End date filter (YYYY-MM-DD)' },
-          status: { type: 'string', description: 'Status filter: pending, confirmed, checked_in, checked_out, cancelled' },
+          query: { type: "string", description: "Search term (name, email, confirmation code)" },
+          startDate: { type: "string", description: "Start date filter (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date filter (YYYY-MM-DD)" },
+          status: {
+            type: "string",
+            description: "Status filter: pending, confirmed, checked_in, checked_out, cancelled",
+          },
         },
         required: [],
       },
@@ -780,10 +833,10 @@ export class ChatToolsService {
 
         if (query) {
           where.OR = [
-            { id: { contains: query, mode: 'insensitive' } },
-            { Guest: { primaryFirstName: { contains: query, mode: 'insensitive' } } },
-            { Guest: { primaryLastName: { contains: query, mode: 'insensitive' } } },
-            { Guest: { email: { contains: query, mode: 'insensitive' } } },
+            { id: { contains: query, mode: "insensitive" } },
+            { Guest: { primaryFirstName: { contains: query, mode: "insensitive" } } },
+            { Guest: { primaryLastName: { contains: query, mode: "insensitive" } } },
+            { Guest: { email: { contains: query, mode: "insensitive" } } },
           ];
         }
 
@@ -800,48 +853,52 @@ export class ChatToolsService {
         const reservations = await prisma.reservation.findMany({
           where,
           include: {
-            Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
+            Guest: {
+              select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true },
+            },
             Site: { select: { name: true } },
           },
-          orderBy: { arrivalDate: 'asc' },
+          orderBy: { arrivalDate: "asc" },
           take: 10,
         });
 
         return {
           success: true,
-          reservations: reservations.map(r => ({
+          reservations: reservations.map((r) => ({
             id: r.id,
             confirmationCode: r.id,
-            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
+            guestName: r.Guest
+              ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`
+              : "Unknown",
             guestEmail: r.Guest?.email,
             site: r.Site?.name,
-            arrival: r.arrivalDate.toISOString().split('T')[0],
-            departure: r.departureDate.toISOString().split('T')[0],
+            arrival: r.arrivalDate.toISOString().split("T")[0],
+            departure: r.departureDate.toISOString().split("T")[0],
             status: r.status,
             balance: `$${(r.balanceAmount / 100).toFixed(2)}`,
           })),
           count: reservations.length,
-          message: `Found ${reservations.length} reservation${reservations.length !== 1 ? 's' : ''}`,
+          message: `Found ${reservations.length} reservation${reservations.length !== 1 ? "s" : ""}`,
         };
       },
     });
 
     // Get reservation details
-    this.tools.set('get_reservation', {
-      name: 'get_reservation',
-      description: 'Get detailed information about a specific reservation.',
+    this.tools.set("get_reservation", {
+      name: "get_reservation",
+      description: "Get detailed information about a specific reservation.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: true, // But scoped to their own reservations
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const where: Prisma.ReservationWhereInput = {
@@ -857,14 +914,16 @@ export class ChatToolsService {
         const reservation = await prisma.reservation.findFirst({
           where,
           include: {
-            Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
+            Guest: {
+              select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true },
+            },
             Site: { select: { name: true, SiteClass: { select: { name: true } } } },
-            Payment: { orderBy: { createdAt: 'desc' }, take: 5 },
+            Payment: { orderBy: { createdAt: "desc" }, take: 5 },
           },
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         return {
@@ -873,16 +932,21 @@ export class ChatToolsService {
             id: reservation.id,
             confirmationCode: reservation.id,
             status: reservation.status,
-            guest: reservation.Guest ? {
-              name: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
-              email: reservation.Guest.email,
-              phone: reservation.Guest.phone,
-            } : null,
+            guest: reservation.Guest
+              ? {
+                  name: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
+                  email: reservation.Guest.email,
+                  phone: reservation.Guest.phone,
+                }
+              : null,
             site: reservation.Site?.name,
             siteClass: reservation.Site?.SiteClass?.name,
-            arrival: reservation.arrivalDate.toISOString().split('T')[0],
-            departure: reservation.departureDate.toISOString().split('T')[0],
-            nights: Math.ceil((reservation.departureDate.getTime() - reservation.arrivalDate.getTime()) / (1000 * 60 * 60 * 24)),
+            arrival: reservation.arrivalDate.toISOString().split("T")[0],
+            departure: reservation.departureDate.toISOString().split("T")[0],
+            nights: Math.ceil(
+              (reservation.departureDate.getTime() - reservation.arrivalDate.getTime()) /
+                (1000 * 60 * 60 * 24),
+            ),
             guests: reservation.adults + reservation.children,
             totals: {
               subtotal: `$${(reservation.baseSubtotal / 100).toFixed(2)}`,
@@ -892,11 +956,11 @@ export class ChatToolsService {
               paid: `$${(reservation.paidAmount / 100).toFixed(2)}`,
               balance: `$${(reservation.balanceAmount / 100).toFixed(2)}`,
             },
-            recentPayments: reservation.Payment.map(p => ({
+            recentPayments: reservation.Payment.map((p) => ({
               amount: `$${(p.amountCents / 100).toFixed(2)}`,
               method: p.method,
               status: p.direction,
-              date: p.createdAt.toISOString().split('T')[0],
+              date: p.createdAt.toISOString().split("T")[0],
             })),
           },
         };
@@ -904,13 +968,13 @@ export class ChatToolsService {
     });
 
     // Get my reservations (guest-specific)
-    this.tools.set('get_my_reservations', {
-      name: 'get_my_reservations',
-      description: 'Get list of reservations for the current guest.',
+    this.tools.set("get_my_reservations", {
+      name: "get_my_reservations",
+      description: "Get list of reservations for the current guest.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          includeHistory: { type: 'boolean', description: 'Include past reservations' },
+          includeHistory: { type: "boolean", description: "Include past reservations" },
         },
         required: [],
       },
@@ -918,7 +982,7 @@ export class ChatToolsService {
       staffRoles: [], // Staff don't use this
       execute: async (args, context, prisma) => {
         if (context.participantType !== ChatParticipantType.guest) {
-          return { success: false, message: 'This tool is for guests only' };
+          return { success: false, message: "This tool is for guests only" };
         }
 
         const includeHistory = getBoolean(args.includeHistory) ?? false;
@@ -929,7 +993,7 @@ export class ChatToolsService {
         };
 
         if (!includeHistory) {
-          where.status = { in: ['pending', 'confirmed', 'checked_in'] };
+          where.status = { in: ["pending", "confirmed", "checked_in"] };
         }
 
         const reservations = await prisma.reservation.findMany({
@@ -937,22 +1001,22 @@ export class ChatToolsService {
           include: {
             Site: { select: { name: true } },
           },
-          orderBy: { arrivalDate: 'desc' },
+          orderBy: { arrivalDate: "desc" },
           take: 10,
         });
 
         return {
           success: true,
-          reservations: reservations.map(r => ({
+          reservations: reservations.map((r) => ({
             id: r.id,
             confirmationCode: r.id,
             site: r.Site?.name,
-            arrival: r.arrivalDate.toISOString().split('T')[0],
-            departure: r.departureDate.toISOString().split('T')[0],
+            arrival: r.arrivalDate.toISOString().split("T")[0],
+            departure: r.departureDate.toISOString().split("T")[0],
             status: r.status,
             balance: `$${(r.balanceAmount / 100).toFixed(2)}`,
           })),
-          message: `You have ${reservations.length} reservation${reservations.length !== 1 ? 's' : ''}`,
+          message: `You have ${reservations.length} reservation${reservations.length !== 1 ? "s" : ""}`,
         };
       },
     });
@@ -960,11 +1024,11 @@ export class ChatToolsService {
     // ============ TIER 2: Guest Self-Service ============
 
     // Get campground info
-    this.tools.set('get_campground_info', {
-      name: 'get_campground_info',
-      description: 'Get information about the campground (hours, policies, amenities, contact).',
+    this.tools.set("get_campground_info", {
+      name: "get_campground_info",
+      description: "Get information about the campground (hours, policies, amenities, contact).",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {},
         required: [],
       },
@@ -991,7 +1055,7 @@ export class ChatToolsService {
         });
 
         if (!campground) {
-          return { success: false, message: 'Campground not found' };
+          return { success: false, message: "Campground not found" };
         }
 
         return {
@@ -1006,9 +1070,9 @@ export class ChatToolsService {
               website: campground.website,
             },
             policies: {
-              checkIn: campground.checkInTime || '3:00 PM',
-              checkOut: campground.checkOutTime || '11:00 AM',
-              cancellation: campground.cancellationPolicyType || 'Standard',
+              checkIn: campground.checkInTime || "3:00 PM",
+              checkOut: campground.checkOutTime || "11:00 AM",
+              cancellation: campground.cancellationPolicyType || "Standard",
               cancellationNotes: campground.cancellationNotes,
             },
             amenities: campground.amenities || [],
@@ -1020,11 +1084,11 @@ export class ChatToolsService {
     // ============ TIER 3: Staff Operations ============
 
     // Get today's arrivals
-    this.tools.set('get_arrivals_today', {
-      name: 'get_arrivals_today',
-      description: 'Get list of guests arriving today.',
+    this.tools.set("get_arrivals_today", {
+      name: "get_arrivals_today",
+      description: "Get list of guests arriving today.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {},
         required: [],
       },
@@ -1033,7 +1097,7 @@ export class ChatToolsService {
         // Get campground timezone for accurate "today" calculation
         const campground = await prisma.campground.findUnique({
           where: { id: context.campgroundId },
-          select: { timezone: true }
+          select: { timezone: true },
         });
         const tz = campground?.timezone || "America/Chicago";
         const { todayStart, todayEnd } = getTodayInTimezone(tz);
@@ -1042,38 +1106,40 @@ export class ChatToolsService {
           where: {
             campgroundId: context.campgroundId,
             arrivalDate: { gte: todayStart, lt: todayEnd },
-            status: { in: ['pending', 'confirmed'] },
+            status: { in: ["pending", "confirmed"] },
           },
           include: {
             Guest: { select: { primaryFirstName: true, primaryLastName: true, phone: true } },
             Site: { select: { name: true } },
           },
-          orderBy: { arrivalDate: 'asc' },
+          orderBy: { arrivalDate: "asc" },
         });
 
         return {
           success: true,
-          arrivals: arrivals.map(r => ({
+          arrivals: arrivals.map((r) => ({
             id: r.id,
             confirmationCode: r.id,
-            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
+            guestName: r.Guest
+              ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`
+              : "Unknown",
             phone: r.Guest?.phone,
             site: r.Site?.name,
             balance: `$${(r.balanceAmount / 100).toFixed(2)}`,
             status: r.status,
           })),
           count: arrivals.length,
-          message: `${arrivals.length} arrival${arrivals.length !== 1 ? 's' : ''} today`,
+          message: `${arrivals.length} arrival${arrivals.length !== 1 ? "s" : ""} today`,
         };
       },
     });
 
     // Get today's departures
-    this.tools.set('get_departures_today', {
-      name: 'get_departures_today',
-      description: 'Get list of guests departing today.',
+    this.tools.set("get_departures_today", {
+      name: "get_departures_today",
+      description: "Get list of guests departing today.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {},
         required: [],
       },
@@ -1082,7 +1148,7 @@ export class ChatToolsService {
         // Get campground timezone for accurate "today" calculation
         const campground = await prisma.campground.findUnique({
           where: { id: context.campgroundId },
-          select: { timezone: true }
+          select: { timezone: true },
         });
         const tz = campground?.timezone || "America/Chicago";
         const { todayStart, todayEnd } = getTodayInTimezone(tz);
@@ -1091,49 +1157,63 @@ export class ChatToolsService {
           where: {
             campgroundId: context.campgroundId,
             departureDate: { gte: todayStart, lt: todayEnd },
-            status: 'checked_in',
+            status: "checked_in",
           },
           include: {
             Guest: { select: { primaryFirstName: true, primaryLastName: true } },
             Site: { select: { name: true } },
           },
-          orderBy: { departureDate: 'asc' },
+          orderBy: { departureDate: "asc" },
         });
 
         return {
           success: true,
-          departures: departures.map(r => ({
+          departures: departures.map((r) => ({
             id: r.id,
             confirmationCode: r.id,
-            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
+            guestName: r.Guest
+              ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`
+              : "Unknown",
             site: r.Site?.name,
             balance: `$${(r.balanceAmount / 100).toFixed(2)}`,
           })),
           count: departures.length,
-          message: `${departures.length} departure${departures.length !== 1 ? 's' : ''} today`,
+          message: `${departures.length} departure${departures.length !== 1 ? "s" : ""} today`,
         };
       },
     });
 
     // Get open tasks
-    this.tools.set('get_tasks', {
-      name: 'get_tasks',
-      description: 'Get a list of open operational tasks.',
+    this.tools.set("get_tasks", {
+      name: "get_tasks",
+      description: "Get a list of open operational tasks.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          state: { type: 'string', description: "Task state filter (optional). Use 'open' for pending/assigned/in_progress/blocked." },
-          states: { type: 'array', items: { type: 'string' }, description: "Task states filter (optional). Supports 'open' alias." },
-          priority: { type: 'string', description: 'Priority filter (optional)' },
-          priorities: { type: 'array', items: { type: 'string' }, description: 'Priority filters (optional)' },
-          siteId: { type: 'string', description: 'Site ID filter (optional)' },
-          assignedToUserId: { type: 'string', description: 'Assigned user ID filter (optional)' },
-          limit: { type: 'number', description: 'Max tasks to return (optional, default 10)' },
+          state: {
+            type: "string",
+            description:
+              "Task state filter (optional). Use 'open' for pending/assigned/in_progress/blocked.",
+          },
+          states: {
+            type: "array",
+            items: { type: "string" },
+            description: "Task states filter (optional). Supports 'open' alias.",
+          },
+          priority: { type: "string", description: "Priority filter (optional)" },
+          priorities: {
+            type: "array",
+            items: { type: "string" },
+            description: "Priority filters (optional)",
+          },
+          siteId: { type: "string", description: "Site ID filter (optional)" },
+          assignedToUserId: { type: "string", description: "Assigned user ID filter (optional)" },
+          limit: { type: "number", description: "Max tasks to return (optional, default 10)" },
         },
         required: [],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk', 'maintenance'],
+      staffRoles: ["owner", "manager", "front_desk", "maintenance"],
       execute: async (args, context, prisma) => {
         const limit = Math.min(getNumber(args.limit) ?? 10, 50);
         const state = parseOpTaskStateFilter(args.state);
@@ -1174,7 +1254,9 @@ export class ChatToolsService {
         type OpTaskWithRelations = Prisma.OpTaskGetPayload<{
           include: {
             Site: { select: { name: true; siteNumber: true } };
-            User_OpTask_assignedToUserIdToUser: { select: { id: true; firstName: true; lastName: true } };
+            User_OpTask_assignedToUserIdToUser: {
+              select: { id: true; firstName: true; lastName: true };
+            };
           };
         }>;
 
@@ -1188,9 +1270,11 @@ export class ChatToolsService {
           },
           include: {
             Site: { select: { name: true, siteNumber: true } },
-            User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+            User_OpTask_assignedToUserIdToUser: {
+              select: { id: true, firstName: true, lastName: true },
+            },
           },
-          orderBy: [{ slaDueAt: 'asc' }, { createdAt: 'desc' }],
+          orderBy: [{ slaDueAt: "asc" }, { createdAt: "desc" }],
           take: limit,
         });
 
@@ -1209,31 +1293,31 @@ export class ChatToolsService {
               : null,
           })),
           count: tasks.length,
-          message: `${tasks.length} open task${tasks.length !== 1 ? 's' : ''}`,
+          message: `${tasks.length} open task${tasks.length !== 1 ? "s" : ""}`,
         };
       },
     });
 
     // Check-in guest (requires confirmation)
-    this.tools.set('check_in_guest', {
-      name: 'check_in_guest',
-      description: 'Check in a guest. Marks their reservation as checked in.',
+    this.tools.set("check_in_guest", {
+      name: "check_in_guest",
+      description: "Check in a guest. Marks their reservation as checked in.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
-          confirmed: { type: 'boolean', description: 'Whether the action has been confirmed' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
+          confirmed: { type: "boolean", description: "Whether the action has been confirmed" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Check-In',
+      confirmationTitle: "Confirm Check-In",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -1248,16 +1332,19 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
-        if (reservation.status !== 'confirmed' && reservation.status !== 'pending') {
-          return { success: false, message: `Cannot check in: reservation is ${reservation.status}` };
+        if (reservation.status !== "confirmed" && reservation.status !== "pending") {
+          return {
+            success: false,
+            message: `Cannot check in: reservation is ${reservation.status}`,
+          };
         }
 
         const updated = await prisma.reservation.update({
           where: { id: reservation.id },
-          data: { status: 'checked_in', checkInAt: new Date() },
+          data: { status: "checked_in", checkInAt: new Date() },
         });
 
         return {
@@ -1273,25 +1360,25 @@ export class ChatToolsService {
     });
 
     // Check-out guest (requires confirmation)
-    this.tools.set('check_out_guest', {
-      name: 'check_out_guest',
-      description: 'Check out a guest. Marks their reservation as checked out.',
+    this.tools.set("check_out_guest", {
+      name: "check_out_guest",
+      description: "Check out a guest. Marks their reservation as checked out.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
-          confirmed: { type: 'boolean', description: 'Whether the action has been confirmed' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
+          confirmed: { type: "boolean", description: "Whether the action has been confirmed" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Check-Out',
+      confirmationTitle: "Confirm Check-Out",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -1306,11 +1393,14 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
-        if (reservation.status !== 'checked_in') {
-          return { success: false, message: `Cannot check out: reservation is ${reservation.status}` };
+        if (reservation.status !== "checked_in") {
+          return {
+            success: false,
+            message: `Cannot check out: reservation is ${reservation.status}`,
+          };
         }
 
         // Check for outstanding balance
@@ -1324,7 +1414,7 @@ export class ChatToolsService {
 
         const updated = await prisma.reservation.update({
           where: { id: reservation.id },
-          data: { status: 'checked_out', checkOutAt: new Date() },
+          data: { status: "checked_out", checkOutAt: new Date() },
         });
 
         return {
@@ -1340,21 +1430,21 @@ export class ChatToolsService {
     });
 
     // Get balance for reservation
-    this.tools.set('get_balance', {
-      name: 'get_balance',
-      description: 'Get the balance due for a reservation.',
+    this.tools.set("get_balance", {
+      name: "get_balance",
+      description: "Get the balance due for a reservation.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: true, // But scoped
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const where: Prisma.ReservationWhereInput = {
@@ -1378,7 +1468,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         const paid = reservation.paidAmount;
@@ -1390,9 +1480,10 @@ export class ChatToolsService {
             paid: `$${(paid / 100).toFixed(2)}`,
             due: `$${(reservation.balanceAmount / 100).toFixed(2)}`,
           },
-          message: reservation.balanceAmount > 0
-            ? `Balance due: $${(reservation.balanceAmount / 100).toFixed(2)}`
-            : 'Reservation is fully paid',
+          message:
+            reservation.balanceAmount > 0
+              ? `Balance due: $${(reservation.balanceAmount / 100).toFixed(2)}`
+              : "Reservation is fully paid",
         };
       },
     });
@@ -1400,16 +1491,22 @@ export class ChatToolsService {
     // ============ TIER 2: Guest Self-Service (Additional) ============
 
     // Get activities/events during stay
-    this.tools.set('get_activities', {
-      name: 'get_activities',
-      description: 'Get activities and events happening during a date range or stay.',
+    this.tools.set("get_activities", {
+      name: "get_activities",
+      description: "Get activities and events happening during a date range or stay.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
-          endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
-          reservationId: { type: 'string', description: 'Reservation ID to get events during stay (alternative to dates)' },
-          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
+          startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date (YYYY-MM-DD)" },
+          reservationId: {
+            type: "string",
+            description: "Reservation ID to get events during stay (alternative to dates)",
+          },
+          confirmed: {
+            type: "boolean",
+            description: "Set true after confirming far-future or cross-year dates",
+          },
         },
         required: [],
       },
@@ -1426,7 +1523,7 @@ export class ChatToolsService {
           startDate,
           endDate,
           confirmed,
-          context.participantType
+          context.participantType,
         );
         if (confirmationError) {
           return { valid: false, message: confirmationError };
@@ -1446,7 +1543,7 @@ export class ChatToolsService {
             },
           });
           if (!reservation) {
-            return { success: false, message: 'Reservation not found' };
+            return { success: false, message: "Reservation not found" };
           }
           startDate = reservation.arrivalDate;
           endDate = reservation.departureDate;
@@ -1454,7 +1551,9 @@ export class ChatToolsService {
           const startDateInput = getString(args.startDate);
           const endDateInput = getString(args.endDate);
           startDate = startDateInput ? new Date(startDateInput) : new Date();
-          endDate = endDateInput ? new Date(endDateInput) : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+          endDate = endDateInput
+            ? new Date(endDateInput)
+            : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
         }
 
         const events = await prisma.event.findMany({
@@ -1465,41 +1564,45 @@ export class ChatToolsService {
             isPublished: true,
             isCancelled: false,
           },
-          orderBy: { startDate: 'asc' },
+          orderBy: { startDate: "asc" },
           take: 20,
         });
 
         return {
           success: true,
-          events: events.map(e => ({
+          events: events.map((e) => ({
             id: e.id,
             title: e.title,
             description: e.description,
-            startDate: e.startDate.toISOString().split('T')[0],
-            endDate: e.endDate?.toISOString().split('T')[0],
+            startDate: e.startDate.toISOString().split("T")[0],
+            endDate: e.endDate?.toISOString().split("T")[0],
             location: e.location,
             category: e.eventType,
           })),
           count: events.length,
-          message: events.length > 0
-            ? `Found ${events.length} event${events.length !== 1 ? 's' : ''}`
-            : 'No events scheduled during this period',
+          message:
+            events.length > 0
+              ? `Found ${events.length} event${events.length !== 1 ? "s" : ""}`
+              : "No events scheduled during this period",
         };
       },
     });
 
     // Request early check-in
-    this.tools.set('request_early_checkin', {
-      name: 'request_early_checkin',
-      description: 'Request early check-in for a reservation. Staff will review the request.',
+    this.tools.set("request_early_checkin", {
+      name: "request_early_checkin",
+      description: "Request early check-in for a reservation. Staff will review the request.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
-          requestedTime: { type: 'string', description: 'Requested check-in time (e.g., "12:00 PM")' },
-          notes: { type: 'string', description: 'Additional notes for the request' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
+          requestedTime: {
+            type: "string",
+            description: 'Requested check-in time (e.g., "12:00 PM")',
+          },
+          notes: { type: "string", description: "Additional notes for the request" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: true,
       execute: async (args, context, prisma) => {
@@ -1507,7 +1610,7 @@ export class ChatToolsService {
         const requestedTime = getString(args.requestedTime);
         const notes = getString(args.notes);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const where: Prisma.ReservationWhereInput = {
@@ -1525,7 +1628,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         // Create a message to staff
@@ -1535,35 +1638,38 @@ export class ChatToolsService {
             campgroundId: context.campgroundId,
             reservationId: reservation.id,
             guestId: reservation.guestId,
-            senderType: 'guest',
-            content: `Early check-in request for ${reservation.Site?.name || 'site'} on ${reservation.arrivalDate.toISOString().split('T')[0]}.\n\nRequested time: ${requestedTime || 'As early as possible'}\n\nNotes: ${notes || 'None'}`,
+            senderType: "guest",
+            content: `Early check-in request for ${reservation.Site?.name || "site"} on ${reservation.arrivalDate.toISOString().split("T")[0]}.\n\nRequested time: ${requestedTime || "As early as possible"}\n\nNotes: ${notes || "None"}`,
           },
         });
 
         return {
           success: true,
-          message: `Early check-in request submitted for ${reservation.arrivalDate.toISOString().split('T')[0]}. The campground staff will review your request and contact you.`,
+          message: `Early check-in request submitted for ${reservation.arrivalDate.toISOString().split("T")[0]}. The campground staff will review your request and contact you.`,
           request: {
             reservationId: reservation.id,
-            requestedTime: requestedTime || 'As early as possible',
-            status: 'pending',
+            requestedTime: requestedTime || "As early as possible",
+            status: "pending",
           },
         };
       },
     });
 
     // Request late check-out
-    this.tools.set('request_late_checkout', {
-      name: 'request_late_checkout',
-      description: 'Request late check-out for a reservation. Staff will review the request.',
+    this.tools.set("request_late_checkout", {
+      name: "request_late_checkout",
+      description: "Request late check-out for a reservation. Staff will review the request.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code' },
-          requestedTime: { type: 'string', description: 'Requested check-out time (e.g., "2:00 PM")' },
-          notes: { type: 'string', description: 'Additional notes for the request' },
+          reservationId: { type: "string", description: "Reservation ID or confirmation code" },
+          requestedTime: {
+            type: "string",
+            description: 'Requested check-out time (e.g., "2:00 PM")',
+          },
+          notes: { type: "string", description: "Additional notes for the request" },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: true,
       execute: async (args, context, prisma) => {
@@ -1571,7 +1677,7 @@ export class ChatToolsService {
         const requestedTime = getString(args.requestedTime);
         const notes = getString(args.notes);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const where: Prisma.ReservationWhereInput = {
@@ -1589,7 +1695,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         // Create a message to staff
@@ -1599,45 +1705,52 @@ export class ChatToolsService {
             campgroundId: context.campgroundId,
             reservationId: reservation.id,
             guestId: reservation.guestId,
-            senderType: 'guest',
-            content: `Late check-out request for ${reservation.Site?.name || 'site'} on ${reservation.departureDate.toISOString().split('T')[0]}.\n\nRequested time: ${requestedTime || 'As late as possible'}\n\nNotes: ${notes || 'None'}`,
+            senderType: "guest",
+            content: `Late check-out request for ${reservation.Site?.name || "site"} on ${reservation.departureDate.toISOString().split("T")[0]}.\n\nRequested time: ${requestedTime || "As late as possible"}\n\nNotes: ${notes || "None"}`,
           },
         });
 
         return {
           success: true,
-          message: `Late check-out request submitted for ${reservation.departureDate.toISOString().split('T')[0]}. The campground staff will review your request and contact you.`,
+          message: `Late check-out request submitted for ${reservation.departureDate.toISOString().split("T")[0]}. The campground staff will review your request and contact you.`,
           request: {
             reservationId: reservation.id,
-            requestedTime: requestedTime || 'As late as possible',
-            status: 'pending',
+            requestedTime: requestedTime || "As late as possible",
+            status: "pending",
           },
         };
       },
     });
 
     // Request reservation change
-    this.tools.set('request_reservation_change', {
-      name: 'request_reservation_change',
-      description: 'Request changes to a reservation (dates, site, or party size). Staff will review the request.',
+    this.tools.set("request_reservation_change", {
+      name: "request_reservation_change",
+      description:
+        "Request changes to a reservation (dates, site, or party size). Staff will review the request.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID or confirmation code (optional if already in context)' },
-          changeType: { type: 'string', description: 'Type of change (dates, site, party size, other)' },
-          newArrivalDate: { type: 'string', description: 'New arrival date (YYYY-MM-DD)' },
-          newDepartureDate: { type: 'string', description: 'New departure date (YYYY-MM-DD)' },
-          newSiteId: { type: 'string', description: 'Requested site ID (optional)' },
-          newSiteType: { type: 'string', description: 'Requested site type (optional)' },
-          partySize: { type: 'number', description: 'New total guest count (optional)' },
-          notes: { type: 'string', description: 'Additional notes for staff (optional)' },
+          reservationId: {
+            type: "string",
+            description: "Reservation ID or confirmation code (optional if already in context)",
+          },
+          changeType: {
+            type: "string",
+            description: "Type of change (dates, site, party size, other)",
+          },
+          newArrivalDate: { type: "string", description: "New arrival date (YYYY-MM-DD)" },
+          newDepartureDate: { type: "string", description: "New departure date (YYYY-MM-DD)" },
+          newSiteId: { type: "string", description: "Requested site ID (optional)" },
+          newSiteType: { type: "string", description: "Requested site type (optional)" },
+          partySize: { type: "number", description: "New total guest count (optional)" },
+          notes: { type: "string", description: "Additional notes for staff (optional)" },
         },
         required: [],
       },
       guestAllowed: true,
       execute: async (args, context, prisma) => {
         if (context.participantType !== ChatParticipantType.guest) {
-          return { success: false, message: 'This tool is for guests only' };
+          return { success: false, message: "This tool is for guests only" };
         }
 
         const reservationId = getString(args.reservationId) ?? context.currentReservationId;
@@ -1650,7 +1763,7 @@ export class ChatToolsService {
         const notes = getString(args.notes);
 
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -1663,7 +1776,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         const changeLines = [
@@ -1676,7 +1789,8 @@ export class ChatToolsService {
           notes ? `Notes: ${notes}` : null,
         ].filter(Boolean);
 
-        const changeSummary = changeLines.length > 0 ? changeLines.join('\n') : 'No details provided.';
+        const changeSummary =
+          changeLines.length > 0 ? changeLines.join("\n") : "No details provided.";
 
         await prisma.message.create({
           data: {
@@ -1684,14 +1798,15 @@ export class ChatToolsService {
             campgroundId: context.campgroundId,
             reservationId: reservation.id,
             guestId: reservation.guestId,
-            senderType: 'guest',
-            content: `Reservation change request for ${reservation.Site?.name || 'site'} (${reservation.arrivalDate.toISOString().split('T')[0]} - ${reservation.departureDate.toISOString().split('T')[0]}).\n\n${changeSummary}`,
+            senderType: "guest",
+            content: `Reservation change request for ${reservation.Site?.name || "site"} (${reservation.arrivalDate.toISOString().split("T")[0]} - ${reservation.departureDate.toISOString().split("T")[0]}).\n\n${changeSummary}`,
           },
         });
 
         return {
           success: true,
-          message: 'Your reservation change request has been sent to the campground staff. They will follow up shortly.',
+          message:
+            "Your reservation change request has been sent to the campground staff. They will follow up shortly.",
           request: {
             reservationId: reservation.id,
             changeType,
@@ -1700,30 +1815,30 @@ export class ChatToolsService {
             newSiteId,
             newSiteType,
             partySize,
-            notes: notes ? '[redacted]' : undefined,
-            status: 'pending',
+            notes: notes ? "[redacted]" : undefined,
+            status: "pending",
           },
         };
       },
     });
 
     // Send message to staff
-    this.tools.set('send_message_to_staff', {
-      name: 'send_message_to_staff',
-      description: 'Send a message to the campground staff.',
+    this.tools.set("send_message_to_staff", {
+      name: "send_message_to_staff",
+      description: "Send a message to the campground staff.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          message: { type: 'string', description: 'Message content' },
-          reservationId: { type: 'string', description: 'Related reservation ID (optional)' },
-          urgent: { type: 'boolean', description: 'Mark as urgent' },
+          message: { type: "string", description: "Message content" },
+          reservationId: { type: "string", description: "Related reservation ID (optional)" },
+          urgent: { type: "boolean", description: "Mark as urgent" },
         },
-        required: ['message'],
+        required: ["message"],
       },
       guestAllowed: true,
       execute: async (args, context, prisma) => {
         if (context.participantType !== ChatParticipantType.guest) {
-          return { success: false, message: 'This tool is for guests only' };
+          return { success: false, message: "This tool is for guests only" };
         }
 
         const message = getString(args.message);
@@ -1731,10 +1846,10 @@ export class ChatToolsService {
         const urgent = getBoolean(args.urgent) ?? false;
 
         if (!message) {
-          throw new BadRequestException('Message is required');
+          throw new BadRequestException("Message is required");
         }
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -1746,7 +1861,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         const created = await prisma.message.create({
@@ -1755,14 +1870,15 @@ export class ChatToolsService {
             campgroundId: context.campgroundId,
             reservationId: reservation.id,
             guestId: context.participantId,
-            senderType: 'guest',
+            senderType: "guest",
             content: urgent ? `[URGENT] ${message}` : message,
           },
         });
 
         return {
           success: true,
-          message: 'Your message has been sent to the campground staff. They will respond as soon as possible.',
+          message:
+            "Your message has been sent to the campground staff. They will respond as soon as possible.",
           messageId: created.id,
         };
       },
@@ -1771,20 +1887,23 @@ export class ChatToolsService {
     // ============ TIER 3: Staff Operations (Additional) ============
 
     // Get occupancy stats
-    this.tools.set('get_occupancy', {
-      name: 'get_occupancy',
-      description: 'Get occupancy statistics for a date range.',
+    this.tools.set("get_occupancy", {
+      name: "get_occupancy",
+      description: "Get occupancy statistics for a date range.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
-          endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
-          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
+          startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date (YYYY-MM-DD)" },
+          confirmed: {
+            type: "boolean",
+            description: "Set true after confirming far-future or cross-year dates",
+          },
         },
-        required: ['startDate', 'endDate'],
+        required: ["startDate", "endDate"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager'],
+      staffRoles: ["owner", "manager"],
       preValidate: async (args) => {
         const startDate = getString(args.startDate);
         const endDate = getString(args.endDate);
@@ -1793,7 +1912,7 @@ export class ChatToolsService {
           startDate,
           endDate,
           confirmed,
-          context.participantType
+          context.participantType,
         );
         if (confirmationError) {
           return { valid: false, message: confirmationError };
@@ -1804,21 +1923,21 @@ export class ChatToolsService {
         const startDateInput = getString(args.startDate);
         const endDateInput = getString(args.endDate);
         if (!startDateInput || !endDateInput) {
-          throw new BadRequestException('Start and end dates are required');
+          throw new BadRequestException("Start and end dates are required");
         }
         const start = new Date(startDateInput);
         const end = new Date(endDateInput);
 
         // Get total sites
         const totalSites = await prisma.site.count({
-          where: { campgroundId: context.campgroundId, status: 'active' },
+          where: { campgroundId: context.campgroundId, status: "active" },
         });
 
         // Get reservations in range
         const reservations = await prisma.reservation.findMany({
           where: {
             campgroundId: context.campgroundId,
-            status: { in: ['confirmed', 'checked_in'] },
+            status: { in: ["confirmed", "checked_in"] },
             arrivalDate: { lte: end },
             departureDate: { gt: start },
           },
@@ -1828,8 +1947,8 @@ export class ChatToolsService {
         const days: { date: string; occupied: number; percentage: number }[] = [];
         const current = new Date(start);
         while (current <= end) {
-          const dateStr = current.toISOString().split('T')[0];
-          const occupied = reservations.filter(r => {
+          const dateStr = current.toISOString().split("T")[0];
+          const occupied = reservations.filter((r) => {
             const arrival = r.arrivalDate;
             const departure = r.departureDate;
             return arrival <= current && departure > current;
@@ -1844,88 +1963,89 @@ export class ChatToolsService {
           current.setDate(current.getDate() + 1);
         }
 
-        const avgOccupancy = days.length > 0
-          ? Math.round(days.reduce((sum, d) => sum + d.percentage, 0) / days.length)
-          : 0;
+        const avgOccupancy =
+          days.length > 0
+            ? Math.round(days.reduce((sum, d) => sum + d.percentage, 0) / days.length)
+            : 0;
 
         const dailyBreakdown = days.slice(0, 14);
         const jsonRender: JsonRenderPayload = {
-          title: 'Occupancy Report',
+          title: "Occupancy Report",
           summary: `Average occupancy ${avgOccupancy}%`,
-          tree: buildJsonRenderTree('root', [
+          tree: buildJsonRenderTree("root", [
             {
-              key: 'root',
-              type: 'Stack',
+              key: "root",
+              type: "Stack",
               props: { gap: 4 },
-              children: ['header', 'metrics', 'chart', 'table'],
+              children: ["header", "metrics", "chart", "table"],
             },
             {
-              key: 'header',
-              type: 'Section',
+              key: "header",
+              type: "Section",
               props: {
-                title: 'Occupancy report',
+                title: "Occupancy report",
                 description: `${startDateInput} to ${endDateInput}`,
               },
             },
             {
-              key: 'metrics',
-              type: 'Grid',
+              key: "metrics",
+              type: "Grid",
               props: { columns: 3, gap: 3 },
-              children: ['metric-average', 'metric-sites', 'metric-days'],
+              children: ["metric-average", "metric-sites", "metric-days"],
             },
             {
-              key: 'metric-average',
-              type: 'Metric',
+              key: "metric-average",
+              type: "Metric",
               props: {
-                label: 'Average occupancy',
-                valuePath: '/occupancy/averagePercent',
-                format: 'percent',
+                label: "Average occupancy",
+                valuePath: "/occupancy/averagePercent",
+                format: "percent",
               },
             },
             {
-              key: 'metric-sites',
-              type: 'Metric',
+              key: "metric-sites",
+              type: "Metric",
               props: {
-                label: 'Active sites',
-                valuePath: '/occupancy/totalSites',
-                format: 'number',
+                label: "Active sites",
+                valuePath: "/occupancy/totalSites",
+                format: "number",
               },
             },
             {
-              key: 'metric-days',
-              type: 'Metric',
+              key: "metric-days",
+              type: "Metric",
               props: {
-                label: 'Days covered',
-                valuePath: '/occupancy/days',
-                format: 'number',
+                label: "Days covered",
+                valuePath: "/occupancy/days",
+                format: "number",
               },
             },
             {
-              key: 'chart',
-              type: 'TrendChart',
+              key: "chart",
+              type: "TrendChart",
               props: {
-                title: 'Daily occupancy',
-                description: 'Percent and occupied sites',
-                dataPath: '/dailyBreakdown',
-                xKey: 'date',
+                title: "Daily occupancy",
+                description: "Percent and occupied sites",
+                dataPath: "/dailyBreakdown",
+                xKey: "date",
                 series: [
-                  { key: 'percentage', color: '#0ea5e9', label: 'Occupancy %' },
-                  { key: 'occupied', color: '#22c55e', label: 'Occupied' },
+                  { key: "percentage", color: "#0ea5e9", label: "Occupancy %" },
+                  { key: "occupied", color: "#22c55e", label: "Occupied" },
                 ],
-                chartType: 'line',
+                chartType: "line",
                 height: 220,
               },
             },
             {
-              key: 'table',
-              type: 'Table',
+              key: "table",
+              type: "Table",
               props: {
-                title: 'Daily breakdown',
-                rowsPath: '/dailyBreakdown',
+                title: "Daily breakdown",
+                rowsPath: "/dailyBreakdown",
                 columns: [
-                  { key: 'date', label: 'Date' },
-                  { key: 'occupied', label: 'Occupied', format: 'number' },
-                  { key: 'percentage', label: 'Occupancy', format: 'percent' },
+                  { key: "date", label: "Date" },
+                  { key: "occupied", label: "Occupied", format: "number" },
+                  { key: "percentage", label: "Occupancy", format: "percent" },
                 ],
               },
             },
@@ -1956,20 +2076,23 @@ export class ChatToolsService {
     });
 
     // Get revenue report
-    this.tools.set('get_revenue_report', {
-      name: 'get_revenue_report',
-      description: 'Get revenue statistics for a date range.',
+    this.tools.set("get_revenue_report", {
+      name: "get_revenue_report",
+      description: "Get revenue statistics for a date range.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
-          endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
-          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
+          startDate: { type: "string", description: "Start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "End date (YYYY-MM-DD)" },
+          confirmed: {
+            type: "boolean",
+            description: "Set true after confirming far-future or cross-year dates",
+          },
         },
-        required: ['startDate', 'endDate'],
+        required: ["startDate", "endDate"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'finance'],
+      staffRoles: ["owner", "manager", "finance"],
       preValidate: async (args) => {
         const startDate = getString(args.startDate);
         const endDate = getString(args.endDate);
@@ -1978,7 +2101,7 @@ export class ChatToolsService {
           startDate,
           endDate,
           confirmed,
-          context.participantType
+          context.participantType,
         );
         if (confirmationError) {
           return { valid: false, message: confirmationError };
@@ -1989,7 +2112,7 @@ export class ChatToolsService {
         const startDateInput = getString(args.startDate);
         const endDateInput = getString(args.endDate);
         if (!startDateInput || !endDateInput) {
-          throw new BadRequestException('Start and end dates are required');
+          throw new BadRequestException("Start and end dates are required");
         }
         const start = new Date(startDateInput);
         const end = new Date(endDateInput);
@@ -1997,7 +2120,7 @@ export class ChatToolsService {
         const payments = await prisma.payment.findMany({
           where: {
             campgroundId: context.campgroundId,
-            direction: 'charge',
+            direction: "charge",
             createdAt: { gte: start, lte: end },
           },
         });
@@ -2006,7 +2129,7 @@ export class ChatToolsService {
         const paymentsByMethod: Record<string, number> = {};
         const methodStats: Record<string, { amountCents: number; count: number }> = {};
         for (const payment of payments) {
-          const method = payment.method || 'other';
+          const method = payment.method || "other";
           paymentsByMethod[method] = (paymentsByMethod[method] || 0) + payment.amountCents;
           const current = methodStats[method] ?? { amountCents: 0, count: 0 };
           current.amountCents += payment.amountCents;
@@ -2023,80 +2146,80 @@ export class ChatToolsService {
           count: stats.count,
         }));
         const jsonRender: JsonRenderPayload = {
-          title: 'Revenue Report',
+          title: "Revenue Report",
           summary: `Total revenue $${totalRevenueDollars.toFixed(2)} (${payments.length} transactions)`,
-          tree: buildJsonRenderTree('root', [
+          tree: buildJsonRenderTree("root", [
             {
-              key: 'root',
-              type: 'Stack',
+              key: "root",
+              type: "Stack",
               props: { gap: 4 },
-              children: ['header', 'metrics', 'chart', 'table'],
+              children: ["header", "metrics", "chart", "table"],
             },
             {
-              key: 'header',
-              type: 'Section',
+              key: "header",
+              type: "Section",
               props: {
-                title: 'Revenue report',
+                title: "Revenue report",
                 description: `${startDateInput} to ${endDateInput}`,
               },
             },
             {
-              key: 'metrics',
-              type: 'Grid',
+              key: "metrics",
+              type: "Grid",
               props: { columns: 3, gap: 3 },
-              children: ['metric-total', 'metric-count', 'metric-average'],
+              children: ["metric-total", "metric-count", "metric-average"],
             },
             {
-              key: 'metric-total',
-              type: 'Metric',
+              key: "metric-total",
+              type: "Metric",
               props: {
-                label: 'Total revenue',
-                valuePath: '/revenue/total',
-                format: 'currency',
+                label: "Total revenue",
+                valuePath: "/revenue/total",
+                format: "currency",
               },
             },
             {
-              key: 'metric-count',
-              type: 'Metric',
+              key: "metric-count",
+              type: "Metric",
               props: {
-                label: 'Transactions',
-                valuePath: '/revenue/transactionCount',
-                format: 'number',
+                label: "Transactions",
+                valuePath: "/revenue/transactionCount",
+                format: "number",
               },
             },
             {
-              key: 'metric-average',
-              type: 'Metric',
+              key: "metric-average",
+              type: "Metric",
               props: {
-                label: 'Avg. transaction',
-                valuePath: '/revenue/averageTransaction',
-                format: 'currency',
+                label: "Avg. transaction",
+                valuePath: "/revenue/averageTransaction",
+                format: "currency",
               },
             },
             {
-              key: 'chart',
-              type: 'TrendChart',
+              key: "chart",
+              type: "TrendChart",
               props: {
-                title: 'Revenue by method',
-                description: 'Totals by payment method',
-                dataPath: '/byMethod',
-                xKey: 'method',
-                chartType: 'bar',
-                series: [{ key: 'amount', color: '#0ea5e9', label: 'Revenue' }],
+                title: "Revenue by method",
+                description: "Totals by payment method",
+                dataPath: "/byMethod",
+                xKey: "method",
+                chartType: "bar",
+                series: [{ key: "amount", color: "#0ea5e9", label: "Revenue" }],
                 height: 220,
               },
             },
             {
-              key: 'table',
-              type: 'Table',
+              key: "table",
+              type: "Table",
               props: {
-                title: 'Payment method breakdown',
-                rowsPath: '/byMethod',
+                title: "Payment method breakdown",
+                rowsPath: "/byMethod",
                 columns: [
-                  { key: 'method', label: 'Method' },
-                  { key: 'amount', label: 'Revenue', format: 'currency' },
-                  { key: 'percent', label: 'Share', format: 'percent' },
-                  { key: 'count', label: 'Count', format: 'number' },
+                  { key: "method", label: "Method" },
+                  { key: "amount", label: "Revenue", format: "currency" },
+                  { key: "percent", label: "Share", format: "percent" },
+                  { key: "count", label: "Count", format: "number" },
                 ],
               },
             },
@@ -2118,7 +2241,7 @@ export class ChatToolsService {
             total: `$${totalRevenueDollars.toFixed(2)}`,
             transactionCount: payments.length,
             byMethod: Object.fromEntries(
-              Object.entries(paymentsByMethod).map(([k, v]) => [k, `$${(v / 100).toFixed(2)}`])
+              Object.entries(paymentsByMethod).map(([k, v]) => [k, `$${(v / 100).toFixed(2)}`]),
             ),
             dateRange: { start: startDateInput, end: endDateInput },
           },
@@ -2129,28 +2252,28 @@ export class ChatToolsService {
     });
 
     // Create hold
-    this.tools.set('create_hold', {
-      name: 'create_hold',
-      description: 'Place a temporary hold on a site to prevent booking.',
+    this.tools.set("create_hold", {
+      name: "create_hold",
+      description: "Place a temporary hold on a site to prevent booking.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          siteId: { type: 'string', description: 'Site ID or name' },
-          arrivalDate: { type: 'string', description: 'Arrival date (YYYY-MM-DD)' },
-          departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
-          holdMinutes: { type: 'number', description: 'Hold duration in minutes (optional)' },
-          note: { type: 'string', description: 'Optional note for the hold' },
+          siteId: { type: "string", description: "Site ID or name" },
+          arrivalDate: { type: "string", description: "Arrival date (YYYY-MM-DD)" },
+          departureDate: { type: "string", description: "Departure date (YYYY-MM-DD)" },
+          holdMinutes: { type: "number", description: "Hold duration in minutes (optional)" },
+          note: { type: "string", description: "Optional note for the hold" },
         },
-        required: ['siteId', 'arrivalDate', 'departureDate'],
+        required: ["siteId", "arrivalDate", "departureDate"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Hold',
+      confirmationTitle: "Confirm Hold",
       preValidate: async (args, context, prisma) => {
         const siteId = getString(args.siteId);
         if (!siteId) {
-          return { valid: false, message: 'Site ID is required.' };
+          return { valid: false, message: "Site ID is required." };
         }
 
         let site = await prisma.site.findFirst({
@@ -2164,7 +2287,7 @@ export class ChatToolsService {
               OR: [
                 { name: siteId },
                 { name: `Site ${siteId}` },
-                { name: { contains: siteId, mode: 'insensitive' } },
+                { name: { contains: siteId, mode: "insensitive" } },
               ],
             },
           });
@@ -2172,13 +2295,13 @@ export class ChatToolsService {
 
         if (!site) {
           const availableSites = await prisma.site.findMany({
-            where: { campgroundId: context.campgroundId, status: 'active' },
+            where: { campgroundId: context.campgroundId, status: "active" },
             select: { id: true, name: true },
-            orderBy: { name: 'asc' },
+            orderBy: { name: "asc" },
             take: 20,
           });
 
-          const siteNames = availableSites.map(s => s.name).join(', ');
+          const siteNames = availableSites.map((s) => s.name).join(", ");
           return {
             valid: false,
             message: `Site "${siteId}" was not found. Available sites: ${siteNames}. Please specify a valid site name.`,
@@ -2198,7 +2321,7 @@ export class ChatToolsService {
         const siteName = getString(args._siteName) ?? siteId;
 
         if (!siteId || !arrivalDate || !departureDate) {
-          throw new BadRequestException('Site ID, arrival date, and departure date are required');
+          throw new BadRequestException("Site ID, arrival date, and departure date are required");
         }
 
         const hold = await this.holds.create({
@@ -2216,8 +2339,8 @@ export class ChatToolsService {
           hold: {
             id: hold.id,
             siteId: hold.siteId,
-            arrivalDate: hold.arrivalDate.toISOString().split('T')[0],
-            departureDate: hold.departureDate.toISOString().split('T')[0],
+            arrivalDate: hold.arrivalDate.toISOString().split("T")[0],
+            departureDate: hold.departureDate.toISOString().split("T")[0],
             expiresAt: hold.expiresAt?.toISOString() ?? null,
             status: hold.status,
             note: hold.note,
@@ -2227,15 +2350,15 @@ export class ChatToolsService {
     });
 
     // List active holds
-    this.tools.set('list_holds', {
-      name: 'list_holds',
-      description: 'List active site holds for a campground.',
+    this.tools.set("list_holds", {
+      name: "list_holds",
+      description: "List active site holds for a campground.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {},
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       execute: async (args, context) => {
         const holds = await this.holds.listByCampground(context.campgroundId);
         return {
@@ -2244,35 +2367,35 @@ export class ChatToolsService {
             id: hold.id,
             siteId: hold.siteId,
             siteName: hold.Site?.name ?? hold.Site?.siteNumber ?? null,
-            arrivalDate: hold.arrivalDate.toISOString().split('T')[0],
-            departureDate: hold.departureDate.toISOString().split('T')[0],
+            arrivalDate: hold.arrivalDate.toISOString().split("T")[0],
+            departureDate: hold.departureDate.toISOString().split("T")[0],
             expiresAt: hold.expiresAt?.toISOString() ?? null,
             status: hold.status,
             note: hold.note,
           })),
           count: holds.length,
-          message: `${holds.length} active hold${holds.length !== 1 ? 's' : ''}`,
+          message: `${holds.length} active hold${holds.length !== 1 ? "s" : ""}`,
         };
       },
     });
 
     // Release hold
-    this.tools.set('release_hold', {
-      name: 'release_hold',
-      description: 'Release an active hold by ID.',
+    this.tools.set("release_hold", {
+      name: "release_hold",
+      description: "Release an active hold by ID.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          holdId: { type: 'string', description: 'Hold ID' },
+          holdId: { type: "string", description: "Hold ID" },
         },
-        required: ['holdId'],
+        required: ["holdId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       execute: async (args, context) => {
         const holdId = getString(args.holdId);
         if (!holdId) {
-          throw new BadRequestException('Hold ID is required');
+          throw new BadRequestException("Hold ID is required");
         }
 
         const hold = await this.holds.release(context.campgroundId, holdId);
@@ -2290,28 +2413,28 @@ export class ChatToolsService {
     });
 
     // Block site
-    this.tools.set('block_site', {
-      name: 'block_site',
-      description: 'Block a site from being booked (for maintenance, etc.).',
+    this.tools.set("block_site", {
+      name: "block_site",
+      description: "Block a site from being booked (for maintenance, etc.).",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          siteId: { type: 'string', description: 'Site ID' },
-          reason: { type: 'string', description: 'Reason for blocking' },
-          startDate: { type: 'string', description: 'Block start date (YYYY-MM-DD)' },
-          endDate: { type: 'string', description: 'Block end date (YYYY-MM-DD)' },
+          siteId: { type: "string", description: "Site ID" },
+          reason: { type: "string", description: "Reason for blocking" },
+          startDate: { type: "string", description: "Block start date (YYYY-MM-DD)" },
+          endDate: { type: "string", description: "Block end date (YYYY-MM-DD)" },
         },
-        required: ['siteId', 'reason'],
+        required: ["siteId", "reason"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager'],
+      staffRoles: ["owner", "manager"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Site Block',
+      confirmationTitle: "Confirm Site Block",
       // Pre-validate before showing confirmation - check site exists and suggest alternatives
       preValidate: async (args, context, prisma) => {
         const siteId = getString(args.siteId);
         if (!siteId) {
-          return { valid: false, message: 'Site ID is required.' };
+          return { valid: false, message: "Site ID is required." };
         }
 
         // Try to find the site by ID first
@@ -2327,7 +2450,7 @@ export class ChatToolsService {
               OR: [
                 { name: siteId },
                 { name: `Site ${siteId}` },
-                { name: { contains: siteId, mode: 'insensitive' } },
+                { name: { contains: siteId, mode: "insensitive" } },
               ],
             },
           });
@@ -2336,13 +2459,13 @@ export class ChatToolsService {
         if (!site) {
           // Get available sites to suggest alternatives
           const availableSites = await prisma.site.findMany({
-            where: { campgroundId: context.campgroundId, status: 'active' },
+            where: { campgroundId: context.campgroundId, status: "active" },
             select: { id: true, name: true },
-            orderBy: { name: 'asc' },
+            orderBy: { name: "asc" },
             take: 20,
           });
 
-          const siteNames = availableSites.map(s => s.name).join(', ');
+          const siteNames = availableSites.map((s) => s.name).join(", ");
           return {
             valid: false,
             message: `Site "${siteId}" was not found. Available sites: ${siteNames}. Please specify a valid site name.`,
@@ -2360,18 +2483,22 @@ export class ChatToolsService {
         const startDateInput = getString(args.startDate);
         const endDateInput = getString(args.endDate);
         if (!siteId || !reason) {
-          throw new BadRequestException('Site ID and reason are required');
+          throw new BadRequestException("Site ID and reason are required");
         }
 
-        this.logger.log(`block_site: Starting execution for site ${siteId}, campground ${context.campgroundId}`);
+        this.logger.log(
+          `block_site: Starting execution for site ${siteId}, campground ${context.campgroundId}`,
+        );
 
         const site = await prisma.site.findFirst({
           where: { id: siteId, campgroundId: context.campgroundId },
         });
 
         if (!site) {
-          this.logger.warn(`block_site: Site ${siteId} not found in campground ${context.campgroundId}`);
-          return { success: false, message: 'Site not found' };
+          this.logger.warn(
+            `block_site: Site ${siteId} not found in campground ${context.campgroundId}`,
+          );
+          return { success: false, message: "Site not found" };
         }
 
         this.logger.log(`block_site: Found site ${site.name} (${site.id})`);
@@ -2380,7 +2507,9 @@ export class ChatToolsService {
           // Create a blackout/block
           const blockId = randomUUID();
           const blockStartDate = startDateInput ? new Date(startDateInput) : new Date();
-          const blockEndDate = endDateInput ? new Date(endDateInput) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+          const blockEndDate = endDateInput
+            ? new Date(endDateInput)
+            : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
           // Check for overlapping blackouts on this site
           const existingOverlap = await prisma.blackoutDate.findFirst({
@@ -2396,11 +2525,13 @@ export class ChatToolsService {
             this.logger.warn(`block_site: Overlapping blackout exists for site ${site.name}`);
             return {
               success: false,
-              message: `Site ${site.name} already has a block from ${existingOverlap.startDate.toISOString().split('T')[0]} to ${existingOverlap.endDate.toISOString().split('T')[0]}. Please remove the existing block first or choose different dates.`,
+              message: `Site ${site.name} already has a block from ${existingOverlap.startDate.toISOString().split("T")[0]} to ${existingOverlap.endDate.toISOString().split("T")[0]}. Please remove the existing block first or choose different dates.`,
             };
           }
 
-          this.logger.log(`block_site: Creating blackout with id=${blockId}, startDate=${blockStartDate.toISOString()}, endDate=${blockEndDate.toISOString()}`);
+          this.logger.log(
+            `block_site: Creating blackout with id=${blockId}, startDate=${blockStartDate.toISOString()}, endDate=${blockEndDate.toISOString()}`,
+          );
 
           const block = await prisma.blackoutDate.create({
             data: {
@@ -2422,36 +2553,45 @@ export class ChatToolsService {
               id: block.id,
               siteId,
               reason,
-              startDate: block.startDate.toISOString().split('T')[0],
-              endDate: block.endDate.toISOString().split('T')[0],
+              startDate: block.startDate.toISOString().split("T")[0],
+              endDate: block.endDate.toISOString().split("T")[0],
             },
           };
         } catch (error) {
-          this.logger.error(`block_site: Failed to create blackout - ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : '');
-          return { success: false, message: `Failed to block site: ${error instanceof Error ? error.message : 'Unknown error'}` };
+          this.logger.error(
+            `block_site: Failed to create blackout - ${error instanceof Error ? error.message : "Unknown error"}`,
+            error instanceof Error ? error.stack : "",
+          );
+          return {
+            success: false,
+            message: `Failed to block site: ${error instanceof Error ? error.message : "Unknown error"}`,
+          };
         }
       },
     });
 
     // Unblock site
-    this.tools.set('unblock_site', {
-      name: 'unblock_site',
-      description: 'Remove a block from a site.',
+    this.tools.set("unblock_site", {
+      name: "unblock_site",
+      description: "Remove a block from a site.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          siteId: { type: 'string', description: 'Site ID' },
-          blockId: { type: 'string', description: 'Block ID (optional, removes all blocks if not specified)' },
+          siteId: { type: "string", description: "Site ID" },
+          blockId: {
+            type: "string",
+            description: "Block ID (optional, removes all blocks if not specified)",
+          },
         },
-        required: ['siteId'],
+        required: ["siteId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager'],
+      staffRoles: ["owner", "manager"],
       execute: async (args, context, prisma) => {
         const siteId = getString(args.siteId);
         const blockId = getString(args.blockId);
         if (!siteId) {
-          throw new BadRequestException('Site ID is required');
+          throw new BadRequestException("Site ID is required");
         }
 
         const where: Prisma.BlackoutDateWhereInput = {
@@ -2467,25 +2607,25 @@ export class ChatToolsService {
 
         return {
           success: true,
-          message: `Removed ${deleted.count} block${deleted.count !== 1 ? 's' : ''} from site`,
+          message: `Removed ${deleted.count} block${deleted.count !== 1 ? "s" : ""} from site`,
           deletedCount: deleted.count,
         };
       },
     });
 
     // Create maintenance ticket
-    this.tools.set('create_maintenance_ticket', {
-      name: 'create_maintenance_ticket',
-      description: 'Create a maintenance ticket for an issue.',
+    this.tools.set("create_maintenance_ticket", {
+      name: "create_maintenance_ticket",
+      description: "Create a maintenance ticket for an issue.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          title: { type: 'string', description: 'Issue title' },
-          description: { type: 'string', description: 'Detailed description of the issue' },
-          siteId: { type: 'string', description: 'Related site ID (optional)' },
-          priority: { type: 'string', description: 'Priority: low, medium, high, critical' },
+          title: { type: "string", description: "Issue title" },
+          description: { type: "string", description: "Detailed description of the issue" },
+          siteId: { type: "string", description: "Related site ID (optional)" },
+          priority: { type: "string", description: "Priority: low, medium, high, critical" },
         },
-        required: ['title', 'description'],
+        required: ["title", "description"],
       },
       guestAllowed: false,
       execute: async (args, context, prisma) => {
@@ -2494,7 +2634,7 @@ export class ChatToolsService {
         const siteId = getString(args.siteId);
         const priority = normalizeMaintenancePriority(args.priority);
         if (!title || !description) {
-          throw new BadRequestException('Title and description are required');
+          throw new BadRequestException("Title and description are required");
         }
 
         const ticket = await prisma.maintenanceTicket.create({
@@ -2505,7 +2645,7 @@ export class ChatToolsService {
             title,
             description,
             priority,
-            status: 'open',
+            status: "open",
           },
         });
 
@@ -2523,37 +2663,37 @@ export class ChatToolsService {
     });
 
     // Lookup guest
-    this.tools.set('lookup_guest', {
-      name: 'lookup_guest',
-      description: 'Search for a guest by name, email, or phone.',
+    this.tools.set("lookup_guest", {
+      name: "lookup_guest",
+      description: "Search for a guest by name, email, or phone.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          query: { type: 'string', description: 'Search term (name, email, or phone)' },
+          query: { type: "string", description: "Search term (name, email, or phone)" },
         },
-        required: ['query'],
+        required: ["query"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       execute: async (args, context, prisma) => {
         const query = getString(args.query);
         if (!query) {
-          throw new BadRequestException('Query is required');
+          throw new BadRequestException("Query is required");
         }
 
         const guests = await prisma.guest.findMany({
           where: {
             Reservation: { some: { campgroundId: context.campgroundId } },
             OR: [
-              { primaryFirstName: { contains: query, mode: 'insensitive' } },
-              { primaryLastName: { contains: query, mode: 'insensitive' } },
-              { email: { contains: query, mode: 'insensitive' } },
-              { phone: { contains: query, mode: 'insensitive' } },
+              { primaryFirstName: { contains: query, mode: "insensitive" } },
+              { primaryLastName: { contains: query, mode: "insensitive" } },
+              { email: { contains: query, mode: "insensitive" } },
+              { phone: { contains: query, mode: "insensitive" } },
             ],
           },
           include: {
             Reservation: {
-              orderBy: { arrivalDate: 'desc' },
+              orderBy: { arrivalDate: "desc" },
               take: 3,
               select: {
                 id: true,
@@ -2568,69 +2708,69 @@ export class ChatToolsService {
 
         return {
           success: true,
-          guests: guests.map(g => ({
+          guests: guests.map((g) => ({
             id: g.id,
             name: `${g.primaryFirstName} ${g.primaryLastName}`,
             email: g.email,
             phone: g.phone,
-            recentReservations: g.Reservation.map(r => ({
+            recentReservations: g.Reservation.map((r) => ({
               id: r.id,
               code: r.id,
-              dates: `${r.arrivalDate.toISOString().split('T')[0]} - ${r.departureDate.toISOString().split('T')[0]}`,
+              dates: `${r.arrivalDate.toISOString().split("T")[0]} - ${r.departureDate.toISOString().split("T")[0]}`,
               status: r.status,
             })),
           })),
           count: guests.length,
-          message: `Found ${guests.length} guest${guests.length !== 1 ? 's' : ''}`,
+          message: `Found ${guests.length} guest${guests.length !== 1 ? "s" : ""}`,
         };
       },
     });
 
     // Send message to guest
-    this.tools.set('send_guest_message', {
-      name: 'send_guest_message',
-      description: 'Send a message to a guest.',
+    this.tools.set("send_guest_message", {
+      name: "send_guest_message",
+      description: "Send a message to a guest.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          guestId: { type: 'string', description: 'Guest ID' },
-          reservationId: { type: 'string', description: 'Reservation ID (optional)' },
-          message: { type: 'string', description: 'Message content' },
+          guestId: { type: "string", description: "Guest ID" },
+          reservationId: { type: "string", description: "Reservation ID (optional)" },
+          message: { type: "string", description: "Message content" },
         },
-        required: ['guestId', 'message'],
+        required: ["guestId", "message"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       execute: async (args, context, prisma) => {
         const guestId = getString(args.guestId);
         const reservationId = getString(args.reservationId);
         const message = getString(args.message);
         if (!guestId || !message) {
-          throw new BadRequestException('Guest ID and message are required');
+          throw new BadRequestException("Guest ID and message are required");
         }
 
         const guest = await prisma.guest.findFirst({
           where: {
             id: guestId,
-            Reservation: { some: { campgroundId: context.campgroundId } }
+            Reservation: { some: { campgroundId: context.campgroundId } },
           },
         });
 
         if (!guest) {
-          return { success: false, message: 'Guest not found' };
+          return { success: false, message: "Guest not found" };
         }
 
         const reservation = reservationId
           ? await prisma.reservation.findFirst({
-            where: { id: reservationId, campgroundId: context.campgroundId, guestId: guest.id },
-          })
+              where: { id: reservationId, campgroundId: context.campgroundId, guestId: guest.id },
+            })
           : await prisma.reservation.findFirst({
-            where: { campgroundId: context.campgroundId, guestId: guest.id },
-            orderBy: { arrivalDate: 'desc' },
-          });
+              where: { campgroundId: context.campgroundId, guestId: guest.id },
+              orderBy: { arrivalDate: "desc" },
+            });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found for guest' };
+          return { success: false, message: "Reservation not found for guest" };
         }
 
         const created = await prisma.message.create({
@@ -2639,7 +2779,7 @@ export class ChatToolsService {
             campgroundId: context.campgroundId,
             guestId: guest.id,
             reservationId: reservation.id,
-            senderType: 'staff',
+            senderType: "staff",
             content: message,
           },
         });
@@ -2653,30 +2793,33 @@ export class ChatToolsService {
     });
 
     // Apply discount
-    this.tools.set('apply_discount', {
-      name: 'apply_discount',
-      description: 'Apply a discount to a reservation.',
+    this.tools.set("apply_discount", {
+      name: "apply_discount",
+      description: "Apply a discount to a reservation.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID' },
-          discountCents: { type: 'number', description: 'Discount amount in cents' },
-          discountPercent: { type: 'number', description: 'Discount percentage (alternative to cents)' },
-          reason: { type: 'string', description: 'Reason for discount' },
+          reservationId: { type: "string", description: "Reservation ID" },
+          discountCents: { type: "number", description: "Discount amount in cents" },
+          discountPercent: {
+            type: "number",
+            description: "Discount percentage (alternative to cents)",
+          },
+          reason: { type: "string", description: "Reason for discount" },
         },
-        required: ['reservationId', 'reason'],
+        required: ["reservationId", "reason"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Discount',
+      confirmationTitle: "Confirm Discount",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         const discountCents = getNumber(args.discountCents);
         const discountPercent = getNumber(args.discountPercent);
         const reason = getString(args.reason);
         if (!reservationId || !reason) {
-          throw new BadRequestException('Reservation ID and reason are required');
+          throw new BadRequestException("Reservation ID and reason are required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -2684,7 +2827,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         let discount = discountCents ?? 0;
@@ -2715,7 +2858,7 @@ export class ChatToolsService {
               amountCents: -discount,
               description: `Discount: ${reason}`,
               occurredAt: new Date(),
-              sourceType: 'discount',
+              sourceType: "discount",
             },
           });
         });
@@ -2734,28 +2877,28 @@ export class ChatToolsService {
     });
 
     // Add charge
-    this.tools.set('add_charge', {
-      name: 'add_charge',
-      description: 'Add an additional charge to a reservation.',
+    this.tools.set("add_charge", {
+      name: "add_charge",
+      description: "Add an additional charge to a reservation.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID' },
-          amountCents: { type: 'number', description: 'Charge amount in cents' },
-          description: { type: 'string', description: 'Charge description' },
+          reservationId: { type: "string", description: "Reservation ID" },
+          amountCents: { type: "number", description: "Charge amount in cents" },
+          description: { type: "string", description: "Charge description" },
         },
-        required: ['reservationId', 'amountCents', 'description'],
+        required: ["reservationId", "amountCents", "description"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Charge',
+      confirmationTitle: "Confirm Charge",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         const amountCents = getNumber(args.amountCents);
         const description = getString(args.description);
         if (!reservationId || amountCents === undefined || !description) {
-          throw new BadRequestException('Reservation ID, amount, and description are required');
+          throw new BadRequestException("Reservation ID, amount, and description are required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -2763,7 +2906,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         const newTotal = reservation.totalAmount + amountCents;
@@ -2788,7 +2931,7 @@ export class ChatToolsService {
               amountCents: amountCents,
               description: description,
               occurredAt: new Date(),
-              sourceType: 'charge',
+              sourceType: "charge",
             },
           });
         });
@@ -2807,28 +2950,28 @@ export class ChatToolsService {
     });
 
     // Move reservation to different site
-    this.tools.set('move_reservation', {
-      name: 'move_reservation',
-      description: 'Move a reservation to a different site.',
+    this.tools.set("move_reservation", {
+      name: "move_reservation",
+      description: "Move a reservation to a different site.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID' },
-          newSiteId: { type: 'string', description: 'New site ID' },
-          reason: { type: 'string', description: 'Reason for move' },
+          reservationId: { type: "string", description: "Reservation ID" },
+          newSiteId: { type: "string", description: "New site ID" },
+          reason: { type: "string", description: "Reason for move" },
         },
-        required: ['reservationId', 'newSiteId'],
+        required: ["reservationId", "newSiteId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Site Move',
+      confirmationTitle: "Confirm Site Move",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         const newSiteId = getString(args.newSiteId);
         const reason = getString(args.reason);
         if (!reservationId || !newSiteId) {
-          throw new BadRequestException('Reservation ID and new site ID are required');
+          throw new BadRequestException("Reservation ID and new site ID are required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -2837,7 +2980,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         const newSite = await prisma.site.findFirst({
@@ -2845,14 +2988,14 @@ export class ChatToolsService {
         });
 
         if (!newSite) {
-          return { success: false, message: 'New site not found' };
+          return { success: false, message: "New site not found" };
         }
 
         // Check availability of new site
         const conflict = await prisma.reservation.findFirst({
           where: {
             siteId: newSiteId,
-            status: { in: ['pending', 'confirmed', 'checked_in'] },
+            status: { in: ["pending", "confirmed", "checked_in"] },
             id: { not: reservationId },
             arrivalDate: { lt: reservation.departureDate },
             departureDate: { gt: reservation.arrivalDate },
@@ -2860,7 +3003,7 @@ export class ChatToolsService {
         });
 
         if (conflict) {
-          return { success: false, message: 'New site is not available for these dates' };
+          return { success: false, message: "New site is not available for these dates" };
         }
 
         const oldSiteName = reservation.Site?.name;
@@ -2876,35 +3019,38 @@ export class ChatToolsService {
           move: {
             from: oldSiteName,
             to: newSite.name,
-            reason: reason || 'Not specified',
+            reason: reason || "Not specified",
           },
         };
       },
     });
 
     // Extend stay
-    this.tools.set('extend_stay', {
-      name: 'extend_stay',
-      description: 'Extend a reservation by adding additional nights.',
+    this.tools.set("extend_stay", {
+      name: "extend_stay",
+      description: "Extend a reservation by adding additional nights.",
       parameters: {
-        type: 'object',
+        type: "object",
         properties: {
-          reservationId: { type: 'string', description: 'Reservation ID' },
-          additionalNights: { type: 'number', description: 'Number of nights to add' },
-          newDepartureDate: { type: 'string', description: 'New departure date (YYYY-MM-DD) - alternative to additionalNights' },
+          reservationId: { type: "string", description: "Reservation ID" },
+          additionalNights: { type: "number", description: "Number of nights to add" },
+          newDepartureDate: {
+            type: "string",
+            description: "New departure date (YYYY-MM-DD) - alternative to additionalNights",
+          },
         },
-        required: ['reservationId'],
+        required: ["reservationId"],
       },
       guestAllowed: false,
-      staffRoles: ['owner', 'manager', 'front_desk'],
+      staffRoles: ["owner", "manager", "front_desk"],
       requiresConfirmation: true,
-      confirmationTitle: 'Confirm Stay Extension',
+      confirmationTitle: "Confirm Stay Extension",
       execute: async (args, context, prisma) => {
         const reservationId = getString(args.reservationId);
         const additionalNights = getNumber(args.additionalNights);
         const newDepartureDate = getString(args.newDepartureDate);
         if (!reservationId) {
-          throw new BadRequestException('Reservation ID is required');
+          throw new BadRequestException("Reservation ID is required");
         }
 
         const reservation = await prisma.reservation.findFirst({
@@ -2913,7 +3059,7 @@ export class ChatToolsService {
         });
 
         if (!reservation) {
-          return { success: false, message: 'Reservation not found' };
+          return { success: false, message: "Reservation not found" };
         }
 
         let newDeparture: Date;
@@ -2923,14 +3069,14 @@ export class ChatToolsService {
           newDeparture = new Date(reservation.departureDate);
           newDeparture.setDate(newDeparture.getDate() + additionalNights);
         } else {
-          return { success: false, message: 'Specify either additionalNights or newDepartureDate' };
+          return { success: false, message: "Specify either additionalNights or newDepartureDate" };
         }
 
         // Check for conflicts
         const conflict = await prisma.reservation.findFirst({
           where: {
             siteId: reservation.siteId,
-            status: { in: ['pending', 'confirmed', 'checked_in'] },
+            status: { in: ["pending", "confirmed", "checked_in"] },
             id: { not: reservationId },
             arrivalDate: { lt: newDeparture },
             departureDate: { gt: reservation.departureDate },
@@ -2938,11 +3084,13 @@ export class ChatToolsService {
         });
 
         if (conflict) {
-          return { success: false, message: 'Cannot extend - site is booked for those dates' };
+          return { success: false, message: "Cannot extend - site is booked for those dates" };
         }
 
         // Calculate additional cost
-        const extraNights = Math.ceil((newDeparture.getTime() - reservation.departureDate.getTime()) / (1000 * 60 * 60 * 24));
+        const extraNights = Math.ceil(
+          (newDeparture.getTime() - reservation.departureDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
         const nightlyRate = reservation.Site?.SiteClass?.defaultRate ?? 0;
         const additionalCost = nightlyRate * extraNights;
 
@@ -2957,10 +3105,10 @@ export class ChatToolsService {
 
         return {
           success: true,
-          message: `Extended stay by ${extraNights} night${extraNights !== 1 ? 's' : ''}. Additional charge: $${(additionalCost / 100).toFixed(2)}`,
+          message: `Extended stay by ${extraNights} night${extraNights !== 1 ? "s" : ""}. Additional charge: $${(additionalCost / 100).toFixed(2)}`,
           extension: {
-            originalDeparture: reservation.departureDate.toISOString().split('T')[0],
-            newDeparture: newDeparture.toISOString().split('T')[0],
+            originalDeparture: reservation.departureDate.toISOString().split("T")[0],
+            newDeparture: newDeparture.toISOString().split("T")[0],
             additionalNights: extraNights,
             additionalCost: `$${(additionalCost / 100).toFixed(2)}`,
           },
@@ -2975,7 +3123,7 @@ export class ChatToolsService {
   getToolsForUser(context: ChatContext): ToolDefinition[] {
     const isGuest = context.participantType === ChatParticipantType.guest;
 
-    return Array.from(this.tools.values()).filter(tool => {
+    return Array.from(this.tools.values()).filter((tool) => {
       // Check guest permission
       if (isGuest && !tool.guestAllowed) {
         return false;
@@ -3003,9 +3151,9 @@ export class ChatToolsService {
    * Execute a tool
    */
   private redactLogValue(value: unknown, depth = 0): unknown {
-    if (depth > 4) return '[truncated]';
-    if (typeof value === 'string') {
-      const { anonymizedText } = this.privacy.anonymize(value, 'minimal');
+    if (depth > 4) return "[truncated]";
+    if (typeof value === "string") {
+      const { anonymizedText } = this.privacy.anonymize(value, "minimal");
       return anonymizedText.length > 180 ? `${anonymizedText.slice(0, 180)}...` : anonymizedText;
     }
     if (!isRecord(value)) {
@@ -3034,12 +3182,12 @@ export class ChatToolsService {
     // Verify permissions
     const isGuest = context.participantType === ChatParticipantType.guest;
     if (isGuest && !tool.guestAllowed) {
-      throw new ForbiddenException('This action is not available');
+      throw new ForbiddenException("This action is not available");
     }
 
     if (!isGuest && tool.staffRoles && tool.staffRoles.length > 0) {
       if (!context.role || !tool.staffRoles.includes(context.role)) {
-        throw new ForbiddenException('You do not have permission for this action');
+        throw new ForbiddenException("You do not have permission for this action");
       }
     }
 
@@ -3048,7 +3196,9 @@ export class ChatToolsService {
     if (schema) {
       const result = schema.safeParse(args);
       if (!result.success) {
-        const errors = result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ');
+        const errors = result.error.errors
+          .map((e) => `${e.path.join(".")}: ${e.message}`)
+          .join(", ");
         this.logger.warn(`Tool argument validation failed for ${name}: ${errors}`);
         throw new BadRequestException(`Invalid arguments: ${errors}`);
       }
@@ -3076,9 +3226,8 @@ export class ChatToolsService {
     const entityId = config.resolveEntityId(args, result);
     if (!entityId) return;
 
-    const actorId = context.participantType === ChatParticipantType.guest
-      ? null
-      : context.participantId;
+    const actorId =
+      context.participantType === ChatParticipantType.guest ? null : context.participantId;
     const afterPayload = sanitizeAuditValue({ tool: name, args, result });
 
     try {
@@ -3093,7 +3242,7 @@ export class ChatToolsService {
       });
     } catch (error) {
       this.logger.warn(
-        `Failed to record audit for tool ${name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        `Failed to record audit for tool ${name}: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -3120,7 +3269,7 @@ export class ChatToolsService {
       this.logger.error(`PreValidate error for ${name}:`, error);
       return {
         valid: false,
-        message: error instanceof Error ? error.message : 'Validation failed',
+        message: error instanceof Error ? error.message : "Validation failed",
       };
     }
   }
@@ -3133,75 +3282,83 @@ export class ChatToolsService {
     const reason = getString(args.reason);
 
     switch (toolName) {
-      case 'check_in_guest':
-        return reservationId ? `Check in reservation ${reservationId}.` : 'Check in the guest.';
-      case 'check_out_guest':
-        return reservationId ? `Check out reservation ${reservationId}.` : 'Check out the guest.';
-      case 'process_refund': {
+      case "check_in_guest":
+        return reservationId ? `Check in reservation ${reservationId}.` : "Check in the guest.";
+      case "check_out_guest":
+        return reservationId ? `Check out reservation ${reservationId}.` : "Check out the guest.";
+      case "process_refund": {
         const amount = formatCurrency(getNumber(args.amountCents));
         return reservationId && amount
           ? `Refund ${amount} for reservation ${reservationId}.`
           : amount
             ? `Refund ${amount}.`
-            : 'Process a refund.';
+            : "Process a refund.";
       }
-      case 'cancel_reservation':
-        return reservationId ? `Cancel reservation ${reservationId}.` : 'Cancel the reservation.';
-      case 'block_site': {
-        const siteName = getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
+      case "cancel_reservation":
+        return reservationId ? `Cancel reservation ${reservationId}.` : "Cancel the reservation.";
+      case "block_site": {
+        const siteName =
+          getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
         const startDate = getString(args.startDate);
         const endDate = getString(args.endDate);
-        const window = startDate && endDate ? ` from ${startDate} to ${endDate}` : startDate ? ` starting ${startDate}` : '';
+        const window =
+          startDate && endDate
+            ? ` from ${startDate} to ${endDate}`
+            : startDate
+              ? ` starting ${startDate}`
+              : "";
         return siteName
-          ? `Block ${siteName}${window}${reason ? ` for "${reason}"` : ''}.`
-          : `Block a site${window}${reason ? ` for "${reason}"` : ''}.`;
+          ? `Block ${siteName}${window}${reason ? ` for "${reason}"` : ""}.`
+          : `Block a site${window}${reason ? ` for "${reason}"` : ""}.`;
       }
-      case 'create_hold': {
-        const siteName = getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
+      case "create_hold": {
+        const siteName =
+          getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
         const arrivalDate = getString(args.arrivalDate);
         const departureDate = getString(args.departureDate);
         if (siteName && arrivalDate && departureDate) {
           return `Hold ${siteName} from ${arrivalDate} to ${departureDate}.`;
         }
-        return 'Place a temporary hold on the site.';
+        return "Place a temporary hold on the site.";
       }
-      case 'apply_discount': {
+      case "apply_discount": {
         const discountCents = getNumber(args.discountCents);
         const discountPercent = getNumber(args.discountPercent);
-        const amount = discountCents !== undefined
-          ? formatCurrency(discountCents)
-          : discountPercent !== undefined
-            ? `${discountPercent}%`
-            : undefined;
-        const amountLabel = amount ?? 'a discount';
+        const amount =
+          discountCents !== undefined
+            ? formatCurrency(discountCents)
+            : discountPercent !== undefined
+              ? `${discountPercent}%`
+              : undefined;
+        const amountLabel = amount ?? "a discount";
         return reservationId
-          ? `Apply ${amountLabel} to reservation ${reservationId}${reason ? ` for "${reason}"` : ''}.`
-          : `Apply ${amountLabel}${reason ? ` for "${reason}"` : ''}.`;
+          ? `Apply ${amountLabel} to reservation ${reservationId}${reason ? ` for "${reason}"` : ""}.`
+          : `Apply ${amountLabel}${reason ? ` for "${reason}"` : ""}.`;
       }
-      case 'add_charge': {
+      case "add_charge": {
         const amount = formatCurrency(getNumber(args.amountCents));
         const description = getString(args.description);
-        const amountLabel = amount ?? 'an additional charge';
+        const amountLabel = amount ?? "an additional charge";
         return reservationId
-          ? `Add ${amountLabel} to reservation ${reservationId}${description ? ` for "${description}"` : ''}.`
-          : `Add ${amountLabel}${description ? ` for "${description}"` : ''}.`;
+          ? `Add ${amountLabel} to reservation ${reservationId}${description ? ` for "${description}"` : ""}.`
+          : `Add ${amountLabel}${description ? ` for "${description}"` : ""}.`;
       }
-      case 'move_reservation': {
+      case "move_reservation": {
         const newSiteId = getString(args.newSiteId);
         return reservationId && newSiteId
-          ? `Move reservation ${reservationId} to site ${newSiteId}${reason ? ` for "${reason}"` : ''}.`
+          ? `Move reservation ${reservationId} to site ${newSiteId}${reason ? ` for "${reason}"` : ""}.`
           : reservationId
-            ? `Move reservation ${reservationId}${reason ? ` for "${reason}"` : ''}.`
-            : 'Move the reservation to a different site.';
+            ? `Move reservation ${reservationId}${reason ? ` for "${reason}"` : ""}.`
+            : "Move the reservation to a different site.";
       }
-      case 'extend_stay': {
+      case "extend_stay": {
         const additionalNights = getNumber(args.additionalNights);
         const newDepartureDate = getString(args.newDepartureDate);
         const extension = newDepartureDate
           ? `to ${newDepartureDate}`
           : additionalNights
-            ? `by ${additionalNights} night${additionalNights !== 1 ? 's' : ''}`
-            : 'by additional nights';
+            ? `by ${additionalNights} night${additionalNights !== 1 ? "s" : ""}`
+            : "by additional nights";
         return reservationId
           ? `Extend reservation ${reservationId} ${extension}.`
           : `Extend the stay ${extension}.`;
@@ -3213,31 +3370,33 @@ export class ChatToolsService {
 
   formatConfirmationDescription(toolName: string, args: Record<string, unknown>): string {
     switch (toolName) {
-      case 'check_in_guest':
+      case "check_in_guest":
         return `Check in reservation ${args.reservationId}?`;
-      case 'check_out_guest':
+      case "check_out_guest":
         return `Check out reservation ${args.reservationId}?`;
-      case 'process_refund':
+      case "process_refund":
         return `Process refund of $${((getNumber(args.amountCents) ?? 0) / 100).toFixed(2)}?`;
-      case 'cancel_reservation':
+      case "cancel_reservation":
         return `Cancel reservation ${args.reservationId}? This action cannot be undone.`;
-      case 'block_site': {
+      case "block_site": {
         const siteName = args._siteName || args.siteName || args.siteId;
-        const dateInfo = args.startDate && args.endDate
-          ? ` from ${args.startDate} to ${args.endDate}`
-          : args.startDate
-          ? ` starting ${args.startDate}`
-          : '';
+        const dateInfo =
+          args.startDate && args.endDate
+            ? ` from ${args.startDate} to ${args.endDate}`
+            : args.startDate
+              ? ` starting ${args.startDate}`
+              : "";
         return `Block ${siteName}${dateInfo} for "${args.reason}"?`;
       }
-      case 'create_hold': {
-        const siteName = getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
+      case "create_hold": {
+        const siteName =
+          getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
         const arrivalDate = getString(args.arrivalDate);
         const departureDate = getString(args.departureDate);
         if (siteName && arrivalDate && departureDate) {
           return `Place a hold on ${siteName} from ${arrivalDate} to ${departureDate}?`;
         }
-        return 'Place a temporary site hold?';
+        return "Place a temporary site hold?";
       }
       default:
         return `Execute ${toolName}?`;

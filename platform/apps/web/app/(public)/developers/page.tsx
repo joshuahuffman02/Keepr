@@ -8,11 +8,13 @@ export const metadata: Metadata = getStaticPageMetadata("/developers");
 const developerFaqs = [
   {
     question: "How do I get API access?",
-    answer: "Sign in as staff and generate an API token in Settings > Developer. Use the token as a Bearer header in your requests.",
+    answer:
+      "Sign in as staff and generate an API token in Settings > Developer. Use the token as a Bearer header in your requests.",
   },
   {
     question: "What endpoints are available?",
-    answer: "The API provides endpoints for campgrounds, availability, reservations, guests, and payments. Check our OpenAPI spec for the complete list.",
+    answer:
+      "The API provides endpoints for campgrounds, availability, reservations, guests, and payments. Check our OpenAPI spec for the complete list.",
   },
   {
     question: "Is the API free to use?",
@@ -20,7 +22,8 @@ const developerFaqs = [
   },
   {
     question: "What authentication method does the API use?",
-    answer: "The API uses token-based authentication with per-organization scoping. All requests require HTTPS.",
+    answer:
+      "The API uses token-based authentication with per-organization scoping. All requests require HTTPS.",
   },
 ];
 

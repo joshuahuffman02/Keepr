@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Get, Param, Post, Query, Req, Res, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import { LedgerService } from "./ledger.service";
 import type { Request, Response } from "express";
 import { JwtAuthGuard } from "../auth/guards";
@@ -12,7 +23,7 @@ type CampgroundRequest = Request & { campgroundId?: string };
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class LedgerController {
-  constructor(private readonly ledger: LedgerService) { }
+  constructor(private readonly ledger: LedgerService) {}
 
   private requireCampgroundId(req: CampgroundRequest, fallback?: string): string {
     const headerValue = req.headers["x-campground-id"];
@@ -30,12 +41,12 @@ export class LedgerController {
     @Param("campgroundId") campgroundId: string,
     @Query("start") start?: string,
     @Query("end") end?: string,
-    @Query("glCode") glCode?: string
+    @Query("glCode") glCode?: string,
   ) {
     return this.ledger.list(campgroundId, {
       start: start ? new Date(start) : undefined,
       end: end ? new Date(end) : undefined,
-      glCode
+      glCode,
     });
   }
 
@@ -46,15 +57,23 @@ export class LedgerController {
     @Query("start") start: string,
     @Query("end") end: string,
     @Query("glCode") glCode: string,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     const rows = await this.ledger.list(campgroundId, {
       start: start ? new Date(start) : undefined,
       end: end ? new Date(end) : undefined,
       glCode: glCode || undefined,
-      limit: 10000
+      limit: 10000,
     });
-    const headers = ["date", "glCode", "account", "reservationId", "amountCents", "direction", "description"];
+    const headers = [
+      "date",
+      "glCode",
+      "account",
+      "reservationId",
+      "amountCents",
+      "direction",
+      "description",
+    ];
     const csv = [headers.join(",")]
       .concat(
         rows.map((r) =>
@@ -65,9 +84,9 @@ export class LedgerController {
             r.reservationId ?? "",
             r.amountCents,
             r.direction,
-            (r.description ?? "").replace(/,/g, ";")
-          ].join(",")
-        )
+            (r.description ?? "").replace(/,/g, ";"),
+          ].join(","),
+        ),
       )
       .join("\n");
     res.setHeader("Content-Type", "text/csv");
@@ -81,7 +100,7 @@ export class LedgerController {
   listByReservation(
     @Param("id") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: CampgroundRequest
+    @Req() req: CampgroundRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ledger.listByReservation(reservationId, requiredCampgroundId);
@@ -93,9 +112,13 @@ export class LedgerController {
   summary(
     @Param("campgroundId") campgroundId: string,
     @Query("start") start?: string,
-    @Query("end") end?: string
+    @Query("end") end?: string,
   ) {
-    return this.ledger.summaryByGl(campgroundId, start ? new Date(start) : undefined, end ? new Date(end) : undefined);
+    return this.ledger.summaryByGl(
+      campgroundId,
+      start ? new Date(start) : undefined,
+      end ? new Date(end) : undefined,
+    );
   }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
@@ -108,7 +131,7 @@ export class LedgerController {
   @Post("campgrounds/:campgroundId/gl-periods")
   async createPeriod(
     @Param("campgroundId") campgroundId: string,
-    @Body() body: { startDate: string; endDate: string; name?: string }
+    @Body() body: { startDate: string; endDate: string; name?: string },
   ) {
     const startDate = new Date(body.startDate);
     const endDate = new Date(body.endDate);
@@ -117,14 +140,22 @@ export class LedgerController {
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("campgrounds/:campgroundId/gl-periods/:id/close")
-  async closePeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: Request) {
+  async closePeriod(
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
+    @Req() req?: Request,
+  ) {
     // campgroundId path param for scoping; service checks id existence
     return this.ledger.closePeriod(campgroundId, id, req?.user?.id);
   }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("campgrounds/:campgroundId/gl-periods/:id/lock")
-  async lockPeriod(@Param("campgroundId") campgroundId: string, @Param("id") id: string, @Req() req?: Request) {
+  async lockPeriod(
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
+    @Req() req?: Request,
+  ) {
     return this.ledger.lockPeriod(campgroundId, id, req?.user?.id);
   }
 }

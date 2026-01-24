@@ -13,8 +13,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "Calculate Your Campground Software Savings",
-    description:
-      "See exactly how much you could save with Keepr's transparent pricing model.",
+    description: "See exactly how much you could save with Keepr's transparent pricing model.",
     type: "website",
   },
 };

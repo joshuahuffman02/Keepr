@@ -20,7 +20,7 @@ const steps = [
 
 export function BookingProgressIndicator({
   currentStep,
-  className
+  className,
 }: BookingProgressIndicatorProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -46,11 +46,15 @@ export function BookingProgressIndicator({
             className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
-            transition={prefersReducedMotion ? { duration: 0 } : {
-              type: "spring",
-              stiffness: 100,
-              damping: 20
-            }}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : {
+                    type: "spring",
+                    stiffness: 100,
+                    damping: 20,
+                  }
+            }
           />
         </div>
 
@@ -63,19 +67,19 @@ export function BookingProgressIndicator({
                 "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium",
                 step.num < currentStep && "bg-emerald-500 text-white",
                 step.num === currentStep && "bg-emerald-500 text-white ring-2 ring-emerald-200",
-                step.num > currentStep && "bg-muted text-muted-foreground"
+                step.num > currentStep && "bg-muted text-muted-foreground",
               )}
               initial={prefersReducedMotion ? {} : { scale: 0.8 }}
-              animate={prefersReducedMotion ? {} : {
-                scale: step.num === currentStep ? 1.1 : 1
-              }}
+              animate={
+                prefersReducedMotion
+                  ? {}
+                  : {
+                      scale: step.num === currentStep ? 1.1 : 1,
+                    }
+              }
               transition={{ type: "spring", stiffness: 300 }}
             >
-              {step.num < currentStep ? (
-                <Check className="h-3 w-3" />
-              ) : (
-                step.num
-              )}
+              {step.num < currentStep ? <Check className="h-3 w-3" /> : step.num}
             </motion.div>
           ))}
         </div>
@@ -99,12 +103,16 @@ export function BookingProgressIndicator({
                       "relative flex items-center justify-center w-12 h-12 rounded-full text-sm font-semibold transition-colors",
                       isComplete && "bg-emerald-500 text-white",
                       isCurrent && "bg-emerald-500 text-white",
-                      isFuture && "bg-muted text-muted-foreground border-2 border-border"
+                      isFuture && "bg-muted text-muted-foreground border-2 border-border",
                     )}
                     initial={prefersReducedMotion ? {} : { scale: 0.9 }}
-                    animate={prefersReducedMotion ? {} : {
-                      scale: isCurrent ? 1 : 1,
-                    }}
+                    animate={
+                      prefersReducedMotion
+                        ? {}
+                        : {
+                            scale: isCurrent ? 1 : 1,
+                          }
+                    }
                     transition={{ type: "spring", stiffness: 300 }}
                   >
                     {/* Pulse ring for current step */}
@@ -113,12 +121,12 @@ export function BookingProgressIndicator({
                         className="absolute inset-0 rounded-full bg-emerald-500"
                         animate={{
                           scale: [1, 1.15, 1],
-                          opacity: [0.5, 0, 0.5]
+                          opacity: [0.5, 0, 0.5],
                         }}
                         transition={{
                           duration: 2,
                           repeat: Infinity,
-                          ease: "easeInOut"
+                          ease: "easeInOut",
                         }}
                       />
                     )}
@@ -133,26 +141,32 @@ export function BookingProgressIndicator({
                         <Check className="h-5 w-5" strokeWidth={3} />
                       </motion.div>
                     ) : (
-                      <StepIcon className={cn(
-                        "h-5 w-5 relative z-10",
-                        isCurrent && "text-white",
-                        isFuture && "text-muted-foreground"
-                      )} />
+                      <StepIcon
+                        className={cn(
+                          "h-5 w-5 relative z-10",
+                          isCurrent && "text-white",
+                          isFuture && "text-muted-foreground",
+                        )}
+                      />
                     )}
                   </motion.div>
 
                   {/* Labels */}
                   <div className="mt-2 text-center">
-                    <span className={cn(
-                      "block text-sm font-medium",
-                      (isComplete || isCurrent) ? "text-emerald-600" : "text-muted-foreground"
-                    )}>
+                    <span
+                      className={cn(
+                        "block text-sm font-medium",
+                        isComplete || isCurrent ? "text-emerald-600" : "text-muted-foreground",
+                      )}
+                    >
                       {step.label}
                     </span>
-                    <span className={cn(
-                      "block text-xs mt-0.5",
-                      isCurrent ? "text-muted-foreground" : "text-muted-foreground"
-                    )}>
+                    <span
+                      className={cn(
+                        "block text-xs mt-0.5",
+                        isCurrent ? "text-muted-foreground" : "text-muted-foreground",
+                      )}
+                    >
                       {step.sublabel}
                     </span>
                   </div>
@@ -166,13 +180,17 @@ export function BookingProgressIndicator({
                       className="absolute inset-y-0 left-0 bg-emerald-500 rounded-full"
                       initial={{ width: 0 }}
                       animate={{
-                        width: step.num < currentStep ? "100%" : "0%"
+                        width: step.num < currentStep ? "100%" : "0%",
                       }}
-                      transition={prefersReducedMotion ? { duration: 0 } : {
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 20
-                      }}
+                      transition={
+                        prefersReducedMotion
+                          ? { duration: 0 }
+                          : {
+                              type: "spring",
+                              stiffness: 100,
+                              damping: 20,
+                            }
+                      }
                     />
                   </div>
                 )}

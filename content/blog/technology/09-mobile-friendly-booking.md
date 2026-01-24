@@ -17,12 +17,14 @@ More than 60% of campground website visits come from mobile devices. If your boo
 ## The Mobile Reality
 
 ### Usage Statistics
+
 - 60-70% of visits are mobile
 - 50%+ of bookings start on mobile
 - Poor mobile experience = abandoned bookings
 - Guests research on phones, often book on phones
 
 ### User Expectations
+
 - Pages load in under 3 seconds
 - Easy to tap buttons and links
 - Forms that work on small screens
@@ -33,18 +35,21 @@ More than 60% of campground website visits come from mobile devices. If your boo
 ## Mobile Booking Essentials
 
 ### Design Requirements
+
 - Responsive layout (adapts to screen)
 - Large, tappable buttons
 - Readable text without zooming
 - Simple navigation
 
 ### Form Optimization
+
 - Minimal required fields
 - Appropriate keyboard types (email, phone, number)
 - Auto-fill compatibility
 - Clear error messages
 
 ### Performance
+
 - Fast page load times
 - Compressed images
 - No flash or incompatible elements
@@ -64,13 +69,13 @@ More than 60% of campground website visits come from mobile devices. If your boo
 
 ## Common Mobile Problems
 
-| Problem | Solution |
-|---------|----------|
-| Tiny buttons | Make tap targets 44px minimum |
-| Slow loading | Compress images, use fast hosting |
-| Form too long | Reduce required fields |
-| Can't read text | Ensure minimum 16px font |
-| Calendar hard to use | Use mobile-optimized date picker |
+| Problem              | Solution                          |
+| -------------------- | --------------------------------- |
+| Tiny buttons         | Make tap targets 44px minimum     |
+| Slow loading         | Compress images, use fast hosting |
+| Form too long        | Reduce required fields            |
+| Can't read text      | Ensure minimum 16px font          |
+| Calendar hard to use | Use mobile-optimized date picker  |
 
 ---
 
@@ -83,4 +88,4 @@ More than 60% of campground website visits come from mobile devices. If your boo
 
 ---
 
-*Keepr's booking interface is optimized for mobile from the ground up. [See mobile booking at campreserv.com](https://campreserv.com)*
+_Keepr's booking interface is optimized for mobile from the ground up. [See mobile booking at campreserv.com](https://campreserv.com)_

@@ -10,7 +10,13 @@ import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import { Input } from "../../../../../components/ui/input";
 import { Label } from "../../../../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { format } from "date-fns";
 import {
@@ -40,7 +46,7 @@ import {
   Check,
   X,
   Sparkles,
-  PartyPopper
+  PartyPopper,
 } from "lucide-react";
 import {
   Dialog,
@@ -48,7 +54,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
 } from "../../../../../components/ui/dialog";
 import {
   AlertDialog,
@@ -59,7 +65,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger
+  AlertDialogTrigger,
 } from "../../../../../components/ui/alert-dialog";
 import { Switch } from "../../../../../components/ui/switch";
 import { AuditLogTimeline } from "../../../../../components/audit/AuditLogTimeline";
@@ -165,9 +171,7 @@ const isDeliveryChannel = (value: string): value is DeliveryChannel =>
   value === "email" || value === "email_and_sms" || value === "sms";
 
 const isSignatureRequest = (value: unknown): value is SignatureRequest =>
-  isRecord(value) &&
-  typeof value.id === "string" &&
-  typeof value.status === "string";
+  isRecord(value) && typeof value.id === "string" && typeof value.status === "string";
 
 export default function ReservationDetailPage() {
   const params = useParams<{ reservationId: string; campgroundId: string }>();
@@ -213,21 +217,21 @@ export default function ReservationDetailPage() {
   const reservationQuery = useQuery<ReservationWithExtras>({
     queryKey: ["reservation", reservationId],
     queryFn: () => apiClient.getReservation(reservationId),
-    enabled: !!reservationId
+    enabled: !!reservationId,
   });
   const reservation = reservationQuery.data;
 
   const checkinStatusQuery = useQuery({
     queryKey: ["checkin-status", reservationId],
     queryFn: () => apiClient.getCheckinStatus(reservationId),
-    enabled: !!reservationId
+    enabled: !!reservationId,
   });
   const checkinStatus = checkinStatusQuery.data;
 
   const accessQuery = useQuery<AccessStatus>({
     queryKey: ["access-status", reservationId],
     queryFn: () => apiClient.getAccessStatus(reservationId, campgroundId),
-    enabled: !!reservationId
+    enabled: !!reservationId,
   });
   const accessStatus = accessQuery.data;
 
@@ -237,9 +241,9 @@ export default function ReservationDetailPage() {
       apiClient.getQuote(campgroundId, {
         siteId: reservation?.siteId || "",
         arrivalDate: reservation?.arrivalDate || "",
-        departureDate: reservation?.departureDate || ""
+        departureDate: reservation?.departureDate || "",
       }),
-    enabled: !!reservationId && !!campgroundId && !!reservation?.siteId
+    enabled: !!reservationId && !!campgroundId && !!reservation?.siteId,
   });
 
   const commsQuery = useQuery<CommunicationList>({
@@ -249,34 +253,36 @@ export default function ReservationDetailPage() {
         campgroundId,
         reservationId,
         guestId: reservation?.guestId,
-        limit: 30
+        limit: 30,
       }),
-    enabled: !!reservationId && !!campgroundId
+    enabled: !!reservationId && !!campgroundId,
   });
 
   const chargesQuery = useQuery<RepeatCharge[]>({
     queryKey: ["reservation-charges", reservationId],
     queryFn: () => apiClient.getRepeatChargesByReservation(reservationId, campgroundId),
-    enabled: !!reservationId && !!campgroundId
+    enabled: !!reservationId && !!campgroundId,
   });
 
   const relatedQuery = useQuery<RelatedReservation[]>({
     queryKey: ["related-reservations", campgroundId, reservation?.guestId],
     queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId && !!reservation?.guestId
+    enabled: !!campgroundId && !!reservation?.guestId,
   });
 
   const signaturesQuery = useQuery<SignatureRequest[]>({
     queryKey: ["signatures", reservationId],
     queryFn: async () => {
-      const res = await fetch(`/api/signatures/reservations/${reservationId}`, { credentials: "include" });
+      const res = await fetch(`/api/signatures/reservations/${reservationId}`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error("Unable to fetch signature requests");
       const data = await res.json();
       if (!Array.isArray(data)) return [];
       return data.filter(isSignatureRequest);
     },
     enabled: !!reservationId,
-    retry: false
+    retry: false,
   });
 
   // Mutations
@@ -298,24 +304,32 @@ export default function ReservationDetailPage() {
         }
         setTimeout(() => setShowCheckOutSuccess(false), 4000);
       }
-    }
+    },
   });
 
   const vehicleMutation = useMutation({
-    mutationFn: (payload: { plate?: string; state?: string; rigType?: string; rigLength?: number }) =>
-      apiClient.upsertVehicle(reservationId, payload, campgroundId),
+    mutationFn: (payload: {
+      plate?: string;
+      state?: string;
+      rigType?: string;
+      rigLength?: number;
+    }) => apiClient.upsertVehicle(reservationId, payload, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
       queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
-    }
+    },
   });
 
   const grantAccessMutation = useMutation({
-    mutationFn: (payload: { provider: string; credentialType: string; credentialValue?: string; idempotencyKey: string }) =>
-      apiClient.grantAccess(reservationId, payload, campgroundId),
+    mutationFn: (payload: {
+      provider: string;
+      credentialType: string;
+      credentialValue?: string;
+      idempotencyKey: string;
+    }) => apiClient.grantAccess(reservationId, payload, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
-    }
+    },
   });
 
   const revokeAccessMutation = useMutation({
@@ -323,7 +337,7 @@ export default function ReservationDetailPage() {
       apiClient.revokeAccess(reservationId, payload, campgroundId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["access-status", reservationId] });
-    }
+    },
   });
 
   const createSignatureMutation = useMutation({
@@ -337,34 +351,34 @@ export default function ReservationDetailPage() {
         message: "Please review and sign the documents.",
         recipientName: reservation?.guest
           ? `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`
-          : undefined
+          : undefined,
       };
       const res = await fetch("/api/signatures/requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Failed to create signature request");
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["signatures", reservationId] });
-    }
+    },
   });
 
   const resendSignatureMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/signatures/requests/${id}/resend`, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to resend");
       return res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["signatures", reservationId] });
-    }
+    },
   });
 
   const coiUploadMutation = useMutation({
@@ -374,17 +388,17 @@ export default function ReservationDetailPage() {
         reservationId,
         guestId: reservation?.guestId,
         fileUrl: coiUrl || "https://placeholder.example/coi.pdf",
-        expiresAt: coiExpiresAt || undefined
+        expiresAt: coiExpiresAt || undefined,
       };
       const res = await fetch("/api/signatures/coi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error("Failed to save COI");
       return res.json();
-    }
+    },
   });
 
   const convertToSeasonalMutation = useMutation({
@@ -422,7 +436,7 @@ export default function ReservationDetailPage() {
           ? String(reservation.rigLength)
           : accessStatus?.vehicle?.rigLength
             ? String(accessStatus.vehicle.rigLength)
-            : ""
+            : "",
       );
       if (reservation.guest?.email && !signatureEmail) {
         setSignatureEmail(reservation.guest.email);
@@ -476,20 +490,40 @@ export default function ReservationDetailPage() {
   const total = totalCents / 100;
   const paid = paidCents / 100;
   const balance = balanceCents / 100;
-  const nights = quote?.nights ?? Math.ceil(
-    (new Date(reservation.departureDate).getTime() - new Date(reservation.arrivalDate).getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const nights =
+    quote?.nights ??
+    Math.ceil(
+      (new Date(reservation.departureDate).getTime() -
+        new Date(reservation.arrivalDate).getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
 
   const related = (relatedQuery.data || [])
     .filter((r) => r.id !== reservationId && r.guestId === reservation.guestId)
     .slice(0, 5);
 
   const statusConfig: Record<string, { bg: string; text: string; border: string }> = {
-    confirmed: { bg: "bg-status-success/15", text: "text-status-success", border: "border-status-success/20" },
-    checked_in: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info/20" },
+    confirmed: {
+      bg: "bg-status-success/15",
+      text: "text-status-success",
+      border: "border-status-success/20",
+    },
+    checked_in: {
+      bg: "bg-status-info/15",
+      text: "text-status-info",
+      border: "border-status-info/20",
+    },
     checked_out: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-    cancelled: { bg: "bg-status-error/10", text: "text-status-error", border: "border-status-error/20" },
-    pending: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning/20" }
+    cancelled: {
+      bg: "bg-status-error/10",
+      text: "text-status-error",
+      border: "border-status-error/20",
+    },
+    pending: {
+      bg: "bg-status-warning/15",
+      text: "text-status-warning",
+      border: "border-status-warning/20",
+    },
   };
   const status = statusConfig[reservation.status] || statusConfig.pending;
 
@@ -519,7 +553,9 @@ export default function ReservationDetailPage() {
                 </Badge>
               </div>
               <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                <span>{formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}</span>
+                <span>
+                  {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
+                </span>
                 <span className="text-muted-foreground/60">|</span>
                 <span>{siteLabel}</span>
                 {siteClassName && (
@@ -541,13 +577,15 @@ export default function ReservationDetailPage() {
                 className={cn(
                   "flex items-center gap-2 px-4 py-2 rounded-lg transition-all",
                   "bg-status-warning/10 border border-status-warning/40",
-                  "hover:border-status-warning/60 hover:shadow-sm cursor-pointer group"
+                  "hover:border-status-warning/60 hover:shadow-sm cursor-pointer group",
                 )}
               >
                 <DollarSign className="h-5 w-5 text-status-warning group-hover:scale-110 transition-transform" />
                 <div className="text-left">
                   <div className="text-xs text-status-warning font-medium">Balance Due</div>
-                  <div className="text-lg font-bold text-status-warning-text">{formatCurrency(balanceCents)}</div>
+                  <div className="text-lg font-bold text-status-warning-text">
+                    {formatCurrency(balanceCents)}
+                  </div>
                 </div>
               </button>
             ) : (
@@ -555,7 +593,9 @@ export default function ReservationDetailPage() {
                 <CheckCircle className="h-5 w-5 text-status-success" />
                 <div className="text-left">
                   <div className="text-xs text-status-success font-medium">Paid in Full</div>
-                  <div className="text-lg font-bold text-status-success-text">{formatCurrency(total * 100)}</div>
+                  <div className="text-lg font-bold text-status-success-text">
+                    {formatCurrency(total * 100)}
+                  </div>
                 </div>
               </div>
             )}
@@ -564,7 +604,10 @@ export default function ReservationDetailPage() {
             {reservation.status === "confirmed" && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button size="lg" className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover">
+                  <Button
+                    size="lg"
+                    className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+                  >
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Check In
                   </Button>
@@ -588,7 +631,10 @@ export default function ReservationDetailPage() {
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                           <Calendar className="h-4 w-4" />
-                          <span>{formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}</span>
+                          <span>
+                            {formatDate(reservation.arrivalDate)} -{" "}
+                            {formatDate(reservation.departureDate)}
+                          </span>
                         </div>
                       </div>
                       <div className="text-xs text-muted-foreground space-y-1">
@@ -707,7 +753,10 @@ export default function ReservationDetailPage() {
             </Button>
 
             {balance > 0 && (
-              <Button onClick={() => setPaymentModalOpen(true)} className="bg-action-primary hover:bg-action-primary-hover text-action-primary-foreground">
+              <Button
+                onClick={() => setPaymentModalOpen(true)}
+                className="bg-action-primary hover:bg-action-primary-hover text-action-primary-foreground"
+              >
                 <CreditCard className="h-4 w-4 mr-2" />
                 Collect Payment
               </Button>
@@ -733,7 +782,9 @@ export default function ReservationDetailPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">Welcome!</h3>
-                <p className="text-status-success">{guestName} is now checked in to {siteLabel}</p>
+                <p className="text-status-success">
+                  {guestName} is now checked in to {siteLabel}
+                </p>
               </div>
             </div>
           </motion.div>
@@ -754,7 +805,9 @@ export default function ReservationDetailPage() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">Check-out Complete</h3>
-                <p className="text-status-info">Site {siteLabel} has been marked for housekeeping</p>
+                <p className="text-status-info">
+                  Site {siteLabel} has been marked for housekeeping
+                </p>
               </div>
             </div>
           </motion.div>
@@ -764,21 +817,29 @@ export default function ReservationDetailPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Balance due</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Balance due
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className={cn(
-              "text-xl font-bold",
-              balanceCents > 0 ? "text-status-warning" : "text-status-success"
-            )}>
+            <div
+              className={cn(
+                "text-xl font-bold",
+                balanceCents > 0 ? "text-status-warning" : "text-status-success",
+              )}
+            >
               {formatCurrency(balanceCents)}
             </div>
-            <div className="text-xs text-muted-foreground">{balanceCents > 0 ? "Outstanding" : "Paid in full"}</div>
+            <div className="text-xs text-muted-foreground">
+              {balanceCents > 0 ? "Outstanding" : "Paid in full"}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Paid to date</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Paid to date
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-xl font-bold text-foreground">{formatCurrency(paidCents)}</div>
@@ -787,20 +848,30 @@ export default function ReservationDetailPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stay length</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Stay length
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-xl font-bold text-foreground">{nights}</div>
-            <div className="text-xs text-muted-foreground">Night{nights !== 1 ? "s" : ""} · {reservation.site?.siteClass?.name || "Standard"}</div>
+            <div className="text-xs text-muted-foreground">
+              Night{nights !== 1 ? "s" : ""} · {reservation.site?.siteClass?.name || "Standard"}
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</CardTitle>
+            <CardTitle className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Status
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="text-xl font-bold text-foreground capitalize">{reservation.status?.replace("_", " ") || "pending"}</div>
-            <div className="text-xs text-muted-foreground">Updated {formatDateTime(reservation.updatedAt)}</div>
+            <div className="text-xl font-bold text-foreground capitalize">
+              {reservation.status?.replace("_", " ") || "pending"}
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Updated {formatDateTime(reservation.updatedAt)}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -848,9 +919,13 @@ export default function ReservationDetailPage() {
               <CardContent>
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Guest</div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Guest
+                    </div>
                     <div className="font-semibold text-foreground">{guestName}</div>
-                    <div className="text-sm text-muted-foreground">{reservation.guest?.email || "--"}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {reservation.guest?.email || "--"}
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -861,49 +936,72 @@ export default function ReservationDetailPage() {
                     </Button>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Site</div>
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Site
+                    </div>
                     <div className="font-semibold text-foreground">{siteLabel}</div>
-                    <div className="text-sm text-muted-foreground">{siteClassName || "Standard"}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {siteClassName || "Standard"}
+                    </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-auto p-0 text-blue-600"
-                      onClick={() => router.push(`/campgrounds/${campgroundId}/sites/${reservation.siteId}`)}
+                      onClick={() =>
+                        router.push(`/campgrounds/${campgroundId}/sites/${reservation.siteId}`)
+                      }
                     >
                       View Site
                     </Button>
                   </div>
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Dates</div>
-                    <div className="font-semibold text-foreground">
-                      {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)}
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Dates
                     </div>
-                    <div className="text-sm text-muted-foreground">{nights} night{nights !== 1 ? "s" : ""}</div>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Party Size</div>
                     <div className="font-semibold text-foreground">
-                      {(reservation.adults ?? 0) + (reservation.children ?? 0)} guest{(reservation.adults ?? 0) + (reservation.children ?? 0) !== 1 ? "s" : ""}
+                      {formatDate(reservation.arrivalDate)} -{" "}
+                      {formatDate(reservation.departureDate)}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {reservation.adults ?? 0} adult{(reservation.adults ?? 0) !== 1 ? "s" : ""}, {reservation.children ?? 0} child{(reservation.children ?? 0) !== 1 ? "ren" : ""}
+                      {nights} night{nights !== 1 ? "s" : ""}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Party Size
+                    </div>
+                    <div className="font-semibold text-foreground">
+                      {(reservation.adults ?? 0) + (reservation.children ?? 0)} guest
+                      {(reservation.adults ?? 0) + (reservation.children ?? 0) !== 1 ? "s" : ""}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {reservation.adults ?? 0} adult{(reservation.adults ?? 0) !== 1 ? "s" : ""},{" "}
+                      {reservation.children ?? 0} child
+                      {(reservation.children ?? 0) !== 1 ? "ren" : ""}
                     </div>
                   </div>
                   {(vehiclePlate || reservation.vehiclePlate) && (
                     <div className="space-y-1">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vehicle</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Vehicle
+                      </div>
                       <div className="font-semibold text-foreground">
-                        {vehiclePlate || reservation.vehiclePlate} {vehicleState || reservation.vehicleState}
+                        {vehiclePlate || reservation.vehiclePlate}{" "}
+                        {vehicleState || reservation.vehicleState}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {vehicleRigType || reservation.rigType || ""}
-                        {(vehicleRigLength || reservation.rigLength) ? ` - ${vehicleRigLength || reservation.rigLength}ft` : ""}
+                        {vehicleRigLength || reservation.rigLength
+                          ? ` - ${vehicleRigLength || reservation.rigLength}ft`
+                          : ""}
                       </div>
                     </div>
                   )}
                   {reservation.notes && (
                     <div className="sm:col-span-2 space-y-1">
-                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notes</div>
+                      <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Notes
+                      </div>
                       <div className="text-sm text-foreground whitespace-pre-line bg-muted rounded-lg p-3 border border-border">
                         {reservation.notes}
                       </div>
@@ -930,21 +1028,25 @@ export default function ReservationDetailPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Primary action area */}
-                <div className={cn(
-                  "p-4 rounded-lg border space-y-3",
-                  balance > 0
-                    ? "bg-status-warning/10 border-status-warning/30"
-                    : "bg-status-success/10 border-status-success/30"
-                )}>
+                <div
+                  className={cn(
+                    "p-4 rounded-lg border space-y-3",
+                    balance > 0
+                      ? "bg-status-warning/10 border-status-warning/30"
+                      : "bg-status-success/10 border-status-success/30",
+                  )}
+                >
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm text-muted-foreground">
                         {balance > 0 ? "Amount Due" : "Total Paid"}
                       </div>
-                      <div className={cn(
-                        "text-2xl font-bold",
-                        balance > 0 ? "text-status-warning-text" : "text-status-success-text"
-                      )}>
+                      <div
+                        className={cn(
+                          "text-2xl font-bold",
+                          balance > 0 ? "text-status-warning-text" : "text-status-success-text",
+                        )}
+                      >
                         {formatCurrency(balance > 0 ? balanceCents : total * 100)}
                       </div>
                     </div>
@@ -994,10 +1096,12 @@ export default function ReservationDetailPage() {
                       <span className="text-muted-foreground">
                         {p.direction === "refund" ? "Refund" : "Payment"}
                       </span>
-                      <span className={cn(
-                        "font-medium",
-                        p.direction === "refund" ? "text-rose-600" : "text-emerald-600"
-                      )}>
+                      <span
+                        className={cn(
+                          "font-medium",
+                          p.direction === "refund" ? "text-rose-600" : "text-emerald-600",
+                        )}
+                      >
                         {formatCurrency(p.amountCents)} - {formatDateTime(p.createdAt || p.date)}
                       </span>
                     </div>
@@ -1005,7 +1109,9 @@ export default function ReservationDetailPage() {
                   {reservation.checkInAt && (
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Checked in</span>
-                      <span className="font-medium text-blue-600">{formatDateTime(reservation.checkInAt)}</span>
+                      <span className="font-medium text-blue-600">
+                        {formatDateTime(reservation.checkInAt)}
+                      </span>
                     </div>
                   )}
                   {reservation.checkOutAt && (
@@ -1025,20 +1131,22 @@ export default function ReservationDetailPage() {
                     <Users className="h-5 w-5 text-muted-foreground" />
                     Related Stays
                   </span>
-                  {related.length > 0 && (
-                    <Badge variant="secondary">{related.length}</Badge>
-                  )}
+                  {related.length > 0 && <Badge variant="secondary">{related.length}</Badge>}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {related.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">First time guest - no previous stays</p>
+                  <p className="text-sm text-muted-foreground">
+                    First time guest - no previous stays
+                  </p>
                 ) : (
                   <div className="space-y-2">
                     {related.map((r) => (
                       <button
                         key={r.id}
-                        onClick={() => router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)}
+                        onClick={() =>
+                          router.push(`/campgrounds/${campgroundId}/reservations/${r.id}`)
+                        }
                         className="w-full flex items-center justify-between p-2 rounded-lg border border-border hover:bg-muted transition-colors text-left"
                       >
                         <div>
@@ -1099,7 +1207,8 @@ export default function ReservationDetailPage() {
                           <div>
                             <div className="font-medium text-amber-900">Convert to Seasonal</div>
                             <div className="text-sm text-status-warning">
-                              This {quote?.nights}-night stay qualifies for seasonal guest management
+                              This {quote?.nights}-night stay qualifies for seasonal guest
+                              management
                             </div>
                           </div>
                           <Button
@@ -1168,7 +1277,9 @@ export default function ReservationDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Paid</span>
-                    <span className="font-semibold text-emerald-600">{formatCurrency(paid * 100)}</span>
+                    <span className="font-semibold text-emerald-600">
+                      {formatCurrency(paid * 100)}
+                    </span>
                   </div>
                   <div className="h-2 rounded-full bg-muted overflow-hidden">
                     <div
@@ -1178,10 +1289,12 @@ export default function ReservationDetailPage() {
                   </div>
                   <div className="flex justify-between pt-2 border-t">
                     <span className="font-medium">Balance</span>
-                    <span className={cn(
-                      "font-bold text-lg",
-                      balance > 0 ? "text-amber-600" : "text-emerald-600"
-                    )}>
+                    <span
+                      className={cn(
+                        "font-bold text-lg",
+                        balance > 0 ? "text-amber-600" : "text-emerald-600",
+                      )}
+                    >
                       {formatCurrency(balanceCents)}
                     </span>
                   </div>
@@ -1243,9 +1356,15 @@ export default function ReservationDetailPage() {
                   <table className="w-full text-sm">
                     <thead className="bg-muted border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">Date</th>
-                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">Method</th>
-                        <th className="text-right px-4 py-3 font-medium text-muted-foreground">Amount</th>
+                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                          Date
+                        </th>
+                        <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                          Method
+                        </th>
+                        <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                          Amount
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -1253,11 +1372,14 @@ export default function ReservationDetailPage() {
                         <tr key={p.id} className="hover:bg-muted">
                           <td className="px-4 py-3">{formatDateTime(p.createdAt || p.date)}</td>
                           <td className="px-4 py-3 capitalize">{p.method || p.direction}</td>
-                          <td className={cn(
-                            "px-4 py-3 text-right font-medium",
-                            p.direction === "refund" ? "text-rose-600" : "text-emerald-600"
-                          )}>
-                            {p.direction === "refund" ? "-" : "+"}{formatCurrency(p.amountCents)}
+                          <td
+                            className={cn(
+                              "px-4 py-3 text-right font-medium",
+                              p.direction === "refund" ? "text-rose-600" : "text-emerald-600",
+                            )}
+                          >
+                            {p.direction === "refund" ? "-" : "+"}
+                            {formatCurrency(p.amountCents)}
                           </td>
                         </tr>
                       ))}
@@ -1281,8 +1403,13 @@ export default function ReservationDetailPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => {
-                      apiClient.generateRepeatCharges(reservationId, campgroundId)
-                        .then(() => queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] }));
+                      apiClient
+                        .generateRepeatCharges(reservationId, campgroundId)
+                        .then(() =>
+                          queryClient.invalidateQueries({
+                            queryKey: ["reservation-charges", reservationId],
+                          }),
+                        );
                     }}
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
@@ -1304,25 +1431,39 @@ export default function ReservationDetailPage() {
                     <table className="w-full text-sm">
                       <thead className="bg-muted border-b">
                         <tr>
-                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Due Date</th>
-                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Amount</th>
-                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">Status</th>
-                          <th className="text-right px-4 py-3 font-medium text-muted-foreground">Action</th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                            Due Date
+                          </th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                            Amount
+                          </th>
+                          <th className="text-left px-4 py-3 font-medium text-muted-foreground">
+                            Status
+                          </th>
+                          <th className="text-right px-4 py-3 font-medium text-muted-foreground">
+                            Action
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y">
                         {chargesQuery.data?.map((charge) => (
                           <tr key={charge.id} className="hover:bg-muted">
                             <td className="px-4 py-3">{formatDate(charge.dueDate)}</td>
-                            <td className="px-4 py-3 font-medium">{formatCurrency(charge.amount)}</td>
+                            <td className="px-4 py-3 font-medium">
+                              {formatCurrency(charge.amount)}
+                            </td>
                             <td className="px-4 py-3">
                               <Badge
                                 variant="outline"
                                 className={cn(
                                   "capitalize",
-                                  charge.status === "paid" && "bg-status-success/15 text-status-success border-status-success/20",
-                                  charge.status === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
-                                  charge.status !== "paid" && charge.status !== "failed" && "bg-status-warning/15 text-status-warning border-status-warning/20"
+                                  charge.status === "paid" &&
+                                    "bg-status-success/15 text-status-success border-status-success/20",
+                                  charge.status === "failed" &&
+                                    "bg-rose-50 text-rose-700 border-rose-200",
+                                  charge.status !== "paid" &&
+                                    charge.status !== "failed" &&
+                                    "bg-status-warning/15 text-status-warning border-status-warning/20",
                                 )}
                               >
                                 {charge.status}
@@ -1334,10 +1475,15 @@ export default function ReservationDetailPage() {
                                   size="sm"
                                   variant="secondary"
                                   onClick={() => {
-                                    apiClient.processRepeatCharge(charge.id, campgroundId)
+                                    apiClient
+                                      .processRepeatCharge(charge.id, campgroundId)
                                       .then(() => {
-                                        queryClient.invalidateQueries({ queryKey: ["reservation-charges", reservationId] });
-                                        queryClient.invalidateQueries({ queryKey: ["reservation", reservationId] });
+                                        queryClient.invalidateQueries({
+                                          queryKey: ["reservation-charges", reservationId],
+                                        });
+                                        queryClient.invalidateQueries({
+                                          queryKey: ["reservation", reservationId],
+                                        });
                                       });
                                   }}
                                 >
@@ -1428,9 +1574,10 @@ export default function ReservationDetailPage() {
                           variant="outline"
                           className={cn(
                             "text-xs",
-                            (c.status || "").toLowerCase().includes("fail") || (c.status || "").toLowerCase().includes("bounce")
+                            (c.status || "").toLowerCase().includes("fail") ||
+                              (c.status || "").toLowerCase().includes("bounce")
                               ? "bg-rose-50 text-rose-700 border-rose-200"
-                              : "bg-status-success/15 text-status-success border-status-success/20"
+                              : "bg-status-success/15 text-status-success border-status-success/20",
                           )}
                         >
                           {c.status}
@@ -1468,9 +1615,13 @@ export default function ReservationDetailPage() {
                         <Badge
                           variant="outline"
                           className={cn(
-                            checkinStatus.checkInStatus === "completed" && "bg-status-success/15 text-status-success border-status-success/20",
-                            checkinStatus.checkInStatus === "failed" && "bg-rose-50 text-rose-700 border-rose-200",
-                            checkinStatus.checkInStatus !== "completed" && checkinStatus.checkInStatus !== "failed" && "bg-status-warning/15 text-status-warning border-status-warning/20"
+                            checkinStatus.checkInStatus === "completed" &&
+                              "bg-status-success/15 text-status-success border-status-success/20",
+                            checkinStatus.checkInStatus === "failed" &&
+                              "bg-rose-50 text-rose-700 border-rose-200",
+                            checkinStatus.checkInStatus !== "completed" &&
+                              checkinStatus.checkInStatus !== "failed" &&
+                              "bg-status-warning/15 text-status-warning border-status-warning/20",
                           )}
                         >
                           {checkinStatus.checkInStatus?.replace("_", " ") || "not started"}
@@ -1481,8 +1632,10 @@ export default function ReservationDetailPage() {
                         <Badge
                           variant="outline"
                           className={cn(
-                            checkinStatus.checkOutStatus === "completed" && "bg-status-success/15 text-status-success border-status-success/20",
-                            checkinStatus.checkOutStatus !== "completed" && "bg-muted text-muted-foreground border-border"
+                            checkinStatus.checkOutStatus === "completed" &&
+                              "bg-status-success/15 text-status-success border-status-success/20",
+                            checkinStatus.checkOutStatus !== "completed" &&
+                              "bg-muted text-muted-foreground border-border",
                           )}
                         >
                           {checkinStatus.checkOutStatus?.replace("_", " ") || "not started"}
@@ -1537,7 +1690,9 @@ export default function ReservationDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <Label htmlFor="vehicle-plate" className="text-xs">License Plate</Label>
+                    <Label htmlFor="vehicle-plate" className="text-xs">
+                      License Plate
+                    </Label>
                     <Input
                       id="vehicle-plate"
                       value={vehiclePlate}
@@ -1546,7 +1701,9 @@ export default function ReservationDetailPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="vehicle-state" className="text-xs">State</Label>
+                    <Label htmlFor="vehicle-state" className="text-xs">
+                      State
+                    </Label>
                     <Input
                       id="vehicle-state"
                       value={vehicleState}
@@ -1555,7 +1712,9 @@ export default function ReservationDetailPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="vehicle-rig-type" className="text-xs">Rig Type</Label>
+                    <Label htmlFor="vehicle-rig-type" className="text-xs">
+                      Rig Type
+                    </Label>
                     <Input
                       id="vehicle-rig-type"
                       value={vehicleRigType}
@@ -1564,7 +1723,9 @@ export default function ReservationDetailPage() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="vehicle-rig-length" className="text-xs">Length (ft)</Label>
+                    <Label htmlFor="vehicle-rig-length" className="text-xs">
+                      Length (ft)
+                    </Label>
                     <Input
                       id="vehicle-rig-length"
                       type="number"
@@ -1581,7 +1742,7 @@ export default function ReservationDetailPage() {
                       plate: vehiclePlate || undefined,
                       state: vehicleState || undefined,
                       rigType: vehicleRigType || undefined,
-                      rigLength: vehicleRigLength ? Number(vehicleRigLength) : undefined
+                      rigLength: vehicleRigLength ? Number(vehicleRigLength) : undefined,
                     })
                   }
                   disabled={vehicleMutation.isPending}
@@ -1633,7 +1794,7 @@ export default function ReservationDetailPage() {
                           provider: accessProvider,
                           credentialType: "pin",
                           credentialValue: accessCode || vehiclePlate || undefined,
-                          idempotencyKey: `grant-${accessProvider}-${reservationId}-${accessCode || "default"}`
+                          idempotencyKey: `grant-${accessProvider}-${reservationId}-${accessCode || "default"}`,
                         })
                       }
                       disabled={grantAccessMutation.isPending}
@@ -1646,7 +1807,9 @@ export default function ReservationDetailPage() {
                       onClick={() =>
                         revokeAccessMutation.mutate({
                           provider: accessProvider,
-                          providerAccessId: accessStatus?.grants.find((g) => g.provider === accessProvider)?.providerAccessId || undefined
+                          providerAccessId:
+                            accessStatus?.grants.find((g) => g.provider === accessProvider)
+                              ?.providerAccessId || undefined,
                         })
                       }
                       disabled={revokeAccessMutation.isPending}
@@ -1657,13 +1820,16 @@ export default function ReservationDetailPage() {
                   {(accessStatus?.grants ?? []).length > 0 && (
                     <div className="space-y-1">
                       {accessStatus?.grants.map((g) => (
-                        <div key={g.id} className="flex items-center justify-between text-sm p-2 rounded border">
+                        <div
+                          key={g.id}
+                          className="flex items-center justify-between text-sm p-2 rounded border"
+                        >
                           <span className="capitalize">{g.provider}</span>
                           <Badge
                             variant="outline"
                             className={cn(
                               g.status === "active" && "bg-status-success/15 text-status-success",
-                              g.status !== "active" && "bg-muted text-muted-foreground"
+                              g.status !== "active" && "bg-muted text-muted-foreground",
                             )}
                           >
                             {g.status}
@@ -1690,7 +1856,10 @@ export default function ReservationDetailPage() {
                   <div className="space-y-2">
                     <h4 className="text-sm font-medium text-foreground">Signature Requests</h4>
                     {signatureRequests.map((req) => (
-                      <div key={req.id} className="flex items-center justify-between p-3 rounded-lg border">
+                      <div
+                        key={req.id}
+                        className="flex items-center justify-between p-3 rounded-lg border"
+                      >
                         <div>
                           <div className="font-medium capitalize">
                             {(req.documentType || "document").replace(/_/g, " ")}
@@ -1727,7 +1896,10 @@ export default function ReservationDetailPage() {
                       onChange={(e) => setSignatureEmail(e.target.value)}
                       aria-label="Signature recipient email"
                     />
-                    <Select value={signatureType} onValueChange={(value) => setSignatureType(value)}>
+                    <Select
+                      value={signatureType}
+                      onValueChange={(value) => setSignatureType(value)}
+                    >
                       <SelectTrigger className="h-10" aria-label="Signature document type">
                         <SelectValue />
                       </SelectTrigger>
@@ -1798,10 +1970,7 @@ export default function ReservationDetailPage() {
             </Card>
 
             {/* Forms */}
-            <ReservationFormsCard
-              campgroundId={campgroundId}
-              reservationId={reservationId}
-            />
+            <ReservationFormsCard campgroundId={campgroundId} reservationId={reservationId} />
           </div>
         </TabsContent>
 
@@ -1872,7 +2041,8 @@ export default function ReservationDetailPage() {
             <div className="rounded-lg border bg-muted p-3">
               <div className="font-medium">{guestName}</div>
               <div className="text-sm text-muted-foreground">
-                {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)} - {siteLabel}
+                {formatDate(reservation.arrivalDate)} - {formatDate(reservation.departureDate)} -{" "}
+                {siteLabel}
               </div>
             </div>
 

@@ -82,10 +82,8 @@ export default function CompareNewbookPage() {
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
               Enterprise features.{" "}
-              <span className="text-keepr-evergreen font-semibold">
-                No $3,000 setup fee.
-              </span>{" "}
-              Go live in 48 hours, not weeks.
+              <span className="text-keepr-evergreen font-semibold">No $3,000 setup fee.</span> Go
+              live in 48 hours, not weeks.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -138,7 +136,8 @@ export default function CompareNewbookPage() {
               Why Parks Look for Newbook Alternatives
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Newbook is powerful, but it comes with trade-offs. Here's what we hear from park owners.
+              Newbook is powerful, but it comes with trade-offs. Here's what we hear from park
+              owners.
             </p>
           </div>
 
@@ -347,7 +346,11 @@ export default function CompareNewbookPage() {
             </div>
 
             <div className="text-center">
-              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
+              <Button
+                asChild
+                size="lg"
+                className="bg-keepr-evergreen hover:bg-keepr-evergreen-light"
+              >
                 <Link href="/signup">
                   Start Without the Big Upfront Cost
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -367,8 +370,8 @@ export default function CompareNewbookPage() {
                 Simple Onboarding. No Training Required.
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                Unlike Newbook's complex platform that requires extensive training, Keepr is intuitive from day one.
-                Most staff are comfortable within hours, not weeks.
+                Unlike Newbook's complex platform that requires extensive training, Keepr is
+                intuitive from day one. Most staff are comfortable within hours, not weeks.
               </p>
 
               <div className="space-y-4">
@@ -395,14 +398,18 @@ export default function CompareNewbookPage() {
                   <div className="w-24 text-sm font-semibold text-slate-500">Newbook</div>
                   <div className="flex-1 bg-red-100 rounded-full h-4 relative">
                     <div className="absolute left-0 top-0 h-full w-[80%] bg-red-500 rounded-full" />
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-red-700">2-4 weeks</span>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-red-700">
+                      2-4 weeks
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-24 text-sm font-semibold text-keepr-evergreen">Keepr</div>
                   <div className="flex-1 bg-keepr-evergreen/15 rounded-full h-4 relative">
                     <div className="absolute left-0 top-0 h-full w-[15%] bg-keepr-evergreen rounded-full" />
-                    <span className="absolute left-[18%] top-1/2 -translate-y-1/2 text-xs text-keepr-evergreen">48 hours</span>
+                    <span className="absolute left-[18%] top-1/2 -translate-y-1/2 text-xs text-keepr-evergreen">
+                      48 hours
+                    </span>
                   </div>
                 </div>
               </div>
@@ -418,7 +425,8 @@ export default function CompareNewbookPage() {
             Ready for Simpler, More Affordable Software?
           </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Get Newbook-level features without the complexity or cost. No contracts, no risk, 30-day money-back guarantee.
+            Get Newbook-level features without the complexity or cost. No contracts, no risk, 30-day
+            money-back guarantee.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

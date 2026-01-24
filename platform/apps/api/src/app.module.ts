@@ -8,9 +8,7 @@ import { CommonModule } from "./common/common.module";
 // Set ENABLE_CRON=true in production only
 const CRON_ENABLED = process.env.ENABLE_CRON === "true";
 if (!CRON_ENABLED) {
-  new Logger("AppModule").warn(
-    "⚠️  Cron jobs DISABLED (set ENABLE_CRON=true to enable)"
-  );
+  new Logger("AppModule").warn("⚠️  Cron jobs DISABLED (set ENABLE_CRON=true to enable)");
 }
 import { AuthModule } from "./auth/auth.module";
 import { OrganizationsModule } from "./organizations/organizations.module";
@@ -26,36 +24,36 @@ import { PricingModule } from "./pricing/pricing.module";
 import { LedgerModule } from "./ledger/ledger.module";
 import { PaymentsModule } from "./payments/payments.module";
 import { StoreModule } from "./store/store.module";
-import { GuestAuthModule } from './guest-auth/guest-auth.module';
-import { BlackoutsModule } from './blackouts/blackouts.module';
-import { PromotionsModule } from './promotions/promotions.module';
-import { PublicReservationsModule } from './public-reservations/public-reservations.module';
-import { MessagesModule } from './messages/messages.module';
-import { EventsModule } from './events/events.module';
-import { EmailModule } from './email/email.module';
-import { WaitlistModule } from './waitlist/waitlist.module';
-import { InternalMessagesModule } from './internal-messages/internal-messages.module';
-import { LoyaltyModule } from './loyalty/loyalty.module';
-import { TaxRulesModule } from './tax-rules/tax-rules.module';
-import { SeasonalRatesModule } from './seasonal-rates/seasonal-rates.module';
-import { GuestEquipmentModule } from './guest-equipment/guest-equipment.module';
-import { RepeatChargesModule } from './repeat-charges/repeat-charges.module';
-import { ActivitiesModule } from './activities/activities.module';
-import { MembershipsModule } from './memberships/memberships.module';
-import { OperationsModule } from './operations/operations.module';
-import { IncidentsModule } from './incidents/incidents.module';
-import { InternalConversationsModule } from './internal-conversations/internal-conversations.module';
-import { HoldsModule } from './holds/holds.module';
-import { AuditModule } from './audit/audit.module';
-import { CommunicationsModule } from './communications/communications.module';
-import { CampaignsModule } from './campaigns/campaigns.module';
-import { OtaModule } from './ota/ota.module';
-import { SiteMapModule } from './site-map/site-map.module';
-import { SupportModule } from './support/support.module';
-import { NpsModule } from './nps/nps.module';
-import { ReviewsModule } from './reviews/reviews.module';
-import { FormsModule } from './forms/forms.module';
-import { SocialPlannerModule } from './social-planner/social-planner.module';
+import { GuestAuthModule } from "./guest-auth/guest-auth.module";
+import { BlackoutsModule } from "./blackouts/blackouts.module";
+import { PromotionsModule } from "./promotions/promotions.module";
+import { PublicReservationsModule } from "./public-reservations/public-reservations.module";
+import { MessagesModule } from "./messages/messages.module";
+import { EventsModule } from "./events/events.module";
+import { EmailModule } from "./email/email.module";
+import { WaitlistModule } from "./waitlist/waitlist.module";
+import { InternalMessagesModule } from "./internal-messages/internal-messages.module";
+import { LoyaltyModule } from "./loyalty/loyalty.module";
+import { TaxRulesModule } from "./tax-rules/tax-rules.module";
+import { SeasonalRatesModule } from "./seasonal-rates/seasonal-rates.module";
+import { GuestEquipmentModule } from "./guest-equipment/guest-equipment.module";
+import { RepeatChargesModule } from "./repeat-charges/repeat-charges.module";
+import { ActivitiesModule } from "./activities/activities.module";
+import { MembershipsModule } from "./memberships/memberships.module";
+import { OperationsModule } from "./operations/operations.module";
+import { IncidentsModule } from "./incidents/incidents.module";
+import { InternalConversationsModule } from "./internal-conversations/internal-conversations.module";
+import { HoldsModule } from "./holds/holds.module";
+import { AuditModule } from "./audit/audit.module";
+import { CommunicationsModule } from "./communications/communications.module";
+import { CampaignsModule } from "./campaigns/campaigns.module";
+import { OtaModule } from "./ota/ota.module";
+import { SiteMapModule } from "./site-map/site-map.module";
+import { SupportModule } from "./support/support.module";
+import { NpsModule } from "./nps/nps.module";
+import { ReviewsModule } from "./reviews/reviews.module";
+import { FormsModule } from "./forms/forms.module";
+import { SocialPlannerModule } from "./social-planner/social-planner.module";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { AiModule } from "./ai/ai.module";
 import { ChatModule } from "./chat/chat.module";
@@ -305,6 +303,6 @@ import { RustServicesModule } from "./rust-services/rust-services.module";
     // Rust Microservices - Security-critical operations
     RustServicesModule,
   ],
-  providers: []
+  providers: [],
 })
-export class AppModule { }
+export class AppModule {}

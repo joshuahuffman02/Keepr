@@ -236,9 +236,7 @@ export function GlobalCommandPalette() {
             >
               <cmd.icon className="mr-2 h-4 w-4" />
               <span>{cmd.label}</span>
-              {cmd.shortcut && (
-                <CommandShortcut>{cmd.shortcut}</CommandShortcut>
-              )}
+              {cmd.shortcut && <CommandShortcut>{cmd.shortcut}</CommandShortcut>}
             </CommandItem>
           ))}
         </CommandGroup>
@@ -254,9 +252,7 @@ export function GlobalCommandPalette() {
             >
               <cmd.icon className="mr-2 h-4 w-4" />
               <span>{cmd.label}</span>
-              {cmd.shortcut && (
-                <CommandShortcut>{cmd.shortcut}</CommandShortcut>
-              )}
+              {cmd.shortcut && <CommandShortcut>{cmd.shortcut}</CommandShortcut>}
             </CommandItem>
           ))}
         </CommandGroup>
@@ -290,9 +286,7 @@ export function GlobalCommandPalette() {
             >
               <cmd.icon className="mr-2 h-4 w-4" />
               <span>{cmd.label}</span>
-              {cmd.shortcut && (
-                <CommandShortcut>{cmd.shortcut}</CommandShortcut>
-              )}
+              {cmd.shortcut && <CommandShortcut>{cmd.shortcut}</CommandShortcut>}
             </CommandItem>
           ))}
         </CommandGroup>

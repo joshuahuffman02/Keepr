@@ -9,10 +9,7 @@ interface PortalLoadingStateProps {
   message?: string;
 }
 
-export function PortalLoadingState({
-  variant = "spinner",
-  message,
-}: PortalLoadingStateProps) {
+export function PortalLoadingState({ variant = "spinner", message }: PortalLoadingStateProps) {
   if (variant === "spinner") {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-3">

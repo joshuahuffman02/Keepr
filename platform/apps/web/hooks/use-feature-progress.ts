@@ -19,7 +19,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api"
 async function fetchWithAuth<T>(
   endpoint: string,
   token: string,
-  options?: RequestInit
+  options?: RequestInit,
 ): Promise<T> {
   const res = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
@@ -88,9 +88,13 @@ export function useFeatureProgress() {
   // Toggle feature mutation
   const toggleMutation = useMutation({
     mutationFn: (featureKey: string) =>
-      fetchWithAuth<FeatureProgressItem>(`/feature-progress/${encodeURIComponent(featureKey)}/toggle`, authToken, {
-        method: "POST",
-      }),
+      fetchWithAuth<FeatureProgressItem>(
+        `/feature-progress/${encodeURIComponent(featureKey)}/toggle`,
+        authToken,
+        {
+          method: "POST",
+        },
+      ),
     onMutate: async (featureKey) => {
       await queryClient.cancelQueries({ queryKey: ["feature-progress"] });
       const previous = queryClient.getQueryData<FeatureProgressItem[]>(["feature-progress"]);
@@ -98,18 +102,26 @@ export function useFeatureProgress() {
       if (previous) {
         const existing = previous.find((p) => p.featureKey === featureKey);
         if (existing) {
-          queryClient.setQueryData<FeatureProgressItem[]>(["feature-progress"],
+          queryClient.setQueryData<FeatureProgressItem[]>(
+            ["feature-progress"],
             previous.map((p) =>
               p.featureKey === featureKey
-                ? { ...p, completed: !p.completed, completedAt: p.completed ? null : new Date().toISOString() }
-                : p
-            )
+                ? {
+                    ...p,
+                    completed: !p.completed,
+                    completedAt: p.completed ? null : new Date().toISOString(),
+                  }
+                : p,
+            ),
           );
         } else {
-          queryClient.setQueryData<FeatureProgressItem[]>(["feature-progress"], [
-            ...previous,
-            { featureKey, completed: true, completedAt: new Date().toISOString(), notes: null },
-          ]);
+          queryClient.setQueryData<FeatureProgressItem[]>(
+            ["feature-progress"],
+            [
+              ...previous,
+              { featureKey, completed: true, completedAt: new Date().toISOString(), notes: null },
+            ],
+          );
         }
       }
       return { previous };
@@ -127,10 +139,14 @@ export function useFeatureProgress() {
   // Mark complete mutation
   const markCompleteMutation = useMutation({
     mutationFn: ({ featureKey, notes }: { featureKey: string; notes?: string }) =>
-      fetchWithAuth<FeatureProgressItem>(`/feature-progress/${encodeURIComponent(featureKey)}/complete`, authToken, {
-        method: "POST",
-        body: JSON.stringify({ notes }),
-      }),
+      fetchWithAuth<FeatureProgressItem>(
+        `/feature-progress/${encodeURIComponent(featureKey)}/complete`,
+        authToken,
+        {
+          method: "POST",
+          body: JSON.stringify({ notes }),
+        },
+      ),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["feature-progress"] });
     },

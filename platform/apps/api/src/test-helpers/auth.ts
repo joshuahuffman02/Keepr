@@ -37,5 +37,7 @@ export const buildAuthMembership = (overrides: Partial<AuthMembership> = {}): Au
 export const buildAuthUser = (overrides: Partial<AuthUser> = {}): AuthUser => ({
   ...defaultUser,
   ...overrides,
-  memberships: hasOwn(overrides, "memberships") ? overrides.memberships ?? [] : defaultUser.memberships,
+  memberships: hasOwn(overrides, "memberships")
+    ? (overrides.memberships ?? [])
+    : defaultUser.memberships,
 });

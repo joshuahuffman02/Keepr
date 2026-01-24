@@ -17,7 +17,7 @@ export class UsageTrackerService {
   constructor(private readonly prisma: PrismaService) {}
 
   private toNullableJsonInput(
-    value: unknown
+    value: unknown,
   ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined {
     if (value === undefined) return undefined;
     if (value === null) return Prisma.JsonNull;
@@ -34,7 +34,7 @@ export class UsageTrackerService {
   async trackBookingCreated(
     reservationId: string,
     campgroundId: string,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ) {
     try {
       // Get organization from campground
@@ -64,7 +64,7 @@ export class UsageTrackerService {
       });
 
       this.logger.debug(
-        `Tracked booking_created for reservation ${reservationId}, org ${organizationId}`
+        `Tracked booking_created for reservation ${reservationId}, org ${organizationId}`,
       );
 
       // Check for setup service surcharge and apply if needed
@@ -78,10 +78,7 @@ export class UsageTrackerService {
   /**
    * Check for and apply setup service surcharge ($1/booking until paid off)
    */
-  private async applySetupServiceSurcharge(
-    organizationId: string,
-    reservationId: string
-  ) {
+  private async applySetupServiceSurcharge(organizationId: string, reservationId: string) {
     try {
       // Find setup services with outstanding balance (oldest first)
       const servicesWithBalance = await this.prisma.setupService.findMany({
@@ -101,7 +98,7 @@ export class UsageTrackerService {
       const service = servicesWithBalance[0];
       const chargeAmount = Math.min(
         service.perBookingSurchargeCents,
-        service.balanceRemainingCents
+        service.balanceRemainingCents,
       );
 
       const newBalance = service.balanceRemainingCents - chargeAmount;
@@ -139,12 +136,12 @@ export class UsageTrackerService {
 
       this.logger.debug(
         `Applied setup service surcharge: $${(chargeAmount / 100).toFixed(2)} for service ${service.id}, ` +
-          `balance remaining: $${(newBalance / 100).toFixed(2)}`
+          `balance remaining: $${(newBalance / 100).toFixed(2)}`,
       );
 
       if (isPaidOff) {
         this.logger.log(
-          `Setup service ${service.id} (${service.serviceType}) is now fully paid off!`
+          `Setup service ${service.id} (${service.serviceType}) is now fully paid off!`,
         );
       }
     } catch (error) {
@@ -161,7 +158,7 @@ export class UsageTrackerService {
     campgroundId: string | null,
     direction: "outbound" | "inbound",
     messageId?: string,
-    segmentCount: number = 1
+    segmentCount: number = 1,
   ) {
     try {
       await this.prisma.usageEvent.create({
@@ -177,7 +174,7 @@ export class UsageTrackerService {
       });
 
       this.logger.debug(
-        `Tracked sms_${direction} for org ${organizationId}, segments: ${segmentCount}`
+        `Tracked sms_${direction} for org ${organizationId}, segments: ${segmentCount}`,
       );
     } catch (error) {
       this.logger.error(`Failed to track SMS usage:`, error);
@@ -191,7 +188,7 @@ export class UsageTrackerService {
     organizationId: string,
     campgroundId: string | null,
     tokenCount: number,
-    modelId?: string
+    modelId?: string,
   ) {
     try {
       await this.prisma.usageEvent.create({
@@ -201,15 +198,11 @@ export class UsageTrackerService {
           campgroundId,
           eventType: "ai_usage",
           quantity: tokenCount,
-          metadata: modelId
-            ? this.toNullableJsonInput({ modelId })
-            : this.toNullableJsonInput({}),
+          metadata: modelId ? this.toNullableJsonInput({ modelId }) : this.toNullableJsonInput({}),
         },
       });
 
-      this.logger.debug(
-        `Tracked ai_usage for org ${organizationId}, tokens: ${tokenCount}`
-      );
+      this.logger.debug(`Tracked ai_usage for org ${organizationId}, tokens: ${tokenCount}`);
     } catch (error) {
       this.logger.error(`Failed to track AI usage:`, error);
     }

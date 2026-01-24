@@ -88,21 +88,29 @@ export class OtaService {
   private readonly webhookErrorRateTarget = Number(process.env.OTA_WEBHOOK_ERROR_RATE ?? 0.01);
   private readonly successRateTarget = Number(process.env.OTA_SUCCESS_RATE ?? 0.95);
 
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  private async requireChannel(campgroundId: string, channelId: string, select?: Record<string, boolean>) {
+  private async requireChannel(
+    campgroundId: string,
+    channelId: string,
+    select?: Record<string, boolean>,
+  ) {
     const channel = await this.prisma.otaChannel.findFirst({
       where: { id: channelId, campgroundId },
-      ...(select ? { select } : {})
+      ...(select ? { select } : {}),
     });
     if (!channel) throw new NotFoundException("Channel not found");
     return channel;
   }
 
-  private async requireMapping(campgroundId: string, mappingId: string, select?: Record<string, boolean>) {
+  private async requireMapping(
+    campgroundId: string,
+    mappingId: string,
+    select?: Record<string, boolean>,
+  ) {
     const mapping = await this.prisma.otaListingMapping.findFirst({
       where: { id: mappingId, OtaChannel: { campgroundId } },
-      ...(select ? { select } : {})
+      ...(select ? { select } : {}),
     });
     if (!mapping) throw new NotFoundException("Mapping not found");
     return mapping;
@@ -256,7 +264,14 @@ export class OtaService {
     });
   }
 
-  logSync(channelId: string, payload: unknown, direction: string, eventType: string, status: string, message?: string) {
+  logSync(
+    channelId: string,
+    payload: unknown,
+    direction: string,
+    eventType: string,
+    status: string,
+    message?: string,
+  ) {
     const payloadJson = toJsonValue(payload);
     return this.prisma.otaSyncLog.create({
       data: {
@@ -293,10 +308,18 @@ export class OtaService {
   private readonly ICAL_TOKEN_EXPIRY_DAYS = 90;
 
   async ensureIcalToken(mappingId: string, campgroundId: string) {
-    const mapping = await this.requireMapping(campgroundId, mappingId, { id: true, icalToken: true, icalTokenExpiresAt: true });
+    const mapping = await this.requireMapping(campgroundId, mappingId, {
+      id: true,
+      icalToken: true,
+      icalTokenExpiresAt: true,
+    });
 
     // Return existing token if valid and not expired
-    if (mapping.icalToken && mapping.icalTokenExpiresAt && new Date(mapping.icalTokenExpiresAt) > new Date()) {
+    if (
+      mapping.icalToken &&
+      mapping.icalTokenExpiresAt &&
+      new Date(mapping.icalTokenExpiresAt) > new Date()
+    ) {
       return mapping.icalToken;
     }
 
@@ -360,7 +383,9 @@ export class OtaService {
 
     // Check token expiration
     if (mapping.icalTokenExpiresAt && new Date(mapping.icalTokenExpiresAt) < new Date()) {
-      throw new BadRequestException("Calendar token has expired. Please generate a new calendar link.");
+      throw new BadRequestException(
+        "Calendar token has expired. Please generate a new calendar link.",
+      );
     }
 
     if (!mapping.siteId) throw new BadRequestException("Mapping is not linked to a site");
@@ -462,16 +487,36 @@ export class OtaService {
       });
     }
 
-    await this.logSync(mapping.channelId, { imported: events.length }, "pull", "availability", "success", "iCal import");
+    await this.logSync(
+      mapping.channelId,
+      { imported: events.length },
+      "pull",
+      "availability",
+      "success",
+      "iCal import",
+    );
     this.recordSync("ical", campgroundId, true, "pull");
     return { ok: true, imported: events.length };
   }
 
-  async handleWebhook(provider: string, body: unknown, rawBody: string, signature?: string, timestamp?: string) {
+  async handleWebhook(
+    provider: string,
+    body: unknown,
+    rawBody: string,
+    signature?: string,
+    timestamp?: string,
+  ) {
     const payload = isRecord(body) ? body : {};
     const channel = await this.prisma.otaChannel.findFirst({
       where: { provider },
-      select: { id: true, webhookSecret: true, campgroundId: true, defaultStatus: true, rateMultiplier: true, feeMode: true },
+      select: {
+        id: true,
+        webhookSecret: true,
+        campgroundId: true,
+        defaultStatus: true,
+        rateMultiplier: true,
+        feeMode: true,
+      },
     });
 
     if (!channel?.id) {
@@ -520,7 +565,14 @@ export class OtaService {
           where: { id: importRecord.id },
           data: { status: "failed", message: "No mapping found for listing" },
         });
-        await this.logSync(channel.id, payload, "pull", "reservation", "failed", "No mapping found");
+        await this.logSync(
+          channel.id,
+          payload,
+          "pull",
+          "reservation",
+          "failed",
+          "No mapping found",
+        );
         return { ok: false, reason: "no_mapping" };
       }
       await this.prisma.otaReservationImport.update({
@@ -544,15 +596,34 @@ export class OtaService {
             where: { id: importRecord.id },
             data: { status: "imported", message: "Cancelled" },
           });
-          await this.logSync(channel.id, payload, "pull", "reservation", "success", "Cancelled reservation");
+          await this.logSync(
+            channel.id,
+            payload,
+            "pull",
+            "reservation",
+            "success",
+            "Cancelled reservation",
+          );
           this.recordSync(provider, channel.campgroundId, true, "pull");
-          return { ok: true, importId: importRecord.id, reservationId: importRecord.reservationId, cancelled: true };
+          return {
+            ok: true,
+            importId: importRecord.id,
+            reservationId: importRecord.reservationId,
+            cancelled: true,
+          };
         } else {
           await this.prisma.otaReservationImport.update({
             where: { id: importRecord.id },
             data: { status: "failed", message: "Cancellation received but reservation not found" },
           });
-          await this.logSync(channel.id, payload, "pull", "reservation", "failed", "Cancellation without reservation");
+          await this.logSync(
+            channel.id,
+            payload,
+            "pull",
+            "reservation",
+            "failed",
+            "Cancellation without reservation",
+          );
           return { ok: false, reason: "missing_reservation_for_cancel" };
         }
       }
@@ -609,9 +680,7 @@ export class OtaService {
 
     const guestRecord = isRecord(payload.guest) ? payload.guest : undefined;
     const guestEmail =
-      getString(payload.guestEmail) ??
-      getString(payload.email) ??
-      getString(guestRecord?.email);
+      getString(payload.guestEmail) ?? getString(payload.email) ?? getString(guestRecord?.email);
     const guestFirst =
       getString(payload.guestFirstName) ??
       getString(payload.firstName) ??
@@ -625,10 +694,16 @@ export class OtaService {
     if (!guestEmail) throw new BadRequestException("Missing guest email");
 
     const rateMultiplier = opts.rateMultiplier ?? 1;
-    const baseSubtotal = Math.round((getNumberValue(payload.baseSubtotalCents) ?? getNumberValue(payload.totalCents) ?? 0) * rateMultiplier);
+    const baseSubtotal = Math.round(
+      (getNumberValue(payload.baseSubtotalCents) ?? getNumberValue(payload.totalCents) ?? 0) *
+        rateMultiplier,
+    );
     const feesAmount = Math.round((getNumberValue(payload.feesCents) ?? 0) * rateMultiplier);
     const taxesAmount = Math.round((getNumberValue(payload.taxesCents) ?? 0) * rateMultiplier);
-    const channelFeeCents = Math.round((getNumberValue(payload.channelFeeCents) ?? getNumberValue(payload.commissionCents) ?? 0) * rateMultiplier);
+    const channelFeeCents = Math.round(
+      (getNumberValue(payload.channelFeeCents) ?? getNumberValue(payload.commissionCents) ?? 0) *
+        rateMultiplier,
+    );
     const totalAmount = Math.max(0, baseSubtotal + feesAmount + taxesAmount);
 
     // Find or create guest
@@ -663,7 +738,12 @@ export class OtaService {
 
     let siteId = opts.siteId;
     if (!siteId && opts.siteClassId) {
-      siteId = await this.findAvailableSiteInClass(opts.campgroundId, opts.siteClassId, new Date(arrival), new Date(departure));
+      siteId = await this.findAvailableSiteInClass(
+        opts.campgroundId,
+        opts.siteClassId,
+        new Date(arrival),
+        new Date(departure),
+      );
     }
     if (!siteId) throw new BadRequestException("Mapping missing siteId");
 
@@ -730,14 +810,20 @@ export class OtaService {
     if (!raw) return null;
     const s = String(raw).toLowerCase();
     if (["cancelled", "canceled", "void"].includes(s)) return ReservationStatus.cancelled;
-    if (["pending", "tentative", "unconfirmed", "hold"].includes(s)) return ReservationStatus.pending;
+    if (["pending", "tentative", "unconfirmed", "hold"].includes(s))
+      return ReservationStatus.pending;
     return ReservationStatus.confirmed;
   }
 
   /**
    * Find an available site within a site class for the given date range.
    */
-  private async findAvailableSiteInClass(campgroundId: string, siteClassId: string, arrival: Date, departure: Date): Promise<string | null> {
+  private async findAvailableSiteInClass(
+    campgroundId: string,
+    siteClassId: string,
+    arrival: Date,
+    departure: Date,
+  ): Promise<string | null> {
     const sites = await this.prisma.site.findMany({
       where: { campgroundId, siteClassId, isActive: true },
       select: { id: true },
@@ -784,7 +870,14 @@ export class OtaService {
     // Check if channel is active
     if (channel.status === "disabled") {
       const message = "Channel is disabled. Enable it to sync availability.";
-      await this.logSync(channelId, { reason: "disabled" }, "push", "availability", "failed", message);
+      await this.logSync(
+        channelId,
+        { reason: "disabled" },
+        "push",
+        "availability",
+        "failed",
+        message,
+      );
       throw new BadRequestException(message);
     }
 
@@ -795,7 +888,14 @@ export class OtaService {
 
     if (mappings.length === 0) {
       const message = "No mappings found for this channel. Create site mappings first.";
-      await this.logSync(channelId, { reason: "no_mappings" }, "push", "availability", "failed", message);
+      await this.logSync(
+        channelId,
+        { reason: "no_mappings" },
+        "push",
+        "availability",
+        "failed",
+        message,
+      );
       throw new BadRequestException(message);
     }
 
@@ -809,13 +909,23 @@ export class OtaService {
     const hasCredentials = config.apiKey && config.externalAccountId;
 
     if (!hasCredentials) {
-      const message = "OTA provider credentials not configured. Add API key and account ID in settings.";
-      await this.logSync(channelId, { reason: "missing_credentials" }, "push", "availability", "failed", message);
+      const message =
+        "OTA provider credentials not configured. Add API key and account ID in settings.";
+      await this.logSync(
+        channelId,
+        { reason: "missing_credentials" },
+        "push",
+        "availability",
+        "failed",
+        message,
+      );
       this.recordSync(channel.provider ?? "unknown", channel.campgroundId, false, "push");
       throw new BadRequestException(message);
     }
 
-    this.logger.log(`Starting availability push for channel ${channelId} (${channel.provider}) with ${mappings.length} mappings`);
+    this.logger.log(
+      `Starting availability push for channel ${channelId} (${channel.provider}) with ${mappings.length} mappings`,
+    );
 
     for (const m of mappings) {
       // Skip disabled mappings
@@ -845,7 +955,7 @@ export class OtaService {
         const availabilityData = await this.prepareAvailabilityData(
           channel.campgroundId,
           m.siteId,
-          m.externalId
+          m.externalId,
         );
 
         // TODO: Call actual OTA provider API here
@@ -867,11 +977,13 @@ export class OtaService {
         // }
 
         // For now, log the sync attempt
-        this.logger.log(`Would push to ${channel.provider} for listing ${m.externalId}: ${JSON.stringify({
-          externalId: m.externalId,
-          siteId: m.siteId,
-          dates: availabilityData.length,
-        })}`);
+        this.logger.log(
+          `Would push to ${channel.provider} for listing ${m.externalId}: ${JSON.stringify({
+            externalId: m.externalId,
+            siteId: m.siteId,
+            dates: availabilityData.length,
+          })}`,
+        );
 
         // Update mapping sync status
         await this.prisma.otaListingMapping.update({
@@ -900,7 +1012,7 @@ export class OtaService {
           "push",
           "availability",
           "failed",
-          `Failed to sync listing ${m.externalId}: ${errorMsg}`
+          `Failed to sync listing ${m.externalId}: ${errorMsg}`,
         );
       }
     }
@@ -917,8 +1029,8 @@ export class OtaService {
       errorCount === 0
         ? `Successfully synced ${successCount} listing${successCount !== 1 ? "s" : ""}`
         : successCount === 0
-        ? `Failed to sync all ${errorCount} listing${errorCount !== 1 ? "s" : ""}`
-        : `Synced ${successCount} listing${successCount !== 1 ? "s" : ""} with ${errorCount} error${errorCount !== 1 ? "s" : ""}`;
+          ? `Failed to sync all ${errorCount} listing${errorCount !== 1 ? "s" : ""}`
+          : `Synced ${successCount} listing${successCount !== 1 ? "s" : ""} with ${errorCount} error${errorCount !== 1 ? "s" : ""}`;
 
     const payload = {
       total: mappings.length,
@@ -943,7 +1055,13 @@ export class OtaService {
 
     this.logger.log(`Completed: ${syncMessage}`);
 
-    return { ok: errorCount < mappings.length, total: mappings.length, successCount, errorCount, errors };
+    return {
+      ok: errorCount < mappings.length,
+      total: mappings.length,
+      successCount,
+      errorCount,
+      errors,
+    };
   }
 
   /**
@@ -985,7 +1103,9 @@ export class OtaService {
     while (current <= endDate) {
       const dateStr = current.toISOString().split("T")[0];
       const isBlocked =
-        reservations.some((r) => current >= new Date(r.arrivalDate) && current < new Date(r.departureDate)) ||
+        reservations.some(
+          (r) => current >= new Date(r.arrivalDate) && current < new Date(r.departureDate),
+        ) ||
         blackouts.some((b) => current >= new Date(b.startDate) && current < new Date(b.endDate));
 
       availability.push({
@@ -998,7 +1118,9 @@ export class OtaService {
       current.setDate(current.getDate() + 1);
     }
 
-    this.logger.log(`Prepared ${availability.length} days of availability for site ${siteId} (external: ${externalId})`);
+    this.logger.log(
+      `Prepared ${availability.length} days of availability for site ${siteId} (external: ${externalId})`,
+    );
     return availability;
   }
 
@@ -1051,7 +1173,11 @@ export class OtaService {
     const monitors = this.monitor();
     const freshnessBreaches = monitors
       .filter((m) => m.ageMinutes === Infinity || m.ageMinutes > this.freshnessMinutes)
-      .map((m) => ({ provider: m.provider, campgroundId: m.campgroundId, ageMinutes: m.ageMinutes }));
+      .map((m) => ({
+        provider: m.provider,
+        campgroundId: m.campgroundId,
+        ageMinutes: m.ageMinutes,
+      }));
     const webhookBreaches = monitors
       .filter((m) => m.webhookErrorRate > this.webhookErrorRateTarget)
       .map((m) => ({
@@ -1079,7 +1205,12 @@ export class OtaService {
     };
   }
 
-  private recordSync(provider: string, campgroundId: string, ok: boolean, _direction: "push" | "pull") {
+  private recordSync(
+    provider: string,
+    campgroundId: string,
+    ok: boolean,
+    _direction: "push" | "pull",
+  ) {
     const key = `${provider}:${campgroundId}`;
     const s = this.stats.get(key) ?? {
       provider,

@@ -1,9 +1,14 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { GamificationEventCategory, MaintenancePriority, MaintenanceStatus, type Prisma } from '@prisma/client';
-import { GamificationService } from '../gamification/gamification.service';
-import { EmailService } from '../email/email.service';
-import { randomUUID } from 'crypto';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import {
+  GamificationEventCategory,
+  MaintenancePriority,
+  MaintenanceStatus,
+  type Prisma,
+} from "@prisma/client";
+import { GamificationService } from "../gamification/gamification.service";
+import { EmailService } from "../email/email.service";
+import { randomUUID } from "crypto";
 
 type MaintenanceTicketWithRelations = Prisma.MaintenanceTicketGetPayload<{
   include: {
@@ -20,7 +25,7 @@ export class MaintenanceService {
     private prisma: PrismaService,
     private gamification: GamificationService,
     private emailService: EmailService,
-  ) { }
+  ) {}
 
   async create(data: {
     campgroundId: string;
@@ -67,7 +72,12 @@ export class MaintenanceService {
     });
   }
 
-  async findAll(campgroundId: string, status?: MaintenanceStatus, siteId?: string, outOfOrder?: boolean) {
+  async findAll(
+    campgroundId: string,
+    status?: MaintenanceStatus,
+    siteId?: string,
+    outOfOrder?: boolean,
+  ) {
     return this.prisma.maintenanceTicket.findMany({
       where: {
         campgroundId,
@@ -80,7 +90,7 @@ export class MaintenanceService {
         User: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -95,45 +105,48 @@ export class MaintenanceService {
     });
   }
 
-  async update(id: string, data: {
-    title?: string;
-    description?: string;
-    status?: MaintenanceStatus;
-    priority?: MaintenancePriority;
-    dueDate?: string;
-    assignedTo?: string;
-    assignedToTeamId?: string;
-    isBlocking?: boolean;
-    resolvedAt?: string;
-    outOfOrder?: boolean;
-    outOfOrderReason?: string;
-    outOfOrderUntil?: string;
-    checklist?: Prisma.InputJsonValue;
-    photos?: Prisma.InputJsonValue;
-    notes?: string;
-  }) {
+  async update(
+    id: string,
+    data: {
+      title?: string;
+      description?: string;
+      status?: MaintenanceStatus;
+      priority?: MaintenancePriority;
+      dueDate?: string;
+      assignedTo?: string;
+      assignedToTeamId?: string;
+      isBlocking?: boolean;
+      resolvedAt?: string;
+      outOfOrder?: boolean;
+      outOfOrderReason?: string;
+      outOfOrderUntil?: string;
+      checklist?: Prisma.InputJsonValue;
+      photos?: Prisma.InputJsonValue;
+      notes?: string;
+    },
+  ) {
     const existing = await this.prisma.maintenanceTicket.findUnique({
       where: { id },
     });
 
-    if (!existing) throw new NotFoundException('Ticket not found');
+    if (!existing) throw new NotFoundException("Ticket not found");
 
     // If status is closed, set resolvedAt if not provided
     let resolvedAt = data.resolvedAt ? new Date(data.resolvedAt) : undefined;
-    if (data.status === 'closed' && !resolvedAt) {
+    if (data.status === "closed" && !resolvedAt) {
       resolvedAt = new Date();
     }
 
     // Handle reopening
     let reopenedAt: Date | undefined;
-    const isReopening = existing.status === 'closed' && data.status && data.status !== 'closed';
+    const isReopening = existing.status === "closed" && data.status && data.status !== "closed";
     if (isReopening) {
       reopenedAt = new Date();
     }
 
     // If resolving/closing, clear out-of-order unless explicitly kept
     let outOfOrder = data.outOfOrder;
-    if (data.status === 'closed' && outOfOrder === undefined) {
+    if (data.status === "closed" && outOfOrder === undefined) {
       outOfOrder = false;
     }
 
@@ -165,7 +178,7 @@ export class MaintenanceService {
       },
     });
 
-    const isClosing = existing && data.status === 'closed' && existing.status !== 'closed';
+    const isClosing = existing && data.status === "closed" && existing.status !== "closed";
     const targetUserId = updatePayload.assignedTo ?? existing?.assignedTo;
 
     if (isClosing && targetUserId) {
@@ -193,7 +206,10 @@ export class MaintenanceService {
   /**
    * Notify staff when a site's out-of-order status changes
    */
-  private async notifyOutOfOrderChange(ticket: MaintenanceTicketWithRelations, wasOutOfOrder: boolean) {
+  private async notifyOutOfOrderChange(
+    ticket: MaintenanceTicketWithRelations,
+    wasOutOfOrder: boolean,
+  ) {
     try {
       const campground = await this.prisma.campground.findUnique({
         where: { id: ticket.campgroundId },
@@ -216,11 +232,11 @@ export class MaintenanceService {
         html: `
           <h2 style="color: ${statusColor}">${siteName} is now ${status}</h2>
           <p><strong>Maintenance Ticket:</strong> ${ticket.title}</p>
-          ${ticket.outOfOrderReason ? `<p><strong>Reason:</strong> ${ticket.outOfOrderReason}</p>` : ''}
-          ${ticket.outOfOrderUntil ? `<p><strong>Expected Return:</strong> ${new Date(ticket.outOfOrderUntil).toLocaleDateString()}</p>` : ''}
-          <p><strong>Priority:</strong> ${ticket.priority || 'medium'}</p>
+          ${ticket.outOfOrderReason ? `<p><strong>Reason:</strong> ${ticket.outOfOrderReason}</p>` : ""}
+          ${ticket.outOfOrderUntil ? `<p><strong>Expected Return:</strong> ${new Date(ticket.outOfOrderUntil).toLocaleDateString()}</p>` : ""}
+          <p><strong>Priority:</strong> ${ticket.priority || "medium"}</p>
           <p><strong>Status:</strong> ${ticket.status}</p>
-          ${ticket.description ? `<p><strong>Description:</strong> ${ticket.description}</p>` : ''}
+          ${ticket.description ? `<p><strong>Description:</strong> ${ticket.description}</p>` : ""}
           <p style="color: #666; font-size: 12px;">This notification was sent because the site's availability status changed.</p>
         `,
         campgroundId: ticket.campgroundId,

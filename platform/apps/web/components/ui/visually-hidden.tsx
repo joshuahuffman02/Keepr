@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 /**
  * VisuallyHidden - Component for screen reader-only content
@@ -12,7 +12,7 @@ import * as React from "react"
  * WCAG: 1.3.1 Info and Relationships (Level A)
  */
 export interface VisuallyHiddenProps extends React.HTMLAttributes<HTMLSpanElement> {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function VisuallyHidden({ children, ...props }: VisuallyHiddenProps) {
@@ -20,5 +20,5 @@ export function VisuallyHidden({ children, ...props }: VisuallyHiddenProps) {
     <span className="sr-only" {...props}>
       {children}
     </span>
-  )
+  );
 }

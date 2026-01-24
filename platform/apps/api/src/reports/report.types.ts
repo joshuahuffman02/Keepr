@@ -1,4 +1,11 @@
-export type ReportCategory = "Bookings" | "Inventory" | "Inventory Expiration" | "Payments" | "Operations" | "Marketing" | "POS";
+export type ReportCategory =
+  | "Bookings"
+  | "Inventory"
+  | "Inventory Expiration"
+  | "Payments"
+  | "Operations"
+  | "Marketing"
+  | "POS";
 
 export type ReportChartType = "line" | "bar" | "pie" | "table";
 

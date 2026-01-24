@@ -1,11 +1,28 @@
-'use client';
+"use client";
 
-import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield, Wrench, Database, Headphones, Sparkles, type LucideIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import {
+  Check,
+  X,
+  ArrowRight,
+  Star,
+  Clock,
+  Users,
+  Zap,
+  Crown,
+  Rocket,
+  Gift,
+  Shield,
+  Wrench,
+  Database,
+  Headphones,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
 
@@ -66,7 +83,10 @@ const tierOrder: EarlyAccessTierKey[] = ["founders_circle", "pioneer", "trailbla
 const isEarlyAccessTierKey = (value: string): value is EarlyAccessTierKey =>
   tierOrder.some((tier) => tier === value);
 
-const fallbackAvailability: Record<EarlyAccessTierKey, { totalSpots: number; pricing: TierPricing }> = {
+const fallbackAvailability: Record<
+  EarlyAccessTierKey,
+  { totalSpots: number; pricing: TierPricing }
+> = {
   founders_circle: {
     totalSpots: 5,
     pricing: {
@@ -361,7 +381,9 @@ type TierModel = {
 export function PricingPreview() {
   const [showComparison, setShowComparison] = useState(false);
   const [availability, setAvailability] = useState<TierAvailability[]>([]);
-  const [availabilityStatus, setAvailabilityStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [availabilityStatus, setAvailabilityStatus] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
   const prefersReducedMotion = useReducedMotionSafe();
 
   useEffect(() => {
@@ -391,7 +413,7 @@ export function PricingPreview() {
 
   const availabilityByTier = useMemo(
     () => new Map(availability.map((tier) => [tier.tier, tier])),
-    [availability]
+    [availability],
   );
 
   const tiers = useMemo<TierModel[]>(() => {
@@ -461,12 +483,15 @@ export function PricingPreview() {
 
   const containerVariants = {
     hidden: { opacity: prefersReducedMotion ? 1 : 0 },
-    visible: { opacity: 1, transition: prefersReducedMotion ? undefined : { staggerChildren: 0.1 } }
+    visible: {
+      opacity: 1,
+      transition: prefersReducedMotion ? undefined : { staggerChildren: 0.1 },
+    },
   };
 
   const itemVariants = {
     hidden: { opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 },
-    visible: { opacity: 1, y: 0, transition: prefersReducedMotion ? undefined : { duration: 0.5 } }
+    visible: { opacity: 1, y: 0, transition: prefersReducedMotion ? undefined : { duration: 0.5 } },
   };
 
   const availabilityLabel =
@@ -499,12 +524,17 @@ export function PricingPreview() {
         : "Early access is full. Standard pricing is available now."
       : `Join the first ${totalSpots} campgrounds building the future of reservation software.`;
   const ctaLink = hasLiveAvailability && totalRemaining === 0 ? "/pricing" : "/signup";
-  const ctaLabel = hasLiveAvailability && totalRemaining === 0 ? "See Standard Pricing" : "Claim Your Founding Spot";
+  const ctaLabel =
+    hasLiveAvailability && totalRemaining === 0
+      ? "See Standard Pricing"
+      : "Claim Your Founding Spot";
 
   return (
-    <section id="pricing" className="py-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal scroll-mt-24">
+    <section
+      id="pricing"
+      className="py-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal scroll-mt-24"
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-
         {/* Early Access Hero */}
         <motion.div
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
@@ -521,13 +551,12 @@ export function PricingPreview() {
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             {hasClaimedSpots
               ? `${spotsFilled} of ${totalSpots} Spots Claimed`
-              : `Be One of Our First ${totalSpots} Founding Campgrounds`
-            }
+              : `Be One of Our First ${totalSpots} Founding Campgrounds`}
           </h2>
 
           <p className="text-xl text-slate-300 mb-8">
-            Early access tiers fill in order — once {activeTier?.name || 'a tier'} is full, the next tier opens.
-            Lock in per-booking fees that will never increase.
+            Early access tiers fill in order — once {activeTier?.name || "a tier"} is full, the next
+            tier opens. Lock in per-booking fees that will never increase.
           </p>
 
           {/* Overall Progress Bar */}
@@ -608,17 +637,17 @@ export function PricingPreview() {
                       <div className="h-4 bg-white/10 rounded-full overflow-hidden">
                         <motion.div
                           className="h-full bg-keepr-clay rounded-full"
-                          initial={{ width: '100%' }}
-                          whileInView={{ width: `${(activeTier.spotsRemaining / activeTier.spots) * 100}%` }}
+                          initial={{ width: "100%" }}
+                          whileInView={{
+                            width: `${(activeTier.spotsRemaining / activeTier.spots) * 100}%`,
+                          }}
                           viewport={{ once: true }}
                           transition={{ duration: 0.8, delay: 0.5 }}
                         />
                       </div>
                     </>
                   ) : (
-                    <div className="text-sm text-slate-300">
-                      {availabilityHint}
-                    </div>
+                    <div className="text-sm text-slate-300">{availabilityHint}</div>
                   )}
                 </div>
 
@@ -626,7 +655,9 @@ export function PricingPreview() {
                 <div className="mt-8 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
                     <span className="text-3xl text-slate-300">$</span>
-                    <span className="text-7xl font-bold text-white">{activeTier.monthlyPriceDisplay}</span>
+                    <span className="text-7xl font-bold text-white">
+                      {activeTier.monthlyPriceDisplay}
+                    </span>
                     <span className="text-xl text-slate-300">/mo</span>
                   </div>
                   <p className="text-lg text-slate-300">{activeTier.monthlyDuration}</p>
@@ -689,7 +720,7 @@ export function PricingPreview() {
                 >
                   {/* Queue Position */}
                   <div className="absolute -top-3 left-4 px-3 py-1 bg-slate-700 text-white/70 text-xs font-medium rounded-full">
-                    Opens {index === 0 ? 'next' : `after ${upcomingTiers[index - 1]?.name}`}
+                    Opens {index === 0 ? "next" : `after ${upcomingTiers[index - 1]?.name}`}
                   </div>
 
                   <div className="flex items-start gap-4 pt-2">
@@ -701,7 +732,9 @@ export function PricingPreview() {
                       <p className="text-sm text-slate-300">{tier.spots} spots</p>
 
                       <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-white/60">${tier.monthlyPriceDisplay}</span>
+                        <span className="text-2xl font-bold text-white/60">
+                          ${tier.monthlyPriceDisplay}
+                        </span>
                         <span className="text-sm text-slate-300">/mo {tier.monthlyDuration}</span>
                       </div>
                       <p className="text-sm text-white/50 mt-1">
@@ -719,7 +752,7 @@ export function PricingPreview() {
         {filledTiers.length > 0 && (
           <div className="max-w-2xl mx-auto mb-16 text-center">
             <p className="text-slate-300 text-sm">
-              Already filled: {filledTiers.map(t => t.name).join(', ')}
+              Already filled: {filledTiers.map((t) => t.name).join(", ")}
             </p>
           </div>
         )}
@@ -727,7 +760,8 @@ export function PricingPreview() {
         {/* After Early Access Note */}
         <div className="text-center mb-16">
           <p className="text-slate-300">
-            After early access fills: <span className="text-white font-semibold">$100/month + $2.30/booking</span>
+            After early access fills:{" "}
+            <span className="text-white font-semibold">$100/month + $2.30/booking</span>
           </p>
           <p className="text-slate-300 text-sm mt-2">
             Includes $5/month AI credits. SMS at cost + small markup.
@@ -741,19 +775,17 @@ export function PricingPreview() {
               <Wrench className="h-4 w-4" />
               Optional Add-Ons
             </div>
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Want Help Getting Set Up?
-            </h3>
+            <h3 className="text-3xl font-bold text-white mb-4">Want Help Getting Set Up?</h3>
             <p className="text-slate-300 max-w-2xl mx-auto">
-              DIY setup is always free with our guides and documentation. But if you'd rather have us handle
-              the heavy lifting, we've got you covered.
+              DIY setup is always free with our guides and documentation. But if you'd rather have
+              us handle the heavy lifting, we've got you covered.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Quick Start */}
             <div className="rounded-2xl border border-border bg-muted/50 p-8">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-xl bg-keepr-evergreen/15">
                   <Headphones className="h-6 w-6 text-keepr-evergreen" />
                 </div>
@@ -802,7 +834,7 @@ export function PricingPreview() {
 
             {/* Data Import Service */}
             <div className="rounded-2xl border border-border bg-muted/50 p-8">
-                <div className="flex items-center gap-3 mb-4">
+              <div className="flex items-center gap-3 mb-4">
                 <div className="p-3 rounded-xl bg-keepr-clay/15">
                   <Database className="h-6 w-6 text-keepr-clay" />
                 </div>
@@ -813,7 +845,8 @@ export function PricingPreview() {
               </div>
 
               <p className="text-slate-300 mb-6">
-                You export from your old system, we clean it up and import it. No more manual data entry.
+                You export from your old system, we clean it up and import it. No more manual data
+                entry.
               </p>
 
               <div className="space-y-3 mb-6">
@@ -841,8 +874,8 @@ export function PricingPreview() {
 
               <div className="mt-6 pt-6 border-t border-border/50">
                 <p className="text-sm text-slate-300">
-                  <span className="text-keepr-clay font-medium">Prefer to pay over time?</span>{" "}
-                  Add $1/booking until paid off.
+                  <span className="text-keepr-clay font-medium">Prefer to pay over time?</span> Add
+                  $1/booking until paid off.
                 </p>
               </div>
             </div>
@@ -860,7 +893,9 @@ export function PricingPreview() {
             className="inline-flex items-center gap-2 px-6 py-3 bg-card/10 hover:bg-card/20 text-foreground rounded-full transition-colors"
           >
             {showComparison ? "Hide" : "Show"} Competitor Comparison
-            <ArrowRight className={`h-4 w-4 transition-transform ${showComparison ? "rotate-90" : ""}`} />
+            <ArrowRight
+              className={`h-4 w-4 transition-transform ${showComparison ? "rotate-90" : ""}`}
+            />
           </button>
         </div>
 
@@ -880,7 +915,9 @@ export function PricingPreview() {
                         {c.name}
                       </span>
                       {c.isUs && (
-                        <span className="block text-xs text-keepr-evergreen/70 mt-1">That's us!</span>
+                        <span className="block text-xs text-keepr-evergreen/70 mt-1">
+                          That's us!
+                        </span>
                       )}
                     </th>
                   ))}
@@ -891,7 +928,10 @@ export function PricingPreview() {
                 <tr className="border-b border-border/50">
                   <td className="p-4 text-slate-300">Monthly Base</td>
                   {competitors.map((c) => (
-                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
+                    <td
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}
+                    >
                       {c.monthlyBase}
                     </td>
                   ))}
@@ -899,7 +939,10 @@ export function PricingPreview() {
                 <tr className="border-b border-border/50">
                   <td className="p-4 text-slate-300">Per Booking Fee</td>
                   {competitors.map((c) => (
-                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
+                    <td
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}
+                    >
                       {c.perBooking}
                     </td>
                   ))}
@@ -907,7 +950,10 @@ export function PricingPreview() {
                 <tr className="border-b border-border/50">
                   <td className="p-4 text-slate-300">Marketplace Commission</td>
                   {competitors.map((c) => (
-                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : c.marketplaceCommission === "10%" ? "text-red-400" : "text-white"}`}>
+                    <td
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : c.marketplaceCommission === "10%" ? "text-red-400" : "text-white"}`}
+                    >
                       {c.marketplaceCommission}
                     </td>
                   ))}
@@ -915,7 +961,10 @@ export function PricingPreview() {
                 <tr className="border-b border-border/50">
                   <td className="p-4 text-slate-300">Setup Fee</td>
                   {competitors.map((c) => (
-                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
+                    <td
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}
+                    >
                       {c.setupFee}
                     </td>
                   ))}
@@ -923,8 +972,15 @@ export function PricingPreview() {
                 <tr className="border-b border-border/50">
                   <td className="p-4 text-slate-300">Free Trial</td>
                   {competitors.map((c) => (
-                    <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
-                      {c.freeTrialDays === "No" ? <X className="h-5 w-5 mx-auto text-red-400" /> : c.freeTrialDays + " days"}
+                    <td
+                      key={c.name}
+                      className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}
+                    >
+                      {c.freeTrialDays === "No" ? (
+                        <X className="h-5 w-5 mx-auto text-red-400" />
+                      ) : (
+                        c.freeTrialDays + " days"
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -934,9 +990,14 @@ export function PricingPreview() {
                   <tr key={key} className="border-b border-border/50">
                     <td className="p-4 text-slate-300">{featureLabels[key]}</td>
                     {competitors.map((c) => (
-                      <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10" : ""}`}>
+                      <td
+                        key={c.name}
+                        className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10" : ""}`}
+                      >
                         {c.features[key] ? (
-                          <Check className={`h-5 w-5 mx-auto ${c.isUs ? "text-keepr-clay" : "text-keepr-evergreen/70"}`} />
+                          <Check
+                            className={`h-5 w-5 mx-auto ${c.isUs ? "text-keepr-clay" : "text-keepr-evergreen/70"}`}
+                          />
                         ) : (
                           <X className="h-5 w-5 mx-auto text-slate-400" />
                         )}
@@ -951,9 +1012,7 @@ export function PricingPreview() {
 
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
-          <p className="text-slate-300 mb-6">
-            {joinMessage}
-          </p>
+          <p className="text-slate-300 mb-6">{joinMessage}</p>
           <Button
             asChild
             variant="outline"

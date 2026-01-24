@@ -1,21 +1,27 @@
-import { ConflictException, Injectable, NotFoundException, Logger, BadRequestException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import {
-    CreateProductCategoryDto,
-    UpdateProductCategoryDto,
-    CreateProductDto,
-    UpdateProductDto,
-    CreateAddOnDto,
-    UpdateAddOnDto,
-    CreateOrderDto,
+  CreateProductCategoryDto,
+  UpdateProductCategoryDto,
+  CreateProductDto,
+  UpdateProductDto,
+  CreateAddOnDto,
+  UpdateAddOnDto,
+  CreateOrderDto,
 } from "./dto/store.dto";
 import {
-    AddOnPricingType,
-    PaymentMethod,
-    OrderChannel,
-    ChannelInventoryMode,
-    TaxRuleType,
-    OrderStatus,
+  AddOnPricingType,
+  PaymentMethod,
+  OrderChannel,
+  ChannelInventoryMode,
+  TaxRuleType,
+  OrderStatus,
 } from "@prisma/client";
 import { EmailService } from "../email/email.service";
 import { StripeService } from "../payments/stripe.service";
@@ -26,75 +32,75 @@ import { postBalancedLedgerEntries } from "../ledger/ledger-posting.util";
 type FulfillmentType = "pickup" | "curbside" | "delivery" | "table_service";
 
 type InventoryProduct = {
-    id: string;
-    name: string;
-    priceCents: number;
-    trackInventory: boolean;
-    channelInventoryMode: ChannelInventoryMode | null;
-    inventoryMode?: string | null;
-    afterHoursAllowed?: boolean | null;
-    onlineStockQty?: number | null;
-    onlineBufferQty?: number | null;
-    posStockQty?: number | null;
-    stockQty?: number | null;
+  id: string;
+  name: string;
+  priceCents: number;
+  trackInventory: boolean;
+  channelInventoryMode: ChannelInventoryMode | null;
+  inventoryMode?: string | null;
+  afterHoursAllowed?: boolean | null;
+  onlineStockQty?: number | null;
+  onlineBufferQty?: number | null;
+  posStockQty?: number | null;
+  stockQty?: number | null;
 };
 
 type OrderWithItems = {
-    id: string;
-    campgroundId: string;
-    items?: Array<{ id?: string; name: string; qty: number; totalCents?: number | null }>;
-    totalCents: number;
-    paymentMethod?: PaymentMethod | null;
-    channel?: OrderChannel | null;
-    fulfillmentType?: string | null;
-    deliveryInstructions?: string | null;
-    promisedAt?: Date | null;
-    createdAt: Date;
-    siteNumber?: string | null;
-    reservationId?: string | null;
-    guest?: { email?: string | null; firstName?: string | null } | null;
-    reservation?: { guestEmail?: string | null; guestName?: string | null } | null;
-    campground?: { name?: string | null } | null;
+  id: string;
+  campgroundId: string;
+  items?: Array<{ id?: string; name: string; qty: number; totalCents?: number | null }>;
+  totalCents: number;
+  paymentMethod?: PaymentMethod | null;
+  channel?: OrderChannel | null;
+  fulfillmentType?: string | null;
+  deliveryInstructions?: string | null;
+  promisedAt?: Date | null;
+  createdAt: Date;
+  siteNumber?: string | null;
+  reservationId?: string | null;
+  guest?: { email?: string | null; firstName?: string | null } | null;
+  reservation?: { guestEmail?: string | null; guestName?: string | null } | null;
+  campground?: { name?: string | null } | null;
 };
 
 type RefundOrder = {
+  id: string;
+  campgroundId: string;
+  totalCents: number;
+  status: OrderStatus;
+  paymentMethod: PaymentMethod;
+  paymentIntentId?: string | null;
+  reservationId?: string | null;
+  items: Array<{
     id: string;
-    campgroundId: string;
-    totalCents: number;
-    status: OrderStatus;
-    paymentMethod: PaymentMethod;
-    paymentIntentId?: string | null;
-    reservationId?: string | null;
-    items: Array<{
-        id: string;
-        productId: string | null;
-        name: string;
-        qty: number;
-        totalCents?: number | null;
-    }>;
-    guest?: { email?: string | null; firstName?: string | null } | null;
-    reservation?: { guestEmail?: string | null; guestName?: string | null } | null;
-    campground?: { name?: string | null } | null;
-};
-
-type OrderAdjustmentItem = {
-    itemId?: string;
-    productId?: string | null;
-    name?: string;
-    qty?: number;
-    amountCents?: number;
-};
-
-type RefundSelection = {
-    itemId: string;
     productId: string | null;
     name: string;
     qty: number;
-    amountCents: number;
+    totalCents?: number | null;
+  }>;
+  guest?: { email?: string | null; firstName?: string | null } | null;
+  reservation?: { guestEmail?: string | null; guestName?: string | null } | null;
+  campground?: { name?: string | null } | null;
+};
+
+type OrderAdjustmentItem = {
+  itemId?: string;
+  productId?: string | null;
+  name?: string;
+  qty?: number;
+  amountCents?: number;
+};
+
+type RefundSelection = {
+  itemId: string;
+  productId: string | null;
+  name: string;
+  qty: number;
+  amountCents: number;
 };
 
 type ActorUser = {
-    id?: string | null;
+  id?: string | null;
 };
 
 const orderChannelValues: Set<string> = new Set(Object.values(OrderChannel));
@@ -104,1065 +110,1120 @@ const addOnPricingTypeValues: Set<string> = new Set(Object.values(AddOnPricingTy
 const isOrderChannel = (value: string): value is OrderChannel => orderChannelValues.has(value);
 const isPaymentMethod = (value: string): value is PaymentMethod => paymentMethodValues.has(value);
 const isAddOnPricingType = (value: string): value is AddOnPricingType =>
-    addOnPricingTypeValues.has(value);
+  addOnPricingTypeValues.has(value);
 
 const getErrorMessage = (error: unknown): string =>
-    error instanceof Error ? error.message : String(error);
+  error instanceof Error ? error.message : String(error);
 
 @Injectable()
 export class StoreService {
-    private readonly logger = new Logger(StoreService.name);
+  private readonly logger = new Logger(StoreService.name);
 
-    constructor(
-        private readonly prisma: PrismaService,
-        private readonly emailService: EmailService,
-        private readonly stripeService: StripeService,
-        private readonly locationService: LocationService
-    ) { }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly emailService: EmailService,
+    private readonly stripeService: StripeService,
+    private readonly locationService: LocationService,
+  ) {}
 
-    private async requireCategory(campgroundId: string, id: string) {
-        const category = await this.prisma.productCategory.findFirst({
-            where: { id, campgroundId },
-            select: { id: true }
-        });
-        if (!category) {
-            throw new NotFoundException("Category not found");
-        }
-        return category;
+  private async requireCategory(campgroundId: string, id: string) {
+    const category = await this.prisma.productCategory.findFirst({
+      where: { id, campgroundId },
+      select: { id: true },
+    });
+    if (!category) {
+      throw new NotFoundException("Category not found");
     }
+    return category;
+  }
 
-    private async requireProduct(campgroundId: string, id: string) {
-        const product = await this.prisma.product.findFirst({
-            where: { id, campgroundId },
-            select: { id: true, trackInventory: true, channelInventoryMode: true, stockQty: true, onlineStockQty: true, posStockQty: true }
-        });
-        if (!product) {
-            throw new NotFoundException("Product not found");
-        }
-        return product;
+  private async requireProduct(campgroundId: string, id: string) {
+    const product = await this.prisma.product.findFirst({
+      where: { id, campgroundId },
+      select: {
+        id: true,
+        trackInventory: true,
+        channelInventoryMode: true,
+        stockQty: true,
+        onlineStockQty: true,
+        posStockQty: true,
+      },
+    });
+    if (!product) {
+      throw new NotFoundException("Product not found");
     }
+    return product;
+  }
 
-    private async requireAddOn(campgroundId: string, id: string) {
-        const addOn = await this.prisma.addOnService.findFirst({
-            where: { id, campgroundId },
-            select: { id: true }
-        });
-        if (!addOn) {
-            throw new NotFoundException("Add-on not found");
-        }
-        return addOn;
+  private async requireAddOn(campgroundId: string, id: string) {
+    const addOn = await this.prisma.addOnService.findFirst({
+      where: { id, campgroundId },
+      select: { id: true },
+    });
+    if (!addOn) {
+      throw new NotFoundException("Add-on not found");
     }
+    return addOn;
+  }
 
-    private async requireOrder(campgroundId: string, id: string) {
-        const order = await this.prisma.storeOrder.findFirst({
-            where: { id, campgroundId }
-        });
-        if (!order) {
-            throw new NotFoundException("Order not found");
-        }
-        return order;
+  private async requireOrder(campgroundId: string, id: string) {
+    const order = await this.prisma.storeOrder.findFirst({
+      where: { id, campgroundId },
+    });
+    if (!order) {
+      throw new NotFoundException("Order not found");
     }
+    return order;
+  }
 
-    // ==================== CATEGORIES ====================
+  // ==================== CATEGORIES ====================
 
-    listCategories(campgroundId: string) {
-        return this.prisma.productCategory.findMany({
-            where: { campgroundId },
-            orderBy: { sortOrder: "asc" },
-            include: {
-                _count: { select: { Product: true } },
-            },
-        });
+  listCategories(campgroundId: string) {
+    return this.prisma.productCategory.findMany({
+      where: { campgroundId },
+      orderBy: { sortOrder: "asc" },
+      include: {
+        _count: { select: { Product: true } },
+      },
+    });
+  }
+
+  /**
+   * Update order status with timestamp tracking
+   */
+  async updateOrderStatus(campgroundId: string, id: string, status: OrderStatus, userId?: string) {
+    await this.requireOrder(campgroundId, id);
+    const data: {
+      status: OrderStatus;
+      readyAt?: Date;
+      deliveredAt?: Date;
+      completedAt?: Date;
+      completedById?: string;
+    } = { status };
+    const now = new Date();
+    if (status === OrderStatus.ready) data.readyAt = now;
+    if (status === OrderStatus.delivered) data.deliveredAt = now;
+    if (status === OrderStatus.completed) {
+      data.completedAt = now;
+      if (userId) data.completedById = userId;
     }
-
-    /**
-     * Update order status with timestamp tracking
-     */
-    async updateOrderStatus(
-        campgroundId: string,
-        id: string,
-        status: OrderStatus,
-        userId?: string
-    ) {
-        await this.requireOrder(campgroundId, id);
-        const data: {
-            status: OrderStatus;
-            readyAt?: Date;
-            deliveredAt?: Date;
-            completedAt?: Date;
-            completedById?: string;
-        } = { status };
-        const now = new Date();
-        if (status === OrderStatus.ready) data.readyAt = now;
-        if (status === OrderStatus.delivered) data.deliveredAt = now;
-        if (status === OrderStatus.completed) {
-            data.completedAt = now;
-            if (userId) data.completedById = userId;
-        }
-        return this.prisma.storeOrder.update({ where: { id }, data });
-    }
-
-    createCategory(data: CreateProductCategoryDto) {
-        return this.prisma.productCategory.create({ data: { ...data, id: randomUUID() } });
-    }
-
-    async updateCategory(campgroundId: string, id: string, data: UpdateProductCategoryDto) {
-        await this.requireCategory(campgroundId, id);
-        return this.prisma.productCategory.update({ where: { id }, data });
-    }
-
-    async deleteCategory(campgroundId: string, id: string) {
-        await this.requireCategory(campgroundId, id);
-        return this.prisma.productCategory.delete({ where: { id } });
-    }
-
-    // ==================== PRODUCTS ====================
-
-    listProducts(campgroundId: string, categoryId?: string) {
-        return this.prisma.product.findMany({
-            where: {
-                campgroundId,
-                ...(categoryId ? { categoryId } : {}),
-            },
-            orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-            include: {
-                ProductCategory: { select: { id: true, name: true } },
-            },
-        }).then((products) =>
-            products.map((product) => ({
-                ...product,
-                category: product.ProductCategory,
-            }))
-        );
-    }
-
-    async getProduct(campgroundId: string, id: string) {
-        const product = await this.prisma.product.findFirst({
-            where: { id, campgroundId },
-            include: { ProductCategory: true },
-        });
-        if (!product) throw new NotFoundException("Product not found");
-        return { ...product, category: product.ProductCategory };
-    }
-
-    createProduct(data: CreateProductDto) {
-        return this.prisma.product.create({ data: { ...data, id: randomUUID() } });
-    }
-
-    async updateProduct(campgroundId: string, id: string, data: UpdateProductDto) {
-        await this.requireProduct(campgroundId, id);
-        return this.prisma.product.update({ where: { id }, data });
-    }
-
-    async deleteProduct(campgroundId: string, id: string) {
-        await this.requireProduct(campgroundId, id);
-        return this.prisma.product.delete({ where: { id } });
-    }
-
-    async setStock(campgroundId: string, id: string, stockQty: number, channel?: OrderChannel | null) {
-        const product = await this.requireProduct(campgroundId, id);
-        const next = Math.max(0, stockQty);
-        if (channel && product.channelInventoryMode === "split") {
-            if (channel === "online" || channel === "portal") {
-                return this.prisma.product.update({ where: { id }, data: { onlineStockQty: next } });
-            }
-            return this.prisma.product.update({ where: { id }, data: { posStockQty: next } });
-        }
-        return this.prisma.product.update({
-            where: { id },
-            data: { stockQty: next },
-        });
-    }
-
-    async adjustStock(campgroundId: string, id: string, adjustment: number, channel?: OrderChannel | null) {
-        const product = await this.requireProduct(campgroundId, id);
-
-        if (channel && product.channelInventoryMode === "split") {
-            if (channel === "online" || channel === "portal") {
-                const newQty = Math.max(0, (product.onlineStockQty ?? 0) + adjustment);
-                return this.prisma.product.update({ where: { id }, data: { onlineStockQty: newQty } });
-            }
-            const newQty = Math.max(0, (product.posStockQty ?? 0) + adjustment);
-            return this.prisma.product.update({ where: { id }, data: { posStockQty: newQty } });
-        }
-
-        const newQty = Math.max(0, product.stockQty + adjustment);
-        return this.prisma.product.update({
-            where: { id },
-            data: { stockQty: newQty },
-        });
-    }
-
-    async getLowStockProducts(campgroundId: string) {
-        const products = await this.prisma.product.findMany({
-            where: {
-                campgroundId,
-                trackInventory: true,
-                lowStockAlert: { not: null },
-            },
-            include: { ProductCategory: true },
-        });
-
-        return products
-            .map((product) => ({ ...product, category: product.ProductCategory }))
-            .filter((product) => product.stockQty <= (product.lowStockAlert || 0));
-    }
-
-    // ==================== ADD-ONS ====================
-
-    listAddOns(campgroundId: string) {
-        return this.prisma.addOnService.findMany({
-            where: { campgroundId },
-            orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-        });
-    }
-
-    createAddOn(data: CreateAddOnDto) {
-        const pricingType =
-            data.pricingType && isAddOnPricingType(data.pricingType)
-                ? data.pricingType
-                : AddOnPricingType.flat;
-        return this.prisma.addOnService.create({
-            data: {
-                id: randomUUID(),
-                ...data,
-                pricingType,
-            },
-        });
-    }
-
-    async updateAddOn(campgroundId: string, id: string, data: UpdateAddOnDto) {
-        await this.requireAddOn(campgroundId, id);
-        const pricingType =
-            data.pricingType && isAddOnPricingType(data.pricingType)
-                ? data.pricingType
-                : undefined;
-        return this.prisma.addOnService.update({
-            where: { id },
-            data: {
-                ...data,
-                ...(pricingType ? { pricingType } : {}),
-            },
-        });
-    }
-
-    async deleteAddOn(campgroundId: string, id: string) {
-        await this.requireAddOn(campgroundId, id);
-        return this.prisma.addOnService.delete({ where: { id } });
-    }
-
-    // ==================== ORDERS ====================
-
-    async findReservationForGuest(reservationId: string, guestId: string) {
-        const reservation = await this.prisma.reservation.findFirst({
-            where: { id: reservationId, guestId },
-            select: { id: true, campgroundId: true, Site: { select: { siteNumber: true } } }
-        });
-        if (!reservation) return null;
-        const { Site, ...rest } = reservation;
-        return { ...rest, site: Site };
-    }
-
-    async listOrders(
-        campgroundId: string,
-        options?: { status?: OrderStatus; reservationId?: string }
-    ) {
-        const orders = await this.prisma.storeOrder.findMany({
-            where: {
-                campgroundId,
-                ...(options?.status ? { status: options.status } : {}),
-                ...(options?.reservationId
-                    ? { reservationId: options.reservationId }
-                    : {}),
-            },
-            orderBy: { createdAt: "desc" },
-            include: {
-                StoreOrderItem: true,
-                Reservation: {
-                    select: {
-                        id: true,
-                        Site: { select: { siteNumber: true } },
-                        Guest: { select: { primaryFirstName: true, primaryLastName: true } },
-                    },
-                },
-                Guest: {
-                    select: { primaryFirstName: true, primaryLastName: true },
-                },
-                User_StoreOrder_completedByIdToUser: {
-                    select: { id: true, firstName: true, lastName: true, email: true }
-                },
-            },
-        });
-
-        const normalizedOrders = orders.map((order) => {
-            const {
-                StoreOrderItem,
-                Reservation,
-                Guest,
-                User_StoreOrder_completedByIdToUser,
-                ...rest
-            } = order;
-
-            const reservation = Reservation
-                ? {
-                    id: Reservation.id,
-                    site: Reservation.Site,
-                    guest: Reservation.Guest,
-                }
-                : null;
-
-            return {
-                ...rest,
-                items: StoreOrderItem,
-                reservation,
-                guest: Guest,
-                completedBy: User_StoreOrder_completedByIdToUser,
-            };
-        });
-
-        return Promise.all(normalizedOrders.map((order) => this.attachAdjustments(order)));
-    }
-
-    /**
-     * Get unseen pending orders
-     */
-    async listUnseenOrders(campgroundId: string) {
-        return this.prisma.storeOrder.findMany({
-            where: {
-                campgroundId,
-                status: "pending",
-                seenAt: null
-            },
-            select: { id: true, createdAt: true, reservationId: true, siteNumber: true }
-        });
-    }
-
-    /**
-     * Mark an order as seen by staff
-     */
-    async markOrderSeen(campgroundId: string, id: string) {
-        await this.requireOrder(campgroundId, id);
-        return this.prisma.storeOrder.update({
-            where: { id },
-            data: { seenAt: new Date() }
-        });
-    }
-
-    async getOrderSummary(campgroundId: string, opts?: { start?: Date; end?: Date }) {
-        const where: { campgroundId: string; createdAt?: { gte?: Date; lte?: Date } } = {
-            campgroundId,
-        };
-        if (opts?.start || opts?.end) {
-            where.createdAt = {
-                ...(opts?.start ? { gte: opts.start } : {}),
-                ...(opts?.end ? { lte: opts.end } : {}),
-            };
-        }
-
-        const [byChannel, byFulfillment, byStatus] = await Promise.all([
-            this.prisma.storeOrder.groupBy({
-                by: ["channel"],
-                where,
-                _count: { _all: true },
-                _sum: { totalCents: true }
-            }),
-            this.prisma.storeOrder.groupBy({
-                by: ["fulfillmentType"],
-                where,
-                _count: { _all: true },
-                _sum: { totalCents: true }
-            }),
-            this.prisma.storeOrder.groupBy({
-                by: ["status"],
-                where,
-                _count: { _all: true },
-                _sum: { totalCents: true }
-            })
-        ]);
-
-        const prepSamples = await this.prisma.storeOrder.findMany({
-            where,
-            select: { createdAt: true, readyAt: true, prepTimeMinutes: true, fulfillmentType: true }
-        });
-
-        let plannedSum = 0;
-        let plannedCount = 0;
-        let actualSum = 0;
-        let actualCount = 0;
-
-        const perFulfillment: Record<string, { plannedSum: number; plannedCount: number; actualSum: number; actualCount: number }> = {};
-
-        for (const o of prepSamples) {
-            if (typeof o.prepTimeMinutes === "number") {
-                plannedSum += o.prepTimeMinutes;
-                plannedCount += 1;
-                const key = o.fulfillmentType || "unknown";
-                perFulfillment[key] = perFulfillment[key] || { plannedSum: 0, plannedCount: 0, actualSum: 0, actualCount: 0 };
-                perFulfillment[key].plannedSum += o.prepTimeMinutes;
-                perFulfillment[key].plannedCount += 1;
-            }
-            if (o.readyAt && o.createdAt) {
-                const diffMs = new Date(o.readyAt).getTime() - new Date(o.createdAt).getTime();
-                if (diffMs > 0) {
-                    actualSum += diffMs / 60000;
-                    actualCount += 1;
-                    const key = o.fulfillmentType || "unknown";
-                    perFulfillment[key] = perFulfillment[key] || { plannedSum: 0, plannedCount: 0, actualSum: 0, actualCount: 0 };
-                    perFulfillment[key].actualSum += diffMs / 60000;
-                    perFulfillment[key].actualCount += 1;
-                }
-            }
-        }
-
-        const averagesByFulfillment = Object.entries(perFulfillment).map(([fulfillmentType, stats]) => ({
-            fulfillmentType,
-            prepMinutesPlanned: stats.plannedCount ? stats.plannedSum / stats.plannedCount : null,
-            prepMinutesActual: stats.actualCount ? stats.actualSum / stats.actualCount : null,
-        }));
-
-        return {
-            byChannel,
-            byFulfillment,
-            byStatus,
-            averages: {
-                prepMinutesPlanned: plannedCount ? plannedSum / plannedCount : null,
-                prepMinutesActual: actualCount ? actualSum / actualCount : null,
-            },
-            averagesByFulfillment
-        };
-    }
-
-    private resolveInventoryChannel(channel?: string | null): OrderChannel {
-        if (!channel) return OrderChannel.pos;
-        if (isOrderChannel(channel)) return channel;
-        return OrderChannel.pos;
-    }
-
-    private resolveFulfillmentType(type?: string | null): FulfillmentType {
-        if (type === "curbside" || type === "delivery" || type === "table_service" || type === "pickup") {
-            return type;
-        }
-        return "pickup";
-    }
-
-    private async adjustInventoryForChannel(product: InventoryProduct, channel: OrderChannel, delta: number) {
-        const mode = product.channelInventoryMode ?? ChannelInventoryMode.shared;
-        if (!product.trackInventory) return;
-        if (mode === "split") {
-            if (channel === "online" || channel === "portal") {
-                const next = Math.max(0, (product.onlineStockQty ?? 0) + delta);
-                await this.prisma.product.update({ where: { id: product.id }, data: { onlineStockQty: next } });
-                return;
-            }
-            const next = Math.max(0, (product.posStockQty ?? 0) + delta);
-            await this.prisma.product.update({ where: { id: product.id }, data: { posStockQty: next } });
-            return;
-        }
-        const next = Math.max(0, (product.stockQty ?? 0) + delta);
-        await this.prisma.product.update({ where: { id: product.id }, data: { stockQty: next } });
-    }
-
-    async createOrder(data: CreateOrderDto, actorUserId?: string) {
-        const campground = await this.prisma.campground.findUnique({
-            where: { id: data.campgroundId },
-            select: {
-                storeOpenHour: true,
-                storeCloseHour: true,
-                email: true,
-                name: true,
-                orderWebhookUrl: true,
-            },
-        });
-        const now = new Date();
-        const openHour = campground?.storeOpenHour ?? Number(process.env.STORE_OPEN_HOUR ?? 8);
-        const closeHour = campground?.storeCloseHour ?? Number(process.env.STORE_CLOSE_HOUR ?? 20);
-        const isOpen = now.getHours() >= openHour && now.getHours() < closeHour;
-
-        // Fetch products and add-ons for the items
-        const productIds = data.items
-            .filter((i) => i.productId)
-            .map((i) => i.productId!);
-        const addOnIds = data.items.filter((i) => i.addOnId).map((i) => i.addOnId!);
-
-        const [products, addOns] = await Promise.all([
-            productIds.length > 0
-                ? this.prisma.product.findMany({ where: { id: { in: productIds } } })
-                : [],
-            addOnIds.length > 0
-                ? this.prisma.addOnService.findMany({ where: { id: { in: addOnIds } } })
-                : [],
-        ]);
-
-        const productMap = new Map<string, InventoryProduct>(products.map((p) => [p.id, p]));
-        const addOnMap = new Map(addOns.map((a) => [a.id, a]));
-
-        // Calculate totals and build order items
-        let subtotalCents = 0;
-        let disallowedAfterHours = false;
-
-        const channel = this.resolveInventoryChannel(data.channel ?? null);
-        const fulfillmentType = this.resolveFulfillmentType(data.fulfillmentType ?? null);
-        const locationId = data.locationId ?? null;
-        const paymentMethod =
-            data.paymentMethod && isPaymentMethod(data.paymentMethod)
-                ? data.paymentMethod
-                : PaymentMethod.card;
-
-        const orderItems = data.items.map((item) => {
-            let name = "";
-            let unitCents = 0;
-            let afterHoursAllowed = false;
-            let availableQty = Infinity;
-
-            if (item.productId) {
-                const product = productMap.get(item.productId);
-                if (product) {
-                    name = product.name;
-                    unitCents = product.priceCents;
-                    afterHoursAllowed = !!product.afterHoursAllowed;
-                    const mode = product.channelInventoryMode ?? ChannelInventoryMode.shared;
-                    if (mode === "split") {
-                        availableQty =
-                            channel === OrderChannel.online || channel === OrderChannel.portal
-                                ? Math.max(0, (product.onlineStockQty ?? 0) - (product.onlineBufferQty ?? 0))
-                                : Math.max(0, product.posStockQty ?? 0);
-                    } else {
-                        availableQty = Math.max(0, product.stockQty ?? 0);
-                    }
-                    if (product.trackInventory && availableQty < item.qty) {
-                        throw new ConflictException(`Not enough ${channel === "online" ? "online" : "in-store"} allotment for ${product.name}`);
-                    }
-                }
-            } else if (item.addOnId) {
-                const addOn = addOnMap.get(item.addOnId);
-                if (addOn) {
-                    name = addOn.name;
-                    unitCents = addOn.priceCents;
-                }
-            }
-
-            const totalCents = unitCents * item.qty;
-            subtotalCents += totalCents;
-
-            if (!isOpen && !afterHoursAllowed) {
-                disallowedAfterHours = true;
-            }
-
-            return {
-                productId: item.productId || null,
-                addOnId: item.addOnId || null,
-                name,
-                qty: item.qty,
-                unitCents,
-                totalCents,
-            };
-        });
-
-        // Calculate tax based on campground tax rules
-        const { taxCents } = await this.calculateStoreTax(data.campgroundId, subtotalCents);
-        const totalCents = subtotalCents + taxCents;
-
-        if (!isOpen && disallowedAfterHours) {
-            throw new ConflictException("Store is closed. Only after-hours items are available.");
-        }
-
-        // Create order with items
-        const order = await this.prisma.storeOrder.create({
-            data: {
-                id: randomUUID(),
-                campgroundId: data.campgroundId,
-                reservationId: data.reservationId || null,
-                guestId: data.guestId || null,
-                siteNumber: data.siteNumber || null,
-                channel,
-                fulfillmentType,
-                deliveryInstructions: data.deliveryInstructions || null,
-                promisedAt: data.promisedAt ? new Date(data.promisedAt) : null,
-                prepTimeMinutes: data.prepTimeMinutes ?? null,
-                paymentMethod,
-                notes: data.notes || null,
-                subtotalCents,
-                taxCents,
-                totalCents,
-                status: "pending",
-                createdBy: actorUserId ?? null,
-                fulfillmentLocationId: locationId,
-                StoreOrderItem: {
-                    create: orderItems.map((item) => ({
-                        ...item,
-                        id: randomUUID(),
-                    })),
-                },
-            },
-            include: { StoreOrderItem: true },
-        });
-        const orderWithItems = { ...order, items: order.StoreOrderItem };
-
-        // Fire-and-forget notifications - log errors but don't block the order
-        this.notifyStaffNewOrder(orderWithItems, campground?.email, campground?.name, campground?.orderWebhookUrl)
-          .catch((err) => this.logger.warn(`Failed to notify staff of new order: ${err instanceof Error ? err.message : err}`));
-
-        const perLocationItems: Array<{ productId: string; qty: number }> = [];
-        const channelItems: Array<{ product: InventoryProduct; qty: number }> = [];
-
-        for (const item of data.items) {
-            if (!item.productId) continue;
-            const product = productMap.get(item.productId);
-            if (!product?.trackInventory || (product.afterHoursAllowed && !isOpen)) continue;
-
-            if (product.inventoryMode === "per_location" && locationId && actorUserId) {
-                perLocationItems.push({ productId: item.productId, qty: item.qty });
-            } else {
-                channelItems.push({ product, qty: item.qty });
-            }
-        }
-
-        if (perLocationItems.length && locationId && actorUserId) {
-            await this.locationService.deductInventoryForSale(
-                data.campgroundId,
-                perLocationItems,
-                locationId,
-                actorUserId,
-                order.id
-            );
-        }
-
-        for (const item of channelItems) {
-            await this.adjustInventoryForChannel(item.product, channel, -item.qty);
-        }
-
-        // Handle payment recording and GL entries based on payment method
-        const dedupeKeyBase = `store_order_${order.id}`;
-
-        if (paymentMethod === PaymentMethod.charge_to_site && data.reservationId) {
-            // Charge to site: debit A/R (guest owes more), credit Store Revenue
-            await postBalancedLedgerEntries(this.prisma, [
-                {
-                    campgroundId: data.campgroundId,
-                    reservationId: data.reservationId,
-                    glCode: "AR",
-                    account: "Accounts Receivable",
-                    description: `Store order #${order.id.slice(-6)}`,
-                    amountCents: totalCents,
-                    direction: "debit",
-                    dedupeKey: `${dedupeKeyBase}:ar:debit`
-                },
-                {
-                    campgroundId: data.campgroundId,
-                    reservationId: data.reservationId,
-                    glCode: "STORE_REVENUE",
-                    account: "Store Revenue",
-                    description: `Store order #${order.id.slice(-6)}`,
-                    amountCents: totalCents,
-                    direction: "credit",
-                    dedupeKey: `${dedupeKeyBase}:store_revenue:credit`
-                }
-            ]);
-
-            // Update reservation balance
-            await this.prisma.reservation.update({
-                where: { id: data.reservationId },
-                data: {
-                    balanceAmount: { increment: totalCents },
-                    totalAmount: { increment: totalCents },
-                },
-            });
-        } else if (paymentMethod === PaymentMethod.card || paymentMethod === PaymentMethod.cash) {
-            // Card/Cash payment: debit Cash (money received), credit Store Revenue
-            const glCode = paymentMethod === PaymentMethod.card ? "CARD" : "CASH";
-            const accountName = paymentMethod === PaymentMethod.card ? "Card Receipts" : "Cash";
-
-            await postBalancedLedgerEntries(this.prisma, [
-                {
-                    campgroundId: data.campgroundId,
-                    reservationId: data.reservationId ?? null,
-                    glCode,
-                    account: accountName,
-                    description: `Store order #${order.id.slice(-6)} (${paymentMethod})`,
-                    amountCents: totalCents,
-                    direction: "debit",
-                    dedupeKey: `${dedupeKeyBase}:${glCode.toLowerCase()}:debit`
-                },
-                {
-                    campgroundId: data.campgroundId,
-                    reservationId: data.reservationId ?? null,
-                    glCode: "STORE_REVENUE",
-                    account: "Store Revenue",
-                    description: `Store order #${order.id.slice(-6)} (${paymentMethod})`,
-                    amountCents: totalCents,
-                    direction: "credit",
-                    dedupeKey: `${dedupeKeyBase}:store_revenue:credit`
-                }
-            ]);
-
-            // If linked to a reservation, also create a Payment record for tracking
-            if (data.reservationId) {
-                await this.prisma.payment.create({
-                    data: {
-                        id: randomUUID(),
-                        campgroundId: data.campgroundId,
-                        reservationId: data.reservationId,
-                        amountCents: totalCents,
-                        method: paymentMethod,
-                        direction: "charge",
-                        note: `Store order #${order.id.slice(-6)}`,
-                        paymentSource: "store"
-                    }
-                });
-            }
-        }
-
-        return orderWithItems;
-    }
-
-    async getOrder(campgroundId: string, id: string) {
-        const order = await this.prisma.storeOrder.findFirst({
-            where: { id, campgroundId },
-            include: {
-                StoreOrderItem: {
-                    include: {
-                        Product: { select: { imageUrl: true } },
-                    },
-                },
-                Reservation: {
-                    select: {
-                        id: true,
-                        Site: { select: { siteNumber: true, name: true } },
-                        Guest: { select: { primaryFirstName: true, primaryLastName: true } },
-                    },
-                },
-            },
-        });
-        if (!order) throw new NotFoundException("Order not found");
-        const normalizedOrder = {
-            ...order,
-            items: order.StoreOrderItem.map((item) => {
-                const { Product, ...rest } = item;
-                return { ...rest, product: Product };
-            }),
-            reservation: order.Reservation
-                ? {
-                    id: order.Reservation.id,
-                    site: order.Reservation.Site,
-                    guest: order.Reservation.Guest,
-                }
-                : null,
-        };
-        return this.attachAdjustments(normalizedOrder);
-    }
-
-    /**
-     * Get order adjustments (refunds/exchanges)
-     */
-    async getOrderAdjustments(orderId: string, campgroundId: string) {
-        await this.requireOrder(campgroundId, orderId);
-        const adjustments = await this.prisma.storeOrderAdjustment.findMany({
-            where: { orderId },
-            orderBy: { createdAt: "desc" },
-            include: {
-                User: {
-                    select: { id: true, firstName: true, lastName: true, email: true }
-                }
-            }
-        });
-
-        return adjustments.map((adjustment) => {
-            const { User, ...rest } = adjustment;
-            return { ...rest, createdBy: User };
-        });
-    }
-
-    /**
-     * Attach adjustments to order object
-     */
-    private async attachAdjustments<T extends { id: string; campgroundId: string }>(order: T) {
-        const adjustments = await this.getOrderAdjustments(order.id, order.campgroundId);
-        return { ...order, adjustments };
-    }
-
-    /**
-     * Record a refund or exchange for an order
-     *
-     * Implements full refund workflow:
-     * - Payment processor refund (Stripe)
-     * - Inventory restoration (optional restock)
-     * - Ledger entry for charge_to_site orders
-     * - Email notification to guest
-     */
-    async recordRefundOrExchange(
-        orderId: string,
-        campgroundId: string,
-        payload: {
-            type?: "refund" | "exchange";
-            items?: OrderAdjustmentItem[];
-            amountCents?: number;
-            note?: string | null;
-            restock?: boolean; // Whether to restore inventory
-            notifyGuest?: boolean; // Whether to send email to guest
+    return this.prisma.storeOrder.update({ where: { id }, data });
+  }
+
+  createCategory(data: CreateProductCategoryDto) {
+    return this.prisma.productCategory.create({ data: { ...data, id: randomUUID() } });
+  }
+
+  async updateCategory(campgroundId: string, id: string, data: UpdateProductCategoryDto) {
+    await this.requireCategory(campgroundId, id);
+    return this.prisma.productCategory.update({ where: { id }, data });
+  }
+
+  async deleteCategory(campgroundId: string, id: string) {
+    await this.requireCategory(campgroundId, id);
+    return this.prisma.productCategory.delete({ where: { id } });
+  }
+
+  // ==================== PRODUCTS ====================
+
+  listProducts(campgroundId: string, categoryId?: string) {
+    return this.prisma.product
+      .findMany({
+        where: {
+          campgroundId,
+          ...(categoryId ? { categoryId } : {}),
         },
-        user?: ActorUser
-    ) {
-        const order = await this.prisma.storeOrder.findFirst({
-            where: { id: orderId, campgroundId },
-            include: {
-                StoreOrderItem: true,
-                Campground: { select: { name: true } },
-                Guest: { select: { email: true, primaryFirstName: true, primaryLastName: true } },
-                Reservation: {
-                    select: {
-                        Guest: { select: { email: true, primaryFirstName: true, primaryLastName: true } }
-                    }
-                }
-            },
-        });
-        if (!order) {
-            throw new NotFoundException("Order not found");
-        }
-        const normalizedOrder: RefundOrder = {
-            ...order,
-            items: order.StoreOrderItem,
-            campground: order.Campground ? { name: order.Campground.name } : null,
-            guest: order.Guest
-                ? { email: order.Guest.email, firstName: order.Guest.primaryFirstName }
-                : null,
-            reservation: order.Reservation?.Guest
-                ? {
-                    guestEmail: order.Reservation.Guest.email,
-                    guestName: `${order.Reservation.Guest.primaryFirstName} ${order.Reservation.Guest.primaryLastName}`
-                }
-                : null,
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+        include: {
+          ProductCategory: { select: { id: true, name: true } },
+        },
+      })
+      .then((products) =>
+        products.map((product) => ({
+          ...product,
+          category: product.ProductCategory,
+        })),
+      );
+  }
+
+  async getProduct(campgroundId: string, id: string) {
+    const product = await this.prisma.product.findFirst({
+      where: { id, campgroundId },
+      include: { ProductCategory: true },
+    });
+    if (!product) throw new NotFoundException("Product not found");
+    return { ...product, category: product.ProductCategory };
+  }
+
+  createProduct(data: CreateProductDto) {
+    return this.prisma.product.create({ data: { ...data, id: randomUUID() } });
+  }
+
+  async updateProduct(campgroundId: string, id: string, data: UpdateProductDto) {
+    await this.requireProduct(campgroundId, id);
+    return this.prisma.product.update({ where: { id }, data });
+  }
+
+  async deleteProduct(campgroundId: string, id: string) {
+    await this.requireProduct(campgroundId, id);
+    return this.prisma.product.delete({ where: { id } });
+  }
+
+  async setStock(
+    campgroundId: string,
+    id: string,
+    stockQty: number,
+    channel?: OrderChannel | null,
+  ) {
+    const product = await this.requireProduct(campgroundId, id);
+    const next = Math.max(0, stockQty);
+    if (channel && product.channelInventoryMode === "split") {
+      if (channel === "online" || channel === "portal") {
+        return this.prisma.product.update({ where: { id }, data: { onlineStockQty: next } });
+      }
+      return this.prisma.product.update({ where: { id }, data: { posStockQty: next } });
+    }
+    return this.prisma.product.update({
+      where: { id },
+      data: { stockQty: next },
+    });
+  }
+
+  async adjustStock(
+    campgroundId: string,
+    id: string,
+    adjustment: number,
+    channel?: OrderChannel | null,
+  ) {
+    const product = await this.requireProduct(campgroundId, id);
+
+    if (channel && product.channelInventoryMode === "split") {
+      if (channel === "online" || channel === "portal") {
+        const newQty = Math.max(0, (product.onlineStockQty ?? 0) + adjustment);
+        return this.prisma.product.update({ where: { id }, data: { onlineStockQty: newQty } });
+      }
+      const newQty = Math.max(0, (product.posStockQty ?? 0) + adjustment);
+      return this.prisma.product.update({ where: { id }, data: { posStockQty: newQty } });
+    }
+
+    const newQty = Math.max(0, product.stockQty + adjustment);
+    return this.prisma.product.update({
+      where: { id },
+      data: { stockQty: newQty },
+    });
+  }
+
+  async getLowStockProducts(campgroundId: string) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        campgroundId,
+        trackInventory: true,
+        lowStockAlert: { not: null },
+      },
+      include: { ProductCategory: true },
+    });
+
+    return products
+      .map((product) => ({ ...product, category: product.ProductCategory }))
+      .filter((product) => product.stockQty <= (product.lowStockAlert || 0));
+  }
+
+  // ==================== ADD-ONS ====================
+
+  listAddOns(campgroundId: string) {
+    return this.prisma.addOnService.findMany({
+      where: { campgroundId },
+      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+    });
+  }
+
+  createAddOn(data: CreateAddOnDto) {
+    const pricingType =
+      data.pricingType && isAddOnPricingType(data.pricingType)
+        ? data.pricingType
+        : AddOnPricingType.flat;
+    return this.prisma.addOnService.create({
+      data: {
+        id: randomUUID(),
+        ...data,
+        pricingType,
+      },
+    });
+  }
+
+  async updateAddOn(campgroundId: string, id: string, data: UpdateAddOnDto) {
+    await this.requireAddOn(campgroundId, id);
+    const pricingType =
+      data.pricingType && isAddOnPricingType(data.pricingType) ? data.pricingType : undefined;
+    return this.prisma.addOnService.update({
+      where: { id },
+      data: {
+        ...data,
+        ...(pricingType ? { pricingType } : {}),
+      },
+    });
+  }
+
+  async deleteAddOn(campgroundId: string, id: string) {
+    await this.requireAddOn(campgroundId, id);
+    return this.prisma.addOnService.delete({ where: { id } });
+  }
+
+  // ==================== ORDERS ====================
+
+  async findReservationForGuest(reservationId: string, guestId: string) {
+    const reservation = await this.prisma.reservation.findFirst({
+      where: { id: reservationId, guestId },
+      select: { id: true, campgroundId: true, Site: { select: { siteNumber: true } } },
+    });
+    if (!reservation) return null;
+    const { Site, ...rest } = reservation;
+    return { ...rest, site: Site };
+  }
+
+  async listOrders(
+    campgroundId: string,
+    options?: { status?: OrderStatus; reservationId?: string },
+  ) {
+    const orders = await this.prisma.storeOrder.findMany({
+      where: {
+        campgroundId,
+        ...(options?.status ? { status: options.status } : {}),
+        ...(options?.reservationId ? { reservationId: options.reservationId } : {}),
+      },
+      orderBy: { createdAt: "desc" },
+      include: {
+        StoreOrderItem: true,
+        Reservation: {
+          select: {
+            id: true,
+            Site: { select: { siteNumber: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
+          },
+        },
+        Guest: {
+          select: { primaryFirstName: true, primaryLastName: true },
+        },
+        User_StoreOrder_completedByIdToUser: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+
+    const normalizedOrders = orders.map((order) => {
+      const { StoreOrderItem, Reservation, Guest, User_StoreOrder_completedByIdToUser, ...rest } =
+        order;
+
+      const reservation = Reservation
+        ? {
+            id: Reservation.id,
+            site: Reservation.Site,
+            guest: Reservation.Guest,
+          }
+        : null;
+
+      return {
+        ...rest,
+        items: StoreOrderItem,
+        reservation,
+        guest: Guest,
+        completedBy: User_StoreOrder_completedByIdToUser,
+      };
+    });
+
+    return Promise.all(normalizedOrders.map((order) => this.attachAdjustments(order)));
+  }
+
+  /**
+   * Get unseen pending orders
+   */
+  async listUnseenOrders(campgroundId: string) {
+    return this.prisma.storeOrder.findMany({
+      where: {
+        campgroundId,
+        status: "pending",
+        seenAt: null,
+      },
+      select: { id: true, createdAt: true, reservationId: true, siteNumber: true },
+    });
+  }
+
+  /**
+   * Mark an order as seen by staff
+   */
+  async markOrderSeen(campgroundId: string, id: string) {
+    await this.requireOrder(campgroundId, id);
+    return this.prisma.storeOrder.update({
+      where: { id },
+      data: { seenAt: new Date() },
+    });
+  }
+
+  async getOrderSummary(campgroundId: string, opts?: { start?: Date; end?: Date }) {
+    const where: { campgroundId: string; createdAt?: { gte?: Date; lte?: Date } } = {
+      campgroundId,
+    };
+    if (opts?.start || opts?.end) {
+      where.createdAt = {
+        ...(opts?.start ? { gte: opts.start } : {}),
+        ...(opts?.end ? { lte: opts.end } : {}),
+      };
+    }
+
+    const [byChannel, byFulfillment, byStatus] = await Promise.all([
+      this.prisma.storeOrder.groupBy({
+        by: ["channel"],
+        where,
+        _count: { _all: true },
+        _sum: { totalCents: true },
+      }),
+      this.prisma.storeOrder.groupBy({
+        by: ["fulfillmentType"],
+        where,
+        _count: { _all: true },
+        _sum: { totalCents: true },
+      }),
+      this.prisma.storeOrder.groupBy({
+        by: ["status"],
+        where,
+        _count: { _all: true },
+        _sum: { totalCents: true },
+      }),
+    ]);
+
+    const prepSamples = await this.prisma.storeOrder.findMany({
+      where,
+      select: { createdAt: true, readyAt: true, prepTimeMinutes: true, fulfillmentType: true },
+    });
+
+    let plannedSum = 0;
+    let plannedCount = 0;
+    let actualSum = 0;
+    let actualCount = 0;
+
+    const perFulfillment: Record<
+      string,
+      { plannedSum: number; plannedCount: number; actualSum: number; actualCount: number }
+    > = {};
+
+    for (const o of prepSamples) {
+      if (typeof o.prepTimeMinutes === "number") {
+        plannedSum += o.prepTimeMinutes;
+        plannedCount += 1;
+        const key = o.fulfillmentType || "unknown";
+        perFulfillment[key] = perFulfillment[key] || {
+          plannedSum: 0,
+          plannedCount: 0,
+          actualSum: 0,
+          actualCount: 0,
         };
-
-        // Validate refund amount doesn't exceed order total
-        const selectedItems: RefundSelection[] =
-            payload.items && payload.items.length > 0
-                ? payload.items.map((item) => {
-                    const match = item.itemId
-                        ? normalizedOrder.items.find((candidate) => candidate.id === item.itemId)
-                        : undefined;
-                    if (item.itemId && !match) {
-                        throw new NotFoundException(`Item ${item.itemId} not found in order`);
-                    }
-                    return {
-                        itemId: item.itemId || match?.id || randomUUID(),
-                        productId: item.productId || match?.productId || null,
-                        name: item.name || match?.name || "Line item",
-                        qty: item.qty ?? match?.qty ?? 0,
-                        amountCents: item.amountCents ?? match?.totalCents ?? 0,
-                    };
-                })
-                : normalizedOrder.items.map((item) => ({
-                    itemId: item.id,
-                    productId: item.productId,
-                    name: item.name,
-                    qty: item.qty,
-                    amountCents: item.totalCents ?? 0,
-                }));
-
-        const amountCents =
-            payload.amountCents ??
-            selectedItems.reduce((sum, item) => sum + item.amountCents, 0);
-
-        // Validate refund amount
-        if (amountCents > normalizedOrder.totalCents) {
-            throw new BadRequestException(`Refund amount (${amountCents}) cannot exceed order total (${normalizedOrder.totalCents})`);
+        perFulfillment[key].plannedSum += o.prepTimeMinutes;
+        perFulfillment[key].plannedCount += 1;
+      }
+      if (o.readyAt && o.createdAt) {
+        const diffMs = new Date(o.readyAt).getTime() - new Date(o.createdAt).getTime();
+        if (diffMs > 0) {
+          actualSum += diffMs / 60000;
+          actualCount += 1;
+          const key = o.fulfillmentType || "unknown";
+          perFulfillment[key] = perFulfillment[key] || {
+            plannedSum: 0,
+            plannedCount: 0,
+            actualSum: 0,
+            actualCount: 0,
+          };
+          perFulfillment[key].actualSum += diffMs / 60000;
+          perFulfillment[key].actualCount += 1;
         }
+      }
+    }
 
-        if (amountCents <= 0) {
-            throw new BadRequestException("Refund amount must be greater than zero");
-        }
+    const averagesByFulfillment = Object.entries(perFulfillment).map(
+      ([fulfillmentType, stats]) => ({
+        fulfillmentType,
+        prepMinutesPlanned: stats.plannedCount ? stats.plannedSum / stats.plannedCount : null,
+        prepMinutesActual: stats.actualCount ? stats.actualSum / stats.actualCount : null,
+      }),
+    );
 
-        const adjustmentType = payload.type === "exchange" ? "exchange" : "refund";
-        let stripeRefundId: string | null = null;
-        let refundStatus: string = "pending";
-        let refundError: string | null = null;
-        let inventoryRestored = false;
-        let notificationSent = false;
+    return {
+      byChannel,
+      byFulfillment,
+      byStatus,
+      averages: {
+        prepMinutesPlanned: plannedCount ? plannedSum / plannedCount : null,
+        prepMinutesActual: actualCount ? actualSum / actualCount : null,
+      },
+      averagesByFulfillment,
+    };
+  }
 
-        // 1. Process payment processor refund for card payments
-        if (
-            adjustmentType === "refund" &&
-            normalizedOrder.paymentMethod === PaymentMethod.card &&
-            normalizedOrder.paymentIntentId
-        ) {
-            try {
-                const refund = await this.stripeService.createRefund(
-                    normalizedOrder.paymentIntentId,
-                    amountCents,
-                    "requested_by_customer",
-                    `refund_${orderId}_${Date.now()}`
-                );
-                stripeRefundId = refund.id;
-                refundStatus = refund.status ?? "succeeded";
-                this.logger.log(`Stripe refund created: ${refund.id} for order ${orderId}`);
-            } catch (err) {
-                refundStatus = "failed";
-                refundError = getErrorMessage(err) || "Stripe refund failed";
-                this.logger.error(`Stripe refund failed for order ${orderId}: ${refundError}`);
-                // Continue with database record even if Stripe fails - can retry later
-            }
-        }
+  private resolveInventoryChannel(channel?: string | null): OrderChannel {
+    if (!channel) return OrderChannel.pos;
+    if (isOrderChannel(channel)) return channel;
+    return OrderChannel.pos;
+  }
 
-        // 2. Restore inventory if requested
-        if (payload.restock && selectedItems.length > 0) {
-            try {
-                for (const item of selectedItems) {
-                    if (item.productId && item.qty > 0) {
-                        await this.prisma.product.update({
-                            where: { id: item.productId },
-                            data: { stockQty: { increment: item.qty } }
-                        });
-                    }
-                }
-                inventoryRestored = true;
-                this.logger.log(`Inventory restored for order ${orderId}: ${selectedItems.length} items`);
-            } catch (err) {
-                this.logger.error(`Failed to restore inventory for order ${orderId}: ${getErrorMessage(err)}`);
-                // Continue even if inventory restore fails
-            }
-        }
+  private resolveFulfillmentType(type?: string | null): FulfillmentType {
+    if (
+      type === "curbside" ||
+      type === "delivery" ||
+      type === "table_service" ||
+      type === "pickup"
+    ) {
+      return type;
+    }
+    return "pickup";
+  }
 
-        // Create database record for the adjustment
-        const adjustment = await this.prisma.storeOrderAdjustment.create({
-            data: {
-                id: randomUUID(),
-                orderId,
-                type: adjustmentType,
-                amountCents,
-                note: payload.note || null,
-                items: selectedItems,
-                createdById: user?.id || null,
-                stripeRefundId,
-                refundStatus,
-                refundError,
-                inventoryRestored,
-                notificationSent: false, // Updated after email sent
-            },
-            include: {
-                User: {
-                    select: { id: true, firstName: true, lastName: true, email: true }
-                }
-            }
+  private async adjustInventoryForChannel(
+    product: InventoryProduct,
+    channel: OrderChannel,
+    delta: number,
+  ) {
+    const mode = product.channelInventoryMode ?? ChannelInventoryMode.shared;
+    if (!product.trackInventory) return;
+    if (mode === "split") {
+      if (channel === "online" || channel === "portal") {
+        const next = Math.max(0, (product.onlineStockQty ?? 0) + delta);
+        await this.prisma.product.update({
+          where: { id: product.id },
+          data: { onlineStockQty: next },
         });
-        const { User, ...adjustmentBase } = adjustment;
-        const normalizedAdjustment = { ...adjustmentBase, createdBy: User };
+        return;
+      }
+      const next = Math.max(0, (product.posStockQty ?? 0) + delta);
+      await this.prisma.product.update({ where: { id: product.id }, data: { posStockQty: next } });
+      return;
+    }
+    const next = Math.max(0, (product.stockQty ?? 0) + delta);
+    await this.prisma.product.update({ where: { id: product.id }, data: { stockQty: next } });
+  }
 
-        // Update order status
-        if (adjustmentType === "refund" && normalizedOrder.status !== OrderStatus.refunded) {
-            await this.updateOrderStatus(campgroundId, orderId, OrderStatus.refunded, user?.id ?? undefined);
+  async createOrder(data: CreateOrderDto, actorUserId?: string) {
+    const campground = await this.prisma.campground.findUnique({
+      where: { id: data.campgroundId },
+      select: {
+        storeOpenHour: true,
+        storeCloseHour: true,
+        email: true,
+        name: true,
+        orderWebhookUrl: true,
+      },
+    });
+    const now = new Date();
+    const openHour = campground?.storeOpenHour ?? Number(process.env.STORE_OPEN_HOUR ?? 8);
+    const closeHour = campground?.storeCloseHour ?? Number(process.env.STORE_CLOSE_HOUR ?? 20);
+    const isOpen = now.getHours() >= openHour && now.getHours() < closeHour;
+
+    // Fetch products and add-ons for the items
+    const productIds = data.items.filter((i) => i.productId).map((i) => i.productId!);
+    const addOnIds = data.items.filter((i) => i.addOnId).map((i) => i.addOnId!);
+
+    const [products, addOns] = await Promise.all([
+      productIds.length > 0
+        ? this.prisma.product.findMany({ where: { id: { in: productIds } } })
+        : [],
+      addOnIds.length > 0
+        ? this.prisma.addOnService.findMany({ where: { id: { in: addOnIds } } })
+        : [],
+    ]);
+
+    const productMap = new Map<string, InventoryProduct>(products.map((p) => [p.id, p]));
+    const addOnMap = new Map(addOns.map((a) => [a.id, a]));
+
+    // Calculate totals and build order items
+    let subtotalCents = 0;
+    let disallowedAfterHours = false;
+
+    const channel = this.resolveInventoryChannel(data.channel ?? null);
+    const fulfillmentType = this.resolveFulfillmentType(data.fulfillmentType ?? null);
+    const locationId = data.locationId ?? null;
+    const paymentMethod =
+      data.paymentMethod && isPaymentMethod(data.paymentMethod)
+        ? data.paymentMethod
+        : PaymentMethod.card;
+
+    const orderItems = data.items.map((item) => {
+      let name = "";
+      let unitCents = 0;
+      let afterHoursAllowed = false;
+      let availableQty = Infinity;
+
+      if (item.productId) {
+        const product = productMap.get(item.productId);
+        if (product) {
+          name = product.name;
+          unitCents = product.priceCents;
+          afterHoursAllowed = !!product.afterHoursAllowed;
+          const mode = product.channelInventoryMode ?? ChannelInventoryMode.shared;
+          if (mode === "split") {
+            availableQty =
+              channel === OrderChannel.online || channel === OrderChannel.portal
+                ? Math.max(0, (product.onlineStockQty ?? 0) - (product.onlineBufferQty ?? 0))
+                : Math.max(0, product.posStockQty ?? 0);
+          } else {
+            availableQty = Math.max(0, product.stockQty ?? 0);
+          }
+          if (product.trackInventory && availableQty < item.qty) {
+            throw new ConflictException(
+              `Not enough ${channel === "online" ? "online" : "in-store"} allotment for ${product.name}`,
+            );
+          }
         }
+      } else if (item.addOnId) {
+        const addOn = addOnMap.get(item.addOnId);
+        if (addOn) {
+          name = addOn.name;
+          unitCents = addOn.priceCents;
+        }
+      }
 
-        // 3. If order was charged to site, create offsetting ledger entry
-        if (
-            normalizedOrder.paymentMethod === PaymentMethod.charge_to_site &&
-            normalizedOrder.reservationId &&
-            adjustmentType === "refund"
-        ) {
-            try {
-                await this.prisma.ledgerEntry.create({
-                    data: {
-                        id: randomUUID(),
-                        campgroundId: normalizedOrder.campgroundId,
-                        reservationId: normalizedOrder.reservationId,
-                        glCode: "STORE",
-                        account: "Store Refunds",
-                        description: `Refund for store order #${normalizedOrder.id.slice(-6)}${adjustment.note ? `: ${adjustment.note}` : ''}`,
-                        amountCents: amountCents,
-                        direction: "credit", // Credit reduces the guest's balance
-                    },
-                });
+      const totalCents = unitCents * item.qty;
+      subtotalCents += totalCents;
 
-                // Update reservation balance
-                await this.prisma.reservation.update({
-                    where: { id: normalizedOrder.reservationId },
-                    data: {
-                        balanceAmount: { decrement: amountCents },
-                        totalAmount: { decrement: amountCents },
-                    },
-                });
-            } catch (error) {
-                this.logger.error(`Failed to create ledger entry for refund: ${getErrorMessage(error)}`);
+      if (!isOpen && !afterHoursAllowed) {
+        disallowedAfterHours = true;
+      }
+
+      return {
+        productId: item.productId || null,
+        addOnId: item.addOnId || null,
+        name,
+        qty: item.qty,
+        unitCents,
+        totalCents,
+      };
+    });
+
+    // Calculate tax based on campground tax rules
+    const { taxCents } = await this.calculateStoreTax(data.campgroundId, subtotalCents);
+    const totalCents = subtotalCents + taxCents;
+
+    if (!isOpen && disallowedAfterHours) {
+      throw new ConflictException("Store is closed. Only after-hours items are available.");
+    }
+
+    // Create order with items
+    const order = await this.prisma.storeOrder.create({
+      data: {
+        id: randomUUID(),
+        campgroundId: data.campgroundId,
+        reservationId: data.reservationId || null,
+        guestId: data.guestId || null,
+        siteNumber: data.siteNumber || null,
+        channel,
+        fulfillmentType,
+        deliveryInstructions: data.deliveryInstructions || null,
+        promisedAt: data.promisedAt ? new Date(data.promisedAt) : null,
+        prepTimeMinutes: data.prepTimeMinutes ?? null,
+        paymentMethod,
+        notes: data.notes || null,
+        subtotalCents,
+        taxCents,
+        totalCents,
+        status: "pending",
+        createdBy: actorUserId ?? null,
+        fulfillmentLocationId: locationId,
+        StoreOrderItem: {
+          create: orderItems.map((item) => ({
+            ...item,
+            id: randomUUID(),
+          })),
+        },
+      },
+      include: { StoreOrderItem: true },
+    });
+    const orderWithItems = { ...order, items: order.StoreOrderItem };
+
+    // Fire-and-forget notifications - log errors but don't block the order
+    this.notifyStaffNewOrder(
+      orderWithItems,
+      campground?.email,
+      campground?.name,
+      campground?.orderWebhookUrl,
+    ).catch((err) =>
+      this.logger.warn(
+        `Failed to notify staff of new order: ${err instanceof Error ? err.message : err}`,
+      ),
+    );
+
+    const perLocationItems: Array<{ productId: string; qty: number }> = [];
+    const channelItems: Array<{ product: InventoryProduct; qty: number }> = [];
+
+    for (const item of data.items) {
+      if (!item.productId) continue;
+      const product = productMap.get(item.productId);
+      if (!product?.trackInventory || (product.afterHoursAllowed && !isOpen)) continue;
+
+      if (product.inventoryMode === "per_location" && locationId && actorUserId) {
+        perLocationItems.push({ productId: item.productId, qty: item.qty });
+      } else {
+        channelItems.push({ product, qty: item.qty });
+      }
+    }
+
+    if (perLocationItems.length && locationId && actorUserId) {
+      await this.locationService.deductInventoryForSale(
+        data.campgroundId,
+        perLocationItems,
+        locationId,
+        actorUserId,
+        order.id,
+      );
+    }
+
+    for (const item of channelItems) {
+      await this.adjustInventoryForChannel(item.product, channel, -item.qty);
+    }
+
+    // Handle payment recording and GL entries based on payment method
+    const dedupeKeyBase = `store_order_${order.id}`;
+
+    if (paymentMethod === PaymentMethod.charge_to_site && data.reservationId) {
+      // Charge to site: debit A/R (guest owes more), credit Store Revenue
+      await postBalancedLedgerEntries(this.prisma, [
+        {
+          campgroundId: data.campgroundId,
+          reservationId: data.reservationId,
+          glCode: "AR",
+          account: "Accounts Receivable",
+          description: `Store order #${order.id.slice(-6)}`,
+          amountCents: totalCents,
+          direction: "debit",
+          dedupeKey: `${dedupeKeyBase}:ar:debit`,
+        },
+        {
+          campgroundId: data.campgroundId,
+          reservationId: data.reservationId,
+          glCode: "STORE_REVENUE",
+          account: "Store Revenue",
+          description: `Store order #${order.id.slice(-6)}`,
+          amountCents: totalCents,
+          direction: "credit",
+          dedupeKey: `${dedupeKeyBase}:store_revenue:credit`,
+        },
+      ]);
+
+      // Update reservation balance
+      await this.prisma.reservation.update({
+        where: { id: data.reservationId },
+        data: {
+          balanceAmount: { increment: totalCents },
+          totalAmount: { increment: totalCents },
+        },
+      });
+    } else if (paymentMethod === PaymentMethod.card || paymentMethod === PaymentMethod.cash) {
+      // Card/Cash payment: debit Cash (money received), credit Store Revenue
+      const glCode = paymentMethod === PaymentMethod.card ? "CARD" : "CASH";
+      const accountName = paymentMethod === PaymentMethod.card ? "Card Receipts" : "Cash";
+
+      await postBalancedLedgerEntries(this.prisma, [
+        {
+          campgroundId: data.campgroundId,
+          reservationId: data.reservationId ?? null,
+          glCode,
+          account: accountName,
+          description: `Store order #${order.id.slice(-6)} (${paymentMethod})`,
+          amountCents: totalCents,
+          direction: "debit",
+          dedupeKey: `${dedupeKeyBase}:${glCode.toLowerCase()}:debit`,
+        },
+        {
+          campgroundId: data.campgroundId,
+          reservationId: data.reservationId ?? null,
+          glCode: "STORE_REVENUE",
+          account: "Store Revenue",
+          description: `Store order #${order.id.slice(-6)} (${paymentMethod})`,
+          amountCents: totalCents,
+          direction: "credit",
+          dedupeKey: `${dedupeKeyBase}:store_revenue:credit`,
+        },
+      ]);
+
+      // If linked to a reservation, also create a Payment record for tracking
+      if (data.reservationId) {
+        await this.prisma.payment.create({
+          data: {
+            id: randomUUID(),
+            campgroundId: data.campgroundId,
+            reservationId: data.reservationId,
+            amountCents: totalCents,
+            method: paymentMethod,
+            direction: "charge",
+            note: `Store order #${order.id.slice(-6)}`,
+            paymentSource: "store",
+          },
+        });
+      }
+    }
+
+    return orderWithItems;
+  }
+
+  async getOrder(campgroundId: string, id: string) {
+    const order = await this.prisma.storeOrder.findFirst({
+      where: { id, campgroundId },
+      include: {
+        StoreOrderItem: {
+          include: {
+            Product: { select: { imageUrl: true } },
+          },
+        },
+        Reservation: {
+          select: {
+            id: true,
+            Site: { select: { siteNumber: true, name: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
+          },
+        },
+      },
+    });
+    if (!order) throw new NotFoundException("Order not found");
+    const normalizedOrder = {
+      ...order,
+      items: order.StoreOrderItem.map((item) => {
+        const { Product, ...rest } = item;
+        return { ...rest, product: Product };
+      }),
+      reservation: order.Reservation
+        ? {
+            id: order.Reservation.id,
+            site: order.Reservation.Site,
+            guest: order.Reservation.Guest,
+          }
+        : null,
+    };
+    return this.attachAdjustments(normalizedOrder);
+  }
+
+  /**
+   * Get order adjustments (refunds/exchanges)
+   */
+  async getOrderAdjustments(orderId: string, campgroundId: string) {
+    await this.requireOrder(campgroundId, orderId);
+    const adjustments = await this.prisma.storeOrderAdjustment.findMany({
+      where: { orderId },
+      orderBy: { createdAt: "desc" },
+      include: {
+        User: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+
+    return adjustments.map((adjustment) => {
+      const { User, ...rest } = adjustment;
+      return { ...rest, createdBy: User };
+    });
+  }
+
+  /**
+   * Attach adjustments to order object
+   */
+  private async attachAdjustments<T extends { id: string; campgroundId: string }>(order: T) {
+    const adjustments = await this.getOrderAdjustments(order.id, order.campgroundId);
+    return { ...order, adjustments };
+  }
+
+  /**
+   * Record a refund or exchange for an order
+   *
+   * Implements full refund workflow:
+   * - Payment processor refund (Stripe)
+   * - Inventory restoration (optional restock)
+   * - Ledger entry for charge_to_site orders
+   * - Email notification to guest
+   */
+  async recordRefundOrExchange(
+    orderId: string,
+    campgroundId: string,
+    payload: {
+      type?: "refund" | "exchange";
+      items?: OrderAdjustmentItem[];
+      amountCents?: number;
+      note?: string | null;
+      restock?: boolean; // Whether to restore inventory
+      notifyGuest?: boolean; // Whether to send email to guest
+    },
+    user?: ActorUser,
+  ) {
+    const order = await this.prisma.storeOrder.findFirst({
+      where: { id: orderId, campgroundId },
+      include: {
+        StoreOrderItem: true,
+        Campground: { select: { name: true } },
+        Guest: { select: { email: true, primaryFirstName: true, primaryLastName: true } },
+        Reservation: {
+          select: {
+            Guest: { select: { email: true, primaryFirstName: true, primaryLastName: true } },
+          },
+        },
+      },
+    });
+    if (!order) {
+      throw new NotFoundException("Order not found");
+    }
+    const normalizedOrder: RefundOrder = {
+      ...order,
+      items: order.StoreOrderItem,
+      campground: order.Campground ? { name: order.Campground.name } : null,
+      guest: order.Guest
+        ? { email: order.Guest.email, firstName: order.Guest.primaryFirstName }
+        : null,
+      reservation: order.Reservation?.Guest
+        ? {
+            guestEmail: order.Reservation.Guest.email,
+            guestName: `${order.Reservation.Guest.primaryFirstName} ${order.Reservation.Guest.primaryLastName}`,
+          }
+        : null,
+    };
+
+    // Validate refund amount doesn't exceed order total
+    const selectedItems: RefundSelection[] =
+      payload.items && payload.items.length > 0
+        ? payload.items.map((item) => {
+            const match = item.itemId
+              ? normalizedOrder.items.find((candidate) => candidate.id === item.itemId)
+              : undefined;
+            if (item.itemId && !match) {
+              throw new NotFoundException(`Item ${item.itemId} not found in order`);
             }
+            return {
+              itemId: item.itemId || match?.id || randomUUID(),
+              productId: item.productId || match?.productId || null,
+              name: item.name || match?.name || "Line item",
+              qty: item.qty ?? match?.qty ?? 0,
+              amountCents: item.amountCents ?? match?.totalCents ?? 0,
+            };
+          })
+        : normalizedOrder.items.map((item) => ({
+            itemId: item.id,
+            productId: item.productId,
+            name: item.name,
+            qty: item.qty,
+            amountCents: item.totalCents ?? 0,
+          }));
+
+    const amountCents =
+      payload.amountCents ?? selectedItems.reduce((sum, item) => sum + item.amountCents, 0);
+
+    // Validate refund amount
+    if (amountCents > normalizedOrder.totalCents) {
+      throw new BadRequestException(
+        `Refund amount (${amountCents}) cannot exceed order total (${normalizedOrder.totalCents})`,
+      );
+    }
+
+    if (amountCents <= 0) {
+      throw new BadRequestException("Refund amount must be greater than zero");
+    }
+
+    const adjustmentType = payload.type === "exchange" ? "exchange" : "refund";
+    let stripeRefundId: string | null = null;
+    let refundStatus: string = "pending";
+    let refundError: string | null = null;
+    let inventoryRestored = false;
+    let notificationSent = false;
+
+    // 1. Process payment processor refund for card payments
+    if (
+      adjustmentType === "refund" &&
+      normalizedOrder.paymentMethod === PaymentMethod.card &&
+      normalizedOrder.paymentIntentId
+    ) {
+      try {
+        const refund = await this.stripeService.createRefund(
+          normalizedOrder.paymentIntentId,
+          amountCents,
+          "requested_by_customer",
+          `refund_${orderId}_${Date.now()}`,
+        );
+        stripeRefundId = refund.id;
+        refundStatus = refund.status ?? "succeeded";
+        this.logger.log(`Stripe refund created: ${refund.id} for order ${orderId}`);
+      } catch (err) {
+        refundStatus = "failed";
+        refundError = getErrorMessage(err) || "Stripe refund failed";
+        this.logger.error(`Stripe refund failed for order ${orderId}: ${refundError}`);
+        // Continue with database record even if Stripe fails - can retry later
+      }
+    }
+
+    // 2. Restore inventory if requested
+    if (payload.restock && selectedItems.length > 0) {
+      try {
+        for (const item of selectedItems) {
+          if (item.productId && item.qty > 0) {
+            await this.prisma.product.update({
+              where: { id: item.productId },
+              data: { stockQty: { increment: item.qty } },
+            });
+          }
         }
+        inventoryRestored = true;
+        this.logger.log(`Inventory restored for order ${orderId}: ${selectedItems.length} items`);
+      } catch (err) {
+        this.logger.error(
+          `Failed to restore inventory for order ${orderId}: ${getErrorMessage(err)}`,
+        );
+        // Continue even if inventory restore fails
+      }
+    }
 
-        // 4. Send email notification to guest
-        const guestEmail = normalizedOrder.guest?.email ?? normalizedOrder.reservation?.guestEmail;
-        const guestName = normalizedOrder.guest?.firstName ?? normalizedOrder.reservation?.guestName ?? "Guest";
-        const shouldNotify = payload.notifyGuest !== false; // Default to true
+    // Create database record for the adjustment
+    const adjustment = await this.prisma.storeOrderAdjustment.create({
+      data: {
+        id: randomUUID(),
+        orderId,
+        type: adjustmentType,
+        amountCents,
+        note: payload.note || null,
+        items: selectedItems,
+        createdById: user?.id || null,
+        stripeRefundId,
+        refundStatus,
+        refundError,
+        inventoryRestored,
+        notificationSent: false, // Updated after email sent
+      },
+      include: {
+        User: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+      },
+    });
+    const { User, ...adjustmentBase } = adjustment;
+    const normalizedAdjustment = { ...adjustmentBase, createdBy: User };
 
-        if (shouldNotify && guestEmail && adjustmentType === "refund") {
-            try {
-                const itemsList = selectedItems
-                    .map(
-                        (item) =>
-                            `<li>${item.qty} x ${item.name} - $${(item.amountCents / 100).toFixed(2)}</li>`
-                    )
-                    .join("");
+    // Update order status
+    if (adjustmentType === "refund" && normalizedOrder.status !== OrderStatus.refunded) {
+      await this.updateOrderStatus(
+        campgroundId,
+        orderId,
+        OrderStatus.refunded,
+        user?.id ?? undefined,
+      );
+    }
 
-                await this.emailService.sendEmail({
-                    to: guestEmail,
-                    subject: `Refund Processed - ${normalizedOrder.campground?.name || 'Store'} Order #${normalizedOrder.id.slice(-6)}`,
-                    html: `
+    // 3. If order was charged to site, create offsetting ledger entry
+    if (
+      normalizedOrder.paymentMethod === PaymentMethod.charge_to_site &&
+      normalizedOrder.reservationId &&
+      adjustmentType === "refund"
+    ) {
+      try {
+        await this.prisma.ledgerEntry.create({
+          data: {
+            id: randomUUID(),
+            campgroundId: normalizedOrder.campgroundId,
+            reservationId: normalizedOrder.reservationId,
+            glCode: "STORE",
+            account: "Store Refunds",
+            description: `Refund for store order #${normalizedOrder.id.slice(-6)}${adjustment.note ? `: ${adjustment.note}` : ""}`,
+            amountCents: amountCents,
+            direction: "credit", // Credit reduces the guest's balance
+          },
+        });
+
+        // Update reservation balance
+        await this.prisma.reservation.update({
+          where: { id: normalizedOrder.reservationId },
+          data: {
+            balanceAmount: { decrement: amountCents },
+            totalAmount: { decrement: amountCents },
+          },
+        });
+      } catch (error) {
+        this.logger.error(`Failed to create ledger entry for refund: ${getErrorMessage(error)}`);
+      }
+    }
+
+    // 4. Send email notification to guest
+    const guestEmail = normalizedOrder.guest?.email ?? normalizedOrder.reservation?.guestEmail;
+    const guestName =
+      normalizedOrder.guest?.firstName ?? normalizedOrder.reservation?.guestName ?? "Guest";
+    const shouldNotify = payload.notifyGuest !== false; // Default to true
+
+    if (shouldNotify && guestEmail && adjustmentType === "refund") {
+      try {
+        const itemsList = selectedItems
+          .map(
+            (item) =>
+              `<li>${item.qty} x ${item.name} - $${(item.amountCents / 100).toFixed(2)}</li>`,
+          )
+          .join("");
+
+        await this.emailService.sendEmail({
+          to: guestEmail,
+          subject: `Refund Processed - ${normalizedOrder.campground?.name || "Store"} Order #${normalizedOrder.id.slice(-6)}`,
+          html: `
                         <h2>Your Refund Has Been Processed</h2>
                         <p>Hi ${guestName},</p>
                         <p>We have processed a refund for your recent order.</p>
                         <p><strong>Order ID:</strong> ${normalizedOrder.id.slice(-6)}</p>
                         <p><strong>Refund Amount:</strong> $${(amountCents / 100).toFixed(2)}</p>
-                        ${payload.note ? `<p><strong>Note:</strong> ${payload.note}</p>` : ''}
+                        ${payload.note ? `<p><strong>Note:</strong> ${payload.note}</p>` : ""}
                         <p><strong>Items Refunded:</strong></p>
                         <ul>${itemsList}</ul>
                         <p>The refund will be credited to your original payment method within 5-10 business days.</p>
                         <p>Thank you for your understanding.</p>
-                        <p>Best regards,<br/>${normalizedOrder.campground?.name || 'The Team'}</p>
-                    `
-                });
-                notificationSent = true;
+                        <p>Best regards,<br/>${normalizedOrder.campground?.name || "The Team"}</p>
+                    `,
+        });
+        notificationSent = true;
 
-                // Update adjustment with notification status
-                await this.prisma.storeOrderAdjustment.update({
-                    where: { id: adjustment.id },
-                    data: { notificationSent: true }
-                });
+        // Update adjustment with notification status
+        await this.prisma.storeOrderAdjustment.update({
+          where: { id: adjustment.id },
+          data: { notificationSent: true },
+        });
 
-                this.logger.log(`Refund notification sent to ${guestEmail} for order ${orderId}`);
-            } catch (err) {
-                this.logger.error(
-                    `Failed to send refund notification for order ${orderId}: ${getErrorMessage(err)}`
-                );
-            }
-        }
-
-        return {
-            ...normalizedAdjustment,
-            notificationSent,
-            stripeRefundId,
-            refundStatus,
-            inventoryRestored
-        };
+        this.logger.log(`Refund notification sent to ${guestEmail} for order ${orderId}`);
+      } catch (err) {
+        this.logger.error(
+          `Failed to send refund notification for order ${orderId}: ${getErrorMessage(err)}`,
+        );
+      }
     }
 
-    private async notifyStaffNewOrder(
-        order: OrderWithItems,
-        email?: string | null,
-        campgroundName?: string | null,
-        webhookUrl?: string | null
-    ) {
-        const title = `New Store Order ${order.id.slice(0, 8)}`;
-        const total = `$${(order.totalCents / 100).toFixed(2)}`;
-        const itemsList =
-            order.items
-                ?.map(
-                    (item) =>
-                        `<li>${item.qty} x ${item.name} - $${((item.totalCents ?? 0) / 100).toFixed(2)}</li>`
-                )
-                .join("") ?? "";
-        const fulfillment = order.fulfillmentType ? String(order.fulfillmentType).replace("_", " ") : "pickup";
-        const channel = order.channel ?? OrderChannel.pos;
-        const instructions = order.deliveryInstructions ? `<p><strong>Instructions:</strong> ${order.deliveryInstructions}</p>` : "";
-        const promised = order.promisedAt ? `<p><strong>Promised at:</strong> ${new Date(order.promisedAt).toLocaleString()}</p>` : "";
+    return {
+      ...normalizedAdjustment,
+      notificationSent,
+      stripeRefundId,
+      refundStatus,
+      inventoryRestored,
+    };
+  }
 
-        if (email) {
-            const html = `
+  private async notifyStaffNewOrder(
+    order: OrderWithItems,
+    email?: string | null,
+    campgroundName?: string | null,
+    webhookUrl?: string | null,
+  ) {
+    const title = `New Store Order ${order.id.slice(0, 8)}`;
+    const total = `$${(order.totalCents / 100).toFixed(2)}`;
+    const itemsList =
+      order.items
+        ?.map(
+          (item) =>
+            `<li>${item.qty} x ${item.name} - $${((item.totalCents ?? 0) / 100).toFixed(2)}</li>`,
+        )
+        .join("") ?? "";
+    const fulfillment = order.fulfillmentType
+      ? String(order.fulfillmentType).replace("_", " ")
+      : "pickup";
+    const channel = order.channel ?? OrderChannel.pos;
+    const instructions = order.deliveryInstructions
+      ? `<p><strong>Instructions:</strong> ${order.deliveryInstructions}</p>`
+      : "";
+    const promised = order.promisedAt
+      ? `<p><strong>Promised at:</strong> ${new Date(order.promisedAt).toLocaleString()}</p>`
+      : "";
+
+    if (email) {
+      const html = `
               <h2>${campgroundName || "Campground"} - New Store Order</h2>
               <p><strong>Order ID:</strong> ${order.id}</p>
               <p><strong>Total:</strong> ${total}</p>
@@ -1177,102 +1238,108 @@ export class StoreService {
               <ul>${itemsList}</ul>
             `;
 
-            await this.emailService.sendEmail({
-                to: email,
-                subject: title,
-                html
-            });
-        }
-
-        if (webhookUrl) {
-            try {
-                await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        type: "store.order.created",
-                        id: order.id,
-                        campgroundName,
-                        total: order.totalCents,
-                        siteNumber: order.siteNumber,
-                        paymentMethod: order.paymentMethod,
-                        channel,
-                        fulfillmentType: order.fulfillmentType,
-                        deliveryInstructions: order.deliveryInstructions,
-                        promisedAt: order.promisedAt,
-                        createdAt: order.createdAt,
-                        items: order.items?.map((item) => ({
-                            name: item.name,
-                            qty: item.qty,
-                            totalCents: item.totalCents ?? 0,
-                        })),
-                    })
-                });
-            } catch {
-                // ignore webhook errors
-            }
-        }
+      await this.emailService.sendEmail({
+        to: email,
+        subject: title,
+        html,
+      });
     }
 
-    /**
-     * Calculate tax for store orders based on campground tax rules
-     */
-    private async calculateStoreTax(campgroundId: string, subtotalCents: number): Promise<{ taxCents: number; taxBreakdown: Array<{ name: string; rate: number; amount: number }> }> {
-        // Fetch active tax rules for the campground that apply to goods/services
-        const taxRules = await this.prisma.taxRule.findMany({
-            where: {
-                campgroundId,
-                isActive: true,
-                category: { in: ['general', 'goods', 'services'] }
-            },
-            orderBy: { createdAt: 'asc' }
+    if (webhookUrl) {
+      try {
+        await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: "store.order.created",
+            id: order.id,
+            campgroundName,
+            total: order.totalCents,
+            siteNumber: order.siteNumber,
+            paymentMethod: order.paymentMethod,
+            channel,
+            fulfillmentType: order.fulfillmentType,
+            deliveryInstructions: order.deliveryInstructions,
+            promisedAt: order.promisedAt,
+            createdAt: order.createdAt,
+            items: order.items?.map((item) => ({
+              name: item.name,
+              qty: item.qty,
+              totalCents: item.totalCents ?? 0,
+            })),
+          }),
         });
-
-        if (taxRules.length === 0) {
-            return { taxCents: 0, taxBreakdown: [] };
-        }
-
-        let totalTaxCents = 0;
-        const taxBreakdown: Array<{ name: string; rate: number; amount: number }> = [];
-
-        for (const rule of taxRules) {
-            let taxAmount = 0;
-
-            switch (rule.type) {
-                case TaxRuleType.percentage:
-                    // Rate is stored as decimal (e.g., 0.0825 for 8.25%)
-                    const rate = rule.rate ? Number(rule.rate) : 0;
-                    taxAmount = Math.round(subtotalCents * rate);
-                    if (taxAmount > 0) {
-                        taxBreakdown.push({
-                            name: rule.name,
-                            rate: rate * 100, // Convert to percentage for display
-                            amount: taxAmount
-                        });
-                    }
-                    break;
-
-                case TaxRuleType.flat:
-                    // Rate is stored as cents for flat taxes
-                    taxAmount = rule.rate ? Math.round(Number(rule.rate) * 100) : 0;
-                    if (taxAmount > 0) {
-                        taxBreakdown.push({
-                            name: rule.name,
-                            rate: 0,
-                            amount: taxAmount
-                        });
-                    }
-                    break;
-
-                case TaxRuleType.exemption:
-                    // Exemptions reduce tax - could be used for tax-exempt items
-                    // For now, we skip these as they'd need item-level logic
-                    break;
-            }
-
-            totalTaxCents += taxAmount;
-        }
-
-        return { taxCents: totalTaxCents, taxBreakdown };
+      } catch {
+        // ignore webhook errors
+      }
     }
+  }
+
+  /**
+   * Calculate tax for store orders based on campground tax rules
+   */
+  private async calculateStoreTax(
+    campgroundId: string,
+    subtotalCents: number,
+  ): Promise<{
+    taxCents: number;
+    taxBreakdown: Array<{ name: string; rate: number; amount: number }>;
+  }> {
+    // Fetch active tax rules for the campground that apply to goods/services
+    const taxRules = await this.prisma.taxRule.findMany({
+      where: {
+        campgroundId,
+        isActive: true,
+        category: { in: ["general", "goods", "services"] },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    if (taxRules.length === 0) {
+      return { taxCents: 0, taxBreakdown: [] };
+    }
+
+    let totalTaxCents = 0;
+    const taxBreakdown: Array<{ name: string; rate: number; amount: number }> = [];
+
+    for (const rule of taxRules) {
+      let taxAmount = 0;
+
+      switch (rule.type) {
+        case TaxRuleType.percentage:
+          // Rate is stored as decimal (e.g., 0.0825 for 8.25%)
+          const rate = rule.rate ? Number(rule.rate) : 0;
+          taxAmount = Math.round(subtotalCents * rate);
+          if (taxAmount > 0) {
+            taxBreakdown.push({
+              name: rule.name,
+              rate: rate * 100, // Convert to percentage for display
+              amount: taxAmount,
+            });
+          }
+          break;
+
+        case TaxRuleType.flat:
+          // Rate is stored as cents for flat taxes
+          taxAmount = rule.rate ? Math.round(Number(rule.rate) * 100) : 0;
+          if (taxAmount > 0) {
+            taxBreakdown.push({
+              name: rule.name,
+              rate: 0,
+              amount: taxAmount,
+            });
+          }
+          break;
+
+        case TaxRuleType.exemption:
+          // Exemptions reduce tax - could be used for tax-exempt items
+          // For now, we skip these as they'd need item-level logic
+          break;
+      }
+
+      totalTaxCents += taxAmount;
+    }
+
+    return { taxCents: totalTaxCents, taxBreakdown };
+  }
 }

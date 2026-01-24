@@ -114,11 +114,15 @@ const parseRevenueData = (value: unknown): RevenueAnalyticsData | null => {
   if (!isRecord(value)) return null;
   const overview = parseOverview(value.overview);
   if (!overview) return null;
-  const monthlyTrends = Array.isArray(value.monthlyTrends) ? value.monthlyTrends.filter(isMonthlyTrend) : [];
+  const monthlyTrends = Array.isArray(value.monthlyTrends)
+    ? value.monthlyTrends.filter(isMonthlyTrend)
+    : [];
   const byAccommodationType = Array.isArray(value.byAccommodationType)
     ? value.byAccommodationType.filter(isAccommodationType)
     : [];
-  const topCampgrounds = Array.isArray(value.topCampgrounds) ? value.topCampgrounds.filter(isTopCampground) : [];
+  const topCampgrounds = Array.isArray(value.topCampgrounds)
+    ? value.topCampgrounds.filter(isTopCampground)
+    : [];
   return { overview, monthlyTrends, byAccommodationType, topCampgrounds };
 };
 
@@ -145,10 +149,8 @@ export default function RevenueIntelligencePage() {
     fetchData();
   }, [dateRange]);
 
-  const formatCount = (value: unknown): string =>
-    isNumber(value) ? value.toLocaleString() : "—";
-  const formatMoney = (value: unknown): string =>
-    isNumber(value) ? formatCurrency(value) : "—";
+  const formatCount = (value: unknown): string => (isNumber(value) ? value.toLocaleString() : "—");
+  const formatMoney = (value: unknown): string => (isNumber(value) ? formatCurrency(value) : "—");
   const formatPercent = (value: unknown): string =>
     isNumber(value) ? `${value.toFixed(1)}%` : "—";
   const formatDollars = (value: unknown, decimals: number): string =>
@@ -166,10 +168,11 @@ export default function RevenueIntelligencePage() {
     return "—";
   };
 
-  const pieData = data?.byAccommodationType?.map((item) => ({
-    name: item.type.charAt(0).toUpperCase() + item.type.slice(1),
-    value: item.percentage,
-  })) || [];
+  const pieData =
+    data?.byAccommodationType?.map((item) => ({
+      name: item.type.charAt(0).toUpperCase() + item.type.slice(1),
+      value: item.percentage,
+    })) || [];
 
   const hasData = data && data.overview && data.overview.totalRevenue > 0;
 
@@ -200,7 +203,8 @@ export default function RevenueIntelligencePage() {
           <DollarSign className="h-16 w-16 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">No Revenue Data Available</h3>
           <p className="text-muted-foreground max-w-md">
-            There is no revenue data for the selected time period. Data will appear here once reservations are made.
+            There is no revenue data for the selected time period. Data will appear here once
+            reservations are made.
           </p>
         </div>
       </div>
@@ -267,9 +271,7 @@ export default function RevenueIntelligencePage() {
             title="Monthly Revenue Trend"
             description="Revenue and booking volume over time"
             data={data?.monthlyTrends || []}
-            dataKeys={[
-              { key: "revenue", color: "#3b82f6", name: "Revenue" },
-            ]}
+            dataKeys={[{ key: "revenue", color: "#3b82f6", name: "Revenue" }]}
             xAxisKey="month"
             type="area"
             height={350}
@@ -294,9 +296,7 @@ export default function RevenueIntelligencePage() {
         title="Average Daily Rate (ADR) Trend"
         description="Track rate changes over time"
         data={data?.monthlyTrends || []}
-        dataKeys={[
-          { key: "adr", color: "#10b981", name: "ADR" },
-        ]}
+        dataKeys={[{ key: "adr", color: "#10b981", name: "ADR" }]}
         xAxisKey="month"
         type="line"
         height={250}

@@ -1,12 +1,29 @@
-import { BadRequestException, ConflictException, Injectable, Logger, UnauthorizedException } from "@nestjs/common";
-import { IdempotencyStatus, OnboardingStatus, OnboardingStep, Prisma, SiteType, UserRole } from "@prisma/client";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  UnauthorizedException,
+} from "@nestjs/common";
+import {
+  IdempotencyStatus,
+  OnboardingStatus,
+  OnboardingStep,
+  Prisma,
+  SiteType,
+  UserRole,
+} from "@prisma/client";
 import { instanceToPlain, plainToInstance } from "class-transformer";
 import { validateSync } from "class-validator";
 import { randomBytes, randomUUID } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
 import { EmailService } from "../email/email.service";
 import { IdempotencyService } from "../payments/idempotency.service";
-import { ONBOARDING_STEP_ORDER, ONBOARDING_TOTAL_STEPS, OnboardingStepKey } from "./onboarding.constants";
+import {
+  ONBOARDING_STEP_ORDER,
+  ONBOARDING_TOTAL_STEPS,
+  OnboardingStepKey,
+} from "./onboarding.constants";
 import { AccountProfileDto, CreateOnboardingInviteDto, StartOnboardingDto } from "./dto";
 
 type OnboardingPayload = Record<string, unknown>;
@@ -57,7 +74,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -125,11 +142,11 @@ export class OnboardingService {
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
     private readonly idempotency: IdempotencyService,
-  ) { }
+  ) {}
 
   async createInvite(dto: CreateOnboardingInviteDto, actor?: OnboardingActor) {
     const token = randomBytes(24).toString("hex");
-    const expiresAt = new Date(Date.now() + ((dto.expiresInHours ?? 72) * 60 * 60 * 1000));
+    const expiresAt = new Date(Date.now() + (dto.expiresInHours ?? 72) * 60 * 60 * 1000);
 
     const invite = await this.prisma.onboardingInvite.create({
       data: {
@@ -141,10 +158,15 @@ export class OnboardingService {
         token,
         expiresAt,
         lastSentAt: new Date(),
-      }
+      },
     });
 
-    await this.sendInviteEmail(invite.token, invite.email, dto.campgroundName ?? "your campground", expiresAt);
+    await this.sendInviteEmail(
+      invite.token,
+      invite.email,
+      dto.campgroundName ?? "your campground",
+      expiresAt,
+    );
 
     return { inviteId: invite.id, token, expiresAt };
   }
@@ -163,7 +185,7 @@ export class OnboardingService {
         expiresAt,
         lastSentAt: new Date(),
         invitedById: actor?.id ?? existing.invitedById ?? null,
-      }
+      },
     });
 
     await this.sendInviteEmail(token, invite.email, "your campground", expiresAt);
@@ -173,25 +195,29 @@ export class OnboardingService {
   async startSession(input: StartOnboardingDto) {
     const invite = await this.requireInvite(input.token);
 
-    const session = invite.OnboardingSession ?? await this.prisma.onboardingSession.create({
-      data: {
-        id: randomUUID(),
-        inviteId: invite.id,
-        organizationId: invite.organizationId ?? null,
-        campgroundId: invite.campgroundId ?? null,
-        status: OnboardingStatus.in_progress,
-        currentStep: OnboardingStep.account_profile,
-        completedSteps: [],
-        expiresAt: invite.expiresAt,
-        updatedAt: new Date(),
-      },
-    });
+    const session =
+      invite.OnboardingSession ??
+      (await this.prisma.onboardingSession.create({
+        data: {
+          id: randomUUID(),
+          inviteId: invite.id,
+          organizationId: invite.organizationId ?? null,
+          campgroundId: invite.campgroundId ?? null,
+          status: OnboardingStatus.in_progress,
+          currentStep: OnboardingStep.account_profile,
+          completedSteps: [],
+          expiresAt: invite.expiresAt,
+          updatedAt: new Date(),
+        },
+      }));
 
     if (!invite.redeemedAt) {
-      await this.prisma.onboardingInvite.update({
-        where: { id: invite.id },
-        data: { redeemedAt: new Date() }
-      }).catch(() => null);
+      await this.prisma.onboardingInvite
+        .update({
+          where: { id: invite.id },
+          data: { redeemedAt: new Date() },
+        })
+        .catch(() => null);
     }
 
     const progress = this.buildProgress(session);
@@ -224,8 +250,17 @@ export class OnboardingService {
     sequence?: string | number | null,
   ) {
     const session = await this.requireSession(sessionId, token);
-    const scope = { campgroundId: session.campgroundId ?? null, tenantId: session.organizationId ?? null };
-    const existing = await this.guardIdempotency(idempotencyKey, { step, payload }, scope, `onboarding/${step}`, sequence);
+    const scope = {
+      campgroundId: session.campgroundId ?? null,
+      tenantId: session.organizationId ?? null,
+    };
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      { step, payload },
+      scope,
+      `onboarding/${step}`,
+      sequence,
+    );
     if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) {
       return existing.responseJson;
     }
@@ -250,16 +285,24 @@ export class OnboardingService {
       // Create campground when park_profile is saved (needed for Stripe connect)
       let campgroundId = session.campgroundId;
       let campgroundSlug: string | null = null;
-      if ((step === OnboardingStep.park_profile || step === OnboardingStep.account_profile) && !campgroundId) {
+      if (
+        (step === OnboardingStep.park_profile || step === OnboardingStep.account_profile) &&
+        !campgroundId
+      ) {
         const profileData = sanitizedRecord;
-        const campgroundData = isRecord(profileData.campground) ? profileData.campground : profileData;
+        const campgroundData = isRecord(profileData.campground)
+          ? profileData.campground
+          : profileData;
         const campgroundName =
           toString(campgroundData.name) ??
           toString(campgroundData.campgroundName) ??
           "My Campground";
 
         // Generate unique slug
-        const baseSlug = campgroundName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        const baseSlug = campgroundName
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
         let slug = baseSlug;
         let counter = 1;
         while (await this.prisma.campground.findUnique({ where: { slug } })) {
@@ -288,11 +331,13 @@ export class OnboardingService {
             timezone: toString(campgroundData.timezone) ?? "America/New_York",
             website: toString(campgroundData.website) ?? null,
             isBookable: false, // Not bookable until onboarding complete
-          }
+          },
         });
         campgroundId = campground.id;
         campgroundSlug = campground.slug;
-        this.logger.log(`Created campground ${campground.id} (${campground.name}) during onboarding`);
+        this.logger.log(
+          `Created campground ${campground.id} (${campground.name}) during onboarding`,
+        );
 
         // Add slug to the sanitized data so it's stored with the session
         sanitizedRecord = {
@@ -346,7 +391,7 @@ export class OnboardingService {
               defaultRate: Math.round(defaultRate * 100), // Convert to cents
               maxOccupancy,
               rigMaxLength: typeof rigMaxLength === "number" ? rigMaxLength : null,
-              hookupsPower: hookupsPower ?? (electricAmps.length > 0),
+              hookupsPower: hookupsPower ?? electricAmps.length > 0,
               hookupsWater,
               hookupsSewer,
               electricAmps,
@@ -360,18 +405,24 @@ export class OnboardingService {
               equipmentTypes: toStringArray(sc.equipmentTypes),
               slideOutsAccepted,
               occupantsIncluded: toNumber(sc.occupantsIncluded) ?? 2,
-              extraAdultFeeCents: typeof extraAdultFee === "number" ? Math.round(extraAdultFee * 100) : null,
-              extraChildFeeCents: typeof extraChildFee === "number" ? Math.round(extraChildFee * 100) : null,
+              extraAdultFeeCents:
+                typeof extraAdultFee === "number" ? Math.round(extraAdultFee * 100) : null,
+              extraChildFeeCents:
+                typeof extraChildFee === "number" ? Math.round(extraChildFee * 100) : null,
               weeklyRateCents: typeof weeklyRate === "number" ? Math.round(weeklyRate * 100) : null,
-              monthlyRateCents: typeof monthlyRate === "number" ? Math.round(monthlyRate * 100) : null,
+              monthlyRateCents:
+                typeof monthlyRate === "number" ? Math.round(monthlyRate * 100) : null,
               petFeeEnabled: toBoolean(sc.petFeeEnabled) ?? false,
               petFeeCents: typeof petFee === "number" ? Math.round(petFee * 100) : null,
               bookingFeeCents: typeof bookingFee === "number" ? Math.round(bookingFee * 100) : null,
-              siteLockFeeCents: typeof siteLockFee === "number" ? Math.round(siteLockFee * 100) : null,
+              siteLockFeeCents:
+                typeof siteLockFee === "number" ? Math.round(siteLockFee * 100) : null,
             },
           });
           createdIds.push(created.id);
-          this.logger.log(`Created SiteClass ${created.id} (${created.name}) for campground ${campgroundId}`);
+          this.logger.log(
+            `Created SiteClass ${created.id} (${created.name}) for campground ${campgroundId}`,
+          );
         }
 
         // Store the created IDs in sanitized data
@@ -393,29 +444,36 @@ export class OnboardingService {
           const site = toRecord(entry);
           // Map the temp siteClassId to actual database ID
           const rawSiteClassId = toString(site.siteClassId);
-          const siteClassIndex = rawSiteClassId && rawSiteClassId.startsWith("temp-")
-            ? Number(rawSiteClassId.replace("temp-", ""))
-            : null;
+          const siteClassIndex =
+            rawSiteClassId && rawSiteClassId.startsWith("temp-")
+              ? Number(rawSiteClassId.replace("temp-", ""))
+              : null;
           const actualSiteClassId = rawSiteClassId
-            ? (rawSiteClassId.startsWith("temp-")
-                ? (typeof siteClassIndex === "number" && Number.isFinite(siteClassIndex) ? siteClassIds[siteClassIndex] : undefined)
-                : rawSiteClassId)
+            ? rawSiteClassId.startsWith("temp-")
+              ? typeof siteClassIndex === "number" && Number.isFinite(siteClassIndex)
+                ? siteClassIds[siteClassIndex]
+                : undefined
+              : rawSiteClassId
             : undefined;
-          const siteClassInfo = (typeof siteClassIndex === "number" && Number.isFinite(siteClassIndex))
-            ? toRecord(siteClassesData[siteClassIndex])
-            : {};
+          const siteClassInfo =
+            typeof siteClassIndex === "number" && Number.isFinite(siteClassIndex)
+              ? toRecord(siteClassesData[siteClassIndex])
+              : {};
 
           if (actualSiteClassId) {
             // Get siteType from siteClass, default to 'rv'
             const siteTypeRaw = toString(siteClassInfo.siteType);
             const siteType = siteTypeRaw && isSiteType(siteTypeRaw) ? siteTypeRaw : SiteType.rv;
             const maxOccupancy = toNumber(siteClassInfo.maxOccupancy) ?? 6;
-            const siteNumber = toString(site.siteNumber)
-              ?? (typeof site.siteNumber === "number" ? site.siteNumber.toString() : "");
+            const siteNumber =
+              toString(site.siteNumber) ??
+              (typeof site.siteNumber === "number" ? site.siteNumber.toString() : "");
             const rigMaxLength = toNumber(site.rigMaxLength);
             const powerAmps = Array.isArray(site.powerAmps)
               ? toNumberArray(site.powerAmps)
-              : toNumberArray(site.powerAmps === undefined || site.powerAmps === null ? [] : [site.powerAmps]);
+              : toNumberArray(
+                  site.powerAmps === undefined || site.powerAmps === null ? [] : [site.powerAmps],
+                );
 
             await this.prisma.site.create({
               data: {
@@ -490,7 +548,7 @@ export class OnboardingService {
 
           // Create user if doesn't exist
           if (!user) {
-            const bcrypt = await import('bcryptjs');
+            const bcrypt = await import("bcryptjs");
             const tempPassword = Math.random().toString(36).slice(-12);
             const passwordHash = await bcrypt.hash(tempPassword, 10);
 
@@ -541,13 +599,15 @@ export class OnboardingService {
 
             // Send invite email (fire-and-forget)
             const inviteUrl = `${baseUrl}/invite?token=${inviteToken}`;
-            const name = [firstName, lastName].filter((value) => value.length > 0).join(" ") || "there";
+            const name =
+              [firstName, lastName].filter((value) => value.length > 0).join(" ") || "there";
             const roleLabel = role.replace("_", " ");
 
-            this.email.sendEmail({
-              to: email,
-              subject: `You've been invited to join a campground team`,
-              html: `
+            this.email
+              .sendEmail({
+                to: email,
+                subject: `You've been invited to join a campground team`,
+                html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
                   <h2 style="color: #0f172a; margin-bottom: 12px;">Welcome, ${name}!</h2>
                   <p style="color: #475569; line-height: 1.5;">
@@ -566,16 +626,19 @@ export class OnboardingService {
                   </p>
                 </div>
               `,
-            }).catch((err) => {
-              this.logger.warn(`Failed to send invite email to ${member.email}: ${err.message}`);
-            });
+              })
+              .catch((err) => {
+                this.logger.warn(`Failed to send invite email to ${member.email}: ${err.message}`);
+              });
           }
         }
       }
 
       // Update campground with operational hours when operational_hours step is saved
       if (step === OnboardingStep.operational_hours && campgroundId) {
-        const hoursData = isRecord(sanitizedRecord.operationalHours) ? sanitizedRecord.operationalHours : sanitizedRecord;
+        const hoursData = isRecord(sanitizedRecord.operationalHours)
+          ? sanitizedRecord.operationalHours
+          : sanitizedRecord;
         const checkInTime = toString(hoursData.checkInTime) ?? "15:00";
         const checkOutTime = toString(hoursData.checkOutTime) ?? "11:00";
         const quietHoursEnabled = toBoolean(hoursData.quietHoursEnabled) ?? false;
@@ -595,7 +658,9 @@ export class OnboardingService {
 
       // Update campground with booking rules when booking_rules step is saved
       if (step === OnboardingStep.booking_rules && campgroundId) {
-        const rulesData = isRecord(sanitizedRecord.bookingRules) ? sanitizedRecord.bookingRules : sanitizedRecord;
+        const rulesData = isRecord(sanitizedRecord.bookingRules)
+          ? sanitizedRecord.bookingRules
+          : sanitizedRecord;
         const longTermEnabled = toBoolean(rulesData.longTermEnabled) ?? false;
         const longTermMinNights = toNumber(rulesData.longTermMinNights) ?? 28;
         const longTermAutoApply = toBoolean(rulesData.longTermAutoApply) ?? true;
@@ -617,7 +682,9 @@ export class OnboardingService {
             where: { campgroundId },
             data: { sameDayBookingCutoffMinutes: 0 },
           });
-          this.logger.log(`Disabled same-day booking cutoffs for all site classes in campground ${campgroundId}`);
+          this.logger.log(
+            `Disabled same-day booking cutoffs for all site classes in campground ${campgroundId}`,
+          );
         }
         // If enabled, leave as null so defaults apply (RV=0, cabin=60)
 
@@ -626,7 +693,9 @@ export class OnboardingService {
 
       // Create waiver template when waivers_documents step is saved
       if (step === OnboardingStep.waivers_documents && campgroundId) {
-        const waiverData = isRecord(sanitizedRecord.waiversDocuments) ? sanitizedRecord.waiversDocuments : sanitizedRecord;
+        const waiverData = isRecord(sanitizedRecord.waiversDocuments)
+          ? sanitizedRecord.waiversDocuments
+          : sanitizedRecord;
         const requireWaiver = toBoolean(waiverData.requireWaiver) ?? false;
         const waiverContent = toString(waiverData.waiverContent);
         const useDefaultWaiver = toBoolean(waiverData.useDefaultWaiver) ?? false;
@@ -648,7 +717,9 @@ I have read and understand this waiver and agree to its terms.`;
               id: randomUUID(),
               campgroundId,
               name: "Standard Liability Waiver",
-              content: useDefaultWaiver ? defaultWaiverContent : (waiverContent ?? defaultWaiverContent),
+              content: useDefaultWaiver
+                ? defaultWaiverContent
+                : (waiverContent ?? defaultWaiverContent),
               isActive: true,
               updatedAt: new Date(),
             },
@@ -659,7 +730,9 @@ I have read and understand this waiver and agree to its terms.`;
 
       // Update campground with communication settings when communication_setup step is saved
       if (step === OnboardingStep.communication_setup && campgroundId) {
-        const commData = isRecord(sanitizedRecord.communicationSetup) ? sanitizedRecord.communicationSetup : sanitizedRecord;
+        const commData = isRecord(sanitizedRecord.communicationSetup)
+          ? sanitizedRecord.communicationSetup
+          : sanitizedRecord;
         const enableNpsSurvey = toBoolean(commData.enableNpsSurvey) ?? false;
         const npsSendHour = toNumber(commData.npsSendHour) ?? 9;
         const useCustomDomain = toBoolean(commData.useCustomDomain) ?? false;
@@ -722,7 +795,7 @@ I have read and understand this waiver and agree to its terms.`;
           id: string;
           campgroundId: string;
           featureKey: string;
-          status: 'setup_now' | 'setup_later' | 'skipped' | 'completed';
+          status: "setup_now" | "setup_later" | "skipped" | "completed";
           priority: number;
           updatedAt: Date;
         }> = [];
@@ -756,7 +829,9 @@ I have read and understand this waiver and agree to its terms.`;
             data: queueItems,
             skipDuplicates: true,
           });
-          this.logger.log(`Created ${queueItems.length} feature queue items for campground ${campgroundId}`);
+          this.logger.log(
+            `Created ${queueItems.length} feature queue items for campground ${campgroundId}`,
+          );
         }
       }
 
@@ -774,7 +849,10 @@ I have read and understand this waiver and agree to its terms.`;
         data: updatedData,
       });
 
-      const nextStatus = progress.remainingSteps.length === 0 ? OnboardingStatus.completed : OnboardingStatus.in_progress;
+      const nextStatus =
+        progress.remainingSteps.length === 0
+          ? OnboardingStatus.completed
+          : OnboardingStatus.in_progress;
 
       const updated = await this.prisma.onboardingSession.update({
         where: { id: sessionId },
@@ -785,7 +863,7 @@ I have read and understand this waiver and agree to its terms.`;
           status: nextStatus,
           data: toNullableJsonInput(updatedData),
           progress: toNullableJsonInput(progress),
-        }
+        },
       });
 
       const response = { session: updated, progress };
@@ -798,12 +876,7 @@ I have read and understand this waiver and agree to its terms.`;
     }
   }
 
-  async saveDraft(
-    sessionId: string,
-    token: string,
-    step: OnboardingStep,
-    payload: unknown,
-  ) {
+  async saveDraft(sessionId: string, token: string, step: OnboardingStep, payload: unknown) {
     if (step !== OnboardingStep.data_import) {
       throw new BadRequestException("Draft updates are only supported for data_import");
     }
@@ -859,7 +932,9 @@ I have read and understand this waiver and agree to its terms.`;
         .flatMap((err) => Object.values(err.constraints ?? {}))
         .filter(Boolean)
         .join(", ");
-      throw new BadRequestException(`Invalid payload for ${step}: ${detail || "validation failed"}`);
+      throw new BadRequestException(
+        `Invalid payload for ${step}: ${detail || "validation failed"}`,
+      );
     }
     const plain = instanceToPlain(instance);
     return isRecord(plain) ? plain : {};
@@ -890,8 +965,16 @@ I have read and understand this waiver and agree to its terms.`;
     return session;
   }
 
-  private async sendInviteEmail(token: string, email: string, campgroundName: string, expiresAt: Date) {
-    const baseUrl = process.env.FRONTEND_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
+  private async sendInviteEmail(
+    token: string,
+    email: string,
+    campgroundName: string,
+    expiresAt: Date,
+  ) {
+    const baseUrl =
+      process.env.FRONTEND_BASE_URL ||
+      process.env.NEXT_PUBLIC_APP_URL ||
+      "https://app.campreserv.com";
     const url = `${baseUrl}/onboarding/${token}`;
     const html = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px; background: #f8fafc;">
@@ -916,20 +999,20 @@ I have read and understand this waiver and agree to its terms.`;
     body: unknown,
     scope: { campgroundId?: string | null; tenantId?: string | null },
     endpoint: string,
-    sequence?: string | number | null
+    sequence?: string | number | null,
   ) {
     if (!key) return null;
     return this.idempotency.start(key, body ?? {}, scope.campgroundId ?? null, {
       tenantId: scope.tenantId ?? null,
       endpoint,
       sequence,
-      rateAction: "apply"
+      rateAction: "apply",
     });
   }
 
   private async finalizeLaunch(
     session: { inviteId: string; data?: unknown },
-    campgroundId: string
+    campgroundId: string,
   ) {
     await this.prisma.campground.update({
       where: { id: campgroundId },
@@ -993,7 +1076,9 @@ I have read and understand this waiver and agree to its terms.`;
     // Check minimum required steps (account_profile is mandatory)
     const completed = new Set(session.completedSteps ?? []);
     if (!completed.has("account_profile")) {
-      throw new BadRequestException("Please complete the account profile step before finishing setup");
+      throw new BadRequestException(
+        "Please complete the account profile step before finishing setup",
+      );
     }
 
     // Get session data
@@ -1004,15 +1089,13 @@ I have read and understand this waiver and agree to its terms.`;
     const organization = session.organizationId
       ? await this.prisma.organization.findUnique({
           where: { id: session.organizationId },
-          include: { EarlyAccessEnrollment: true }
+          include: { EarlyAccessEnrollment: true },
         })
       : null;
 
     // Generate slug from campground name
     const campgroundName =
-      toString(accountProfile.campgroundName) ??
-      toString(accountProfile.name) ??
-      "My Campground";
+      toString(accountProfile.campgroundName) ?? toString(accountProfile.name) ?? "My Campground";
     const baseSlug = campgroundName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -1047,8 +1130,8 @@ I have read and understand this waiver and agree to its terms.`;
         postalCode: toString(accountProfile.postalCode) ?? null,
         timezone: toString(accountProfile.timezone) ?? "America/New_York",
         website: toString(accountProfile.website) ?? null,
-        isBookable: true
-      }
+        isBookable: true,
+      },
     });
 
     // Create membership for user
@@ -1057,8 +1140,8 @@ I have read and understand this waiver and agree to its terms.`;
         id: randomUUID(),
         userId,
         campgroundId: campground.id,
-        role: UserRole.owner
-      }
+        role: UserRole.owner,
+      },
     });
 
     // Update session with campground ID and mark completed
@@ -1066,8 +1149,8 @@ I have read and understand this waiver and agree to its terms.`;
       where: { id: sessionId },
       data: {
         campgroundId: campground.id,
-        status: OnboardingStatus.completed
-      }
+        status: OnboardingStatus.completed,
+      },
     });
 
     // Get user for welcome email
@@ -1075,7 +1158,10 @@ I have read and understand this waiver and agree to its terms.`;
 
     // Send welcome email
     if (user?.email) {
-      const baseUrl = process.env.FRONTEND_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://app.campreserv.com";
+      const baseUrl =
+        process.env.FRONTEND_BASE_URL ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        "https://app.campreserv.com";
       const dashboardUrl = `${baseUrl}/dashboard`;
 
       await this.email.sendEmail({
@@ -1087,8 +1173,8 @@ I have read and understand this waiver and agree to its terms.`;
           dashboardUrl,
           tierName: organization?.EarlyAccessEnrollment
             ? this.getTierDisplayName(organization.EarlyAccessEnrollment.tier)
-            : null
-        })
+            : null,
+        }),
       });
     }
 
@@ -1096,7 +1182,7 @@ I have read and understand this waiver and agree to its terms.`;
       success: true,
       campgroundId: campground.id,
       slug: campground.slug,
-      redirectUrl: `/dashboard`
+      redirectUrl: `/dashboard`,
     };
   }
 
@@ -1104,7 +1190,7 @@ I have read and understand this waiver and agree to its terms.`;
     const names: Record<string, string> = {
       founders_circle: "Founder's Circle",
       pioneer: "Pioneer",
-      trailblazer: "Trailblazer"
+      trailblazer: "Trailblazer",
     };
     return names[tier] || tier;
   }
@@ -1168,7 +1254,12 @@ I have read and understand this waiver and agree to its terms.`;
 
 function inviteExpiryString(date: Date) {
   try {
-    return date.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   } catch {
     return date.toISOString();
   }

@@ -7,37 +7,42 @@ Complete implementation of Phases 1-4 of the platform roadmap including dynamic 
 ## Changes
 
 ### Schema Changes
+
 - **Migration file**: `prisma/migrations/20241210_phase4_notifications_waitlist/migration.sql`
 - **Models added**: `PricingRuleV2`, `DemandBand`, `DepositPolicy`, `AutoCollectSchedule`, `UpsellItem`, `UpsellBundle`, `ReservationUpsell`, `IdempotencyKey`, `Task`, `Group`, `NotificationTrigger`, `ScheduledNotification`
 - **WaitlistEntry enhanced**: `priority`, `autoOffer`, `maxPrice`, `flexibleDates`, `flexibleDays`, `convertedReservationId`, `convertedAt`
 
 ### Backend Modules
-| Module | Purpose |
-|--------|---------|
-| `pricing-v2` | Dynamic pricing rules engine |
-| `deposit-policies` | Deposit strategy configuration |
-| `upsells` | Add-ons and upsell catalog |
-| `auto-collect` | Automated balance collection cron |
-| `tasks` | Housekeeping/turnover management |
-| `groups` | Linked reservation groups |
+
+| Module                  | Purpose                             |
+| ----------------------- | ----------------------------------- |
+| `pricing-v2`            | Dynamic pricing rules engine        |
+| `deposit-policies`      | Deposit strategy configuration      |
+| `upsells`               | Add-ons and upsell catalog          |
+| `auto-collect`          | Automated balance collection cron   |
+| `tasks`                 | Housekeeping/turnover management    |
+| `groups`                | Linked reservation groups           |
 | `notification-triggers` | Event-based automated notifications |
 
 ### Frontend Pages
-| Route | Page |
-|-------|------|
-| `/settings/pricing-rules` | Dynamic pricing management |
-| `/settings/deposit-policies` | Deposit policy configuration |
-| `/settings/upsells` | Upsell items catalog |
+
+| Route                             | Page                         |
+| --------------------------------- | ---------------------------- |
+| `/settings/pricing-rules`         | Dynamic pricing management   |
+| `/settings/deposit-policies`      | Deposit policy configuration |
+| `/settings/upsells`               | Upsell items catalog         |
 | `/settings/notification-triggers` | Automated notification setup |
-| `/operations` | Housekeeping kanban board |
-| `/groups` | Group booking management |
-| `/analytics` | Real-time metrics dashboard |
+| `/operations`                     | Housekeeping kanban board    |
+| `/groups`                         | Group booking management     |
+| `/analytics`                      | Real-time metrics dashboard  |
 
 ### Cron Jobs
+
 - **Auto-collect**: `@Cron(EVERY_HOUR)` in `AutoCollectService.handleAutoCollectCron()`
 - **Scheduled notifications**: `@Cron(EVERY_MINUTE)` in `NotificationTriggersService.processScheduledNotifications()`
 
 ### SMS Feature Flag
+
 - Env var: `SMS_ENABLED` (defaults to `true`)
 - Twilio credentials: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
 - **Non-fatal fallback**: If creds missing, logs warning and returns `{ provider: "noop", success: false }`
@@ -124,4 +129,3 @@ platform/
 - [ ] Cron job intervals appropriate
 - [ ] SMS no-op path confirmed safe
 - [ ] UI gaps documented for backlog
-

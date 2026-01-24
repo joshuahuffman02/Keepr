@@ -7,24 +7,24 @@ import { Checkbox } from "../../../../components/ui/checkbox";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "../../../../components/ui/select";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Banknote, Clock, Percent, DollarSign } from "lucide-react";
 import { HelpTooltip } from "../../../../components/ui/help-tooltip";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
 
 type DepositPolicy = {
@@ -72,8 +72,15 @@ const defaultFormData: FormData = {
   active: true,
 };
 
-const strategyLabels: Record<string, { label: string; icon: typeof DollarSign; description: string }> = {
-  first_night: { label: "First Night", icon: Clock, description: "Charge the first night's rate as deposit" },
+const strategyLabels: Record<
+  string,
+  { label: string; icon: typeof DollarSign; description: string }
+> = {
+  first_night: {
+    label: "First Night",
+    icon: Clock,
+    description: "Charge the first night's rate as deposit",
+  },
   percent: { label: "Percentage", icon: Percent, description: "Charge a percentage of the total" },
   fixed: { label: "Fixed Amount", icon: DollarSign, description: "Charge a fixed dollar amount" },
 };
@@ -136,8 +143,13 @@ export default function DepositPoliciesPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof apiClient.updateDepositPolicy>[1] }) =>
-      apiClient.updateDepositPolicy(id, data, campgroundId!),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Parameters<typeof apiClient.updateDepositPolicy>[1];
+    }) => apiClient.updateDepositPolicy(id, data, campgroundId!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["deposit-policies", campgroundId] });
       closeModal();
@@ -163,12 +175,12 @@ export default function DepositPoliciesPage() {
     setFormData({
       name: policy.name,
       strategy: policy.strategy,
-      value: policy.strategy === "percent"
-        ? String(policy.value)
-        : String(policy.value / 100),
+      value: policy.strategy === "percent" ? String(policy.value) : String(policy.value / 100),
       applyTo: policy.applyTo,
       dueTiming: policy.dueTiming,
-      dueHoursBeforeArrival: policy.dueHoursBeforeArrival ? String(policy.dueHoursBeforeArrival) : "24",
+      dueHoursBeforeArrival: policy.dueHoursBeforeArrival
+        ? String(policy.dueHoursBeforeArrival)
+        : "24",
       minCap: policy.minCap ? String(policy.minCap / 100) : "",
       maxCap: policy.maxCap ? String(policy.maxCap / 100) : "",
       siteClassId: policy.siteClassId || "",
@@ -198,14 +210,14 @@ export default function DepositPoliciesPage() {
     const payload = {
       name: formData.name.trim(),
       strategy: formData.strategy,
-      value: formData.strategy === "percent"
-        ? parseFloat(formData.value)
-        : parseFloat(formData.value) * 100,
+      value:
+        formData.strategy === "percent"
+          ? parseFloat(formData.value)
+          : parseFloat(formData.value) * 100,
       applyTo: formData.applyTo,
       dueTiming: formData.dueTiming,
-      dueHoursBeforeArrival: formData.dueTiming === "before_arrival"
-        ? parseInt(formData.dueHoursBeforeArrival)
-        : null,
+      dueHoursBeforeArrival:
+        formData.dueTiming === "before_arrival" ? parseInt(formData.dueHoursBeforeArrival) : null,
       minCap: formData.minCap ? parseFloat(formData.minCap) * 100 : null,
       maxCap: formData.maxCap ? parseFloat(formData.maxCap) * 100 : null,
       siteClassId: formData.siteClassId || null,
@@ -261,92 +273,92 @@ export default function DepositPoliciesPage() {
 
   return (
     <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Deposit Policies</h1>
-            <p className="text-muted-foreground">
-              Configure deposit requirements for reservations.
-            </p>
-          </div>
-          <Button onClick={openCreateModal}>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Deposit Policies</h1>
+          <p className="text-muted-foreground">Configure deposit requirements for reservations.</p>
+        </div>
+        <Button onClick={openCreateModal}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Policy
+        </Button>
+      </div>
+
+      {policiesQuery.isLoading ? (
+        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+      ) : policiesQuery.data?.length === 0 ? (
+        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+          <Banknote className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold text-foreground">No deposit policies yet</h3>
+          <p className="mt-2 text-muted-foreground">
+            Create policies to require deposits at booking or before arrival.
+          </p>
+          <Button className="mt-4" onClick={openCreateModal}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Policy
+            Create First Policy
           </Button>
         </div>
-
-        {policiesQuery.isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
-        ) : policiesQuery.data?.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
-            <Banknote className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold text-foreground">No deposit policies yet</h3>
-            <p className="mt-2 text-muted-foreground">
-              Create policies to require deposits at booking or before arrival.
-            </p>
-            <Button className="mt-4" onClick={openCreateModal}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create First Policy
-            </Button>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {policiesQuery.data?.map((policy) => {
-              const StrategyIcon = strategyLabels[policy.strategy]?.icon || DollarSign;
-              return (
-                <div
-                  key={policy.id}
-                  className={`border rounded-lg p-4 ${policy.active ? "bg-card" : "bg-muted opacity-60"}`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${policy.active ? "bg-status-info/15 text-status-info" : "bg-muted text-muted-foreground"}`}>
-                        <StrategyIcon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-foreground">{policy.name}</h3>
-                          {!policy.active && (
-                            <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
-                              Inactive
-                            </span>
-                          )}
-                        </div>
-                        <div className="mt-1 text-sm text-muted-foreground">
-                          <span className="font-medium text-foreground">{formatValue(policy)}</span>
-                          {" • "}
-                          {applyToLabels[policy.applyTo]}
-                          {" • "}
-                          {dueTimingLabels[policy.dueTiming]}
-                          {policy.dueTiming === "before_arrival" && policy.dueHoursBeforeArrival && (
-                            <> ({policy.dueHoursBeforeArrival}h before)</>
-                          )}
-                        </div>
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {getSiteClassName(policy.siteClassId)}
-                          {policy.minCap && <> • Min: ${(policy.minCap / 100).toFixed(2)}</>}
-                          {policy.maxCap && <> • Max: ${(policy.maxCap / 100).toFixed(2)}</>}
-                        </div>
-                      </div>
+      ) : (
+        <div className="grid gap-4">
+          {policiesQuery.data?.map((policy) => {
+            const StrategyIcon = strategyLabels[policy.strategy]?.icon || DollarSign;
+            return (
+              <div
+                key={policy.id}
+                className={`border rounded-lg p-4 ${policy.active ? "bg-card" : "bg-muted opacity-60"}`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`p-2 rounded-lg ${policy.active ? "bg-status-info/15 text-status-info" : "bg-muted text-muted-foreground"}`}
+                    >
+                      <StrategyIcon className="h-5 w-5" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => openEditModal(policy)}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setDeleteConfirmId(policy.id)}
-                        className="text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground">{policy.name}</h3>
+                        {!policy.active && (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-status-warning/15 text-status-warning">
+                            Inactive
+                          </span>
+                        )}
+                      </div>
+                      <div className="mt-1 text-sm text-muted-foreground">
+                        <span className="font-medium text-foreground">{formatValue(policy)}</span>
+                        {" • "}
+                        {applyToLabels[policy.applyTo]}
+                        {" • "}
+                        {dueTimingLabels[policy.dueTiming]}
+                        {policy.dueTiming === "before_arrival" && policy.dueHoursBeforeArrival && (
+                          <> ({policy.dueHoursBeforeArrival}h before)</>
+                        )}
+                      </div>
+                      <div className="mt-1 text-xs text-muted-foreground">
+                        {getSiteClassName(policy.siteClassId)}
+                        {policy.minCap && <> • Min: ${(policy.minCap / 100).toFixed(2)}</>}
+                        {policy.maxCap && <> • Max: ${(policy.maxCap / 100).toFixed(2)}</>}
+                      </div>
                     </div>
                   </div>
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => openEditModal(policy)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setDeleteConfirmId(policy.id)}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (
@@ -471,13 +483,17 @@ export default function DepositPoliciesPage() {
 
               {formData.dueTiming === "before_arrival" && (
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-1">Hours Before Arrival</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-1">
+                    Hours Before Arrival
+                  </Label>
                   <Input
                     type="number"
                     min="1"
                     className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                     value={formData.dueHoursBeforeArrival}
-                    onChange={(e) => setFormData({ ...formData, dueHoursBeforeArrival: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, dueHoursBeforeArrival: e.target.value })
+                    }
                   />
                 </div>
               )}
@@ -486,13 +502,20 @@ export default function DepositPoliciesPage() {
                 <Label className="block text-sm font-medium text-foreground mb-1">Site Class</Label>
                 <Select
                   value={formData.siteClassId || EMPTY_SELECT_VALUE}
-                  onValueChange={(value) => setFormData({ ...formData, siteClassId: value === EMPTY_SELECT_VALUE ? "" : value })}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      siteClassId: value === EMPTY_SELECT_VALUE ? "" : value,
+                    })
+                  }
                 >
                   <SelectTrigger className="w-full text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={EMPTY_SELECT_VALUE}>All Site Classes (campground default)</SelectItem>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>
+                      All Site Classes (campground default)
+                    </SelectItem>
                     {siteClassesQuery.data?.map((sc: SiteClass) => (
                       <SelectItem key={sc.id} value={sc.id}>
                         {sc.name}
@@ -539,9 +562,13 @@ export default function DepositPoliciesPage() {
                 <Checkbox
                   id="active"
                   checked={formData.active}
-                  onCheckedChange={(checked) => setFormData({ ...formData, active: Boolean(checked) })}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, active: Boolean(checked) })
+                  }
                 />
-                <Label htmlFor="active" className="text-sm text-foreground">Active</Label>
+                <Label htmlFor="active" className="text-sm text-foreground">
+                  Active
+                </Label>
               </div>
             </div>
 
@@ -557,7 +584,10 @@ export default function DepositPoliciesPage() {
         </div>
       )}
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Deposit Policy</AlertDialogTitle>

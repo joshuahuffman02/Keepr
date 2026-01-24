@@ -1,30 +1,55 @@
-import { IsString, IsOptional, IsObject, MaxLength, IsUUID, IsArray, ValidateNested, IsInt, Min, Max, ValidateIf, MinLength, IsIn } from 'class-validator';
-import { Type } from 'class-transformer';
-import { z } from 'zod';
+import {
+  IsString,
+  IsOptional,
+  IsObject,
+  MaxLength,
+  IsUUID,
+  IsArray,
+  ValidateNested,
+  IsInt,
+  Min,
+  Max,
+  ValidateIf,
+  MinLength,
+  IsIn,
+} from "class-validator";
+import { Type } from "class-transformer";
+import { z } from "zod";
 
 // Zod schema for validation
 const attachmentSchema = z.object({
   name: z.string().min(1).max(255),
   contentType: z.string().min(1).max(128),
-  size: z.number().int().min(1).max(10 * 1024 * 1024),
+  size: z
+    .number()
+    .int()
+    .min(1)
+    .max(10 * 1024 * 1024),
   storageKey: z.string().optional(),
   url: z.string().optional(),
 });
 
-export const sendMessageSchema = z.object({
-  conversationId: z.string().optional(),
-  sessionId: z.string().max(128).optional(),
-  message: z.string().max(4000).optional(),
-  attachments: z.array(attachmentSchema).optional(),
-  visibility: z.enum(["public", "internal"]).optional(),
-  context: z.object({
-    reservationId: z.string().optional(),
-    currentPage: z.string().optional(),
-  }).optional(),
-}).refine((value) => {
-  const message = value.message?.trim() ?? "";
-  return message.length > 0 || (value.attachments?.length ?? 0) > 0;
-}, { message: "Message or attachment required", path: ["message"] });
+export const sendMessageSchema = z
+  .object({
+    conversationId: z.string().optional(),
+    sessionId: z.string().max(128).optional(),
+    message: z.string().max(4000).optional(),
+    attachments: z.array(attachmentSchema).optional(),
+    visibility: z.enum(["public", "internal"]).optional(),
+    context: z
+      .object({
+        reservationId: z.string().optional(),
+        currentPage: z.string().optional(),
+      })
+      .optional(),
+  })
+  .refine(
+    (value) => {
+      const message = value.message?.trim() ?? "";
+      return message.length > 0 || (value.attachments?.length ?? 0) > 0;
+    },
+    { message: "Message or attachment required", path: ["message"] },
+  );
 
 export type SendMessageInput = z.infer<typeof sendMessageSchema>;
 
@@ -66,12 +91,12 @@ export class SendMessageDto {
 }
 
 // Response types
-export type ChatMessageVisibility = 'public' | 'internal';
+export type ChatMessageVisibility = "public" | "internal";
 
 export interface ChatMessageResponse {
   conversationId: string;
   messageId: string;
-  role: 'assistant';
+  role: "assistant";
   content: string;
   parts?: ChatMessagePart[];
   toolCalls?: ToolCall[];
@@ -128,20 +153,20 @@ export interface ToolResult {
 }
 
 export type ChatMessagePart =
-  | { type: 'text'; text: string }
+  | { type: "text"; text: string }
   | {
-      type: 'tool';
+      type: "tool";
       name: string;
       callId: string;
       args?: Record<string, unknown>;
       result?: unknown;
       error?: string;
     }
-  | { type: 'file'; file: ChatAttachment }
-  | { type: 'card'; title?: string; summary?: string; payload?: Record<string, unknown> };
+  | { type: "file"; file: ChatAttachment }
+  | { type: "card"; title?: string; summary?: string; payload?: Record<string, unknown> };
 
 export interface ActionRequired {
-  type: 'confirmation' | 'form' | 'selection';
+  type: "confirmation" | "form" | "selection";
   actionId: string;
   title: string;
   description: string;
@@ -153,5 +178,5 @@ export interface ActionRequired {
 export interface ActionOption {
   id: string;
   label: string;
-  variant?: 'default' | 'destructive' | 'outline';
+  variant?: "default" | "destructive" | "outline";
 }

@@ -56,16 +56,8 @@ export class WebhookService {
    * Compute signature using legacy format for backward compatibility
    * Format: t=<timestamp>,v1=<digest>
    */
-  private computeSignature(
-    secret: string,
-    payload: string,
-    timestamp: number
-  ): string {
-    return this.securityService.generateLegacySignature(
-      secret,
-      payload,
-      timestamp
-    );
+  private computeSignature(secret: string, payload: string, timestamp: number): string {
+    return this.securityService.generateLegacySignature(secret, payload, timestamp);
   }
 
   /**
@@ -90,13 +82,11 @@ export class WebhookService {
         description: input.description,
         eventTypes: input.eventTypes,
         secret,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
     });
 
-    this.logger.log(
-      `Created webhook endpoint ${endpoint.id} for campground ${input.campgroundId}`
-    );
+    this.logger.log(`Created webhook endpoint ${endpoint.id} for campground ${input.campgroundId}`);
 
     return { endpoint, secret };
   }
@@ -117,7 +107,7 @@ export class WebhookService {
   async toggleEndpoint(id: string, campgroundId: string, isActive: boolean) {
     const endpoint = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
-      select: { id: true }
+      select: { id: true },
     });
     if (!endpoint) {
       throw new NotFoundException("Webhook endpoint not found");
@@ -142,7 +132,7 @@ export class WebhookService {
   async emit(
     eventType: WebhookEvent,
     campgroundId: string,
-    payload: Record<string, unknown>
+    payload: Record<string, unknown>,
   ): Promise<void> {
     const endpoints = await this.prisma.webhookEndpoint.findMany({
       where: {
@@ -158,7 +148,7 @@ export class WebhookService {
 
     if (!endpoints.length) {
       this.logger.debug(
-        `No webhook endpoints for event ${eventType} in campground ${campgroundId}`
+        `No webhook endpoints for event ${eventType} in campground ${campgroundId}`,
       );
       return;
     }
@@ -199,11 +189,9 @@ export class WebhookService {
         body,
         signature,
         v2Signature,
-        v2Timestamp
+        v2Timestamp,
       ).catch((err) => {
-        this.logger.error(
-          `Failed to deliver webhook ${delivery.id}: ${err.message}`
-        );
+        this.logger.error(`Failed to deliver webhook ${delivery.id}: ${err.message}`);
       });
     }
   }
@@ -218,7 +206,7 @@ export class WebhookService {
     body: string,
     legacySignature?: string,
     v2Signature?: string,
-    v2Timestamp?: number
+    v2Timestamp?: number,
   ): Promise<void> {
     const delivery = await this.prisma.webhookDelivery.findUnique({
       where: { id: deliveryId },
@@ -229,11 +217,8 @@ export class WebhookService {
     const signature = legacySignature || this.computeSignature(secret, body, timestamp);
 
     // Generate v2 signature if not provided
-    const sig2 =
-      v2Signature ||
-      this.securityService.generateSignature(secret, body).signature;
-    const ts2 =
-      v2Timestamp || Math.floor(Date.now() / 1000);
+    const sig2 = v2Signature || this.securityService.generateSignature(secret, body).signature;
+    const ts2 = v2Timestamp || Math.floor(Date.now() / 1000);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
@@ -289,7 +274,7 @@ export class WebhookService {
   private async scheduleRetry(
     deliveryId: string,
     responseStatus: number | null,
-    errorMessage: string
+    errorMessage: string,
   ): Promise<void> {
     const delivery = await this.prisma.webhookDelivery.findUnique({
       where: { id: deliveryId },
@@ -311,15 +296,13 @@ export class WebhookService {
       });
 
       this.logger.warn(
-        `Webhook ${deliveryId} moved to dead letter queue after ${attempt} attempts`
+        `Webhook ${deliveryId} moved to dead letter queue after ${attempt} attempts`,
       );
       return;
     }
 
     // Schedule next retry with exponential backoff
-    const delayMs =
-      RETRY_DELAYS_MS[attempt - 1] ||
-      RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1];
+    const delayMs = RETRY_DELAYS_MS[attempt - 1] || RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1];
     const nextRetryAt = new Date(Date.now() + delayMs);
 
     await this.prisma.webhookDelivery.update({
@@ -333,9 +316,7 @@ export class WebhookService {
       },
     });
 
-    this.logger.log(
-      `Webhook ${deliveryId} scheduled for retry ${attempt + 1} in ${delayMs}ms`
-    );
+    this.logger.log(`Webhook ${deliveryId} scheduled for retry ${attempt + 1} in ${delayMs}ms`);
   }
 
   /**
@@ -378,7 +359,7 @@ export class WebhookService {
           delivery.id,
           delivery.WebhookEndpoint.url,
           delivery.WebhookEndpoint.secret,
-          body
+          body,
         );
 
         // Check if it was delivered
@@ -472,11 +453,7 @@ export class WebhookService {
     });
 
     const timestamp = Date.now();
-    const signature = this.computeSignature(
-      delivery.WebhookEndpoint.secret,
-      body,
-      timestamp
-    );
+    const signature = this.computeSignature(delivery.WebhookEndpoint.secret, body, timestamp);
     const replayPayload = toJsonValue(delivery.payload) ?? Prisma.JsonNull;
 
     const replayLog = await this.prisma.webhookDelivery.create({
@@ -492,11 +469,10 @@ export class WebhookService {
       },
     });
 
-    const { signature: v2Sig, timestamp: v2Ts } =
-      this.securityService.generateSignature(
-        delivery.WebhookEndpoint.secret,
-        body
-      );
+    const { signature: v2Sig, timestamp: v2Ts } = this.securityService.generateSignature(
+      delivery.WebhookEndpoint.secret,
+      body,
+    );
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
@@ -530,7 +506,7 @@ export class WebhookService {
       });
 
       this.logger.log(
-        `Replayed webhook ${deliveryId} -> ${replayLog.id}: ${res.ok ? "delivered" : "failed"}`
+        `Replayed webhook ${deliveryId} -> ${replayLog.id}: ${res.ok ? "delivered" : "failed"}`,
       );
 
       return replayLog;
@@ -591,7 +567,7 @@ export class WebhookService {
     });
 
     this.logger.log(
-      `Purged ${result.count} webhook delivery logs older than ${retentionDays} days`
+      `Purged ${result.count} webhook delivery logs older than ${retentionDays} days`,
     );
 
     return result.count;

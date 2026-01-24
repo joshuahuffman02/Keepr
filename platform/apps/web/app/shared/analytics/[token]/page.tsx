@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,12 +101,12 @@ const toChartDatum = (value: unknown): ChartDatum | null => {
 
 const toChartDataArray = (value: unknown): ChartDatum[] | undefined => {
   if (!Array.isArray(value)) return undefined;
-  return value
-    .map(toChartDatum)
-    .filter((item): item is ChartDatum => item !== null);
+  return value.map(toChartDatum).filter((item): item is ChartDatum => item !== null);
 };
 
-const toPartyComposition = (value: unknown): AnalyticsDemographics["partyComposition"] | undefined => {
+const toPartyComposition = (
+  value: unknown,
+): AnalyticsDemographics["partyComposition"] | undefined => {
   if (!isRecord(value)) return undefined;
   const adultsOnly = getNumber(value.adultsOnly);
   const withChildren = getNumber(value.withChildren);
@@ -224,9 +218,7 @@ function BarChart({
     <div className="space-y-2">
       {data.map((item, i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-24 text-xs text-slate-400 truncate">
-            {item[labelKey] ?? "—"}
-          </div>
+          <div className="w-24 text-xs text-slate-400 truncate">{item[labelKey] ?? "—"}</div>
           <div className="flex-1 h-6 bg-slate-800 rounded overflow-hidden">
             <div
               className="h-full bg-emerald-600 rounded transition-all"
@@ -234,9 +226,7 @@ function BarChart({
             />
           </div>
           <div className="w-16 text-xs text-slate-300 text-right">
-            {item.percentage
-              ? `${item.percentage}%`
-              : Number(item[valueKey] ?? 0).toLocaleString()}
+            {item.percentage ? `${item.percentage}%` : Number(item[valueKey] ?? 0).toLocaleString()}
           </div>
         </div>
       ))}
@@ -297,9 +287,7 @@ export default function SharedAnalyticsPage() {
       setRequiresPassword(false);
     } catch (err) {
       console.error("Failed to fetch shared analytics:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to load analytics"
-      );
+      setError(err instanceof Error ? err.message : "Failed to load analytics");
     } finally {
       setLoading(false);
     }
@@ -341,9 +329,7 @@ export default function SharedAnalyticsPage() {
               <Lock className="h-6 w-6 text-slate-400" />
             </div>
             <CardTitle className="text-white">Password Required</CardTitle>
-            <CardDescription>
-              This shared report is password protected.
-            </CardDescription>
+            <CardDescription>This shared report is password protected.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -355,14 +341,9 @@ export default function SharedAnalyticsPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-slate-800 border-slate-700"
                 />
-                {passwordError && (
-                  <p className="text-sm text-rose-400">{passwordError}</p>
-                )}
+                {passwordError && <p className="text-sm text-rose-400">{passwordError}</p>}
               </div>
-              <Button
-                type="submit"
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
-              >
+              <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700">
                 View Report
               </Button>
             </form>
@@ -380,9 +361,7 @@ export default function SharedAnalyticsPage() {
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-6 w-6 text-rose-500" />
               <div>
-                <h3 className="font-semibold text-rose-200">
-                  Unable to Load Report
-                </h3>
+                <h3 className="font-semibold text-rose-200">Unable to Load Report</h3>
                 <p className="text-sm text-rose-300/80">{error}</p>
               </div>
             </div>
@@ -406,18 +385,12 @@ export default function SharedAnalyticsPage() {
           <div>
             <div className="flex items-center gap-3 mb-2">
               {analytics.campground && (
-                <Badge
-                  variant="outline"
-                  className="text-emerald-400 border-emerald-400/50"
-                >
+                <Badge variant="outline" className="text-emerald-400 border-emerald-400/50">
                   <Building2 className="h-3 w-3 mr-1" />
                   {analytics.campground.name}
                 </Badge>
               )}
-              <Badge
-                variant="outline"
-                className="text-slate-400 border-slate-600"
-              >
+              <Badge variant="outline" className="text-slate-400 border-slate-600">
                 {analytics.dateRange === "last_30_days" && "Last 30 Days"}
                 {analytics.dateRange === "last_90_days" && "Last 90 Days"}
                 {analytics.dateRange === "last_12_months" && "Last 12 Months"}
@@ -445,10 +418,7 @@ export default function SharedAnalyticsPage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <Users className="h-8 w-8 text-emerald-500" />
-                  <Badge
-                    variant="outline"
-                    className="text-emerald-400 border-emerald-400/50"
-                  >
+                  <Badge variant="outline" className="text-emerald-400 border-emerald-400/50">
                     Total
                   </Badge>
                 </div>
@@ -470,9 +440,7 @@ export default function SharedAnalyticsPage() {
                   <div className="text-2xl font-bold text-white">
                     {data.overview.newGuestsThisMonth?.toLocaleString() || "N/A"}
                   </div>
-                  <div className="text-sm text-slate-400">
-                    New Guests This Month
-                  </div>
+                  <div className="text-sm text-slate-400">New Guests This Month</div>
                 </div>
               </CardContent>
             </Card>
@@ -481,10 +449,7 @@ export default function SharedAnalyticsPage() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <Users className="h-8 w-8 text-amber-500" />
-                  <Badge
-                    variant="outline"
-                    className="text-amber-400 border-amber-400/50"
-                  >
+                  <Badge variant="outline" className="text-amber-400 border-amber-400/50">
                     {data.overview.repeatRate || 0}%
                   </Badge>
                 </div>
@@ -523,16 +488,12 @@ export default function SharedAnalyticsPage() {
                   <MapPin className="h-5 w-5 text-emerald-500" />
                   Geographic Origin
                 </CardTitle>
-                <CardDescription>
-                  Where your guests are coming from
-                </CardDescription>
+                <CardDescription>Where your guests are coming from</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {data.geographic.byCountry && (
                   <div>
-                    <h4 className="text-sm font-medium text-slate-300 mb-3">
-                      By Country
-                    </h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-3">By Country</h4>
                     <BarChart
                       data={data.geographic.byCountry}
                       labelKey="country"
@@ -564,21 +525,13 @@ export default function SharedAnalyticsPage() {
                   <Truck className="h-5 w-5 text-amber-500" />
                   Guest Demographics
                 </CardTitle>
-                <CardDescription>
-                  Equipment types and party composition
-                </CardDescription>
+                <CardDescription>Equipment types and party composition</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {data.demographics.rigTypes && (
                   <div>
-                    <h4 className="text-sm font-medium text-slate-300 mb-3">
-                      RV/Equipment Types
-                    </h4>
-                    <BarChart
-                      data={data.demographics.rigTypes}
-                      labelKey="type"
-                      valueKey="count"
-                    />
+                    <h4 className="text-sm font-medium text-slate-300 mb-3">RV/Equipment Types</h4>
+                    <BarChart data={data.demographics.rigTypes} labelKey="type" valueKey="count" />
                   </div>
                 )}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-700">
@@ -595,8 +548,7 @@ export default function SharedAnalyticsPage() {
                         ? (
                             (data.demographics.partyComposition.withChildren /
                               (data.demographics.partyComposition.adultsOnly +
-                                data.demographics.partyComposition
-                                  .withChildren)) *
+                                data.demographics.partyComposition.withChildren)) *
                             100
                           ).toFixed(0)
                         : "N/A"}
@@ -629,9 +581,7 @@ export default function SharedAnalyticsPage() {
               <CardContent className="space-y-6">
                 {data.travelBehavior.stayReasons && (
                   <div>
-                    <h4 className="text-sm font-medium text-slate-300 mb-3">
-                      Stay Reasons
-                    </h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-3">Stay Reasons</h4>
                     <BarChart
                       data={data.travelBehavior.stayReasons.slice(0, 5)}
                       labelKey="reason"
@@ -641,9 +591,7 @@ export default function SharedAnalyticsPage() {
                 )}
                 {data.travelBehavior.bookingSources && (
                   <div>
-                    <h4 className="text-sm font-medium text-slate-300 mb-3">
-                      Booking Sources
-                    </h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-3">Booking Sources</h4>
                     <BarChart
                       data={data.travelBehavior.bookingSources.slice(0, 5)}
                       labelKey="source"
@@ -673,23 +621,19 @@ export default function SharedAnalyticsPage() {
                         insight.type === "warning"
                           ? "bg-amber-900/20 border-amber-700/50"
                           : insight.type === "success"
-                          ? "bg-emerald-900/20 border-emerald-700/50"
-                          : "bg-slate-700/30 border-slate-600/50"
+                            ? "bg-emerald-900/20 border-emerald-700/50"
+                            : "bg-slate-700/30 border-slate-600/50"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-sm text-white">
-                          {insight.title}
-                        </span>
+                        <span className="font-medium text-sm text-white">{insight.title}</span>
                         {insight.metric && (
                           <Badge variant="outline" className="text-xs">
                             {insight.metric}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-slate-400">
-                        {insight.description}
-                      </p>
+                      <p className="text-xs text-slate-400">{insight.description}</p>
                     </div>
                   ))}
                 </div>
@@ -701,12 +645,10 @@ export default function SharedAnalyticsPage() {
         {/* Footer */}
         <div className="text-center text-sm text-slate-500 pt-8 border-t border-slate-800">
           <p>
-            Powered by{" "}
-            <span className="text-emerald-500 font-semibold">CampReserv</span>
+            Powered by <span className="text-emerald-500 font-semibold">CampReserv</span>
           </p>
           <p className="mt-1">
-            This is a shared view-only report. Contact the sender for access to
-            full analytics.
+            This is a shared view-only report. Contact the sender for access to full analytics.
           </p>
         </div>
       </div>

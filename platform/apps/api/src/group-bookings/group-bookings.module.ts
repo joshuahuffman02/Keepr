@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
-import { GroupBookingsController } from './group-bookings.controller';
-import { GroupBookingsService } from './group-bookings.service';
-import { PrismaModule } from '../prisma/prisma.module';
+import { Module } from "@nestjs/common";
+import { GroupBookingsController } from "./group-bookings.controller";
+import { GroupBookingsService } from "./group-bookings.service";
+import { PrismaModule } from "../prisma/prisma.module";
 
 @Module({
   imports: [PrismaModule],

@@ -53,34 +53,34 @@ Example under "Operation Details":
 
 ### What Campreserv Does BETTER
 
-| Feature | Campreserv | K2 |
-|---------|------------|-----|
-| **Search-based settings discovery** | Global search on landing page | No search |
-| **Branding/theming** | Full brand customization | Basic |
-| **Integrations ecosystem** | Rich integration directory | Limited |
-| **Gamification** | Badges, XP, rewards | None |
-| **ADA Accessibility** | Certification program | Basic attributes |
-| **Value Stack/Guarantees** | Multiple guarantee types | None |
-| **POS Integration options** | Lightspeed, Shopify, etc. | KampStore only |
-| **Dynamic Pricing** | Rule stacking, priorities | Less flexible |
-| **Security Certification** | Assessment checklist | None |
-| **Webhook support** | Developer tools | None |
+| Feature                             | Campreserv                    | K2               |
+| ----------------------------------- | ----------------------------- | ---------------- |
+| **Search-based settings discovery** | Global search on landing page | No search        |
+| **Branding/theming**                | Full brand customization      | Basic            |
+| **Integrations ecosystem**          | Rich integration directory    | Limited          |
+| **Gamification**                    | Badges, XP, rewards           | None             |
+| **ADA Accessibility**               | Certification program         | Basic attributes |
+| **Value Stack/Guarantees**          | Multiple guarantee types      | None             |
+| **POS Integration options**         | Lightspeed, Shopify, etc.     | KampStore only   |
+| **Dynamic Pricing**                 | Rule stacking, priorities     | Less flexible    |
+| **Security Certification**          | Assessment checklist          | None             |
+| **Webhook support**                 | Developer tools               | None             |
 
 ### What K2 Has That We Should Add
 
-| Feature | Description | Priority |
-|---------|-------------|----------|
-| **Grid Optimization** | Auto-optimize site assignments nightly | HIGH |
-| **Equipment Types** | RV types with tow/length requirements | MEDIUM |
-| **Rate Groups** | Color-coded calendar periods | HIGH |
-| **Charge Codes** | Reusable fee definitions | MEDIUM |
-| **Additional Questions (UDFs)** | Custom reservation fields | HIGH |
-| **Lock Codes** | Site lock reasons (maintenance, etc.) | MEDIUM |
-| **Referral Sources** | Track how guests found you | LOW |
-| **Site Closures** | Temporary closures with reasons | MEDIUM |
-| **System Check** | Validation/health dashboard | HIGH |
-| **Text Fields** | Configurable policy text blocks | LOW |
-| **Long Term Stay** | Monthly/seasonal settings | MEDIUM |
+| Feature                         | Description                            | Priority |
+| ------------------------------- | -------------------------------------- | -------- |
+| **Grid Optimization**           | Auto-optimize site assignments nightly | HIGH     |
+| **Equipment Types**             | RV types with tow/length requirements  | MEDIUM   |
+| **Rate Groups**                 | Color-coded calendar periods           | HIGH     |
+| **Charge Codes**                | Reusable fee definitions               | MEDIUM   |
+| **Additional Questions (UDFs)** | Custom reservation fields              | HIGH     |
+| **Lock Codes**                  | Site lock reasons (maintenance, etc.)  | MEDIUM   |
+| **Referral Sources**            | Track how guests found you             | LOW      |
+| **Site Closures**               | Temporary closures with reasons        | MEDIUM   |
+| **System Check**                | Validation/health dashboard            | HIGH     |
+| **Text Fields**                 | Configurable policy text blocks        | LOW      |
+| **Long Term Stay**              | Monthly/seasonal settings              | MEDIUM   |
 
 ---
 
@@ -97,6 +97,7 @@ Example under "Operation Details":
 ### Level 2: Sub-sections Per Category
 
 #### 1. Property
+
 - Campground Profile
 - Site Types & Attributes
 - Equipment Types (NEW)
@@ -107,6 +108,7 @@ Example under "Operation Details":
 - Store Hours
 
 #### 2. Pricing
+
 - Rate Plans
 - Rate Groups (NEW - calendar colors)
 - Seasonal Rates
@@ -116,6 +118,7 @@ Example under "Operation Details":
 - Deposit Policies
 
 #### 3. Bookings
+
 - Booking Policies
 - Stay Rules (min/max)
 - Blackout Dates
@@ -127,6 +130,7 @@ Example under "Operation Details":
 - Optimization (NEW)
 
 #### 4. Store
+
 - Departments
 - Products
 - Upsells
@@ -134,6 +138,7 @@ Example under "Operation Details":
 - POS Integrations
 
 #### 5. Access
+
 - Users & Roles
 - Permissions
 - Security Groups
@@ -141,6 +146,7 @@ Example under "Operation Details":
 - Audit Log
 
 #### 6. System
+
 - System Check (NEW)
 - Communications
 - Email Templates
@@ -256,6 +262,7 @@ interface SettingsNavContext {
 **Purpose**: Automatically optimize site assignments to maximize revenue and occupancy.
 
 **Settings**:
+
 - Enable/disable dynamic optimization
 - Days before arrival to stop optimizing
 - Site classes to include (RV, Tent, Cabin, etc.)
@@ -263,6 +270,7 @@ interface SettingsNavContext {
 - Optimization goals (revenue vs occupancy)
 
 **How it works**:
+
 - Runs nightly
 - Analyzes upcoming reservations
 - Suggests/auto-moves reservations to better sites
@@ -273,6 +281,7 @@ interface SettingsNavContext {
 **Purpose**: Define named periods with colors for visual calendar display.
 
 **Fields**:
+
 - Name (e.g., "Peak Summer", "Holiday", "Shoulder Season")
 - Color (for calendar display)
 - Date ranges per year
@@ -284,6 +293,7 @@ interface SettingsNavContext {
 **Purpose**: Add custom questions to reservation flow.
 
 **Fields**:
+
 - Question text
 - Field type (Yes/No, Text, Number, Dropdown, Multi-select)
 - When to display (Reservation, Express Arrival, Registration)
@@ -296,6 +306,7 @@ interface SettingsNavContext {
 **Purpose**: Proactive configuration validation.
 
 **Checks**:
+
 - Rates not configured for pricing groups
 - Missing tax table assignments
 - Sites without pricing groups
@@ -305,6 +316,7 @@ interface SettingsNavContext {
 - Payment processor not configured
 
 **Display**:
+
 - Actionable items count (with badge)
 - Informational items
 - Direct links to fix issues
@@ -314,6 +326,7 @@ interface SettingsNavContext {
 ## Implementation Phases
 
 ### Phase 1: Foundation (Week 1-2)
+
 - [ ] Create central settings layout component
 - [ ] Implement 3-level tab navigation
 - [ ] Set up route structure
@@ -321,18 +334,21 @@ interface SettingsNavContext {
 - [ ] Add Active/Inactive/All filter component
 
 ### Phase 2: Migration (Week 2-3)
+
 - [ ] Wrap existing settings pages in new layout
 - [ ] Create category index pages
 - [ ] Update breadcrumb navigation
 - [ ] Ensure all existing functionality works
 
 ### Phase 3: New Features (Week 3-5)
+
 - [ ] Implement Rate Groups with calendar colors
 - [ ] Add Custom Fields (UDFs) system
 - [ ] Build System Check dashboard
 - [ ] Create Equipment Types management
 
 ### Phase 4: Polish (Week 5-6)
+
 - [ ] Add keyboard navigation
 - [ ] Implement search within settings
 - [ ] Add quick actions (copy, bulk operations)

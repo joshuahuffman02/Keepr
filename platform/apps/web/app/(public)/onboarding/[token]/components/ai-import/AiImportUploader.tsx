@@ -98,7 +98,7 @@ export function AiImportUploader({
         await uploadFile(files[0]);
       }
     },
-    [sessionId, token]
+    [sessionId, token],
   );
 
   const handleFileSelect = useCallback(
@@ -108,7 +108,7 @@ export function AiImportUploader({
         await uploadFile(files[0]);
       }
     },
-    [sessionId, token]
+    [sessionId, token],
   );
 
   const uploadFile = async (file: File) => {
@@ -121,16 +121,13 @@ export function AiImportUploader({
       formData.append("file", file);
       formData.append("token", token);
 
-      const response = await fetch(
-        apiUrl(`/onboarding/session/${sessionId}/ai-import/upload`),
-        {
-          method: "POST",
-          headers: {
-            "x-onboarding-token": token,
-          },
-          body: formData,
-        }
-      );
+      const response = await fetch(apiUrl(`/onboarding/session/${sessionId}/ai-import/upload`), {
+        method: "POST",
+        headers: {
+          "x-onboarding-token": token,
+        },
+        body: formData,
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -182,7 +179,7 @@ export function AiImportUploader({
             isDragging
               ? "border-primary bg-primary/5 scale-[1.02]"
               : "border-muted-foreground/25 hover:border-primary/50",
-            disabled && "opacity-50 pointer-events-none"
+            disabled && "opacity-50 pointer-events-none",
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -204,9 +201,7 @@ export function AiImportUploader({
                 </div>
                 <div>
                   <p className="text-lg font-medium">Analyzing document...</p>
-                  <p className="text-sm text-muted-foreground">
-                    AI is classifying your file
-                  </p>
+                  <p className="text-sm text-muted-foreground">AI is classifying your file</p>
                 </div>
               </>
             ) : (
@@ -215,9 +210,7 @@ export function AiImportUploader({
                   <Upload className="w-8 h-8 text-primary" />
                 </div>
                 <div>
-                  <p className="text-lg font-medium">
-                    Drop your file here or click to browse
-                  </p>
+                  <p className="text-lg font-medium">Drop your file here or click to browse</p>
                   <p className="text-sm text-muted-foreground mt-1">
                     Supports CSV, Excel, PDF, and images
                   </p>
@@ -247,12 +240,7 @@ export function AiImportUploader({
                 <p className="font-medium text-destructive">Upload failed</p>
                 <p className="text-sm text-destructive/80">{error}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setError(null)}
-                className="shrink-0"
-              >
+              <Button variant="ghost" size="sm" onClick={() => setError(null)} className="shrink-0">
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -297,7 +285,7 @@ export function AiImportUploader({
                     <span
                       className={cn(
                         "text-sm",
-                        getConfidenceColor(uploadedFile.classification.confidence)
+                        getConfidenceColor(uploadedFile.classification.confidence),
                       )}
                     >
                       {getConfidenceLabel(uploadedFile.classification.confidence)} (
@@ -307,20 +295,13 @@ export function AiImportUploader({
 
                   {uploadedFile.classification.detectedColumns && (
                     <div className="mt-3">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Detected columns:
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Detected columns:</p>
                       <div className="flex flex-wrap gap-1">
-                        {uploadedFile.classification.detectedColumns
-                          .slice(0, 6)
-                          .map((col) => (
-                            <span
-                              key={col}
-                              className="px-2 py-0.5 text-xs rounded bg-muted"
-                            >
-                              {col}
-                            </span>
-                          ))}
+                        {uploadedFile.classification.detectedColumns.slice(0, 6).map((col) => (
+                          <span key={col} className="px-2 py-0.5 text-xs rounded bg-muted">
+                            {col}
+                          </span>
+                        ))}
                         {uploadedFile.classification.detectedColumns.length > 6 && (
                           <span className="px-2 py-0.5 text-xs rounded bg-muted">
                             +{uploadedFile.classification.detectedColumns.length - 6} more

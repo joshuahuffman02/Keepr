@@ -18,18 +18,18 @@ const getUserTenantId = (user: unknown): string | null => {
 @UseGuards(JwtAuthGuard)
 @Controller("tasks/bundles")
 export class TaskBundlerController {
-    constructor(private readonly bundler: TaskBundlerService) { }
+  constructor(private readonly bundler: TaskBundlerService) {}
 
-    @Get()
-    async getBundles(@Req() req: Request) {
-        const tenantId = getUserTenantId(req.user);
+  @Get()
+  async getBundles(@Req() req: Request) {
+    const tenantId = getUserTenantId(req.user);
 
-        // Fallback if not strictly defined on user
-        if (!tenantId) {
-            // For development/scaffolding, might throw or return empty
-            return [];
-        }
-
-        return this.bundler.getBundles(tenantId);
+    // Fallback if not strictly defined on user
+    if (!tenantId) {
+      // For development/scaffolding, might throw or return empty
+      return [];
     }
+
+    return this.bundler.getBundles(tenantId);
+  }
 }

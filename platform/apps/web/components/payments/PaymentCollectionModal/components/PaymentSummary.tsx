@@ -66,7 +66,9 @@ export function PaymentSummary({
               <span className="text-emerald-600 flex items-center gap-1">
                 {discount.code || discount.description}
                 <button
-                  onClick={() => discount.promoCodeId && actions.removeDiscount(discount.promoCodeId)}
+                  onClick={() =>
+                    discount.promoCodeId && actions.removeDiscount(discount.promoCodeId)
+                  }
                   className="p-0.5 hover:bg-muted rounded"
                   aria-label="Remove discount"
                 >
@@ -90,12 +92,15 @@ export function PaymentSummary({
       )}
 
       {/* Processing fee (pass-through mode) */}
-      {showFees && config?.feeMode === "pass_through" && config.showFeeBreakdown && feeCents > 0 && (
-        <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">Processing Fee</span>
-          <span className="text-muted-foreground">+{formatCurrency(feeCents)}</span>
-        </div>
-      )}
+      {showFees &&
+        config?.feeMode === "pass_through" &&
+        config.showFeeBreakdown &&
+        feeCents > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Processing Fee</span>
+            <span className="text-muted-foreground">+{formatCurrency(feeCents)}</span>
+          </div>
+        )}
 
       {/* Divider */}
       <div className="border-t border-border my-2" />
@@ -120,7 +125,7 @@ export function PaymentSummary({
             <span
               className={cn(
                 "font-semibold text-lg",
-                remainingCents > 0 ? "text-amber-600" : "text-green-600"
+                remainingCents > 0 ? "text-amber-600" : "text-green-600",
               )}
             >
               {formatCurrency(remainingCents)}

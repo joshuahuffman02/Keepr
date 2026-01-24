@@ -31,35 +31,43 @@ import { FAQJsonLd } from "@/components/seo";
 const softwareFaqs = [
   {
     question: "What types of campgrounds can use Keepr?",
-    answer: "Keepr works for all types of outdoor hospitality: RV parks, tent campgrounds, cabin rentals, glamping sites, yurts, treehouses, and mixed-use properties. Our flexible site class system lets you manage any combination of accommodations.",
+    answer:
+      "Keepr works for all types of outdoor hospitality: RV parks, tent campgrounds, cabin rentals, glamping sites, yurts, treehouses, and mixed-use properties. Our flexible site class system lets you manage any combination of accommodations.",
   },
   {
     question: "How is Keepr different from Campspot or Newbook?",
-    answer: "Unlike Campspot, we charge zero commission on bookings (just a flat $2.30 per reservation). Unlike Newbook, there are no setup fees or long implementation times. We offer features most competitors lack: AI demand forecasting, built-in loyalty programs, and integrated staff scheduling.",
+    answer:
+      "Unlike Campspot, we charge zero commission on bookings (just a flat $2.30 per reservation). Unlike Newbook, there are no setup fees or long implementation times. We offer features most competitors lack: AI demand forecasting, built-in loyalty programs, and integrated staff scheduling.",
   },
   {
     question: "Can I manage multiple campground properties?",
-    answer: "Yes. Our platform supports multi-property management with centralized reporting, shared guest databases, and portfolio-wide analytics. Each property can have its own branding, rates, and policies.",
+    answer:
+      "Yes. Our platform supports multi-property management with centralized reporting, shared guest databases, and portfolio-wide analytics. Each property can have its own branding, rates, and policies.",
   },
   {
     question: "Does it work offline for remote campgrounds?",
-    answer: "Yes. Our POS system includes offline mode that syncs when connectivity returns. Staff can process check-ins, take payments, and create reservations even without internet access.",
+    answer:
+      "Yes. Our POS system includes offline mode that syncs when connectivity returns. Staff can process check-ins, take payments, and create reservations even without internet access.",
   },
   {
     question: "What integrations are available?",
-    answer: "Keepr integrates with Stripe for payments, QuickBooks and Xero for accounting, major OTA channels (Hipcamp, Airbnb, Booking.com), and offers a full REST API for custom integrations.",
+    answer:
+      "Keepr integrates with Stripe for payments, QuickBooks and Xero for accounting, major OTA channels (Hipcamp, Airbnb, Booking.com), and offers a full REST API for custom integrations.",
   },
   {
     question: "How does the AI demand forecasting work?",
-    answer: "Our AI analyzes your historical booking patterns, local events, weather data, and competitor pricing to predict future demand. It suggests optimal pricing and can automatically adjust rates based on your rules.",
+    answer:
+      "Our AI analyzes your historical booking patterns, local events, weather data, and competitor pricing to predict future demand. It suggests optimal pricing and can automatically adjust rates based on your rules.",
   },
   {
     question: "What guest communication features are included?",
-    answer: "All plans include automated confirmation emails, pre-arrival reminders, and check-out instructions. Higher tiers add SMS messaging, guest surveys, and a self-service portal where guests can manage their reservations.",
+    answer:
+      "All plans include automated confirmation emails, pre-arrival reminders, and check-out instructions. Higher tiers add SMS messaging, guest surveys, and a self-service portal where guests can manage their reservations.",
   },
   {
     question: "Is training provided for my staff?",
-    answer: "Yes. We provide DIY video tutorials, role-specific training guides, and live onboarding sessions for Pro and Enterprise plans. Most staff become comfortable with the system within a few hours.",
+    answer:
+      "Yes. We provide DIY video tutorials, role-specific training guides, and live onboarding sessions for Pro and Enterprise plans. Most staff become comfortable with the system within a few hours.",
   },
 ];
 
@@ -89,7 +97,8 @@ const structuredData = {
   name: "Keepr",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  description: "All-in-one campground management software for reservations, POS, staff scheduling, and AI insights.",
+  description:
+    "All-in-one campground management software for reservations, POS, staff scheduling, and AI insights.",
   offers: {
     "@type": "Offer",
     price: "100",
@@ -266,7 +275,8 @@ export default function CampgroundManagementSoftwarePage() {
               Everything You Need to Run Your Campground
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Stop juggling multiple systems. Keepr handles reservations, payments, staff, POS, and analytics in one platform.
+              Stop juggling multiple systems. Keepr handles reservations, payments, staff, POS, and
+              analytics in one platform.
             </p>
           </div>
 
@@ -354,7 +364,8 @@ export default function CampgroundManagementSoftwarePage() {
               Built for Every Type of Campground
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Whether you're running RV sites, tent camping, cabins, or glamping, Keepr handles it all.
+              Whether you're running RV sites, tent camping, cabins, or glamping, Keepr handles it
+              all.
             </p>
           </div>
 
@@ -444,10 +455,26 @@ export default function CampgroundManagementSoftwarePage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: "1", title: "Sign Up", description: "Create your account in 2 minutes. No credit card required." },
-              { step: "2", title: "Configure", description: "Set up your sites, rates, and policies with our guided wizard." },
-              { step: "3", title: "Migrate", description: "We import your data from any system for free." },
-              { step: "4", title: "Go Live", description: "Start taking bookings. Your team will be comfortable in hours." },
+              {
+                step: "1",
+                title: "Sign Up",
+                description: "Create your account in 2 minutes. No credit card required.",
+              },
+              {
+                step: "2",
+                title: "Configure",
+                description: "Set up your sites, rates, and policies with our guided wizard.",
+              },
+              {
+                step: "3",
+                title: "Migrate",
+                description: "We import your data from any system for free.",
+              },
+              {
+                step: "4",
+                title: "Go Live",
+                description: "Start taking bookings. Your team will be comfortable in hours.",
+              },
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="w-12 h-12 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-bold text-xl flex items-center justify-center mx-auto mb-4">
@@ -471,7 +498,8 @@ export default function CampgroundManagementSoftwarePage() {
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
-              "Keepr replaced 4 different tools we were using. The AI predictions alone have saved us thousands in no-shows."
+              "Keepr replaced 4 different tools we were using. The AI predictions alone have saved
+              us thousands in no-shows."
             </blockquote>
             <div className="text-slate-600">
               <span className="font-semibold text-slate-900">Sarah M.</span>
@@ -522,7 +550,8 @@ export default function CampgroundManagementSoftwarePage() {
             Ready to Modernize Your Campground?
           </h2>
           <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
-            Join hundreds of campgrounds using Keepr to save time, reduce no-shows, and grow revenue.
+            Join hundreds of campgrounds using Keepr to save time, reduce no-shows, and grow
+            revenue.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

@@ -11,24 +11,39 @@ import type { ExportFormat } from "@/lib/export-utils";
 import { ReportsV2Shell } from "@/components/reports-v2/ReportsV2Shell";
 import { ReportsV2Header } from "@/components/reports-v2/ReportsV2Header";
 import { ReportsV2SubNav } from "@/components/reports-v2/ReportsV2SubNav";
-import { ReportsV2FiltersSheet, type ReportsV2Filters } from "@/components/reports-v2/ReportsV2FiltersSheet";
+import {
+  ReportsV2FiltersSheet,
+  type ReportsV2Filters,
+} from "@/components/reports-v2/ReportsV2FiltersSheet";
 import { SaveReportDialogV2 } from "@/components/reports-v2/SaveReportDialogV2";
 import { ReportRendererV2 } from "@/components/reports-v2/ReportRendererV2";
 import { listSavedReports } from "@/components/reports/savedReports";
 import { getReportMetaV2, type ReportTabV2 } from "@/lib/report-registry-v2";
-import { buildReportHrefV2, buildReportQueryV2, normalizeReportSelectionV2 } from "@/lib/report-links-v2";
+import {
+  buildReportHrefV2,
+  buildReportQueryV2,
+  normalizeReportSelectionV2,
+} from "@/lib/report-links-v2";
 
 const DEFAULT_FILTERS: ReportsV2Filters = {
   status: "all",
   siteType: "all",
-  groupBy: "none"
+  groupBy: "none",
 };
 
 const isStatusFilter = (value: string | null): value is ReportsV2Filters["status"] =>
-  value === "all" || value === "confirmed" || value === "checked_in" || value === "pending" || value === "cancelled";
+  value === "all" ||
+  value === "confirmed" ||
+  value === "checked_in" ||
+  value === "pending" ||
+  value === "cancelled";
 
 const isGroupByFilter = (value: string | null): value is ReportsV2Filters["groupBy"] =>
-  value === "none" || value === "site" || value === "status" || value === "date" || value === "siteType";
+  value === "none" ||
+  value === "site" ||
+  value === "status" ||
+  value === "date" ||
+  value === "siteType";
 
 export function ReportsV2ReportPage() {
   const params = useParams();
@@ -39,7 +54,10 @@ export function ReportsV2ReportPage() {
 
   const rawTab = typeof params?.tab === "string" ? params.tab : "overview";
   const rawSub = typeof params?.sub === "string" ? params.sub : null;
-  const normalized = normalizeReportSelectionV2(rawTab, rawSub) || { tab: "overview", subTab: null };
+  const normalized = normalizeReportSelectionV2(rawTab, rawSub) || {
+    tab: "overview",
+    subTab: null,
+  };
 
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<{ start: string; end: string }>(() => {
@@ -48,7 +66,7 @@ export function ReportsV2ReportPage() {
     start.setDate(start.getDate() - 30);
     return {
       start: start.toISOString().slice(0, 10),
-      end: end.toISOString().slice(0, 10)
+      end: end.toISOString().slice(0, 10),
     };
   });
   const [filters, setFilters] = useState<ReportsV2Filters>(DEFAULT_FILTERS);
@@ -80,7 +98,7 @@ export function ReportsV2ReportPage() {
     if (start || end) {
       setDateRange((prev) => ({
         start: start || prev.start,
-        end: end || prev.end
+        end: end || prev.end,
       }));
     }
 
@@ -88,7 +106,7 @@ export function ReportsV2ReportPage() {
       setFilters((prev) => ({
         status: isStatusFilter(status) ? status : prev.status,
         siteType: siteType || prev.siteType,
-        groupBy: isGroupByFilter(groupBy) ? groupBy : prev.groupBy
+        groupBy: isGroupByFilter(groupBy) ? groupBy : prev.groupBy,
       }));
     }
     setIsReady(true);
@@ -101,7 +119,7 @@ export function ReportsV2ReportPage() {
       tab: normalized.tab,
       subTab: normalized.subTab,
       dateRange,
-      filters
+      filters,
     });
     const current = `${pathname}${currentQuery}`;
     if (current !== desired) {
@@ -119,7 +137,7 @@ export function ReportsV2ReportPage() {
     const interval = setInterval(() => {
       queryClient.invalidateQueries({
         predicate: (query) =>
-          Array.isArray(query.queryKey) && query.queryKey.includes(campgroundId)
+          Array.isArray(query.queryKey) && query.queryKey.includes(campgroundId),
       });
       setLastUpdatedAt(new Date());
     }, 60000);
@@ -129,8 +147,7 @@ export function ReportsV2ReportPage() {
   const handleRefresh = () => {
     if (!campgroundId) return;
     queryClient.invalidateQueries({
-      predicate: (query) =>
-        Array.isArray(query.queryKey) && query.queryKey.includes(campgroundId)
+      predicate: (query) => Array.isArray(query.queryKey) && query.queryKey.includes(campgroundId),
     });
     setLastUpdatedAt(new Date());
   };
@@ -142,7 +159,9 @@ export function ReportsV2ReportPage() {
   return (
     <DashboardShell>
       <div className="space-y-5">
-        <Breadcrumbs items={[{ label: "Reports v2", href: "/reports-v2" }, { label: reportLabel }]} />
+        <Breadcrumbs
+          items={[{ label: "Reports v2", href: "/reports-v2" }, { label: reportLabel }]}
+        />
 
         <ReportsV2Shell
           activeTab={normalized.tab}
@@ -208,7 +227,7 @@ export function ReportsV2ReportPage() {
             subTab: normalized.subTab,
             dateRange,
             filters,
-            campgroundId
+            campgroundId,
           }}
           onSaved={() => setSavedReports(listSavedReports(campgroundId))}
         />
@@ -217,13 +236,17 @@ export function ReportsV2ReportPage() {
       <ExportDialog
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
-        exportPreview={campgroundId ? {
-          reportName: reportLabel,
-          subReportName: normalized.subTab,
-          dateRange,
-          rowCount: 0,
-          tabName: normalized.tab
-        } : null}
+        exportPreview={
+          campgroundId
+            ? {
+                reportName: reportLabel,
+                subReportName: normalized.subTab,
+                dateRange,
+                rowCount: 0,
+                tabName: normalized.tab,
+              }
+            : null
+        }
         onExport={(format: ExportFormat) => {
           exportReport(normalized.tab, normalized.subTab, format);
         }}

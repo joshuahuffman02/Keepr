@@ -23,12 +23,7 @@ const DELIVERY_TIMEOUT_MS = 30_000; // 30 seconds
 /**
  * Webhook delivery status
  */
-export type DeliveryStatus =
-  | "pending"
-  | "delivered"
-  | "failed"
-  | "retrying"
-  | "dead_letter";
+export type DeliveryStatus = "pending" | "delivered" | "failed" | "retrying" | "dead_letter";
 
 export interface DeliveryResult {
   success: boolean;
@@ -44,7 +39,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
@@ -59,7 +55,7 @@ export class WebhookDeliveryService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly securityService: WebhookSecurityService
+    private readonly securityService: WebhookSecurityService,
   ) {}
 
   /**
@@ -73,7 +69,7 @@ export class WebhookDeliveryService {
   async emit(
     eventType: WebhookEvent,
     campgroundId: string,
-    payload: Record<string, unknown>
+    payload: Record<string, unknown>,
   ): Promise<string[]> {
     // Find all active endpoints that subscribe to this event type
     const endpoints = await this.prisma.webhookEndpoint.findMany({
@@ -95,7 +91,7 @@ export class WebhookDeliveryService {
 
     if (!endpoints.length) {
       this.logger.debug(
-        `No webhook endpoints found for event ${eventType} in campground ${campgroundId}`
+        `No webhook endpoints found for event ${eventType} in campground ${campgroundId}`,
       );
       return [];
     }
@@ -121,7 +117,7 @@ export class WebhookDeliveryService {
       secret: string;
     },
     eventType: WebhookEvent,
-    payload: Record<string, unknown>
+    payload: Record<string, unknown>,
   ): Promise<string> {
     const payloadValue = toJsonInput(payload);
     if (!payloadValue) {
@@ -135,10 +131,7 @@ export class WebhookDeliveryService {
     };
 
     const body = JSON.stringify(eventPayload);
-    const { signature, timestamp } = this.securityService.generateSignature(
-      endpoint.secret,
-      body
-    );
+    const { signature, timestamp } = this.securityService.generateSignature(endpoint.secret, body);
 
     // Create delivery record
     const delivery = await this.prisma.webhookDelivery.create({
@@ -155,13 +148,9 @@ export class WebhookDeliveryService {
     });
 
     // Attempt delivery asynchronously (don't block the caller)
-    this.attemptDelivery(delivery.id, endpoint.url, endpoint.secret, body).catch(
-      (err) => {
-        this.logger.error(
-          `Failed to deliver webhook ${delivery.id}: ${err.message}`
-        );
-      }
-    );
+    this.attemptDelivery(delivery.id, endpoint.url, endpoint.secret, body).catch((err) => {
+      this.logger.error(`Failed to deliver webhook ${delivery.id}: ${err.message}`);
+    });
 
     return delivery.id;
   }
@@ -173,7 +162,7 @@ export class WebhookDeliveryService {
     deliveryId: string,
     url: string,
     secret: string,
-    body: string
+    body: string,
   ): Promise<DeliveryResult> {
     const delivery = await this.prisma.webhookDelivery.findUnique({
       where: { id: deliveryId },
@@ -184,16 +173,13 @@ export class WebhookDeliveryService {
     }
 
     const attempt = delivery.attempt || 1;
-    const { signature, timestamp } = this.securityService.generateSignature(
-      secret,
-      body
-    );
+    const { signature, timestamp } = this.securityService.generateSignature(secret, body);
 
     const headers = this.securityService.buildDeliveryHeaders(
       deliveryId,
       signature,
       timestamp,
-      attempt
+      attempt,
     );
 
     const controller = new AbortController();
@@ -223,9 +209,7 @@ export class WebhookDeliveryService {
           },
         });
 
-        this.logger.log(
-          `Webhook ${deliveryId} delivered successfully to ${url}`
-        );
+        this.logger.log(`Webhook ${deliveryId} delivered successfully to ${url}`);
 
         return {
           success: true,
@@ -241,11 +225,10 @@ export class WebhookDeliveryService {
         deliveryId,
         response.status,
         responseBody.slice(0, 2000),
-        attempt
+        attempt,
       );
     } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Webhook delivery failed";
+      const errorMessage = err instanceof Error ? err.message : "Webhook delivery failed";
 
       // Network error - schedule retry or mark as failed
       return this.handleDeliveryFailure(deliveryId, null, errorMessage, attempt);
@@ -261,7 +244,7 @@ export class WebhookDeliveryService {
     deliveryId: string,
     responseStatus: number | null,
     errorMessage: string,
-    attempt: number
+    attempt: number,
   ): Promise<DeliveryResult> {
     if (attempt >= MAX_RETRIES) {
       // Move to dead letter queue
@@ -276,7 +259,7 @@ export class WebhookDeliveryService {
       });
 
       this.logger.warn(
-        `Webhook ${deliveryId} moved to dead letter queue after ${attempt} attempts`
+        `Webhook ${deliveryId} moved to dead letter queue after ${attempt} attempts`,
       );
 
       return {
@@ -303,7 +286,7 @@ export class WebhookDeliveryService {
     });
 
     this.logger.log(
-      `Webhook ${deliveryId} scheduled for retry ${attempt + 1} at ${nextRetryAt.toISOString()}`
+      `Webhook ${deliveryId} scheduled for retry ${attempt + 1} at ${nextRetryAt.toISOString()}`,
     );
 
     return {
@@ -320,7 +303,9 @@ export class WebhookDeliveryService {
    * @param batchSize - Maximum number of retries to process at once
    * @returns Number of retries processed
    */
-  async processRetries(batchSize = 100): Promise<{ processed: number; succeeded: number; failed: number }> {
+  async processRetries(
+    batchSize = 100,
+  ): Promise<{ processed: number; succeeded: number; failed: number }> {
     const pendingRetries = await this.prisma.webhookDelivery.findMany({
       where: {
         status: "retrying",
@@ -358,7 +343,7 @@ export class WebhookDeliveryService {
         delivery.id,
         delivery.WebhookEndpoint.url,
         delivery.WebhookEndpoint.secret,
-        body
+        body,
       );
 
       if (result.success) {
@@ -380,7 +365,7 @@ export class WebhookDeliveryService {
    */
   async getDeadLetterQueue(
     campgroundId: string,
-    limit = 50
+    limit = 50,
   ): Promise<
     Array<{
       id: string;
@@ -430,9 +415,7 @@ export class WebhookDeliveryService {
     }
 
     if (delivery.status !== "dead_letter") {
-      throw new NotFoundException(
-        `Delivery ${deliveryId} is not in dead letter queue`
-      );
+      throw new NotFoundException(`Delivery ${deliveryId} is not in dead letter queue`);
     }
 
     if (!delivery.WebhookEndpoint || !delivery.WebhookEndpoint.isActive) {
@@ -460,7 +443,7 @@ export class WebhookDeliveryService {
       deliveryId,
       delivery.WebhookEndpoint.url,
       delivery.WebhookEndpoint.secret,
-      body
+      body,
     );
   }
 
@@ -481,9 +464,7 @@ export class WebhookDeliveryService {
       },
     });
 
-    this.logger.log(
-      `Purged ${result.count} dead letter entries older than ${retentionDays} days`
-    );
+    this.logger.log(`Purged ${result.count} dead letter entries older than ${retentionDays} days`);
 
     return result.count;
   }

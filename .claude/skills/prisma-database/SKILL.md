@@ -7,11 +7,13 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 # Prisma Database for Campreserv
 
 ## Schema Location
+
 `platform/apps/api/prisma/schema.prisma`
 
 ## Common Models
 
 ### Core Entities
+
 - `Campground` - Main business entity
 - `Site` - Individual camping sites
 - `SiteClass` - Site types/categories
@@ -20,6 +22,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 - `User` - Staff/admin users
 
 ### Supporting Entities
+
 - `LedgerEntry` - Financial transactions
 - `Payment` - Payment records
 - `Promotion` - Discount codes
@@ -28,6 +31,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ## Query Patterns
 
 ### Basic CRUD
+
 ```typescript
 // Create
 await prisma.reservation.create({
@@ -173,6 +177,7 @@ await prisma.$transaction(async (tx) => {
 ## Performance Tips
 
 ### Avoid N+1 Queries
+
 ```typescript
 // BAD - N+1 queries
 const reservations = await prisma.reservation.findMany();
@@ -187,6 +192,7 @@ const reservations = await prisma.reservation.findMany({
 ```
 
 ### Select Only Needed Fields
+
 ```typescript
 // Only get what you need
 await prisma.reservation.findMany({
@@ -199,6 +205,7 @@ await prisma.reservation.findMany({
 ```
 
 ### Pagination
+
 ```typescript
 const PAGE_SIZE = 20;
 

@@ -20,18 +20,11 @@ export {
   HelpTooltipContent,
   HelpTooltipSection,
   HelpTooltipList,
-  HelpTooltipLink
+  HelpTooltipLink,
 } from "./HelpTooltip";
 
-export {
-  OnboardingHint,
-  PageOnboardingHint
-} from "./OnboardingHint";
+export { OnboardingHint, PageOnboardingHint } from "./OnboardingHint";
 
-export {
-  HelpAnchor
-} from "./HelpAnchor";
+export { HelpAnchor } from "./HelpAnchor";
 
-export {
-  HelpPanel
-} from "./HelpPanel";
+export { HelpPanel } from "./HelpPanel";

@@ -42,7 +42,7 @@ import { Badge } from "@/components/ui/badge"
 ### 3. Form Fields
 
 ```tsx
-import { FormField } from "@/components/ui/form-field"
+import { FormField } from "@/components/ui/form-field";
 
 // Good - proper label, error handling, helper text
 <FormField
@@ -53,7 +53,7 @@ import { FormField } from "@/components/ui/form-field"
   helperText="We'll never share your email"
   value={email}
   onChange={(e) => setEmail(e.target.value)}
-/>
+/>;
 ```
 
 ### 4. Loading States
@@ -74,37 +74,35 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner"
 ### 5. Dialogs/Modals
 
 ```tsx
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 // Good - has title and description
 <Dialog open={open} onOpenChange={setOpen}>
   <DialogContent>
     <DialogHeader>
       <DialogTitle>Confirm Deletion</DialogTitle>
-      <DialogDescription>
-        This action cannot be undone. Are you sure?
-      </DialogDescription>
+      <DialogDescription>This action cannot be undone. Are you sure?</DialogDescription>
     </DialogHeader>
     {/* Dialog content */}
   </DialogContent>
-</Dialog>
+</Dialog>;
 ```
 
 ### 6. Dynamic Content Announcements
 
 ```tsx
-import { useAccessibility } from "@/components/accessibility/AccessibilityProvider"
+import { useAccessibility } from "@/components/accessibility/AccessibilityProvider";
 
 function MyComponent() {
-  const { announceMessage } = useAccessibility()
+  const { announceMessage } = useAccessibility();
 
   const handleSave = async () => {
-    await saveData()
+    await saveData();
     // Announce to screen readers
-    announceMessage("Changes saved successfully", "polite")
-  }
+    announceMessage("Changes saved successfully", "polite");
+  };
 
-  return <Button onClick={handleSave}>Save</Button>
+  return <Button onClick={handleSave}>Save</Button>;
 }
 ```
 
@@ -193,29 +191,29 @@ function MyComponent() {
 
 ### Common ARIA Attributes
 
-| Attribute | Usage | Example |
-|-----------|-------|---------|
-| `aria-label` | Provides label when none visible | `<button aria-label="Close">×</button>` |
-| `aria-labelledby` | References ID of labeling element | `<div role="dialog" aria-labelledby="title">` |
-| `aria-describedby` | References ID of description | `<input aria-describedby="help-text">` |
-| `aria-hidden` | Hides from screen readers | `<span aria-hidden="true">→</span>` |
-| `aria-live` | Announces dynamic changes | `<div aria-live="polite">` |
-| `aria-current` | Indicates current item | `<a aria-current="page">Home</a>` |
-| `aria-expanded` | For collapsible content | `<button aria-expanded={open}>` |
-| `aria-invalid` | For form validation | `<input aria-invalid={!!error}>` |
-| `aria-required` | For required fields | `<input aria-required={true}>` |
-| `aria-modal` | For modal dialogs | `<div role="dialog" aria-modal="true">` |
+| Attribute          | Usage                             | Example                                       |
+| ------------------ | --------------------------------- | --------------------------------------------- |
+| `aria-label`       | Provides label when none visible  | `<button aria-label="Close">×</button>`       |
+| `aria-labelledby`  | References ID of labeling element | `<div role="dialog" aria-labelledby="title">` |
+| `aria-describedby` | References ID of description      | `<input aria-describedby="help-text">`        |
+| `aria-hidden`      | Hides from screen readers         | `<span aria-hidden="true">→</span>`           |
+| `aria-live`        | Announces dynamic changes         | `<div aria-live="polite">`                    |
+| `aria-current`     | Indicates current item            | `<a aria-current="page">Home</a>`             |
+| `aria-expanded`    | For collapsible content           | `<button aria-expanded={open}>`               |
+| `aria-invalid`     | For form validation               | `<input aria-invalid={!!error}>`              |
+| `aria-required`    | For required fields               | `<input aria-required={true}>`                |
+| `aria-modal`       | For modal dialogs                 | `<div role="dialog" aria-modal="true">`       |
 
 ### ARIA Roles
 
-| Role | Usage | Example |
-|------|-------|---------|
-| `alert` | Important, time-sensitive message | `<div role="alert">` |
-| `status` | Advisory information | `<div role="status">` |
-| `navigation` | Navigation landmark | `<nav role="navigation">` |
-| `search` | Search landmark | `<form role="search">` |
-| `dialog` | Dialog window | `<div role="dialog">` |
-| `button` | Button element | `<div role="button">` (use `<button>` instead) |
+| Role         | Usage                             | Example                                        |
+| ------------ | --------------------------------- | ---------------------------------------------- |
+| `alert`      | Important, time-sensitive message | `<div role="alert">`                           |
+| `status`     | Advisory information              | `<div role="status">`                          |
+| `navigation` | Navigation landmark               | `<nav role="navigation">`                      |
+| `search`     | Search landmark                   | `<form role="search">`                         |
+| `dialog`     | Dialog window                     | `<div role="dialog">`                          |
+| `button`     | Button element                    | `<div role="button">` (use `<button>` instead) |
 
 ## Keyboard Navigation
 
@@ -234,20 +232,20 @@ function MyComponent() {
 // Auto-focus first field in form
 useEffect(() => {
   if (isOpen) {
-    firstInputRef.current?.focus()
+    firstInputRef.current?.focus();
   }
-}, [isOpen])
+}, [isOpen]);
 
 // Return focus after modal closes
-const previousFocus = useRef<HTMLElement>()
+const previousFocus = useRef<HTMLElement>();
 
 useEffect(() => {
   if (isOpen) {
-    previousFocus.current = document.activeElement as HTMLElement
+    previousFocus.current = document.activeElement as HTMLElement;
   } else {
-    previousFocus.current?.focus()
+    previousFocus.current?.focus();
   }
-}, [isOpen])
+}, [isOpen]);
 ```
 
 ## Color Contrast Requirements

@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +35,12 @@ interface SaveReportDialogV2Props {
   onSaved?: (report: SavedReport) => void;
 }
 
-export function SaveReportDialogV2({ open, onOpenChange, reportConfig, onSaved }: SaveReportDialogV2Props) {
+export function SaveReportDialogV2({
+  open,
+  onOpenChange,
+  reportConfig,
+  onSaved,
+}: SaveReportDialogV2Props) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [pinToNav, setPinToNav] = useState(true);
@@ -48,14 +60,14 @@ export function SaveReportDialogV2({ open, onOpenChange, reportConfig, onSaved }
         dateRange: reportConfig.dateRange,
         filters: reportConfig.filters,
         campgroundId: reportConfig.campgroundId,
-        pinned: pinToNav
+        pinned: pinToNav,
       });
 
       const href = buildReportHrefV2({
         tab: reportConfig.tab,
         subTab: reportConfig.subTab ?? null,
         dateRange: reportConfig.dateRange,
-        filters: reportConfig.filters
+        filters: reportConfig.filters,
       });
 
       if (pinToNav) {
@@ -93,7 +105,8 @@ export function SaveReportDialogV2({ open, onOpenChange, reportConfig, onSaved }
             Save this report view
           </DialogTitle>
           <DialogDescription>
-            Save filters, date range, and grouping so this view is one click away. You can pin it to your main menu.
+            Save filters, date range, and grouping so this view is one click away. You can pin it to
+            your main menu.
           </DialogDescription>
         </DialogHeader>
 
@@ -126,18 +139,35 @@ export function SaveReportDialogV2({ open, onOpenChange, reportConfig, onSaved }
           <div className="flex items-center justify-between rounded-xl border border-border bg-muted px-4 py-3">
             <div>
               <div className="text-sm font-medium text-foreground">Pin to navigation</div>
-              <div className="text-xs text-muted-foreground">Show this report in the main left menu for quick access.</div>
+              <div className="text-xs text-muted-foreground">
+                Show this report in the main left menu for quick access.
+              </div>
             </div>
-            <Switch checked={pinToNav} onCheckedChange={setPinToNav} aria-label="Pin saved report" />
+            <Switch
+              checked={pinToNav}
+              onCheckedChange={setPinToNav}
+              aria-label="Pin saved report"
+            />
           </div>
 
           <div className="rounded-xl border border-border bg-muted px-4 py-3 text-xs text-muted-foreground">
             <div className="font-medium text-foreground">Current configuration</div>
-            <div className="mt-1">Report: {reportConfig.tab}{reportConfig.subTab ? ` / ${reportConfig.subTab}` : ""}</div>
-            <div>Date range: {reportConfig.dateRange.start} to {reportConfig.dateRange.end}</div>
-            {reportConfig.filters.status !== "all" && <div>Status: {reportConfig.filters.status}</div>}
-            {reportConfig.filters.siteType !== "all" && <div>Site type: {reportConfig.filters.siteType}</div>}
-            {reportConfig.filters.groupBy !== "none" && <div>Group by: {reportConfig.filters.groupBy}</div>}
+            <div className="mt-1">
+              Report: {reportConfig.tab}
+              {reportConfig.subTab ? ` / ${reportConfig.subTab}` : ""}
+            </div>
+            <div>
+              Date range: {reportConfig.dateRange.start} to {reportConfig.dateRange.end}
+            </div>
+            {reportConfig.filters.status !== "all" && (
+              <div>Status: {reportConfig.filters.status}</div>
+            )}
+            {reportConfig.filters.siteType !== "all" && (
+              <div>Site type: {reportConfig.filters.siteType}</div>
+            )}
+            {reportConfig.filters.groupBy !== "none" && (
+              <div>Group by: {reportConfig.filters.groupBy}</div>
+            )}
           </div>
         </div>
 

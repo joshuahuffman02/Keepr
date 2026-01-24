@@ -1,6 +1,7 @@
 # ACCT-HIGH-023: Org Billing Subscription Endpoints Bypass Org Access Validation - FIXED
 
 ## Severity
+
 **HIGH** - Cross-organization billing manipulation vulnerability
 
 ## Vulnerability Description
@@ -13,11 +14,13 @@ The organization billing controller had two endpoints that accepted `periodId` p
 ### Attack Vector
 
 A malicious platform admin could:
+
 1. Discover a `periodId` from Organization A
 2. Call the endpoint using Organization B's `organizationId` in the URL
 3. Manipulate billing periods across organizations
 
 Example attack:
+
 ```bash
 # Attacker learns periodId "period-123" belongs to Org A
 # But calls endpoint with Org B's ID
@@ -30,21 +33,25 @@ Authorization: Bearer <platform_admin_token>
 ## Root Cause
 
 The endpoints only validated:
+
 - User had `platform_admin` role
 - Period existed in database
 
 They did NOT validate:
+
 - Period belonged to the organization in the URL path
 - User had access to the target organization (even though platform_admins technically have access to all orgs, the validation was missing)
 
 ## Fix Implementation
 
 ### File Modified
+
 `/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/apps/api/src/org-billing/org-billing.controller.ts`
 
 ### Changes Made
 
 1. **Added new validation method** `validatePeriodOwnership()`:
+
 ```typescript
 /**
  * Validates that a billing period belongs to the specified organization.
@@ -69,6 +76,7 @@ private async validatePeriodOwnership(periodId: string, organizationId: string):
 ```
 
 2. **Updated `finalizePeriod()` endpoint**:
+
 ```typescript
 @Post("periods/:periodId/finalize")
 @Roles(PlatformRole.platform_admin)
@@ -79,15 +87,16 @@ async finalizePeriod(
 ) {
   // NEW: Validate period ownership to prevent cross-org manipulation
   await this.validatePeriodOwnership(periodId, organizationId);
-  
+
   // NEW: Even for platform admins, validate org access for audit trail
   await this.validateOrgAccess(organizationId, req.user);
-  
+
   return this.billingService.finalizePeriod(periodId);
 }
 ```
 
 3. **Updated `markPeriodPaid()` endpoint**:
+
 ```typescript
 @Post("periods/:periodId/paid")
 @Roles(PlatformRole.platform_admin)
@@ -99,10 +108,10 @@ async markPeriodPaid(
 ) {
   // NEW: Validate period ownership to prevent cross-org manipulation
   await this.validatePeriodOwnership(periodId, organizationId);
-  
+
   // NEW: Even for platform admins, validate org access for audit trail
   await this.validateOrgAccess(organizationId, req.user);
-  
+
   return this.billingService.markPeriodPaid(periodId, body.stripePaymentIntentId);
 }
 ```
@@ -117,6 +126,7 @@ async markPeriodPaid(
 ## Testing Verification
 
 Build completed successfully:
+
 ```
 Successfully compiled: 863 files with swc (339.24ms)
 ```
@@ -147,9 +157,11 @@ Successfully compiled: 863 files with swc (339.24ms)
 This fix follows the principle of **parameter binding validation** - when an endpoint accepts multiple identifiers (organizationId and periodId), always validate their relationship before performing operations.
 
 This pattern should be applied to all endpoints that accept:
+
 - Parent resource ID in URL path
 - Child resource ID in URL path or body
 - Operations that modify or access the child resource
 
 ## Status
+
 **FIXED** - Ready for testing and deployment

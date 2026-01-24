@@ -29,7 +29,7 @@ export class PlatformAnalyticsService {
     private bookingService: BookingBehaviorService,
     private losService: LengthOfStayService,
     private amenityService: AmenityAnalyticsService,
-    private benchmarkService: BenchmarkService
+    private benchmarkService: BenchmarkService,
   ) {}
 
   /**
@@ -101,23 +101,16 @@ export class PlatformAnalyticsService {
   async getFullAnalytics(params: AnalyticsQueryParams) {
     const dateRange = this.parseDateRange(params);
 
-    const [
-      revenue,
-      guestJourney,
-      accommodations,
-      geographic,
-      booking,
-      los,
-      amenities,
-    ] = await Promise.all([
-      this.revenueService.getFullAnalytics(dateRange),
-      this.guestJourneyService.getFullAnalytics(dateRange),
-      this.accommodationService.getFullAnalytics(dateRange),
-      this.geographicService.getFullAnalytics(dateRange),
-      this.bookingService.getFullAnalytics(dateRange),
-      this.losService.getFullAnalytics(dateRange),
-      this.amenityService.getFullAnalytics(dateRange),
-    ]);
+    const [revenue, guestJourney, accommodations, geographic, booking, los, amenities] =
+      await Promise.all([
+        this.revenueService.getFullAnalytics(dateRange),
+        this.guestJourneyService.getFullAnalytics(dateRange),
+        this.accommodationService.getFullAnalytics(dateRange),
+        this.geographicService.getFullAnalytics(dateRange),
+        this.bookingService.getFullAnalytics(dateRange),
+        this.losService.getFullAnalytics(dateRange),
+        this.amenityService.getFullAnalytics(dateRange),
+      ]);
 
     return {
       metadata: {

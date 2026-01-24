@@ -69,9 +69,7 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
           key={i}
           className="flex items-center gap-2 rounded-full bg-card/10 backdrop-blur-sm px-3 py-1.5 text-sm text-foreground/90"
         >
-          {showIcons && (
-            <badge.icon className="h-4 w-4 text-keepr-clay" />
-          )}
+          {showIcons && <badge.icon className="h-4 w-4 text-keepr-clay" />}
           <span>{badge.shortText}</span>
         </div>
       ))}
@@ -82,7 +80,12 @@ export function TrustBadges({ variant = "inline", className, showIcons = true }:
 // Variant for dark backgrounds (hero)
 export function TrustBadgesDark({ className }: { className?: string }) {
   return (
-    <div className={cn("flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/80", className)}>
+    <div
+      className={cn(
+        "flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-white/80",
+        className,
+      )}
+    >
       <span className="flex items-center gap-1.5">
         <CheckCircle2 className="h-4 w-4 text-keepr-clay-light" />
         Verified photos

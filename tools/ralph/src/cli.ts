@@ -12,7 +12,7 @@ import {
   runIteration,
   saveState,
   writeDefaultConfig,
-  resolveStatePath
+  resolveStatePath,
 } from "./core";
 
 const args = process.argv.slice(2);
@@ -31,8 +31,8 @@ function printHelp(): void {
       "  ralph resume",
       "  ralph status [--json]",
       "  ralph reset",
-      ""
-    ].join("\n")
+      "",
+    ].join("\n"),
   );
 }
 

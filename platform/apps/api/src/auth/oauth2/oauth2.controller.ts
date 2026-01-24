@@ -11,13 +11,7 @@ import {
   BadRequestException,
 } from "@nestjs/common";
 import { Response } from "express";
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiBody,
-} from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody } from "@nestjs/swagger";
 import { OAuth2Service } from "./oauth2.service";
 import {
   OAuth2TokenRequestDto,
@@ -53,7 +47,8 @@ export class OAuth2Controller {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: "Get access token",
-    description: "Exchange client credentials, authorization code, or refresh token for an access token",
+    description:
+      "Exchange client credentials, authorization code, or refresh token for an access token",
   })
   @ApiBody({ type: OAuth2TokenRequestDto })
   @ApiResponse({
@@ -140,13 +135,13 @@ export class OAuth2Controller {
   async authorize(
     @Query() query: OAuth2AuthorizeRequestDto,
     @CurrentUser() user: AuthUser,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     // Per RFC 6749 Section 4.1.2.1: MUST validate client_id and redirect_uri BEFORE
     // using redirect_uri for error responses. If these are invalid, return error directly.
     const validatedRedirectUri = await this.validateClientAndRedirectUri(
       query.client_id,
-      query.redirect_uri
+      query.redirect_uri,
     );
 
     // If validation failed, validatedRedirectUri is null - return error directly, do not redirect
@@ -165,7 +160,7 @@ export class OAuth2Controller {
         validatedRedirectUri,
         "unsupported_response_type",
         "Only 'code' response type is supported",
-        query.state
+        query.state,
       );
     }
 
@@ -201,7 +196,7 @@ export class OAuth2Controller {
    */
   private async validateClientAndRedirectUri(
     clientId: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<string | null> {
     try {
       const client = await this.oauth2Service.getClientForValidation(clientId);
@@ -231,7 +226,8 @@ export class OAuth2Controller {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: "Revoke token",
-    description: "Revoke an access token or refresh token. Client authentication is required per RFC 7009.",
+    description:
+      "Revoke an access token or refresh token. Client authentication is required per RFC 7009.",
   })
   @ApiBody({ type: OAuth2RevokeRequestDto })
   @ApiResponse({ status: 200, description: "Token revoked (or was already invalid)" })
@@ -325,7 +321,7 @@ export class OAuth2Controller {
     redirectUri: string,
     error: string,
     errorDescription: string,
-    state?: string
+    state?: string,
   ) {
     try {
       const url = new URL(redirectUri);

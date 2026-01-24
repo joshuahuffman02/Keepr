@@ -14,11 +14,11 @@ type SetupServiceStatus = "pending" | "in_progress" | "completed" | "cancelled";
 
 // Pricing configuration (in cents)
 const SETUP_SERVICE_PRICING: Record<SetupServiceType, number> = {
-  quick_start: 24900,        // $249
-  data_import_500: 29900,    // $299
-  data_import_2000: 59900,   // $599
-  data_import_5000: 99900,   // $999
-  data_import_custom: 0,     // Custom quote
+  quick_start: 24900, // $249
+  data_import_500: 29900, // $299
+  data_import_2000: 59900, // $599
+  data_import_5000: 99900, // $999
+  data_import_custom: 0, // Custom quote
 };
 
 const PER_BOOKING_SURCHARGE_CENTS = 100; // $1.00
@@ -91,9 +91,7 @@ export class SetupServicesService {
     const priceCents = SETUP_SERVICE_PRICING[data.serviceType];
 
     if (priceCents === 0 && data.serviceType === "data_import_custom") {
-      throw new BadRequestException(
-        "Custom data import requires a quote. Please contact us."
-      );
+      throw new BadRequestException("Custom data import requires a quote. Please contact us.");
     }
 
     // Check if org already has an active service of the same type
@@ -106,9 +104,7 @@ export class SetupServicesService {
     });
 
     if (existingService) {
-      throw new BadRequestException(
-        `You already have an active ${data.serviceType} service.`
-      );
+      throw new BadRequestException(`You already have an active ${data.serviceType} service.`);
     }
 
     const setupService = await this.prisma.setupService.create({
@@ -146,9 +142,7 @@ export class SetupServicesService {
       isPaidOff: s.balanceRemainingCents === 0,
       progressPercent:
         s.totalCents > 0
-          ? Math.round(
-              ((s.totalCents - s.balanceRemainingCents) / s.totalCents) * 100
-            )
+          ? Math.round(((s.totalCents - s.balanceRemainingCents) / s.totalCents) * 100)
           : 100,
     }));
   }
@@ -189,7 +183,7 @@ export class SetupServicesService {
    */
   async applyBookingSurcharge(
     organizationId: string,
-    reservationId: string
+    reservationId: string,
   ): Promise<{ charged: boolean; amountCents: number; serviceId?: string }> {
     const servicesWithBalance = await this.getActiveWithBalance(organizationId);
 
@@ -199,10 +193,7 @@ export class SetupServicesService {
 
     // Apply to the oldest service first
     const service = servicesWithBalance[0];
-    const chargeAmount = Math.min(
-      service.perBookingSurchargeCents,
-      service.balanceRemainingCents
-    );
+    const chargeAmount = Math.min(service.perBookingSurchargeCents, service.balanceRemainingCents);
 
     const newBalance = service.balanceRemainingCents - chargeAmount;
     const isPaidOff = newBalance <= 0;
@@ -227,11 +218,7 @@ export class SetupServicesService {
   /**
    * Update service status (admin)
    */
-  async updateStatus(
-    serviceId: string,
-    status: SetupServiceStatus,
-    completedBy?: string
-  ) {
+  async updateStatus(serviceId: string, status: SetupServiceStatus, completedBy?: string) {
     const service = await this.prisma.setupService.findUnique({
       where: { id: serviceId },
     });
@@ -283,9 +270,7 @@ export class SetupServicesService {
       progressPercent:
         service.totalCents > 0
           ? Math.round(
-              ((service.totalCents - service.balanceRemainingCents) /
-                service.totalCents) *
-                100
+              ((service.totalCents - service.balanceRemainingCents) / service.totalCents) * 100,
             )
           : 100,
     };

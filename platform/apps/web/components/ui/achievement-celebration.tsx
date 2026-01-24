@@ -277,20 +277,14 @@ export function AchievementCelebration({
                 </motion.div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-semibold text-foreground truncate">
-                      {title}
-                    </h4>
+                    <h4 className="font-semibold text-foreground truncate">{title}</h4>
                     {badge && (
                       <span className="px-2 py-0.5 text-xs font-medium bg-status-warning/15 text-status-warning rounded-full">
                         {badge}
                       </span>
                     )}
                   </div>
-                  {subtitle && (
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {subtitle}
-                    </p>
-                  )}
+                  {subtitle && <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>}
                 </div>
                 {!prefersReducedMotion && (
                   <motion.div
@@ -347,7 +341,7 @@ export function AchievementCelebration({
                   height: 200,
                   left: "50%",
                   top: "50%",
-                  transform: "translate(-50%, -50%)"
+                  transform: "translate(-50%, -50%)",
                 }}
               />
             )}
@@ -370,17 +364,15 @@ export function AchievementCelebration({
             <motion.div
               initial={prefersReducedMotion ? {} : { scale: 0, rotate: -180 }}
               animate={prefersReducedMotion ? {} : { scale: 1, rotate: 0 }}
-              transition={
-                prefersReducedMotion
-                  ? {}
-                  : { delay: 0.1, ...SPRING_CONFIG }
-              }
+              transition={prefersReducedMotion ? {} : { delay: 0.1, ...SPRING_CONFIG }}
               className="mb-6 relative"
             >
-              <div className={cn(
-                "w-24 h-24 rounded-full flex items-center justify-center mx-auto",
-                config.bgColor
-              )}>
+              <div
+                className={cn(
+                  "w-24 h-24 rounded-full flex items-center justify-center mx-auto",
+                  config.bgColor,
+                )}
+              >
                 <IconComponent className={cn("h-16 w-16", config.color)} />
               </div>
 

@@ -13,12 +13,7 @@ import { randomUUID } from "crypto";
  */
 
 // Distance calculation using Haversine formula
-function haversineDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 3959; // Earth's radius in miles
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -62,9 +57,7 @@ export class GeoAssociationService {
 
     // Find or create state location
     if (campground.state) {
-      const stateLocation = await this.findOrCreateStateLocation(
-        campground.state
-      );
+      const stateLocation = await this.findOrCreateStateLocation(campground.state);
       if (stateLocation) {
         associations.push({
           campgroundId,
@@ -79,7 +72,7 @@ export class GeoAssociationService {
           campground.city,
           campground.state,
           campground.latitude?.toNumber(),
-          campground.longitude?.toNumber()
+          campground.longitude?.toNumber(),
         );
         if (cityLocation) {
           associations.push({
@@ -194,7 +187,7 @@ export class GeoAssociationService {
     cityName: string,
     stateCode: string,
     latitude?: number,
-    longitude?: number
+    longitude?: number,
   ) {
     const slug = `${cityName}-${stateCode}`
       .toLowerCase()
@@ -289,7 +282,7 @@ export class GeoAssociationService {
    */
   async associateCampgroundWithAttractions(
     campgroundId: string,
-    maxDistanceMiles: number = 100
+    maxDistanceMiles: number = 100,
   ): Promise<void> {
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
@@ -336,7 +329,7 @@ export class GeoAssociationService {
         lat,
         lon,
         attraction.latitude.toNumber(),
-        attraction.longitude.toNumber()
+        attraction.longitude.toNumber(),
       );
 
       if (distance <= maxDistanceMiles) {
@@ -367,7 +360,7 @@ export class GeoAssociationService {
    * Bulk associate all campgrounds with locations
    */
   async bulkAssociateLocations(
-    onProgress?: (processed: number, total: number) => void
+    onProgress?: (processed: number, total: number) => void,
   ): Promise<{ processed: number; errors: number }> {
     const campgrounds = await this.prisma.campground.findMany({
       where: {
@@ -385,9 +378,7 @@ export class GeoAssociationService {
         await this.associateCampgroundWithLocations(cg.id);
         processed++;
       } catch (error) {
-        this.logger.error(
-          `Failed to associate campground ${cg.id}: ${error}`
-        );
+        this.logger.error(`Failed to associate campground ${cg.id}: ${error}`);
         errors++;
       }
 
@@ -403,7 +394,7 @@ export class GeoAssociationService {
    * Bulk associate all campgrounds with attractions
    */
   async bulkAssociateAttractions(
-    onProgress?: (processed: number, total: number) => void
+    onProgress?: (processed: number, total: number) => void,
   ): Promise<{ processed: number; errors: number }> {
     const campgrounds = await this.prisma.campground.findMany({
       where: {
@@ -422,9 +413,7 @@ export class GeoAssociationService {
         await this.associateCampgroundWithAttractions(cg.id);
         processed++;
       } catch (error) {
-        this.logger.error(
-          `Failed to associate attractions for campground ${cg.id}: ${error}`
-        );
+        this.logger.error(`Failed to associate attractions for campground ${cg.id}: ${error}`);
         errors++;
       }
 

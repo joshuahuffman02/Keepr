@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Delete,
-  Param,
-  Body,
-  UseGuards,
-} from "@nestjs/common";
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../auth/guards/scope.guard";
@@ -58,7 +49,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   async getQueueItem(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.getQueueItem(campgroundId, featureKey);
   }
@@ -70,7 +61,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async addToQueue(
     @Param("campgroundId") campgroundId: string,
-    @Body() dto: CreateFeatureQueueDto
+    @Body() dto: CreateFeatureQueueDto,
   ) {
     return this.service.addToQueue(campgroundId, dto);
   }
@@ -82,7 +73,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async bulkAddToQueue(
     @Param("campgroundId") campgroundId: string,
-    @Body() dto: BulkCreateFeatureQueueDto
+    @Body() dto: BulkCreateFeatureQueueDto,
   ) {
     return this.service.bulkAddToQueue(campgroundId, dto);
   }
@@ -94,7 +85,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async startFeature(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.startFeature(campgroundId, featureKey);
   }
@@ -106,7 +97,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async completeFeature(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.completeFeature(campgroundId, featureKey);
   }
@@ -118,7 +109,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async skipFeature(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.skipFeature(campgroundId, featureKey);
   }
@@ -130,7 +121,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async requeueFeature(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.requeueFeature(campgroundId, featureKey);
   }
@@ -143,7 +134,7 @@ export class FeatureSetupQueueController {
   async updateQueueItem(
     @Param("campgroundId") campgroundId: string,
     @Param("featureKey") featureKey: string,
-    @Body() dto: UpdateFeatureQueueDto
+    @Body() dto: UpdateFeatureQueueDto,
   ) {
     return this.service.updateQueueItem(campgroundId, featureKey, dto);
   }
@@ -155,7 +146,7 @@ export class FeatureSetupQueueController {
   @Roles(UserRole.owner, UserRole.manager)
   async removeFromQueue(
     @Param("campgroundId") campgroundId: string,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     return this.service.removeFromQueue(campgroundId, featureKey);
   }

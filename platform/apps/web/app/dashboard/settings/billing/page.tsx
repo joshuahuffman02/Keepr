@@ -248,12 +248,9 @@ export default function BillingPage() {
   const { data: campgroundData } = useQuery<{ organizationId: string }>({
     queryKey: ["campground", selectedCampground?.id],
     queryFn: async () => {
-      const res = await fetch(
-        `${API_BASE}/campgrounds/${selectedCampground?.id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
-      );
+      const res = await fetch(`${API_BASE}/campgrounds/${selectedCampground?.id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
+      });
       if (!res.ok) throw new Error("Failed to fetch campground");
       return res.json();
     },
@@ -265,12 +262,9 @@ export default function BillingPage() {
   const { data: summary, isLoading: summaryLoading } = useQuery<BillingSummary>({
     queryKey: ["billing-summary", organizationId],
     queryFn: async () => {
-      const res = await fetch(
-        `${API_BASE}/organizations/${organizationId}/billing/summary`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
-      );
+      const res = await fetch(`${API_BASE}/organizations/${organizationId}/billing/summary`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
+      });
       if (!res.ok) throw new Error("Failed to fetch billing summary");
       return res.json();
     },
@@ -284,7 +278,7 @@ export default function BillingPage() {
         `${API_BASE}/organizations/${organizationId}/billing/history?limit=6`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
+        },
       );
       if (!res.ok) throw new Error("Failed to fetch billing history");
       return res.json();
@@ -296,12 +290,9 @@ export default function BillingPage() {
   const { data: setupServices } = useQuery<SetupService[]>({
     queryKey: ["setup-services", organizationId],
     queryFn: async () => {
-      const res = await fetch(
-        `${API_BASE}/organizations/${organizationId}/setup-services`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
-      );
+      const res = await fetch(`${API_BASE}/organizations/${organizationId}/setup-services`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
+      });
       if (!res.ok) throw new Error("Failed to fetch setup services");
       return res.json();
     },
@@ -316,7 +307,7 @@ export default function BillingPage() {
         `${API_BASE}/campgrounds/${selectedCampground?.id}/billing-dashboard/summary`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
+        },
       );
       if (!res.ok) throw new Error("Failed to fetch revenue summary");
       return res.json();
@@ -332,7 +323,7 @@ export default function BillingPage() {
         `${API_BASE}/campgrounds/${selectedCampground?.id}/billing-dashboard/payouts?limit=5`,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}` },
-        }
+        },
       );
       if (!res.ok) throw new Error("Failed to fetch payouts");
       return res.json();
@@ -352,17 +343,14 @@ export default function BillingPage() {
       serviceType: string;
       payUpfront: boolean;
     }) => {
-      const res = await fetch(
-        `${API_BASE}/organizations/${organizationId}/setup-services`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}`,
-          },
-          body: JSON.stringify({ serviceType, payUpfront }),
-        }
-      );
+      const res = await fetch(`${API_BASE}/organizations/${organizationId}/setup-services`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("campreserv:authToken")}`,
+        },
+        body: JSON.stringify({ serviceType, payUpfront }),
+      });
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.message || "Failed to purchase");
@@ -421,10 +409,7 @@ export default function BillingPage() {
         {isLoading ? (
           <div className="space-y-6">
             {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="h-48 bg-muted rounded-2xl animate-pulse"
-              />
+              <div key={i} className="h-48 bg-muted rounded-2xl animate-pulse" />
             ))}
           </div>
         ) : summary ? (
@@ -439,12 +424,8 @@ export default function BillingPage() {
                     {tierIcons[summary.tier.name] || tierIcons.standard}
                   </div>
                   <div>
-                    <p className="text-white/80 text-sm font-medium">
-                      Current Plan
-                    </p>
-                    <h2 className="text-2xl font-bold">
-                      {summary.tier.displayName}
-                    </h2>
+                    <p className="text-white/80 text-sm font-medium">Current Plan</p>
+                    <h2 className="text-2xl font-bold">{summary.tier.displayName}</h2>
                   </div>
                 </div>
                 <div className="text-right">
@@ -458,8 +439,7 @@ export default function BillingPage() {
                   )}
                   {summary.tier.monthlyFeeEndsAt && (
                     <p className="text-white/70 text-sm mt-1">
-                      Free monthly until{" "}
-                      {formatDate(summary.tier.monthlyFeeEndsAt)}
+                      Free monthly until {formatDate(summary.tier.monthlyFeeEndsAt)}
                     </p>
                   )}
                 </div>
@@ -514,9 +494,7 @@ export default function BillingPage() {
                     <p className="text-2xl font-bold text-foreground">
                       -{formatCents(revenueSummary.summary.paymentFees.totalCents)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Stripe processing fees
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">Stripe processing fees</p>
                   </div>
 
                   <div className="bg-card rounded-xl p-4 border border-border">
@@ -527,9 +505,7 @@ export default function BillingPage() {
                     <p className="text-2xl font-bold text-foreground">
                       -{formatCents(revenueSummary.summary.platformFees.totalCents)}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Per-booking + SMS
-                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">Per-booking + SMS</p>
                   </div>
 
                   <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
@@ -543,7 +519,8 @@ export default function BillingPage() {
                     <p className="text-xs text-emerald-600 mt-1">
                       {revenueSummary.summary.netRevenue.pendingPayoutCents > 0 && (
                         <>
-                          {formatCents(revenueSummary.summary.netRevenue.pendingPayoutCents)} pending
+                          {formatCents(revenueSummary.summary.netRevenue.pendingPayoutCents)}{" "}
+                          pending
                         </>
                       )}
                     </p>
@@ -552,9 +529,7 @@ export default function BillingPage() {
 
                 {/* Fee Details */}
                 <div className="p-6 border-t border-border">
-                  <h4 className="text-sm font-semibold text-foreground mb-4">
-                    Fee Breakdown
-                  </h4>
+                  <h4 className="text-sm font-semibold text-foreground mb-4">Fee Breakdown</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Stripe processing fees</span>
@@ -580,7 +555,8 @@ export default function BillingPage() {
                     )}
                     <div className="border-t border-border pt-3 flex justify-between text-sm">
                       <span className="text-muted-foreground">
-                        Per-booking fees ({revenueSummary.summary.platformFees.bookingCount} bookings)
+                        Per-booking fees ({revenueSummary.summary.platformFees.bookingCount}{" "}
+                        bookings)
                       </span>
                       <span className="text-foreground font-medium">
                         {formatCents(revenueSummary.summary.platformFees.perBookingFeeCents)}
@@ -592,7 +568,7 @@ export default function BillingPage() {
                         <span className="text-foreground font-medium">
                           {formatCents(
                             revenueSummary.summary.platformFees.smsOutboundCents +
-                              revenueSummary.summary.platformFees.smsInboundCents
+                              revenueSummary.summary.platformFees.smsInboundCents,
                           )}
                         </span>
                       </div>
@@ -611,12 +587,8 @@ export default function BillingPage() {
                       <Wallet className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground">
-                        Recent Payouts
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Bank deposits from Stripe
-                      </p>
+                      <h3 className="text-lg font-semibold text-foreground">Recent Payouts</h3>
+                      <p className="text-sm text-muted-foreground">Bank deposits from Stripe</p>
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" asChild>
@@ -688,7 +660,7 @@ export default function BillingPage() {
                     <p className="text-muted-foreground">
                       {formatPeriod(
                         summary.currentPeriod.periodStart,
-                        summary.currentPeriod.periodEnd
+                        summary.currentPeriod.periodEnd,
                       )}
                     </p>
                   </div>
@@ -730,9 +702,7 @@ export default function BillingPage() {
                       <Calendar className="h-5 w-5 text-emerald-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
-                        Per-Booking Fees
-                      </p>
+                      <p className="font-medium text-foreground">Per-Booking Fees</p>
                       <p className="text-sm text-muted-foreground">
                         {summary.charges.bookingFees.quantity} bookings @{" "}
                         {formatCents(summary.charges.bookingFees.unitCents)} each
@@ -752,13 +722,10 @@ export default function BillingPage() {
                         <MessageSquare className="h-5 w-5 text-violet-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-foreground">
-                          Outbound SMS
-                        </p>
+                        <p className="font-medium text-foreground">Outbound SMS</p>
                         <p className="text-sm text-muted-foreground">
                           {summary.charges.smsOutbound.quantity} messages @{" "}
-                          {formatCents(summary.charges.smsOutbound.unitCents)}{" "}
-                          each
+                          {formatCents(summary.charges.smsOutbound.unitCents)} each
                         </p>
                       </div>
                     </div>
@@ -779,8 +746,7 @@ export default function BillingPage() {
                         <p className="font-medium text-foreground">Inbound SMS</p>
                         <p className="text-sm text-muted-foreground">
                           {summary.charges.smsInbound.quantity} messages @{" "}
-                          {formatCents(summary.charges.smsInbound.unitCents)}{" "}
-                          each
+                          {formatCents(summary.charges.smsInbound.unitCents)} each
                         </p>
                       </div>
                     </div>
@@ -813,9 +779,7 @@ export default function BillingPage() {
 
                 {/* Total */}
                 <div className="px-6 py-4 bg-muted flex items-center justify-between">
-                  <p className="font-semibold text-foreground">
-                    Estimated Total for Period
-                  </p>
+                  <p className="font-semibold text-foreground">Estimated Total for Period</p>
                   <p className="text-2xl font-bold text-foreground">
                     {formatCents(summary.totals.totalCents)}
                   </p>
@@ -832,9 +796,7 @@ export default function BillingPage() {
                   </div>
                   <span className="text-sm text-muted-foreground">Bookings</span>
                 </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {summary.usage.bookingCount}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{summary.usage.bookingCount}</p>
               </div>
 
               <div className="bg-card rounded-xl border border-border p-4">
@@ -844,9 +806,7 @@ export default function BillingPage() {
                   </div>
                   <span className="text-sm text-muted-foreground">SMS Sent</span>
                 </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {summary.usage.smsOutbound}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{summary.usage.smsOutbound}</p>
               </div>
 
               <div className="bg-card rounded-xl border border-border p-4">
@@ -856,9 +816,7 @@ export default function BillingPage() {
                   </div>
                   <span className="text-sm text-muted-foreground">SMS Received</span>
                 </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {summary.usage.smsInbound}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{summary.usage.smsInbound}</p>
               </div>
 
               <div className="bg-card rounded-xl border border-border p-4">
@@ -875,174 +833,174 @@ export default function BillingPage() {
             </div>
 
             {/* Setup Services Section - only show if has active pay-over-time balance OR still in setup phase */}
-            {((setupServices && setupServices.some(s => s.balanceRemainingCents > 0)) || summary.usage.bookingCount === 0) && (
-            <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
-              <div className="p-6 border-b border-border">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                      <Wrench className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-foreground">
-                        Setup Assistance
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        Need help getting set up? We&apos;ve got you covered.
-                      </p>
+            {((setupServices && setupServices.some((s) => s.balanceRemainingCents > 0)) ||
+              summary.usage.bookingCount === 0) && (
+              <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-border">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <Wrench className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-foreground">Setup Assistance</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Need help getting set up? We&apos;ve got you covered.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Active Setup Services with Balance */}
-              {setupServices && setupServices.filter(s => s.balanceRemainingCents > 0).length > 0 && (
-                <div className="p-6 border-b border-border bg-blue-50/50">
-                  <h4 className="text-sm font-semibold text-foreground mb-4">
-                    Pay-Over-Time Balance
-                  </h4>
-                  <div className="space-y-4">
-                    {setupServices
-                      .filter((s) => s.balanceRemainingCents > 0)
-                      .map((service) => (
-                        <div
-                          key={service.id}
-                          className="bg-card rounded-lg p-4 border border-border"
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-foreground">
-                              {service.displayName}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {formatCents(service.balanceRemainingCents)} remaining
-                            </span>
-                          </div>
-                          <div className="h-2 bg-muted rounded-full overflow-hidden">
+                {/* Active Setup Services with Balance */}
+                {setupServices &&
+                  setupServices.filter((s) => s.balanceRemainingCents > 0).length > 0 && (
+                    <div className="p-6 border-b border-border bg-blue-50/50">
+                      <h4 className="text-sm font-semibold text-foreground mb-4">
+                        Pay-Over-Time Balance
+                      </h4>
+                      <div className="space-y-4">
+                        {setupServices
+                          .filter((s) => s.balanceRemainingCents > 0)
+                          .map((service) => (
                             <div
-                              className="h-full bg-blue-500 rounded-full transition-all"
-                              style={{ width: `${service.progressPercent}%` }}
-                            />
+                              key={service.id}
+                              className="bg-card rounded-lg p-4 border border-border"
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="font-medium text-foreground">
+                                  {service.displayName}
+                                </span>
+                                <span className="text-sm text-muted-foreground">
+                                  {formatCents(service.balanceRemainingCents)} remaining
+                                </span>
+                              </div>
+                              <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-blue-500 rounded-full transition-all"
+                                  style={{ width: `${service.progressPercent}%` }}
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                {service.bookingsCharged} bookings charged @ $1.00 each
+                                {" • "}
+                                {Math.ceil(service.balanceRemainingCents / 100)} bookings to go
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* Purchase Options - only show if still in setup phase (no bookings yet) */}
+                {summary.usage.bookingCount === 0 && (
+                  <div className="p-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* Quick Start */}
+                      <div className="border border-border rounded-xl p-5 hover:border-blue-300 transition-colors">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Headphones className="h-5 w-5 text-blue-600" />
                           </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {service.bookingsCharged} bookings charged @ $1.00 each
-                            {" • "}
-                            {Math.ceil(service.balanceRemainingCents / 100)} bookings to go
-                          </p>
+                          <div>
+                            <h4 className="font-semibold text-foreground">Quick Start</h4>
+                            <p className="text-sm text-muted-foreground">We configure, you relax</p>
+                          </div>
                         </div>
-                      ))}
-                  </div>
-                </div>
-              )}
+                        <p className="text-2xl font-bold text-foreground mb-2">$249</p>
+                        <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                          <li>• Site & rate configuration</li>
+                          <li>• Payment gateway setup</li>
+                          <li>• 30-minute training call</li>
+                        </ul>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => {
+                              setPurchaseType("quick_start");
+                              setPayUpfront(true);
+                            }}
+                          >
+                            Pay Now
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => {
+                              setPurchaseType("quick_start");
+                              setPayUpfront(false);
+                            }}
+                          >
+                            $1/booking
+                          </Button>
+                        </div>
+                      </div>
 
-              {/* Purchase Options - only show if still in setup phase (no bookings yet) */}
-              {summary.usage.bookingCount === 0 && (
-              <div className="p-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Quick Start */}
-                  <div className="border border-border rounded-xl p-5 hover:border-blue-300 transition-colors">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Headphones className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground">Quick Start</h4>
-                        <p className="text-sm text-muted-foreground">We configure, you relax</p>
+                      {/* Data Import */}
+                      <div className="border border-border rounded-xl p-5 hover:border-emerald-300 transition-colors">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <Database className="h-5 w-5 text-emerald-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-foreground">Data Import</h4>
+                            <p className="text-sm text-muted-foreground">
+                              We import your reservations
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-muted-foreground space-y-1 mb-4">
+                          <div className="flex justify-between">
+                            <span>Up to 500</span>
+                            <span className="font-medium">$299</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>501 - 2,000</span>
+                            <span className="font-medium">$599</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>2,001 - 5,000</span>
+                            <span className="font-medium">$999</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => {
+                              setPurchaseType("data_import_500");
+                              setPayUpfront(true);
+                            }}
+                          >
+                            Get Started
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-2xl font-bold text-foreground mb-2">$249</p>
-                    <ul className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <li>• Site & rate configuration</li>
-                      <li>• Payment gateway setup</li>
-                      <li>• 30-minute training call</li>
-                    </ul>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="flex-1"
-                        onClick={() => {
-                          setPurchaseType("quick_start");
-                          setPayUpfront(true);
-                        }}
-                      >
-                        Pay Now
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => {
-                          setPurchaseType("quick_start");
-                          setPayUpfront(false);
-                        }}
-                      >
-                        $1/booking
-                      </Button>
-                    </div>
-                  </div>
 
-                  {/* Data Import */}
-                  <div className="border border-border rounded-xl p-5 hover:border-emerald-300 transition-colors">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <Database className="h-5 w-5 text-emerald-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-foreground">Data Import</h4>
-                        <p className="text-sm text-muted-foreground">We import your reservations</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-muted-foreground space-y-1 mb-4">
-                      <div className="flex justify-between">
-                        <span>Up to 500</span>
-                        <span className="font-medium">$299</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>501 - 2,000</span>
-                        <span className="font-medium">$599</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>2,001 - 5,000</span>
-                        <span className="font-medium">$999</span>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1"
-                        onClick={() => {
-                          setPurchaseType("data_import_500");
-                          setPayUpfront(true);
-                        }}
-                      >
-                        Get Started
-                      </Button>
-                    </div>
+                    <p className="text-xs text-muted-foreground text-center mt-4">
+                      Pay-over-time: Add $1/booking until paid off. No interest, no pressure.
+                    </p>
                   </div>
-                </div>
-
-                <p className="text-xs text-muted-foreground text-center mt-4">
-                  Pay-over-time: Add $1/booking until paid off. No interest, no pressure.
-                </p>
+                )}
               </div>
-              )}
-            </div>
             )}
 
             {/* Purchase Confirmation Modal */}
             {purchaseType && (
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-card rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl">
-                  <h3 className="text-xl font-bold text-foreground mb-4">
-                    Confirm Purchase
-                  </h3>
+                  <h3 className="text-xl font-bold text-foreground mb-4">Confirm Purchase</h3>
                   <p className="text-muted-foreground mb-6">
                     {payUpfront ? (
                       <>You&apos;ll be charged now for this service.</>
                     ) : (
                       <>
-                        No upfront payment. We&apos;ll add $1.00 to each booking until
-                        the service is paid off.
+                        No upfront payment. We&apos;ll add $1.00 to each booking until the service
+                        is paid off.
                       </>
                     )}
                   </p>
@@ -1072,9 +1030,7 @@ export default function BillingPage() {
                     </Button>
                   </div>
                   {purchaseMutation.isError && (
-                    <p className="text-red-600 text-sm mt-4">
-                      {purchaseMutation.error.message}
-                    </p>
+                    <p className="text-red-600 text-sm mt-4">{purchaseMutation.error.message}</p>
                   )}
                 </div>
               </div>
@@ -1084,9 +1040,7 @@ export default function BillingPage() {
             {history && history.length > 0 && (
               <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-border flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Billing History
-                  </h3>
+                  <h3 className="text-lg font-semibold text-foreground">Billing History</h3>
                   <Button variant="ghost" size="sm">
                     View All
                     <ChevronRight className="h-4 w-4 ml-1" />
@@ -1135,17 +1089,11 @@ export default function BillingPage() {
             <div className="bg-muted rounded-2xl p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-foreground">
-                    Payment Method
-                  </h3>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Manage how you pay for Keepr
-                  </p>
+                  <h3 className="font-semibold text-foreground">Payment Method</h3>
+                  <p className="text-muted-foreground text-sm mt-1">Manage how you pay for Keepr</p>
                 </div>
                 <Button variant="outline" asChild>
-                  <Link href="/dashboard/settings/payments">
-                    Update Payment Method
-                  </Link>
+                  <Link href="/dashboard/settings/payments">Update Payment Method</Link>
                 </Button>
               </div>
             </div>

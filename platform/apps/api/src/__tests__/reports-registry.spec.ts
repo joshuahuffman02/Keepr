@@ -30,7 +30,7 @@ describe("Report registry & executor", () => {
       stayType: "standard",
       rigType: "rv",
       promoCode: "NY25",
-      leadTimeDays: 4
+      leadTimeDays: 4,
     },
     {
       id: "res-2",
@@ -46,8 +46,8 @@ describe("Report registry & executor", () => {
       stayType: "group",
       rigType: "tent",
       promoCode: null,
-      leadTimeDays: 1
-    }
+      leadTimeDays: 1,
+    },
   ];
 
   const paymentRows = [
@@ -58,7 +58,7 @@ describe("Report registry & executor", () => {
       amountCents: 10000,
       method: "card",
       direction: "charge",
-      stripeFeeCents: 300
+      stripeFeeCents: 300,
     },
     {
       id: "pay-2",
@@ -67,29 +67,31 @@ describe("Report registry & executor", () => {
       amountCents: -2000,
       method: "card",
       direction: "refund",
-      stripeFeeCents: 0
-    }
+      stripeFeeCents: 0,
+    },
   ];
 
   const prismaStub = {
     reservation: {
-      findMany: jest.fn().mockResolvedValue(reservationRows)
+      findMany: jest.fn().mockResolvedValue(reservationRows),
     },
     payment: {
-      findMany: jest.fn().mockResolvedValue(paymentRows)
+      findMany: jest.fn().mockResolvedValue(paymentRows),
     },
     ledgerEntry: { findMany: jest.fn().mockResolvedValue([]) },
     payout: { findMany: jest.fn().mockResolvedValue([]) },
     supportReport: { findMany: jest.fn().mockResolvedValue([]) },
     task: { findMany: jest.fn().mockResolvedValue([]) },
     analyticsEvent: { findMany: jest.fn().mockResolvedValue([]) },
-    integrationExportJob: { count: jest.fn().mockResolvedValue(0) }
+    integrationExportJob: { count: jest.fn().mockResolvedValue(0) },
   };
 
   const observabilityStub = { recordReportResult: jest.fn() };
   const alertingStub = { dispatch: jest.fn().mockResolvedValue({ ok: true }) };
   const dashboardStub = { summary: jest.fn() };
-  const uploadsStub = { uploadBuffer: jest.fn().mockResolvedValue({ url: "file://export.csv", key: "export.csv" }) };
+  const uploadsStub = {
+    uploadBuffer: jest.fn().mockResolvedValue({ url: "file://export.csv", key: "export.csv" }),
+  };
   const auditStub = { recordExport: jest.fn() };
   const jobQueueStub = { enqueue: jest.fn((_q: string, fn: () => unknown) => fn()) };
   const emailStub = { sendEmail: jest.fn() };
@@ -100,7 +102,7 @@ describe("Report registry & executor", () => {
         ReportsService,
         {
           provide: PrismaService,
-          useValue: prismaStub
+          useValue: prismaStub,
         },
         { provide: ObservabilityService, useValue: observabilityStub },
         { provide: AlertingService, useValue: alertingStub },
@@ -108,8 +110,8 @@ describe("Report registry & executor", () => {
         { provide: UploadsService, useValue: uploadsStub },
         { provide: AuditService, useValue: auditStub },
         { provide: JobQueueService, useValue: jobQueueStub },
-        { provide: EmailService, useValue: emailStub }
-      ]
+        { provide: EmailService, useValue: emailStub },
+      ],
     }).compile();
     service = moduleRef.get(ReportsService);
   });
@@ -126,7 +128,10 @@ describe("Report registry & executor", () => {
   });
 
   it("runs a report and returns series + rows", async () => {
-    const res = await service.runReport(campgroundId, { reportId: "bookings.daily_bookings", limit: 5 });
+    const res = await service.runReport(campgroundId, {
+      reportId: "bookings.daily_bookings",
+      limit: 5,
+    });
 
     expect(res.meta.id).toBe("bookings.daily_bookings");
     expect(Array.isArray(res.rows)).toBe(true);

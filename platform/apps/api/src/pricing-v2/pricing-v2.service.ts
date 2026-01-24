@@ -1,7 +1,13 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { CreatePricingRuleV2Dto } from "./dto/create-pricing-rule-v2.dto";
 import { UpdatePricingRuleV2Dto } from "./dto/update-pricing-rule-v2.dto";
-import { PricingRuleType, PricingStackMode, AdjustmentType, PricingRuleV2, Prisma } from "@prisma/client";
+import {
+  PricingRuleType,
+  PricingStackMode,
+  AdjustmentType,
+  PricingRuleV2,
+  Prisma,
+} from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { AuditService } from "../audit/audit.service";
 
@@ -37,7 +43,12 @@ export function extractMinNights(calendarRefId?: string | null): number | null {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
-export function ruleApplies(rule: PricingRuleConstraints, day: Date, dow: number, nights: number): boolean {
+export function ruleApplies(
+  rule: PricingRuleConstraints,
+  day: Date,
+  dow: number,
+  nights: number,
+): boolean {
   if (rule.startDate && day < rule.startDate) return false;
   if (rule.endDate && day > rule.endDate) return false;
   if (rule.dowMask && rule.dowMask.length > 0 && !rule.dowMask.includes(dow)) return false;
@@ -46,7 +57,11 @@ export function ruleApplies(rule: PricingRuleConstraints, day: Date, dow: number
   return true;
 }
 
-export function computeAdjustment(adjustmentType: AdjustmentType, value: Prisma.Decimal, baseCents: number): number {
+export function computeAdjustment(
+  adjustmentType: AdjustmentType,
+  value: Prisma.Decimal,
+  baseCents: number,
+): number {
   const val = Number(value);
   if (adjustmentType === AdjustmentType.percent) {
     return Math.round(baseCents * val);
@@ -85,13 +100,13 @@ export type PricingAuditWriter = {
 export class PricingV2Service {
   constructor(
     @Inject(PrismaService) private readonly prisma: PricingV2Store,
-    @Inject(AuditService) private readonly audit: PricingAuditWriter
+    @Inject(AuditService) private readonly audit: PricingAuditWriter,
   ) {}
 
   list(campgroundId: string) {
     return this.prisma.pricingRuleV2.findMany({
       where: { campgroundId },
-      orderBy: [{ active: "desc" }, { priority: "asc" }, { createdAt: "desc" }]
+      orderBy: [{ active: "desc" }, { priority: "asc" }, { createdAt: "desc" }],
     });
   }
 
@@ -105,7 +120,7 @@ export class PricingV2Service {
     baseRateCents: number,
     arrivalDate: Date,
     departureDate: Date,
-    occupancyPct?: number
+    occupancyPct?: number,
   ): Promise<PricingBreakdown> {
     const nights = computeNights(arrivalDate, departureDate);
 
@@ -114,14 +129,14 @@ export class PricingV2Service {
       where: {
         campgroundId,
         active: true,
-        OR: [{ siteClassId: null }, { siteClassId }]
+        OR: [{ siteClassId: null }, { siteClassId }],
       },
-      orderBy: [{ priority: "asc" }]
+      orderBy: [{ priority: "asc" }],
     });
 
     // Separate demand rules (applied last)
-    const demandRules = rules.filter(r => r.type === PricingRuleType.demand);
-    const standardRules = rules.filter(r => r.type !== PricingRuleType.demand);
+    const demandRules = rules.filter((r) => r.type === PricingRuleType.demand);
+    const standardRules = rules.filter((r) => r.type !== PricingRuleType.demand);
 
     let totalCents = 0;
     let baseSubtotalCents = 0;
@@ -147,20 +162,35 @@ export class PricingV2Service {
         if (rule.stackMode === PricingStackMode.override) {
           nightlyAdjustment = adj;
           overrideApplied = true;
-          if (!appliedRules.find(r => r.id === rule.id)) {
-            appliedRules.push({ id: rule.id, name: rule.name, type: rule.type, adjustmentCents: adj });
+          if (!appliedRules.find((r) => r.id === rule.id)) {
+            appliedRules.push({
+              id: rule.id,
+              name: rule.name,
+              type: rule.type,
+              adjustmentCents: adj,
+            });
           }
           break; // Override stops further rules
         } else if (rule.stackMode === PricingStackMode.additive) {
           nightlyAdjustment += adj;
-          if (!appliedRules.find(r => r.id === rule.id)) {
-            appliedRules.push({ id: rule.id, name: rule.name, type: rule.type, adjustmentCents: adj });
+          if (!appliedRules.find((r) => r.id === rule.id)) {
+            appliedRules.push({
+              id: rule.id,
+              name: rule.name,
+              type: rule.type,
+              adjustmentCents: adj,
+            });
           }
         } else if (rule.stackMode === PricingStackMode.max) {
           if (adj > nightlyAdjustment) {
             nightlyAdjustment = adj;
-            if (!appliedRules.find(r => r.id === rule.id)) {
-              appliedRules.push({ id: rule.id, name: rule.name, type: rule.type, adjustmentCents: adj });
+            if (!appliedRules.find((r) => r.id === rule.id)) {
+              appliedRules.push({
+                id: rule.id,
+                name: rule.name,
+                type: rule.type,
+                adjustmentCents: adj,
+              });
             }
           }
         }
@@ -179,7 +209,9 @@ export class PricingV2Service {
         const band = await this.prisma.demandBand.findUnique({ where: { id: rule.demandBandId } });
         if (!band || !band.active) continue;
         if (occupancyPct >= band.thresholdPct) {
-          const adj = computeAdjustment(band.adjustmentType, band.adjustmentValue, totalCents / nights) * nights;
+          const adj =
+            computeAdjustment(band.adjustmentType, band.adjustmentValue, totalCents / nights) *
+            nights;
           demandAdjustmentCents += adj;
           appliedRules.push({ id: rule.id, name: rule.name, type: "demand", adjustmentCents: adj });
         }
@@ -190,8 +222,8 @@ export class PricingV2Service {
 
     // Apply min/max caps from rules (use most restrictive)
     let cappedAt: "min" | "max" | null = null;
-    const minCaps = rules.filter(r => r.minRateCap !== null).map(r => r.minRateCap!);
-    const maxCaps = rules.filter(r => r.maxRateCap !== null).map(r => r.maxRateCap!);
+    const minCaps = rules.filter((r) => r.minRateCap !== null).map((r) => r.minRateCap!);
+    const maxCaps = rules.filter((r) => r.maxRateCap !== null).map((r) => r.maxRateCap!);
     const minCap = minCaps.length > 0 ? Math.max(...minCaps) : null;
     const maxCap = maxCaps.length > 0 ? Math.min(...maxCaps) : null;
 
@@ -205,7 +237,10 @@ export class PricingV2Service {
     }
 
     // Version string for snapshot
-    const ruleIds = rules.map(r => r.id).sort().join(",");
+    const ruleIds = rules
+      .map((r) => r.id)
+      .sort()
+      .join(",");
     const pricingRuleVersion = `v2:${ruleIds.slice(0, 32)}:${Date.now()}`;
 
     return {
@@ -216,7 +251,7 @@ export class PricingV2Service {
       totalBeforeTaxCents: totalCents,
       appliedRules,
       cappedAt,
-      pricingRuleVersion
+      pricingRuleVersion,
     };
   }
 
@@ -230,8 +265,8 @@ export class PricingV2Service {
         calendarRefId: dto.calendarRefId ?? null,
         demandBandId: dto.demandBandId ?? null,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
-        endDate: dto.endDate ? new Date(dto.endDate) : null
-      }
+        endDate: dto.endDate ? new Date(dto.endDate) : null,
+      },
     });
 
     // Audit log
@@ -242,13 +277,18 @@ export class PricingV2Service {
       entity: "PricingRuleV2",
       entityId: rule.id,
       before: null,
-      after: rule
+      after: rule,
     });
 
     return rule;
   }
 
-  async update(campgroundId: string, id: string, dto: UpdatePricingRuleV2Dto, actorId?: string | null) {
+  async update(
+    campgroundId: string,
+    id: string,
+    dto: UpdatePricingRuleV2Dto,
+    actorId?: string | null,
+  ) {
     const existing = await this.prisma.pricingRuleV2.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Pricing rule not found");
     const rest: UpdatePricingRuleV2Dto = {
@@ -266,7 +306,7 @@ export class PricingV2Service {
       endDate: dto.endDate,
       minRateCap: dto.minRateCap,
       maxRateCap: dto.maxRateCap,
-      active: dto.active
+      active: dto.active,
     };
     const existingForValidation = {
       ...existing,
@@ -279,12 +319,13 @@ export class PricingV2Service {
       where: { id },
       data: {
         ...rest,
-        siteClassId: dto.siteClassId === undefined ? undefined : dto.siteClassId ?? null,
-        calendarRefId: dto.calendarRefId === undefined ? undefined : dto.calendarRefId ?? null,
-        demandBandId: dto.demandBandId === undefined ? undefined : dto.demandBandId ?? null,
-        startDate: dto.startDate === undefined ? undefined : dto.startDate ? new Date(dto.startDate) : null,
-        endDate: dto.endDate === undefined ? undefined : dto.endDate ? new Date(dto.endDate) : null
-      }
+        siteClassId: dto.siteClassId === undefined ? undefined : (dto.siteClassId ?? null),
+        calendarRefId: dto.calendarRefId === undefined ? undefined : (dto.calendarRefId ?? null),
+        demandBandId: dto.demandBandId === undefined ? undefined : (dto.demandBandId ?? null),
+        startDate:
+          dto.startDate === undefined ? undefined : dto.startDate ? new Date(dto.startDate) : null,
+        endDate: dto.endDate === undefined ? undefined : dto.endDate ? new Date(dto.endDate) : null,
+      },
     });
 
     // Audit log
@@ -295,7 +336,7 @@ export class PricingV2Service {
       entity: "PricingRuleV2",
       entityId: id,
       before: existing,
-      after: updated
+      after: updated,
     });
 
     return updated;
@@ -314,13 +355,16 @@ export class PricingV2Service {
       entity: "PricingRuleV2",
       entityId: id,
       before: existing,
-      after: null
+      after: null,
     });
 
     return existing;
   }
 
-  private async validateRule(campgroundId: string, dto: Partial<CreatePricingRuleV2Dto> & { id?: string }) {
+  private async validateRule(
+    campgroundId: string,
+    dto: Partial<CreatePricingRuleV2Dto> & { id?: string },
+  ) {
     // Prevent overlapping overrides in same site class and date window
     if (dto.stackMode === PricingStackMode.override) {
       const overlapping = await this.prisma.pricingRuleV2.count({
@@ -335,10 +379,10 @@ export class PricingV2Service {
             { startDate: null, endDate: null },
             {
               startDate: { lte: dto.endDate ? new Date(dto.endDate) : undefined },
-              endDate: { gte: dto.startDate ? new Date(dto.startDate) : undefined }
-            }
-          ]
-        }
+              endDate: { gte: dto.startDate ? new Date(dto.startDate) : undefined },
+            },
+          ],
+        },
       });
       if (overlapping > 0) {
         throw new BadRequestException("Overlapping override pricing rules are not allowed");

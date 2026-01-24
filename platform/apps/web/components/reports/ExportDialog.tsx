@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { FileSpreadsheet, FileDown, Calendar, Info } from "lucide-react";
 import { ExportFormat } from "@/lib/export-utils";
@@ -22,7 +29,7 @@ interface ExportDialogProps {
 }
 
 export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: ExportDialogProps) {
-  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>('csv');
+  const [selectedFormat, setSelectedFormat] = useState<ExportFormat>("csv");
 
   const handleExport = () => {
     onExport(selectedFormat);
@@ -39,9 +46,7 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
             <FileSpreadsheet className="h-5 w-5 text-emerald-600" />
             Export Report
           </DialogTitle>
-          <DialogDescription>
-            Review and download your report data
-          </DialogDescription>
+          <DialogDescription>Review and download your report data</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -62,12 +67,15 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
                 <Calendar className="h-3.5 w-3.5" /> Date Range
               </span>
               <span className="font-medium text-foreground">
-                {new Date(exportPreview.dateRange.start).toLocaleDateString()} — {new Date(exportPreview.dateRange.end).toLocaleDateString()}
+                {new Date(exportPreview.dateRange.start).toLocaleDateString()} —{" "}
+                {new Date(exportPreview.dateRange.end).toLocaleDateString()}
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Rows</span>
-              <span className="font-medium text-foreground">~{exportPreview.rowCount.toLocaleString()}</span>
+              <span className="font-medium text-foreground">
+                ~{exportPreview.rowCount.toLocaleString()}
+              </span>
             </div>
           </div>
 
@@ -76,11 +84,11 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
             <label className="text-sm font-medium text-foreground">Export Format</label>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setSelectedFormat('csv')}
+                onClick={() => setSelectedFormat("csv")}
                 className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
-                  selectedFormat === 'csv'
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                    : 'border-border bg-card text-foreground hover:border-border'
+                  selectedFormat === "csv"
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-900"
+                    : "border-border bg-card text-foreground hover:border-border"
                 }`}
               >
                 <FileSpreadsheet className="h-4 w-4" />
@@ -90,11 +98,11 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
                 </div>
               </button>
               <button
-                onClick={() => setSelectedFormat('xlsx')}
+                onClick={() => setSelectedFormat("xlsx")}
                 className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${
-                  selectedFormat === 'xlsx'
-                    ? 'border-emerald-500 bg-emerald-50 text-emerald-900'
-                    : 'border-border bg-card text-foreground hover:border-border'
+                  selectedFormat === "xlsx"
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-900"
+                    : "border-border bg-card text-foreground hover:border-border"
                 }`}
               >
                 <FileSpreadsheet className="h-4 w-4" />
@@ -111,7 +119,15 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
             <Info className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
             <span>
               Reports are read-only views of your live data. To edit reservation or billing data,
-              use the <a href="/reservations" className="text-blue-600 underline">Reservations</a> or <a href="/billing" className="text-blue-600 underline">Billing</a> pages.
+              use the{" "}
+              <a href="/reservations" className="text-blue-600 underline">
+                Reservations
+              </a>{" "}
+              or{" "}
+              <a href="/billing" className="text-blue-600 underline">
+                Billing
+              </a>{" "}
+              pages.
             </span>
           </div>
         </div>
@@ -120,12 +136,9 @@ export function ExportDialog({ open, onOpenChange, exportPreview, onExport }: Ex
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button
-            onClick={handleExport}
-            className="flex items-center gap-2"
-          >
+          <Button onClick={handleExport} className="flex items-center gap-2">
             <FileDown className="h-4 w-4" />
-            Download {selectedFormat === 'xlsx' ? 'Excel CSV' : 'CSV'}
+            Download {selectedFormat === "xlsx" ? "Excel CSV" : "CSV"}
           </Button>
         </DialogFooter>
       </DialogContent>

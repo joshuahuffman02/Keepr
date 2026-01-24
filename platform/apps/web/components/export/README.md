@@ -5,17 +5,20 @@ A comprehensive, flexible export dialog component for exporting tabular data wit
 ## Features
 
 ### 1. Column Picker
+
 - Checkbox list to select which columns to export
 - Select All / Deselect All functionality
 - Visual indication of selected columns
 - Preserves column order from original data
 
 ### 2. Format Options
+
 - CSV format (universal compatibility)
 - Excel CSV format (with UTF-8 BOM for Excel)
 - Visual format selection buttons
 
 ### 3. Date Range Selection
+
 - **Presets:**
   - Today
   - This Week
@@ -27,6 +30,7 @@ A comprehensive, flexible export dialog component for exporting tabular data wit
 - Visual preview of selected date range
 
 ### 4. Saved Presets
+
 - Save current export configuration as a named preset
 - Load saved presets with one click
 - Delete unwanted presets
@@ -34,11 +38,13 @@ A comprehensive, flexible export dialog component for exporting tabular data wit
 - Shows column count, format, and date range for each preset
 
 ### 5. Export Summary
+
 - Real-time row count display
 - Column count (selected / total)
 - Visual badges for quick reference
 
 ### 6. File Generation
+
 - Automatic filename generation with timestamp
 - Proper CSV escaping for special characters
 - Excel-compatible CSV with BOM
@@ -84,7 +90,7 @@ function MyComponent() {
   return (
     <>
       <button onClick={() => setShowExport(true)}>Export</button>
-      
+
       <AdvancedExportDialog
         open={showExport}
         onOpenChange={setShowExport}
@@ -110,7 +116,7 @@ function MyComponent() {
     console.log("Format:", format);
     console.log("Columns:", selectedColumns);
     console.log("Date Range:", dateRange);
-    
+
     // Implement custom export logic here
     // e.g., API call to generate server-side export
   }}
@@ -121,21 +127,21 @@ function MyComponent() {
 
 ### AdvancedExportDialogProps
 
-| Prop | Type | Required | Description |
-|------|------|----------|-------------|
-| `open` | `boolean` | Yes | Controls dialog visibility |
-| `onOpenChange` | `(open: boolean) => void` | Yes | Callback when dialog open state changes |
-| `availableColumns` | `ExportColumn[]` | Yes | Array of available columns with metadata |
-| `data` | `any[]` | Yes | Array of data objects to export |
-| `reportName` | `string` | Yes | Name used for generated filename |
-| `onExport` | `(format, columns, dateRange) => void` | No | Custom export handler (overrides default) |
+| Prop               | Type                                   | Required | Description                               |
+| ------------------ | -------------------------------------- | -------- | ----------------------------------------- |
+| `open`             | `boolean`                              | Yes      | Controls dialog visibility                |
+| `onOpenChange`     | `(open: boolean) => void`              | Yes      | Callback when dialog open state changes   |
+| `availableColumns` | `ExportColumn[]`                       | Yes      | Array of available columns with metadata  |
+| `data`             | `any[]`                                | Yes      | Array of data objects to export           |
+| `reportName`       | `string`                               | Yes      | Name used for generated filename          |
+| `onExport`         | `(format, columns, dateRange) => void` | No       | Custom export handler (overrides default) |
 
 ### ExportColumn Interface
 
 ```typescript
 interface ExportColumn {
-  key: string;      // Property key in data object
-  label: string;    // Display label for column header
+  key: string; // Property key in data object
+  label: string; // Display label for column header
   enabled: boolean; // Whether selected by default
 }
 ```
@@ -151,10 +157,10 @@ interface ExportPreset {
   id: string;
   name: string;
   columns: string[];
-  dateRangeType: 'today' | 'week' | 'month' | 'year' | 'custom';
+  dateRangeType: "today" | "week" | "month" | "year" | "custom";
   customDateStart?: string;
   customDateEnd?: string;
-  format: 'csv' | 'xlsx';
+  format: "csv" | "xlsx";
   createdAt: string;
 }
 
@@ -181,12 +187,15 @@ interface DateRangePreset {
 ## Design Patterns Used
 
 ### 1. Controlled Component Pattern
+
 Dialog state is managed by parent component for maximum flexibility.
 
 ### 2. Hydration Safety
+
 All localStorage operations check `typeof window !== 'undefined'` to prevent SSR errors.
 
 ### 3. Accessibility
+
 - Semantic HTML with proper labels
 - ARIA attributes where needed
 - Keyboard navigation support
@@ -194,12 +203,14 @@ All localStorage operations check `typeof window !== 'undefined'` to prevent SSR
 - Screen reader friendly
 
 ### 4. React Best Practices
+
 - Uses `useId()` for generating unique IDs
 - `useMemo` for expensive computations
 - `useEffect` for side effects
 - Proper TypeScript types throughout
 
 ### 5. Separation of Concerns
+
 - UI logic in component
 - Business logic in utilities
 - Data persistence abstracted to export-presets.ts
@@ -207,6 +218,7 @@ All localStorage operations check `typeof window !== 'undefined'` to prevent SSR
 ## Styling
 
 Uses existing UI component library:
+
 - Dialog (custom implementation)
 - Button (class-variance-authority)
 - Checkbox (Radix UI)
@@ -227,6 +239,7 @@ All styling uses Tailwind CSS classes matching the existing design system.
 ## Future Enhancements
 
 Potential improvements:
+
 - [ ] Drag-and-drop column reordering
 - [ ] Column grouping
 - [ ] Preview before export
@@ -258,16 +271,19 @@ Potential improvements:
 ## Troubleshooting
 
 ### Preset not saving
+
 - Check browser localStorage quota
 - Verify browser allows localStorage
 - Check console for errors
 
 ### CSV not downloading
+
 - Verify browser allows downloads
 - Check popup blocker settings
 - Test with smaller dataset
 
 ### Date range incorrect
+
 - Check timezone handling
 - Verify date input format (YYYY-MM-DD)
 - Test edge cases (month boundaries, leap years)

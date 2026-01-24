@@ -78,8 +78,8 @@ export function formatOnPayCsv(rows: ExportRow[]): string {
       row.earningCode ?? "REG",
       row.hours.toFixed(2),
       row.rate != null ? row.rate.toFixed(2) : "",
-      row.roleCode ?? ""
-    ].join(",")
+      row.roleCode ?? "",
+    ].join(","),
   );
   return [header.join(","), ...lines].join("\n");
 }
@@ -93,8 +93,8 @@ export function formatGenericCsv(rows: ExportRow[]): string {
       row.earningCode ?? "",
       row.rate != null ? row.rate.toFixed(2) : "",
       row.roleCode ?? "",
-      (row.notes ?? "").replace(/,/g, ";")
-    ].join(",")
+      (row.notes ?? "").replace(/,/g, ";"),
+    ].join(","),
   );
   return [header.join(","), ...lines].join("\n");
 }
@@ -111,8 +111,8 @@ export function formatGustoCsv(rows: ExportRow[]): string {
       row.userId,
       row.hours.toFixed(2),
       mapToGustoEarningType(row.earningCode),
-      row.roleCode ?? ""
-    ].join(",")
+      row.roleCode ?? "",
+    ].join(","),
   );
   return [header.join(","), ...lines].join("\n");
 }
@@ -150,8 +150,8 @@ export function formatAdpCsv(rows: ExportRow[]): string {
       row.userId,
       mapToAdpEarningCode(row.earningCode),
       row.hours.toFixed(2),
-      row.rate != null ? row.rate.toFixed(2) : ""
-    ].join(",")
+      row.rate != null ? row.rate.toFixed(2) : "",
+    ].join(","),
   );
   return [header.join(","), ...lines].join("\n");
 }
@@ -195,7 +195,11 @@ function getFormatterForProvider(provider: Provider): (rows: ExportRow[]) => str
 export class PayrollService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private mapEntryToRow(entry: TimeEntryRecord, earningCodes: EarningCodeRecord[], provider: Provider): ExportRow {
+  private mapEntryToRow(
+    entry: TimeEntryRecord,
+    earningCodes: EarningCodeRecord[],
+    provider: Provider,
+  ): ExportRow {
     const minutes = minutesBetween(entry);
     const hours = Number((minutes / 60).toFixed(2));
     const roleCode = entry?.StaffShift?.StaffRole?.code ?? entry?.StaffShift?.role ?? null;
@@ -214,7 +218,7 @@ export class PayrollService {
       earningCode,
       rate,
       roleCode,
-      notes: entry.note ?? null
+      notes: entry.note ?? null,
     };
   }
 
@@ -238,8 +242,8 @@ export class PayrollService {
         provider,
         format,
         status: "pending",
-        requestedById: params.requestedById
-      }
+        requestedById: params.requestedById,
+      },
     });
 
     try {
@@ -249,19 +253,25 @@ export class PayrollService {
             campgroundId: params.campgroundId,
             clockInAt: { gte: params.periodStart },
             clockOutAt: { lte: params.periodEnd },
-            status: { in: ["approved", "submitted"] }
+            status: { in: ["approved", "submitted"] },
           },
           include: {
-            StaffShift: { select: { id: true, role: true, StaffRole: { select: { code: true, hourlyRate: true } } } }
-          }
+            StaffShift: {
+              select: {
+                id: true,
+                role: true,
+                StaffRole: { select: { code: true, hourlyRate: true } },
+              },
+            },
+          },
         }),
         this.prisma.payrollEarningCode.findMany({
-          where: { campgroundId: params.campgroundId, provider }
-        })
+          where: { campgroundId: params.campgroundId, provider },
+        }),
       ]);
 
       const rows = aggregateExportRows(
-        entries.map((entry) => this.mapEntryToRow(entry, earningCodes, provider))
+        entries.map((entry) => this.mapEntryToRow(entry, earningCodes, provider)),
       );
 
       const csv = format === "csv" ? getFormatterForProvider(provider)(rows) : undefined;
@@ -277,8 +287,8 @@ export class PayrollService {
           earningCode: row.earningCode,
           rate: row.rate,
           roleCode: row.roleCode,
-          notes: row.notes
-        }))
+          notes: row.notes,
+        })),
       });
 
       await this.prisma.payrollExport.update({
@@ -287,8 +297,8 @@ export class PayrollService {
           status: "generated",
           rowCount: rows.length,
           totalHours: rows.reduce((sum, row) => sum + row.hours, 0),
-          completedAt: new Date()
-        }
+          completedAt: new Date(),
+        },
       });
 
       return {
@@ -296,13 +306,13 @@ export class PayrollService {
         provider,
         format,
         rows,
-        csv
+        csv,
       };
     } catch (err) {
       const failureReason = err instanceof Error ? err.message : "Payroll export failed";
       await this.prisma.payrollExport.update({
         where: { id: exportRecord.id },
-        data: { status: "failed", failureReason }
+        data: { status: "failed", failureReason },
       });
       throw err;
     }
@@ -317,12 +327,12 @@ export class PayrollService {
       orderBy: { createdAt: "desc" },
       take: limit,
       include: {
-        User: { select: { id: true, email: true, firstName: true, lastName: true } }
-      }
+        User: { select: { id: true, email: true, firstName: true, lastName: true } },
+      },
     });
     return exports.map(({ User, ...exportRecord }) => ({
       ...exportRecord,
-      requestedBy: User
+      requestedBy: User,
     }));
   }
 
@@ -336,10 +346,10 @@ export class PayrollService {
         User: { select: { id: true, email: true, firstName: true, lastName: true } },
         PayrollExportLine: {
           include: {
-            User: { select: { id: true, email: true, firstName: true, lastName: true } }
-          }
-        }
-      }
+            User: { select: { id: true, email: true, firstName: true, lastName: true } },
+          },
+        },
+      },
     });
 
     if (!exportRecord) return null;
@@ -355,7 +365,7 @@ export class PayrollService {
       earningCode: line.earningCode,
       rate: line.rate == null ? null : coerceNumber(line.rate),
       roleCode: line.roleCode,
-      notes: line.notes
+      notes: line.notes,
     }));
 
     const csv = getFormatterForProvider(exportRecord.provider)(rows);
@@ -381,30 +391,38 @@ export class PayrollService {
           campgroundId: params.campgroundId,
           clockInAt: { gte: params.periodStart },
           clockOutAt: { lte: params.periodEnd },
-          status: { in: ["approved", "submitted"] }
+          status: { in: ["approved", "submitted"] },
         },
         include: {
-          StaffShift: { select: { id: true, role: true, StaffRole: { select: { code: true, hourlyRate: true } } } },
-          User_StaffTimeEntry_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } }
-        }
+          StaffShift: {
+            select: {
+              id: true,
+              role: true,
+              StaffRole: { select: { code: true, hourlyRate: true } },
+            },
+          },
+          User_StaffTimeEntry_userIdToUser: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
+        },
       }),
       this.prisma.payrollEarningCode.findMany({
-        where: { campgroundId: params.campgroundId, provider }
-      })
+        where: { campgroundId: params.campgroundId, provider },
+      }),
     ]);
 
     const rows = aggregateExportRows(
-      entries.map((entry) => this.mapEntryToRow(entry, earningCodes, provider))
+      entries.map((entry) => this.mapEntryToRow(entry, earningCodes, provider)),
     );
 
     // Enrich rows with user info for preview
     const userMap = new Map(
-      entries.map((entry) => [entry.userId, entry.User_StaffTimeEntry_userIdToUser])
+      entries.map((entry) => [entry.userId, entry.User_StaffTimeEntry_userIdToUser]),
     );
 
     const enrichedRows = rows.map((row) => ({
       ...row,
-      user: userMap.get(row.userId) || null
+      user: userMap.get(row.userId) || null,
     }));
 
     const csv = getFormatterForProvider(provider)(rows);
@@ -416,7 +434,7 @@ export class PayrollService {
       rowCount: rows.length,
       totalHours: rows.reduce((sum, row) => sum + row.hours, 0),
       rows: enrichedRows,
-      csv
+      csv,
     };
   }
 
@@ -425,7 +443,7 @@ export class PayrollService {
    */
   async getConfig(campgroundId: string) {
     const config = await this.prisma.payrollConfig.findUnique({
-      where: { campgroundId }
+      where: { campgroundId },
     });
 
     return config || { campgroundId, provider: "generic", companyId: null };
@@ -434,25 +452,21 @@ export class PayrollService {
   /**
    * Update payroll config for a campground
    */
-  async updateConfig(params: {
-    campgroundId: string;
-    provider: Provider;
-    companyId?: string;
-  }) {
+  async updateConfig(params: { campgroundId: string; provider: Provider; companyId?: string }) {
     return this.prisma.payrollConfig.upsert({
       where: { campgroundId: params.campgroundId },
       update: {
         provider: params.provider,
         companyId: params.companyId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
       create: {
         id: randomUUID(),
         campgroundId: params.campgroundId,
         provider: params.provider,
         companyId: params.companyId,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 }

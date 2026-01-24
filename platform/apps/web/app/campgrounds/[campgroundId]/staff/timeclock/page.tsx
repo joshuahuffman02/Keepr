@@ -52,10 +52,15 @@ const SPRING_CONFIG: { type: "spring"; stiffness: number; damping: number } = {
 
 export default function TimeclockPage({ params }: { params: { campgroundId: string } }) {
   const { data: whoami } = useWhoami();
-  const [resolvedCampgroundId, setResolvedCampgroundId] = useState<string | null>(params.campgroundId || null);
+  const [resolvedCampgroundId, setResolvedCampgroundId] = useState<string | null>(
+    params.campgroundId || null,
+  );
   const [shiftId, setShiftId] = useState("");
   const [note, setNote] = useState("");
-  const [status, setStatus] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const [status, setStatus] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
   const [shifts, setShifts] = useState<Shift[]>([]);
   const [loadingShifts, setLoadingShifts] = useState(false);
   const [clockingIn, setClockingIn] = useState(false);
@@ -82,13 +87,14 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
 
   useEffect(() => {
     const loadShifts = async () => {
-      if (!resolvedCampgroundId || resolvedCampgroundId === "undefined" || !whoami?.user?.id) return;
+      if (!resolvedCampgroundId || resolvedCampgroundId === "undefined" || !whoami?.user?.id)
+        return;
       setLoadingShifts(true);
       try {
         const now = new Date();
         const lastWeek = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
         const res = await fetch(
-          `/api/staff/shifts?campgroundId=${resolvedCampgroundId}&startDate=${lastWeek.toISOString()}&endDate=${now.toISOString()}`
+          `/api/staff/shifts?campgroundId=${resolvedCampgroundId}&startDate=${lastWeek.toISOString()}&endDate=${now.toISOString()}`,
         );
         if (res.ok) {
           const data: Shift[] = await res.json();
@@ -119,21 +125,25 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
       const res = await fetch(`/api/staff/shifts/${shiftId}/${action}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note })
+        body: JSON.stringify({ note }),
       });
 
       if (res.ok) {
         setStatus({
           type: "success",
-          message: action === "clock-in"
-            ? "You're clocked in! Have a great shift."
-            : "You're clocked out! Great work today."
+          message:
+            action === "clock-in"
+              ? "You're clocked in! Have a great shift."
+              : "You're clocked out! Great work today.",
         });
         // Clear form on success
         setShiftId("");
         setNote("");
       } else {
-        setStatus({ type: "error", message: "Unable to record. Please check the shift ID and try again." });
+        setStatus({
+          type: "error",
+          message: "Unable to record. Please check the shift ID and try again.",
+        });
       }
     } catch {
       setStatus({ type: "error", message: "Connection error. Please try again." });
@@ -144,12 +154,10 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
   };
 
   // Find the selected shift from the shifts array
-  const selectedShift = shifts.find(s => s.id === shiftId);
+  const selectedShift = shifts.find((s) => s.id === shiftId);
 
   // Get the active time entry for the selected shift
-  const activeTimeEntry = selectedShift?.timeEntries?.find(
-    (e) => e.clockInAt && !e.clockOutAt
-  );
+  const activeTimeEntry = selectedShift?.timeEntries?.find((e) => e.clockInAt && !e.clockOutAt);
 
   const startBreak = async (type: BreakType) => {
     if (!activeTimeEntry) {
@@ -169,7 +177,10 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
       if (res.ok) {
         const data = await res.json();
         setActiveBreak({ id: data.id, type: data.type, startedAt: data.startedAt });
-        setStatus({ type: "info", message: `${type.charAt(0).toUpperCase() + type.slice(1)} break started!` });
+        setStatus({
+          type: "info",
+          message: `${type.charAt(0).toUpperCase() + type.slice(1)} break started!`,
+        });
       } else {
         setStatus({ type: "error", message: "Could not start break. Please try again." });
       }
@@ -248,7 +259,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                 "fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg",
                 status.type === "success" && "bg-emerald-600 text-white",
                 status.type === "error" && "bg-red-600 text-white",
-                status.type === "info" && "bg-blue-600 text-white"
+                status.type === "info" && "bg-blue-600 text-white",
               )}
               role={status.type === "error" ? "alert" : "status"}
               aria-live="polite"
@@ -268,10 +279,18 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
           className="bg-card rounded-2xl border border-border p-8 text-center shadow-sm"
         >
           <div className="text-muted-foreground text-sm font-medium mb-2">
-            {currentTime?.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }) ?? "Loading..."}
+            {currentTime?.toLocaleDateString(undefined, {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            }) ?? "Loading..."}
           </div>
           <div className="text-5xl md:text-7xl font-bold text-foreground font-mono tracking-tight">
-            {currentTime?.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", second: "2-digit" }) ?? "--:--:--"}
+            {currentTime?.toLocaleTimeString(undefined, {
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+            }) ?? "--:--:--"}
           </div>
           {whoami?.user && (
             <div className="mt-4 flex items-center justify-center gap-2 text-muted-foreground">
@@ -280,7 +299,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                 {(() => {
                   const user = whoami?.user;
                   const nameParts = [user?.firstName, user?.lastName].filter(
-                    (part): part is string => Boolean(part)
+                    (part): part is string => Boolean(part),
                   );
                   const displayName = nameParts.length > 0 ? nameParts.join(" ") : undefined;
                   return displayName || user?.email || "Staff Member";
@@ -328,7 +347,9 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                     <Coffee className="w-6 h-6 text-muted-foreground" />
                   </div>
                   <p className="text-muted-foreground text-sm">No shifts found for this week.</p>
-                  <p className="text-muted-foreground text-xs mt-1">You can still enter a shift ID manually below.</p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    You can still enter a shift ID manually below.
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -343,7 +364,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                         "w-full text-left rounded-lg border-2 p-4 transition-all",
                         shiftId === shift.id
                           ? "border-status-info/40 bg-status-info/10"
-                          : "border-border hover:border-border hover:bg-muted/60"
+                          : "border-border hover:border-border hover:bg-muted/60",
                       )}
                     >
                       <div className="flex items-center justify-between">
@@ -352,11 +373,21 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                             {shift.role || "Shift"}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(shift.shiftDate).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
-                            {" "}&middot;{" "}
-                            {new Date(shift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                            {new Date(shift.shiftDate).toLocaleDateString(undefined, {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                            })}{" "}
+                            &middot;{" "}
+                            {new Date(shift.startTime).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
                             {" - "}
-                            {new Date(shift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                            {new Date(shift.endTime).toLocaleTimeString([], {
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })}
                           </div>
                         </div>
                         {shiftId === shift.id && (
@@ -372,7 +403,10 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
 
               {/* Manual Entry */}
               <div className="pt-4 border-t border-border">
-                <Label htmlFor="timeclock-shift-id" className="block text-sm font-medium text-foreground mb-2">
+                <Label
+                  htmlFor="timeclock-shift-id"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
                   Or enter shift ID manually
                 </Label>
                 <Input
@@ -410,21 +444,33 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
               {/* Selected Shift Display */}
               {selectedShift && (
                 <div className="rounded-lg bg-status-info/10 border border-status-info/20 p-4">
-                  <div className="text-xs font-semibold text-status-info uppercase tracking-wider mb-1">Selected Shift</div>
-                  <div className="font-semibold text-foreground">{selectedShift.role || "Shift"}</div>
+                  <div className="text-xs font-semibold text-status-info uppercase tracking-wider mb-1">
+                    Selected Shift
+                  </div>
+                  <div className="font-semibold text-foreground">
+                    {selectedShift.role || "Shift"}
+                  </div>
                   <div className="text-sm text-muted-foreground">
-                    {new Date(selectedShift.shiftDate).toLocaleDateString()}
-                    {" "}&middot;{" "}
-                    {new Date(selectedShift.startTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                    {new Date(selectedShift.shiftDate).toLocaleDateString()} &middot;{" "}
+                    {new Date(selectedShift.startTime).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
                     {" - "}
-                    {new Date(selectedShift.endTime).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                    {new Date(selectedShift.endTime).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
                   </div>
                 </div>
               )}
 
               {/* Note Field */}
               <div>
-                <Label htmlFor="timeclock-note" className="block text-sm font-medium text-foreground mb-2">
+                <Label
+                  htmlFor="timeclock-note"
+                  className="block text-sm font-medium text-foreground mb-2"
+                >
                   Add a note <span className="text-muted-foreground">(optional)</span>
                 </Label>
                 <Input
@@ -489,7 +535,10 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                     {activeBreak && (
                       <span className="text-xs text-amber-600 font-medium">
                         On {activeBreak.type} break since{" "}
-                        {new Date(activeBreak.startedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                        {new Date(activeBreak.startedAt).toLocaleTimeString([], {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
                       </span>
                     )}
                   </div>
@@ -544,17 +593,21 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                               <Utensils className="w-4 h-4 text-amber-600" />
                               <div>
                                 <div className="font-medium text-foreground">Meal Break</div>
-                                <div className="text-xs text-muted-foreground">Unpaid lunch/dinner</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Unpaid lunch/dinner
+                                </div>
                               </div>
                             </button>
                             <button
                               onClick={() => startBreak("rest")}
                               className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-muted/60 transition-colors border-t border-border"
                             >
-                      <Coffee className="w-4 h-4 text-status-info" />
+                              <Coffee className="w-4 h-4 text-status-info" />
                               <div>
                                 <div className="font-medium text-foreground">Rest Break</div>
-                                <div className="text-xs text-muted-foreground">Paid short break</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Paid short break
+                                </div>
                               </div>
                             </button>
                             <button
@@ -564,7 +617,9 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                               <Clock className="w-4 h-4 text-muted-foreground" />
                               <div>
                                 <div className="font-medium text-foreground">Unpaid Break</div>
-                                <div className="text-xs text-muted-foreground">Other unpaid time</div>
+                                <div className="text-xs text-muted-foreground">
+                                  Other unpaid time
+                                </div>
                               </div>
                             </button>
                           </motion.div>

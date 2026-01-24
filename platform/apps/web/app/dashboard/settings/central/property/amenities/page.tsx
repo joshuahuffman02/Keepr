@@ -55,9 +55,7 @@ export default function AmenitiesPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/settings/amenities">
-            Manage Amenities
-          </Link>
+          <Link href="/dashboard/settings/amenities">Manage Amenities</Link>
         </Button>
       </div>
 
@@ -74,9 +72,7 @@ export default function AmenitiesPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-foreground">{category.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {category.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
                       <div className="flex gap-2 mt-3">
                         <Badge variant="outline">{category.count} amenities</Badge>
                       </div>

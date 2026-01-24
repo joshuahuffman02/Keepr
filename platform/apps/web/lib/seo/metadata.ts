@@ -42,11 +42,17 @@ export function generatePageMetadata(options: MetadataOptions = {}): Metadata {
   const allKeywords = [...SEO_CONFIG.keywords, ...keywords];
 
   // Handle image configuration
-  const imageConfig = typeof image === "string"
-    ? { url: image.startsWith("http") ? image : `${baseUrl}${image}`, width: 1200, height: 630, alt: fullTitle }
-    : image
-    ? { ...image, url: image.url.startsWith("http") ? image.url : `${baseUrl}${image.url}` }
-    : { url: `${baseUrl}/og-image.png`, width: 1200, height: 630, alt: SEO_CONFIG.siteName };
+  const imageConfig =
+    typeof image === "string"
+      ? {
+          url: image.startsWith("http") ? image : `${baseUrl}${image}`,
+          width: 1200,
+          height: 630,
+          alt: fullTitle,
+        }
+      : image
+        ? { ...image, url: image.url.startsWith("http") ? image.url : `${baseUrl}${image.url}` }
+        : { url: `${baseUrl}/og-image.png`, width: 1200, height: 630, alt: SEO_CONFIG.siteName };
 
   const twitterImageConfig = image
     ? { ...imageConfig, alt: imageConfig.alt || fullTitle }

@@ -32,20 +32,84 @@ const US_GRID = [
 
 const COLOR_SCALES = {
   blue: {
-    bg: ["bg-blue-50", "bg-blue-100", "bg-blue-200", "bg-blue-300", "bg-blue-400", "bg-blue-500", "bg-blue-600"],
-    text: ["text-blue-700", "text-blue-700", "text-blue-700", "text-blue-900", "text-white", "text-white", "text-white"],
+    bg: [
+      "bg-blue-50",
+      "bg-blue-100",
+      "bg-blue-200",
+      "bg-blue-300",
+      "bg-blue-400",
+      "bg-blue-500",
+      "bg-blue-600",
+    ],
+    text: [
+      "text-blue-700",
+      "text-blue-700",
+      "text-blue-700",
+      "text-blue-900",
+      "text-white",
+      "text-white",
+      "text-white",
+    ],
   },
   green: {
-    bg: ["bg-green-50", "bg-green-100", "bg-green-200", "bg-green-300", "bg-green-400", "bg-green-500", "bg-green-600"],
-    text: ["text-green-700", "text-green-700", "text-green-700", "text-green-900", "text-white", "text-white", "text-white"],
+    bg: [
+      "bg-green-50",
+      "bg-green-100",
+      "bg-green-200",
+      "bg-green-300",
+      "bg-green-400",
+      "bg-green-500",
+      "bg-green-600",
+    ],
+    text: [
+      "text-green-700",
+      "text-green-700",
+      "text-green-700",
+      "text-green-900",
+      "text-white",
+      "text-white",
+      "text-white",
+    ],
   },
   purple: {
-    bg: ["bg-purple-50", "bg-purple-100", "bg-purple-200", "bg-purple-300", "bg-purple-400", "bg-purple-500", "bg-purple-600"],
-    text: ["text-purple-700", "text-purple-700", "text-purple-700", "text-purple-900", "text-white", "text-white", "text-white"],
+    bg: [
+      "bg-purple-50",
+      "bg-purple-100",
+      "bg-purple-200",
+      "bg-purple-300",
+      "bg-purple-400",
+      "bg-purple-500",
+      "bg-purple-600",
+    ],
+    text: [
+      "text-purple-700",
+      "text-purple-700",
+      "text-purple-700",
+      "text-purple-900",
+      "text-white",
+      "text-white",
+      "text-white",
+    ],
   },
   amber: {
-    bg: ["bg-amber-50", "bg-amber-100", "bg-amber-200", "bg-amber-300", "bg-amber-400", "bg-amber-500", "bg-amber-600"],
-    text: ["text-amber-700", "text-amber-700", "text-amber-700", "text-amber-900", "text-white", "text-white", "text-white"],
+    bg: [
+      "bg-amber-50",
+      "bg-amber-100",
+      "bg-amber-200",
+      "bg-amber-300",
+      "bg-amber-400",
+      "bg-amber-500",
+      "bg-amber-600",
+    ],
+    text: [
+      "text-amber-700",
+      "text-amber-700",
+      "text-amber-700",
+      "text-amber-900",
+      "text-white",
+      "text-white",
+      "text-white",
+    ],
   },
 };
 
@@ -58,10 +122,10 @@ export function USStateHeatmap({
   colorScale = "blue",
 }: USStateHeatmapProps) {
   // Create a map of state -> data
-  const stateMap = new Map(data.map(d => [d.state, d]));
+  const stateMap = new Map(data.map((d) => [d.state, d]));
 
   // Calculate min/max for color scaling
-  const values = data.map(d => d.value);
+  const values = data.map((d) => d.value);
   const maxValue = Math.max(...values, 1);
   const minValue = Math.min(...values, 0);
 
@@ -122,7 +186,7 @@ export function USStateHeatmap({
                     className={cn(
                       "aspect-square rounded flex items-center justify-center text-xs font-semibold cursor-default transition-transform hover:scale-110 hover:z-10",
                       value > 0 ? colors.bg[colorIdx] : "bg-muted",
-                      value > 0 ? colors.text[colorIdx] : "text-muted-foreground"
+                      value > 0 ? colors.text[colorIdx] : "text-muted-foreground",
                     )}
                     title={stateData ? `${state}: ${formatValue(value)}` : state}
                   >
@@ -143,9 +207,7 @@ export function USStateHeatmap({
             ))}
             <span className="text-xs text-muted-foreground ml-2">High</span>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Hover over states for details
-          </p>
+          <p className="text-xs text-muted-foreground">Hover over states for details</p>
         </div>
 
         {/* Top 5 States Summary */}

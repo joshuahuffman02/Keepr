@@ -33,8 +33,7 @@ export class LengthOfStayService {
    */
   private calculateLos(arrivalDate: Date, departureDate: Date): number {
     return Math.ceil(
-      (new Date(departureDate).getTime() - new Date(arrivalDate).getTime()) /
-      (1000 * 60 * 60 * 24)
+      (new Date(departureDate).getTime() - new Date(arrivalDate).getTime()) / (1000 * 60 * 60 * 24),
     );
   }
 
@@ -65,9 +64,9 @@ export class LengthOfStayService {
       };
     }
 
-    const lengths = reservations.map((r) =>
-      this.calculateLos(r.arrivalDate, r.departureDate)
-    ).sort((a, b) => a - b);
+    const lengths = reservations
+      .map((r) => this.calculateLos(r.arrivalDate, r.departureDate))
+      .sort((a, b) => a - b);
 
     const avg = lengths.reduce((a, b) => a + b, 0) / lengths.length;
     const median = lengths[Math.floor(lengths.length / 2)];
@@ -187,18 +186,20 @@ export class LengthOfStayService {
       byType[type].push(los);
     }
 
-    return Object.entries(byType).map(([type, lengths]) => {
-      lengths.sort((a, b) => a - b);
-      const avg = lengths.reduce((a, b) => a + b, 0) / lengths.length;
-      const median = lengths[Math.floor(lengths.length / 2)];
+    return Object.entries(byType)
+      .map(([type, lengths]) => {
+        lengths.sort((a, b) => a - b);
+        const avg = lengths.reduce((a, b) => a + b, 0) / lengths.length;
+        const median = lengths[Math.floor(lengths.length / 2)];
 
-      return {
-        type,
-        averageLos: avg,
-        medianLos: median,
-        reservations: lengths.length,
-      };
-    }).sort((a, b) => b.averageLos - a.averageLos);
+        return {
+          type,
+          averageLos: avg,
+          medianLos: median,
+          reservations: lengths.length,
+        };
+      })
+      .sort((a, b) => b.averageLos - a.averageLos);
   }
 
   /**
@@ -233,9 +234,7 @@ export class LengthOfStayService {
     return Object.entries(byMonth)
       .map(([month, lengths]) => ({
         month,
-        averageLos: lengths.length > 0
-          ? lengths.reduce((a, b) => a + b, 0) / lengths.length
-          : 0,
+        averageLos: lengths.length > 0 ? lengths.reduce((a, b) => a + b, 0) / lengths.length : 0,
         reservations: lengths.length,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
@@ -273,15 +272,24 @@ export class LengthOfStayService {
     }
 
     const monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
 
     return monthNames.map((name, i) => ({
       month: name,
-      averageLos: byArrivalMonth[i].count > 0
-        ? byArrivalMonth[i].totalLos / byArrivalMonth[i].count
-        : 0,
+      averageLos:
+        byArrivalMonth[i].count > 0 ? byArrivalMonth[i].totalLos / byArrivalMonth[i].count : 0,
       reservations: byArrivalMonth[i].count,
     }));
   }

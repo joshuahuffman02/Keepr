@@ -13,6 +13,7 @@ This policy establishes requirements for creating, managing, and protecting pass
 ## 2. Scope
 
 This policy applies to:
+
 - All employees, contractors, and seasonal workers
 - All computer systems, software, and online accounts
 - WiFi networks and point-of-sale systems
@@ -23,26 +24,28 @@ This policy applies to:
 ### 3.1 Minimum Standards
 
 All passwords must meet these requirements:
+
 - **Length:** Minimum 12 characters
 - **Complexity:** Include at least 3 of the following:
   - Uppercase letters (A-Z)
   - Lowercase letters (a-z)
   - Numbers (0-9)
-  - Special characters (!@#$%^&*)
+  - Special characters (!@#$%^&\*)
 - **No personal information:** Names, birthdays, campground name
 - **No dictionary words:** Avoid common words
 
 ### 3.2 Password Examples
 
 | Weak (Not Allowed) | Strong (Acceptable) |
-|--------------------|---------------------|
-| campground123 | Tr33s&Str34ms#2024! |
-| Summer2024 | M0untain$unR!se99 |
-| password | C@mpf!re_N!ghts#42 |
+| ------------------ | ------------------- |
+| campground123      | Tr33s&Str34ms#2024! |
+| Summer2024         | M0untain$unR!se99   |
+| password           | C@mpf!re_N!ghts#42  |
 
 ### 3.3 Password Managers
 
 We recommend using a password manager such as:
+
 - 1Password
 - Bitwarden
 - LastPass
@@ -59,12 +62,12 @@ Contact management for approved options and setup assistance.
 
 ### 4.2 Password Changes
 
-| Situation | Action Required |
-|-----------|-----------------|
-| Regular schedule | Change every 90 days |
-| Suspected compromise | Change immediately |
-| Employee departure | Change all shared system passwords |
-| Security incident | Change all affected passwords |
+| Situation            | Action Required                    |
+| -------------------- | ---------------------------------- |
+| Regular schedule     | Change every 90 days               |
+| Suspected compromise | Change immediately                 |
+| Employee departure   | Change all shared system passwords |
+| Security incident    | Change all affected passwords      |
 
 ### 4.3 Account Lockout
 
@@ -75,6 +78,7 @@ Contact management for approved options and setup assistance.
 ## 5. Multi-Factor Authentication (MFA)
 
 MFA is required for:
+
 - [ ] Reservation management system (Campreserv)
 - [ ] Email accounts
 - [ ] Banking and financial systems
@@ -91,13 +95,13 @@ MFA is required for:
 
 ### 6.1 Role-Based Access
 
-| Role | System Access |
-|------|---------------|
-| Owner/Manager | Full administrative access |
-| Office Staff | Reservations, guest data, basic reports |
-| Maintenance | Work orders only |
-| Seasonal Help | Limited check-in functions |
-| Cleaning Staff | Housekeeping dashboard only |
+| Role           | System Access                           |
+| -------------- | --------------------------------------- |
+| Owner/Manager  | Full administrative access              |
+| Office Staff   | Reservations, guest data, basic reports |
+| Maintenance    | Work orders only                        |
+| Seasonal Help  | Limited check-in functions              |
+| Cleaning Staff | Housekeeping dashboard only             |
 
 ### 6.2 Access Reviews
 
@@ -108,11 +112,13 @@ MFA is required for:
 ## 7. WiFi Network Security
 
 ### 7.1 Staff Network
+
 - Strong WPA3 password
 - Change password when employees leave
 - Do not share with guests
 
 ### 7.2 Guest Network
+
 - Separate from staff network
 - Captive portal or simple password
 - Rotate password regularly
@@ -120,11 +126,13 @@ MFA is required for:
 ## 8. Physical Security
 
 ### 8.1 Computer Workstations
+
 - Lock screen when stepping away (Windows+L or Cmd+Q)
 - Auto-lock after 5 minutes of inactivity
 - Log out completely at end of shift
 
 ### 8.2 Written Passwords
+
 - Never write passwords on sticky notes
 - Do not store passwords in plain text files
 - Use password manager instead
@@ -132,6 +140,7 @@ MFA is required for:
 ## 9. Incident Reporting
 
 Report immediately if you:
+
 - Suspect your password was compromised
 - Notice unauthorized account activity
 - Receive suspicious emails asking for credentials
@@ -142,6 +151,7 @@ Report immediately if you:
 ## 10. Consequences
 
 Violations of this policy may result in:
+
 - Additional security training
 - Restricted system access
 - Disciplinary action up to termination
@@ -152,12 +162,12 @@ Violations of this policy may result in:
 
 I have read, understand, and agree to comply with this Password & Access Policy.
 
-**Employee Name:** _________________________
+**Employee Name:** ************\_************
 
-**Signature:** _________________________
+**Signature:** ************\_************
 
-**Date:** _____________
+**Date:** ******\_******
 
 ---
 
-*This template is provided by Campreserv for guidance purposes. Adapt as needed for your specific systems and requirements.*
+_This template is provided by Campreserv for guidance purposes. Adapt as needed for your specific systems and requirements._

@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { PublicReservationsService } from "../public-reservations/public-reservations.service";
 import crypto, { randomUUID } from "crypto";
@@ -26,7 +31,7 @@ export interface KioskReservationDto {
 export class KioskService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly publicReservations: PublicReservationsService
+    private readonly publicReservations: PublicReservationsService,
   ) {}
 
   /**
@@ -211,7 +216,7 @@ export class KioskService {
       allowWalkIns?: boolean;
       allowCheckIn?: boolean;
       allowPayments?: boolean;
-    }
+    },
   ) {
     const device = await this.prisma.kioskDevice.findFirst({
       where: { id: deviceId, campgroundId },
@@ -338,7 +343,7 @@ export class KioskService {
       children: dto.children ?? 0,
       guest: dto.guest,
       equipment: dto.equipment,
-      source: "kiosk",  // Mark as kiosk booking for analytics
+      source: "kiosk", // Mark as kiosk booking for analytics
     });
 
     return reservation;

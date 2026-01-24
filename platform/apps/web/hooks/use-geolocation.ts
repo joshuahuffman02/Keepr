@@ -4,17 +4,57 @@ import { useState, useEffect, useCallback } from "react";
 
 // US state abbreviation to full name mapping
 const STATE_NAMES: Record<string, string> = {
-  AL: "Alabama", AK: "Alaska", AZ: "Arizona", AR: "Arkansas", CA: "California",
-  CO: "Colorado", CT: "Connecticut", DE: "Delaware", FL: "Florida", GA: "Georgia",
-  HI: "Hawaii", ID: "Idaho", IL: "Illinois", IN: "Indiana", IA: "Iowa",
-  KS: "Kansas", KY: "Kentucky", LA: "Louisiana", ME: "Maine", MD: "Maryland",
-  MA: "Massachusetts", MI: "Michigan", MN: "Minnesota", MS: "Mississippi", MO: "Missouri",
-  MT: "Montana", NE: "Nebraska", NV: "Nevada", NH: "New Hampshire", NJ: "New Jersey",
-  NM: "New Mexico", NY: "New York", NC: "North Carolina", ND: "North Dakota", OH: "Ohio",
-  OK: "Oklahoma", OR: "Oregon", PA: "Pennsylvania", RI: "Rhode Island", SC: "South Carolina",
-  SD: "South Dakota", TN: "Tennessee", TX: "Texas", UT: "Utah", VT: "Vermont",
-  VA: "Virginia", WA: "Washington", WV: "West Virginia", WI: "Wisconsin", WY: "Wyoming",
-  DC: "District of Columbia"
+  AL: "Alabama",
+  AK: "Alaska",
+  AZ: "Arizona",
+  AR: "Arkansas",
+  CA: "California",
+  CO: "Colorado",
+  CT: "Connecticut",
+  DE: "Delaware",
+  FL: "Florida",
+  GA: "Georgia",
+  HI: "Hawaii",
+  ID: "Idaho",
+  IL: "Illinois",
+  IN: "Indiana",
+  IA: "Iowa",
+  KS: "Kansas",
+  KY: "Kentucky",
+  LA: "Louisiana",
+  ME: "Maine",
+  MD: "Maryland",
+  MA: "Massachusetts",
+  MI: "Michigan",
+  MN: "Minnesota",
+  MS: "Mississippi",
+  MO: "Missouri",
+  MT: "Montana",
+  NE: "Nebraska",
+  NV: "Nevada",
+  NH: "New Hampshire",
+  NJ: "New Jersey",
+  NM: "New Mexico",
+  NY: "New York",
+  NC: "North Carolina",
+  ND: "North Dakota",
+  OH: "Ohio",
+  OK: "Oklahoma",
+  OR: "Oregon",
+  PA: "Pennsylvania",
+  RI: "Rhode Island",
+  SC: "South Carolina",
+  SD: "South Dakota",
+  TN: "Tennessee",
+  TX: "Texas",
+  UT: "Utah",
+  VT: "Vermont",
+  VA: "Virginia",
+  WA: "Washington",
+  WV: "West Virginia",
+  WI: "Wisconsin",
+  WY: "Wyoming",
+  DC: "District of Columbia",
 };
 
 export interface GeolocationState {
@@ -46,7 +86,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     enableHighAccuracy = false,
     timeout = 10000,
     maximumAge = 1000 * 60 * 60 * 24, // 24 hours
-    autoDetect = true
+    autoDetect = true,
   } = options;
 
   const [state, setState] = useState<GeolocationState>({
@@ -57,7 +97,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     city: null,
     error: null,
     isLoading: false,
-    isSupported: typeof window !== "undefined" && "geolocation" in navigator
+    isSupported: typeof window !== "undefined" && "geolocation" in navigator,
   });
 
   // Load cached location on mount
@@ -76,7 +116,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
             longitude: parsed.longitude,
             state: parsed.state,
             stateName: parsed.stateName,
-            city: parsed.city
+            city: parsed.city,
           }));
           return;
         }
@@ -89,7 +129,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     if (autoDetect && state.isSupported) {
       detectLocation();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Reverse geocode coordinates to get state/city
@@ -101,9 +141,9 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
         {
           headers: {
             "Accept-Language": "en-US,en",
-            "User-Agent": "Keepr/1.0"
-          }
-        }
+            "User-Agent": "Keepr/1.0",
+          },
+        },
       );
 
       if (!response.ok) {
@@ -130,7 +170,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
     if (!state.isSupported) {
       setState((prev) => ({
         ...prev,
-        error: "Geolocation is not supported by your browser"
+        error: "Geolocation is not supported by your browser",
       }));
       return;
     }
@@ -142,7 +182,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy,
           timeout,
-          maximumAge
+          maximumAge,
         });
       });
 
@@ -159,7 +199,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
         city,
         error: null,
         isLoading: false,
-        isSupported: true
+        isSupported: true,
       };
 
       setState(newState);
@@ -174,8 +214,8 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
             state: stateCode,
             stateName,
             city,
-            timestamp: Date.now()
-          })
+            timestamp: Date.now(),
+          }),
         );
       }
     } catch (error) {
@@ -198,7 +238,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: errorMessage
+        error: errorMessage,
       }));
     }
   }, [state.isSupported, enableHighAccuracy, timeout, maximumAge, reverseGeocode]);
@@ -216,14 +256,14 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
       city: null,
       error: null,
       isLoading: false,
-      isSupported: state.isSupported
+      isSupported: state.isSupported,
     });
   }, [state.isSupported]);
 
   return {
     ...state,
     detectLocation,
-    clearLocation
+    clearLocation,
   };
 }
 

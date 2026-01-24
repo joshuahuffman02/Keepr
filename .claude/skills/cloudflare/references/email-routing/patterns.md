@@ -18,22 +18,22 @@ export default {
 ### 2. Parse Email with postal-mime
 
 ```typescript
-import * as PostalMime from 'postal-mime';
+import * as PostalMime from "postal-mime";
 
 export default {
   async email(message, env, ctx) {
     const parser = new PostalMime.default();
     const rawEmail = new Response(message.raw);
     const email = await parser.parse(await rawEmail.arrayBuffer());
-    
+
     console.log({
       from: email.from,
       to: email.to,
       subject: email.subject,
       html: email.html,
-      attachments: email.attachments
+      attachments: email.attachments,
     });
-    
+
     await message.forward("destination@example.com");
   },
 };
@@ -43,4 +43,5 @@ export default {
 
 ```typescript
 export default {
-  async email(message, env, 
+  async email(message, env,
+```

@@ -17,5 +17,3 @@ export class CopilotActionDto {
   @IsOptional()
   payload?: Record<string, unknown>;
 }
-
-

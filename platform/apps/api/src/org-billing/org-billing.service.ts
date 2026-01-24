@@ -55,7 +55,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -144,7 +144,7 @@ export class OrgBillingService {
     const usageSummary = await this.calculatePeriodUsage(
       organizationId,
       currentPeriod.periodStart,
-      currentPeriod.periodEnd
+      currentPeriod.periodEnd,
     );
 
     // Calculate monthly fee (check if still in free period)
@@ -164,12 +164,22 @@ export class OrgBillingService {
 
     // Calculate totals
     const subscriptionCents = monthlyFeeCents;
-    const bookingFeesCents = usageSummary.bookingCount * (org.EarlyAccessEnrollment?.lockedBookingFee || tierConfig.perBookingFeeCents);
+    const bookingFeesCents =
+      usageSummary.bookingCount *
+      (org.EarlyAccessEnrollment?.lockedBookingFee || tierConfig.perBookingFeeCents);
     const smsOutboundCents = usageSummary.smsOutbound * tierConfig.smsOutboundCents;
     const smsInboundCents = usageSummary.smsInbound * tierConfig.smsInboundCents;
-    const aiTokensCents = Math.round((usageSummary.aiTokens / 1000) * tierConfig.aiTokensPer1kCents);
+    const aiTokensCents = Math.round(
+      (usageSummary.aiTokens / 1000) * tierConfig.aiTokensPer1kCents,
+    );
     const setupServiceSurchargeCents = usageSummary.setupServiceSurchargeCents || 0;
-    const totalCents = subscriptionCents + bookingFeesCents + smsOutboundCents + smsInboundCents + aiTokensCents + setupServiceSurchargeCents;
+    const totalCents =
+      subscriptionCents +
+      bookingFeesCents +
+      smsOutboundCents +
+      smsInboundCents +
+      aiTokensCents +
+      setupServiceSurchargeCents;
 
     // Get active setup services with balance for display
     const activeSetupServices = await this.prisma.setupService.findMany({
@@ -251,7 +261,7 @@ export class OrgBillingService {
         activeWithBalance: activeSetupServices,
         totalBalanceRemainingCents: activeSetupServices.reduce(
           (sum, s) => sum + s.balanceRemainingCents,
-          0
+          0,
         ),
       },
     };
@@ -427,7 +437,7 @@ export class OrgBillingService {
     periodStart?: Date,
     periodEnd?: Date,
     limit = 100,
-    offset = 0
+    offset = 0,
   ) {
     const where: Record<string, unknown> = { organizationId };
 
@@ -493,12 +503,13 @@ export class OrgBillingService {
     const usage = await this.calculatePeriodUsage(
       period.organizationId,
       period.periodStart,
-      period.periodEnd
+      period.periodEnd,
     );
 
     const tierName = period.Organization.EarlyAccessEnrollment?.tier || "standard";
     const tierConfig = TIER_CONFIGS[tierName] || TIER_CONFIGS.standard;
-    const lockedBookingFee = period.Organization.EarlyAccessEnrollment?.lockedBookingFee || tierConfig.perBookingFeeCents;
+    const lockedBookingFee =
+      period.Organization.EarlyAccessEnrollment?.lockedBookingFee || tierConfig.perBookingFeeCents;
 
     // Calculate monthly fee
     let monthlyFeeCents = tierConfig.monthlyFeeCents;

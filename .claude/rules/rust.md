@@ -10,6 +10,7 @@ paths:
 ## Why Rust in This Project
 
 Rust is used for **security-critical and performance-critical** code where correctness is essential:
+
 - Payment processing (can't afford bugs)
 - Availability calculator (complex date logic)
 - Authentication/security (critical)
@@ -277,6 +278,7 @@ const response = await axios.post('http://localhost:8080/process-payment', {
 ## Verification
 
 After editing Rust code:
+
 1. `cargo check` - Fast type checking
 2. `cargo clippy` - Lint for common mistakes
 3. `cargo test` - Run tests

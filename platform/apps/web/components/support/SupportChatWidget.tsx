@@ -2,7 +2,17 @@
 
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Send, LifeBuoy, ExternalLink, ShieldCheck, Paperclip, X, Loader2, AlertTriangle, FileText } from "lucide-react";
+import {
+  Send,
+  LifeBuoy,
+  ExternalLink,
+  ShieldCheck,
+  Paperclip,
+  X,
+  Loader2,
+  AlertTriangle,
+  FileText,
+} from "lucide-react";
 import Link from "next/link";
 import { apiClient } from "@/lib/api-client";
 import { API_BASE } from "@/lib/api-config";
@@ -17,10 +27,22 @@ import {
 import type { ChatAccent, UnifiedChatMessage } from "@/components/chat";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -58,7 +80,7 @@ type PartnerMessage = UnifiedChatMessage & {
 };
 
 const isUserAssistantMessage = <T extends UnifiedChatMessage>(
-  message: T
+  message: T,
 ): message is T & { role: "user" | "assistant" } =>
   message.role === "user" || message.role === "assistant";
 
@@ -126,7 +148,7 @@ const EXECUTABLE_ACTIONS = new Set([
   "refund_reservation",
   "send_guest_message",
   "move_reservation",
-  "adjust_rate"
+  "adjust_rate",
 ]);
 
 type TicketAttachment = {
@@ -294,11 +316,15 @@ function buildActionSummary(draft: ActionDraft) {
         : params.siteId
           ? `Site ${formatId(params.siteId)}`
           : null;
-  const reservationLabel = params.reservationId ? `Reservation ${formatId(params.reservationId)}` : null;
+  const reservationLabel = params.reservationId
+    ? `Reservation ${formatId(params.reservationId)}`
+    : null;
 
   switch (draft.actionType) {
     case "lookup_availability":
-      return dateRange ? `Checking availability for ${dateRange}.` : "Checking availability for your campground.";
+      return dateRange
+        ? `Checking availability for ${dateRange}.`
+        : "Checking availability for your campground.";
     case "create_hold":
       if (siteLabel && dateRange) return `Drafting a hold for ${siteLabel} (${dateRange}).`;
       if (siteLabel) return `Drafting a hold for ${siteLabel}.`;
@@ -310,9 +336,12 @@ function buildActionSummary(draft: ActionDraft) {
       if (dateRange) return `Blocking a site for maintenance (${dateRange}).`;
       return "Blocking a site for maintenance.";
     case "create_maintenance_ticket":
-      if (params.issue && siteLabel) return `Creating a maintenance ticket for ${siteLabel}: ${params.issue}.`;
+      if (params.issue && siteLabel)
+        return `Creating a maintenance ticket for ${siteLabel}: ${params.issue}.`;
       if (params.issue) return `Creating a maintenance ticket: ${params.issue}.`;
-      return siteLabel ? `Creating a maintenance ticket for ${siteLabel}.` : "Creating a maintenance ticket.";
+      return siteLabel
+        ? `Creating a maintenance ticket for ${siteLabel}.`
+        : "Creating a maintenance ticket.";
     case "create_operational_task":
       if (params.title || params.task || params.summary) {
         const label = params.title ?? params.task ?? params.summary;
@@ -321,8 +350,11 @@ function buildActionSummary(draft: ActionDraft) {
       return "Creating an operations task.";
     case "update_housekeeping_status":
       const statusLabel = params.status ?? params.housekeepingStatus;
-      if (siteLabel && statusLabel) return `Updating housekeeping for ${siteLabel} to ${statusLabel}.`;
-      return siteLabel ? `Updating housekeeping for ${siteLabel}.` : "Updating housekeeping status.";
+      if (siteLabel && statusLabel)
+        return `Updating housekeeping for ${siteLabel} to ${statusLabel}.`;
+      return siteLabel
+        ? `Updating housekeeping for ${siteLabel}.`
+        : "Updating housekeeping status.";
     case "generate_billing_schedule":
       return "Generating a billing schedule for the reservation.";
     case "refund_reservation":
@@ -335,13 +367,15 @@ function buildActionSummary(draft: ActionDraft) {
       if (params.subject) return `Logging a guest note: ${params.subject}.`;
       return "Logging a guest note.";
     case "move_reservation":
-      if (reservationLabel && siteLabel && dateRange) return `Moving ${reservationLabel} to ${siteLabel} (${dateRange}).`;
+      if (reservationLabel && siteLabel && dateRange)
+        return `Moving ${reservationLabel} to ${siteLabel} (${dateRange}).`;
       if (reservationLabel && siteLabel) return `Moving ${reservationLabel} to ${siteLabel}.`;
       if (reservationLabel && dateRange) return `Moving ${reservationLabel} to ${dateRange}.`;
       if (reservationLabel) return `Drafting a move for ${reservationLabel}.`;
       return "Drafting a reservation move.";
     case "adjust_rate":
-      if (params.siteClassName && dateRange) return `Adjusting rates for ${params.siteClassName} (${dateRange}).`;
+      if (params.siteClassName && dateRange)
+        return `Adjusting rates for ${params.siteClassName} (${dateRange}).`;
       if (params.siteClassName) return `Adjusting rates for ${params.siteClassName}.`;
       return dateRange ? `Adjusting rates for ${dateRange}.` : "Adjusting rates.";
     default:
@@ -362,7 +396,7 @@ function buildActionHighlights(draft: ActionDraft) {
 
   const dateRange = formatDateRange(
     toOptionalString(params.arrivalDate),
-    toOptionalString(params.departureDate)
+    toOptionalString(params.departureDate),
   );
   if (dateRange) addItem(["arrivalDate", "departureDate"], "Dates", dateRange);
 
@@ -378,14 +412,18 @@ function buildActionHighlights(draft: ActionDraft) {
   if (params.reason) addItem("reason", "Reason", String(params.reason));
   if (params.priority) addItem("priority", "Priority", String(params.priority));
   if (params.status) addItem("status", "Status", String(params.status));
-  if (params.housekeepingStatus) addItem("housekeepingStatus", "Housekeeping", String(params.housekeepingStatus));
+  if (params.housekeepingStatus)
+    addItem("housekeepingStatus", "Housekeeping", String(params.housekeepingStatus));
   if (params.type) addItem("type", "Type", String(params.type));
   if (params.amountCents) addItem("amountCents", "Amount (cents)", String(params.amountCents));
   if (params.destination) addItem("destination", "Destination", String(params.destination));
   if (params.subject) addItem("subject", "Subject", String(params.subject));
-  if (params.message || params.body) addItem("message", "Message", formatValue(params.message ?? params.body));
-  if (params.adjustmentType) addItem("adjustmentType", "Adjustment type", String(params.adjustmentType));
-  if (params.adjustmentValue) addItem("adjustmentValue", "Adjustment", String(params.adjustmentValue));
+  if (params.message || params.body)
+    addItem("message", "Message", formatValue(params.message ?? params.body));
+  if (params.adjustmentType)
+    addItem("adjustmentType", "Adjustment type", String(params.adjustmentType));
+  if (params.adjustmentValue)
+    addItem("adjustmentValue", "Adjustment", String(params.adjustmentValue));
   if (params.newRateCents) addItem("newRateCents", "New rate (cents)", String(params.newRateCents));
   if (params.siteClassName) addItem("siteClassName", "Site class", String(params.siteClassName));
 
@@ -397,7 +435,7 @@ function buildActionHighlights(draft: ActionDraft) {
 
   const newDateRange = formatDateRange(
     toOptionalString(params.newArrivalDate),
-    toOptionalString(params.newDepartureDate)
+    toOptionalString(params.newDepartureDate),
   );
   if (newDateRange) addItem(["newArrivalDate", "newDepartureDate"], "New dates", newDateRange);
 
@@ -434,9 +472,8 @@ export function SupportChatWidget() {
   const { data: whoami } = useWhoami();
 
   const lastSupportUserMessage = useMemo(
-    () =>
-      [...supportMessages].reverse().find((message) => message.role === "user")?.content ?? "",
-    [supportMessages]
+    () => [...supportMessages].reverse().find((message) => message.role === "user")?.content ?? "",
+    [supportMessages],
   );
 
   const readyTicketAttachments = useMemo(
@@ -447,10 +484,10 @@ export function SupportChatWidget() {
         }
         return [item.attachment];
       }),
-    [ticketAttachments]
+    [ticketAttachments],
   );
   const hasUploadingTicketAttachments = ticketAttachments.some(
-    (item) => item.status === "uploading"
+    (item) => item.status === "uploading",
   );
   const canSubmitTicket =
     (ticketSubject.trim().length > 0 || ticketDetails.trim().length > 0) &&
@@ -583,15 +620,15 @@ export function SupportChatWidget() {
         prev.map((entry) =>
           entry.id === item.id
             ? { ...entry, status: "ready", attachment, error: undefined }
-            : entry
-        )
+            : entry,
+        ),
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : "Upload failed";
       setTicketAttachments((prev) =>
         prev.map((entry) =>
-          entry.id === item.id ? { ...entry, status: "error", error: message } : entry
-        )
+          entry.id === item.id ? { ...entry, status: "error", error: message } : entry,
+        ),
       );
     }
   };
@@ -610,10 +647,12 @@ export function SupportChatWidget() {
       }));
 
   const gatherEvidenceLinks = () =>
-    supportMessages.flatMap((message) => message.helpArticles ?? []).map((article) => ({
-      label: article.title,
-      url: article.url,
-    }));
+    supportMessages
+      .flatMap((message) => message.helpArticles ?? [])
+      .map((article) => ({
+        label: article.title,
+        url: article.url,
+      }));
 
   const handleTicketSubmit = async () => {
     if (!canSubmitTicket) return;
@@ -631,7 +670,7 @@ export function SupportChatWidget() {
       const submitterName =
         whoami?.user?.firstName || whoami?.user?.lastName
           ? `${whoami?.user?.firstName ?? ""} ${whoami?.user?.lastName ?? ""}`.trim()
-          : whoami?.user?.email ?? null;
+          : (whoami?.user?.email ?? null);
       const submitter = whoami?.user
         ? {
             id: whoami.user.id ?? null,
@@ -725,7 +764,8 @@ export function SupportChatWidget() {
       message: string;
       history: { role: "user" | "assistant"; content: string }[];
     }) => {
-      const authToken = localStorage.getItem("campreserv:authToken") || localStorage.getItem("token");
+      const authToken =
+        localStorage.getItem("campreserv:authToken") || localStorage.getItem("token");
       const res = await fetch(`${API_BASE}/ai/support/chat`, {
         method: "POST",
         headers: {
@@ -964,7 +1004,11 @@ export function SupportChatWidget() {
       <p className="text-sm text-muted-foreground mb-6">
         Share the issue, impact, or question and we will route it.
       </p>
-      <SuggestedPrompts prompts={PROMPTS.support} onSelect={handleSupportQuickReply} accent={accent} />
+      <SuggestedPrompts
+        prompts={PROMPTS.support}
+        onSelect={handleSupportQuickReply}
+        accent={accent}
+      />
     </div>
   );
 
@@ -974,7 +1018,11 @@ export function SupportChatWidget() {
       <p className="text-sm text-muted-foreground mb-6">
         Describe the action you want drafted and I will prepare the approval.
       </p>
-      <SuggestedPrompts prompts={PROMPTS.partner} onSelect={handlePartnerQuickReply} accent={accent} />
+      <SuggestedPrompts
+        prompts={PROMPTS.partner}
+        onSelect={handlePartnerQuickReply}
+        accent={accent}
+      />
     </div>
   );
 
@@ -1044,7 +1092,9 @@ export function SupportChatWidget() {
             <div className="flex items-center justify-between space-x-3 rounded-lg border border-border px-3 py-2">
               <div>
                 <div className="text-sm font-medium text-foreground">Include transcript</div>
-                <div className="text-xs text-muted-foreground">Attach the last 20 messages for context.</div>
+                <div className="text-xs text-muted-foreground">
+                  Attach the last 20 messages for context.
+                </div>
               </div>
               <Switch
                 checked={ticketIncludeTranscript}
@@ -1077,9 +1127,7 @@ export function SupportChatWidget() {
                   className="hidden"
                   onChange={handleTicketAttachmentChange}
                 />
-                <span className="text-xs text-muted-foreground">
-                  Images or PDFs up to 10 MB.
-                </span>
+                <span className="text-xs text-muted-foreground">Images or PDFs up to 10 MB.</span>
               </div>
               {ticketAttachments.length > 0 && (
                 <div className="space-y-2">
@@ -1138,11 +1186,7 @@ export function SupportChatWidget() {
             >
               Cancel
             </Button>
-            <Button
-              type="button"
-              onClick={handleTicketSubmit}
-              disabled={!canSubmitTicket}
-            >
+            <Button type="button" onClick={handleTicketSubmit} disabled={!canSubmitTicket}>
               {ticketSubmitting ? "Submitting..." : "Submit ticket"}
             </Button>
           </DialogFooter>
@@ -1153,7 +1197,9 @@ export function SupportChatWidget() {
           type="button"
           onClick={() => setMode("support")}
           className={`rounded-full px-3 py-1 transition-colors ${
-            isSupportMode ? "bg-status-info/15 text-status-info" : "bg-muted text-muted-foreground hover:bg-muted/80"
+            isSupportMode
+              ? "bg-status-info/15 text-status-info"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
         >
           Support
@@ -1162,7 +1208,9 @@ export function SupportChatWidget() {
           type="button"
           onClick={() => setMode("partner")}
           className={`rounded-full px-3 py-1 transition-colors ${
-            isSupportMode ? "bg-muted text-muted-foreground hover:bg-muted/80" : "bg-status-success/15 text-status-success"
+            isSupportMode
+              ? "bg-muted text-muted-foreground hover:bg-muted/80"
+              : "bg-status-success/15 text-status-success"
           }`}
         >
           Staff
@@ -1206,243 +1254,276 @@ export function SupportChatWidget() {
         />
       ) : (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {partnerMessages.length === 0 ? (
-            partnerEmptyState
-          ) : (
-            partnerMessages.map((msg) => (
-              <div key={msg.id} className="space-y-2">
-                <ChatMessage {...msg} accent={accent} />
-                <div className={cn(msg.role === "assistant" ? "ml-11" : "mr-11")}>
-                  {msg.denials?.length ? (
-                    <div className="mt-3 rounded-lg border border-status-error/30 bg-status-error/15 px-3 py-2 text-xs text-status-error">
-                      {msg.denials.map((denial, idx) => (
-                        <div key={`${denial.reason}-${idx}`}>
-                          {denial.reason}
-                          {denial.guidance ? ` - ${denial.guidance}` : ""}
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {msg.questions?.length ? (
-                    <div className="mt-3 space-y-2">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        Needs input
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {msg.questions.map((question, idx) => (
-                          <button
-                            key={`${question}-${idx}`}
-                            type="button"
-                            onClick={() => handlePartnerQuickReply(question)}
-                            className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:border-status-success hover:text-status-success"
-                          >
-                            {question}
-                          </button>
+          {partnerMessages.length === 0
+            ? partnerEmptyState
+            : partnerMessages.map((msg) => (
+                <div key={msg.id} className="space-y-2">
+                  <ChatMessage {...msg} accent={accent} />
+                  <div className={cn(msg.role === "assistant" ? "ml-11" : "mr-11")}>
+                    {msg.denials?.length ? (
+                      <div className="mt-3 rounded-lg border border-status-error/30 bg-status-error/15 px-3 py-2 text-xs text-status-error">
+                        {msg.denials.map((denial, idx) => (
+                          <div key={`${denial.reason}-${idx}`}>
+                            {denial.reason}
+                            {denial.guidance ? ` - ${denial.guidance}` : ""}
+                          </div>
                         ))}
                       </div>
-                    </div>
-                  ) : null}
+                    ) : null}
 
-                  {msg.actionDrafts?.length ? (
-                    <div className="mt-3 space-y-3">
-                      {msg.actionDrafts.map((draft) => {
-                        const isReadOnlyExecuted = draft.action === "read" && draft.status === "executed";
+                    {msg.questions?.length ? (
+                      <div className="mt-3 space-y-2">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                          Needs input
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {msg.questions.map((question, idx) => (
+                            <button
+                              key={`${question}-${idx}`}
+                              type="button"
+                              onClick={() => handlePartnerQuickReply(question)}
+                              className="rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground hover:border-status-success hover:text-status-success"
+                            >
+                              {question}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
 
-                        if (isReadOnlyExecuted) {
-                          if (!draft.evidenceLinks?.length) return null;
-                          return (
-                            <div key={draft.id} className="flex flex-wrap gap-2">
-                              {draft.evidenceLinks.map((link) => (
-                                <Link
-                                  key={`${link.label}-${link.url}`}
-                                  href={link.url}
-                                  className="inline-flex items-center gap-1.5 rounded-full border border-status-success/30 bg-status-success/10 px-3 py-1.5 text-xs font-medium text-status-success hover:bg-status-success/20 transition-colors"
-                                >
-                                  <ExternalLink className="w-3 h-3" />
-                                  {link.label}
-                                </Link>
-                              ))}
-                            </div>
-                          );
-                        }
+                    {msg.actionDrafts?.length ? (
+                      <div className="mt-3 space-y-3">
+                        {msg.actionDrafts.map((draft) => {
+                          const isReadOnlyExecuted =
+                            draft.action === "read" && draft.status === "executed";
 
-                        const statusClass =
-                          draft.status === "executed"
-                            ? "bg-status-success/15 text-status-success"
-                            : draft.status === "denied"
-                              ? "bg-status-error/15 text-status-error"
-                              : "bg-status-warning/15 text-status-warning";
-                        const impactClass =
-                          draft.impact?.level === "high"
-                            ? "bg-status-error/15 text-status-error"
-                            : draft.impact?.level === "medium"
-                              ? "bg-status-warning/15 text-status-warning"
-                              : "bg-status-success/15 text-status-success";
-                        const summary = buildActionSummary(draft);
-                        const { items: highlights, usedKeys } = buildActionHighlights(draft);
-                        const detailParams = Object.entries(draft.parameters ?? {}).filter(([key]) => !usedKeys.has(key));
-
-                        return (
-                          <div key={draft.id} className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground">
-                            <div className="flex flex-wrap items-start justify-between gap-2">
-                              <div>
-                                <div className="text-sm font-semibold text-foreground">
-                                  {ACTION_LABELS[draft.actionType] || draft.actionType}
-                                </div>
-                                {summary ? <div className="mt-1 text-xs text-muted-foreground">{summary}</div> : null}
-                              </div>
-                              <div className="flex flex-wrap items-center gap-2">
-                                {draft.requiresConfirmation && (
-                                  <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[11px] text-status-warning">
-                                    Confirm to run
-                                  </span>
-                                )}
-                                <span className={`rounded-full px-2 py-0.5 text-[11px] ${statusClass}`}>
-                                  {draft.status}
-                                </span>
-                              </div>
-                            </div>
-
-                            {highlights.length ? (
-                              <div className="mt-3 rounded-lg border border-border bg-muted px-3 py-2 text-[11px]">
-                                <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
-                                  Key details
-                                </div>
-                                <div className="mt-2 space-y-1">
-                                  {highlights.map((item) => (
-                                    <div key={`${draft.id}-${item.key}`} className="flex items-center justify-between gap-4">
-                                      <span className="text-muted-foreground">{item.label}</span>
-                                      <span className="text-foreground">{item.value}</span>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ) : null}
-
-                            {draft.impact && (
-                              <div className="mt-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
-                                <div className="flex items-center justify-between">
-                                  <span className="font-semibold text-foreground">Impact</span>
-                                  <span className={`rounded-full px-2 py-0.5 text-[11px] ${impactClass}`}>
-                                    {draft.impact.level}
-                                  </span>
-                                </div>
-                                <p className="mt-1 text-muted-foreground">{draft.impact.summary}</p>
-                                {draft.impact.warnings?.length ? (
-                                  <div className="mt-2 space-y-1 text-status-warning">
-                                    {draft.impact.warnings.map((warning) => (
-                                      <div key={warning}>- {warning}</div>
-                                    ))}
-                                  </div>
-                                ) : null}
-                                {draft.impact.saferAlternative ? (
-                                  <div className="mt-2 text-status-success">
-                                    Safer alternative: {draft.impact.saferAlternative}
-                                  </div>
-                                ) : null}
-                              </div>
-                            )}
-
-                            {draft.evidenceLinks?.length ? (
-                              <div className="mt-2 flex flex-wrap gap-2">
+                          if (isReadOnlyExecuted) {
+                            if (!draft.evidenceLinks?.length) return null;
+                            return (
+                              <div key={draft.id} className="flex flex-wrap gap-2">
                                 {draft.evidenceLinks.map((link) => (
                                   <Link
                                     key={`${link.label}-${link.url}`}
                                     href={link.url}
-                                    className="inline-flex items-center gap-1.5 rounded-full border border-status-success/30 bg-status-success/10 px-3 py-1 text-[11px] text-status-success hover:bg-status-success/20"
+                                    className="inline-flex items-center gap-1.5 rounded-full border border-status-success/30 bg-status-success/10 px-3 py-1.5 text-xs font-medium text-status-success hover:bg-status-success/20 transition-colors"
                                   >
                                     <ExternalLink className="w-3 h-3" />
                                     {link.label}
                                   </Link>
                                 ))}
                               </div>
-                            ) : null}
+                            );
+                          }
 
-                            {draft.requiresConfirmation && (
-                              <div className="mt-3 flex flex-wrap items-center gap-2">
-                                {EXECUTABLE_ACTIONS.has(draft.actionType) ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleConfirmDraft(draft)}
-                                    disabled={confirmPartnerMutation.isPending && confirmingDraftId === draft.id}
-                                    className="rounded-full bg-status-success px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-status-success/80 disabled:opacity-60"
-                                  >
-                                    {confirmingDraftId === draft.id ? "Confirming..." : "Confirm & run"}
-                                  </button>
-                                ) : (
-                                  <span className="text-[11px] text-muted-foreground">
-                                    Review this draft in the linked screen to continue.
-                                  </span>
-                                )}
-                                <span className="text-[11px] text-muted-foreground">Runs with your permissions.</span>
-                              </div>
-                            )}
+                          const statusClass =
+                            draft.status === "executed"
+                              ? "bg-status-success/15 text-status-success"
+                              : draft.status === "denied"
+                                ? "bg-status-error/15 text-status-error"
+                                : "bg-status-warning/15 text-status-warning";
+                          const impactClass =
+                            draft.impact?.level === "high"
+                              ? "bg-status-error/15 text-status-error"
+                              : draft.impact?.level === "medium"
+                                ? "bg-status-warning/15 text-status-warning"
+                                : "bg-status-success/15 text-status-success";
+                          const summary = buildActionSummary(draft);
+                          const { items: highlights, usedKeys } = buildActionHighlights(draft);
+                          const detailParams = Object.entries(draft.parameters ?? {}).filter(
+                            ([key]) => !usedKeys.has(key),
+                          );
 
-                            {(draft.sensitivity || detailParams.length > 0) && (
-                              <details className="mt-3 text-[11px] text-muted-foreground">
-                                <summary className="cursor-pointer select-none">Technical details</summary>
-                                <div className="mt-2 space-y-1">
-                                  <div className="flex items-center justify-between gap-4">
-                                    <span>Action</span>
-                                    <span className="text-foreground">{draft.action}</span>
+                          return (
+                            <div
+                              key={draft.id}
+                              className="rounded-xl border border-border bg-card p-3 text-xs text-muted-foreground"
+                            >
+                              <div className="flex flex-wrap items-start justify-between gap-2">
+                                <div>
+                                  <div className="text-sm font-semibold text-foreground">
+                                    {ACTION_LABELS[draft.actionType] || draft.actionType}
                                   </div>
-                                  <div className="flex items-center justify-between gap-4">
-                                    <span>Resource</span>
-                                    <span className="text-foreground">{draft.resource}</span>
-                                  </div>
-                                  {draft.sensitivity && (
-                                    <div className="flex items-center justify-between gap-4">
-                                      <span>Sensitivity</span>
-                                      <span className="text-foreground">{draft.sensitivity}</span>
+                                  {summary ? (
+                                    <div className="mt-1 text-xs text-muted-foreground">
+                                      {summary}
                                     </div>
+                                  ) : null}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  {draft.requiresConfirmation && (
+                                    <span className="rounded-full bg-status-warning/15 px-2 py-0.5 text-[11px] text-status-warning">
+                                      Confirm to run
+                                    </span>
                                   )}
-                                  {detailParams.length > 0 && (
-                                    <div className="mt-2 space-y-1">
-                                      {detailParams.map(([key, value]) => (
-                                        <div key={key} className="flex items-center justify-between gap-4">
-                                          <span>{key}</span>
-                                          <span className="text-foreground">{formatValue(value)}</span>
-                                        </div>
+                                  <span
+                                    className={`rounded-full px-2 py-0.5 text-[11px] ${statusClass}`}
+                                  >
+                                    {draft.status}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {highlights.length ? (
+                                <div className="mt-3 rounded-lg border border-border bg-muted px-3 py-2 text-[11px]">
+                                  <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                                    Key details
+                                  </div>
+                                  <div className="mt-2 space-y-1">
+                                    {highlights.map((item) => (
+                                      <div
+                                        key={`${draft.id}-${item.key}`}
+                                        className="flex items-center justify-between gap-4"
+                                      >
+                                        <span className="text-muted-foreground">{item.label}</span>
+                                        <span className="text-foreground">{item.value}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              {draft.impact && (
+                                <div className="mt-2 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
+                                  <div className="flex items-center justify-between">
+                                    <span className="font-semibold text-foreground">Impact</span>
+                                    <span
+                                      className={`rounded-full px-2 py-0.5 text-[11px] ${impactClass}`}
+                                    >
+                                      {draft.impact.level}
+                                    </span>
+                                  </div>
+                                  <p className="mt-1 text-muted-foreground">
+                                    {draft.impact.summary}
+                                  </p>
+                                  {draft.impact.warnings?.length ? (
+                                    <div className="mt-2 space-y-1 text-status-warning">
+                                      {draft.impact.warnings.map((warning) => (
+                                        <div key={warning}>- {warning}</div>
                                       ))}
                                     </div>
-                                  )}
+                                  ) : null}
+                                  {draft.impact.saferAlternative ? (
+                                    <div className="mt-2 text-status-success">
+                                      Safer alternative: {draft.impact.saferAlternative}
+                                    </div>
+                                  ) : null}
                                 </div>
-                              </details>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null}
+                              )}
 
-                  {msg.confirmations?.length ? (
-                    <div className="mt-3 rounded-lg border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-xs text-status-warning">
-                      {msg.confirmations.map((confirmation) => (
-                        <div key={confirmation.id}>{confirmation.prompt}</div>
-                      ))}
-                    </div>
-                  ) : null}
+                              {draft.evidenceLinks?.length ? (
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                  {draft.evidenceLinks.map((link) => (
+                                    <Link
+                                      key={`${link.label}-${link.url}`}
+                                      href={link.url}
+                                      className="inline-flex items-center gap-1.5 rounded-full border border-status-success/30 bg-status-success/10 px-3 py-1 text-[11px] text-status-success hover:bg-status-success/20"
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      {link.label}
+                                    </Link>
+                                  ))}
+                                </div>
+                              ) : null}
 
-                  {msg.evidenceLinks?.length ? (
-                    <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
-                      {msg.evidenceLinks.map((link) => (
-                        <Link
-                          key={`${link.label}-${link.url}`}
-                          href={link.url}
-                          className="rounded-full border border-border bg-card px-3 py-1 text-muted-foreground hover:border-status-success hover:text-status-success"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
+                              {draft.requiresConfirmation && (
+                                <div className="mt-3 flex flex-wrap items-center gap-2">
+                                  {EXECUTABLE_ACTIONS.has(draft.actionType) ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => handleConfirmDraft(draft)}
+                                      disabled={
+                                        confirmPartnerMutation.isPending &&
+                                        confirmingDraftId === draft.id
+                                      }
+                                      className="rounded-full bg-status-success px-3 py-1 text-[11px] font-semibold text-white shadow-sm transition hover:bg-status-success/80 disabled:opacity-60"
+                                    >
+                                      {confirmingDraftId === draft.id
+                                        ? "Confirming..."
+                                        : "Confirm & run"}
+                                    </button>
+                                  ) : (
+                                    <span className="text-[11px] text-muted-foreground">
+                                      Review this draft in the linked screen to continue.
+                                    </span>
+                                  )}
+                                  <span className="text-[11px] text-muted-foreground">
+                                    Runs with your permissions.
+                                  </span>
+                                </div>
+                              )}
+
+                              {(draft.sensitivity || detailParams.length > 0) && (
+                                <details className="mt-3 text-[11px] text-muted-foreground">
+                                  <summary className="cursor-pointer select-none">
+                                    Technical details
+                                  </summary>
+                                  <div className="mt-2 space-y-1">
+                                    <div className="flex items-center justify-between gap-4">
+                                      <span>Action</span>
+                                      <span className="text-foreground">{draft.action}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-4">
+                                      <span>Resource</span>
+                                      <span className="text-foreground">{draft.resource}</span>
+                                    </div>
+                                    {draft.sensitivity && (
+                                      <div className="flex items-center justify-between gap-4">
+                                        <span>Sensitivity</span>
+                                        <span className="text-foreground">{draft.sensitivity}</span>
+                                      </div>
+                                    )}
+                                    {detailParams.length > 0 && (
+                                      <div className="mt-2 space-y-1">
+                                        {detailParams.map(([key, value]) => (
+                                          <div
+                                            key={key}
+                                            className="flex items-center justify-between gap-4"
+                                          >
+                                            <span>{key}</span>
+                                            <span className="text-foreground">
+                                              {formatValue(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                </details>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+
+                    {msg.confirmations?.length ? (
+                      <div className="mt-3 rounded-lg border border-status-warning/30 bg-status-warning/15 px-3 py-2 text-xs text-status-warning">
+                        {msg.confirmations.map((confirmation) => (
+                          <div key={confirmation.id}>{confirmation.prompt}</div>
+                        ))}
+                      </div>
+                    ) : null}
+
+                    {msg.evidenceLinks?.length ? (
+                      <div className="mt-2 flex flex-wrap gap-2 text-[11px]">
+                        {msg.evidenceLinks.map((link) => (
+                          <Link
+                            key={`${link.label}-${link.url}`}
+                            href={link.url}
+                            className="rounded-full border border-border bg-card px-3 py-1 text-muted-foreground hover:border-status-success hover:text-status-success"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
+              ))}
 
-          {isPending && <ChatMessage id="typing" role="assistant" content="" isLoading={true} accent={accent} />}
+          {isPending && (
+            <ChatMessage id="typing" role="assistant" content="" isLoading={true} accent={accent} />
+          )}
           <div ref={messagesEndRef} />
         </div>
       )}
@@ -1477,7 +1558,9 @@ export function SupportChatWidget() {
             onClick={handleSend}
             disabled={!activeInput.trim() || isPending}
             className={`p-2 text-white rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-              isSupportMode ? "bg-status-info hover:bg-status-info/80" : "bg-status-success hover:bg-status-success/80"
+              isSupportMode
+                ? "bg-status-info hover:bg-status-info/80"
+                : "bg-status-success hover:bg-status-success/80"
             }`}
           >
             <Send className="w-5 h-5" />

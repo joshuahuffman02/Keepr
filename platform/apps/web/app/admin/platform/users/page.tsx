@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -25,7 +31,7 @@ const PLATFORM_ROLE_OPTIONS = [
   { value: "support_lead", label: "Support Lead" },
   { value: "regional_support", label: "Regional Support" },
   { value: "ops_engineer", label: "Ops Engineer" },
-  { value: "platform_admin", label: "Platform Admin" }
+  { value: "platform_admin", label: "Platform Admin" },
 ];
 
 export default function PlatformUsersPage() {
@@ -41,11 +47,16 @@ export default function PlatformUsersPage() {
   const canManage = !!platformRole;
 
   const filteredStaff = useMemo(() => {
-    const byRegion = regionFilter === "all" ? staff : staff.filter((s) => (s.platformRegion || s.region) === regionFilter);
+    const byRegion =
+      regionFilter === "all"
+        ? staff
+        : staff.filter((s) => (s.platformRegion || s.region) === regionFilter);
     if (!search.trim()) return byRegion;
     const q = search.toLowerCase();
     return byRegion.filter(
-      (s) => s.email.toLowerCase().includes(q) || `${s.firstName ?? ""} ${s.lastName ?? ""}`.toLowerCase().includes(q)
+      (s) =>
+        s.email.toLowerCase().includes(q) ||
+        `${s.firstName ?? ""} ${s.lastName ?? ""}`.toLowerCase().includes(q),
     );
   }, [regionFilter, search, staff]);
 
@@ -54,7 +65,9 @@ export default function PlatformUsersPage() {
     try {
       const base = process.env.NEXT_PUBLIC_API_BASE || "";
       const params = regionFilter !== "all" ? `?region=${encodeURIComponent(regionFilter)}` : "";
-      const res = await fetch(`${base}/support/reports/staff/directory${params}`, { credentials: "include" });
+      const res = await fetch(`${base}/support/reports/staff/directory${params}`, {
+        credentials: "include",
+      });
       if (!res.ok) throw new Error(`Failed to load staff (${res.status})`);
       const data: Staff[] = await res.json();
       setStaff(data.filter((s) => s.platformRole || s.platformActive));
@@ -84,8 +97,8 @@ export default function PlatformUsersPage() {
           region: target.region ?? null,
           platformRole: target.platformRole ?? null,
           platformRegion: target.platformRegion ?? null,
-          platformActive: String(target.platformActive !== false)
-        })
+          platformActive: String(target.platformActive !== false),
+        }),
       });
       if (!res.ok) throw new Error(`Update failed (${res.status})`);
       const updated: Staff = await res.json();
@@ -119,10 +132,13 @@ export default function PlatformUsersPage() {
           <div>
             <div className="text-xs uppercase font-semibold text-muted-foreground">Platform</div>
             <h1 className="text-2xl font-bold text-foreground">Platform users</h1>
-            <p className="text-sm text-muted-foreground">Internal staff for support and operations. Hidden from campground staff.</p>
+            <p className="text-sm text-muted-foreground">
+              Internal staff for support and operations. Hidden from campground staff.
+            </p>
             {whoamiError && (
               <p className="text-xs text-rose-600 mt-1">
-                Failed to load identity: {whoamiError instanceof Error ? whoamiError.message : "Unknown error"}
+                Failed to load identity:{" "}
+                {whoamiError instanceof Error ? whoamiError.message : "Unknown error"}
               </p>
             )}
           </div>
@@ -145,7 +161,12 @@ export default function PlatformUsersPage() {
               placeholder="Search by name or email"
               className="h-8 w-56"
             />
-            <Button size="sm" variant="outline" onClick={() => void loadStaff()} disabled={loading || whoamiLoading}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => void loadStaff()}
+              disabled={loading || whoamiLoading}
+            >
               Refresh
             </Button>
           </div>
@@ -155,7 +176,9 @@ export default function PlatformUsersPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs uppercase font-semibold text-muted-foreground">Directory</div>
-              <p className="text-sm text-muted-foreground">Assign platform role, region, and active status.</p>
+              <p className="text-sm text-muted-foreground">
+                Assign platform role, region, and active status.
+              </p>
             </div>
             {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
           </div>
@@ -167,7 +190,9 @@ export default function PlatformUsersPage() {
                   <div>
                     <div className="text-sm font-semibold text-foreground">{s.email}</div>
                     <div className="text-xs text-muted-foreground">
-                      {(s.firstName || s.lastName) ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim() : "—"}
+                      {s.firstName || s.lastName
+                        ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim()
+                        : "—"}
                     </div>
                     <div className="text-[11px] text-muted-foreground space-x-2">
                       <span>Region: {s.platformRegion ?? s.region ?? "n/a"}</span>
@@ -178,7 +203,13 @@ export default function PlatformUsersPage() {
                     <Select
                       value={s.platformRole ?? "unassigned"}
                       onValueChange={(value) =>
-                        setStaff((prev) => prev.map((p) => (p.id === s.id ? { ...p, platformRole: value === "unassigned" ? null : value } : p)))
+                        setStaff((prev) =>
+                          prev.map((p) =>
+                            p.id === s.id
+                              ? { ...p, platformRole: value === "unassigned" ? null : value }
+                              : p,
+                          ),
+                        )
                       }
                     >
                       <SelectTrigger className="w-44 h-8">
@@ -198,19 +229,33 @@ export default function PlatformUsersPage() {
                       placeholder="Region"
                       value={s.platformRegion ?? ""}
                       onChange={(e) =>
-                        setStaff((prev) => prev.map((p) => (p.id === s.id ? { ...p, platformRegion: e.target.value || null } : p)))
+                        setStaff((prev) =>
+                          prev.map((p) =>
+                            p.id === s.id ? { ...p, platformRegion: e.target.value || null } : p,
+                          ),
+                        )
                       }
                     />
                     <Badge
                       variant={s.platformActive === false ? "destructive" : "secondary"}
                       className="cursor-pointer"
                       onClick={() =>
-                        setStaff((prev) => prev.map((p) => (p.id === s.id ? { ...p, platformActive: p.platformActive === false ? true : false } : p)))
+                        setStaff((prev) =>
+                          prev.map((p) =>
+                            p.id === s.id
+                              ? { ...p, platformActive: p.platformActive === false ? true : false }
+                              : p,
+                          ),
+                        )
                       }
                     >
                       {s.platformActive === false ? "Inactive" : "Active"}
                     </Badge>
-                    <Button size="sm" onClick={() => void saveStaff(s)} disabled={savingId === s.id || !canManage}>
+                    <Button
+                      size="sm"
+                      onClick={() => void saveStaff(s)}
+                      disabled={savingId === s.id || !canManage}
+                    >
                       {savingId === s.id ? "Saving…" : "Save"}
                     </Button>
                   </div>

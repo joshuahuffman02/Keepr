@@ -52,10 +52,7 @@ interface SocialProofStripProps {
   variant?: "light" | "tint" | "warm";
 }
 
-export function SocialProofStrip({
-  className,
-  variant = "light"
-}: SocialProofStripProps) {
+export function SocialProofStrip({ className, variant = "light" }: SocialProofStripProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotionSafe();
@@ -143,7 +140,8 @@ export function SocialProofStrip({
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <Icon className={cn("h-4 w-4 md:h-5 md:w-5", stat.color)} />
                   <span className="text-xl md:text-3xl font-bold text-slate-900">
-                    {stat.value.toLocaleString()}{stat.suffix}
+                    {stat.value.toLocaleString()}
+                    {stat.suffix}
                   </span>
                 </div>
                 <p className="text-xs md:text-sm text-slate-500">{stat.label}</p>
@@ -169,7 +167,12 @@ export function SocialProofInline({ className }: { className?: string }) {
   const statesCount = stats?.campgrounds?.byState?.length ?? 18;
 
   return (
-    <div className={cn("flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm", className)}>
+    <div
+      className={cn(
+        "flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm",
+        className,
+      )}
+    >
       <span className="text-white/90">
         <strong className="text-white">{campgroundCount}+</strong> campgrounds
       </span>

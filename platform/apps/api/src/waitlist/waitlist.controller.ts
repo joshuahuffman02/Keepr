@@ -1,132 +1,140 @@
-import { Controller, Get, Post, Patch, Body, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
-import { WaitlistService } from './waitlist.service';
-import { CreateWaitlistEntryDto } from '@keepr/shared';
-import { JwtAuthGuard } from '../auth/guards';
-import { ScopeGuard } from '../auth/guards/scope.guard';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Body,
+  Param,
+  Delete,
+  Query,
+  UseGuards,
+  Req,
+} from "@nestjs/common";
+import { WaitlistService } from "./waitlist.service";
+import { CreateWaitlistEntryDto } from "@keepr/shared";
+import { JwtAuthGuard } from "../auth/guards";
+import { ScopeGuard } from "../auth/guards/scope.guard";
 import type { Request } from "express";
 
 const toHeaderValue = (value: string | string[] | undefined): string | undefined =>
-    Array.isArray(value) ? value[0] : value;
+  Array.isArray(value) ? value[0] : value;
 
 interface CreateStaffWaitlistDto {
-    campgroundId: string;
-    type: 'regular' | 'seasonal';
-    contactName: string;
-    contactEmail?: string;
-    contactPhone?: string;
-    notes?: string;
-    siteId?: string;
-    siteTypeId?: string;
-    arrivalDate?: string;
-    departureDate?: string;
-    priority?: number;
-    autoOffer?: boolean;
-    maxPrice?: number;
-    flexibleDates?: boolean;
-    flexibleDays?: number;
+  campgroundId: string;
+  type: "regular" | "seasonal";
+  contactName: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  notes?: string;
+  siteId?: string;
+  siteTypeId?: string;
+  arrivalDate?: string;
+  departureDate?: string;
+  priority?: number;
+  autoOffer?: boolean;
+  maxPrice?: number;
+  flexibleDates?: boolean;
+  flexibleDays?: number;
 }
 
 interface UpdateWaitlistDto {
-    contactName?: string;
-    contactEmail?: string;
-    contactPhone?: string;
-    notes?: string;
-    siteId?: string;
-    siteTypeId?: string;
-    arrivalDate?: string;
-    departureDate?: string;
-    priority?: number;
-    autoOffer?: boolean;
-    maxPrice?: number;
-    flexibleDates?: boolean;
-    flexibleDays?: number;
-    status?: 'waiting' | 'offered' | 'accepted' | 'expired' | 'cancelled';
+  contactName?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  notes?: string;
+  siteId?: string;
+  siteTypeId?: string;
+  arrivalDate?: string;
+  departureDate?: string;
+  priority?: number;
+  autoOffer?: boolean;
+  maxPrice?: number;
+  flexibleDates?: boolean;
+  flexibleDays?: number;
+  status?: "waiting" | "offered" | "accepted" | "expired" | "cancelled";
 }
 
 @UseGuards(JwtAuthGuard, ScopeGuard)
-@Controller('campgrounds/:campgroundId/waitlist')
+@Controller("campgrounds/:campgroundId/waitlist")
 export class WaitlistController {
-    constructor(private readonly waitlistService: WaitlistService) { }
+  constructor(private readonly waitlistService: WaitlistService) {}
 
-    @Post()
-    create(
-        @Param('campgroundId') campgroundId: string,
-        @Body() createWaitlistDto: CreateWaitlistEntryDto,
-        @Req() req: Request
-    ) {
-        const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
-        const sequence =
-            toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
-        const actor = { campgroundId };
-        // Ensure campgroundId from path is used
-        return this.waitlistService.create(
-            { ...createWaitlistDto, campgroundId },
-            idempotencyKey,
-            sequence,
-            actor
-        );
-    }
+  @Post()
+  create(
+    @Param("campgroundId") campgroundId: string,
+    @Body() createWaitlistDto: CreateWaitlistEntryDto,
+    @Req() req: Request,
+  ) {
+    const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
+    const sequence =
+      toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
+    const actor = { campgroundId };
+    // Ensure campgroundId from path is used
+    return this.waitlistService.create(
+      { ...createWaitlistDto, campgroundId },
+      idempotencyKey,
+      sequence,
+      actor,
+    );
+  }
 
-    @Post('staff')
-    createStaffEntry(
-        @Param('campgroundId') campgroundId: string,
-        @Body() dto: CreateStaffWaitlistDto,
-        @Req() req: Request
-    ) {
-        const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
-        const sequence =
-            toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
-        const actor = { campgroundId };
-        // Ensure campgroundId from path is used
-        return this.waitlistService.createStaffEntry(
-            { ...dto, campgroundId },
-            idempotencyKey,
-            sequence,
-            actor
-        );
-    }
+  @Post("staff")
+  createStaffEntry(
+    @Param("campgroundId") campgroundId: string,
+    @Body() dto: CreateStaffWaitlistDto,
+    @Req() req: Request,
+  ) {
+    const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
+    const sequence =
+      toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
+    const actor = { campgroundId };
+    // Ensure campgroundId from path is used
+    return this.waitlistService.createStaffEntry(
+      { ...dto, campgroundId },
+      idempotencyKey,
+      sequence,
+      actor,
+    );
+  }
 
-    @Post(':id/accept')
-    accept(
-        @Param('campgroundId') campgroundId: string,
-        @Param('id') id: string,
-        @Req() req: Request
-    ) {
-        const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
-        const sequence =
-            toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
-        const actor = { campgroundId };
-        return this.waitlistService.accept(id, idempotencyKey, sequence, actor);
-    }
+  @Post(":id/accept")
+  accept(
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
+    @Req() req: Request,
+  ) {
+    const idempotencyKey = toHeaderValue(req.headers["idempotency-key"]);
+    const sequence =
+      toHeaderValue(req.headers["x-client-seq"]) ?? toHeaderValue(req.headers["client-seq"]);
+    const actor = { campgroundId };
+    return this.waitlistService.accept(id, idempotencyKey, sequence, actor);
+  }
 
-    @Get()
-    findAll(
-        @Param('campgroundId') campgroundId: string,
-        @Query('type') type?: string,
-        @Query('limit') limit?: string,
-        @Query('offset') offset?: string,
-    ) {
-        return this.waitlistService.findAll(campgroundId, {
-            type,
-            limit: limit ? parseInt(limit, 10) : undefined,
-            offset: offset ? parseInt(offset, 10) : undefined
-        });
-    }
+  @Get()
+  findAll(
+    @Param("campgroundId") campgroundId: string,
+    @Query("type") type?: string,
+    @Query("limit") limit?: string,
+    @Query("offset") offset?: string,
+  ) {
+    return this.waitlistService.findAll(campgroundId, {
+      type,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      offset: offset ? parseInt(offset, 10) : undefined,
+    });
+  }
 
-    @Patch(':id')
-    update(
-        @Param('campgroundId') campgroundId: string,
-        @Param('id') id: string,
-        @Body() dto: UpdateWaitlistDto
-    ) {
-        return this.waitlistService.updateEntry(id, campgroundId, dto);
-    }
+  @Patch(":id")
+  update(
+    @Param("campgroundId") campgroundId: string,
+    @Param("id") id: string,
+    @Body() dto: UpdateWaitlistDto,
+  ) {
+    return this.waitlistService.updateEntry(id, campgroundId, dto);
+  }
 
-    @Delete(':id')
-    remove(
-        @Param('campgroundId') campgroundId: string,
-        @Param('id') id: string
-    ) {
-        return this.waitlistService.remove(id, campgroundId);
-    }
+  @Delete(":id")
+  remove(@Param("campgroundId") campgroundId: string, @Param("id") id: string) {
+    return this.waitlistService.remove(id, campgroundId);
+  }
 }

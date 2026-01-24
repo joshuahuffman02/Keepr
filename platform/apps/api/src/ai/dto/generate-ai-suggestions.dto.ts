@@ -10,4 +10,3 @@ export class GenerateAiSuggestionsDto {
   @MaxLength(200)
   focus?: string;
 }
-

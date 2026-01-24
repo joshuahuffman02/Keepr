@@ -11,32 +11,38 @@ const getErrorMessage = (error: unknown): string =>
 @Injectable()
 export class PaymentsScheduler {
   private readonly logger = new Logger(PaymentsScheduler.name);
-  private readonly capabilitiesTtlMs = Number(process.env.STRIPE_CAPABILITIES_TTL_MS ?? 6 * 60 * 60 * 1000); // default 6h
+  private readonly capabilitiesTtlMs = Number(
+    process.env.STRIPE_CAPABILITIES_TTL_MS ?? 6 * 60 * 60 * 1000,
+  ); // default 6h
   constructor(
     private readonly prisma: PrismaService,
     private readonly recon: PaymentsReconciliationService,
     private readonly queue: JobQueueService,
-    private readonly stripe: StripeService
-  ) { }
+    private readonly stripe: StripeService,
+  ) {}
 
   @Cron("0 * * * *") // hourly
   async reconcilePayouts() {
     const accounts = await this.prisma.campground.findMany({
       where: { stripeAccountId: { not: null } },
-      select: { stripeAccountId: true }
+      select: { stripeAccountId: true },
     });
     await Promise.all(
       accounts.map((cg) => {
         const stripeAccountId = cg.stripeAccountId;
         if (!stripeAccountId) return Promise.resolve();
-        return this.queue.enqueue(
-          "payout-recon",
-          () => this.recon.reconcileRecentPayouts(stripeAccountId),
-          { jobName: `recon-${stripeAccountId}`, timeoutMs: 30000, concurrency: 2 }
-        ).catch((err) => {
-          this.logger.warn(`Recon failed for account ${stripeAccountId}: ${err instanceof Error ? err.message : err}`);
-        });
-      })
+        return this.queue
+          .enqueue("payout-recon", () => this.recon.reconcileRecentPayouts(stripeAccountId), {
+            jobName: `recon-${stripeAccountId}`,
+            timeoutMs: 30000,
+            concurrency: 2,
+          })
+          .catch((err) => {
+            this.logger.warn(
+              `Recon failed for account ${stripeAccountId}: ${err instanceof Error ? err.message : err}`,
+            );
+          });
+      }),
     );
   }
 
@@ -48,13 +54,13 @@ export class PaymentsScheduler {
     const disputes = await this.prisma.dispute.findMany({
       where: {
         status: { notIn: ["won", "lost", "charge_refunded"] },
-        evidenceDueBy: { lte: cutoff, gte: now }
+        evidenceDueBy: { lte: cutoff, gte: now },
       },
-      select: { stripeDisputeId: true, campgroundId: true, evidenceDueBy: true }
+      select: { stripeDisputeId: true, campgroundId: true, evidenceDueBy: true },
     });
     for (const d of disputes) {
       await this.recon.sendAlert(
-        `Dispute due soon: ${d.stripeDisputeId} camp ${d.campgroundId} due ${d.evidenceDueBy?.toISOString?.() ?? ""}`
+        `Dispute due soon: ${d.stripeDisputeId} camp ${d.campgroundId} due ${d.evidenceDueBy?.toISOString?.() ?? ""}`,
       );
     }
   }
@@ -72,10 +78,10 @@ export class PaymentsScheduler {
         stripeAccountId: { not: null },
         OR: [
           { stripeCapabilitiesFetchedAt: null },
-          { stripeCapabilitiesFetchedAt: { lt: cutoff } }
-        ]
+          { stripeCapabilitiesFetchedAt: { lt: cutoff } },
+        ],
       },
-      select: { id: true, stripeAccountId: true }
+      select: { id: true, stripeAccountId: true },
     });
 
     for (const cg of campgrounds) {
@@ -88,8 +94,8 @@ export class PaymentsScheduler {
           where: { id: cg.id },
           data: {
             stripeCapabilities: capabilities,
-            stripeCapabilitiesFetchedAt: new Date()
-          }
+            stripeCapabilitiesFetchedAt: new Date(),
+          },
         });
       } catch (err: unknown) {
         this.logger.warn(`Capability refresh failed for ${cg.id}: ${getErrorMessage(err)}`);

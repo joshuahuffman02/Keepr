@@ -71,9 +71,7 @@ export function Integrations({
 
   const toggleInterest = (id: string) => {
     const current = data.interestedIn || [];
-    const updated = current.includes(id)
-      ? current.filter((i) => i !== id)
-      : [...current, id];
+    const updated = current.includes(id) ? current.filter((i) => i !== id) : [...current, id];
     onChange({ ...data, interestedIn: updated });
   };
 
@@ -115,12 +113,8 @@ export function Integrations({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/20 mb-4">
             <Puzzle className="w-8 h-8 text-purple-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Connect Your Tools
-          </h2>
-          <p className="text-slate-400">
-            Link with your favorite business software
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Connect Your Tools</h2>
+          <p className="text-slate-400">Link with your favorite business software</p>
         </motion.div>
 
         {/* Set Up Now Section */}
@@ -130,9 +124,7 @@ export function Integrations({
           transition={{ delay: 0.15 }}
           className="space-y-4"
         >
-          <h3 className="text-sm font-medium text-slate-300 uppercase tracking-wide">
-            Set Up Now
-          </h3>
+          <h3 className="text-sm font-medium text-slate-300 uppercase tracking-wide">Set Up Now</h3>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {/* QuickBooks Card */}
@@ -141,32 +133,26 @@ export function Integrations({
                 "relative p-5 rounded-xl border transition-all",
                 data.quickbooks?.connected
                   ? "bg-emerald-500/10 border-emerald-500/50"
-                  : "bg-slate-800/30 border-slate-700 hover:border-slate-600"
+                  : "bg-slate-800/30 border-slate-700 hover:border-slate-600",
               )}
             >
               <div className="flex items-start gap-4">
                 <div
                   className={cn(
                     "w-12 h-12 rounded-xl flex items-center justify-center",
-                    data.quickbooks?.connected
-                      ? "bg-emerald-500/20"
-                      : "bg-green-500/20"
+                    data.quickbooks?.connected ? "bg-emerald-500/20" : "bg-green-500/20",
                   )}
                 >
                   <BookOpen
                     className={cn(
                       "w-6 h-6",
-                      data.quickbooks?.connected
-                        ? "text-emerald-400"
-                        : "text-green-400"
+                      data.quickbooks?.connected ? "text-emerald-400" : "text-green-400",
                     )}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-white">QuickBooks</h4>
-                  <p className="text-sm text-slate-400 mt-1">
-                    Sync invoices, payments & reports
-                  </p>
+                  <p className="text-sm text-slate-400 mt-1">Sync invoices, payments & reports</p>
                 </div>
               </div>
 
@@ -203,32 +189,26 @@ export function Integrations({
                 "relative p-5 rounded-xl border transition-all",
                 data.gateAccess?.connected
                   ? "bg-emerald-500/10 border-emerald-500/50"
-                  : "bg-slate-800/30 border-slate-700 hover:border-slate-600"
+                  : "bg-slate-800/30 border-slate-700 hover:border-slate-600",
               )}
             >
               <div className="flex items-start gap-4">
                 <div
                   className={cn(
                     "w-12 h-12 rounded-xl flex items-center justify-center",
-                    data.gateAccess?.connected
-                      ? "bg-emerald-500/20"
-                      : "bg-blue-500/20"
+                    data.gateAccess?.connected ? "bg-emerald-500/20" : "bg-blue-500/20",
                   )}
                 >
                   <DoorOpen
                     className={cn(
                       "w-6 h-6",
-                      data.gateAccess?.connected
-                        ? "text-emerald-400"
-                        : "text-blue-400"
+                      data.gateAccess?.connected ? "text-emerald-400" : "text-blue-400",
                     )}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-white">Gate Access</h4>
-                  <p className="text-sm text-slate-400 mt-1">
-                    Auto-generate gate codes for guests
-                  </p>
+                  <p className="text-sm text-slate-400 mt-1">Auto-generate gate codes for guests</p>
                 </div>
               </div>
 
@@ -284,15 +264,13 @@ export function Integrations({
                     "flex items-center gap-4 p-4 rounded-xl border text-left transition-all",
                     isSelected
                       ? "bg-purple-500/10 border-purple-500/50"
-                      : "bg-slate-800/30 border-slate-700 hover:border-slate-600"
+                      : "bg-slate-800/30 border-slate-700 hover:border-slate-600",
                   )}
                 >
                   <div
                     className={cn(
                       "w-5 h-5 rounded border-2 flex items-center justify-center transition-all",
-                      isSelected
-                        ? "bg-purple-500 border-purple-500"
-                        : "border-slate-600"
+                      isSelected ? "bg-purple-500 border-purple-500" : "border-slate-600",
                     )}
                   >
                     {isSelected && <Check className="w-3 h-3 text-white" />}
@@ -300,28 +278,18 @@ export function Integrations({
                   <div
                     className={cn(
                       "w-10 h-10 rounded-lg flex items-center justify-center",
-                      isSelected ? "bg-purple-500/20" : "bg-slate-700/50"
+                      isSelected ? "bg-purple-500/20" : "bg-slate-700/50",
                     )}
                   >
                     <Icon
-                      className={cn(
-                        "w-5 h-5",
-                        isSelected ? "text-purple-400" : "text-slate-400"
-                      )}
+                      className={cn("w-5 h-5", isSelected ? "text-purple-400" : "text-slate-400")}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p
-                      className={cn(
-                        "font-medium",
-                        isSelected ? "text-white" : "text-slate-300"
-                      )}
-                    >
+                    <p className={cn("font-medium", isSelected ? "text-white" : "text-slate-300")}>
                       {integration.label}
                     </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {integration.description}
-                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">{integration.description}</p>
                   </div>
                 </button>
               );
@@ -338,10 +306,8 @@ export function Integrations({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              All integrations are optional.
-            </span>{" "}
-            You can connect any of these anytime from Settings {">"} Integrations.
+            <span className="text-slate-300 font-medium">All integrations are optional.</span> You
+            can connect any of these anytime from Settings {">"} Integrations.
           </div>
         </motion.div>
 
@@ -357,7 +323,7 @@ export function Integrations({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             Continue to Review

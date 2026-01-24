@@ -23,6 +23,7 @@ The good news: pricing isn't just a guess. You can use data, strategy, and marke
 Before setting prices, understand your minimum:
 
 **Fixed costs (don't change with occupancy):**
+
 - Property taxes
 - Insurance
 - Loan payments
@@ -31,12 +32,14 @@ Before setting prices, understand your minimum:
 - Maintenance reserve
 
 **Variable costs (increase with bookings):**
+
 - Utilities per site
 - Cleaning/turnover
 - Materials/supplies
 - Credit card processing
 
 **Calculate your break-even:**
+
 ```
 Example:
 Annual fixed costs: $200,000
@@ -59,6 +62,7 @@ $200,000 / (200 days × 50 sites × ($50 - $8)) = 47.6%
 Research campgrounds within your competitive radius:
 
 **What to collect:**
+
 - Nightly rates by site type
 - Seasonal pricing variations
 - Weekend vs. weekday pricing
@@ -67,6 +71,7 @@ Research campgrounds within your competitive radius:
 - Occupancy indicators (sold out, availability)
 
 **Where to look:**
+
 - Campground websites
 - Google Business listings
 - Campground directories (KOA, Good Sam, Hipcamp)
@@ -76,11 +81,11 @@ Research campgrounds within your competitive radius:
 
 Decide where you want to sit relative to competitors:
 
-| Position | When It Makes Sense |
-|----------|-------------------|
-| Premium (15-30% above) | Superior amenities, location, or experience |
-| Market rate | Comparable offerings |
-| Value (10-20% below) | Fewer amenities, building momentum, newer property |
+| Position               | When It Makes Sense                                |
+| ---------------------- | -------------------------------------------------- |
+| Premium (15-30% above) | Superior amenities, location, or experience        |
+| Market rate            | Comparable offerings                               |
+| Value (10-20% below)   | Fewer amenities, building momentum, newer property |
 
 ---
 
@@ -92,16 +97,16 @@ Not all sites are equal. Price them accordingly:
 
 **Typical differentials:**
 
-| Site Type | Base | Premium |
-|-----------|------|---------|
-| Basic tent (no hookups) | $25-35 | — |
-| Electric only | $35-45 | — |
-| Water/Electric | $40-55 | — |
-| Full hookup (W/E/S) | $50-70 | — |
-| Pull-through | Base + $5-10 | — |
-| Premium location (waterfront, view, level) | Site + $10-25 | — |
-| 50-amp service | Site + $5 | — |
-| Cabins/glamping | $100-250 | — |
+| Site Type                                  | Base          | Premium |
+| ------------------------------------------ | ------------- | ------- |
+| Basic tent (no hookups)                    | $25-35        | —       |
+| Electric only                              | $35-45        | —       |
+| Water/Electric                             | $40-55        | —       |
+| Full hookup (W/E/S)                        | $50-70        | —       |
+| Pull-through                               | Base + $5-10  | —       |
+| Premium location (waterfront, view, level) | Site + $10-25 | —       |
+| 50-amp service                             | Site + $5     | —       |
+| Cabins/glamping                            | $100-250      | —       |
 
 ### The "Good/Better/Best" Approach
 
@@ -121,11 +126,11 @@ This captures different guest segments and creates upsell opportunities.
 
 Most campgrounds should have at least three rate tiers:
 
-| Season | Rate Approach |
-|--------|--------------|
-| Peak (summer, holidays) | Maximum rates |
+| Season                  | Rate Approach     |
+| ----------------------- | ----------------- |
+| Peak (summer, holidays) | Maximum rates     |
 | Shoulder (spring, fall) | 10-20% below peak |
-| Off-season | 20-40% below peak |
+| Off-season              | 20-40% below peak |
 
 ### Day-of-Week Pricing
 
@@ -153,6 +158,7 @@ For sophisticated pricing:
 Don't just match competitors—justify your rates with value:
 
 **Amenities that support higher pricing:**
+
 - Pool or lake access
 - Full hookups
 - WiFi quality
@@ -206,6 +212,7 @@ When unsure, test:
 ### The "Goldilocks" Indicator
 
 **Ideal state:**
+
 - Healthy occupancy (70-85% peak season)
 - Some sites available for last-minute bookings
 - Guests comment on value (not "cheap")
@@ -321,4 +328,4 @@ Start with solid research, set thoughtful initial rates, and adjust based on res
 
 ---
 
-*Keepr makes pricing management easy with seasonal rate automation, site-type pricing, and revenue reporting. [Optimize your pricing at campreserv.com](https://campreserv.com)*
+_Keepr makes pricing management easy with seasonal rate automation, site-type pricing, and revenue reporting. [Optimize your pricing at campreserv.com](https://campreserv.com)_

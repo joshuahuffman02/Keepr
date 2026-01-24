@@ -40,7 +40,7 @@ export class ApprovalsController {
       metadata?: Record<string, unknown>;
       campgroundId?: string;
       requestedBy?: string;
-    }
+    },
   ) {
     return this.approvals.create({
       ...body,
@@ -54,10 +54,7 @@ export class ApprovalsController {
   }
 
   @Post(":id/reject")
-  async reject(
-    @Param("id") id: string,
-    @Body() body: { approver: string; reason?: string }
-  ) {
+  async reject(@Param("id") id: string, @Body() body: { approver: string; reason?: string }) {
     return this.approvals.reject(id, body.approver, body.reason);
   }
 
@@ -75,7 +72,7 @@ export class ApprovalsController {
       approverRoles?: UserRole[];
       campgroundId?: string;
       createdById?: string;
-    }
+    },
   ) {
     return this.approvals.createPolicy(body);
   }
@@ -93,7 +90,7 @@ export class ApprovalsController {
       description?: string | null;
       approverRoles?: UserRole[];
       isActive?: boolean;
-    }
+    },
   ) {
     return this.approvals.updatePolicy(id, body);
   }

@@ -9,8 +9,8 @@ import {
   Min,
   Max,
   ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+} from "class-validator";
+import { Type } from "class-transformer";
 import {
   OpTaskCategory,
   OpTaskState,
@@ -18,7 +18,7 @@ import {
   OpSlaStatus,
   OpTriggerEvent,
   OpRecurrencePattern,
-} from '@prisma/client';
+} from "@prisma/client";
 
 // ============================================================================
 // TASK DTOs

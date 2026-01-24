@@ -4,7 +4,7 @@ import { randomBytes } from "crypto";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -16,8 +16,8 @@ async function main() {
     create: {
       id: "sandbox-org",
       name: "Sandbox Org",
-      subscriptionTier: "starter"
-    }
+      subscriptionTier: "starter",
+    },
   });
 
   const campground = await prisma.campground.upsert({
@@ -31,8 +31,8 @@ async function main() {
       city: "Demo",
       state: "CA",
       country: "USA",
-      timezone: "America/Los_Angeles"
-    }
+      timezone: "America/Los_Angeles",
+    },
   });
 
   const site = await prisma.site.upsert({
@@ -45,8 +45,8 @@ async function main() {
       name: "Pull-through A1",
       siteType: "rv",
       maxOccupancy: 8,
-      rigMaxLength: 40
-    }
+      rigMaxLength: 40,
+    },
   });
 
   const guest = await prisma.guest.upsert({
@@ -57,8 +57,8 @@ async function main() {
       primaryFirstName: "Demo",
       primaryLastName: "Guest",
       email: "sandbox-guest@keepr.demo",
-      phone: "+15555550123"
-    }
+      phone: "+15555550123",
+    },
   });
 
   await prisma.reservation.upsert({
@@ -76,8 +76,8 @@ async function main() {
       status: "confirmed",
       totalAmount: 20000,
       paidAmount: 5000,
-      balanceAmount: 15000
-    }
+      balanceAmount: 15000,
+    },
   });
 
   const clientSecret = randomBytes(12).toString("hex");
@@ -87,15 +87,33 @@ async function main() {
       campgroundId: campground.id,
       name: "Sandbox Demo Client",
       clientSecretHash: await bcrypt.hash(clientSecret, 12),
-      scopes: ["reservations:read", "reservations:write", "guests:read", "guests:write", "sites:read", "sites:write", "webhooks:read", "webhooks:write"]
+      scopes: [
+        "reservations:read",
+        "reservations:write",
+        "guests:read",
+        "guests:write",
+        "sites:read",
+        "sites:write",
+        "webhooks:read",
+        "webhooks:write",
+      ],
     },
     create: {
       campgroundId: campground.id,
       name: "Sandbox Demo Client",
       clientId: "sandbox-client",
       clientSecretHash: await bcrypt.hash(clientSecret, 12),
-      scopes: ["reservations:read", "reservations:write", "guests:read", "guests:write", "sites:read", "sites:write", "webhooks:read", "webhooks:write"]
-    }
+      scopes: [
+        "reservations:read",
+        "reservations:write",
+        "guests:read",
+        "guests:write",
+        "sites:read",
+        "sites:write",
+        "webhooks:read",
+        "webhooks:write",
+      ],
+    },
   });
 
   console.log("Sandbox seeded");

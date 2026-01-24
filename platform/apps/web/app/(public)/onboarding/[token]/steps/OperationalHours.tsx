@@ -103,31 +103,23 @@ export function OperationalHours({
 }: OperationalHoursProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  const [checkInTime, setCheckInTime] = useState(
-    initialData?.checkInTime || "15:00"
-  );
-  const [checkOutTime, setCheckOutTime] = useState(
-    initialData?.checkOutTime || "11:00"
-  );
+  const [checkInTime, setCheckInTime] = useState(initialData?.checkInTime || "15:00");
+  const [checkOutTime, setCheckOutTime] = useState(initialData?.checkOutTime || "11:00");
 
   const [quietHoursEnabled, setQuietHoursEnabled] = useState(
-    initialData?.quietHoursEnabled || false
+    initialData?.quietHoursEnabled || false,
   );
-  const [quietHoursStart, setQuietHoursStart] = useState(
-    initialData?.quietHoursStart || "22:00"
-  );
-  const [quietHoursEnd, setQuietHoursEnd] = useState(
-    initialData?.quietHoursEnd || "07:00"
-  );
+  const [quietHoursStart, setQuietHoursStart] = useState(initialData?.quietHoursStart || "22:00");
+  const [quietHoursEnd, setQuietHoursEnd] = useState(initialData?.quietHoursEnd || "07:00");
 
   const [checkInWindowEnabled, setCheckInWindowEnabled] = useState(
-    initialData?.checkInWindowEnabled || false
+    initialData?.checkInWindowEnabled || false,
   );
   const [checkInWindowStart, setCheckInWindowStart] = useState(
-    initialData?.checkInWindowStart || "12:00"
+    initialData?.checkInWindowStart || "12:00",
   );
   const [checkInWindowEnd, setCheckInWindowEnd] = useState(
-    initialData?.checkInWindowEnd || "18:00"
+    initialData?.checkInWindowEnd || "18:00",
   );
 
   const [saving, setSaving] = useState(false);
@@ -171,12 +163,8 @@ export function OperationalHours({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/20 mb-4">
             <Clock className="w-8 h-8 text-emerald-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Set Your Hours
-          </h2>
-          <p className="text-slate-400">
-            When can guests arrive and when do they need to leave?
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Set Your Hours</h2>
+          <p className="text-slate-400">When can guests arrive and when do they need to leave?</p>
         </motion.div>
 
         {/* Main check-in/check-out times */}
@@ -188,9 +176,7 @@ export function OperationalHours({
         >
           {/* Check-in time */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">
-              Check-in Time
-            </label>
+            <label className="text-sm font-medium text-slate-300">Check-in Time</label>
             <div className="relative">
               <select
                 value={checkInTime}
@@ -201,7 +187,7 @@ export function OperationalHours({
                   "text-white font-medium",
                   "focus:border-emerald-500 focus:outline-none",
                   "appearance-none cursor-pointer",
-                  "transition-colors"
+                  "transition-colors",
                 )}
               >
                 {checkInTimes.map((time) => (
@@ -216,9 +202,7 @@ export function OperationalHours({
 
           {/* Check-out time */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-300">
-              Check-out Time
-            </label>
+            <label className="text-sm font-medium text-slate-300">Check-out Time</label>
             <div className="relative">
               <select
                 value={checkOutTime}
@@ -229,7 +213,7 @@ export function OperationalHours({
                   "text-white font-medium",
                   "focus:border-emerald-500 focus:outline-none",
                   "appearance-none cursor-pointer",
-                  "transition-colors"
+                  "transition-colors",
                 )}
               >
                 {checkOutTimes.map((time) => (
@@ -263,7 +247,7 @@ export function OperationalHours({
               onClick={() => setQuietHoursEnabled(!quietHoursEnabled)}
               className={cn(
                 "relative w-12 h-7 rounded-full transition-colors",
-                quietHoursEnabled ? "bg-emerald-500" : "bg-slate-600"
+                quietHoursEnabled ? "bg-emerald-500" : "bg-slate-600",
               )}
             >
               <motion.div
@@ -271,7 +255,7 @@ export function OperationalHours({
                 transition={SPRING_CONFIG}
                 className={cn(
                   "absolute top-1 w-5 h-5 rounded-full bg-white",
-                  quietHoursEnabled ? "left-6" : "left-1"
+                  quietHoursEnabled ? "left-6" : "left-1",
                 )}
               />
             </button>
@@ -289,9 +273,7 @@ export function OperationalHours({
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
-                  Start Time
-                </label>
+                <label className="text-sm font-medium text-slate-300">Start Time</label>
                 <div className="relative">
                   <select
                     value={quietHoursStart}
@@ -304,7 +286,7 @@ export function OperationalHours({
                       "focus:border-emerald-500 focus:outline-none",
                       "appearance-none cursor-pointer",
                       "transition-colors",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
                     )}
                   >
                     {allDayTimes.map((time) => (
@@ -318,9 +300,7 @@ export function OperationalHours({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
-                  End Time
-                </label>
+                <label className="text-sm font-medium text-slate-300">End Time</label>
                 <div className="relative">
                   <select
                     value={quietHoursEnd}
@@ -333,7 +313,7 @@ export function OperationalHours({
                       "focus:border-emerald-500 focus:outline-none",
                       "appearance-none cursor-pointer",
                       "transition-colors",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
                     )}
                   >
                     {allDayTimes.map((time) => (
@@ -360,16 +340,14 @@ export function OperationalHours({
           <label className="flex items-center justify-between p-4 rounded-xl border-2 border-slate-700 bg-slate-800/30 cursor-pointer hover:border-slate-600 transition-colors">
             <div>
               <h3 className="font-semibold text-white">Check-in Window</h3>
-              <p className="text-sm text-slate-400">
-                Limit when guests can arrive on check-in day
-              </p>
+              <p className="text-sm text-slate-400">Limit when guests can arrive on check-in day</p>
             </div>
             <button
               type="button"
               onClick={() => setCheckInWindowEnabled(!checkInWindowEnabled)}
               className={cn(
                 "relative w-12 h-7 rounded-full transition-colors",
-                checkInWindowEnabled ? "bg-emerald-500" : "bg-slate-600"
+                checkInWindowEnabled ? "bg-emerald-500" : "bg-slate-600",
               )}
             >
               <motion.div
@@ -377,7 +355,7 @@ export function OperationalHours({
                 transition={SPRING_CONFIG}
                 className={cn(
                   "absolute top-1 w-5 h-5 rounded-full bg-white",
-                  checkInWindowEnabled ? "left-6" : "left-1"
+                  checkInWindowEnabled ? "left-6" : "left-1",
                 )}
               />
             </button>
@@ -395,9 +373,7 @@ export function OperationalHours({
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
-                  Earliest Arrival
-                </label>
+                <label className="text-sm font-medium text-slate-300">Earliest Arrival</label>
                 <div className="relative">
                   <select
                     value={checkInWindowStart}
@@ -410,7 +386,7 @@ export function OperationalHours({
                       "focus:border-emerald-500 focus:outline-none",
                       "appearance-none cursor-pointer",
                       "transition-colors",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
                     )}
                   >
                     {allDayTimes.map((time) => (
@@ -424,9 +400,7 @@ export function OperationalHours({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">
-                  Latest Arrival
-                </label>
+                <label className="text-sm font-medium text-slate-300">Latest Arrival</label>
                 <div className="relative">
                   <select
                     value={checkInWindowEnd}
@@ -439,7 +413,7 @@ export function OperationalHours({
                       "focus:border-emerald-500 focus:outline-none",
                       "appearance-none cursor-pointer",
                       "transition-colors",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                      "disabled:opacity-50 disabled:cursor-not-allowed",
                     )}
                   >
                     {allDayTimes.map((time) => (
@@ -466,8 +440,8 @@ export function OperationalHours({
             <span className="text-slate-300 font-medium">
               You can change these later in settings.
             </span>{" "}
-            These hours will be displayed to guests and help manage their
-            expectations during the booking process.
+            These hours will be displayed to guests and help manage their expectations during the
+            booking process.
           </p>
         </motion.div>
 
@@ -484,7 +458,7 @@ export function OperationalHours({
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Continue"}

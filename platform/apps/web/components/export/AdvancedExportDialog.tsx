@@ -43,7 +43,14 @@ import {
   parseDateFromInput,
   ExportPreset,
 } from "@/lib/export-presets";
-import { ExportFormat, convertToCSV, convertToExcelCSV, downloadCSV, downloadExcelCSV, generateExportFilename } from "@/lib/export-utils";
+import {
+  ExportFormat,
+  convertToCSV,
+  convertToExcelCSV,
+  downloadCSV,
+  downloadExcelCSV,
+  generateExportFilename,
+} from "@/lib/export-utils";
 
 export interface AdvancedExportDialogProps {
   open: boolean;
@@ -51,11 +58,15 @@ export interface AdvancedExportDialogProps {
   availableColumns: ExportColumn[];
   data: Array<Record<string, unknown>>;
   reportName: string;
-  onExport?: (format: ExportFormat, columns: string[], dateRange: { start: Date; end: Date }) => void;
+  onExport?: (
+    format: ExportFormat,
+    columns: string[],
+    dateRange: { start: Date; end: Date },
+  ) => void;
 }
 
-type DateRangeType = 'today' | 'week' | 'month' | 'year' | 'custom';
-const dateRangeTypes: DateRangeType[] = ['today', 'week', 'month', 'year', 'custom'];
+type DateRangeType = "today" | "week" | "month" | "year" | "custom";
+const dateRangeTypes: DateRangeType[] = ["today", "week", "month", "year", "custom"];
 const isDateRangeType = (value: string): value is DateRangeType =>
   dateRangeTypes.some((option) => option === value);
 
@@ -68,25 +79,21 @@ export function AdvancedExportDialog({
   onExport,
 }: AdvancedExportDialogProps) {
   const [selectedColumns, setSelectedColumns] = useState<Set<string>>(
-    new Set(availableColumns.filter((col) => col.enabled).map((col) => col.key))
+    new Set(availableColumns.filter((col) => col.enabled).map((col) => col.key)),
   );
-  const [format, setFormat] = useState<ExportFormat>('csv');
-  const [dateRangeType, setDateRangeType] = useState<DateRangeType>('month');
-  const [customStartDate, setCustomStartDate] = useState<string>(
-    formatDateForInput(new Date())
-  );
-  const [customEndDate, setCustomEndDate] = useState<string>(
-    formatDateForInput(new Date())
-  );
+  const [format, setFormat] = useState<ExportFormat>("csv");
+  const [dateRangeType, setDateRangeType] = useState<DateRangeType>("month");
+  const [customStartDate, setCustomStartDate] = useState<string>(formatDateForInput(new Date()));
+  const [customEndDate, setCustomEndDate] = useState<string>(formatDateForInput(new Date()));
   const [savedPresets, setSavedPresets] = useState<ExportPreset[]>([]);
-  const [presetName, setPresetName] = useState<string>('');
+  const [presetName, setPresetName] = useState<string>("");
   const [showSavePreset, setShowSavePreset] = useState<boolean>(false);
 
   const selectAllId = useId();
   const presetNameId = useId();
 
   useEffect(() => {
-    if (open && typeof window !== 'undefined') {
+    if (open && typeof window !== "undefined") {
       setSavedPresets(loadExportPresets());
     }
   }, [open]);
@@ -97,7 +104,7 @@ export function AdvancedExportDialog({
   }, [availableColumns]);
 
   const currentDateRange = useMemo(() => {
-    if (dateRangeType === 'custom') {
+    if (dateRangeType === "custom") {
       return {
         start: parseDateFromInput(customStartDate),
         end: parseDateFromInput(customEndDate),
@@ -105,7 +112,7 @@ export function AdvancedExportDialog({
     }
 
     const preset = DATE_RANGE_PRESETS.find((p) => {
-      const label = p.label.toLowerCase().replace(/\s+/g, '');
+      const label = p.label.toLowerCase().replace(/\s+/g, "");
       return label === dateRangeType || label.startsWith(dateRangeType);
     });
 
@@ -113,7 +120,7 @@ export function AdvancedExportDialog({
       return preset.getValue();
     }
 
-    return DATE_RANGE_PRESETS.find((p) => p.label === 'This Month')!.getValue();
+    return DATE_RANGE_PRESETS.find((p) => p.label === "This Month")!.getValue();
   }, [dateRangeType, customStartDate, customEndDate]);
 
   const selectedColumnsList = useMemo(() => {
@@ -140,7 +147,7 @@ export function AdvancedExportDialog({
 
   const handleExport = () => {
     if (selectedColumns.size === 0) {
-      alert('Please select at least one column to export.');
+      alert("Please select at least one column to export.");
       return;
     }
 
@@ -161,13 +168,13 @@ export function AdvancedExportDialog({
     const headers = selectedColumnsList.map((col) => col.label);
 
     let csvContent: string;
-    if (format === 'xlsx') {
+    if (format === "xlsx") {
       csvContent = convertToExcelCSV(filteredData, headers);
-      const filename = generateExportFilename(reportName, 'csv');
+      const filename = generateExportFilename(reportName, "csv");
       downloadExcelCSV(csvContent, filename);
     } else {
       csvContent = convertToCSV(filteredData, headers);
-      const filename = generateExportFilename(reportName, 'csv');
+      const filename = generateExportFilename(reportName, "csv");
       downloadCSV(csvContent, filename);
     }
 
@@ -176,7 +183,7 @@ export function AdvancedExportDialog({
 
   const handleSavePreset = () => {
     if (!presetName.trim()) {
-      alert('Please enter a name for this preset.');
+      alert("Please enter a name for this preset.");
       return;
     }
 
@@ -184,13 +191,13 @@ export function AdvancedExportDialog({
       name: presetName.trim(),
       columns: Array.from(selectedColumns),
       dateRangeType,
-      customDateStart: dateRangeType === 'custom' ? customStartDate : undefined,
-      customDateEnd: dateRangeType === 'custom' ? customEndDate : undefined,
+      customDateStart: dateRangeType === "custom" ? customStartDate : undefined,
+      customDateEnd: dateRangeType === "custom" ? customEndDate : undefined,
       format,
     });
 
     setSavedPresets([...savedPresets, preset]);
-    setPresetName('');
+    setPresetName("");
     setShowSavePreset(false);
   };
 
@@ -241,7 +248,8 @@ export function AdvancedExportDialog({
                         >
                           <div className="font-medium text-sm text-foreground">{preset.name}</div>
                           <div className="text-xs text-muted-foreground mt-1">
-                            {preset.columns.length} columns • {preset.format.toUpperCase()} • {preset.dateRangeType}
+                            {preset.columns.length} columns • {preset.format.toUpperCase()} •{" "}
+                            {preset.dateRangeType}
                           </div>
                         </button>
                         <Button
@@ -281,11 +289,14 @@ export function AdvancedExportDialog({
                   {availableColumns.map((column) => (
                     <div key={column.key} className="flex items-center gap-2">
                       <Checkbox
-                        id={'column-' + column.key}
+                        id={"column-" + column.key}
                         checked={selectedColumns.has(column.key)}
                         onCheckedChange={() => handleToggleColumn(column.key)}
                       />
-                      <Label htmlFor={'column-' + column.key} className="text-sm font-normal cursor-pointer">
+                      <Label
+                        htmlFor={"column-" + column.key}
+                        className="text-sm font-normal cursor-pointer"
+                      >
                         {column.label}
                       </Label>
                     </div>
@@ -320,10 +331,12 @@ export function AdvancedExportDialog({
                   </SelectContent>
                 </Select>
 
-                {dateRangeType === 'custom' && (
+                {dateRangeType === "custom" && (
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     <div className="space-y-2">
-                      <Label htmlFor="startDate" className="text-sm">Start Date</Label>
+                      <Label htmlFor="startDate" className="text-sm">
+                        Start Date
+                      </Label>
                       <Input
                         id="startDate"
                         type="date"
@@ -332,7 +345,9 @@ export function AdvancedExportDialog({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="endDate" className="text-sm">End Date</Label>
+                      <Label htmlFor="endDate" className="text-sm">
+                        End Date
+                      </Label>
                       <Input
                         id="endDate"
                         type="date"
@@ -344,7 +359,8 @@ export function AdvancedExportDialog({
                 )}
 
                 <div className="text-xs text-muted-foreground bg-blue-50 border border-blue-100 rounded-lg p-2">
-                  Selected range: {currentDateRange.start.toLocaleDateString()} to {currentDateRange.end.toLocaleDateString()}
+                  Selected range: {currentDateRange.start.toLocaleDateString()} to{" "}
+                  {currentDateRange.end.toLocaleDateString()}
                 </div>
               </div>
 
@@ -354,8 +370,13 @@ export function AdvancedExportDialog({
                 <Label className="text-sm font-semibold">Export Format</Label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => setFormat('csv')}
-                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'csv' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-border bg-card text-foreground hover:border-border')}
+                    onClick={() => setFormat("csv")}
+                    className={
+                      "flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all " +
+                      (format === "csv"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-900"
+                        : "border-border bg-card text-foreground hover:border-border")
+                    }
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                     <div className="text-left">
@@ -364,8 +385,13 @@ export function AdvancedExportDialog({
                     </div>
                   </button>
                   <button
-                    onClick={() => setFormat('xlsx')}
-                    className={'flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ' + (format === 'xlsx' ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : 'border-border bg-card text-foreground hover:border-border')}
+                    onClick={() => setFormat("xlsx")}
+                    className={
+                      "flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all " +
+                      (format === "xlsx"
+                        ? "border-emerald-500 bg-emerald-50 text-emerald-900"
+                        : "border-border bg-card text-foreground hover:border-border")
+                    }
                   >
                     <FileSpreadsheet className="h-4 w-4" />
                     <div className="text-left">
@@ -390,7 +416,9 @@ export function AdvancedExportDialog({
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Columns:</span>
-                    <Badge variant="outline">{selectedColumns.size} of {availableColumns.length}</Badge>
+                    <Badge variant="outline">
+                      {selectedColumns.size} of {availableColumns.length}
+                    </Badge>
                   </div>
                 </div>
               </div>
@@ -398,7 +426,9 @@ export function AdvancedExportDialog({
               {showSavePreset ? (
                 <div className="space-y-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor={presetNameId} className="text-sm font-semibold">Save Current Configuration</Label>
+                    <Label htmlFor={presetNameId} className="text-sm font-semibold">
+                      Save Current Configuration
+                    </Label>
                     <Button
                       variant="ghost"
                       size="icon"
@@ -415,7 +445,7 @@ export function AdvancedExportDialog({
                     value={presetName}
                     onChange={(e) => setPresetName(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === "Enter") {
                         e.preventDefault();
                         handleSavePreset();
                       }
@@ -450,7 +480,7 @@ export function AdvancedExportDialog({
             className="flex items-center gap-2"
           >
             <FileDown className="h-4 w-4" />
-            Export {selectedColumns.size > 0 ? selectedColumns.size + ' columns' : ''}
+            Export {selectedColumns.size > 0 ? selectedColumns.size + " columns" : ""}
           </Button>
         </DialogFooter>
       </DialogContent>

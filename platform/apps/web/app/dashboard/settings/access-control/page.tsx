@@ -30,17 +30,17 @@ export default function AccessControlSettingsPage() {
   const queryClient = useQueryClient();
   const { data: whoami, isLoading: whoamiLoading } = useQuery({
     queryKey: ["whoami"],
-    queryFn: () => apiClient.getWhoami()
+    queryFn: () => apiClient.getWhoami(),
   });
 
   const campgroundId = useMemo(
     () => whoami?.user?.memberships?.[0]?.campgroundId ?? undefined,
-    [whoami?.user?.memberships]
+    [whoami?.user?.memberships],
   );
 
   const allowed = useMemo(
     () => Boolean(whoami?.user?.platformRole || (whoami?.user?.memberships?.length ?? 0) > 0),
-    [whoami]
+    [whoami],
   );
 
   const providersQuery = useQuery({
@@ -51,7 +51,7 @@ export default function AccessControlSettingsPage() {
       }
       return apiClient.listAccessProviders(campgroundId);
     },
-    enabled: !!campgroundId && allowed
+    enabled: !!campgroundId && allowed,
   });
 
   const [selectedProvider, setSelectedProvider] = useState<Provider>("kisi");
@@ -89,9 +89,9 @@ export default function AccessControlSettingsPage() {
       toast({
         title: "Save failed",
         description: message,
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const handleSave = () => {
@@ -107,7 +107,7 @@ export default function AccessControlSettingsPage() {
       displayName: displayName || undefined,
       status: status || undefined,
       webhookSecret: webhookSecret || undefined,
-      credentials
+      credentials,
     });
   };
 
@@ -122,7 +122,9 @@ export default function AccessControlSettingsPage() {
   if (!allowed || !campgroundId) {
     return (
       <div>
-        <div className="text-sm text-muted-foreground">Access control is restricted to authorized users.</div>
+        <div className="text-sm text-muted-foreground">
+          Access control is restricted to authorized users.
+        </div>
       </div>
     );
   }
@@ -133,13 +135,16 @@ export default function AccessControlSettingsPage() {
         <div>
           <h1 className="text-xl font-semibold text-foreground">Access Control</h1>
           <p className="text-sm text-muted-foreground">
-            Configure gate/lock providers (Kisi, Brivo, CloudKey), credentials, and webhook secrets per campground.
+            Configure gate/lock providers (Kisi, Brivo, CloudKey), credentials, and webhook secrets
+            per campground.
           </p>
         </div>
         <Button
           size="sm"
           variant="outline"
-          onClick={() => queryClient.invalidateQueries({ queryKey: ["access-providers", campgroundId] })}
+          onClick={() =>
+            queryClient.invalidateQueries({ queryKey: ["access-providers", campgroundId] })
+          }
         >
           <RefreshCcw className="h-4 w-4 mr-1" />
           Refresh
@@ -154,11 +159,29 @@ export default function AccessControlSettingsPage() {
             <div className="space-y-2">
               <h4 className="font-semibold text-foreground">How Access Control Works</h4>
               <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Supported Providers:</strong> We integrate with Kisi, Brivo, and CloudKey gate/lock systems. Select your provider from the dropdown.</p>
-                <p><strong>Credentials:</strong> Enter your provider's API credentials (keys, org IDs, etc.) in the JSON field. These are securely stored and used to communicate with your gate system.</p>
-                <p><strong>Webhook Setup:</strong> Configure your provider to send events to our webhook endpoint. Use the webhook secret to verify signatures.</p>
-                <p><strong>How It Works:</strong> When a guest checks in, we send unlock commands to your gate system. Gate events (open/close) are logged for security audits.</p>
-                <p className="text-status-info"><em>Note: This feature requires a compatible gate/lock provider. Contact us if you need help with integration.</em></p>
+                <p>
+                  <strong>Supported Providers:</strong> We integrate with Kisi, Brivo, and CloudKey
+                  gate/lock systems. Select your provider from the dropdown.
+                </p>
+                <p>
+                  <strong>Credentials:</strong> Enter your provider's API credentials (keys, org
+                  IDs, etc.) in the JSON field. These are securely stored and used to communicate
+                  with your gate system.
+                </p>
+                <p>
+                  <strong>Webhook Setup:</strong> Configure your provider to send events to our
+                  webhook endpoint. Use the webhook secret to verify signatures.
+                </p>
+                <p>
+                  <strong>How It Works:</strong> When a guest checks in, we send unlock commands to
+                  your gate system. Gate events (open/close) are logged for security audits.
+                </p>
+                <p className="text-status-info">
+                  <em>
+                    Note: This feature requires a compatible gate/lock provider. Contact us if you
+                    need help with integration.
+                  </em>
+                </p>
               </div>
             </div>
           </div>
@@ -197,7 +220,11 @@ export default function AccessControlSettingsPage() {
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Display name</Label>
-              <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} placeholder="Front gate" />
+              <Input
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Front gate"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Status</Label>
@@ -244,10 +271,14 @@ export default function AccessControlSettingsPage() {
 
           <div className="border-t pt-3 space-y-2">
             <div className="text-xs text-muted-foreground">
-              Webhook endpoint: <code className="bg-muted px-1 py-0.5 rounded">/api/access/webhooks/{selectedProvider}</code>
+              Webhook endpoint:{" "}
+              <code className="bg-muted px-1 py-0.5 rounded">
+                /api/access/webhooks/{selectedProvider}
+              </code>
             </div>
             <div className="text-xs text-muted-foreground">
-              Pass <code className="bg-muted px-1 py-0.5 rounded">x-signature</code> with HMAC of raw body.
+              Pass <code className="bg-muted px-1 py-0.5 rounded">x-signature</code> with HMAC of
+              raw body.
             </div>
           </div>
         </CardContent>

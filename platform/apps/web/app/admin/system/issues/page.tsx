@@ -75,7 +75,10 @@ function IssueCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const priority = PRIORITY_STYLES[issue.priority] || PRIORITY_STYLES.medium;
-  const category = CATEGORY_STYLES[issue.category] || { bg: "bg-muted0/20", text: "text-muted-foreground" };
+  const category = CATEGORY_STYLES[issue.category] || {
+    bg: "bg-muted0/20",
+    text: "text-muted-foreground",
+  };
 
   return (
     <div
@@ -127,7 +130,7 @@ function KanbanColumn({
   issues,
   onStatusChange,
 }: {
-  status: typeof STATUS_COLUMNS[0];
+  status: (typeof STATUS_COLUMNS)[0];
   issues: Issue[];
   onStatusChange: (id: string, status: string) => void;
 }) {
@@ -181,10 +184,7 @@ export default function IssuesPage() {
       if (!issuesRes.ok) throw new Error(`Failed to load issues (${issuesRes.status})`);
       if (!countsRes.ok) throw new Error(`Failed to load counts (${countsRes.status})`);
 
-      const [issuesData, countsData] = await Promise.all([
-        issuesRes.json(),
-        countsRes.json(),
-      ]);
+      const [issuesData, countsData] = await Promise.all([issuesRes.json(), countsRes.json()]);
 
       setIssues(Array.isArray(issuesData) ? issuesData : []);
       setCounts(countsData);
@@ -276,12 +276,12 @@ export default function IssuesPage() {
       {counts && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.entries(counts.categoryCounts).map(([category, count]) => {
-            const style = CATEGORY_STYLES[category] || { bg: "bg-muted0/20", text: "text-muted-foreground" };
+            const style = CATEGORY_STYLES[category] || {
+              bg: "bg-muted0/20",
+              text: "text-muted-foreground",
+            };
             return (
-              <div
-                key={category}
-                className={`${style.bg} rounded-lg p-4 border border-border`}
-              >
+              <div key={category} className={`${style.bg} rounded-lg p-4 border border-border`}>
                 <div className={`text-2xl font-bold ${style.text}`}>{count}</div>
                 <div className="text-sm text-muted-foreground capitalize">{category}</div>
               </div>

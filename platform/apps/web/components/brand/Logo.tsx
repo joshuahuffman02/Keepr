@@ -63,10 +63,7 @@ export function Logo({ size = "md", variant = "evergreen", className }: LogoProp
  * Keepr logo as an image (for when SVG text rendering is problematic)
  * Uses the PNG file - make sure to save the logo PNG to /public/images/logo/
  */
-export function LogoImage({
-  size = "md",
-  className,
-}: Omit<LogoProps, "variant">) {
+export function LogoImage({ size = "md", className }: Omit<LogoProps, "variant">) {
   const heights = {
     sm: 24,
     md: 32,

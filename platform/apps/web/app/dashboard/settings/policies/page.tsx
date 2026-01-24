@@ -8,10 +8,22 @@ import { apiClient } from "../../../../lib/api-client";
 import type { DepositConfig } from "@keepr/shared";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../../../components/ui/card";
 import { useToast } from "../../../../components/ui/use-toast";
 import { Loader2, DollarSign, Calendar, FileText, ArrowRight } from "lucide-react";
 import { HelpTooltip } from "../../../../components/ui/help-tooltip";
@@ -23,7 +35,9 @@ function FormsInfoBanner() {
       <div className="flex items-start gap-3">
         <FileText className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-blue-900">Looking for legal documents and waivers?</p>
+          <p className="text-sm font-medium text-blue-900">
+            Looking for legal documents and waivers?
+          </p>
           <p className="text-sm text-blue-700 mt-1">
             Park rules, liability waivers, and other legal documents have moved to the Forms page.
           </p>
@@ -81,7 +95,9 @@ export default function BookingRulesPage() {
       cancellationPolicyType: cg.cancellationPolicyType || "",
       cancellationWindowHours: cg.cancellationWindowHours ? String(cg.cancellationWindowHours) : "",
       cancellationFeeType: cg.cancellationFeeType || "",
-      cancellationFeeFlatCents: cg.cancellationFeeFlatCents ? String(cg.cancellationFeeFlatCents) : "",
+      cancellationFeeFlatCents: cg.cancellationFeeFlatCents
+        ? String(cg.cancellationFeeFlatCents)
+        : "",
       cancellationFeePercent: cg.cancellationFeePercent ? String(cg.cancellationFeePercent) : "",
       cancellationNotes: cg.cancellationNotes || "",
     });
@@ -91,10 +107,16 @@ export default function BookingRulesPage() {
     mutationFn: () =>
       apiClient.updateCampgroundPolicies(campgroundId!, {
         cancellationPolicyType: policyForm.cancellationPolicyType || null,
-        cancellationWindowHours: policyForm.cancellationWindowHours ? Number(policyForm.cancellationWindowHours) : null,
+        cancellationWindowHours: policyForm.cancellationWindowHours
+          ? Number(policyForm.cancellationWindowHours)
+          : null,
         cancellationFeeType: policyForm.cancellationFeeType || null,
-        cancellationFeeFlatCents: policyForm.cancellationFeeFlatCents ? Number(policyForm.cancellationFeeFlatCents) : null,
-        cancellationFeePercent: policyForm.cancellationFeePercent ? Number(policyForm.cancellationFeePercent) : null,
+        cancellationFeeFlatCents: policyForm.cancellationFeeFlatCents
+          ? Number(policyForm.cancellationFeeFlatCents)
+          : null,
+        cancellationFeePercent: policyForm.cancellationFeePercent
+          ? Number(policyForm.cancellationFeePercent)
+          : null,
         cancellationNotes: policyForm.cancellationNotes || null,
       }),
     onSuccess: () => {
@@ -152,7 +174,9 @@ export default function BookingRulesPage() {
                 <Calendar className="h-5 w-5 text-amber-600" />
                 <CardTitle>Cancellation Policy</CardTitle>
               </div>
-              <CardDescription>Define policy type, window, and fee for cancellations.</CardDescription>
+              <CardDescription>
+                Define policy type, window, and fee for cancellations.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-4">
@@ -160,9 +184,13 @@ export default function BookingRulesPage() {
                   <Label>Policy Type</Label>
                   <Select
                     value={policyForm.cancellationPolicyType}
-                    onValueChange={(v) => setPolicyForm((f) => ({ ...f, cancellationPolicyType: v }))}
+                    onValueChange={(v) =>
+                      setPolicyForm((f) => ({ ...f, cancellationPolicyType: v }))
+                    }
                   >
-                    <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="flexible">Flexible</SelectItem>
                       <SelectItem value="moderate">Moderate</SelectItem>
@@ -180,7 +208,9 @@ export default function BookingRulesPage() {
                     type="number"
                     min={0}
                     value={policyForm.cancellationWindowHours}
-                    onChange={(e) => setPolicyForm((f) => ({ ...f, cancellationWindowHours: e.target.value }))}
+                    onChange={(e) =>
+                      setPolicyForm((f) => ({ ...f, cancellationWindowHours: e.target.value }))
+                    }
                     placeholder="48"
                   />
                 </div>
@@ -193,7 +223,9 @@ export default function BookingRulesPage() {
                     value={policyForm.cancellationFeeType}
                     onValueChange={(v) => setPolicyForm((f) => ({ ...f, cancellationFeeType: v }))}
                   >
-                    <SelectTrigger><SelectValue placeholder="Select fee" /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select fee" />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">None</SelectItem>
                       <SelectItem value="flat">Flat amount</SelectItem>
@@ -211,7 +243,9 @@ export default function BookingRulesPage() {
                     type="number"
                     min={0}
                     value={policyForm.cancellationFeeFlatCents}
-                    onChange={(e) => setPolicyForm((f) => ({ ...f, cancellationFeeFlatCents: e.target.value }))}
+                    onChange={(e) =>
+                      setPolicyForm((f) => ({ ...f, cancellationFeeFlatCents: e.target.value }))
+                    }
                     placeholder="2500"
                   />
                 </div>
@@ -225,7 +259,9 @@ export default function BookingRulesPage() {
                     min={0}
                     max={100}
                     value={policyForm.cancellationFeePercent}
-                    onChange={(e) => setPolicyForm((f) => ({ ...f, cancellationFeePercent: e.target.value }))}
+                    onChange={(e) =>
+                      setPolicyForm((f) => ({ ...f, cancellationFeePercent: e.target.value }))
+                    }
                     placeholder="25"
                   />
                 </div>
@@ -235,7 +271,9 @@ export default function BookingRulesPage() {
                 <Textarea
                   rows={3}
                   value={policyForm.cancellationNotes}
-                  onChange={(e) => setPolicyForm((f) => ({ ...f, cancellationNotes: e.target.value }))}
+                  onChange={(e) =>
+                    setPolicyForm((f) => ({ ...f, cancellationNotes: e.target.value }))
+                  }
                   placeholder="Additional details shown to staff and guests..."
                 />
               </div>
@@ -243,7 +281,10 @@ export default function BookingRulesPage() {
           </Card>
 
           <div className="flex justify-end">
-            <Button onClick={() => savePolicyMutation.mutate()} disabled={savePolicyMutation.isPending}>
+            <Button
+              onClick={() => savePolicyMutation.mutate()}
+              disabled={savePolicyMutation.isPending}
+            >
               {savePolicyMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {savePolicyMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>

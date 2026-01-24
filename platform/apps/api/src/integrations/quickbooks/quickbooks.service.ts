@@ -50,7 +50,7 @@ type QuickbooksSyncLogClient = {
 };
 
 const hasQuickbooksSyncLog = (
-  prisma: PrismaService
+  prisma: PrismaService,
 ): prisma is PrismaService & { quickbooksSyncLog: QuickbooksSyncLogClient } =>
   "quickbooksSyncLog" in prisma;
 
@@ -79,7 +79,11 @@ export class QuickBooksService {
   /**
    * Exchange authorization code for tokens
    */
-  async handleOAuthCallback(code: string, realmId: string, campgroundId: string): Promise<{ success: boolean }> {
+  async handleOAuthCallback(
+    code: string,
+    realmId: string,
+    campgroundId: string,
+  ): Promise<{ success: boolean }> {
     const clientId = process.env.QUICKBOOKS_CLIENT_ID;
     const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET;
 
@@ -280,12 +284,15 @@ export class QuickBooksService {
     });
   }
 
-  private async saveIntegration(campgroundId: string, config: {
-    realmId: string;
-    accessToken: string;
-    refreshToken: string;
-    expiresAt: Date;
-  }) {
+  private async saveIntegration(
+    campgroundId: string,
+    config: {
+      realmId: string;
+      accessToken: string;
+      refreshToken: string;
+      expiresAt: Date;
+    },
+  ) {
     const existing = await this.getIntegration(campgroundId);
 
     if (existing) {
@@ -344,14 +351,17 @@ export class QuickBooksService {
     return mapping[method] ?? "Other";
   }
 
-  private async recordSyncLog(campgroundId: string, data: {
-    entityType: string;
-    entityId: string;
-    status: string;
-    requestData?: unknown;
-    responseData?: unknown;
-    error?: string;
-  }) {
+  private async recordSyncLog(
+    campgroundId: string,
+    data: {
+      entityType: string;
+      entityId: string;
+      status: string;
+      requestData?: unknown;
+      responseData?: unknown;
+      error?: string;
+    },
+  ) {
     // In production, save to a quickbooksSyncLog table
     this.logger.log(`Sync log: ${JSON.stringify({ campgroundId, ...data })}`);
   }

@@ -133,7 +133,9 @@ export default function CharityReportsPage() {
       d.reservation.id.slice(-8).toUpperCase(),
     ]);
 
-    const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join("\n");
+    const csv = [headers.join(","), ...rows.map((r) => r.map((c) => `"${c}"`).join(","))].join(
+      "\n",
+    );
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -204,7 +206,9 @@ export default function CharityReportsPage() {
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Charity Reports</h1>
-              <p className="text-muted-foreground">Detailed donation analytics and payout tracking</p>
+              <p className="text-muted-foreground">
+                Detailed donation analytics and payout tracking
+              </p>
             </div>
           </div>
 
@@ -286,7 +290,10 @@ export default function CharityReportsPage() {
                       <span className="text-sm text-muted-foreground">Total Raised</span>
                     </div>
                     <p className="text-3xl font-bold text-foreground">
-                      ${(stats.totalAmountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                      $
+                      {(stats.totalAmountCents / 100).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                      })}
                     </p>
                   </div>
 
@@ -353,7 +360,10 @@ export default function CharityReportsPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-semibold text-foreground">
-                            ${(item.amountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                            $
+                            {(item.amountCents / 100).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}
                           </p>
                           <p className="text-sm text-muted-foreground">{item.count} donations</p>
                         </div>
@@ -379,7 +389,10 @@ export default function CharityReportsPage() {
                           <div className="mb-2">{getStatusBadge(item.status)}</div>
                           <p className="text-2xl font-bold text-foreground">{item.count}</p>
                           <p className="text-sm text-muted-foreground">
-                            ${(item.amountCents / 100).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                            $
+                            {(item.amountCents / 100).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                            })}
                           </p>
                         </div>
                       ))}
@@ -429,9 +442,12 @@ export default function CharityReportsPage() {
                           </td>
                           <td className="px-6 py-4">
                             <p className="text-sm font-medium text-foreground">
-                              {donation.reservation.guest.firstName} {donation.reservation.guest.lastName}
+                              {donation.reservation.guest.firstName}{" "}
+                              {donation.reservation.guest.lastName}
                             </p>
-                            <p className="text-xs text-muted-foreground">{donation.reservation.guest.email}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {donation.reservation.guest.email}
+                            </p>
                           </td>
                           <td className="px-6 py-4 text-sm text-foreground">
                             {donation.charity.name}
@@ -525,9 +541,7 @@ export default function CharityReportsPage() {
                     </tbody>
                   </table>
                   {payouts.payouts.length === 0 && (
-                    <div className="p-12 text-center text-muted-foreground">
-                      No payouts found
-                    </div>
+                    <div className="p-12 text-center text-muted-foreground">No payouts found</div>
                   )}
                 </div>
               </div>

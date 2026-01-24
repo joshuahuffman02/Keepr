@@ -19,7 +19,7 @@ Email marketing is the highest-ROI marketing channel available—and it's one ca
 ### Where to Collect Emails
 
 - **At booking:** Required field in reservation
-- **At check-in:** Confirm or collect if missing  
+- **At check-in:** Confirm or collect if missing
 - **On website:** Newsletter signup form
 - **At checkout:** "Stay in touch" invitation
 
@@ -32,22 +32,26 @@ Email marketing is the highest-ROI marketing channel available—and it's one ca
 ## Email Types That Work
 
 ### 1. Transactional Emails
+
 - Booking confirmations
 - Pre-arrival information
 - Post-departure thank-you
 
 ### 2. Promotional Emails
+
 - Seasonal rate announcements
 - Last-minute availability
 - Early booking access
 
 ### 3. Newsletter Emails
+
 - Monthly campground updates
 - Event announcements
 - Local area news
 - Camping tips
 
 ### 4. Triggered Emails
+
 - Birthday greetings
 - Anniversary of first stay
 - "We miss you" for lapsed guests
@@ -135,4 +139,4 @@ Ready to book? [Link]
 
 ---
 
-*Keepr includes automated email sequences for confirmations, reminders, and follow-ups. [Build your email marketing at campreserv.com](https://campreserv.com)*
+_Keepr includes automated email sequences for confirmations, reminders, and follow-ups. [Build your email marketing at campreserv.com](https://campreserv.com)_

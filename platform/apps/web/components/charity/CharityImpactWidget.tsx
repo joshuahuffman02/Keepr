@@ -103,23 +103,11 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
     }
   }, [loadingStats, stats]);
 
-  const animatedTotal = useAnimatedCounter(
-    stats?.totalAmountCents ?? 0,
-    1800,
-    hasAnimated
-  );
+  const animatedTotal = useAnimatedCounter(stats?.totalAmountCents ?? 0, 1800, hasAnimated);
 
-  const animatedDonations = useAnimatedCounter(
-    stats?.totalDonations ?? 0,
-    1500,
-    hasAnimated
-  );
+  const animatedDonations = useAnimatedCounter(stats?.totalDonations ?? 0, 1500, hasAnimated);
 
-  const animatedDonors = useAnimatedCounter(
-    stats?.donorCount ?? 0,
-    1300,
-    hasAnimated
-  );
+  const animatedDonors = useAnimatedCounter(stats?.donorCount ?? 0, 1300, hasAnimated);
 
   const statsLoading = loadingStats && !stats;
 
@@ -173,9 +161,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
               <Heart className="h-6 w-6 text-rose-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-foreground mb-1">
-                Community impact
-              </h3>
+              <h3 className="font-semibold text-foreground mb-1">Community impact</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Enable round-up donations so guests can support a charity with every stay.
               </p>
@@ -195,9 +181,8 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
 
   const charityName = charitySettings?.charity?.name ?? "Charity";
   const optInRate = stats?.optInRate ?? 0;
-  const averageDonationDisplay = stats && stats.totalDonations > 0
-    ? formatDollars(stats.averageDonationCents ?? 0)
-    : "—";
+  const averageDonationDisplay =
+    stats && stats.totalDonations > 0 ? formatDollars(stats.averageDonationCents ?? 0) : "—";
   const optInDisplay = stats ? `${optInRate.toFixed(0)}%` : "—";
 
   return (
@@ -211,9 +196,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
               </span>
               <div>
                 <div className="text-sm font-semibold text-foreground">Community impact</div>
-                <div className="text-xs text-muted-foreground">
-                  Donations to {charityName}
-                </div>
+                <div className="text-xs text-muted-foreground">Donations to {charityName}</div>
               </div>
             </div>
             <Link
@@ -276,9 +259,7 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
                   </div>
                   <p className="text-2xl font-bold text-rose-600">{animatedDonations}</p>
                   <p className="text-xs text-muted-foreground truncate">Donations</p>
-                  <p className="text-sm text-rose-600 truncate">
-                    Avg {averageDonationDisplay}
-                  </p>
+                  <p className="text-sm text-rose-600 truncate">Avg {averageDonationDisplay}</p>
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center justify-center gap-1 mb-2">

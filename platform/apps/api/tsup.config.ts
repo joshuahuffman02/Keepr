@@ -16,11 +16,11 @@ export default defineConfig([
     tsconfig: "./tsconfig.json",
     skipNodeModulesBundle: true,
     shims: false,
-    external: ["@keepr/shared"]
+    external: ["@keepr/shared"],
   },
   // Vercel serverless build (output to api/ folder)
   {
-    entry: { "index": "src/serverless.ts" },
+    entry: { index: "src/serverless.ts" },
     format: ["cjs"],
     platform: "node",
     target: "node20",
@@ -33,6 +33,6 @@ export default defineConfig([
     tsconfig: "./tsconfig.json",
     skipNodeModulesBundle: true,
     shims: false,
-    external: ["@keepr/shared"]
-  }
+    external: ["@keepr/shared"],
+  },
 ]);

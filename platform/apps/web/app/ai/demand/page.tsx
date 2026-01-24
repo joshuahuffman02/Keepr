@@ -59,8 +59,16 @@ interface DemandForecast {
 const demandLevelColors: Record<DemandLevel, { bg: string; text: string; border: string }> = {
   very_low: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info" },
   low: { bg: "bg-status-info/15", text: "text-status-info", border: "border-status-info" },
-  moderate: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning" },
-  high: { bg: "bg-status-warning/15", text: "text-status-warning", border: "border-status-warning" },
+  moderate: {
+    bg: "bg-status-warning/15",
+    text: "text-status-warning",
+    border: "border-status-warning",
+  },
+  high: {
+    bg: "bg-status-warning/15",
+    text: "text-status-warning",
+    border: "border-status-warning",
+  },
   very_high: { bg: "bg-status-error/15", text: "text-status-error", border: "border-status-error" },
 };
 
@@ -72,13 +80,7 @@ const demandLevelLabels: Record<DemandLevel, string> = {
   very_high: "Very High",
 };
 
-const demandLevels: DemandLevel[] = [
-  "very_low",
-  "low",
-  "moderate",
-  "high",
-  "very_high",
-];
+const demandLevels: DemandLevel[] = ["very_low", "low", "moderate", "high", "very_high"];
 
 function getDemandIcon(level: DemandLevel) {
   switch (level) {
@@ -130,7 +132,7 @@ function DemandLegend() {
               "h-3 w-3 rounded-sm",
               demandLevelColors[level].bg,
               demandLevelColors[level].border,
-              "border"
+              "border",
             )}
           />
           <span className="text-slate-600">{demandLevelLabels[level]}</span>
@@ -165,17 +167,13 @@ function CalendarDay({
         colors.border,
         isSelected && "ring-2 ring-emerald-500 ring-offset-1",
         isToday && "ring-2 ring-slate-900 ring-offset-1",
-        "hover:opacity-90 cursor-pointer"
+        "hover:opacity-90 cursor-pointer",
       )}
     >
-      <span
-        className={cn("text-sm font-medium", colors.text, isToday && "font-bold")}
-      >
+      <span className={cn("text-sm font-medium", colors.text, isToday && "font-bold")}>
         {dayNum}
       </span>
-      <span className={cn("text-xs", colors.text)}>
-        {Math.round(day.predictedOccupancy)}%
-      </span>
+      <span className={cn("text-xs", colors.text)}>{Math.round(day.predictedOccupancy)}%</span>
       {day.isHoliday && (
         <div className="absolute top-0.5 right-0.5">
           <Sparkles className="h-2.5 w-2.5 text-amber-500" />
@@ -303,7 +301,7 @@ function HeatmapCalendar({
             />
           ) : (
             <div key={`empty-${idx}`} className="h-14 sm:h-16" />
-          )
+          ),
         )}
       </div>
 
@@ -352,7 +350,7 @@ function DayDetailPanel({
               className={cn(
                 "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium mt-1",
                 colors.bg,
-                colors.text
+                colors.text,
               )}
             >
               {getDemandIcon(forecast.demandLevel)}
@@ -381,9 +379,7 @@ function DayDetailPanel({
             <p className="text-2xl font-bold text-emerald-600">
               {formatCurrency(forecast.predictedRevenue)}
             </p>
-            <p className="text-xs text-slate-400">
-              Currently booked: {forecast.existingBookings}%
-            </p>
+            <p className="text-xs text-slate-400">Currently booked: {forecast.existingBookings}%</p>
           </div>
         </div>
 
@@ -424,7 +420,7 @@ function DayDetailPanel({
                   <span
                     className={cn(
                       "text-xs font-medium",
-                      factor.impact > 0 ? "text-emerald-600" : "text-red-600"
+                      factor.impact > 0 ? "text-emerald-600" : "text-red-600",
                     )}
                   >
                     {factor.impact > 0 ? "+" : ""}
@@ -445,8 +441,18 @@ function InsightsPanel({
   isLoading,
 }: {
   insights: {
-    peakDemandPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; reason: string }>;
-    lowDemandPeriods: Array<{ startDate: string; endDate: string; avgDemand: number; suggestion: string }>;
+    peakDemandPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      reason: string;
+    }>;
+    lowDemandPeriods: Array<{
+      startDate: string;
+      endDate: string;
+      avgDemand: number;
+      suggestion: string;
+    }>;
     upcomingOpportunities: Array<{ date: string; type: string; description: string }>;
   } | null;
   isLoading: boolean;
@@ -478,7 +484,10 @@ function InsightsPanel({
           </CardHeader>
           <CardContent className="space-y-2">
             {insights.peakDemandPeriods.slice(0, 3).map((period, idx) => (
-              <div key={idx} className="bg-status-warning/15 rounded-lg p-3 border border-status-warning/20">
+              <div
+                key={idx}
+                className="bg-status-warning/15 rounded-lg p-3 border border-status-warning/20"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-status-warning">
                     {formatDateRange(period.startDate, period.endDate)}
@@ -505,7 +514,10 @@ function InsightsPanel({
           </CardHeader>
           <CardContent className="space-y-2">
             {insights.lowDemandPeriods.slice(0, 3).map((period, idx) => (
-              <div key={idx} className="bg-status-info/15 rounded-lg p-3 border border-status-info/20">
+              <div
+                key={idx}
+                className="bg-status-info/15 rounded-lg p-3 border border-status-info/20"
+              >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-status-info">
                     {formatDateRange(period.startDate, period.endDate)}
@@ -532,13 +544,16 @@ function InsightsPanel({
           </CardHeader>
           <CardContent className="space-y-2">
             {insights.upcomingOpportunities.slice(0, 5).map((opp, idx) => (
-              <div key={idx} className="flex items-start gap-2 py-2 border-b border-slate-100 last:border-0">
+              <div
+                key={idx}
+                className="flex items-start gap-2 py-2 border-b border-slate-100 last:border-0"
+              >
                 <div
                   className={cn(
                     "shrink-0 w-6 h-6 rounded-full flex items-center justify-center",
                     opp.type === "pricing"
                       ? "bg-status-success/15 text-status-success"
-                      : "bg-purple-100 text-purple-600"
+                      : "bg-purple-100 text-purple-600",
                   )}
                 >
                   {opp.type === "pricing" ? (
@@ -724,9 +739,7 @@ export default function DemandForecastPage() {
                     onSelectDate={setSelectedDate}
                   />
                 ) : (
-                  <div className="text-center py-8 text-slate-400">
-                    No forecast data available
-                  </div>
+                  <div className="text-center py-8 text-slate-400">No forecast data available</div>
                 )}
               </CardContent>
             </Card>
@@ -735,10 +748,7 @@ export default function DemandForecastPage() {
           {/* Sidebar */}
           <div className="space-y-4">
             {/* Day Detail */}
-            <DayDetailPanel
-              forecast={selectedForecast}
-              onClose={() => setSelectedDate(null)}
-            />
+            <DayDetailPanel forecast={selectedForecast} onClose={() => setSelectedDate(null)} />
 
             {/* Insights */}
             <InsightsPanel insights={insights || null} isLoading={insightsLoading} />

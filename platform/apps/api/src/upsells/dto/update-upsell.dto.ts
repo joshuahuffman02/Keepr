@@ -19,4 +19,3 @@ export class UpdateUpsellDto extends PartialType(CreateUpsellDto) {
   @IsString()
   siteClassId?: string | null;
 }
-

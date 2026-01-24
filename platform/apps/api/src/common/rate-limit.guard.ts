@@ -35,15 +35,15 @@ export function SkipRateLimit() {
 export class RateLimitGuard implements CanActivate {
   constructor(
     private readonly rateLimitService: RateLimitTiersService,
-    private readonly reflector: Reflector
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     // Check if rate limiting is skipped for this endpoint
-    const skipRateLimit = this.reflector.getAllAndOverride<boolean>(
-      SKIP_RATE_LIMIT,
-      [context.getHandler(), context.getClass()]
-    );
+    const skipRateLimit = this.reflector.getAllAndOverride<boolean>(SKIP_RATE_LIMIT, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (skipRateLimit) {
       return true;
@@ -61,9 +61,7 @@ export class RateLimitGuard implements CanActivate {
     }
 
     // Check concurrent request limit
-    const concurrentAllowed = await this.rateLimitService.startConcurrent(
-      principal.apiClientId
-    );
+    const concurrentAllowed = await this.rateLimitService.startConcurrent(principal.apiClientId);
 
     if (!concurrentAllowed) {
       throw new HttpException(
@@ -73,7 +71,7 @@ export class RateLimitGuard implements CanActivate {
           message: "Too many concurrent requests. Please wait and try again.",
           code: "CONCURRENT_LIMIT_EXCEEDED",
         },
-        HttpStatus.TOO_MANY_REQUESTS
+        HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 
@@ -106,7 +104,7 @@ export class RateLimitGuard implements CanActivate {
           remaining: result.remaining,
           resetAt: result.resetAt.toISOString(),
         },
-        HttpStatus.TOO_MANY_REQUESTS
+        HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 

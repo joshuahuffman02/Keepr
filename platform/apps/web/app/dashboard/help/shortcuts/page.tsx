@@ -23,7 +23,7 @@ const shortcutGroups: ShortcutGroup[] = [
       { keys: ["⌘", "/"], description: "Open help panel" },
       { keys: ["?"], description: "Show keyboard shortcuts reference" },
       { keys: ["ESC"], description: "Close any open modal/dialog" },
-    ]
+    ],
   },
   {
     title: "Navigation (Sequential)",
@@ -36,28 +36,24 @@ const shortcutGroups: ShortcutGroup[] = [
       { keys: ["G", "P"], description: "Go to POS" },
       { keys: ["G", "M"], description: "Go to Messages" },
       { keys: ["G", "S"], description: "Go to Settings" },
-    ]
+    ],
   },
   {
     title: "Quick Actions",
     icon: Zap,
-    shortcuts: [
-      { keys: ["⌘", "N"], description: "New booking" },
-    ]
-  }
+    shortcuts: [{ keys: ["⌘", "N"], description: "New booking" }],
+  },
 ];
 
 export default function ShortcutsPage() {
-  const isMac = typeof window !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  const isMac =
+    typeof window !== "undefined" && navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
   return (
     <DashboardShell>
       <div className="space-y-6">
         <Breadcrumbs
-          items={[
-            { label: "Help", href: "/dashboard/help" },
-            { label: "Keyboard Shortcuts" }
-          ]}
+          items={[{ label: "Help", href: "/dashboard/help" }, { label: "Keyboard Shortcuts" }]}
         />
 
         {/* Header */}
@@ -71,7 +67,11 @@ export default function ShortcutsPage() {
             </div>
             <div className="px-3 py-1.5 bg-slate-100 rounded-lg">
               <span className="text-xs font-medium text-slate-600">
-                Press <kbd className="px-2 py-0.5 bg-white rounded text-slate-900 border border-slate-200">?</kbd> anytime
+                Press{" "}
+                <kbd className="px-2 py-0.5 bg-white rounded text-slate-900 border border-slate-200">
+                  ?
+                </kbd>{" "}
+                anytime
               </span>
             </div>
           </div>
@@ -135,11 +135,27 @@ export default function ShortcutsPage() {
           <ul className="space-y-2 text-sm text-slate-700">
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Use <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">⌘K</kbd> to quickly search for guests, sites, and reservations</span>
+              <span>
+                Use{" "}
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">
+                  ⌘K
+                </kbd>{" "}
+                to quickly search for guests, sites, and reservations
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">G</kbd> then <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">D</kbd> should be pressed one after another, not together (you have 1 second between keys)</span>
+              <span>
+                Sequential shortcuts like{" "}
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">
+                  G
+                </kbd>{" "}
+                then{" "}
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">
+                  D
+                </kbd>{" "}
+                should be pressed one after another, not together (you have 1 second between keys)
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
@@ -147,11 +163,19 @@ export default function ShortcutsPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Most navigation and action shortcuts are disabled when typing to prevent conflicts</span>
+              <span>
+                Most navigation and action shortcuts are disabled when typing to prevent conflicts
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>
-              <span>Press <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">?</kbd> anytime to see the quick reference panel</span>
+              <span>
+                Press{" "}
+                <kbd className="px-1.5 py-0.5 bg-white rounded text-xs border border-slate-200">
+                  ?
+                </kbd>{" "}
+                anytime to see the quick reference panel
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-600 font-bold">•</span>

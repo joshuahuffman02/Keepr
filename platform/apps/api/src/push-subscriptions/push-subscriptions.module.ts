@@ -13,4 +13,3 @@ import { AuthModule } from "../auth/auth.module";
   exports: [MobilePushService],
 })
 export class PushSubscriptionsModule {}
-

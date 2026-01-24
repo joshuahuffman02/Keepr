@@ -17,16 +17,19 @@ Every booking, every guest, every dollar creates data. The campgrounds that thri
 ## Key Metrics to Track
 
 ### Occupancy Metrics
+
 - **Occupancy rate:** Sites sold / Sites available
 - **RevPAR:** Revenue per available site-night
 - **Average length of stay:** Total nights / Total reservations
 
 ### Revenue Metrics
+
 - **Average daily rate (ADR):** Total revenue / Nights sold
 - **Revenue by site type:** Compare performance
 - **Add-on revenue:** Non-site income
 
 ### Guest Metrics
+
 - **New vs. returning guests:** Loyalty indicator
 - **Booking lead time:** How far in advance
 - **Cancellation rate:** Lost bookings
@@ -36,18 +39,21 @@ Every booking, every guest, every dollar creates data. The campgrounds that thri
 ## Making Data Actionable
 
 ### Compare Time Periods
+
 - This year vs. last year
 - This month vs. last month
 - Weekdays vs. weekends
 - Peak vs. shoulder season
 
 ### Identify Patterns
+
 - Which days fill first?
 - What site types are most popular?
 - When do cancellations spike?
 - Where do guests come from?
 
 ### Ask "Why?"
+
 - Why is weekday occupancy low?
 - Why did revenue drop in September?
 - Why are certain sites less popular?
@@ -56,12 +62,12 @@ Every booking, every guest, every dollar creates data. The campgrounds that thri
 
 ## Using Insights
 
-| Insight | Action |
-|---------|--------|
-| Low weekday occupancy | Create weekday promotions |
-| High cancellation rate | Review cancellation policy |
-| Premium sites underperforming | Evaluate pricing or marketing |
-| Long booking lead time | Encourage early booking with incentives |
+| Insight                       | Action                                  |
+| ----------------------------- | --------------------------------------- |
+| Low weekday occupancy         | Create weekday promotions               |
+| High cancellation rate        | Review cancellation policy              |
+| Premium sites underperforming | Evaluate pricing or marketing           |
+| Long booking lead time        | Encourage early booking with incentives |
 
 ---
 
@@ -82,4 +88,4 @@ Every booking, every guest, every dollar creates data. The campgrounds that thri
 
 ---
 
-*Keepr includes built-in analytics dashboards that surface the metrics you need. [Make data-driven decisions at campreserv.com](https://campreserv.com)*
+_Keepr includes built-in analytics dashboards that surface the metrics you need. [Make data-driven decisions at campreserv.com](https://campreserv.com)_

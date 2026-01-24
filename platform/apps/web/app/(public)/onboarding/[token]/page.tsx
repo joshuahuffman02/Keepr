@@ -191,13 +191,19 @@ const isMeteredBillingMode = (value: unknown): value is MeteredBillingMode =>
 const isTaxRuleType = (value: unknown): value is TaxRuleType =>
   isString(value) && taxTypeValues.some((option) => option === value);
 
-const getRecordField = (record: Record<string, unknown> | undefined, key: string): Record<string, unknown> | undefined => {
+const getRecordField = (
+  record: Record<string, unknown> | undefined,
+  key: string,
+): Record<string, unknown> | undefined => {
   if (!record) return undefined;
   const value = record[key];
   return isRecord(value) ? value : undefined;
 };
 
-const getArrayField = (record: Record<string, unknown> | undefined, key: string): unknown[] | undefined => {
+const getArrayField = (
+  record: Record<string, unknown> | undefined,
+  key: string,
+): unknown[] | undefined => {
   if (!record) return undefined;
   const value = record[key];
   return Array.isArray(value) ? value : undefined;
@@ -205,7 +211,7 @@ const getArrayField = (record: Record<string, unknown> | undefined, key: string)
 
 const isMissingRequiredEqual = (
   left?: Array<{ key: string; missingFields: string[] }>,
-  right?: Array<{ key: string; missingFields: string[] }>
+  right?: Array<{ key: string; missingFields: string[] }>,
 ) => {
   if (left === right) return true;
   if (!left || !right) return false;
@@ -237,7 +243,9 @@ const isRatePeriod = (value: unknown): value is RatePeriod =>
 const isRateEntry = (value: unknown): value is { siteClassId: string; nightlyRate: number } =>
   isRecord(value) && isString(value.siteClassId) && isNumber(value.nightlyRate);
 
-const isPricingType = (value: unknown): value is FeesAndAddonsState["addOnItems"][number]["pricingType"] =>
+const isPricingType = (
+  value: unknown,
+): value is FeesAndAddonsState["addOnItems"][number]["pricingType"] =>
   value === "flat" || value === "per_night" || value === "per_person";
 
 const isPetFeeType = (value: unknown): value is FeesAndAddonsState["petFeeType"] =>
@@ -340,8 +348,13 @@ const isWaiversDocumentsData = (value: unknown): value is WaiversDocumentsData =
   (value.waiverContent === undefined || isString(value.waiverContent)) &&
   (value.useDefaultWaiver === undefined || isBoolean(value.useDefaultWaiver));
 
-const isPreArrivalReminder = (value: unknown): value is CommunicationSetupData["preArrivalReminders"][number] =>
-  isRecord(value) && isNumber(value.days) && isBoolean(value.enabled) && isString(value.description);
+const isPreArrivalReminder = (
+  value: unknown,
+): value is CommunicationSetupData["preArrivalReminders"][number] =>
+  isRecord(value) &&
+  isNumber(value.days) &&
+  isBoolean(value.enabled) &&
+  isString(value.description);
 
 const isCommunicationSetupData = (value: unknown): value is CommunicationSetupData =>
   isRecord(value) &&
@@ -411,7 +424,9 @@ const isSiteClassData = (value: unknown): value is SiteClassData =>
   isBoolean(value.meteredEnabled) &&
   (value.meteredType === null || isMeteredType(value.meteredType)) &&
   (value.meteredBillingMode === null || isMeteredBillingMode(value.meteredBillingMode)) &&
-  (value.rvOrientation === undefined || value.rvOrientation === null || isRvOrientation(value.rvOrientation)) &&
+  (value.rvOrientation === undefined ||
+    value.rvOrientation === null ||
+    isRvOrientation(value.rvOrientation)) &&
   (value.id === undefined || isString(value.id));
 
 const isSiteData = (value: unknown): value is SiteData =>
@@ -480,12 +495,10 @@ export default function OnboardingPage() {
 
     const mappedCompletedSteps = (sessionQuery.data.progress?.completedSteps || [])
       .map(mapStepKey)
-      .filter((key): key is OnboardingStepKey =>
-        onboardingSteps.some(s => s.key === key)
-      );
+      .filter((key): key is OnboardingStepKey => onboardingSteps.some((s) => s.key === key));
 
     const currentStepKey = mapStepKey(
-      session.currentStep || sessionQuery.data.progress?.nextStep || "park_profile"
+      session.currentStep || sessionQuery.data.progress?.nextStep || "park_profile",
     );
 
     // Extract signup data for pre-population
@@ -497,11 +510,13 @@ export default function OnboardingPage() {
     };
 
     // Extract data from step-keyed structure
-    const parkProfileStep = getRecordField(data, "park_profile") ?? getRecordField(data, "account_profile");
-    const parkProfileData =
-      getRecordField(parkProfileStep, "campground") ?? signupCampground;
+    const parkProfileStep =
+      getRecordField(data, "park_profile") ?? getRecordField(data, "account_profile");
+    const parkProfileData = getRecordField(parkProfileStep, "campground") ?? signupCampground;
     const parkProfileAmenities =
-      parkProfileData && isStringArray(parkProfileData.amenities) ? parkProfileData.amenities : undefined;
+      parkProfileData && isStringArray(parkProfileData.amenities)
+        ? parkProfileData.amenities
+        : undefined;
 
     const siteClassesRaw =
       getArrayField(getRecordField(data, "site_classes"), "siteClasses") ??
@@ -550,8 +565,7 @@ export default function OnboardingPage() {
     const cancellationRulesData = cancellationRulesRaw?.filter(isCancellationRule);
 
     const parkRulesRaw =
-      getRecordField(getRecordField(data, "park_rules"), "parkRules") ??
-      getRecord(data.parkRules);
+      getRecordField(getRecordField(data, "park_rules"), "parkRules") ?? getRecord(data.parkRules);
     const parkRulesData = isParkRulesData(parkRulesRaw) ? parkRulesRaw : undefined;
 
     const teamMembersRaw =
@@ -565,8 +579,7 @@ export default function OnboardingPage() {
     const integrationsData = isIntegrationsData(integrationsRaw) ? integrationsRaw : undefined;
 
     const inventoryPathRaw =
-      getString(getRecordField(data, "inventory_choice")?.path) ??
-      getString(data.inventoryPath);
+      getString(getRecordField(data, "inventory_choice")?.path) ?? getString(data.inventoryPath);
     const inventoryPathData =
       inventoryPathRaw === "import" || inventoryPathRaw === "manual" ? inventoryPathRaw : null;
     const dataImportRecord = getRecord(data.data_import);
@@ -579,15 +592,11 @@ export default function OnboardingPage() {
             const record = getRecord(entry);
             if (!record) return null;
             const key = getString(record.key);
-            const missingFields = (getArrayField(record, "missingFields") || []).filter(
-              isString
-            );
+            const missingFields = (getArrayField(record, "missingFields") || []).filter(isString);
             if (!key) return null;
             return { key, missingFields };
           })
-          .filter(
-            (entry): entry is { key: string; missingFields: string[] } => entry !== null
-          )
+          .filter((entry): entry is { key: string; missingFields: string[] } => entry !== null)
       : undefined;
     const dataImportData = dataImportRecord
       ? {
@@ -616,11 +625,12 @@ export default function OnboardingPage() {
       ? operationalHoursCandidate
       : undefined;
 
-    const bookingRulesRecord =
-      getRecord(data.booking_rules) ?? getRecord(data.bookingRules);
+    const bookingRulesRecord = getRecord(data.booking_rules) ?? getRecord(data.bookingRules);
     const bookingRulesCandidate =
       getRecordField(bookingRulesRecord, "bookingRules") ?? bookingRulesRecord;
-    const bookingRulesData = isBookingRulesData(bookingRulesCandidate) ? bookingRulesCandidate : undefined;
+    const bookingRulesData = isBookingRulesData(bookingRulesCandidate)
+      ? bookingRulesCandidate
+      : undefined;
 
     const waiversDocumentsRecord =
       getRecord(data.waivers_documents) ?? getRecord(data.waiversDocuments);
@@ -646,12 +656,15 @@ export default function OnboardingPage() {
       getRecord(data.featureTriage);
     const featureTriageData = isFeatureTriageData(featureTriageRaw) ? featureTriageRaw : undefined;
 
-    const guidedSetupRaw =
-      getRecord(data.guided_setup) ?? getRecord(data.guidedSetup);
+    const guidedSetupRaw = getRecord(data.guided_setup) ?? getRecord(data.guidedSetup);
     const guidedSetupData = isGuidedSetupData(guidedSetupRaw) ? guidedSetupRaw : undefined;
     // Reconstruct recommendations from smart_quiz if available
-    const recommendedNowRaw = smartQuizRaw ? getArrayField(smartQuizRaw, "recommendedNow") : undefined;
-    const recommendedLaterRaw = smartQuizRaw ? getArrayField(smartQuizRaw, "recommendedLater") : undefined;
+    const recommendedNowRaw = smartQuizRaw
+      ? getArrayField(smartQuizRaw, "recommendedNow")
+      : undefined;
+    const recommendedLaterRaw = smartQuizRaw
+      ? getArrayField(smartQuizRaw, "recommendedLater")
+      : undefined;
     const featureRecommendationsData =
       smartQuizData?.recommendations ??
       (recommendedNowRaw || recommendedLaterRaw
@@ -743,7 +756,7 @@ export default function OnboardingPage() {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_BASE}/onboarding/session/${sessionQuery.data.session.id}/stripe/status?token=${encodeURIComponent(token)}`,
-          { headers: { "X-Onboarding-Token": token } }
+          { headers: { "X-Onboarding-Token": token } },
         );
         if (response.ok) {
           const result = await response.json();
@@ -767,13 +780,16 @@ export default function OnboardingPage() {
     checkStripeStatus();
   }, [sessionQuery.data?.session?.id, token, state.currentStep, state.stripeConnected]);
 
-  const goToStep = useCallback((step: OnboardingStepKey, direction: "forward" | "backward" = "forward") => {
-    setState((prev) => ({
-      ...prev,
-      currentStep: step,
-      direction,
-    }));
-  }, []);
+  const goToStep = useCallback(
+    (step: OnboardingStepKey, direction: "forward" | "backward" = "forward") => {
+      setState((prev) => ({
+        ...prev,
+        currentStep: step,
+        direction,
+      }));
+    },
+    [],
+  );
 
   const handleDataImportDraftChange = useCallback((draft: DataImportDraft) => {
     setState((prev) => {
@@ -820,10 +836,14 @@ export default function OnboardingPage() {
   }, []);
 
   const showCelebration = useCallback(
-    (title: string, subtitle?: string, type: "stripe" | "sites" | "launch" | "default" = "default") => {
+    (
+      title: string,
+      subtitle?: string,
+      type: "stripe" | "sites" | "launch" | "default" = "default",
+    ) => {
       setCelebration({ show: true, title, subtitle, type });
     },
-    []
+    [],
   );
 
   const hideCelebration = useCallback(() => {
@@ -840,7 +860,7 @@ export default function OnboardingPage() {
         token,
         payload.step,
         payload.data,
-        idempotencyKey
+        idempotencyKey,
       );
     },
     onSuccess: () => {
@@ -867,8 +887,7 @@ export default function OnboardingPage() {
         <div className="text-center max-w-md">
           <h1 className="text-2xl font-bold text-white mb-2">Link Problem</h1>
           <p className="text-slate-400">
-            We couldn't validate this setup link. Please request a new invite or
-            contact support.
+            We couldn't validate this setup link. Please request a new invite or contact support.
           </p>
         </div>
       </div>
@@ -884,10 +903,11 @@ export default function OnboardingPage() {
     // Extract slug from the API response (server generates slug when creating campground)
     const savedCampground = getRecordField(
       getRecordField(getRecord(result?.session?.data), "park_profile"),
-      "campground"
+      "campground",
     );
     const savedSlug = savedCampground ? getString(savedCampground.slug) : undefined;
-    const campgroundId = result?.session?.campgroundId || sessionQuery.data?.session.campgroundId || "";
+    const campgroundId =
+      result?.session?.campgroundId || sessionQuery.data?.session.campgroundId || "";
 
     setState((prev) => ({
       ...prev,
@@ -921,7 +941,7 @@ export default function OnboardingPage() {
           "X-Onboarding-Token": token,
         },
         body: JSON.stringify({ token }),
-      }
+      },
     );
     if (!response.ok) {
       const error = await response.json();
@@ -943,7 +963,7 @@ export default function OnboardingPage() {
         headers: {
           "X-Onboarding-Token": token,
         },
-      }
+      },
     );
     if (!response.ok) {
       return false;
@@ -990,11 +1010,7 @@ export default function OnboardingPage() {
       })),
     }));
     completeStep("sites_builder");
-    showCelebration(
-      `${sites.length} Sites Ready!`,
-      "Your inventory is set up",
-      "sites"
-    );
+    showCelebration(`${sites.length} Sites Ready!`, "Your inventory is set up", "sites");
     setTimeout(() => {
       hideCelebration();
       goToStep("rate_periods");
@@ -1025,15 +1041,23 @@ export default function OnboardingPage() {
         sitesCreated: result.sitesCreated,
         siteClassesCreated: result.siteClassesCreated,
       },
-      sites: Array(result.sitesCreated).fill({ id: "imported", name: "", siteNumber: "", siteClassId: "" }),
-      siteClasses: prev.siteClasses || Array(result.siteClassesCreated).fill({ id: "imported", name: "", siteType: "", defaultRate: 0 }),
+      sites: Array(result.sitesCreated).fill({
+        id: "imported",
+        name: "",
+        siteNumber: "",
+        siteClassId: "",
+      }),
+      siteClasses:
+        prev.siteClasses ||
+        Array(result.siteClassesCreated).fill({
+          id: "imported",
+          name: "",
+          siteType: "",
+          defaultRate: 0,
+        }),
     }));
     completeStep("data_import");
-    showCelebration(
-      `${result.sitesCreated} Sites Imported!`,
-      "Your inventory is ready",
-      "sites"
-    );
+    showCelebration(`${result.sitesCreated} Sites Imported!`, "Your inventory is ready", "sites");
     setTimeout(() => {
       hideCelebration();
       goToStep("rate_periods");
@@ -1230,7 +1254,11 @@ export default function OnboardingPage() {
       communicationSetup: data,
     }));
     completeStep("communication_setup");
-    showCelebration("Emails Configured!", "Guests will receive beautiful, professional messages", "default");
+    showCelebration(
+      "Emails Configured!",
+      "Guests will receive beautiful, professional messages",
+      "default",
+    );
     setTimeout(() => {
       hideCelebration();
       goToStep("integrations");
@@ -1270,7 +1298,11 @@ export default function OnboardingPage() {
       pinnedPages,
     }));
     completeStep("menu_setup");
-    showCelebration("Dashboard Personalized!", "Your menu is set up exactly how you like it", "default");
+    showCelebration(
+      "Dashboard Personalized!",
+      "Your menu is set up exactly how you like it",
+      "default",
+    );
     setTimeout(() => {
       hideCelebration();
       goToStep("feature_discovery");
@@ -1427,11 +1459,7 @@ export default function OnboardingPage() {
       data: { launched: true },
     });
     completeStep("review_launch");
-    showCelebration(
-      "You're LIVE!",
-      "Your campground is ready to accept bookings",
-      "launch"
-    );
+    showCelebration("You're LIVE!", "Your campground is ready to accept bookings", "launch");
     setTimeout(() => {
       // Redirect to dashboard
       router.push("/dashboard");
@@ -1441,7 +1469,12 @@ export default function OnboardingPage() {
   const handlePreview = () => {
     // Open campground homepage in new tab with preview token
     // Fallback slug generation uses same algorithm as backend
-    const slug = state.campground?.slug || state.campground?.name?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const slug =
+      state.campground?.slug ||
+      state.campground?.name
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
     if (slug) {
       window.open(`/park/${slug}/v2?token=${encodeURIComponent(token)}`, "_blank");
     }
@@ -1804,7 +1837,9 @@ export default function OnboardingPage() {
       case "feature_triage":
         return (
           <FeatureTriage
-            recommendations={state.featureRecommendations || { setupNow: [], setupLater: [], skipped: [] }}
+            recommendations={
+              state.featureRecommendations || { setupNow: [], setupLater: [], skipped: [] }
+            }
             data={state.featureTriage || {}}
             onChange={handleFeatureTriageChange}
             onNext={handleFeatureTriageNext}
@@ -1898,9 +1933,7 @@ export default function OnboardingPage() {
         completedSteps={state.completedSteps}
         inventoryPath={state.inventoryPath}
         onStepClick={(step) => {
-          const currentIndex = onboardingSteps.findIndex(
-            (s) => s.key === state.currentStep
-          );
+          const currentIndex = onboardingSteps.findIndex((s) => s.key === state.currentStep);
           const targetIndex = onboardingSteps.findIndex((s) => s.key === step);
           goToStep(step, targetIndex < currentIndex ? "backward" : "forward");
         }}
@@ -1908,10 +1941,7 @@ export default function OnboardingPage() {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col">
-        <StepContainer
-          currentStep={state.currentStep}
-          direction={state.direction}
-        >
+        <StepContainer currentStep={state.currentStep} direction={state.direction}>
           {renderStep()}
         </StepContainer>
       </main>

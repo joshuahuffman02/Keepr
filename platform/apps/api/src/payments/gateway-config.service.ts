@@ -9,7 +9,9 @@ import { isRecord } from "../utils/type-guards";
 
 type GatewayProvider = "stripe" | "adyen" | "authorize_net" | "other";
 type GatewayMode = "test" | "prod";
-type GatewayConfigRecord = CampgroundPaymentGatewayConfig & { GatewayFeePreset?: GatewayFeePreset | null };
+type GatewayConfigRecord = CampgroundPaymentGatewayConfig & {
+  GatewayFeePreset?: GatewayFeePreset | null;
+};
 type GatewayConfigCandidate = {
   gateway: GatewayProvider;
   mode: GatewayMode;
@@ -26,14 +28,15 @@ type GatewayConfigCandidate = {
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
 };
 
 const toJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -42,7 +45,7 @@ const toJsonInput = (
 };
 
 const toAuditRecord = (
-  view: GatewayConfigView | null | undefined
+  view: GatewayConfigView | null | undefined,
 ): Record<string, unknown> | null | undefined => {
   if (view === undefined) return undefined;
   if (view === null) return null;
@@ -59,7 +62,7 @@ const toAuditRecord = (
     effectiveFee: view.effectiveFee,
     credentials: view.credentials,
     hasProductionCredentials: view.hasProductionCredentials,
-    additionalConfig: view.additionalConfig
+    additionalConfig: view.additionalConfig,
   };
   return record;
 };
@@ -68,8 +71,8 @@ const toAuditRecord = (
 export class GatewayConfigService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService
-  ) { }
+    private readonly audit: AuditService,
+  ) {}
 
   async getConfig(campgroundId: string): Promise<GatewayConfigView | null> {
     const existing = await this.ensureConfig(campgroundId);
@@ -79,18 +82,21 @@ export class GatewayConfigService {
   async upsertConfig(
     campgroundId: string,
     dto: UpsertPaymentGatewayConfigDto,
-    actor?: { userId?: string | null; ip?: string | null; userAgent?: string | null }
+    actor?: { userId?: string | null; ip?: string | null; userAgent?: string | null },
   ): Promise<GatewayConfigView> {
-    const existing: GatewayConfigRecord | null = await this.prisma.campgroundPaymentGatewayConfig.findUnique({
-      where: { campgroundId },
-      include: { GatewayFeePreset: true }
-    });
+    const existing: GatewayConfigRecord | null =
+      await this.prisma.campgroundPaymentGatewayConfig.findUnique({
+        where: { campgroundId },
+        include: { GatewayFeePreset: true },
+      });
 
     const preset = await this.resolvePreset(dto.gateway, dto.mode, dto.feePresetId);
     this.ensureProdGuard(dto.mode, dto, existing);
 
     const additionalConfig =
-      dto.additionalConfig !== undefined ? toJsonInput(dto.additionalConfig) : toJsonInput(existing?.additionalConfig);
+      dto.additionalConfig !== undefined
+        ? toJsonInput(dto.additionalConfig)
+        : toJsonInput(existing?.additionalConfig);
     const nextData: GatewayConfigCandidate = {
       gateway: dto.gateway,
       mode: dto.mode,
@@ -98,11 +104,13 @@ export class GatewayConfigService {
       feePercentBasisPoints: dto.feePercentBasisPoints ?? existing?.feePercentBasisPoints ?? null,
       feeFlatCents: dto.feeFlatCents ?? existing?.feeFlatCents ?? null,
       feePresetId: dto.feePresetId ?? existing?.feePresetId ?? preset?.id ?? null,
-      publishableKeySecretId: dto.publishableKeySecretId ?? existing?.publishableKeySecretId ?? null,
+      publishableKeySecretId:
+        dto.publishableKeySecretId ?? existing?.publishableKeySecretId ?? null,
       secretKeySecretId: dto.secretKeySecretId ?? existing?.secretKeySecretId ?? null,
-      merchantAccountIdSecretId: dto.merchantAccountIdSecretId ?? existing?.merchantAccountIdSecretId ?? null,
+      merchantAccountIdSecretId:
+        dto.merchantAccountIdSecretId ?? existing?.merchantAccountIdSecretId ?? null,
       webhookSecretId: dto.webhookSecretId ?? existing?.webhookSecretId ?? null,
-      additionalConfig
+      additionalConfig,
     };
 
     if (existing && this.isSame(existing, nextData)) {
@@ -114,12 +122,12 @@ export class GatewayConfigService {
       create: {
         id: randomUUID(),
         campgroundId,
-        ...nextData
+        ...nextData,
       },
       update: {
-        ...nextData
+        ...nextData,
       },
-      include: { GatewayFeePreset: true }
+      include: { GatewayFeePreset: true },
     });
 
     await this.audit.record({
@@ -131,7 +139,7 @@ export class GatewayConfigService {
       before: toAuditRecord(GatewayConfigMapper.toView(existing)),
       after: toAuditRecord(GatewayConfigMapper.toView(saved)),
       ip: actor?.ip,
-      userAgent: actor?.userAgent
+      userAgent: actor?.userAgent,
     });
 
     return GatewayConfigMapper.toView(saved)!;
@@ -140,7 +148,7 @@ export class GatewayConfigService {
   private async ensureConfig(campgroundId: string) {
     const existing = await this.prisma.campgroundPaymentGatewayConfig.findUnique({
       where: { campgroundId },
-      include: { GatewayFeePreset: true }
+      include: { GatewayFeePreset: true },
     });
     if (existing) return existing;
 
@@ -152,14 +160,15 @@ export class GatewayConfigService {
         gateway: "stripe",
         mode: "test",
         feeMode: "absorb",
-        feePresetId: preset?.id ?? null
+        feePresetId: preset?.id ?? null,
       },
-      include: { GatewayFeePreset: true }
+      include: { GatewayFeePreset: true },
     });
   }
 
   private isSame(existing: GatewayConfigRecord, candidate: GatewayConfigCandidate) {
-    const candidateAdditional = candidate.additionalConfig === Prisma.JsonNull ? null : candidate.additionalConfig;
+    const candidateAdditional =
+      candidate.additionalConfig === Prisma.JsonNull ? null : candidate.additionalConfig;
     const existingAdditional = existing.additionalConfig ?? null;
     return (
       existing.gateway === candidate.gateway &&
@@ -170,7 +179,8 @@ export class GatewayConfigService {
       (existing.feePresetId ?? null) === (candidate.feePresetId ?? null) &&
       (existing.publishableKeySecretId ?? null) === (candidate.publishableKeySecretId ?? null) &&
       (existing.secretKeySecretId ?? null) === (candidate.secretKeySecretId ?? null) &&
-      (existing.merchantAccountIdSecretId ?? null) === (candidate.merchantAccountIdSecretId ?? null) &&
+      (existing.merchantAccountIdSecretId ?? null) ===
+        (candidate.merchantAccountIdSecretId ?? null) &&
       (existing.webhookSecretId ?? null) === (candidate.webhookSecretId ?? null) &&
       JSON.stringify(existingAdditional) === JSON.stringify(candidateAdditional ?? null)
     );
@@ -179,21 +189,27 @@ export class GatewayConfigService {
   private ensureProdGuard(
     mode: GatewayMode,
     dto: UpsertPaymentGatewayConfigDto,
-    existing?: GatewayConfigRecord | null
+    existing?: GatewayConfigRecord | null,
   ) {
     if (mode !== "prod") return;
     const hasSecret = Boolean(
       dto.secretKeySecretId ||
       dto.merchantAccountIdSecretId ||
       existing?.secretKeySecretId ||
-      existing?.merchantAccountIdSecretId
+      existing?.merchantAccountIdSecretId,
     );
     if (!hasSecret) {
-      throw new BadRequestException("Production mode requires gateway credentials to be configured.");
+      throw new BadRequestException(
+        "Production mode requires gateway credentials to be configured.",
+      );
     }
   }
 
-  private async resolvePreset(gateway: GatewayProvider, mode: GatewayMode, presetId?: string | null) {
+  private async resolvePreset(
+    gateway: GatewayProvider,
+    mode: GatewayMode,
+    presetId?: string | null,
+  ) {
     if (presetId) {
       const preset = await this.prisma.gatewayFeePreset.findUnique({ where: { id: presetId } });
       if (!preset) throw new BadRequestException("feePresetId is invalid");

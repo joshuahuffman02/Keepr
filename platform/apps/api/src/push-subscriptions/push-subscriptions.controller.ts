@@ -1,4 +1,15 @@
-import { BadRequestException, Body, Controller, Post, Get, Delete, Req, UseGuards, HttpCode, HttpStatus } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Req,
+  UseGuards,
+  HttpCode,
+  HttpStatus,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { PushSubscriptionsService } from "./push-subscriptions.service";
 import { MobilePushService } from "./mobile-push.service";
@@ -24,7 +35,7 @@ const getHeaderValue = (headers: Request["headers"], key: string): string | unde
 export class PushSubscriptionsController {
   constructor(
     private readonly pushSubscriptions: PushSubscriptionsService,
-    private readonly mobilePush: MobilePushService
+    private readonly mobilePush: MobilePushService,
   ) {}
 
   // =========================================================================
@@ -34,7 +45,8 @@ export class PushSubscriptionsController {
   @Post("subscribe")
   async subscribe(@Body() body: unknown, @Req() req: AuthRequest) {
     const bodyRecord = isRecord(body) ? body : undefined;
-    const subscriptionCandidate = bodyRecord && "subscription" in bodyRecord ? bodyRecord.subscription : body;
+    const subscriptionCandidate =
+      bodyRecord && "subscription" in bodyRecord ? bodyRecord.subscription : body;
     const campgroundId = getString(bodyRecord?.campgroundId);
     const userId = req.user?.userId ?? req.user?.id;
 

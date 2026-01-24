@@ -88,7 +88,8 @@ export default function TemplatesPage() {
       return;
     }
 
-    apiClient.getCampaignTemplates(id)
+    apiClient
+      .getCampaignTemplates(id)
       .then((data) => {
         setTemplates(data);
         setLoading(false);
@@ -139,9 +140,7 @@ export default function TemplatesPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Email Templates</h2>
-          <p className="text-muted-foreground mt-1">
-            Customize automated email and SMS messages
-          </p>
+          <p className="text-muted-foreground mt-1">Customize automated email and SMS messages</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -155,9 +154,7 @@ export default function TemplatesPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Email Templates</h2>
-          <p className="text-muted-foreground mt-1">
-            Customize automated email and SMS messages
-          </p>
+          <p className="text-muted-foreground mt-1">Customize automated email and SMS messages</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -175,9 +172,7 @@ export default function TemplatesPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Email Templates</h2>
-          <p className="text-muted-foreground mt-1">
-            Customize automated email and SMS messages
-          </p>
+          <p className="text-muted-foreground mt-1">Customize automated email and SMS messages</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
@@ -199,9 +194,8 @@ export default function TemplatesPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Templates are used with notification triggers to send automated messages
-          to guests. Create a template here, then connect it to a trigger in the
-          Notifications section.
+          Templates are used with notification triggers to send automated messages to guests. Create
+          a template here, then connect it to a trigger in the Notifications section.
         </AlertDescription>
       </Alert>
 
@@ -244,9 +238,7 @@ export default function TemplatesPage() {
                 <FileText className="h-5 w-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {templates.length}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{templates.length}</p>
                 <p className="text-sm text-muted-foreground">Total Templates</p>
               </div>
             </div>
@@ -259,12 +251,10 @@ export default function TemplatesPage() {
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No templates yet
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No templates yet</h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Create email and SMS templates to automate your guest communication.
-              Start from scratch or use our prebuilt templates.
+              Create email and SMS templates to automate your guest communication. Start from
+              scratch or use our prebuilt templates.
             </p>
             <Button asChild>
               <Link href="/dashboard/settings/templates">
@@ -294,13 +284,15 @@ export default function TemplatesPage() {
                       className="flex items-center justify-between px-4 py-3 hover:bg-muted/60 transition-colors group"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`p-2 rounded-lg ${
-                          template.channel === "email"
-                            ? "bg-status-info/15 text-status-info"
-                            : template.channel === "sms"
-                            ? "bg-status-success/15 text-status-success"
-                            : "bg-purple-100 text-purple-600"
-                        }`}>
+                        <div
+                          className={`p-2 rounded-lg ${
+                            template.channel === "email"
+                              ? "bg-status-info/15 text-status-info"
+                              : template.channel === "sms"
+                                ? "bg-status-success/15 text-status-success"
+                                : "bg-purple-100 text-purple-600"
+                          }`}
+                        >
                           {template.channel === "email" ? (
                             <Mail className="h-4 w-4" />
                           ) : template.channel === "sms" ? (
@@ -312,9 +304,7 @@ export default function TemplatesPage() {
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-foreground truncate">
-                            {template.name}
-                          </p>
+                          <p className="font-medium text-foreground truncate">{template.name}</p>
                           {template.subject && (
                             <p className="text-sm text-muted-foreground truncate">
                               {template.subject}
@@ -389,9 +379,7 @@ export default function TemplatesPage() {
                 <Mail className="h-5 w-5 text-status-info" />
               </div>
               <div>
-                <p className="font-medium text-foreground">
-                  Connect Templates to Triggers
-                </p>
+                <p className="font-medium text-foreground">Connect Templates to Triggers</p>
                 <p className="text-sm text-muted-foreground">
                   Set up automatic sending when events occur
                 </p>
@@ -407,7 +395,10 @@ export default function TemplatesPage() {
       </Card>
 
       {/* Delete Template Confirmation */}
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Template</AlertDialogTitle>

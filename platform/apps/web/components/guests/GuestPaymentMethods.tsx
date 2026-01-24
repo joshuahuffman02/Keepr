@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { Loader2, CreditCard, Trash2, Star, Plus, Shield } from "lucide-react";
 import { format } from "date-fns";
 
@@ -47,7 +54,11 @@ function getCardBrandColor(brand: string | null): string {
   return CARD_BRAND_COLORS[brand.toLowerCase()] || CARD_BRAND_COLORS.default;
 }
 
-export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroundIds = [] }: GuestPaymentMethodsProps) {
+export function GuestPaymentMethods({
+  guestId,
+  campgroundId,
+  additionalCampgroundIds = [],
+}: GuestPaymentMethodsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -65,14 +76,14 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
     queryKey: ["guest-payment-methods-all", uniqueCampgroundIds, guestId],
     queryFn: async () => {
       const results = await Promise.all(
-        uniqueCampgroundIds.map(cgId =>
-          apiClient.getGuestPaymentMethods(cgId, guestId).catch(() => [])
-        )
+        uniqueCampgroundIds.map((cgId) =>
+          apiClient.getGuestPaymentMethods(cgId, guestId).catch(() => []),
+        ),
       );
       // Aggregate and deduplicate by stripePaymentMethodId
       const allMethods: PaymentMethod[] = results.flat();
       const seen = new Set<string>();
-      return allMethods.filter(pm => {
+      return allMethods.filter((pm) => {
         if (seen.has(pm.stripePaymentMethodId)) return false;
         seen.add(pm.stripePaymentMethodId);
         return true;
@@ -181,7 +192,8 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                 Saved Payment Methods
               </CardTitle>
               <CardDescription>
-                Cards on file for this guest. Refunds are processed to the original payment method only.
+                Cards on file for this guest. Refunds are processed to the original payment method
+                only.
               </CardDescription>
             </div>
             <Button size="sm" onClick={() => setShowAddCard(true)}>
@@ -205,22 +217,22 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                 <div
                   key={pm.id}
                   className={`flex items-center justify-between p-4 rounded-lg border ${
-                    pm.isDefault ? "border-status-success-border bg-status-success-bg" : "border-border bg-muted/40"
+                    pm.isDefault
+                      ? "border-status-success-border bg-status-success-bg"
+                      : "border-border bg-muted/40"
                   }`}
                 >
                   <div className="flex items-center gap-4">
                     <div
                       className={`w-12 h-8 rounded flex items-center justify-center text-white text-xs font-bold ${getCardBrandColor(
-                        pm.brand
+                        pm.brand,
                       )}`}
                     >
                       {pm.brand?.toUpperCase().slice(0, 4) || "CARD"}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          •••• •••• •••• {pm.last4 || "****"}
-                        </span>
+                        <span className="font-medium">•••• •••• •••• {pm.last4 || "****"}</span>
                         {pm.isDefault && (
                           <Badge className="bg-status-success-bg text-status-success-text text-xs">
                             <Star className="w-3 h-3 mr-1" />
@@ -232,7 +244,8 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        Expires {formatExpiry(pm.expMonth, pm.expYear)} · {getAddedByLabel(pm.addedBy)}
+                        Expires {formatExpiry(pm.expMonth, pm.expYear)} ·{" "}
+                        {getAddedByLabel(pm.addedBy)}
                       </div>
                     </div>
                   </div>
@@ -257,11 +270,7 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
                     >
                       Edit
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setDeleteConfirm(pm.id)}
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => setDeleteConfirm(pm.id)}>
                       <Trash2 className="w-4 h-4 text-muted-foreground" />
                     </Button>
                   </div>
@@ -296,8 +305,8 @@ export function GuestPaymentMethods({ guestId, campgroundId, additionalCampgroun
           </DialogHeader>
           <div className="py-4">
             <p className="text-sm text-muted-foreground mb-4">
-              This will create a Stripe SetupIntent. In production, you would use Stripe Elements
-              or the Payment Element to collect card details securely.
+              This will create a Stripe SetupIntent. In production, you would use Stripe Elements or
+              the Payment Element to collect card details securely.
             </p>
             <div className="p-4 bg-muted/40 rounded-lg border border-border">
               <p className="text-xs text-muted-foreground">

@@ -173,9 +173,7 @@ export function PhotoLightbox({
               <motion.div
                 key={currentIndex}
                 className="relative w-full h-full flex items-center justify-center p-4 md:p-16"
-                initial={
-                  prefersReducedMotion ? {} : { opacity: 0, x: 50 }
-                }
+                initial={prefersReducedMotion ? {} : { opacity: 0, x: 50 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={prefersReducedMotion ? {} : { opacity: 0, x: -50 }}
                 transition={{ duration: 0.2 }}
@@ -238,34 +236,22 @@ export function PhotoLightbox({
                     "focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-black",
                     index === currentIndex
                       ? "ring-2 ring-white scale-110"
-                      : "opacity-50 hover:opacity-80"
+                      : "opacity-50 hover:opacity-80",
                   )}
                   aria-label={`View photo ${index + 1}`}
                   aria-current={index === currentIndex ? "true" : undefined}
                 >
                   {isExternal ? (
-                    <img
-                      src={photo}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
+                    <img src={photo} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <Image
-                      src={photo}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="80px"
-                    />
+                    <Image src={photo} alt="" fill className="object-cover" sizes="80px" />
                   )}
                 </button>
               ))}
             </div>
 
             {/* Mobile swipe hint */}
-            <p className="text-center text-white/60 text-xs mt-2 md:hidden">
-              Swipe to navigate
-            </p>
+            <p className="text-center text-white/60 text-xs mt-2 md:hidden">Swipe to navigate</p>
           </div>
         </motion.div>
       )}

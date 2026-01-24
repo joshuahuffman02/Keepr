@@ -9,7 +9,6 @@ import { Reflector } from "@nestjs/core";
 @Module({
   controllers: [PermissionsController],
   providers: [PermissionsService, PermissionGuard, ScopeGuard, Reflector],
-  exports: [PermissionsService, PermissionGuard, ScopeGuard]
+  exports: [PermissionsService, PermissionGuard, ScopeGuard],
 })
 export class PermissionsModule {}
-

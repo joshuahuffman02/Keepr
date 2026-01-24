@@ -11,10 +11,7 @@ describe("OTA config stub endpoint", () => {
   beforeEach(async () => {
     moduleRef = await Test.createTestingModule({
       controllers: [OtaController],
-      providers: [
-        OtaService,
-        { provide: PrismaService, useValue: {} },
-      ],
+      providers: [OtaService, { provide: PrismaService, useValue: {} }],
     }).compile();
 
     controller = moduleRef.get(OtaController);

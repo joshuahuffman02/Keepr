@@ -16,8 +16,8 @@ import { CampgroundReviewConnectors } from "./campground-review-connectors.servi
     PrismaService,
     CampgroundsIngestScheduler,
     CampgroundAssetsService,
-    CampgroundReviewConnectors
+    CampgroundReviewConnectors,
   ],
-  exports: [CampgroundsService]
+  exports: [CampgroundsService],
 })
 export class CampgroundsModule {}

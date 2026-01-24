@@ -1,26 +1,44 @@
 export const helpContextMap: { match: RegExp; topicIds: string[] }[] = [
   { match: /^\/dashboard/, topicIds: ["dashboard-overview", "reports-overview"] },
-  { match: /^\/calendar/, topicIds: ["calendar-availability", "booking-new", "reservation-manage"] },
+  {
+    match: /^\/calendar/,
+    topicIds: ["calendar-availability", "booking-new", "reservation-manage"],
+  },
   { match: /^\/booking/, topicIds: ["booking-new", "policies-rules", "payments-collect"] },
-  { match: /^\/reservations/, topicIds: ["reservation-manage", "check-in-out", "payments-collect", "payments-refund"] },
+  {
+    match: /^\/reservations/,
+    topicIds: ["reservation-manage", "check-in-out", "payments-collect", "payments-refund"],
+  },
   { match: /^\/guests/, topicIds: ["guests-profiles", "messages-inbox", "payments-collect"] },
   { match: /^\/messages/, topicIds: ["messages-inbox", "support-contact"] },
-  { match: /^\/campgrounds\/[^/]+\/sites/, topicIds: ["sites-management", "site-classes", "maintenance-work-orders"] },
+  {
+    match: /^\/campgrounds\/[^/]+\/sites/,
+    topicIds: ["sites-management", "site-classes", "maintenance-work-orders"],
+  },
   { match: /^\/campgrounds\/[^/]+\/classes/, topicIds: ["site-classes", "pricing-rules"] },
-  { match: /^\/campgrounds(\/|$)/, topicIds: ["campground-setup", "sites-management", "site-classes"] },
+  {
+    match: /^\/campgrounds(\/|$)/,
+    topicIds: ["campground-setup", "sites-management", "site-classes"],
+  },
   { match: /^\/settings\/pricing-rules/, topicIds: ["pricing-rules", "site-classes"] },
   { match: /^\/pricing/, topicIds: ["pricing-rules", "site-classes"] },
-  { match: /^\/maintenance/, topicIds: ["maintenance-work-orders", "maintenance-cleaning", "blackout-dates"] },
+  {
+    match: /^\/maintenance/,
+    topicIds: ["maintenance-work-orders", "maintenance-cleaning", "blackout-dates"],
+  },
   { match: /^\/ledger/, topicIds: ["ledger-close-day", "payments-collect", "payments-refund"] },
   { match: /^\/reports/, topicIds: ["reports-overview", "ledger-close-day", "pricing-rules"] },
   { match: /^\/settings\/blackout-dates/, topicIds: ["blackout-dates", "maintenance-work-orders"] },
   { match: /^\/settings\/users/, topicIds: ["users-roles", "policies-rules"] },
   { match: /^\/settings\/policies/, topicIds: ["policies-rules", "support-contact"] },
-  { match: /^\/settings\/payments/, topicIds: ["payments-config", "payments-collect", "payments-refund"] },
+  {
+    match: /^\/settings\/payments/,
+    topicIds: ["payments-config", "payments-collect", "payments-refund"],
+  },
   { match: /^\/settings\/ota/, topicIds: ["ota-channels", "pricing-rules"] },
   { match: /^\/settings\/branding/, topicIds: ["branding"] },
   { match: /^\/marketing/, topicIds: ["marketing-promotions", "branding"] },
   { match: /^\/forms/, topicIds: ["forms-waivers", "policies-rules"] },
   { match: /^\/updates/, topicIds: ["reports-overview", "support-contact"] },
-  { match: /^\/dashboard\/help/, topicIds: ["support-contact", "reports-overview"] }
+  { match: /^\/dashboard\/help/, topicIds: ["support-contact", "reports-overview"] },
 ];

@@ -23,4 +23,3 @@ export class UpdatePricingRuleV2Dto extends PartialType(CreatePricingRuleV2Dto) 
   @IsString()
   endDate?: string | null;
 }
-

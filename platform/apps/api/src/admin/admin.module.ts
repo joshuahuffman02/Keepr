@@ -14,42 +14,41 @@ import { GuestSegmentController } from "./guest-segment.controller";
 import { AnalyticsExportService } from "./analytics-export.service";
 import { AnalyticsShareService } from "./analytics-share.service";
 import {
-    AnalyticsExportController,
-    SharedAnalyticsController,
+  AnalyticsExportController,
+  SharedAnalyticsController,
 } from "./analytics-export.controller";
 import { PlatformAnalyticsModule } from "./platform-analytics/platform-analytics.module";
 import { IssuesModule } from "./issues/issues.module";
 
 @Module({
-    imports: [PrismaModule, PlatformAnalyticsModule, IssuesModule],
-    controllers: [
-        AuditLogController,
-        FeatureFlagController,
-        AnnouncementController,
-        AdminCampgroundController,
-        GuestAnalyticsController,
-        GuestSegmentController,
-        AnalyticsExportController,
-        SharedAnalyticsController,
-    ],
-    providers: [
-        AuditLogService,
-        FeatureFlagService,
-        AnnouncementService,
-        GuestAnalyticsService,
-        GuestSegmentService,
-        AnalyticsExportService,
-        AnalyticsShareService,
-    ],
-    exports: [
-        AuditLogService,
-        FeatureFlagService,
-        AnnouncementService,
-        GuestAnalyticsService,
-        GuestSegmentService,
-        AnalyticsExportService,
-        AnalyticsShareService,
-    ],
+  imports: [PrismaModule, PlatformAnalyticsModule, IssuesModule],
+  controllers: [
+    AuditLogController,
+    FeatureFlagController,
+    AnnouncementController,
+    AdminCampgroundController,
+    GuestAnalyticsController,
+    GuestSegmentController,
+    AnalyticsExportController,
+    SharedAnalyticsController,
+  ],
+  providers: [
+    AuditLogService,
+    FeatureFlagService,
+    AnnouncementService,
+    GuestAnalyticsService,
+    GuestSegmentService,
+    AnalyticsExportService,
+    AnalyticsShareService,
+  ],
+  exports: [
+    AuditLogService,
+    FeatureFlagService,
+    AnnouncementService,
+    GuestAnalyticsService,
+    GuestSegmentService,
+    AnalyticsExportService,
+    AnalyticsShareService,
+  ],
 })
-export class AdminModule { }
-
+export class AdminModule {}

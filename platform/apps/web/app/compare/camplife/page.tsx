@@ -83,9 +83,7 @@ export default function CompareCamplifePage() {
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
               CampLife simplicity.{" "}
-              <span className="text-keepr-evergreen font-semibold">
-                Enterprise features.
-              </span>{" "}
+              <span className="text-keepr-evergreen font-semibold">Enterprise features.</span>{" "}
               Multi-property support and AI included.
             </p>
 
@@ -139,7 +137,8 @@ export default function CompareCamplifePage() {
               What CampLife Users Are Missing
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              CampLife works well for small, single-location parks. But as you grow, you'll hit these walls.
+              CampLife works well for small, single-location parks. But as you grow, you'll hit
+              these walls.
             </p>
           </div>
 
@@ -160,9 +159,7 @@ export default function CompareCamplifePage() {
           </div>
 
           <div className="mt-12 text-center">
-            <p className="text-slate-600 mb-6">
-              Ready to grow beyond CampLife's limitations?
-            </p>
+            <p className="text-slate-600 mb-6">Ready to grow beyond CampLife's limitations?</p>
             <Button asChild className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
               <Link href="/signup">
                 Start Your Free Trial
@@ -236,7 +233,9 @@ export default function CompareCamplifePage() {
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Transparent Pricing</td>
                   <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
-                    <span className="text-keepr-evergreen font-semibold">$100/mo + $2.30/booking</span>
+                    <span className="text-keepr-evergreen font-semibold">
+                      $100/mo + $2.30/booking
+                    </span>
                     <span className="block text-xs text-keepr-evergreen/80">
                       SMS at cost. AI beyond included credits billed separately.
                     </span>
@@ -304,32 +303,38 @@ export default function CompareCamplifePage() {
               {
                 icon: Building2,
                 title: "Multi-Property Management",
-                description: "Manage multiple campgrounds from one dashboard. Share rates, staff, and insights across locations.",
+                description:
+                  "Manage multiple campgrounds from one dashboard. Share rates, staff, and insights across locations.",
               },
               {
                 icon: Users,
                 title: "Loyalty & Gamification",
-                description: "Built-in XP system and rewards program. Turn one-time guests into repeat visitors.",
+                description:
+                  "Built-in XP system and rewards program. Turn one-time guests into repeat visitors.",
               },
               {
                 icon: Zap,
                 title: "AI Demand Forecasting",
-                description: "Predict busy periods and optimize pricing automatically. $5/month AI credits included.",
+                description:
+                  "Predict busy periods and optimize pricing automatically. $5/month AI credits included.",
               },
               {
                 icon: Award,
                 title: "Staff Scheduling + Payroll",
-                description: "Integrated scheduling that syncs with reservations. Time tracking and payroll built-in.",
+                description:
+                  "Integrated scheduling that syncs with reservations. Time tracking and payroll built-in.",
               },
               {
                 icon: Shield,
                 title: "Advanced Analytics",
-                description: "A/B testing, anomaly detection, and rate parity monitoring across all properties.",
+                description:
+                  "A/B testing, anomaly detection, and rate parity monitoring across all properties.",
               },
               {
                 icon: Clock,
                 title: "Workflow Automation",
-                description: "Automate emails, tasks, and notifications. Reduce manual work by hours per week.",
+                description:
+                  "Automate emails, tasks, and notifications. Reduce manual work by hours per week.",
               },
             ].map((feature) => (
               <div
@@ -354,7 +359,8 @@ export default function CompareCamplifePage() {
                 Transparent Pricing. No Demo Required.
               </h2>
               <p className="text-slate-600">
-                CampLife requires a demo just to see pricing. Keepr publishes its base pricing up front, with usage-based add-ons billed separately.
+                CampLife requires a demo just to see pricing. Keepr publishes its base pricing up
+                front, with usage-based add-ons billed separately.
               </p>
             </div>
 
@@ -370,7 +376,9 @@ export default function CompareCamplifePage() {
                 <div className="text-4xl font-bold text-keepr-evergreen mb-2">$100/mo</div>
                 <div className="text-slate-600">+ $2.30 per booking</div>
                 <div className="text-sm text-keepr-evergreen mt-2">$5/mo AI credits included</div>
-                <div className="text-xs text-slate-500 mt-2">SMS at cost · AI overage billed separately</div>
+                <div className="text-xs text-slate-500 mt-2">
+                  SMS at cost · AI overage billed separately
+                </div>
               </div>
             </div>
 
@@ -378,7 +386,11 @@ export default function CompareCamplifePage() {
               <p className="text-slate-600 mb-4">
                 Transparent base pricing with usage-based add-ons billed separately.
               </p>
-              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
+              <Button
+                asChild
+                size="lg"
+                className="bg-keepr-evergreen hover:bg-keepr-evergreen-light"
+              >
                 <Link href="/pricing">
                   See Full Pricing Details
                   <ArrowRight className="ml-2 h-4 w-4" />

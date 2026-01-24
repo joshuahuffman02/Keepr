@@ -10,14 +10,15 @@ const isString = (value: unknown): value is string => typeof value === "string";
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -92,7 +93,10 @@ export class PrivacyService {
     return this.maskValue(value);
   }
 
-  private applyTagRedactions(sample: unknown, tags: { field: string; redactionMode?: RedactionMode | null }[]): unknown {
+  private applyTagRedactions(
+    sample: unknown,
+    tags: { field: string; redactionMode?: RedactionMode | null }[],
+  ): unknown {
     if (Array.isArray(sample)) return sample.map((v) => this.applyTagRedactions(v, tags));
     if (isRecord(sample)) {
       const byField = new Map(tags.map((tag) => [tag.field, tag.redactionMode]));
@@ -125,7 +129,12 @@ export class PrivacyService {
 
   async updateSettings(
     campgroundId: string,
-    patch: Partial<{ redactPII: boolean; consentRequired: boolean; backupRetentionDays: number; keyRotationDays: number }>
+    patch: Partial<{
+      redactPII: boolean;
+      consentRequired: boolean;
+      backupRetentionDays: number;
+      keyRotationDays: number;
+    }>,
   ) {
     await this.getSettings(campgroundId);
     return this.prisma.privacySetting.update({
@@ -212,14 +221,18 @@ export class PrivacyService {
       where: resource ? { resource } : undefined,
       select: { field: true, redactionMode: true, classification: true },
       orderBy: [{ resource: "asc" }, { field: "asc" }],
-      take: 100
+      take: 100,
     });
 
     const redacted = tags.length ? this.applyTagRedactions(sample, tags) : this.scrub(sample);
 
     return {
       redacted,
-      rulesApplied: tags.map((t) => ({ field: t.field, redactionMode: t.redactionMode, classification: t.classification })),
+      rulesApplied: tags.map((t) => ({
+        field: t.field,
+        redactionMode: t.redactionMode,
+        classification: t.classification,
+      })),
       campgroundId,
     };
   }
@@ -227,7 +240,15 @@ export class PrivacyService {
   async listRecentRedactions(campgroundId: string) {
     const logs = await this.prisma.auditLog.findMany({
       where: { campgroundId },
-      select: { id: true, action: true, entity: true, entityId: true, before: true, after: true, createdAt: true },
+      select: {
+        id: true,
+        action: true,
+        entity: true,
+        entityId: true,
+        before: true,
+        after: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: "desc" },
       take: 10,
     });
@@ -419,7 +440,22 @@ export class PrivacyService {
     }
 
     rows.push(
-      ["setting", campgroundId, "", "", "", "", "", "", "", "", "", "", "redactPII", sanitize(bundle.settings.redactPII)].join(","),
+      [
+        "setting",
+        campgroundId,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "redactPII",
+        sanitize(bundle.settings.redactPII),
+      ].join(","),
     );
     rows.push(
       [

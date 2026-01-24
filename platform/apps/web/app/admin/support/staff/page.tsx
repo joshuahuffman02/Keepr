@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useWhoami } from "@/hooks/use-whoami";
@@ -43,7 +49,9 @@ export default function SupportStaffDirectoryPage() {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [campgroundId, setCampgroundId] = useState<string>("");
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<Record<string, { region: string; ownershipRoles: string }>>({});
+  const [drafts, setDrafts] = useState<Record<string, { region: string; ownershipRoles: string }>>(
+    {},
+  );
   const { toast } = useToast();
   const { data: whoami, isLoading: whoamiLoading, error: whoamiError } = useWhoami();
   const hasMembership = (whoami?.user?.memberships?.length ?? 0) > 0;
@@ -71,7 +79,7 @@ export default function SupportStaffDirectoryPage() {
       const qs = parts.length ? `?${parts.join("&")}` : "";
       const res = await fetch(`${base}/support/reports/staff/directory${qs}`, {
         credentials: "include",
-        headers: getAuthHeaders()
+        headers: getAuthHeaders(),
       });
       if (!res.ok) throw new Error(`Failed to load staff (${res.status})`);
       const raw = await res.json();
@@ -100,7 +108,7 @@ export default function SupportStaffDirectoryPage() {
     if (existing) return existing;
     return {
       region: s.region ?? "",
-      ownershipRoles: (s.ownershipRoles ?? []).join(", ")
+      ownershipRoles: (s.ownershipRoles ?? []).join(", "),
     };
   };
 
@@ -119,7 +127,7 @@ export default function SupportStaffDirectoryPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json", ...getAuthHeaders() },
         credentials: "include",
-        body: JSON.stringify({ region: draft.region || null, ownershipRoles: roles })
+        body: JSON.stringify({ region: draft.region || null, ownershipRoles: roles }),
       });
       if (!res.ok) throw new Error(`Failed to update (${res.status})`);
       const updatedRaw = await res.json();
@@ -140,9 +148,9 @@ export default function SupportStaffDirectoryPage() {
       { value: "north", label: "North" },
       { value: "south", label: "South" },
       { value: "east", label: "East" },
-      { value: "west", label: "West" }
+      { value: "west", label: "West" },
     ],
-    []
+    [],
   );
 
   if (!whoamiLoading && !allowSupport) {
@@ -165,7 +173,9 @@ export default function SupportStaffDirectoryPage() {
           <div>
             <div className="text-xs uppercase font-semibold text-muted-foreground">Support</div>
             <h1 className="text-2xl font-bold text-foreground">Staff directory</h1>
-            <p className="text-sm text-muted-foreground">Scoped by campground and region for assignments/notifications.</p>
+            <p className="text-sm text-muted-foreground">
+              Scoped by campground and region for assignments/notifications.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Select value={regionFilter} onValueChange={setRegionFilter}>
@@ -186,7 +196,12 @@ export default function SupportStaffDirectoryPage() {
               placeholder="Campground ID"
               className="h-8 w-48"
             />
-            <Button variant="outline" size="sm" onClick={() => void loadStaff()} disabled={loading || whoamiLoading}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void loadStaff()}
+              disabled={loading || whoamiLoading}
+            >
               Refresh
             </Button>
           </div>
@@ -196,10 +211,16 @@ export default function SupportStaffDirectoryPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-xs uppercase font-semibold text-muted-foreground">Directory</div>
-              <p className="text-sm text-muted-foreground">Only staff permitted for the selected region/campground are shown.</p>
+              <p className="text-sm text-muted-foreground">
+                Only staff permitted for the selected region/campground are shown.
+              </p>
             </div>
             {loading && <div className="text-xs text-muted-foreground">Loading…</div>}
-            {whoamiError && <div className="text-xs text-rose-600">Scope fetch failed: {getErrorMessage(whoamiError)}</div>}
+            {whoamiError && (
+              <div className="text-xs text-rose-600">
+                Scope fetch failed: {getErrorMessage(whoamiError)}
+              </div>
+            )}
           </div>
 
           <div className="grid gap-3">
@@ -211,10 +232,13 @@ export default function SupportStaffDirectoryPage() {
                     <div>
                       <div className="text-sm font-semibold text-foreground">{s.email}</div>
                       <div className="text-xs text-muted-foreground">
-                        {(s.firstName || s.lastName) ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim() : "—"}
+                        {s.firstName || s.lastName
+                          ? `${s.firstName ?? ""} ${s.lastName ?? ""}`.trim()
+                          : "—"}
                       </div>
                       <div className="text-[11px] text-muted-foreground">
-                        Region: {s.region ?? "n/a"} • Ownership: {(s.ownershipRoles ?? []).join(", ") || "none"}
+                        Region: {s.region ?? "n/a"} • Ownership:{" "}
+                        {(s.ownershipRoles ?? []).join(", ") || "none"}
                       </div>
                       {s.memberships?.length ? (
                         <div className="text-[11px] text-muted-foreground">
@@ -226,7 +250,9 @@ export default function SupportStaffDirectoryPage() {
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() => toast({ title: "Notify (stub)", description: `Sent to ${s.email}` })}
+                        onClick={() =>
+                          toast({ title: "Notify (stub)", description: `Sent to ${s.email}` })
+                        }
                         disabled={whoamiLoading}
                       >
                         Notify
@@ -239,7 +265,10 @@ export default function SupportStaffDirectoryPage() {
                     <Select
                       value={draft.region || "unassigned"}
                       onValueChange={(v) =>
-                        setDrafts((prev) => ({ ...prev, [s.id]: { ...draft, region: v === "unassigned" ? "" : v } }))
+                        setDrafts((prev) => ({
+                          ...prev,
+                          [s.id]: { ...draft, region: v === "unassigned" ? "" : v },
+                        }))
                       }
                       disabled={whoamiLoading}
                     >
@@ -262,7 +291,10 @@ export default function SupportStaffDirectoryPage() {
                     <Input
                       value={draft.ownershipRoles}
                       onChange={(e) =>
-                        setDrafts((prev) => ({ ...prev, [s.id]: { ...draft, ownershipRoles: e.target.value } }))
+                        setDrafts((prev) => ({
+                          ...prev,
+                          [s.id]: { ...draft, ownershipRoles: e.target.value },
+                        }))
                       }
                       placeholder="owner, manager"
                       className="h-8 w-44"
@@ -279,7 +311,9 @@ export default function SupportStaffDirectoryPage() {
                 </div>
               );
             })}
-            {staff.length === 0 && !loading && <div className="text-sm text-muted-foreground">No staff match this scope.</div>}
+            {staff.length === 0 && !loading && (
+              <div className="text-sm text-muted-foreground">No staff match this scope.</div>
+            )}
           </div>
         </Card>
       </div>

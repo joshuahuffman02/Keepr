@@ -1,14 +1,5 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  NotFoundException,
-} from "@nestjs/common";
-import {
-  PublicCampgroundsService,
-  CampgroundSearchOptions,
-} from "./public-campgrounds.service";
+import { Controller, Get, Param, Query, NotFoundException } from "@nestjs/common";
+import { PublicCampgroundsService, CampgroundSearchOptions } from "./public-campgrounds.service";
 import { CampgroundClaimStatus } from "@prisma/client";
 
 /**
@@ -24,9 +15,7 @@ import { CampgroundClaimStatus } from "@prisma/client";
 
 @Controller("public/campgrounds")
 export class PublicCampgroundsController {
-  constructor(
-    private readonly publicCampgrounds: PublicCampgroundsService
-  ) {}
+  constructor(private readonly publicCampgrounds: PublicCampgroundsService) {}
 
   /**
    * Get a campground by slug (for individual campground pages)
@@ -44,19 +33,13 @@ export class PublicCampgroundsController {
    * Get similar campgrounds (for recommendations)
    */
   @Get(":slug/similar")
-  async getSimilar(
-    @Param("slug") slug: string,
-    @Query("limit") limit?: string
-  ) {
+  async getSimilar(@Param("slug") slug: string, @Query("limit") limit?: string) {
     const campground = await this.publicCampgrounds.getBySlug(slug);
     if (!campground) {
       throw new NotFoundException(`Campground not found: ${slug}`);
     }
 
-    return this.publicCampgrounds.getSimilar(
-      campground.id,
-      limit ? parseInt(limit, 10) : 4
-    );
+    return this.publicCampgrounds.getSimilar(campground.id, limit ? parseInt(limit, 10) : 4);
   }
 
   /**
@@ -71,7 +54,7 @@ export class PublicCampgroundsController {
     @Query("claimStatus") claimStatus?: CampgroundClaimStatus,
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
-    @Query("sortBy") sortBy?: "name" | "rating" | "distance" | "reviewCount"
+    @Query("sortBy") sortBy?: "name" | "rating" | "distance" | "reviewCount",
   ) {
     const options: CampgroundSearchOptions = {
       state,
@@ -92,9 +75,7 @@ export class PublicCampgroundsController {
    */
   @Get("featured/list")
   async getFeaturedCampgrounds(@Query("limit") limit?: string) {
-    return this.publicCampgrounds.getFeatured(
-      limit ? parseInt(limit, 10) : 8
-    );
+    return this.publicCampgrounds.getFeatured(limit ? parseInt(limit, 10) : 8);
   }
 
   /**
@@ -105,7 +86,7 @@ export class PublicCampgroundsController {
     @Query("state") state?: string,
     @Query("search") search?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.publicCampgrounds.getUnclaimedForClaim({
       state,

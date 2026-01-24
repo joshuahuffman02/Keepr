@@ -74,7 +74,7 @@ function WalletPaymentButton({
         setError(
           walletType === "apple_pay"
             ? "Apple Pay is not available on this device"
-            : "Google Pay is not available on this device"
+            : "Google Pay is not available on this device",
         );
       }
     });
@@ -89,7 +89,7 @@ function WalletPaymentButton({
         const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(
           clientSecret,
           { payment_method: event.paymentMethod.id },
-          { handleActions: false }
+          { handleActions: false },
         );
 
         if (confirmError) {
@@ -189,7 +189,8 @@ function WalletPaymentButton({
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-center text-muted-foreground">
-            Click the button below to pay with {walletType === "apple_pay" ? "Apple Pay" : "Google Pay"}
+            Click the button below to pay with{" "}
+            {walletType === "apple_pay" ? "Apple Pay" : "Google Pay"}
           </p>
 
           <div className="max-w-sm mx-auto">

@@ -201,7 +201,8 @@ const PREBUILT_TEMPLATES: PrebuiltTemplate[] = [
     channel: "sms",
     subject: null,
     html: null,
-    textBody: "Hi {{guest_name}}! Reminder: Your check-in at {{campground_name}} is today. Site {{site_number}} is ready. Check-in after 2pm. See you soon!",
+    textBody:
+      "Hi {{guest_name}}! Reminder: Your check-in at {{campground_name}} is today. Site {{site_number}} is ready. Check-in after 2pm. See you soon!",
   },
   {
     name: "Payment Received",
@@ -398,7 +399,8 @@ const PREBUILT_TEMPLATES: PrebuiltTemplate[] = [
     channel: "sms",
     subject: null,
     html: null,
-    textBody: "Welcome to {{campground_name}}! Site {{site_number}} is ready for you. Office: 8am-8pm. WiFi password at the office. Enjoy your stay!",
+    textBody:
+      "Welcome to {{campground_name}}! Site {{site_number}} is ready for you. Office: 8am-8pm. WiFi password at the office. Enjoy your stay!",
   },
 ];
 
@@ -506,7 +508,9 @@ export default function TemplatesPage() {
             </div>
             <div>
               <div className="font-medium">{successToast.message}</div>
-              <div className="text-sm text-emerald-100">"{successToast.templateName}" is ready to use</div>
+              <div className="text-sm text-emerald-100">
+                "{successToast.templateName}" is ready to use
+              </div>
             </div>
             <Link
               href="/dashboard/settings/notification-triggers"
@@ -529,7 +533,9 @@ export default function TemplatesPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Email & SMS Templates</h1>
-            <p className="text-muted-foreground mt-1">Create message templates, then connect them to triggers to automate sending</p>
+            <p className="text-muted-foreground mt-1">
+              Create message templates, then connect them to triggers to automate sending
+            </p>
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
@@ -601,9 +607,7 @@ export default function TemplatesPage() {
                     <Sparkles className="h-10 w-10 text-status-info" />
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">
-                  No Templates Yet
-                </h3>
+                <h3 className="text-xl font-bold text-foreground mb-2">No Templates Yet</h3>
                 <p className="text-muted-foreground mb-6 max-w-sm mx-auto">
                   Start by adding a prebuilt template below, or create a custom one from scratch.
                 </p>
@@ -617,11 +621,14 @@ export default function TemplatesPage() {
                 </button>
               </div>
             ) : (
-              CATEGORIES.map(cat => {
+              CATEGORIES.map((cat) => {
                 const catTemplates = templatesByCategory[cat];
                 if (catTemplates.length === 0) return null;
                 return (
-                  <div key={cat} className="bg-card rounded-xl border border-border overflow-hidden">
+                  <div
+                    key={cat}
+                    className="bg-card rounded-xl border border-border overflow-hidden"
+                  >
                     <div className="px-4 py-2 bg-muted border-b border-border">
                       <h3 className="font-medium text-foreground capitalize">{cat}</h3>
                     </div>
@@ -630,14 +637,22 @@ export default function TemplatesPage() {
                         <button
                           key={template.id}
                           onClick={() => setSelectedTemplate(template)}
-                          className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors ${selectedTemplate?.id === template.id ? "bg-violet-50 border-l-2 border-violet-500" : ""
-                            }`}
+                          className={`w-full px-4 py-3 text-left hover:bg-muted transition-colors ${
+                            selectedTemplate?.id === template.id
+                              ? "bg-violet-50 border-l-2 border-violet-500"
+                              : ""
+                          }`}
                         >
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="font-medium text-foreground">{template.name}</div>
                               <div className="text-xs text-muted-foreground flex items-center gap-1">
-                                {template.channel === "email" ? <Mail className="h-3.5 w-3.5" /> : <Smartphone className="h-3.5 w-3.5" />} {template.channel}
+                                {template.channel === "email" ? (
+                                  <Mail className="h-3.5 w-3.5" />
+                                ) : (
+                                  <Smartphone className="h-3.5 w-3.5" />
+                                )}{" "}
+                                {template.channel}
                               </div>
                             </div>
                           </div>
@@ -676,7 +691,7 @@ export default function TemplatesPage() {
             <div className="mt-6 bg-card rounded-xl border border-border p-4">
               <h4 className="font-medium text-foreground mb-3">Available Variables</h4>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {TEMPLATE_VARIABLES.map(v => (
+                {TEMPLATE_VARIABLES.map((v) => (
                   <div
                     key={v.key}
                     className="px-2 py-1 bg-muted rounded text-xs cursor-pointer hover:bg-muted transition-colors"
@@ -820,7 +835,13 @@ function TemplateEditor({
       {/* Header */}
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="text-muted-foreground">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
+          <span className="text-muted-foreground">
+            {template.channel === "email" ? (
+              <Mail className="h-5 w-5" />
+            ) : (
+              <Smartphone className="h-5 w-5" />
+            )}
+          </span>
           <Input
             type="text"
             {...register("name")}
@@ -831,8 +852,11 @@ function TemplateEditor({
           <button
             type="button"
             onClick={onTogglePreview}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${previewMode ? "bg-violet-100 text-violet-700" : "bg-muted text-muted-foreground hover:bg-muted"
-              }`}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              previewMode
+                ? "bg-violet-100 text-violet-700"
+                : "bg-muted text-muted-foreground hover:bg-muted"
+            }`}
           >
             {previewMode ? "Edit" : "Preview"}
           </button>
@@ -866,9 +890,7 @@ function TemplateEditor({
 
       {/* Content */}
       <form onSubmit={handleSubmit(onSubmit)} className="p-5 space-y-4">
-        {errors.name && (
-          <p className="text-sm text-red-600">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
 
         {template.channel === "email" && (
           <FormField
@@ -888,7 +910,9 @@ function TemplateEditor({
             {template.channel === "email" ? (
               <div
                 className="p-4 bg-card"
-                dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(previewHtml) || previewHtml }}
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify?.sanitize(previewHtml) || previewHtml,
+                }}
               />
             ) : (
               <div className="p-4 bg-muted text-foreground font-mono text-sm whitespace-pre-wrap">
@@ -993,7 +1017,9 @@ function CreateTemplateModal({
     >
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md p-6 motion-safe:animate-in motion-safe:zoom-in-95 motion-safe:duration-200">
         <div className="flex items-center justify-between mb-6">
-          <h2 id="create-template-title" className="text-xl font-bold text-foreground">New Template</h2>
+          <h2 id="create-template-title" className="text-xl font-bold text-foreground">
+            New Template
+          </h2>
           <button
             onClick={onClose}
             aria-label="Close dialog"
@@ -1018,7 +1044,9 @@ function CreateTemplateModal({
           />
 
           <div>
-            <label id="channel-label" className="block text-sm font-medium text-foreground mb-1">Channel</label>
+            <label id="channel-label" className="block text-sm font-medium text-foreground mb-1">
+              Channel
+            </label>
             <div className="flex gap-2" role="radiogroup" aria-labelledby="channel-label">
               <button
                 type="button"
@@ -1027,9 +1055,10 @@ function CreateTemplateModal({
                 onClick={() => setValue("channel", "email", { shouldValidate: true })}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                   focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
-                  ${channel === "email"
-                    ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-muted text-muted-foreground border border-border hover:border-border"
+                  ${
+                    channel === "email"
+                      ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                      : "bg-muted text-muted-foreground border border-border hover:border-border"
                   }`}
               >
                 <Mail className="h-4 w-4" /> Email
@@ -1041,9 +1070,10 @@ function CreateTemplateModal({
                 onClick={() => setValue("channel", "sms", { shouldValidate: true })}
                 className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150
                   focus-visible:ring-2 focus-visible:ring-violet-500 flex items-center justify-center gap-1.5
-                  ${channel === "sms"
-                    ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
-                    : "bg-muted text-muted-foreground border border-border hover:border-border"
+                  ${
+                    channel === "sms"
+                      ? "bg-violet-100 text-violet-700 border-2 border-violet-300"
+                      : "bg-muted text-muted-foreground border border-border hover:border-border"
                   }`}
               >
                 <Smartphone className="h-4 w-4" /> SMS
@@ -1052,20 +1082,22 @@ function CreateTemplateModal({
           </div>
 
           <div>
-            <label htmlFor="category-select" className="block text-sm font-medium text-foreground mb-1">Category</label>
+            <label
+              htmlFor="category-select"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
+              Category
+            </label>
             <Controller
               name="category"
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger
-                    id="category-select"
-                    className="w-full"
-                  >
+                  <SelectTrigger id="category-select" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map(cat => (
+                    {CATEGORIES.map((cat) => (
                       <SelectItem key={cat} value={cat} className="capitalize">
                         {cat}
                       </SelectItem>
@@ -1115,7 +1147,7 @@ function PrebuiltTemplatesGallery({
   const [addingTemplate, setAddingTemplate] = useState<string | null>(null);
   const [recentlyAdded, setRecentlyAdded] = useState<string | null>(null);
 
-  const handleAddTemplate = async (template: typeof PREBUILT_TEMPLATES[0]) => {
+  const handleAddTemplate = async (template: (typeof PREBUILT_TEMPLATES)[0]) => {
     setAddingTemplate(template.name);
     try {
       await apiClient.createCampaignTemplate(campgroundId, {
@@ -1146,12 +1178,14 @@ function PrebuiltTemplatesGallery({
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <FileText className="h-5 w-5" /> Prebuilt Templates
           </h3>
-          <p className="text-sm text-muted-foreground">Professional templates ready to use - just click to add</p>
+          <p className="text-sm text-muted-foreground">
+            Professional templates ready to use - just click to add
+          </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {PREBUILT_TEMPLATES.map(template => {
+        {PREBUILT_TEMPLATES.map((template) => {
           const added = alreadyAdded(template.name);
           const isAdding = addingTemplate === template.name;
           const justAdded = recentlyAdded === template.name;
@@ -1170,7 +1204,11 @@ function PrebuiltTemplatesGallery({
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">
-                    {template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}
+                    {template.channel === "email" ? (
+                      <Mail className="h-5 w-5" />
+                    ) : (
+                      <Smartphone className="h-5 w-5" />
+                    )}
                   </span>
                   <span className="font-medium text-foreground text-sm">{template.name}</span>
                 </div>

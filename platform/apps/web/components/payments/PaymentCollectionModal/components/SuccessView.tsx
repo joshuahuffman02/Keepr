@@ -25,7 +25,12 @@ import {
   Sparkles,
 } from "lucide-react";
 import { usePaymentContext } from "../context/PaymentContext";
-import { PaymentMethodType, PAYMENT_METHOD_INFO, TenderEntry, PaymentResult } from "../context/types";
+import {
+  PaymentMethodType,
+  PAYMENT_METHOD_INFO,
+  TenderEntry,
+  PaymentResult,
+} from "../context/types";
 import { cn } from "../../../../lib/utils";
 import { useAchievement } from "../../../../hooks/use-achievement";
 import { AchievementCelebration } from "../../../ui/achievement-celebration";
@@ -112,9 +117,10 @@ export function SuccessView({
       if (!props.guestEmail || !props.campgroundId || emailSent || emailSending) return;
 
       // Get the reservation ID from subject if available
-      const reservationId = props.subject?.type === "reservation" || props.subject?.type === "balance"
-        ? props.subject.reservationId
-        : undefined;
+      const reservationId =
+        props.subject?.type === "reservation" || props.subject?.type === "balance"
+          ? props.subject.reservationId
+          : undefined;
 
       if (!reservationId) return;
 
@@ -133,7 +139,7 @@ export function SuccessView({
         // setEmailSent(true);
 
         // For now, just simulate success after a brief delay
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise((resolve) => setTimeout(resolve, 500));
         setEmailSent(true);
       } catch (err) {
         console.error("Failed to send receipt email:", err);
@@ -220,9 +226,7 @@ export function SuccessView({
         transition={{ delay: 0.2, ...SPRING_CONFIG }}
       >
         <h2 className="text-2xl font-bold text-foreground">Payment Complete!</h2>
-        <p className="mt-1 text-muted-foreground">
-          Thank you for your payment
-        </p>
+        <p className="mt-1 text-muted-foreground">Thank you for your payment</p>
       </motion.div>
 
       {/* Email sent indicator */}
@@ -251,9 +255,7 @@ export function SuccessView({
           {/* Original amount */}
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Subtotal</span>
-            <span className="text-foreground">
-              ${(originalAmountCents / 100).toFixed(2)}
-            </span>
+            <span className="text-foreground">${(originalAmountCents / 100).toFixed(2)}</span>
           </div>
 
           {/* Discounts */}
@@ -261,9 +263,7 @@ export function SuccessView({
             <>
               {appliedDiscounts.map((discount, idx) => (
                 <div key={idx} className="flex justify-between text-sm">
-                  <span className="text-emerald-600">
-                    {discount.code || discount.description}
-                  </span>
+                  <span className="text-emerald-600">{discount.code || discount.description}</span>
                   <span className="text-emerald-600">
                     -${(discount.discountCents / 100).toFixed(2)}
                   </span>
@@ -288,9 +288,7 @@ export function SuccessView({
           <div className="border-t border-border pt-2">
             <div className="flex justify-between font-medium">
               <span className="text-foreground">Total Paid</span>
-              <span className="text-emerald-600 text-lg">
-                ${(totalPaid / 100).toFixed(2)}
-              </span>
+              <span className="text-emerald-600 text-lg">${(totalPaid / 100).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -319,11 +317,7 @@ export function SuccessView({
       >
         {/* Print receipt */}
         {onPrintReceipt && (
-          <Button
-            variant="outline"
-            onClick={onPrintReceipt}
-            className="w-full"
-          >
+          <Button variant="outline" onClick={onPrintReceipt} className="w-full">
             <Printer className="h-4 w-4 mr-2" />
             Print Receipt
           </Button>
@@ -331,10 +325,7 @@ export function SuccessView({
 
         {/* Check In/Out button (if applicable) */}
         {onCheckInOut && checkInOutLabel && (
-          <Button
-            onClick={handleCheckInOut}
-            className="w-full bg-emerald-600 hover:bg-emerald-700"
-          >
+          <Button onClick={handleCheckInOut} className="w-full bg-emerald-600 hover:bg-emerald-700">
             {checkInOutLabel === "Check In" ? (
               <LogIn className="h-4 w-4 mr-2" />
             ) : (
@@ -348,10 +339,7 @@ export function SuccessView({
         <Button
           variant={onCheckInOut ? "outline" : "default"}
           onClick={handleDone}
-          className={cn(
-            "w-full",
-            !onCheckInOut && "bg-emerald-600 hover:bg-emerald-700"
-          )}
+          className={cn("w-full", !onCheckInOut && "bg-emerald-600 hover:bg-emerald-700")}
         >
           {onCheckInOut ? "Close" : "Done"}
         </Button>
@@ -430,9 +418,7 @@ export function SuccessIndicator({ message }: { message?: string }) {
       <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center">
         <Check className="h-3 w-3" />
       </div>
-      <span className="text-sm font-medium">
-        {message || "Payment successful"}
-      </span>
+      <span className="text-sm font-medium">{message || "Payment successful"}</span>
     </div>
   );
 }

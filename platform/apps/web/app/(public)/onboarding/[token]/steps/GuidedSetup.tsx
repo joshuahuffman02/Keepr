@@ -143,10 +143,10 @@ export function GuidedSetup({
   // State
   const [currentIndex, setCurrentIndex] = useState(data.currentFeatureIndex || 0);
   const [completedFeatures, setCompletedFeatures] = useState<Set<string>>(
-    () => new Set(data.completedFeatures || [])
+    () => new Set(data.completedFeatures || []),
   );
   const [skippedFeatures, setSkippedFeatures] = useState<Set<string>>(
-    () => new Set(data.skippedFeatures || [])
+    () => new Set(data.skippedFeatures || []),
   );
   const [isNavigating, setIsNavigating] = useState(false);
 
@@ -158,7 +158,7 @@ export function GuidedSetup({
 
   // Estimated time remaining
   const remainingFeatures = orderedFeatures.filter(
-    (f) => !completedFeatures.has(f.key) && !skippedFeatures.has(f.key)
+    (f) => !completedFeatures.has(f.key) && !skippedFeatures.has(f.key),
   );
   const estimatedMinutes = getTotalEstimatedMinutes(remainingFeatures.map((f) => f.key));
 
@@ -183,10 +183,7 @@ export function GuidedSetup({
 
     // Move to next uncompleted feature or finish
     const nextIndex = orderedFeatures.findIndex(
-      (f, i) =>
-        i > currentIndex &&
-        !completedFeatures.has(f.key) &&
-        !skippedFeatures.has(f.key)
+      (f, i) => i > currentIndex && !completedFeatures.has(f.key) && !skippedFeatures.has(f.key),
     );
 
     if (nextIndex === -1) {
@@ -219,10 +216,7 @@ export function GuidedSetup({
 
     // Move to next uncompleted feature or finish
     const nextIndex = orderedFeatures.findIndex(
-      (f, i) =>
-        i > currentIndex &&
-        !completedFeatures.has(f.key) &&
-        !skippedFeatures.has(f.key)
+      (f, i) => i > currentIndex && !completedFeatures.has(f.key) && !skippedFeatures.has(f.key),
     );
 
     if (nextIndex === -1) {
@@ -261,7 +255,7 @@ export function GuidedSetup({
   const handleSkipAll = useCallback(() => {
     // Mark all remaining as skipped
     const remaining = orderedFeatures.filter(
-      (f) => !completedFeatures.has(f.key) && !skippedFeatures.has(f.key)
+      (f) => !completedFeatures.has(f.key) && !skippedFeatures.has(f.key),
     );
 
     setSkippedFeatures((prev) => {
@@ -286,8 +280,8 @@ export function GuidedSetup({
           </div>
           <h2 className="text-2xl font-bold text-white mb-4">No Features to Set Up</h2>
           <p className="text-slate-400 mb-6">
-            You didn't select any features for immediate setup. You can always configure
-            features later from your dashboard.
+            You didn't select any features for immediate setup. You can always configure features
+            later from your dashboard.
           </p>
           <Button onClick={onComplete} className="bg-emerald-600 hover:bg-emerald-500">
             Continue to Launch
@@ -341,9 +335,7 @@ export function GuidedSetup({
             </div>
           </div>
           <div className="text-right">
-            <div className="text-sm text-slate-400">
-              ~{estimatedMinutes} min remaining
-            </div>
+            <div className="text-sm text-slate-400">~{estimatedMinutes} min remaining</div>
           </div>
         </div>
         <Progress value={progressPercent} className="h-2" />
@@ -366,14 +358,11 @@ export function GuidedSetup({
                 <FeatureIcon className="w-7 h-7 text-emerald-400" />
               </div>
               <div className="flex-1">
-                <h2 className="text-2xl font-bold text-white mb-1">
-                  {currentFeature.label}
-                </h2>
+                <h2 className="text-2xl font-bold text-white mb-1">{currentFeature.label}</h2>
                 <p className="text-slate-400">{currentFeature.description}</p>
               </div>
               <div className="flex items-center gap-2 text-slate-500 text-sm">
-                <Clock className="w-4 h-4" />
-                ~{currentFeature.estimatedMinutes} min
+                <Clock className="w-4 h-4" />~{currentFeature.estimatedMinutes} min
               </div>
             </div>
 
@@ -395,7 +384,7 @@ export function GuidedSetup({
                           "px-2.5 py-1 rounded-full text-xs font-medium",
                           isCompleted
                             ? "bg-emerald-500/20 text-emerald-400"
-                            : "bg-slate-700 text-slate-400"
+                            : "bg-slate-700 text-slate-400",
                         )}
                       >
                         {isCompleted && <Check className="w-3 h-3 inline mr-1" />}
@@ -447,7 +436,7 @@ export function GuidedSetup({
                           ? "bg-emerald-500/10 text-emerald-400/60"
                           : isSkipped
                             ? "bg-slate-700/50 text-slate-500 line-through"
-                            : "bg-slate-700 text-slate-400"
+                            : "bg-slate-700 text-slate-400",
                     )}
                   >
                     {isCompleted && <Check className="w-3 h-3 inline mr-1" />}
@@ -462,11 +451,7 @@ export function GuidedSetup({
 
       {/* Footer actions */}
       <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-700">
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="text-slate-400 hover:text-white"
-        >
+        <Button variant="ghost" onClick={onBack} className="text-slate-400 hover:text-white">
           <ChevronLeft className="w-4 h-4 mr-2" />
           Back
         </Button>

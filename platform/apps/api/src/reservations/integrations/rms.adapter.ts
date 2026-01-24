@@ -37,7 +37,7 @@ export function mapRmsToInternal(payload: RmsReservation): Partial<ReservationIm
     adults: payload.adults,
     children: payload.children ?? 0,
     status: normalizeReservationStatus(payload.status),
-    totalAmount: (payload.balanceDueCents ?? 0),
+    totalAmount: payload.balanceDueCents ?? 0,
     paidAmount: 0,
     source: "rms",
   };

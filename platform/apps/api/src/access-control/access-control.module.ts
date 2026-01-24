@@ -19,8 +19,8 @@ import { PermissionsModule } from "../permissions/permissions.module";
     AccessProviderRegistry,
     KisiAdapter,
     BrivoAdapter,
-    CloudKeyAdapter
+    CloudKeyAdapter,
   ],
-  exports: [AccessControlService, AccessProviderRegistry]
+  exports: [AccessControlService, AccessProviderRegistry],
 })
-export class AccessControlModule { }
+export class AccessControlModule {}

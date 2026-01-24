@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { UpsellsService } from "./upsells.service";
 import { CreateUpsellDto } from "./dto/create-upsell.dto";
@@ -46,7 +46,9 @@ export class UpsellsController {
     }
 
     const platformRole = user.platformRole ?? "";
-    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(platformRole);
+    const isPlatformStaff = ["platform_admin", "platform_superadmin", "support_agent"].includes(
+      platformRole,
+    );
     if (isPlatformStaff) {
       return;
     }
@@ -69,7 +71,7 @@ export class UpsellsController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreateUpsellDto,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.upsells.create(campgroundId, dto);
@@ -81,7 +83,7 @@ export class UpsellsController {
     @Param("id") id: string,
     @Body() dto: UpdateUpsellDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -93,7 +95,7 @@ export class UpsellsController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

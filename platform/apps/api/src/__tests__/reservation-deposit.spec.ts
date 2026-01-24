@@ -1,4 +1,7 @@
-import { assertReservationDepositV2, calculateReservationDepositV2 } from "../reservations/reservation-deposit";
+import {
+  assertReservationDepositV2,
+  calculateReservationDepositV2,
+} from "../reservations/reservation-deposit";
 
 describe("Reservation deposit v2 helpers", () => {
   it("returns v2:none when no deposit policy exists", async () => {
@@ -8,7 +11,7 @@ describe("Reservation deposit v2 helpers", () => {
       siteClassId: null,
       totalAmountCents: 20000,
       lodgingOnlyCents: 20000,
-      nights: 2
+      nights: 2,
     });
 
     expect(result.depositAmount).toBe(0);
@@ -20,8 +23,8 @@ describe("Reservation deposit v2 helpers", () => {
       calculateDeposit: jest.fn().mockResolvedValue({
         depositAmountCents: 5000,
         depositPolicyVersion: "dp:1:v1",
-        policy: { name: "Standard", strategy: "percent" }
-      })
+        policy: { name: "Standard", strategy: "percent" },
+      }),
     };
 
     await expect(
@@ -31,8 +34,8 @@ describe("Reservation deposit v2 helpers", () => {
         totalAmountCents: 20000,
         lodgingOnlyCents: 20000,
         paidAmountCents: 1000,
-        nights: 2
-      })
+        nights: 2,
+      }),
     ).rejects.toThrow("Deposit of at least $50.00 required");
   });
 
@@ -41,8 +44,8 @@ describe("Reservation deposit v2 helpers", () => {
       calculateDeposit: jest.fn().mockResolvedValue({
         depositAmountCents: 5000,
         depositPolicyVersion: "dp:1:v1",
-        policy: { name: "Standard", strategy: "percent" }
-      })
+        policy: { name: "Standard", strategy: "percent" },
+      }),
     };
 
     const result = await assertReservationDepositV2(depositPoliciesService, {
@@ -51,7 +54,7 @@ describe("Reservation deposit v2 helpers", () => {
       totalAmountCents: 20000,
       lodgingOnlyCents: 20000,
       paidAmountCents: 6000,
-      nights: 2
+      nights: 2,
     });
 
     expect(result.depositAmount).toBe(5000);

@@ -66,7 +66,7 @@ function renderPicker() {
   return render(
     <QueryClientProvider client={qc}>
       <PortfolioParkPicker tone="light" />
-    </QueryClientProvider>
+    </QueryClientProvider>,
   );
 }
 
@@ -98,7 +98,7 @@ describe("PortfolioParkPicker", () => {
             activePortfolioId: "p1",
             activeParkId: "park-1a",
           }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
+          { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
       // POST select
@@ -112,7 +112,7 @@ describe("PortfolioParkPicker", () => {
             activePortfolioId: portfolioId,
             activeParkId: parkId ?? "park-1a",
           }),
-          { status: 200, headers: { "Content-Type": "application/json" } }
+          { status: 200, headers: { "Content-Type": "application/json" } },
         );
       }
       return new Response("not found", { status: 404 });
@@ -144,7 +144,7 @@ describe("PortfolioParkPicker", () => {
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringMatching(/\/portfolios\/select$/),
-        expect.objectContaining({ method: "POST" })
+        expect.objectContaining({ method: "POST" }),
       );
     });
 

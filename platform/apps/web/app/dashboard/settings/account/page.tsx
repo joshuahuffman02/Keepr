@@ -44,26 +44,27 @@ export default function AccountSettingsPage() {
       <>
         <PageHeader
           eyebrow="Account"
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
                 <User className="h-5 w-5" />
               </span>
               <span>My Profile</span>
             </span>
-          )}
+          }
           subtitle="Sign in to view your profile and access details."
-          actions={(
+          actions={
             <Button asChild>
               <Link href="/auth/signin">Sign in</Link>
             </Button>
-          )}
+          }
         />
 
         <div className="mt-6">
           <Card className="border-border">
             <CardContent className="p-6 text-sm text-muted-foreground">
-              You're currently signed out. Sign in to view your profile, team role, and campground access.
+              You're currently signed out. Sign in to view your profile, team role, and campground
+              access.
             </CardContent>
           </Card>
         </div>
@@ -75,16 +76,16 @@ export default function AccountSettingsPage() {
     <>
       <PageHeader
         eyebrow="Account"
-        title={(
+        title={
           <span className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
               <User className="h-5 w-5" />
             </span>
             <span>My Profile</span>
           </span>
-        )}
+        }
         subtitle="Your sign-in details and access scope."
-        actions={(
+        actions={
           <>
             <Button variant="outline" asChild>
               <Link href="/dashboard/settings/security">
@@ -99,18 +100,18 @@ export default function AccountSettingsPage() {
               </Link>
             </Button>
           </>
-        )}
+        }
       />
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
         <Card className="border-border">
           <CardContent className="p-6 space-y-4">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Signed in as</div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Signed in as
+              </div>
               <div className="text-2xl font-semibold text-foreground">{displayName}</div>
-              {displayEmail && (
-                <div className="text-sm text-muted-foreground">{displayEmail}</div>
-              )}
+              {displayEmail && <div className="text-sm text-muted-foreground">{displayEmail}</div>}
             </div>
             <div className="flex flex-wrap gap-2">
               {platformRole && (
@@ -156,8 +157,8 @@ export default function AccountSettingsPage() {
             <div>
               <div className="text-sm font-semibold text-foreground">Account tips</div>
               <p className="text-sm text-muted-foreground mt-1">
-                Need to update your name, permissions, or sign-in method? Your admin can help from the team settings
-                page. Security settings are available in the menu above.
+                Need to update your name, permissions, or sign-in method? Your admin can help from
+                the team settings page. Security settings are available in the menu above.
               </p>
             </div>
             <div className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">

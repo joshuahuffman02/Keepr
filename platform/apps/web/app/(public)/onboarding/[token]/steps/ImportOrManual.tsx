@@ -50,7 +50,7 @@ function PathCard({
       className={cn(
         "relative group text-left p-6 rounded-2xl border transition-all w-full",
         "bg-slate-800/50 border-slate-700",
-        "hover:border-transparent hover:shadow-2xl"
+        "hover:border-transparent hover:shadow-2xl",
       )}
       style={{
         boxShadow: `0 0 0 0 ${glowColor}`,
@@ -74,12 +74,7 @@ function PathCard({
       )}
 
       {/* Icon */}
-      <div
-        className={cn(
-          "w-14 h-14 rounded-xl flex items-center justify-center mb-4",
-          gradient
-        )}
-      >
+      <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-4", gradient)}>
         <Icon className="w-7 h-7 text-white" />
       </div>
 
@@ -130,9 +125,7 @@ export function ImportOrManual({ onSelect }: ImportOrManualProps) {
         <h2 className="text-xl font-semibold text-white mb-2">
           How would you like to set up your sites?
         </h2>
-        <p className="text-slate-400">
-          Choose the path that works best for your situation
-        </p>
+        <p className="text-slate-400">Choose the path that works best for your situation</p>
       </motion.div>
 
       <div className="grid md:grid-cols-2 gap-6">

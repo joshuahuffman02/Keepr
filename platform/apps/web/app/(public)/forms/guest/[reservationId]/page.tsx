@@ -9,8 +9,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FileText, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, CheckCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  FileText,
+  Check,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  CheckCircle,
+} from "lucide-react";
 
 interface FormTemplate {
   id: string;
@@ -63,8 +77,7 @@ const parseReservation = (value: unknown): ReservationSummary | null => {
     : undefined;
   const site = isRecord(value.site)
     ? {
-        siteNumber:
-          typeof value.site.siteNumber === "string" ? value.site.siteNumber : undefined,
+        siteNumber: typeof value.site.siteNumber === "string" ? value.site.siteNumber : undefined,
       }
     : undefined;
   return { campgroundId: value.campgroundId, arrivalDate: value.arrivalDate, campground, site };
@@ -75,9 +88,7 @@ const parseFormTemplates = (value: unknown): FormTemplate[] => {
   return value.filter((item): item is FormTemplate => {
     if (!isRecord(item)) return false;
     return (
-      typeof item.id === "string" &&
-      typeof item.title === "string" &&
-      typeof item.type === "string"
+      typeof item.id === "string" && typeof item.title === "string" && typeof item.type === "string"
     );
   });
 };
@@ -96,7 +107,9 @@ export default function GuestFormsPage() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
 
-  const [formResponses, setFormResponses] = useState<Record<string, Record<string, string | boolean>>>({});
+  const [formResponses, setFormResponses] = useState<
+    Record<string, Record<string, string | boolean>>
+  >({});
   const [completedForms, setCompletedForms] = useState<Set<string>>(new Set());
   const [expandedForm, setExpandedForm] = useState<string | null>(null);
   const [skipNotes, setSkipNotes] = useState<Record<string, string>>({});
@@ -106,12 +119,14 @@ export default function GuestFormsPage() {
   const { data: reservation, isLoading: loadingRes } = useQuery({
     queryKey: ["guest-reservation", reservationId, token],
     queryFn: async () => {
-      const res = await fetch(`/api/public/reservations/${reservationId}?token=${encodeURIComponent(token)}`);
+      const res = await fetch(
+        `/api/public/reservations/${reservationId}?token=${encodeURIComponent(token)}`,
+      );
       if (!res.ok) throw new Error("Reservation not found");
       const data = await res.json();
       return parseReservation(data);
     },
-    enabled: !!reservationId && !!token
+    enabled: !!reservationId && !!token,
   });
 
   // Fetch forms for this reservation's campground
@@ -119,24 +134,28 @@ export default function GuestFormsPage() {
     queryKey: ["guest-forms", reservation?.campgroundId],
     queryFn: async () => {
       if (!reservation?.campgroundId) return [];
-      const res = await fetch(`/api/public/campgrounds/${reservation.campgroundId}/forms?showAt=after_booking`);
+      const res = await fetch(
+        `/api/public/campgrounds/${reservation.campgroundId}/forms?showAt=after_booking`,
+      );
       if (!res.ok) return [];
       const data = await res.json();
       return parseFormTemplates(data);
     },
-    enabled: !!reservation?.campgroundId
+    enabled: !!reservation?.campgroundId,
   });
 
   // Fetch already submitted forms for this reservation
   const { data: submissions = [] } = useQuery({
     queryKey: ["guest-form-submissions", reservationId, token],
     queryFn: async () => {
-      const res = await fetch(`/api/public/reservations/${reservationId}/form-submissions?token=${encodeURIComponent(token)}`);
+      const res = await fetch(
+        `/api/public/reservations/${reservationId}/form-submissions?token=${encodeURIComponent(token)}`,
+      );
       if (!res.ok) return [];
       const data = await res.json();
       return parseFormSubmissions(data);
     },
-    enabled: !!reservationId && !!token
+    enabled: !!reservationId && !!token,
   });
 
   // Mark already-submitted forms as complete
@@ -149,7 +168,13 @@ export default function GuestFormsPage() {
 
   // Submit form mutation
   const submitMutation = useMutation({
-    mutationFn: async ({ formTemplateId, responses }: { formTemplateId: string; responses: Record<string, unknown> }) => {
+    mutationFn: async ({
+      formTemplateId,
+      responses,
+    }: {
+      formTemplateId: string;
+      responses: Record<string, unknown>;
+    }) => {
       const res = await fetch("/api/public/forms/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -157,20 +182,20 @@ export default function GuestFormsPage() {
           formTemplateId,
           campgroundId: reservation?.campgroundId,
           reservationId,
-          responses
-        })
+          responses,
+        }),
       });
       if (!res.ok) throw new Error("Failed to submit form");
       return res.json();
     },
     onSuccess: (_, variables) => {
-      setCompletedForms(prev => new Set([...prev, variables.formTemplateId]));
+      setCompletedForms((prev) => new Set([...prev, variables.formTemplateId]));
       setExpandedForm(null);
       setError(null);
     },
     onError: () => {
       setError("Failed to submit form. Please try again.");
-    }
+    },
   });
 
   // Early return for missing token (after all hooks)
@@ -179,19 +204,21 @@ export default function GuestFormsPage() {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Access Token Required</h1>
-          <p className="text-slate-600">Please use the link provided in your email to access your forms.</p>
+          <p className="text-slate-600">
+            Please use the link provided in your email to access your forms.
+          </p>
         </div>
       </div>
     );
   }
 
   const handleInputChange = (formId: string, questionId: string, value: string | boolean) => {
-    setFormResponses(prev => ({
+    setFormResponses((prev) => ({
       ...prev,
       [formId]: {
         ...(prev[formId] || {}),
-        [questionId]: value
-      }
+        [questionId]: value,
+      },
     }));
   };
 
@@ -200,9 +227,11 @@ export default function GuestFormsPage() {
     const responses = formResponses[form.id] || {};
 
     // Check required questions
-    const missingRequired = questions.filter(q => q.required && !responses[q.id]);
+    const missingRequired = questions.filter((q) => q.required && !responses[q.id]);
     if (missingRequired.length > 0) {
-      setError(`Please complete required fields: ${missingRequired.map(q => q.label).join(", ")}`);
+      setError(
+        `Please complete required fields: ${missingRequired.map((q) => q.label).join(", ")}`,
+      );
       return;
     }
 
@@ -217,15 +246,13 @@ export default function GuestFormsPage() {
     // Submit with skip note
     submitMutation.mutate({
       formTemplateId: formId,
-      responses: { _skipped: true, _skipReason: skipNotes[formId] }
+      responses: { _skipped: true, _skipReason: skipNotes[formId] },
     });
   };
 
   // Calculate completion
   const requiredForms = forms.filter((f) => f.isRequired !== false);
-  const allRequiredComplete = requiredForms.every((f) =>
-    completedForms.has(f.id)
-  );
+  const allRequiredComplete = requiredForms.every((f) => completedForms.has(f.id));
 
   if (loadingRes || loadingForms) {
     return (
@@ -280,11 +307,16 @@ export default function GuestFormsPage() {
             </div>
             <CardTitle>Complete Your Forms</CardTitle>
             <CardDescription>
-              {reservation.campground?.name || "Your campground"} requires the following forms to be completed before your stay.
+              {reservation.campground?.name || "Your campground"} requires the following forms to be
+              completed before your stay.
             </CardDescription>
             <div className="mt-4 text-sm text-slate-600">
-              <p>Reservation: <strong>{reservation.site?.siteNumber}</strong></p>
-              <p>Arriving: <strong>{new Date(reservation.arrivalDate).toLocaleDateString()}</strong></p>
+              <p>
+                Reservation: <strong>{reservation.site?.siteNumber}</strong>
+              </p>
+              <p>
+                Arriving: <strong>{new Date(reservation.arrivalDate).toLocaleDateString()}</strong>
+              </p>
             </div>
           </CardHeader>
         </Card>
@@ -326,9 +358,13 @@ export default function GuestFormsPage() {
                   <div className="flex items-center gap-2">
                     {form.isRequired === false && <Badge variant="outline">Optional</Badge>}
                     {isComplete ? (
-                      <Badge variant="default" className="bg-emerald-600">Completed</Badge>
+                      <Badge variant="default" className="bg-emerald-600">
+                        Completed
+                      </Badge>
+                    ) : isExpanded ? (
+                      <ChevronUp className="h-5 w-5 text-slate-400" />
                     ) : (
-                      isExpanded ? <ChevronUp className="h-5 w-5 text-slate-400" /> : <ChevronDown className="h-5 w-5 text-slate-400" />
+                      <ChevronDown className="h-5 w-5 text-slate-400" />
                     )}
                   </div>
                 </div>
@@ -400,7 +436,9 @@ export default function GuestFormsPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                   {q.options.map((opt) => (
-                                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                                    <SelectItem key={opt} value={opt}>
+                                      {opt}
+                                    </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
@@ -435,7 +473,9 @@ export default function GuestFormsPage() {
                           <Input
                             placeholder="Reason for skipping..."
                             value={skipNotes[form.id] || ""}
-                            onChange={(e) => setSkipNotes(prev => ({ ...prev, [form.id]: e.target.value }))}
+                            onChange={(e) =>
+                              setSkipNotes((prev) => ({ ...prev, [form.id]: e.target.value }))
+                            }
                             className="flex-1"
                           />
                           <Button

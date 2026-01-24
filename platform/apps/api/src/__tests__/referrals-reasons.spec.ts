@@ -122,9 +122,18 @@ describe("Referral codes and stay reasons", () => {
         ]),
       },
       referralProgram: {
-        findMany: jest.fn().mockResolvedValue([{ id: "ref-1", code: "FRIEND10", source: "friend", channel: "email" }]),
+        findMany: jest
+          .fn()
+          .mockResolvedValue([
+            { id: "ref-1", code: "FRIEND10", source: "friend", channel: "email" },
+          ]),
       },
-      integrationExportJob: { findMany: jest.fn(), findUnique: jest.fn(), create: jest.fn(), count: jest.fn() },
+      integrationExportJob: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        count: jest.fn(),
+      },
     };
 
     const moduleRef = await Test.createTestingModule({
@@ -163,7 +172,12 @@ describe("Referral codes and stay reasons", () => {
           { stayReasonPreset: "other", stayReasonOther: "climbing comp" },
         ]),
       },
-      integrationExportJob: { findMany: jest.fn(), findUnique: jest.fn(), create: jest.fn(), count: jest.fn() },
+      integrationExportJob: {
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        count: jest.fn(),
+      },
     };
 
     const moduleRef = await Test.createTestingModule({

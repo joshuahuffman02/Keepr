@@ -432,10 +432,7 @@ export class PublicCampgroundsService {
   /**
    * Get similar campgrounds for recommendations
    */
-  async getSimilar(
-    campgroundId: string,
-    limit: number = 4
-  ): Promise<CampgroundSearchResult[]> {
+  async getSimilar(campgroundId: string, limit: number = 4): Promise<CampgroundSearchResult[]> {
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
       select: { state: true, amenities: true, claimStatus: true },
@@ -492,9 +489,7 @@ export class PublicCampgroundsService {
     state: string | null;
     claimStatus: CampgroundClaimStatus;
   }): string {
-    const location = [campground.city, campground.state]
-      .filter(Boolean)
-      .join(", ");
+    const location = [campground.city, campground.state].filter(Boolean).join(", ");
 
     if (campground.claimStatus === CampgroundClaimStatus.claimed) {
       return location
@@ -502,9 +497,7 @@ export class PublicCampgroundsService {
         : `${campground.name} - Book Your Campsite`;
     }
 
-    return location
-      ? `${campground.name} - Camping near ${location}`
-      : campground.name;
+    return location ? `${campground.name} - Camping near ${location}` : campground.name;
   }
 
   private buildMetaDescription(campground: {
@@ -519,9 +512,7 @@ export class PublicCampgroundsService {
       return campground.description.slice(0, 160);
     }
 
-    const location = [campground.city, campground.state]
-      .filter(Boolean)
-      .join(", ");
+    const location = [campground.city, campground.state].filter(Boolean).join(", ");
     const amenityList = campground.amenities.slice(0, 3).join(", ");
 
     if (campground.claimStatus === CampgroundClaimStatus.claimed) {

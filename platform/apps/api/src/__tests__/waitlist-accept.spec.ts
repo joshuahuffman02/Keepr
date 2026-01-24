@@ -10,9 +10,11 @@ describe("Waitlist accept guard", () => {
   it("returns conflict on second accept", async () => {
     const prisma = {
       waitlistEntry: {
-        findUnique: jest.fn().mockResolvedValue({ id: "w1", campgroundId: "camp-1", status: "fulfilled" }),
-        update: jest.fn()
-      }
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ id: "w1", campgroundId: "camp-1", status: "fulfilled" }),
+        update: jest.fn(),
+      },
     };
 
     const emailService = { sendEmail: jest.fn() };
@@ -20,7 +22,7 @@ describe("Waitlist accept guard", () => {
       findBySequence: jest.fn().mockResolvedValue(null),
       start: jest.fn().mockResolvedValue({ status: "pending", createdAt: new Date() }),
       complete: jest.fn(),
-      fail: jest.fn()
+      fail: jest.fn(),
     };
     const observability = { recordOfferLag: jest.fn() };
 
@@ -30,15 +32,15 @@ describe("Waitlist accept guard", () => {
         { provide: PrismaService, useValue: prisma },
         { provide: EmailService, useValue: emailService },
         { provide: IdempotencyService, useValue: idempotency },
-        { provide: ObservabilityService, useValue: observability }
-      ]
+        { provide: ObservabilityService, useValue: observability },
+      ],
     }).compile();
 
     const service = moduleRef.get(WaitlistService);
 
-    await expect(service.accept("w1", "idem", "seq-1", { campgroundId: "camp-1" })).rejects.toBeInstanceOf(
-      ConflictException
-    );
+    await expect(
+      service.accept("w1", "idem", "seq-1", { campgroundId: "camp-1" }),
+    ).rejects.toBeInstanceOf(ConflictException);
     expect(idempotency.fail).toHaveBeenCalled();
 
     await moduleRef.close();

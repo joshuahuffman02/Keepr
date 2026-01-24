@@ -1,6 +1,7 @@
 # Enhanced Onboarding Implementation Plan
 
 ## Overview
+
 Expand onboarding to capture more detailed campground configuration while maintaining our beautiful, step-by-step UI. All new sections are skippable.
 
 ---
@@ -8,6 +9,7 @@ Expand onboarding to capture more detailed campground configuration while mainta
 ## Database Changes Required
 
 ### 1. SiteClass Model Additions
+
 ```prisma
 model SiteClass {
   // ... existing fields
@@ -29,6 +31,7 @@ model SiteClass {
 ```
 
 ### 2. Campground Model Additions
+
 ```prisma
 model Campground {
   // ... existing fields
@@ -40,6 +43,7 @@ model Campground {
 ```
 
 ### 3. Leverage Existing Models
+
 - **SeasonalRate** - Already supports rate periods with date ranges
 - **DepositPolicy** - Already supports flexible deposit rules
 - **AddOnService** - Use for inventory items (firewood, guest passes, etc.)
@@ -49,11 +53,13 @@ model Campground {
 ## Onboarding Flow Changes
 
 ### Current Flow (11 steps)
+
 1. Park Profile → 2. Stripe Connect → 3. Inventory Choice → 4. Data Import →
-5. Site Classes → 6. Sites Builder → 7. Rates Setup → 8. Tax Rules →
-9. Deposit Policy → 10. Park Rules → 11. Review & Launch
+2. Site Classes → 6. Sites Builder → 7. Rates Setup → 8. Tax Rules →
+3. Deposit Policy → 10. Park Rules → 11. Review & Launch
 
 ### Enhanced Flow (14 steps)
+
 1. Park Profile (+ amenities expanded)
 2. Stripe Connect
 3. Inventory Choice
@@ -78,6 +84,7 @@ model Campground {
 **New UI Sections (collapsible):**
 
 #### A. Equipment & Dimensions
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Equipment & Dimensions (Optional)                    ▼  │
@@ -104,6 +111,7 @@ model Campground {
 ```
 
 #### B. Guest Pricing
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ Guest Pricing (Optional)                             ▼  │
@@ -381,36 +389,43 @@ model Campground {
 ## Implementation Order
 
 ### Phase 1: Database & API
+
 1. Add new fields to SiteClass model (equipmentTypes, occupantsIncluded, fees)
 2. Add bookingSources/stayReasons to Campground model
 3. Run migration
 4. Update onboarding API to handle new fields
 
 ### Phase 2: Enhanced Site Classes
+
 5. Create EquipmentTypePicker component
 6. Create GuestPricingPanel component
 7. Integrate into SiteClasses step
 
 ### Phase 3: Rate Periods
+
 8. Create RatePeriods step component
 9. Create RatePeriodCard component
 10. Store in SeasonalRate model
 
 ### Phase 4: Enhanced Rates
+
 11. Modify Rates step to show period × day-of-week matrix
 12. Save to SeasonalRate with dow adjustments
 
 ### Phase 5: Fees & Add-ons
+
 13. Create FeesAndAddons step component
 14. Create AddOnItemCard component
 15. Store in AddOnService model
 
 ### Phase 6: Deposit & Cancellation
+
 16. Create enhanced DepositRules component (using DepositPolicy)
 17. Create CancellationRules step component
 18. Create CancellationRuleBuilder component
 
 ### Phase 7: Booking Sources
+
 19. Add collapsible sections to ParkProfile
 20. Create SourcesPicker component
 
@@ -419,6 +434,7 @@ model Campground {
 ## Files to Create
 
 ### New Components
+
 - `components/onboarding/EquipmentTypePicker.tsx`
 - `components/onboarding/GuestPricingPanel.tsx`
 - `components/onboarding/RatePeriodCard.tsx`
@@ -427,11 +443,13 @@ model Campground {
 - `components/onboarding/SourcesPicker.tsx`
 
 ### New Steps
+
 - `steps/RatePeriods.tsx`
 - `steps/FeesAndAddons.tsx`
 - `steps/CancellationRules.tsx`
 
 ### Modified Steps
+
 - `steps/SiteClasses.tsx` - Add equipment types, guest pricing
 - `steps/Rates.tsx` - Support rate periods, weekday/weekend
 - `steps/DepositPolicy.tsx` - Use full DepositPolicy model
@@ -440,6 +458,7 @@ model Campground {
 ---
 
 ## Equipment Type Options
+
 ```typescript
 const EQUIPMENT_TYPES = [
   { id: "class_a", label: "Class A", icon: Truck },
@@ -457,6 +476,7 @@ const EQUIPMENT_TYPES = [
 ```
 
 ## Slide-Out Options
+
 ```typescript
 const SLIDEOUT_OPTIONS = [
   { id: "both_sides", label: "Both Sides" },

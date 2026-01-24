@@ -196,16 +196,25 @@ export function KeyboardShortcutsDialog() {
               <li className="flex items-start gap-2">
                 <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Use <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">{formatKey("cmd")}K</kbd> to
-                  quickly search for guests, sites, and reservations
+                  Use{" "}
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">
+                    {formatKey("cmd")}K
+                  </kbd>{" "}
+                  to quickly search for guests, sites, and reservations
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Sequential shortcuts like <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">G</kbd>{" "}
-                  then <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">D</kbd> should be pressed one
-                  after another, not together
+                  Sequential shortcuts like{" "}
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">
+                    G
+                  </kbd>{" "}
+                  then{" "}
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">
+                    D
+                  </kbd>{" "}
+                  should be pressed one after another, not together
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -217,8 +226,11 @@ export function KeyboardShortcutsDialog() {
               <li className="flex items-start gap-2">
                 <span className="text-status-warning font-bold mt-0.5">•</span>
                 <span>
-                  Press <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">?</kbd> anytime to see this
-                  reference panel
+                  Press{" "}
+                  <kbd className="px-1.5 py-0.5 bg-card rounded border border-border text-[10px]">
+                    ?
+                  </kbd>{" "}
+                  anytime to see this reference panel
                 </span>
               </li>
             </ul>
@@ -228,7 +240,11 @@ export function KeyboardShortcutsDialog() {
         {/* Footer */}
         <div className="px-6 py-4 border-t border-border bg-muted flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
-            Press <kbd className="px-2 py-0.5 bg-card rounded text-foreground border border-border text-[10px]">ESC</kbd> to close
+            Press{" "}
+            <kbd className="px-2 py-0.5 bg-card rounded text-foreground border border-border text-[10px]">
+              ESC
+            </kbd>{" "}
+            to close
           </span>
           <a
             href="/dashboard/help/shortcuts"

@@ -35,18 +35,19 @@ You can't teach what you don't know.
 
 Not everyone needs the same level of training:
 
-| Role | Training Focus |
-|------|---------------|
-| Front Desk/Check-in | Reservations, check-in/out, payments, daily tasks |
-| Maintenance | Site status updates, maintenance blocks, basic search |
-| Management | Reporting, settings, pricing, full system overview |
-| Seasonal Staff | Essential tasks only, with clear escalation paths |
+| Role                | Training Focus                                        |
+| ------------------- | ----------------------------------------------------- |
+| Front Desk/Check-in | Reservations, check-in/out, payments, daily tasks     |
+| Maintenance         | Site status updates, maintenance blocks, basic search |
+| Management          | Reporting, settings, pricing, full system overview    |
+| Seasonal Staff      | Essential tasks only, with clear escalation paths     |
 
 Match training depth to job requirements.
 
 ### Prepare Training Materials
 
 Create or gather:
+
 - [ ] Quick reference cards (laminated for durability)
 - [ ] Step-by-step guides for common tasks
 - [ ] Training login/sandbox account if available
@@ -62,6 +63,7 @@ Create or gather:
 Start with the big picture before diving into tasks:
 
 **Cover:**
+
 - What the software does and why you chose it
 - Main sections/modules of the interface
 - How to log in and log out securely
@@ -75,6 +77,7 @@ Start with the big picture before diving into tasks:
 Before making changes, staff should be comfortable finding information:
 
 **Key tasks:**
+
 - Search for existing reservations
 - View site availability/calendar
 - Look up guest history
@@ -88,6 +91,7 @@ Before making changes, staff should be comfortable finding information:
 This is the core skill for front-desk staff:
 
 **Process walkthrough:**
+
 1. Check availability for requested dates
 2. Create new reservation
 3. Enter guest information
@@ -97,12 +101,14 @@ This is the core skill for front-desk staff:
 7. Send confirmation
 
 **Common scenarios to practice:**
+
 - Standard weekend reservation
 - Specific site request
 - Multi-night stay
 - Returning guest (using existing profile)
 
 **Error handling:**
+
 - What happens if site is unavailable?
 - What if payment fails?
 - How to correct entered mistakes
@@ -112,6 +118,7 @@ This is the core skill for front-desk staff:
 Daily operations training:
 
 **Check-in process:**
+
 1. Pull up reservation
 2. Verify guest information
 3. Collect any balance due
@@ -120,6 +127,7 @@ Daily operations training:
 6. Provide site map and information
 
 **Check-out process:**
+
 1. Locate checked-in guest
 2. Review any additional charges
 3. Process final payment if needed
@@ -127,6 +135,7 @@ Daily operations training:
 5. Update site status
 
 **Walk-in handling:**
+
 - How to create same-day reservations
 - Quickly checking availability
 - Processing immediate payments
@@ -136,12 +145,14 @@ Daily operations training:
 Handling changes is inevitable:
 
 **Modifications:**
+
 - Changing dates (extending, shortening)
 - Changing site assignments
 - Adding or removing guests
 - Adding extras or services
 
 **Cancellations:**
+
 - Full cancellation process
 - Applying cancellation policy (fees, credits)
 - Refund processing
@@ -154,6 +165,7 @@ Handling changes is inevitable:
 Money matters require extra care:
 
 **Payment tasks:**
+
 - Taking deposits
 - Processing balances
 - Handling multiple payment methods
@@ -162,6 +174,7 @@ Money matters require extra care:
 - Voiding transactions (if permitted)
 
 **Important policies:**
+
 - Who has authority to give discounts?
 - Who can process refunds?
 - What documentation is required?
@@ -243,6 +256,7 @@ NOTES:
 ### Laminated Desk Cards
 
 Provide quick-reference cards for the most common tasks staff do daily:
+
 - Lookup reservation
 - Check-in guest
 - Check-out guest
@@ -253,12 +267,12 @@ Provide quick-reference cards for the most common tasks staff do daily:
 
 Document common issues and solutions:
 
-| Problem | Cause | Solution |
-|---------|-------|----------|
-| Can't find reservation | Wrong date/name | Try alternate search, check spelling |
-| Payment won't process | Card declined | Try again, request alternate payment |
-| Site shows wrong status | Sync delay | Refresh page, check manually |
-| System is slow | Internet issue | Check connection, wait and retry |
+| Problem                 | Cause           | Solution                             |
+| ----------------------- | --------------- | ------------------------------------ |
+| Can't find reservation  | Wrong date/name | Try alternate search, check spelling |
+| Payment won't process   | Card declined   | Try again, request alternate payment |
+| Site shows wrong status | Sync delay      | Refresh page, check manually         |
+| System is slow          | Internet issue  | Check connection, wait and retry     |
 
 ---
 
@@ -267,6 +281,7 @@ Document common issues and solutions:
 ### Regular Refreshers
 
 Schedule periodic training updates:
+
 - When software updates with new features
 - Before peak season begins
 - When new staff joins
@@ -275,6 +290,7 @@ Schedule periodic training updates:
 ### Track Common Errors
 
 Monitor for recurring issues:
+
 - Incorrect pricing quoted
 - Double-bookings
 - Failed payment handling
@@ -285,6 +301,7 @@ Use errors as training opportunities, not punishment.
 ### Celebrate Competency
 
 Acknowledge staff who master the system:
+
 - "Ask [Name]" designation for peer questions
 - Recognition for error-free periods
 - Input on workflow improvements
@@ -311,4 +328,4 @@ Invest the time upfront to train properly, create solid reference materials, and
 
 ---
 
-*Keepr is designed to be intuitive for staff, with minimal training required for daily operations. When you do need help, our support team is ready to assist with training and onboarding. [Learn more at campreserv.com](https://campreserv.com)*
+_Keepr is designed to be intuitive for staff, with minimal training required for daily operations. When you do need help, our support team is ready to assist with training and onboarding. [Learn more at campreserv.com](https://campreserv.com)_

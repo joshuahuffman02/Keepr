@@ -2,14 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Calendar,
-  Users,
-  Star,
-  X,
-  ChevronUp,
-  Heart,
-} from "lucide-react";
+import { Calendar, Users, Star, X, ChevronUp, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -118,7 +111,7 @@ export function MobileBookingBar({
               "fixed bottom-0 left-0 right-0 z-50 md:hidden",
               "bg-card border-t border-border shadow-2xl shadow-black/20",
               isExpanded ? "rounded-t-2xl" : "",
-              className
+              className,
             )}
             initial={prefersReducedMotion ? { y: 0 } : { y: 100 }}
             animate={{ y: 0 }}
@@ -140,10 +133,7 @@ export function MobileBookingBar({
             {!isExpanded && (
               <div className="flex items-center justify-between p-4 safe-area-inset-bottom">
                 <div className="flex-1 min-w-0">
-                  <button
-                    onClick={() => setIsExpanded(true)}
-                    className="text-left w-full"
-                  >
+                  <button onClick={() => setIsExpanded(true)} className="text-left w-full">
                     {priceFrom ? (
                       <div className="flex items-baseline gap-1">
                         <span className="text-lg font-bold text-foreground">
@@ -269,13 +259,11 @@ export function MobileBookingBar({
                             <SelectValue placeholder="Select guests" />
                           </SelectTrigger>
                           <SelectContent>
-                            {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map(
-                              (g) => (
-                                <SelectItem key={g} value={g}>
-                                  {g} guest{g === "1" ? "" : "s"}
-                                </SelectItem>
-                              )
-                            )}
+                            {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((g) => (
+                              <SelectItem key={g} value={g}>
+                                {g} guest{g === "1" ? "" : "s"}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       </div>

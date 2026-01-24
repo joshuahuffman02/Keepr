@@ -2,11 +2,30 @@
 
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../components/ui/dialog";
 import { Badge } from "../../components/ui/badge";
 import { Skeleton } from "../../components/ui/skeleton";
 import { Textarea } from "../../components/ui/textarea";
@@ -16,10 +35,30 @@ import { apiClient } from "../../lib/api-client";
 import { useToast } from "../../components/ui/use-toast";
 import { cn } from "../../lib/utils";
 import {
-  FileSignature, Download, FileText, Search, Filter, MoreVertical,
-  CheckCircle2, Clock, Eye, Send, X, AlertTriangle, Calendar,
-  Users, TrendingUp, Loader2, Upload, Ban, RefreshCw, ChevronDown,
-  Megaphone, UserCheck, FileX, PenLine
+  FileSignature,
+  Download,
+  FileText,
+  Search,
+  Filter,
+  MoreVertical,
+  CheckCircle2,
+  Clock,
+  Eye,
+  Send,
+  X,
+  AlertTriangle,
+  Calendar,
+  Users,
+  TrendingUp,
+  Loader2,
+  Upload,
+  Ban,
+  RefreshCw,
+  ChevronDown,
+  Megaphone,
+  UserCheck,
+  FileX,
+  PenLine,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -112,9 +151,7 @@ const isContractTemplate = (value: unknown): value is Contract["template"] => {
   if (value === null) return true;
   if (!isRecord(value)) return false;
   return (
-    typeof value.id === "string" &&
-    typeof value.name === "string" &&
-    typeof value.type === "string"
+    typeof value.id === "string" && typeof value.name === "string" && typeof value.type === "string"
   );
 };
 
@@ -185,16 +222,56 @@ const isContractsResponse = (value: unknown): value is { contracts: Contract[]; 
   typeof value.total === "number";
 
 const statusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  preview: { label: "Preview", color: "bg-purple-100 text-purple-700", icon: <Eye className="h-3 w-3" /> },
-  draft: { label: "Draft", color: "bg-muted text-muted-foreground", icon: <FileText className="h-3 w-3" /> },
-  sent: { label: "Sent", color: "bg-status-info/15 text-status-info border-status-info/30", icon: <Send className="h-3 w-3" /> },
-  viewed: { label: "Viewed", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Eye className="h-3 w-3" /> },
-  signed: { label: "Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <CheckCircle2 className="h-3 w-3" /> },
-  signed_paper: { label: "Paper Signed", color: "bg-status-success/15 text-status-success border-status-success/30", icon: <PenLine className="h-3 w-3" /> },
-  waived: { label: "Waived", color: "bg-teal-100 text-teal-700", icon: <UserCheck className="h-3 w-3" /> },
-  declined: { label: "Declined", color: "bg-status-error/15 text-status-error border-status-error/30", icon: <X className="h-3 w-3" /> },
-  voided: { label: "Voided", color: "bg-muted text-muted-foreground", icon: <Ban className="h-3 w-3" /> },
-  expired: { label: "Expired", color: "bg-status-warning/15 text-status-warning border-status-warning/30", icon: <Clock className="h-3 w-3" /> },
+  preview: {
+    label: "Preview",
+    color: "bg-purple-100 text-purple-700",
+    icon: <Eye className="h-3 w-3" />,
+  },
+  draft: {
+    label: "Draft",
+    color: "bg-muted text-muted-foreground",
+    icon: <FileText className="h-3 w-3" />,
+  },
+  sent: {
+    label: "Sent",
+    color: "bg-status-info/15 text-status-info border-status-info/30",
+    icon: <Send className="h-3 w-3" />,
+  },
+  viewed: {
+    label: "Viewed",
+    color: "bg-status-warning/15 text-status-warning border-status-warning/30",
+    icon: <Eye className="h-3 w-3" />,
+  },
+  signed: {
+    label: "Signed",
+    color: "bg-status-success/15 text-status-success border-status-success/30",
+    icon: <CheckCircle2 className="h-3 w-3" />,
+  },
+  signed_paper: {
+    label: "Paper Signed",
+    color: "bg-status-success/15 text-status-success border-status-success/30",
+    icon: <PenLine className="h-3 w-3" />,
+  },
+  waived: {
+    label: "Waived",
+    color: "bg-teal-100 text-teal-700",
+    icon: <UserCheck className="h-3 w-3" />,
+  },
+  declined: {
+    label: "Declined",
+    color: "bg-status-error/15 text-status-error border-status-error/30",
+    icon: <X className="h-3 w-3" />,
+  },
+  voided: {
+    label: "Voided",
+    color: "bg-muted text-muted-foreground",
+    icon: <Ban className="h-3 w-3" />,
+  },
+  expired: {
+    label: "Expired",
+    color: "bg-status-warning/15 text-status-warning border-status-warning/30",
+    icon: <Clock className="h-3 w-3" />,
+  },
 };
 
 const waiverReasonLabels: Record<string, string> = {
@@ -218,11 +295,17 @@ const documentTypeLabels: Record<string, string> = {
 };
 
 // Stats Dashboard Component
-function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | null; isLoading: boolean }) {
+function ContractStatsDashboard({
+  stats,
+  isLoading,
+}: {
+  stats: ContractStats | null;
+  isLoading: boolean;
+}) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-24 rounded-lg" />
         ))}
       </div>
@@ -256,17 +339,52 @@ function ContractStatsDashboard({ stats, isLoading }: { stats: ContractStats | n
 
       {/* Status Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        <StatCard label="Signed (Digital)" value={stats.signed} icon={<CheckCircle2 className="h-4 w-4" />} color="emerald" />
-        <StatCard label="Signed (Paper)" value={stats.signedPaper} icon={<PenLine className="h-4 w-4" />} color="emerald" />
-        <StatCard label="Waived" value={stats.waived} icon={<UserCheck className="h-4 w-4" />} color="teal" />
-        <StatCard label="Pending" value={stats.pendingCount} icon={<Clock className="h-4 w-4" />} color="amber" />
-        <StatCard label="Expired/Declined" value={stats.expired + stats.declined} icon={<AlertTriangle className="h-4 w-4" />} color="red" />
+        <StatCard
+          label="Signed (Digital)"
+          value={stats.signed}
+          icon={<CheckCircle2 className="h-4 w-4" />}
+          color="emerald"
+        />
+        <StatCard
+          label="Signed (Paper)"
+          value={stats.signedPaper}
+          icon={<PenLine className="h-4 w-4" />}
+          color="emerald"
+        />
+        <StatCard
+          label="Waived"
+          value={stats.waived}
+          icon={<UserCheck className="h-4 w-4" />}
+          color="teal"
+        />
+        <StatCard
+          label="Pending"
+          value={stats.pendingCount}
+          icon={<Clock className="h-4 w-4" />}
+          color="amber"
+        />
+        <StatCard
+          label="Expired/Declined"
+          value={stats.expired + stats.declined}
+          icon={<AlertTriangle className="h-4 w-4" />}
+          color="red"
+        />
       </div>
     </div>
   );
 }
 
-function StatCard({ label, value, icon, color }: { label: string; value: number; icon: React.ReactNode; color: string }) {
+function StatCard({
+  label,
+  value,
+  icon,
+  color,
+}: {
+  label: string;
+  value: number;
+  icon: React.ReactNode;
+  color: string;
+}) {
   const colorClasses: Record<string, string> = {
     emerald: "bg-status-success/15 text-status-success border-status-success/30",
     teal: "bg-teal-50 text-teal-600 border-teal-200",
@@ -292,7 +410,7 @@ function PaperSignedModal({
   onClose,
   contract,
   onSubmit,
-  isLoading
+  isLoading,
 }: {
   open: boolean;
   onClose: () => void;
@@ -319,7 +437,8 @@ function PaperSignedModal({
             Mark as Paper Signed
           </DialogTitle>
           <DialogDescription>
-            Record that {contract?.guest?.primaryFirstName} {contract?.guest?.primaryLastName} signed the contract on paper.
+            Record that {contract?.guest?.primaryFirstName} {contract?.guest?.primaryLastName}{" "}
+            signed the contract on paper.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -343,13 +462,19 @@ function PaperSignedModal({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={() => onSubmit({ paperSignedAt, notes: notes || undefined })}
             disabled={isLoading}
             className="bg-emerald-600 hover:bg-emerald-700"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <PenLine className="h-4 w-4 mr-2" />}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <PenLine className="h-4 w-4 mr-2" />
+            )}
             Mark as Signed
           </Button>
         </DialogFooter>
@@ -364,7 +489,7 @@ function WaiveSignatureModal({
   onClose,
   contract,
   onSubmit,
-  isLoading
+  isLoading,
 }: {
   open: boolean;
   onClose: () => void;
@@ -391,8 +516,9 @@ function WaiveSignatureModal({
             Waive Signature Requirement
           </DialogTitle>
           <DialogDescription>
-            Waive the signature requirement for {contract?.guest?.primaryFirstName} {contract?.guest?.primaryLastName}.
-            The contract will be marked as complete without a signature.
+            Waive the signature requirement for {contract?.guest?.primaryFirstName}{" "}
+            {contract?.guest?.primaryLastName}. The contract will be marked as complete without a
+            signature.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -413,23 +539,35 @@ function WaiveSignatureModal({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="waiverNotes">Notes {reason === "other" && <span className="text-red-500">*</span>}</Label>
+            <Label htmlFor="waiverNotes">
+              Notes {reason === "other" && <span className="text-red-500">*</span>}
+            </Label>
             <Textarea
               id="waiverNotes"
-              placeholder={reason === "other" ? "Required - explain why signature is being waived" : "Optional notes..."}
+              placeholder={
+                reason === "other"
+                  ? "Required - explain why signature is being waived"
+                  : "Optional notes..."
+              }
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button
             onClick={() => onSubmit({ reason, notes: notes || undefined })}
             disabled={isLoading || !reason || (reason === "other" && !notes)}
             className="bg-teal-600 hover:bg-teal-700"
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <UserCheck className="h-4 w-4 mr-2" />}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <UserCheck className="h-4 w-4 mr-2" />
+            )}
             Waive Signature
           </Button>
         </DialogFooter>
@@ -445,7 +583,7 @@ function ContractRow({
   onWaive,
   onResend,
   onVoid,
-  onDownload
+  onDownload,
 }: {
   contract: Contract;
   onMarkPaperSigned: () => void;
@@ -461,7 +599,9 @@ function ContractRow({
 
   const isPending = ["sent", "viewed"].includes(contract.status);
   const isCompleted = ["signed", "signed_paper", "waived"].includes(contract.status);
-  const canModify = !["voided", "expired", "signed", "signed_paper", "waived", "declined"].includes(contract.status);
+  const canModify = !["voided", "expired", "signed", "signed_paper", "waived", "declined"].includes(
+    contract.status,
+  );
 
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg bg-card hover:shadow-sm transition-shadow">
@@ -474,7 +614,9 @@ function ContractRow({
               {status.label}
             </Badge>
             {contract.seasonYear && (
-              <Badge variant="outline" className="text-xs">{contract.seasonYear}</Badge>
+              <Badge variant="outline" className="text-xs">
+                {contract.seasonYear}
+              </Badge>
             )}
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -558,7 +700,7 @@ function RenewalCampaignModal({
   open,
   onClose,
   campgroundId,
-  onSuccess
+  onSuccess,
 }: {
   open: boolean;
   onClose: () => void;
@@ -581,7 +723,8 @@ function RenewalCampaignModal({
       // This would call the renewal campaign API
       toast({
         title: "Coming Soon",
-        description: "Renewal campaign functionality will be available soon. You can manually create contracts for now."
+        description:
+          "Renewal campaign functionality will be available soon. You can manually create contracts for now.",
       });
       onClose();
     } catch {
@@ -600,7 +743,8 @@ function RenewalCampaignModal({
             Send Renewal Campaign
           </DialogTitle>
           <DialogDescription>
-            Send seasonal contract renewals to previous guests. Contracts will be sent based on seniority and availability.
+            Send seasonal contract renewals to previous guests. Contracts will be sent based on
+            seniority and availability.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -637,15 +781,26 @@ function RenewalCampaignModal({
             <div className="flex items-start gap-2">
               <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <div>
-                <strong>Coming Soon:</strong> This feature will automatically identify returning seasonals and send renewal contracts based on configurable priority rules.
+                <strong>Coming Soon:</strong> This feature will automatically identify returning
+                seasonals and send renewal contracts based on configurable priority rules.
               </div>
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleSend} disabled={isLoading} className="bg-blue-600 hover:bg-blue-700">
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSend}
+            disabled={isLoading}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Send className="h-4 w-4 mr-2" />
+            )}
             Preview Campaign
           </Button>
         </DialogFooter>
@@ -798,13 +953,17 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
   };
 
   // Filter contracts by search
-  const filteredContracts = (contractsQuery.data?.contracts || []).filter(c => {
+  const filteredContracts = (contractsQuery.data?.contracts || []).filter((c) => {
     if (!searchQuery) return true;
     const search = searchQuery.toLowerCase();
-    const guestName = c.guest ? `${c.guest.primaryFirstName} ${c.guest.primaryLastName}` : c.recipientName || "";
-    return guestName.toLowerCase().includes(search) ||
-           c.guest?.email?.toLowerCase().includes(search) ||
-           c.template?.name?.toLowerCase().includes(search);
+    const guestName = c.guest
+      ? `${c.guest.primaryFirstName} ${c.guest.primaryLastName}`
+      : c.recipientName || "";
+    return (
+      guestName.toLowerCase().includes(search) ||
+      c.guest?.email?.toLowerCase().includes(search) ||
+      c.template?.name?.toLowerCase().includes(search)
+    );
   });
 
   if (!campgroundId) {
@@ -895,8 +1054,10 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Seasons</SelectItem>
-                {seasonYears.map(year => (
-                  <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                {seasonYears.map((year) => (
+                  <SelectItem key={year} value={String(year)}>
+                    {year}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -920,17 +1081,21 @@ export function ContractsTab({ campgroundId }: { campgroundId: string | null }) 
           {/* Contracts List */}
           {contractsQuery.isLoading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map(i => <Skeleton key={i} className="h-20 rounded-lg" />)}
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-20 rounded-lg" />
+              ))}
             </div>
           ) : filteredContracts.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <FileX className="h-12 w-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium">No contracts found</p>
-              <p className="text-sm">Try adjusting your filters or send a renewal campaign to get started.</p>
+              <p className="text-sm">
+                Try adjusting your filters or send a renewal campaign to get started.
+              </p>
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredContracts.map(contract => (
+              {filteredContracts.map((contract) => (
                 <ContractRow
                   key={contract.id}
                   contract={contract}

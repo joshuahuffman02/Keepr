@@ -14,10 +14,10 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ## Employee Information
 
-**Employee Name:** ____________________________
-**Position:** ____________________________
-**Training Date:** ____________________________
-**Trainer:** ____________________________
+**Employee Name:** ************\_\_\_\_************
+**Position:** ************\_\_\_\_************
+**Training Date:** ************\_\_\_\_************
+**Trainer:** ************\_\_\_\_************
 
 ---
 
@@ -25,16 +25,16 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| Why strong passwords matter | [ ] | ___ |
-| Creating strong passwords (12+ characters, complexity) | [ ] | ___ |
-| Never sharing passwords with anyone | [ ] | ___ |
-| Not writing passwords on sticky notes | [ ] | ___ |
-| Using a password manager | [ ] | ___ |
-| Different passwords for different accounts | [ ] | ___ |
-| Recognizing when to change passwords | [ ] | ___ |
-| Multi-factor authentication (MFA) | [ ] | ___ |
+| Topic                                                  | Covered | Employee Initials |
+| ------------------------------------------------------ | :-----: | :---------------: |
+| Why strong passwords matter                            |   [ ]   |      \_\_\_       |
+| Creating strong passwords (12+ characters, complexity) |   [ ]   |      \_\_\_       |
+| Never sharing passwords with anyone                    |   [ ]   |      \_\_\_       |
+| Not writing passwords on sticky notes                  |   [ ]   |      \_\_\_       |
+| Using a password manager                               |   [ ]   |      \_\_\_       |
+| Different passwords for different accounts             |   [ ]   |      \_\_\_       |
+| Recognizing when to change passwords                   |   [ ]   |      \_\_\_       |
+| Multi-factor authentication (MFA)                      |   [ ]   |      \_\_\_       |
 
 ### Quick Quiz
 
@@ -54,16 +54,16 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| What is phishing? | [ ] | ___ |
-| Identifying suspicious emails | [ ] | ___ |
-| Checking sender addresses carefully | [ ] | ___ |
-| Not clicking unknown links | [ ] | ___ |
-| Verifying requests for information | [ ] | ___ |
-| Phone scams and pretexting | [ ] | ___ |
-| What to do if you clicked a bad link | [ ] | ___ |
-| Reporting suspicious messages | [ ] | ___ |
+| Topic                                | Covered | Employee Initials |
+| ------------------------------------ | :-----: | :---------------: |
+| What is phishing?                    |   [ ]   |      \_\_\_       |
+| Identifying suspicious emails        |   [ ]   |      \_\_\_       |
+| Checking sender addresses carefully  |   [ ]   |      \_\_\_       |
+| Not clicking unknown links           |   [ ]   |      \_\_\_       |
+| Verifying requests for information   |   [ ]   |      \_\_\_       |
+| Phone scams and pretexting           |   [ ]   |      \_\_\_       |
+| What to do if you clicked a bad link |   [ ]   |      \_\_\_       |
+| Reporting suspicious messages        |   [ ]   |      \_\_\_       |
 
 ### Phishing Red Flags Reviewed
 
@@ -93,25 +93,25 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| What is personally identifiable information (PII)? | [ ] | ___ |
-| Types of guest data we collect | [ ] | ___ |
-| Why protecting guest data matters | [ ] | ___ |
-| Clean desk policy | [ ] | ___ |
-| Screen privacy when guests are present | [ ] | ___ |
-| Secure document disposal (shredding) | [ ] | ___ |
-| Not discussing guest info in public areas | [ ] | ___ |
-| Verifying identity before sharing info | [ ] | ___ |
+| Topic                                              | Covered | Employee Initials |
+| -------------------------------------------------- | :-----: | :---------------: |
+| What is personally identifiable information (PII)? |   [ ]   |      \_\_\_       |
+| Types of guest data we collect                     |   [ ]   |      \_\_\_       |
+| Why protecting guest data matters                  |   [ ]   |      \_\_\_       |
+| Clean desk policy                                  |   [ ]   |      \_\_\_       |
+| Screen privacy when guests are present             |   [ ]   |      \_\_\_       |
+| Secure document disposal (shredding)               |   [ ]   |      \_\_\_       |
+| Not discussing guest info in public areas          |   [ ]   |      \_\_\_       |
+| Verifying identity before sharing info             |   [ ]   |      \_\_\_       |
 
 ### Data Handling Scenarios Reviewed
 
-| Scenario | Correct Response |
-|----------|------------------|
-| Guest asks for their own reservation info | Verify identity first |
+| Scenario                                        | Correct Response             |
+| ----------------------------------------------- | ---------------------------- |
+| Guest asks for their own reservation info       | Verify identity first        |
 | Someone calls asking about another guest's stay | Never confirm guest presence |
-| Found printout with guest credit card info | Shred immediately |
-| Guest asks you to email their receipt | Send only to email on file |
+| Found printout with guest credit card info      | Shred immediately            |
+| Guest asks you to email their receipt           | Send only to email on file   |
 
 ### Quick Quiz
 
@@ -126,16 +126,16 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| Locking workstations when stepping away | [ ] | ___ |
-| Securing keys and access cards | [ ] | ___ |
-| Not letting strangers tailgate through doors | [ ] | ___ |
-| Reporting lost keys/cards immediately | [ ] | ___ |
-| Proper lock-up procedures | [ ] | ___ |
-| Securing cash and payment devices | [ ] | ___ |
-| Challenging unfamiliar people in staff areas | [ ] | ___ |
-| End-of-day security checklist | [ ] | ___ |
+| Topic                                        | Covered | Employee Initials |
+| -------------------------------------------- | :-----: | :---------------: |
+| Locking workstations when stepping away      |   [ ]   |      \_\_\_       |
+| Securing keys and access cards               |   [ ]   |      \_\_\_       |
+| Not letting strangers tailgate through doors |   [ ]   |      \_\_\_       |
+| Reporting lost keys/cards immediately        |   [ ]   |      \_\_\_       |
+| Proper lock-up procedures                    |   [ ]   |      \_\_\_       |
+| Securing cash and payment devices            |   [ ]   |      \_\_\_       |
+| Challenging unfamiliar people in staff areas |   [ ]   |      \_\_\_       |
+| End-of-day security checklist                |   [ ]   |      \_\_\_       |
 
 ### Quick Quiz
 
@@ -150,14 +150,14 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| Never write down full card numbers | [ ] | ___ |
-| Properly handling payment terminals | [ ] | ___ |
-| What to do if terminal seems tampered with | [ ] | ___ |
-| Not storing card data on paper or computers | [ ] | ___ |
-| Recognizing card skimmers | [ ] | ___ |
-| Processing refunds securely | [ ] | ___ |
+| Topic                                       | Covered | Employee Initials |
+| ------------------------------------------- | :-----: | :---------------: |
+| Never write down full card numbers          |   [ ]   |      \_\_\_       |
+| Properly handling payment terminals         |   [ ]   |      \_\_\_       |
+| What to do if terminal seems tampered with  |   [ ]   |      \_\_\_       |
+| Not storing card data on paper or computers |   [ ]   |      \_\_\_       |
+| Recognizing card skimmers                   |   [ ]   |      \_\_\_       |
+| Processing refunds securely                 |   [ ]   |      \_\_\_       |
 
 ### Quick Quiz
 
@@ -172,14 +172,14 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| What qualifies as a security incident | [ ] | ___ |
-| Who to report incidents to | [ ] | ___ |
-| Importance of immediate reporting | [ ] | ___ |
-| Not trying to "fix" security problems alone | [ ] | ___ |
-| Documenting what happened | [ ] | ___ |
-| Preserving evidence | [ ] | ___ |
+| Topic                                       | Covered | Employee Initials |
+| ------------------------------------------- | :-----: | :---------------: |
+| What qualifies as a security incident       |   [ ]   |      \_\_\_       |
+| Who to report incidents to                  |   [ ]   |      \_\_\_       |
+| Importance of immediate reporting           |   [ ]   |      \_\_\_       |
+| Not trying to "fix" security problems alone |   [ ]   |      \_\_\_       |
+| Documenting what happened                   |   [ ]   |      \_\_\_       |
+| Preserving evidence                         |   [ ]   |      \_\_\_       |
 
 ### Report To:
 
@@ -199,14 +199,14 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 
 ### Training Topics
 
-| Topic | Covered | Employee Initials |
-|-------|:-------:|:-----------------:|
-| Acceptable use of work computers | [ ] | ___ |
-| Not downloading unauthorized software | [ ] | ___ |
-| Using secure websites (HTTPS) | [ ] | ___ |
-| Not using public WiFi for work | [ ] | ___ |
-| Being cautious with USB drives | [ ] | ___ |
-| Social media best practices | [ ] | ___ |
+| Topic                                 | Covered | Employee Initials |
+| ------------------------------------- | :-----: | :---------------: |
+| Acceptable use of work computers      |   [ ]   |      \_\_\_       |
+| Not downloading unauthorized software |   [ ]   |      \_\_\_       |
+| Using secure websites (HTTPS)         |   [ ]   |      \_\_\_       |
+| Not using public WiFi for work        |   [ ]   |      \_\_\_       |
+| Being cautious with USB drives        |   [ ]   |      \_\_\_       |
+| Social media best practices           |   [ ]   |      \_\_\_       |
 
 ---
 
@@ -215,29 +215,30 @@ Complete this training with all employees upon hire and annually thereafter. Doc
 ### Employee Acknowledgment
 
 I acknowledge that I have:
+
 - Completed all security awareness training modules
 - Had the opportunity to ask questions
 - Understand my responsibilities for protecting guest data
 - Know who to contact to report security concerns
 
-**Employee Signature:** _________________________ **Date:** _____________
+**Employee Signature:** ************\_************ **Date:** ******\_******
 
 ### Trainer Verification
 
 I verify that this employee has completed the security awareness training and demonstrated understanding of the material.
 
-**Trainer Signature:** _________________________ **Date:** _____________
+**Trainer Signature:** ************\_************ **Date:** ******\_******
 
 ---
 
 ## Annual Refresher Log
 
 | Year | Date Completed | Trainer | Employee Signature |
-|------|----------------|---------|-------------------|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+| ---- | -------------- | ------- | ------------------ |
+|      |                |         |                    |
+|      |                |         |                    |
+|      |                |         |                    |
+|      |                |         |                    |
 
 ---
 
@@ -250,4 +251,4 @@ I verify that this employee has completed the security awareness training and de
 
 ---
 
-*This template is provided by Campreserv for guidance purposes. Customize training content based on your specific systems and procedures.*
+_This template is provided by Campreserv for guidance purposes. Customize training content based on your specific systems and procedures._

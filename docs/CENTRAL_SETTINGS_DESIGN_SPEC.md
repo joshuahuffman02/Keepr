@@ -10,29 +10,33 @@ This document combines emotional design, UX, and accessibility requirements for 
 
 ### Emotional Goals by Context
 
-| Context | Target Emotion | Design Approach |
-|---------|---------------|-----------------|
-| **First visit** | Curiosity, not overwhelm | Progressive reveal, welcoming empty states |
-| **Finding a setting** | Confidence, control | Fast search, clear hierarchy |
-| **Enabling optimization** | Trust, safety | Transparency, easy undo, clear explanations |
-| **Completing setup** | Accomplishment | Celebration moments, progress tracking |
-| **Fixing system issues** | Competence | Clear guidance, one-click fixes |
+| Context                   | Target Emotion           | Design Approach                             |
+| ------------------------- | ------------------------ | ------------------------------------------- |
+| **First visit**           | Curiosity, not overwhelm | Progressive reveal, welcoming empty states  |
+| **Finding a setting**     | Confidence, control      | Fast search, clear hierarchy                |
+| **Enabling optimization** | Trust, safety            | Transparency, easy undo, clear explanations |
+| **Completing setup**      | Accomplishment           | Celebration moments, progress tracking      |
+| **Fixing system issues**  | Competence               | Clear guidance, one-click fixes             |
 
 ### Anxiety Points to Address
 
 #### 1. "Where is that setting?"
+
 - **Solution**: Global search with fuzzy matching
 - **Micro-interaction**: Search results highlight matching text, animate in with stagger
 
 #### 2. "Will auto-optimization mess up my reservations?"
+
 - **Solution**: Preview mode, activity log, easy disable
 - **Copy**: "You're always in control. Review changes before they happen."
 
 #### 3. "Did my changes save?"
+
 - **Solution**: Auto-save with visible indicator, undo capability
 - **Micro-interaction**: Subtle pulse on save, toast confirmation
 
 #### 4. "Am I missing something important?"
+
 - **Solution**: System Check with clear actionable items
 - **Micro-interaction**: Badge with count, cards that expand to show fix action
 
@@ -109,17 +113,17 @@ This document combines emotional design, UX, and accessibility requirements for 
 
 ### Keyboard Navigation
 
-| Key | Action |
-|-----|--------|
-| `Tab` | Move between interactive elements |
-| `Arrow Left/Right` | Move between tabs at same level |
-| `Arrow Down` | From L1 tab, focus first L2 tab |
-| `Arrow Up` | From L2 tab, focus parent L1 tab |
-| `Enter/Space` | Activate focused tab |
-| `Home` | First tab in current level |
-| `End` | Last tab in current level |
-| `/` or `Cmd+K` | Open search |
-| `Escape` | Close search/modal, go back |
+| Key                | Action                            |
+| ------------------ | --------------------------------- |
+| `Tab`              | Move between interactive elements |
+| `Arrow Left/Right` | Move between tabs at same level   |
+| `Arrow Down`       | From L1 tab, focus first L2 tab   |
+| `Arrow Up`         | From L2 tab, focus parent L1 tab  |
+| `Enter/Space`      | Activate focused tab              |
+| `Home`             | First tab in current level        |
+| `End`              | Last tab in current level         |
+| `/` or `Cmd+K`     | Open search                       |
+| `Escape`           | Close search/modal, go back       |
 
 ---
 
@@ -132,9 +136,10 @@ This document combines emotional design, UX, and accessibility requirements for 
 ```tsx
 // Search Modal (Cmd+K)
 <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50">
-  <div className="max-w-xl mx-auto mt-[20vh] bg-white rounded-xl shadow-2xl
-                  animate-in fade-in slide-in-from-top-4 duration-200">
-
+  <div
+    className="max-w-xl mx-auto mt-[20vh] bg-white rounded-xl shadow-2xl
+                  animate-in fade-in slide-in-from-top-4 duration-200"
+  >
     {/* Search Input */}
     <div className="flex items-center gap-3 px-4 py-3 border-b">
       <Search className="h-5 w-5 text-slate-400" />
@@ -161,15 +166,22 @@ This document combines emotional design, UX, and accessibility requirements for 
 
     {/* Quick Actions Footer */}
     <div className="flex items-center gap-4 px-4 py-2 border-t text-xs text-slate-500">
-      <span><kbd>↑↓</kbd> Navigate</span>
-      <span><kbd>↵</kbd> Open</span>
-      <span><kbd>ESC</kbd> Close</span>
+      <span>
+        <kbd>↑↓</kbd> Navigate
+      </span>
+      <span>
+        <kbd>↵</kbd> Open
+      </span>
+      <span>
+        <kbd>ESC</kbd> Close
+      </span>
     </div>
   </div>
 </div>
 ```
 
 **Accessibility**:
+
 - `role="combobox"` with `aria-expanded`, `aria-controls`
 - Results use `role="listbox"` with `aria-activedescendant`
 - Live region announces result count
@@ -189,26 +201,32 @@ This document combines emotional design, UX, and accessibility requirements for 
     </div>
 
     {/* Animated badge */}
-    <span className="px-2.5 py-0.5 text-sm font-medium bg-amber-100 text-amber-800
-                     rounded-full animate-in zoom-in duration-300">
+    <span
+      className="px-2.5 py-0.5 text-sm font-medium bg-amber-100 text-amber-800
+                     rounded-full animate-in zoom-in duration-300"
+    >
       {actionableCount} to review
     </span>
   </div>
 
   {/* Issue Cards */}
   <div className="divide-y">
-    {issues.map(issue => (
-      <div key={issue.id}
-           className="flex items-center justify-between px-4 py-3
-                      hover:bg-slate-50 transition-colors group">
+    {issues.map((issue) => (
+      <div
+        key={issue.id}
+        className="flex items-center justify-between px-4 py-3
+                      hover:bg-slate-50 transition-colors group"
+      >
         <div className="flex items-center gap-3">
           {/* Status icon with color + shape for accessibility */}
-          <div className={cn(
-            "h-2 w-2 rounded-full",
-            issue.severity === 'error' && "bg-red-500",
-            issue.severity === 'warning' && "bg-amber-500",
-            issue.severity === 'info' && "bg-blue-500"
-          )} />
+          <div
+            className={cn(
+              "h-2 w-2 rounded-full",
+              issue.severity === "error" && "bg-red-500",
+              issue.severity === "warning" && "bg-amber-500",
+              issue.severity === "info" && "bg-blue-500",
+            )}
+          />
           <span>{issue.message}</span>
         </div>
 
@@ -227,6 +245,7 @@ This document combines emotional design, UX, and accessibility requirements for 
 ```
 
 **Micro-interactions**:
+
 - Badge pulses when new issues appear
 - Check mark animation when issue fixed
 - Card slides out smoothly when resolved
@@ -267,8 +286,8 @@ This document combines emotional design, UX, and accessibility requirements for 
         <Shield className="h-4 w-4 text-purple-600" />
         <AlertTitle>You're always in control</AlertTitle>
         <AlertDescription>
-          Optimization respects guest preferences, accessibility needs, and
-          your site rules. View all changes in the activity log.
+          Optimization respects guest preferences, accessibility needs, and your site rules. View
+          all changes in the activity log.
         </AlertDescription>
       </Alert>
 
@@ -290,7 +309,7 @@ This document combines emotional design, UX, and accessibility requirements for 
         <div>
           <Label>Optimize these site types</Label>
           <div className="flex flex-wrap gap-2 mt-2">
-            {siteClasses.map(sc => (
+            {siteClasses.map((sc) => (
               <Toggle
                 key={sc.id}
                 pressed={selectedClasses.includes(sc.id)}
@@ -307,9 +326,7 @@ This document combines emotional design, UX, and accessibility requirements for 
         <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
           <div>
             <p className="font-medium">Preview mode</p>
-            <p className="text-sm text-slate-500">
-              See suggested moves without applying them
-            </p>
+            <p className="text-sm text-slate-500">See suggested moves without applying them</p>
           </div>
           <Switch checked={previewMode} onCheckedChange={setPreviewMode} />
         </div>
@@ -318,7 +335,7 @@ This document combines emotional design, UX, and accessibility requirements for 
       {/* Activity log link */}
       <div className="mt-4 pt-4 border-t flex items-center justify-between">
         <span className="text-sm text-slate-500">
-          Last run: {lastRun ? formatRelative(lastRun) : 'Never'}
+          Last run: {lastRun ? formatRelative(lastRun) : "Never"}
         </span>
         <Button variant="link" className="text-purple-600">
           View optimization log →
@@ -348,12 +365,12 @@ This document combines emotional design, UX, and accessibility requirements for 
     </PopoverTrigger>
     <PopoverContent className="w-auto p-3">
       <div className="grid grid-cols-6 gap-2">
-        {PRESET_COLORS.map(color => (
+        {PRESET_COLORS.map((color) => (
           <button
             key={color}
             className={cn(
               "h-8 w-8 rounded-lg transition-all hover:scale-110",
-              color === group.color && "ring-2 ring-offset-2 ring-slate-900"
+              color === group.color && "ring-2 ring-offset-2 ring-slate-900",
             )}
             style={{ backgroundColor: color }}
             onClick={() => updateColor(group.id, color)}
@@ -372,7 +389,7 @@ This document combines emotional design, UX, and accessibility requirements for 
       className="font-medium"
     />
     <p className="text-sm text-slate-500">
-      {group.dateRanges.length} date range{group.dateRanges.length !== 1 && 's'}
+      {group.dateRanges.length} date range{group.dateRanges.length !== 1 && "s"}
     </p>
   </div>
 
@@ -402,6 +419,7 @@ This document combines emotional design, UX, and accessibility requirements for 
 ```
 
 **Accessibility for Colors**:
+
 - Each rate group has name displayed alongside color
 - Calendar shows pattern/texture option for colorblind mode
 - Screen reader: "Peak Season, red, 45 days assigned"
@@ -566,19 +584,19 @@ This document combines emotional design, UX, and accessibility requirements for 
   </CardHeader>
   <CardContent>
     <div className="space-y-3">
-      {setupSteps.map(step => (
+      {setupSteps.map((step) => (
         <div key={step.id} className="flex items-center gap-3">
           {step.completed ? (
-            <div className="h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center
-                           animate-in zoom-in duration-300">
+            <div
+              className="h-6 w-6 rounded-full bg-emerald-500 flex items-center justify-center
+                           animate-in zoom-in duration-300"
+            >
               <Check className="h-4 w-4 text-white" />
             </div>
           ) : (
             <div className="h-6 w-6 rounded-full border-2 border-slate-300" />
           )}
-          <span className={step.completed ? 'text-slate-500 line-through' : ''}>
-            {step.label}
-          </span>
+          <span className={step.completed ? "text-slate-500 line-through" : ""}>{step.label}</span>
         </div>
       ))}
     </div>
@@ -610,7 +628,7 @@ const handleEnableOptimization = () => {
     confetti({
       particleCount: 100,
       spread: 70,
-      origin: { y: 0.6 }
+      origin: { y: 0.6 },
     });
 
     toast({
@@ -643,7 +661,7 @@ const handleEnableOptimization = () => {
 
 ```tsx
 // Announce tab changes
-const [announcement, setAnnouncement] = useState('');
+const [announcement, setAnnouncement] = useState("");
 
 const handleTabChange = (category: string, section: string) => {
   setAnnouncement(`${category}, ${section} settings. ${getItemCount(section)} items.`);
@@ -652,18 +670,18 @@ const handleTabChange = (category: string, section: string) => {
 // Live region
 <div role="status" aria-live="polite" className="sr-only">
   {announcement}
-</div>
+</div>;
 ```
 
 ### Color Independence
 
-| Element | Color | Non-color indicator |
-|---------|-------|---------------------|
-| Active tab | Green underline | Bold text, underline |
-| Error status | Red dot | Triangle icon + "Error" text |
-| Warning status | Amber dot | Warning icon + "Warning" text |
-| Success status | Green dot | Check icon + "Complete" text |
-| Rate group color | User-chosen | Name always displayed |
+| Element          | Color           | Non-color indicator           |
+| ---------------- | --------------- | ----------------------------- |
+| Active tab       | Green underline | Bold text, underline          |
+| Error status     | Red dot         | Triangle icon + "Error" text  |
+| Warning status   | Amber dot       | Warning icon + "Warning" text |
+| Success status   | Green dot       | Check icon + "Complete" text  |
+| Rate group color | User-chosen     | Name always displayed         |
 
 ### Focus Management
 
@@ -715,11 +733,11 @@ const prefersReducedMotion = usePrefersReducedMotion();
 
 ### Breakpoint Behavior
 
-| Breakpoint | L1 Tabs | L2 Tabs | Layout |
-|------------|---------|---------|--------|
-| Desktop (1024px+) | Horizontal | Horizontal scroll | Side-by-side |
-| Tablet (768-1023px) | Horizontal | Horizontal scroll | Stacked |
-| Mobile (<768px) | Dropdown select | Horizontal scroll | Full-width |
+| Breakpoint          | L1 Tabs         | L2 Tabs           | Layout       |
+| ------------------- | --------------- | ----------------- | ------------ |
+| Desktop (1024px+)   | Horizontal      | Horizontal scroll | Side-by-side |
+| Tablet (768-1023px) | Horizontal      | Horizontal scroll | Stacked      |
+| Mobile (<768px)     | Dropdown select | Horizontal scroll | Full-width   |
 
 ### Mobile Tab Selector
 
@@ -774,41 +792,45 @@ const prefersReducedMotion = usePrefersReducedMotion();
 
 ### Component Animations
 
-| Component | Animation | Duration | Easing |
-|-----------|-----------|----------|--------|
-| Tab underline | Slide | 200ms | ease-out |
-| Tab content | Fade + slide | 250ms | ease-out |
-| Modal open | Fade + scale | 200ms | ease-out |
-| Modal close | Fade + scale | 150ms | ease-in |
-| Toast enter | Slide from right | 300ms | ease-out |
-| Toast exit | Fade out | 150ms | ease-in |
-| Search results | Stagger fade | 30ms delay each | ease-out |
-| Success check | Scale + fade | 300ms | bounce |
-| Badge pulse | Scale | 1000ms | ease-in-out, infinite |
+| Component      | Animation        | Duration        | Easing                |
+| -------------- | ---------------- | --------------- | --------------------- |
+| Tab underline  | Slide            | 200ms           | ease-out              |
+| Tab content    | Fade + slide     | 250ms           | ease-out              |
+| Modal open     | Fade + scale     | 200ms           | ease-out              |
+| Modal close    | Fade + scale     | 150ms           | ease-in               |
+| Toast enter    | Slide from right | 300ms           | ease-out              |
+| Toast exit     | Fade out         | 150ms           | ease-in               |
+| Search results | Stagger fade     | 30ms delay each | ease-out              |
+| Success check  | Scale + fade     | 300ms           | bounce                |
+| Badge pulse    | Scale            | 1000ms          | ease-in-out, infinite |
 
 ---
 
 ## Implementation Priority
 
 ### Phase 1: Foundation
+
 1. Tab navigation component (all 3 levels)
 2. Settings layout wrapper
 3. Global search
 4. Route structure
 
 ### Phase 2: Core Features
+
 1. System Check dashboard
 2. Rate Groups with colors
 3. Custom Fields (UDFs)
 4. Equipment Types
 
 ### Phase 3: Advanced Features
+
 1. Grid Optimization
 2. Site Closures
 3. Lock Codes
 4. Referral Sources
 
 ### Phase 4: Polish
+
 1. Celebration moments
 2. Progress tracking
 3. Keyboard shortcuts panel

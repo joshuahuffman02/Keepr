@@ -17,17 +17,20 @@ Campgrounds that add online booking consistently see significant increases in re
 ## Why Online Booking Works
 
 ### Availability 24/7
+
 - Guests book when they're excited (evening, weekend)
 - No waiting for office hours
 - Impulse bookings captured
 
 ### Reduced Friction
+
 - No phone tag
 - Instant confirmation
 - Self-service convenience
 - Book in 2 minutes vs. 10-minute phone call
 
 ### Guest Preference
+
 - 70%+ of travelers prefer online booking
 - Younger demographics expect it
 - Aligns with how they book everything else
@@ -38,19 +41,20 @@ Campgrounds that add online booking consistently see significant increases in re
 
 Typical improvements after implementing online booking:
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Total reservations | Baseline | +30-50% |
-| Weekend bookings | Strong | +20-30% |
-| Weekday bookings | Weak | +50-75% |
-| Booking after hours | 0% | 30-40% of total |
-| Average lead time | Short | Longer (more advance bookings) |
+| Metric              | Before   | After                          |
+| ------------------- | -------- | ------------------------------ |
+| Total reservations  | Baseline | +30-50%                        |
+| Weekend bookings    | Strong   | +20-30%                        |
+| Weekday bookings    | Weak     | +50-75%                        |
+| Booking after hours | 0%       | 30-40% of total                |
+| Average lead time   | Short    | Longer (more advance bookings) |
 
 ---
 
 ## Making Online Booking Work
 
 ### Essential Features
+
 - Real-time availability
 - Secure payment processing
 - Instant confirmation
@@ -58,6 +62,7 @@ Typical improvements after implementing online booking:
 - Clear site descriptions and photos
 
 ### Implementation Tips
+
 - Prominent "Book Now" buttons
 - Simple date selection
 - Show availability clearly
@@ -88,4 +93,4 @@ You set the rules—pricing, minimums, policies. The system enforces them automa
 
 ---
 
-*Keepr's online booking is designed for campgrounds—intuitive for guests, powerful for owners. [Start booking online at campreserv.com](https://campreserv.com)*
+_Keepr's online booking is designed for campgrounds—intuitive for guests, powerful for owners. [Start booking online at campreserv.com](https://campreserv.com)_

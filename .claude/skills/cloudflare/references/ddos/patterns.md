@@ -6,19 +6,25 @@
 // Account-level override with custom expression
 const config = {
   description: "Allowlist trusted IPs",
-  rules: [{
-    expression: "ip.src in { 203.0.113.0/24 192.0.2.1 }",
-    action: "execute",
-    action_parameters: {
-      id: managedRulesetId,
-      overrides: { sensitivity_level: "eoff" }, // Effectively off
+  rules: [
+    {
+      expression: "ip.src in { 203.0.113.0/24 192.0.2.1 }",
+      action: "execute",
+      action_parameters: {
+        id: managedRulesetId,
+        overrides: { sensitivity_level: "eoff" }, // Effectively off
+      },
     },
-  }],
+  ],
 };
 
 await fetch(
   `https://api.cloudflare.com/client/v4/accounts/${accountId}/rulesets/phases/ddos_l7/entrypoint`,
-  { method: "PUT", headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" }, body: JSON.stringify(config) }
+  {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  },
 );
 ```
 
@@ -30,7 +36,7 @@ const config = {
   description: "Route-specific protection",
   rules: [
     {
-      expression: "not http.request.uri.path matches \"^/api/\"",
+      expression: 'not http.request.uri.path matches "^/api/"',
       action: "execute",
       action_parameters: {
         id: managedRulesetId,
@@ -38,7 +44,7 @@ const config = {
       },
     },
     {
-      expression: "http.request.uri.path matches \"^/api/\"",
+      expression: 'http.request.uri.path matches "^/api/"',
       action: "execute",
       action_parameters: {
         id: managedRulesetId,
@@ -52,9 +58,19 @@ const config = {
 ## Progressive Enhancement
 
 ```typescript
-enum ProtectionLevel { MONITORING = "monitoring", LOW = "low", MEDIUM = "medium", HIGH = "high" }
+enum ProtectionLevel {
+  MONITORING = "monitoring",
+  LOW = "low",
+  MEDIUM = "medium",
+  HIGH = "high",
+}
 
-async function setProtectionLevel(zoneId: string, level: ProtectionLevel, managedRulesetId: string, apiToken: string) {
+async function setProtectionLevel(
+  zoneId: string,
+  level: ProtectionLevel,
+  managedRulesetId: string,
+  apiToken: string,
+) {
   const levelConfig = {
     [ProtectionLevel.MONITORING]: { action: "log", sensitivity: "eoff" },
     [ProtectionLevel.LOW]: { action: "managed_challenge", sensitivity: "low" },
@@ -65,14 +81,16 @@ async function setProtectionLevel(zoneId: string, level: ProtectionLevel, manage
   const settings = levelConfig[level];
   const config = {
     description: `DDoS protection level: ${level}`,
-    rules: [{
-      expression: "true",
-      action: "execute",
-      action_parameters: {
-        id: managedRulesetId,
-        overrides: { action: settings.action, sensitivity_level: settings.sensitivity },
+    rules: [
+      {
+        expression: "true",
+        action: "execute",
+        action_parameters: {
+          id: managedRulesetId,
+          overrides: { action: settings.action, sensitivity_level: settings.sensitivity },
+        },
       },
-    }],
+    ],
   };
 
   return fetch(/* ... */);
@@ -95,7 +113,9 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     if (request.url.includes("/attack-detected")) {
       const attackData = await request.json();
-      await env.KV_NAMESPACE.put(`attack:${Date.now()}`, JSON.stringify(attackData), { expirationTtl: 86400 });
+      await env.KV_NAMESPACE.put(`attack:${Date.now()}`, JSON.stringify(attackData), {
+        expirationTtl: 86400,
+      });
 
       const recentAttacks = await getRecentAttacks(env.KV_NAMESPACE);
       if (recentAttacks.length > 5) {
@@ -123,7 +143,8 @@ export default {
 const config = {
   description: "Multi-tier DDoS protection",
   rules: [
-    { // Strictest for unknown traffic
+    {
+      // Strictest for unknown traffic
       expression: "not ip.src in $known_ips and not cf.bot_management.score gt 30",
       action: "execute",
       action_parameters: {
@@ -131,7 +152,8 @@ const config = {
         overrides: { sensitivity_level: "default", action: "block" },
       },
     },
-    { // Medium for verified bots
+    {
+      // Medium for verified bots
       expression: "cf.bot_management.verified_bot",
       action: "execute",
       action_parameters: {
@@ -139,7 +161,8 @@ const config = {
         overrides: { sensitivity_level: "medium", action: "managed_challenge" },
       },
     },
-    { // Low for trusted IPs
+    {
+      // Low for trusted IPs
       expression: "ip.src in $trusted_ips",
       action: "execute",
       action_parameters: {

@@ -124,14 +124,14 @@ Let's calculate what a medium-sized campground (100 sites, 3,000 bookings/year) 
 
 **Traditional Enterprise Software:**
 
-| Cost | Monthly | Annual |
-|------|---------|--------|
-| Base subscription | $399 | $4,788 |
-| Per-booking ($2.50 x 250/mo) | $625 | $7,500 |
-| Credit card fees (passed through) | ~$800 | ~$9,600 |
-| Support upgrade | $99 | $1,188 |
-| Annual training refresh | N/A | $500 |
-| **Total** | **~$1,923** | **~$23,576** |
+| Cost                              | Monthly     | Annual       |
+| --------------------------------- | ----------- | ------------ |
+| Base subscription                 | $399        | $4,788       |
+| Per-booking ($2.50 x 250/mo)      | $625        | $7,500       |
+| Credit card fees (passed through) | ~$800       | ~$9,600      |
+| Support upgrade                   | $99         | $1,188       |
+| Annual training refresh           | N/A         | $500         |
+| **Total**                         | **~$1,923** | **~$23,576** |
 
 Add the first-year setup fee ($2,000), and year one costs $25,576.
 
@@ -146,6 +146,7 @@ Software costs should scale with the value it delivers. A reasonable model:
 ### Base Cost: Cover Operating Expenses
 
 A fair monthly base covers:
+
 - Hosting and infrastructure
 - Basic support
 - Regular updates
@@ -260,4 +261,4 @@ Modern software should cost less, not more. The technology has gotten cheaper. C
 
 ---
 
-*Keepr offers transparent pricing: $100/month base + $2.30 per booking, with AI features included and no setup fees. Calculate your actual cost in seconds. [See the difference at campeveryday.com](https://campeveryday.com)*
+_Keepr offers transparent pricing: $100/month base + $2.30 per booking, with AI features included and no setup fees. Calculate your actual cost in seconds. [See the difference at campeveryday.com](https://campeveryday.com)_

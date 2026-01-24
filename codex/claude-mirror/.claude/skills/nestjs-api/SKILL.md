@@ -147,6 +147,7 @@ export class CreateFeatureDto {
 ## Guards
 
 ### JWT Guard
+
 ```typescript
 @UseGuards(JwtAuthGuard)
 @Get("protected")
@@ -154,6 +155,7 @@ async protectedRoute() {}
 ```
 
 ### Custom Permission Guard
+
 ```typescript
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @RequirePermission("reportsRead")
@@ -199,6 +201,7 @@ export class ReservationService {
 ```
 
 **Important**: If a service is used from another module, that module must:
+
 1. Export the service: `exports: [MyService]`
 2. Be imported by the consuming module: `imports: [MyModule]`
 

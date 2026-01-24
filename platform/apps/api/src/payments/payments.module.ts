@@ -15,10 +15,28 @@ import { LedgerModule } from "../ledger/ledger.module";
 import { RustPaymentClientService } from "./rust-payment-client.service";
 
 @Module({
-  imports: [forwardRef(() => ReservationsModule), PermissionsModule, AuditModule, LedgerModule, IdempotencyModule, ConfigModule],
+  imports: [
+    forwardRef(() => ReservationsModule),
+    PermissionsModule,
+    AuditModule,
+    LedgerModule,
+    IdempotencyModule,
+    ConfigModule,
+  ],
   controllers: [PaymentsController, GatewayConfigController],
-  providers: [StripeService, PaymentsReconciliationService, PaymentsScheduler, GatewayConfigService, RustPaymentClientService],
-  exports: [StripeService, PaymentsReconciliationService, IdempotencyModule, GatewayConfigService, RustPaymentClientService]
+  providers: [
+    StripeService,
+    PaymentsReconciliationService,
+    PaymentsScheduler,
+    GatewayConfigService,
+    RustPaymentClientService,
+  ],
+  exports: [
+    StripeService,
+    PaymentsReconciliationService,
+    IdempotencyModule,
+    GatewayConfigService,
+    RustPaymentClientService,
+  ],
 })
-export class PaymentsModule { }
-
+export class PaymentsModule {}

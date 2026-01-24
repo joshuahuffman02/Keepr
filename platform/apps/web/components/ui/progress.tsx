@@ -20,11 +20,7 @@ export function Progress({ value = 0, max = 100, className, ...props }: Progress
       aria-valuenow={value}
       {...props}
     >
-      <div
-        className="h-2 bg-emerald-600 transition-all"
-        style={{ width: `${percentage}%` }}
-      />
+      <div className="h-2 bg-emerald-600 transition-all" style={{ width: `${percentage}%` }} />
     </div>
   );
 }
-

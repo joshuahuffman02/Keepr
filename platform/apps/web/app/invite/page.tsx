@@ -36,7 +36,7 @@ function InvitePageInner() {
         token,
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        password
+        password,
       });
     },
     onSuccess: () => {
@@ -45,7 +45,7 @@ function InvitePageInner() {
     },
     onError: (err: Error) => {
       toast({ title: "Invite failed", description: err.message, variant: "destructive" });
-    }
+    },
   });
 
   if (!token) {
@@ -79,18 +79,22 @@ function InvitePageInner() {
             </div>
             <div className="space-y-2">
               <Label>Password</Label>
-              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
               <p className="text-xs text-slate-500">Minimum 8 characters.</p>
             </div>
             <div className="space-y-2">
               <Label>Confirm password</Label>
-              <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              <Input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
             </div>
-            <Button
-              className="w-full"
-              onClick={() => accept.mutate()}
-              disabled={accept.isPending}
-            >
+            <Button className="w-full" onClick={() => accept.mutate()} disabled={accept.isPending}>
               {accept.isPending ? "Accepting..." : "Accept invite"}
             </Button>
             <p className="text-xs text-slate-500 text-center">Invite token: {token.slice(0, 6)}…</p>
@@ -108,4 +112,3 @@ export default function InvitePage() {
     </Suspense>
   );
 }
-

@@ -124,7 +124,8 @@ export function AdminAiAssistant({
     let actions: Message["actions"] = [];
 
     if (lowerMessage.includes("today") && lowerMessage.includes("stat")) {
-      content = "Here's a quick overview for today:\n\n" +
+      content =
+        "Here's a quick overview for today:\n\n" +
         "Arrivals: 8 guests\n" +
         "Departures: 5 guests\n" +
         "Occupancy: 76%\n" +
@@ -133,7 +134,8 @@ export function AdminAiAssistant({
       suggestions = ["Show arrivals list", "Revenue breakdown", "Site availability"];
       actions = [{ label: "View Dashboard", action: "navigate", data: { path: "/dashboard" } }];
     } else if (lowerMessage.includes("arrival")) {
-      content = "You have 8 arrivals scheduled for today:\n\n" +
+      content =
+        "You have 8 arrivals scheduled for today:\n\n" +
         "- Smith family (Site A12, 2:00 PM)\n" +
         "- Johnson (Site B5, 3:00 PM)\n" +
         "- Garcia group (Site C8, 1:00 PM)\n" +
@@ -142,7 +144,8 @@ export function AdminAiAssistant({
       suggestions = ["Full arrivals list", "Print check-in sheets", "Send welcome texts"];
       actions = [{ label: "View Calendar", action: "navigate", data: { path: "/calendar" } }];
     } else if (lowerMessage.includes("suggestion") || lowerMessage.includes("recommend")) {
-      content = "Based on today's operations, here are my suggestions:\n\n" +
+      content =
+        "Based on today's operations, here are my suggestions:\n\n" +
         "1. Site A15 needs maintenance check (reported yesterday)\n" +
         "2. Consider early check-in for Garcia group (arriving from far)\n" +
         "3. Low on firewood inventory - reorder soon\n" +
@@ -150,7 +153,8 @@ export function AdminAiAssistant({
         "Would you like me to help with any of these?";
       suggestions = ["Create maintenance ticket", "Contact Garcia group", "Order supplies"];
     } else if (lowerMessage.includes("help") || lowerMessage.includes("what can you")) {
-      content = "I can help you with:\n\n" +
+      content =
+        "I can help you with:\n\n" +
         "Operations: Check-ins, departures, site status\n" +
         "Analytics: Revenue, occupancy, guest stats\n" +
         "Tasks: Maintenance tickets, inventory alerts\n" +
@@ -159,14 +163,18 @@ export function AdminAiAssistant({
         "Just ask me anything about your campground!";
       suggestions = ["Today's arrivals", "Revenue this week", "Pending maintenance"];
     } else if (lowerMessage.includes("revenue")) {
-      content = "Revenue summary:\n\n" +
+      content =
+        "Revenue summary:\n\n" +
         "Today: $2,450\n" +
         "This week: $18,340\n" +
         "This month: $67,890\n\n" +
         "You're up 12% compared to last month. Your RV sites are performing particularly well!";
       suggestions = ["Revenue by site type", "Compare to last year", "Export report"];
     } else {
-      content = "I understand you're asking about: \"" + userMessage + "\"\n\n" +
+      content =
+        "I understand you're asking about: \"" +
+        userMessage +
+        '"\n\n' +
         "Let me help you with that. Could you provide a bit more context? For example:\n" +
         "- Are you looking for today's data?\n" +
         "- Do you need help with a specific guest or reservation?\n" +
@@ -271,7 +279,7 @@ export function AdminAiAssistant({
         className={cn(
           "fixed z-50 w-14 h-14 bg-action-primary text-action-primary-foreground rounded-full shadow-xl hover:shadow-2xl transition-shadow flex items-center justify-center",
           positionClasses[position],
-          className
+          className,
         )}
         aria-label="Open AI Assistant"
       >
@@ -290,7 +298,7 @@ export function AdminAiAssistant({
         "fixed z-50 bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-border",
         positionClasses[position],
         isExpanded ? "w-[600px] h-[80vh]" : "w-96 h-[500px]",
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -325,11 +333,7 @@ export function AdminAiAssistant({
             title={isExpanded ? "Minimize" : "Expand"}
             aria-label={isExpanded ? "Minimize" : "Expand"}
           >
-            {isExpanded ? (
-              <Minimize2 className="w-4 h-4" />
-            ) : (
-              <Maximize2 className="w-4 h-4" />
-            )}
+            {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </Button>
           <Button
             variant="ghost"
@@ -365,10 +369,7 @@ export function AdminAiAssistant({
               key={msg.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn(
-                "flex gap-3",
-                msg.role === "user" ? "justify-end" : "justify-start"
-              )}
+              className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}
             >
               {msg.role === "assistant" && (
                 <div className="w-8 h-8 bg-status-info-bg rounded-full flex items-center justify-center flex-shrink-0">
@@ -380,7 +381,7 @@ export function AdminAiAssistant({
                   "max-w-[80%] p-3 rounded-2xl",
                   msg.role === "user"
                     ? "bg-action-primary text-action-primary-foreground rounded-br-md"
-                    : "bg-muted text-foreground rounded-bl-md"
+                    : "bg-muted text-foreground rounded-bl-md",
                 )}
               >
                 <p className="text-sm whitespace-pre-wrap">{msg.content}</p>

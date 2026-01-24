@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
 import type { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
@@ -20,40 +20,45 @@ export class GroupBookingsService {
     groupArrivalTime?: string;
     groupDepartureTime?: string;
   }) {
-    return this.prisma.groupBooking.create({
-      data: {
-        id: randomUUID(),
-        campgroundId: data.campgroundId,
-        groupName: data.groupName,
-        primaryGuestId: data.primaryGuestId,
-        groupType: data.groupType,
-        preferAdjacent: data.preferAdjacent ?? false,
-        preferSameFloor: data.preferSameFloor ?? false,
-        preferConnecting: data.preferConnecting ?? false,
-        preferredZone: data.preferredZone,
-        billingType: data.billingType ?? 'individual',
-        groupArrivalTime: data.groupArrivalTime,
-        groupDepartureTime: data.groupDepartureTime,
-        assignmentStatus: 'pending',
-        updatedAt: new Date(),
-      },
-      include: {
-        Guest: {
-          select: { primaryFirstName: true, primaryLastName: true, email: true },
+    return this.prisma.groupBooking
+      .create({
+        data: {
+          id: randomUUID(),
+          campgroundId: data.campgroundId,
+          groupName: data.groupName,
+          primaryGuestId: data.primaryGuestId,
+          groupType: data.groupType,
+          preferAdjacent: data.preferAdjacent ?? false,
+          preferSameFloor: data.preferSameFloor ?? false,
+          preferConnecting: data.preferConnecting ?? false,
+          preferredZone: data.preferredZone,
+          billingType: data.billingType ?? "individual",
+          groupArrivalTime: data.groupArrivalTime,
+          groupDepartureTime: data.groupDepartureTime,
+          assignmentStatus: "pending",
+          updatedAt: new Date(),
         },
-      },
-    }).then(({ Guest, ...group }) => ({
-      ...group,
-      primaryGuest: Guest,
-    }));
+        include: {
+          Guest: {
+            select: { primaryFirstName: true, primaryLastName: true, email: true },
+          },
+        },
+      })
+      .then(({ Guest, ...group }) => ({
+        ...group,
+        primaryGuest: Guest,
+      }));
   }
 
-  async findAll(campgroundId: string, filters?: {
-    groupType?: string;
-    assignmentStatus?: string;
-    startDate?: Date;
-    endDate?: Date;
-  }) {
+  async findAll(
+    campgroundId: string,
+    filters?: {
+      groupType?: string;
+      assignmentStatus?: string;
+      startDate?: Date;
+      endDate?: Date;
+    },
+  ) {
     const where: Prisma.GroupBookingWhereInput = { campgroundId };
 
     if (filters?.groupType) {
@@ -77,7 +82,7 @@ export class GroupBookingsService {
         },
         _count: { select: { Reservation: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return groups.map(({ Guest, Reservation, _count, ...group }) => ({
@@ -99,13 +104,13 @@ export class GroupBookingsService {
             Site: { select: { name: true, zone: true } },
             Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true } },
           },
-          orderBy: { arrivalDate: 'asc' },
+          orderBy: { arrivalDate: "asc" },
         },
       },
     });
 
     if (!groupBooking) {
-      throw new NotFoundException('Group booking not found');
+      throw new NotFoundException("Group booking not found");
     }
 
     const { Guest, Campground, Reservation, ...group } = groupBooking;
@@ -117,17 +122,20 @@ export class GroupBookingsService {
     };
   }
 
-  async update(id: string, data: Partial<{
-    groupName: string;
-    groupType: string;
-    preferAdjacent: boolean;
-    preferSameFloor: boolean;
-    preferConnecting: boolean;
-    preferredZone: string;
-    billingType: string;
-    groupArrivalTime: string;
-    groupDepartureTime: string;
-  }>) {
+  async update(
+    id: string,
+    data: Partial<{
+      groupName: string;
+      groupType: string;
+      preferAdjacent: boolean;
+      preferSameFloor: boolean;
+      preferConnecting: boolean;
+      preferredZone: string;
+      billingType: string;
+      groupArrivalTime: string;
+      groupDepartureTime: string;
+    }>,
+  ) {
     return this.prisma.groupBooking.update({
       where: { id },
       data,
@@ -142,12 +150,12 @@ export class GroupBookingsService {
     });
 
     if (!group) {
-      throw new NotFoundException('Group booking not found');
+      throw new NotFoundException("Group booking not found");
     }
 
     if (group._count.Reservation > 0) {
       throw new BadRequestException(
-        'Cannot delete a group with reservations. Remove reservations first.'
+        "Cannot delete a group with reservations. Remove reservations first.",
       );
     }
 
@@ -157,16 +165,16 @@ export class GroupBookingsService {
   async addReservationToGroup(groupId: string, reservationId: string) {
     const group = await this.prisma.groupBooking.findUnique({ where: { id: groupId } });
     if (!group) {
-      throw new NotFoundException('Group booking not found');
+      throw new NotFoundException("Group booking not found");
     }
 
     const reservation = await this.prisma.reservation.findUnique({ where: { id: reservationId } });
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
     if (reservation.campgroundId !== group.campgroundId) {
-      throw new BadRequestException('Reservation must be at the same property as the group');
+      throw new BadRequestException("Reservation must be at the same property as the group");
     }
 
     return this.prisma.reservation.update({
@@ -185,9 +193,9 @@ export class GroupBookingsService {
   async optimizeRoomAssignments(groupId: string) {
     const group = await this.findOne(groupId);
 
-    const unassignedReservations = group.reservations.filter(r => !r.siteId);
+    const unassignedReservations = group.reservations.filter((r) => !r.siteId);
     if (unassignedReservations.length === 0) {
-      return { message: 'All reservations already have site assignments', assignments: [] };
+      return { message: "All reservations already have site assignments", assignments: [] };
     }
 
     // Get available sites matching group preferences
@@ -201,10 +209,7 @@ export class GroupBookingsService {
         SiteClass: true,
         StructureAttributes: true,
       },
-      orderBy: [
-        { zone: 'asc' },
-        { siteNumber: 'asc' },
-      ],
+      orderBy: [{ zone: "asc" }, { siteNumber: "asc" }],
     });
 
     // Simple assignment algorithm - in production this would be more sophisticated
@@ -213,7 +218,7 @@ export class GroupBookingsService {
     // Group sites by zone/floor for adjacency optimization
     const sitesByZone = new Map<string, typeof availableSites>();
     for (const site of availableSites) {
-      const zone = site.zone ?? 'default';
+      const zone = site.zone ?? "default";
       if (!sitesByZone.has(zone)) {
         sitesByZone.set(zone, []);
       }
@@ -221,7 +226,7 @@ export class GroupBookingsService {
     }
 
     // Find zone with most available sites to keep group together
-    let bestZone = 'default';
+    let bestZone = "default";
     let maxSites = 0;
     for (const [zone, sites] of sitesByZone) {
       if (sites.length > maxSites) {
@@ -242,7 +247,7 @@ export class GroupBookingsService {
         where: {
           siteId: site.id,
           id: { not: reservation.id },
-          status: { in: ['confirmed', 'checked_in'] },
+          status: { in: ["confirmed", "checked_in"] },
           arrivalDate: { lt: reservation.departureDate },
           departureDate: { gt: reservation.arrivalDate },
         },
@@ -269,13 +274,13 @@ export class GroupBookingsService {
     await this.prisma.groupBooking.update({
       where: { id: groupId },
       data: {
-        assignmentStatus: allAssigned ? 'complete' : 'partial',
+        assignmentStatus: allAssigned ? "complete" : "partial",
       },
     });
 
     return {
       message: allAssigned
-        ? 'All rooms assigned successfully'
+        ? "All rooms assigned successfully"
         : `Assigned ${assignments.length} of ${unassignedReservations.length} rooms`,
       assignments,
     };

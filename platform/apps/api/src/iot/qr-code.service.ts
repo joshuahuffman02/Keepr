@@ -4,14 +4,14 @@ import { createHash, randomBytes, randomUUID } from "crypto";
 import * as QRCode from "qrcode";
 
 export type QRCodeType =
-  | "checkin"        // Guest scans to start check-in
-  | "checkout"       // Guest scans to start check-out
-  | "site"           // Site identification QR
-  | "amenity"        // Amenity access (pool, laundry, etc.)
-  | "store"          // Store/POS ordering
-  | "event"          // Event registration
-  | "wifi"           // WiFi credentials
-  | "emergency";     // Emergency info
+  | "checkin" // Guest scans to start check-in
+  | "checkout" // Guest scans to start check-out
+  | "site" // Site identification QR
+  | "amenity" // Amenity access (pool, laundry, etc.)
+  | "store" // Store/POS ordering
+  | "event" // Event registration
+  | "wifi" // WiFi credentials
+  | "emergency"; // Emergency info
 
 const QR_CODE_TYPES: QRCodeType[] = [
   "checkin",
@@ -94,7 +94,7 @@ export class QRCodeService {
           arrivalDate: reservation.arrivalDate,
           departureDate: reservation.departureDate,
         },
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
     });
 
@@ -142,7 +142,7 @@ export class QRCodeService {
             siteNumber: site.siteNumber,
             siteType: site.siteType,
           },
-          updatedAt: new Date()
+          updatedAt: new Date(),
         },
       });
     }
@@ -161,7 +161,11 @@ export class QRCodeService {
   /**
    * Generate QR code for WiFi credentials
    */
-  async generateWifiCode(campgroundId: string, ssid: string, password: string): Promise<QRCodeResult> {
+  async generateWifiCode(
+    campgroundId: string,
+    ssid: string,
+    password: string,
+  ): Promise<QRCodeResult> {
     // WiFi QR code format: WIFI:T:WPA;S:ssid;P:password;;
     const wifiString = `WIFI:T:WPA;S:${ssid};P:${password};;`;
     const dataUrl = await this.generateQRImage(wifiString);
@@ -175,7 +179,7 @@ export class QRCodeService {
         code: token,
         expiresAt: null,
         metadata: { ssid },
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
     });
 
@@ -223,7 +227,7 @@ export class QRCodeService {
         code: token,
         expiresAt: null,
         metadata: { tableNumber },
-        updatedAt: new Date()
+        updatedAt: new Date(),
       },
     });
 
@@ -326,7 +330,9 @@ export class QRCodeService {
   /**
    * Bulk generate site QR codes for all sites in a campground
    */
-  async generateAllSiteCodes(campgroundId: string): Promise<{ generated: number; skipped: number }> {
+  async generateAllSiteCodes(
+    campgroundId: string,
+  ): Promise<{ generated: number; skipped: number }> {
     const sites = await this.prisma.site.findMany({
       where: { campgroundId },
     });
@@ -370,7 +376,10 @@ export class QRCodeService {
         errorCorrectionLevel: "M",
       });
     } catch (error) {
-      this.logger.error("Failed to generate QR code image:", error instanceof Error ? error.stack : error);
+      this.logger.error(
+        "Failed to generate QR code image:",
+        error instanceof Error ? error.stack : error,
+      );
       throw new BadRequestException("Failed to generate QR code");
     }
   }

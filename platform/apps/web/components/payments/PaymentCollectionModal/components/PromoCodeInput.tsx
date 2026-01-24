@@ -116,7 +116,7 @@ export function PromoCodeInput({ disabled = false }: PromoCodeInputProps) {
                 className={cn(
                   "uppercase",
                   error && "border-red-300 focus:border-red-500",
-                  success && "border-emerald-300 focus:border-emerald-500"
+                  success && "border-emerald-300 focus:border-emerald-500",
                 )}
               />
               {success && (
@@ -129,11 +129,7 @@ export function PromoCodeInput({ disabled = false }: PromoCodeInputProps) {
               disabled={disabled || applying || !code.trim()}
               variant="outline"
             >
-              {applying ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Apply"
-              )}
+              {applying ? <Loader2 className="h-4 w-4 animate-spin" /> : "Apply"}
             </Button>
           </div>
           {error && <p className="text-xs text-red-600">{error}</p>}

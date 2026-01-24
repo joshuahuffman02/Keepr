@@ -67,9 +67,16 @@ export default function HelpPage() {
 
   const categories = useMemo(() => Array.from(new Set(helpTopics.map((t) => t.category))), []);
 
-  const roleFilterTopics = useCallback((topics: HelpTopic[]) => (role ? topics.filter((t) => !t.roles || t.roles.includes(role)) : topics), [role]);
+  const roleFilterTopics = useCallback(
+    (topics: HelpTopic[]) =>
+      role ? topics.filter((t) => !t.roles || t.roles.includes(role)) : topics,
+    [role],
+  );
 
-  const contextual = useMemo(() => roleFilterTopics(getContextTopics(pathname || "/")), [pathname, roleFilterTopics]);
+  const contextual = useMemo(
+    () => roleFilterTopics(getContextTopics(pathname || "/")),
+    [pathname, roleFilterTopics],
+  );
 
   const filtered = useMemo(() => {
     let list: HelpTopic[] = roleFilterTopics(helpTopics);
@@ -84,19 +91,30 @@ export default function HelpPage() {
 
   const popular = useMemo(() => roleFilterTopics(helpTopics.slice(0, 6)), [roleFilterTopics]);
 
-  const pinnedTopics = useMemo(() => filteredByIds(roleFilterTopics(helpTopics), pinnedIds), [pinnedIds, roleFilterTopics]);
-  const recentTopics = useMemo(() => filteredByIds(roleFilterTopics(helpTopics), recentIds), [recentIds, roleFilterTopics]);
+  const pinnedTopics = useMemo(
+    () => filteredByIds(roleFilterTopics(helpTopics), pinnedIds),
+    [pinnedIds, roleFilterTopics],
+  );
+  const recentTopics = useMemo(
+    () => filteredByIds(roleFilterTopics(helpTopics), recentIds),
+    [recentIds, roleFilterTopics],
+  );
 
   const recordRecent = (id: string) => {
     setRecentIds((prev) => [id, ...prev.filter((r) => r !== id)].slice(0, 12));
   };
 
   const togglePin = (id: string) => {
-    setPinnedIds((prev) => (prev.includes(id) ? prev.filter((p) => p !== id) : [id, ...prev].slice(0, 12)));
+    setPinnedIds((prev) =>
+      prev.includes(id) ? prev.filter((p) => p !== id) : [id, ...prev].slice(0, 12),
+    );
   };
 
   const copyLink = async (id: string) => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/dashboard/help#${id}` : `/dashboard/help#${id}`;
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/dashboard/help#${id}`
+        : `/dashboard/help#${id}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -121,7 +139,8 @@ export default function HelpPage() {
         <div className="max-w-2xl mx-auto card p-6 border border-amber-200 bg-amber-50">
           <div className="text-sm font-semibold text-amber-800 mb-2">Staff access required</div>
           <p className="text-slate-700 text-sm">
-            Help content is available to campground staff. Please sign in with your staff account to continue.
+            Help content is available to campground staff. Please sign in with your staff account to
+            continue.
           </p>
           <div className="mt-4 flex gap-2">
             <Link
@@ -130,7 +149,10 @@ export default function HelpPage() {
             >
               Sign in
             </Link>
-            <Link href="/" className="px-4 py-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+            <Link
+              href="/"
+              className="px-4 py-2 text-sm font-semibold text-emerald-700 hover:text-emerald-800"
+            >
               Go to homepage
             </Link>
           </div>
@@ -161,16 +183,23 @@ export default function HelpPage() {
         <Breadcrumbs
           items={[
             { label: "Home", href: "/dashboard" },
-            { label: "Help", href: "/dashboard/help" }
+            { label: "Help", href: "/dashboard/help" },
           ]}
         />
 
         <div className="card p-6 border border-slate-200 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <div className="text-xs font-semibold uppercase text-slate-500 tracking-wide">Help desk</div>
-              <h1 className="text-2xl font-bold text-slate-900 mt-1">Fast answers for every screen</h1>
-              <p className="text-slate-600 mt-2 text-sm">Context-aware help. Short steps for front desk, deeper detail when needed. No videos.</p>
+              <div className="text-xs font-semibold uppercase text-slate-500 tracking-wide">
+                Help desk
+              </div>
+              <h1 className="text-2xl font-bold text-slate-900 mt-1">
+                Fast answers for every screen
+              </h1>
+              <p className="text-slate-600 mt-2 text-sm">
+                Context-aware help. Short steps for front desk, deeper detail when needed. No
+                videos.
+              </p>
             </div>
             <div className="flex flex-wrap gap-2">
               {categories.map((cat) => (
@@ -178,7 +207,9 @@ export default function HelpPage() {
                   key={cat}
                   onClick={() => setCategory(category === cat ? null : cat)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition ${
-                    category === cat ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                    category === cat
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "border-slate-200 text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   {cat}
@@ -204,7 +235,9 @@ export default function HelpPage() {
                   key={r}
                   onClick={() => setRole(role === r ? null : r)}
                   className={`px-3 py-1.5 rounded-full text-sm border transition ${
-                    role === r ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                    role === r
+                      ? "bg-emerald-50 border-emerald-200 text-emerald-700"
+                      : "border-slate-200 text-slate-700 hover:bg-slate-50"
                   }`}
                 >
                   {r}
@@ -225,7 +258,9 @@ export default function HelpPage() {
 
           {contextual.length > 0 && (
             <div className="mt-4 border border-emerald-100 bg-emerald-50/50 rounded-lg p-3">
-              <div className="text-xs font-semibold text-emerald-700 uppercase">Relevant to this page</div>
+              <div className="text-xs font-semibold text-emerald-700 uppercase">
+                Relevant to this page
+              </div>
               <div className="mt-2 flex flex-wrap gap-2">
                 {contextual.map((topic) => (
                   <a
@@ -260,7 +295,14 @@ export default function HelpPage() {
             <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Pinned</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {pinnedTopics.map((topic) => (
-                <HelpCard key={topic.id} topic={topic} onVisit={recordRecent} onPinToggle={togglePin} onCopy={copyLink} pinned />
+                <HelpCard
+                  key={topic.id}
+                  topic={topic}
+                  onVisit={recordRecent}
+                  onPinToggle={togglePin}
+                  onCopy={copyLink}
+                  pinned
+                />
               ))}
             </div>
           </section>
@@ -268,10 +310,19 @@ export default function HelpPage() {
 
         {recentTopics.length > 0 && (
           <section className="card p-4 border border-slate-200">
-            <div className="text-xs uppercase font-semibold text-slate-500 mb-2">Recently viewed</div>
+            <div className="text-xs uppercase font-semibold text-slate-500 mb-2">
+              Recently viewed
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {recentTopics.map((topic) => (
-                <HelpCard key={topic.id} topic={topic} onVisit={recordRecent} onPinToggle={togglePin} onCopy={copyLink} pinned={pinnedIds.includes(topic.id)} />
+                <HelpCard
+                  key={topic.id}
+                  topic={topic}
+                  onVisit={recordRecent}
+                  onPinToggle={togglePin}
+                  onCopy={copyLink}
+                  pinned={pinnedIds.includes(topic.id)}
+                />
               ))}
             </div>
           </section>
@@ -333,7 +384,7 @@ function HelpCard({
   pinned,
   onPinToggle,
   onCopy,
-  onVisit
+  onVisit,
 }: {
   topic: HelpTopic;
   pinned?: boolean;
@@ -344,18 +395,25 @@ function HelpCard({
   const steps = topic.steps.slice(0, 5);
 
   return (
-    <div id={topic.id} className="card p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+    <div
+      id={topic.id}
+      className="card p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow"
+    >
       <div className="flex items-start gap-3">
         <div className="flex-1">
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-semibold text-slate-900">{topic.title}</h3>
-            <span className="px-2 py-0.5 text-[11px] rounded-full bg-slate-100 text-slate-600">{topic.category}</span>
+            <span className="px-2 py-0.5 text-[11px] rounded-full bg-slate-100 text-slate-600">
+              {topic.category}
+            </span>
           </div>
           <p className="mt-1 text-sm text-slate-600">{topic.summary}</p>
           <div className="mt-3 space-y-2">
             {steps.map((step, idx) => (
               <div key={idx} className="flex items-start gap-2 text-sm text-slate-700">
-                <span className="mt-0.5 h-5 w-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs">{idx + 1}</span>
+                <span className="mt-0.5 h-5 w-5 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs">
+                  {idx + 1}
+                </span>
                 <span>{step}</span>
               </div>
             ))}
@@ -379,7 +437,11 @@ function HelpCard({
           </div>
           <div className="mt-3 flex items-center gap-3 text-xs text-slate-600">
             {topic.links?.map((link) => (
-              <Link key={link.href} href={link.href} className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
+              <Link
+                key={link.href}
+                href={link.href}
+                className="inline-flex items-center gap-1 text-emerald-600 font-semibold"
+              >
                 {link.label}
                 <ArrowIcon />
               </Link>
@@ -392,7 +454,10 @@ function HelpCard({
               Open
               <ArrowUpRightIcon />
             </Link>
-            <button onClick={() => onCopy?.(topic.id)} className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700">
+            <button
+              onClick={() => onCopy?.(topic.id)}
+              className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700"
+            >
               <CopyIcon />
               Copy link
             </button>
@@ -403,7 +468,10 @@ function HelpCard({
               <PinIcon filled={pinned} />
               {pinned ? "Pinned" : "Pin"}
             </button>
-            <Link href="/dashboard/help" className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 ml-auto">
+            <Link
+              href="/dashboard/help"
+              className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 ml-auto"
+            >
               Back to top
               <ArrowUpIcon />
             </Link>
@@ -425,7 +493,15 @@ function SearchIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function ArrowIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="currentColor"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M5 12h14" />
       <path d="m12 5 7 7-7 7" />
     </svg>
@@ -434,7 +510,15 @@ function ArrowIcon() {
 
 function ArrowUpIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      stroke="currentColor"
+      fill="none"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 19V5" />
       <path d="M5 12l7-7 7 7" />
     </svg>
@@ -460,7 +544,13 @@ function ArrowUpRightIcon() {
 
 function PinIcon({ filled }: { filled?: boolean }) {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 24 24" stroke="currentColor" fill={filled ? "currentColor" : "none"} strokeWidth="2">
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      fill={filled ? "currentColor" : "none"}
+      strokeWidth="2"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M12 17v5M9 3h6l-1 7h-4zM7 10h10" />
     </svg>
   );

@@ -3,11 +3,23 @@
 import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useWhoami } from "@/hooks/use-whoami";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Plus, X, Search, Loader2, CheckCircle, Send } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type TicketSubmitter = {
   id?: string | null;
@@ -65,7 +77,13 @@ type NewTicketForm = {
 };
 
 const STATUS_FILTER_OPTIONS: readonly TicketStatusFilter[] = ["all", "open", "completed"];
-const CATEGORY_FILTER_OPTIONS: readonly TicketCategoryFilter[] = ["all", "issue", "question", "feature", "other"];
+const CATEGORY_FILTER_OPTIONS: readonly TicketCategoryFilter[] = [
+  "all",
+  "issue",
+  "question",
+  "feature",
+  "other",
+];
 const TICKET_ROLES: TicketRole[] = ["Owner", "Manager", "Front desk", "Maintenance", "Finance"];
 const TICKET_URGENCIES: TicketUrgency[] = ["Normal", "High - Guests waiting", "Critical - Outage"];
 
@@ -115,7 +133,7 @@ export default function TicketsPage() {
     email: "",
     campground: "",
     role: "Manager",
-    urgency: "Normal"
+    urgency: "Normal",
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -149,27 +167,32 @@ export default function TicketsPage() {
   }, []);
 
   // Single pass for counts and unique areas - O(n) instead of O(6n)
-  const { openCount, completedCount, issueCount, questionCount, featureCount, areas } = useMemo(() => {
-    let open = 0, completed = 0, issue = 0, question = 0, feature = 0;
-    const areaSet = new Set<string>();
-    for (const t of tickets) {
-      if (t.status === "open") open++;
-      if (t.status === "completed") completed++;
-      const cat = t.category ?? "issue";
-      if (cat === "issue") issue++;
-      if (cat === "question") question++;
-      if (cat === "feature") feature++;
-      areaSet.add(t.area || "General");
-    }
-    return {
-      openCount: open,
-      completedCount: completed,
-      issueCount: issue,
-      questionCount: question,
-      featureCount: feature,
-      areas: ["all", ...Array.from(areaSet).sort()],
-    };
-  }, [tickets]);
+  const { openCount, completedCount, issueCount, questionCount, featureCount, areas } =
+    useMemo(() => {
+      let open = 0,
+        completed = 0,
+        issue = 0,
+        question = 0,
+        feature = 0;
+      const areaSet = new Set<string>();
+      for (const t of tickets) {
+        if (t.status === "open") open++;
+        if (t.status === "completed") completed++;
+        const cat = t.category ?? "issue";
+        if (cat === "issue") issue++;
+        if (cat === "question") question++;
+        if (cat === "feature") feature++;
+        areaSet.add(t.area || "General");
+      }
+      return {
+        openCount: open,
+        completedCount: completed,
+        issueCount: issue,
+        questionCount: question,
+        featureCount: feature,
+        areas: ["all", ...Array.from(areaSet).sort()],
+      };
+    }, [tickets]);
 
   // Combined filter - O(n) instead of O(4n) + memoized
   const filteredTickets = useMemo(() => {
@@ -183,12 +206,16 @@ export default function TicketsPage() {
         // Area filter
         if (areaFilter !== "all" && (t.area || "General") !== areaFilter) return false;
         // Search filter
-        if (q && !(
-          t.title.toLowerCase().includes(q) ||
-          (t.notes ?? "").toLowerCase().includes(q) ||
-          (t.pageTitle ?? "").toLowerCase().includes(q) ||
-          (t.path ?? "").toLowerCase().includes(q)
-        )) return false;
+        if (
+          q &&
+          !(
+            t.title.toLowerCase().includes(q) ||
+            (t.notes ?? "").toLowerCase().includes(q) ||
+            (t.pageTitle ?? "").toLowerCase().includes(q) ||
+            (t.path ?? "").toLowerCase().includes(q)
+          )
+        )
+          return false;
         return true;
       })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -227,28 +254,35 @@ export default function TicketsPage() {
     const map: Record<string, { label: string; className: string }> = {
       issue: { label: "Issue", className: "bg-rose-50 text-rose-700 border border-rose-100" },
       question: { label: "Question", className: "bg-sky-50 text-sky-700 border border-sky-100" },
-      feature: { label: "Feature", className: "bg-amber-50 text-amber-800 border border-amber-100" },
+      feature: {
+        label: "Feature",
+        className: "bg-amber-50 text-amber-800 border border-amber-100",
+      },
       other: { label: "Other", className: "bg-muted text-foreground border border-border" },
     };
 
     const areaColors: Record<string, string> = {
-      'UI/UX': 'bg-purple-50 text-purple-700 border-purple-100',
-      'Payments': 'bg-emerald-50 text-emerald-700 border-emerald-100',
-      'Auth': 'bg-indigo-50 text-indigo-700 border-indigo-100',
-      'Reservations': 'bg-blue-50 text-blue-700 border-blue-100',
-      'Admin': 'bg-muted text-foreground border-border',
-      'General': 'bg-gray-50 text-gray-600 border-gray-100'
+      "UI/UX": "bg-purple-50 text-purple-700 border-purple-100",
+      Payments: "bg-emerald-50 text-emerald-700 border-emerald-100",
+      Auth: "bg-indigo-50 text-indigo-700 border-indigo-100",
+      Reservations: "bg-blue-50 text-blue-700 border-blue-100",
+      Admin: "bg-muted text-foreground border-border",
+      General: "bg-gray-50 text-gray-600 border-gray-100",
     };
 
     const picked = map[c] || map.issue;
-    const areaClass = areaColors[area] || areaColors['General'];
+    const areaClass = areaColors[area] || areaColors["General"];
 
     return (
       <div className="flex gap-1.5">
-        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${picked.className}`}>
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${picked.className}`}
+        >
           {picked.label}
         </span>
-        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${areaClass}`}>
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium border ${areaClass}`}
+        >
           {area}
         </span>
       </div>
@@ -266,7 +300,10 @@ export default function TicketsPage() {
   };
 
   const markCompleted = async (ticket: Ticket) => {
-    const notes = window.prompt("Add quick notes (optional):", ticket.agentNotes ?? "") ?? ticket.agentNotes ?? "";
+    const notes =
+      window.prompt("Add quick notes (optional):", ticket.agentNotes ?? "") ??
+      ticket.agentNotes ??
+      "";
     setUpdatingId(ticket.id);
     try {
       const res = await fetch("/api/tickets", {
@@ -328,7 +365,7 @@ export default function TicketsPage() {
         body: JSON.stringify({
           id: detailTicket.id,
           agentNotes: combinedNotes,
-          status: newStatus
+          status: newStatus,
         }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
@@ -359,13 +396,13 @@ export default function TicketsPage() {
           submitter: {
             id: whoami?.user?.id ?? null,
             name: newTicket.name || userDisplayName,
-            email: newTicket.email || whoami?.user?.email || null
+            email: newTicket.email || whoami?.user?.email || null,
           },
           extra: {
             campground: newTicket.campground,
             role: newTicket.role,
-            urgency: newTicket.urgency
-          }
+            urgency: newTicket.urgency,
+          },
         }),
       });
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
@@ -382,7 +419,7 @@ export default function TicketsPage() {
           email: "",
           campground: "",
           role: "Manager",
-          urgency: "Normal"
+          urgency: "Normal",
         });
       }, 2000);
       await loadTickets();
@@ -394,7 +431,6 @@ export default function TicketsPage() {
     }
   };
 
-
   return (
     <div className="w-full">
       <div className="flex w-full flex-col gap-5 px-4 md:px-8 py-6">
@@ -404,7 +440,9 @@ export default function TicketsPage() {
               Ticket desk <span className="text-[11px] text-emerald-600">with context capture</span>
             </div>
             <h1 className="mt-2 text-2xl font-semibold text-foreground">Tickets</h1>
-            <p className="text-sm text-muted-foreground">Track issues, questions, and ideas—then respond fast.</p>
+            <p className="text-sm text-muted-foreground">
+              Track issues, questions, and ideas—then respond fast.
+            </p>
           </div>
           <div className="flex flex-col gap-2 items-end">
             {canViewList && (
@@ -470,7 +508,12 @@ export default function TicketsPage() {
                 </>
               )}
               <Button variant="outline" asChild>
-                <a href="/roadmap" className="flex items-center gap-2" target="_blank" rel="noreferrer">
+                <a
+                  href="/roadmap"
+                  className="flex items-center gap-2"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   Roadmap
                 </a>
               </Button>
@@ -495,7 +538,13 @@ export default function TicketsPage() {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 Open
@@ -505,7 +554,13 @@ export default function TicketsPage() {
             </div>
             <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M5 13l4 4L19 7" />
                 </svg>
                 Completed
@@ -515,7 +570,13 @@ export default function TicketsPage() {
             </div>
             <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6" />
                 </svg>
                 Features
@@ -525,7 +586,13 @@ export default function TicketsPage() {
             </div>
             <div className="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 shadow-sm">
               <div className="flex items-center gap-2 text-xs font-semibold text-sky-700">
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M9.5 9a2.5 2.5 0 1 1 4.9.5c0 1.5-1.5 2-2.4 2.9-.3.3-.5.8-.5 1.3" />
                   <path d="M12 17h.01" />
                   <circle cx="12" cy="12" r="9" />
@@ -540,12 +607,15 @@ export default function TicketsPage() {
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <div className="font-semibold">Sign in to view and manage tickets</div>
             <p className="text-xs text-amber-800 mt-1">
-              You can still submit a ticket without logging in, but the list and responses are staff-only.
+              You can still submit a ticket without logging in, but the list and responses are
+              staff-only.
             </p>
           </div>
         )}
 
-        {error && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
+        {error && (
+          <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>
+        )}
 
         {!canViewList ? (
           <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
@@ -553,7 +623,9 @@ export default function TicketsPage() {
               <Search className="h-6 w-6 text-muted-foreground" />
             </div>
             <h3 className="text-lg font-medium text-foreground">Ticket history is staff-only</h3>
-            <p className="text-sm mt-1 mb-4">Sign in to view the ticket queue or create a new ticket below.</p>
+            <p className="text-sm mt-1 mb-4">
+              Sign in to view the ticket queue or create a new ticket below.
+            </p>
             <div className="flex flex-wrap items-center gap-2">
               <Button variant="secondary" asChild>
                 <a href="/auth/signin?callbackUrl=/tickets">Sign in</a>
@@ -588,20 +660,41 @@ export default function TicketsPage() {
               <table className="min-w-full divide-y divide-border">
                 <thead className="bg-muted sticky top-0 z-10">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Votes</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Title</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Details</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Submitter</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Device</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Page</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">When</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Votes
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Status
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Title
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Details
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Submitter
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Device
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Page
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      When
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredTickets.map((ticket, idx) => (
-                    <tr key={ticket.id} className={`bg-card hover:bg-muted ${idx % 2 === 1 ? "bg-muted/40" : ""}`}>
+                    <tr
+                      key={ticket.id}
+                      className={`bg-card hover:bg-muted ${idx % 2 === 1 ? "bg-muted/40" : ""}`}
+                    >
                       <td className="px-4 py-4 align-top text-sm text-foreground">
                         <div className="flex items-center gap-2">
                           <Button
@@ -612,15 +705,18 @@ export default function TicketsPage() {
                           >
                             {upvotingId === ticket.id ? "…" : "Upvote"}
                           </Button>
-                          <span className="text-sm font-semibold text-foreground">{ticket.votes ?? 0}</span>
+                          <span className="text-sm font-semibold text-foreground">
+                            {ticket.votes ?? 0}
+                          </span>
                         </div>
                       </td>
                       <td className="px-4 py-4 align-top text-xs font-semibold">
                         <span
-                          className={`inline-flex rounded-full px-2 py-1 ${ticket.status === "completed"
-                            ? "bg-status-success/15 text-status-success"
-                            : "bg-status-warning/15 text-status-warning"
-                            }`}
+                          className={`inline-flex rounded-full px-2 py-1 ${
+                            ticket.status === "completed"
+                              ? "bg-status-success/15 text-status-success"
+                              : "bg-status-warning/15 text-status-warning"
+                          }`}
                         >
                           {ticket.status === "completed" ? "Completed" : "Open"}
                         </span>
@@ -637,27 +733,47 @@ export default function TicketsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-4 align-top text-sm text-foreground whitespace-pre-wrap space-y-2">
-                        <div className={expandedNotes[ticket.id] ? "" : "line-clamp-3"}>{ticket.notes ?? "—"}</div>
+                        <div className={expandedNotes[ticket.id] ? "" : "line-clamp-3"}>
+                          {ticket.notes ?? "—"}
+                        </div>
                         {ticket.notes && ticket.notes.length > 140 && (
                           <button
                             className="text-xs font-semibold text-emerald-700 hover:underline"
                             onClick={() =>
-                              setExpandedNotes((prev) => ({ ...prev, [ticket.id]: !prev[ticket.id] }))
+                              setExpandedNotes((prev) => ({
+                                ...prev,
+                                [ticket.id]: !prev[ticket.id],
+                              }))
                             }
                           >
                             {expandedNotes[ticket.id] ? "Show less" : "Show all"}
                           </button>
                         )}
                         {ticket.agentNotes && (
-                          <Button size="sm" variant="ghost" className="px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="px-0 text-emerald-700"
+                            onClick={() => setDetailTicket(ticket)}
+                          >
                             View agent notes
                           </Button>
                         )}
                       </td>
                       <td className="px-4 py-4 align-top text-sm text-foreground space-y-1">
-                        {ticket.submitter?.name && <div className="font-semibold text-foreground">{ticket.submitter.name}</div>}
-                        {ticket.submitter?.email && <div className="text-xs text-muted-foreground">{ticket.submitter.email}</div>}
-                        {!ticket.submitter?.name && !ticket.submitter?.email && <div className="text-xs text-muted-foreground">Anonymous</div>}
+                        {ticket.submitter?.name && (
+                          <div className="font-semibold text-foreground">
+                            {ticket.submitter.name}
+                          </div>
+                        )}
+                        {ticket.submitter?.email && (
+                          <div className="text-xs text-muted-foreground">
+                            {ticket.submitter.email}
+                          </div>
+                        )}
+                        {!ticket.submitter?.name && !ticket.submitter?.email && (
+                          <div className="text-xs text-muted-foreground">Anonymous</div>
+                        )}
                         {ticket.upvoters && ticket.upvoters.length > 0 && (
                           <div className="text-[11px] text-muted-foreground">
                             Upvoted by{" "}
@@ -671,10 +787,18 @@ export default function TicketsPage() {
                       </td>
                       <td className="px-4 py-4 align-top text-xs text-muted-foreground space-y-1">
                         <div className="font-semibold text-foreground">{deviceLabel(ticket)}</div>
-                        {ticket.client?.language && <div className="text-xs text-muted-foreground">{ticket.client.language}</div>}
+                        {ticket.client?.language && (
+                          <div className="text-xs text-muted-foreground">
+                            {ticket.client.language}
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-4 align-top text-xs text-muted-foreground space-y-1 max-w-[220px]">
-                        {ticket.pageTitle && <div className="font-semibold text-foreground line-clamp-1">{ticket.pageTitle}</div>}
+                        {ticket.pageTitle && (
+                          <div className="font-semibold text-foreground line-clamp-1">
+                            {ticket.pageTitle}
+                          </div>
+                        )}
                         {ticket.url && (
                           <a
                             href={ticket.url}
@@ -686,19 +810,40 @@ export default function TicketsPage() {
                             {displayUrl(ticket.url)}
                           </a>
                         )}
-                        {ticket.path && <div className="text-muted-foreground line-clamp-1" title={ticket.path}>{ticket.path}</div>}
-                        {ticket.selection && <div className="text-muted-foreground line-clamp-1" title={ticket.selection}>Selection: “{ticket.selection}”</div>}
+                        {ticket.path && (
+                          <div className="text-muted-foreground line-clamp-1" title={ticket.path}>
+                            {ticket.path}
+                          </div>
+                        )}
+                        {ticket.selection && (
+                          <div
+                            className="text-muted-foreground line-clamp-1"
+                            title={ticket.selection}
+                          >
+                            Selection: “{ticket.selection}”
+                          </div>
+                        )}
                       </td>
                       <td className="px-4 py-4 align-top text-sm text-muted-foreground">
                         {ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}
                       </td>
                       <td className="px-4 py-4 align-top text-sm text-muted-foreground bg-card">
                         <div className="flex flex-col gap-2">
-                          <Button size="sm" variant="ghost" className="justify-start px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="justify-start px-0 text-emerald-700"
+                            onClick={() => setDetailTicket(ticket)}
+                          >
                             Details
                           </Button>
                           {ticket.url && (
-                            <Button size="sm" variant="ghost" className="justify-start px-0 text-emerald-700" asChild>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="justify-start px-0 text-emerald-700"
+                              asChild
+                            >
                               <a href={ticket.url} target="_blank" rel="noreferrer">
                                 Review page →
                               </a>
@@ -727,24 +872,42 @@ export default function TicketsPage() {
             {/* Mobile cards */}
             <div className="space-y-3 md:hidden">
               {filteredTickets.map((ticket) => (
-                <div key={ticket.id} className="rounded-lg border border-border bg-card p-3 shadow-sm">
+                <div
+                  key={ticket.id}
+                  className="rounded-lg border border-border bg-card p-3 shadow-sm"
+                >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <div className="text-xs font-semibold uppercase text-muted-foreground">{ticket.status === "completed" ? "Completed" : "Open"}</div>
+                      <div className="text-xs font-semibold uppercase text-muted-foreground">
+                        {ticket.status === "completed" ? "Completed" : "Open"}
+                      </div>
                       <div className="flex items-center gap-2">
                         {categoryBadge(ticket)}
-                        <div className="text-base font-semibold text-foreground line-clamp-2">{ticket.title}</div>
+                        <div className="text-base font-semibold text-foreground line-clamp-2">
+                          {ticket.title}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">{ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {ticket.createdAt ? new Date(ticket.createdAt).toLocaleString() : "—"}
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="secondary" onClick={() => upvote(ticket)} disabled={upvotingId === ticket.id}>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => upvote(ticket)}
+                        disabled={upvotingId === ticket.id}
+                      >
                         {upvotingId === ticket.id ? "…" : "Upvote"}
                       </Button>
-                      <span className="text-sm font-semibold text-foreground">{ticket.votes ?? 0}</span>
+                      <span className="text-sm font-semibold text-foreground">
+                        {ticket.votes ?? 0}
+                      </span>
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-foreground line-clamp-3">{ticket.notes ?? "—"}</div>
+                  <div className="mt-2 text-sm text-foreground line-clamp-3">
+                    {ticket.notes ?? "—"}
+                  </div>
                   {ticket.notes && ticket.notes.length > 140 && (
                     <button
                       className="text-xs font-semibold text-emerald-700 hover:underline"
@@ -783,7 +946,12 @@ export default function TicketsPage() {
                     </a>
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
-                    <Button size="sm" variant="ghost" className="px-0 text-emerald-700" onClick={() => setDetailTicket(ticket)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="px-0 text-emerald-700"
+                      onClick={() => setDetailTicket(ticket)}
+                    >
                       Details
                     </Button>
                     {ticket.url && (
@@ -796,7 +964,12 @@ export default function TicketsPage() {
                     {ticket.status === "completed" ? (
                       <span className="text-xs text-muted-foreground self-center">Done</span>
                     ) : (
-                      <Button size="sm" variant="secondary" onClick={() => markCompleted(ticket)} disabled={updatingId === ticket.id}>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => markCompleted(ticket)}
+                        disabled={updatingId === ticket.id}
+                      >
                         {updatingId === ticket.id ? "Saving..." : "Mark completed"}
                       </Button>
                     )}
@@ -807,24 +980,33 @@ export default function TicketsPage() {
           </>
         )}
 
-        <Dialog open={!!detailTicket} onOpenChange={(open) => (!open ? setDetailTicket(null) : undefined)}>
+        <Dialog
+          open={!!detailTicket}
+          onOpenChange={(open) => (!open ? setDetailTicket(null) : undefined)}
+        >
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>{detailTicket?.title ?? "Details"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-3 text-sm text-foreground">
               <div className="rounded-md border border-border bg-muted p-3">
-                <div className="text-xs font-semibold uppercase text-muted-foreground">Ticket details</div>
+                <div className="text-xs font-semibold uppercase text-muted-foreground">
+                  Ticket details
+                </div>
                 <div className="mt-1 whitespace-pre-wrap">{detailTicket?.notes ?? "—"}</div>
               </div>
               <div>
-                <div className="text-xs font-semibold uppercase text-muted-foreground">Agent notes</div>
+                <div className="text-xs font-semibold uppercase text-muted-foreground">
+                  Agent notes
+                </div>
                 <div className="whitespace-pre-wrap rounded border border-border bg-muted p-3">
                   {detailTicket?.agentNotes ?? "No agent notes yet."}
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs font-semibold uppercase text-muted-foreground">Add response</div>
+                <div className="text-xs font-semibold uppercase text-muted-foreground">
+                  Add response
+                </div>
                 <Textarea
                   rows={3}
                   placeholder="Reply or add context. This will append to agent notes."
@@ -890,7 +1072,7 @@ export default function TicketsPage() {
                   <Input
                     placeholder="Your name"
                     value={newTicket.name}
-                    onChange={(e) => setNewTicket(prev => ({ ...prev, name: e.target.value }))}
+                    onChange={(e) => setNewTicket((prev) => ({ ...prev, name: e.target.value }))}
                   />
                 </div>
                 <div className="space-y-2">
@@ -899,7 +1081,7 @@ export default function TicketsPage() {
                     type="email"
                     placeholder="hello@keeprstay.com"
                     value={newTicket.email}
-                    onChange={(e) => setNewTicket(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) => setNewTicket((prev) => ({ ...prev, email: e.target.value }))}
                   />
                 </div>
               </div>
@@ -910,7 +1092,9 @@ export default function TicketsPage() {
                   <Input
                     placeholder="North Woods RV"
                     value={newTicket.campground}
-                    onChange={(e) => setNewTicket(prev => ({ ...prev, campground: e.target.value }))}
+                    onChange={(e) =>
+                      setNewTicket((prev) => ({ ...prev, campground: e.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -962,7 +1146,7 @@ export default function TicketsPage() {
                 <Input
                   placeholder="Brief summary of the issue"
                   value={newTicket.title}
-                  onChange={(e) => setNewTicket(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) => setNewTicket((prev) => ({ ...prev, title: e.target.value }))}
                 />
               </div>
 
@@ -971,7 +1155,9 @@ export default function TicketsPage() {
                   <label className="text-sm font-medium text-foreground">Category</label>
                   <Select
                     value={newTicket.category}
-                    onValueChange={(val: "issue" | "question" | "feature" | "other") => setNewTicket(prev => ({ ...prev, category: val }))}
+                    onValueChange={(val: "issue" | "question" | "feature" | "other") =>
+                      setNewTicket((prev) => ({ ...prev, category: val }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -988,7 +1174,7 @@ export default function TicketsPage() {
                   <label className="text-sm font-medium text-foreground">Area</label>
                   <Select
                     value={newTicket.area}
-                    onValueChange={(val) => setNewTicket(prev => ({ ...prev, area: val }))}
+                    onValueChange={(val) => setNewTicket((prev) => ({ ...prev, area: val }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1011,7 +1197,7 @@ export default function TicketsPage() {
                   placeholder="What happened? Include reservation IDs, timestamps, or error messages."
                   rows={5}
                   value={newTicket.notes}
-                  onChange={(e) => setNewTicket(prev => ({ ...prev, notes: e.target.value }))}
+                  onChange={(e) => setNewTicket((prev) => ({ ...prev, notes: e.target.value }))}
                 />
               </div>
 
@@ -1026,8 +1212,14 @@ export default function TicketsPage() {
             </div>
 
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setCreateOpen(false)} disabled={creating}>Cancel</Button>
-              <Button onClick={handleCreate} disabled={creating || !newTicket.title.trim()} className="gap-2">
+              <Button variant="ghost" onClick={() => setCreateOpen(false)} disabled={creating}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={creating || !newTicket.title.trim()}
+                className="gap-2"
+              >
                 {creating ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -1043,7 +1235,6 @@ export default function TicketsPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
       </div>
     </div>
   );

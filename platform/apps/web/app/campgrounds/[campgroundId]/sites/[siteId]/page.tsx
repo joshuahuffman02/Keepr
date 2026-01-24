@@ -24,13 +24,13 @@ export default function SiteDetailPage() {
   const siteQuery = useQuery({
     queryKey: ["site", siteId],
     queryFn: () => apiClient.getSite(siteId),
-    enabled: !!siteId
+    enabled: !!siteId,
   });
 
   const reservationsQuery = useQuery({
     queryKey: ["campground-reservations", campgroundId],
     queryFn: () => apiClient.getReservations(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const statusQuery = useQuery({
@@ -38,27 +38,29 @@ export default function SiteDetailPage() {
     queryFn: () =>
       apiClient.getSitesWithStatus(campgroundId, {
         arrivalDate: todayIso,
-        departureDate: horizonIso
+        departureDate: horizonIso,
       }),
-    enabled: !!campgroundId && !!siteId
+    enabled: !!campgroundId && !!siteId,
   });
 
   const maintenanceQuery = useQuery({
     queryKey: ["maintenance", campgroundId],
     queryFn: () => apiClient.getMaintenanceTickets("open", campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const blackoutQuery = useQuery({
     queryKey: ["blackouts", campgroundId],
     queryFn: () => apiClient.getBlackouts(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   if (siteQuery.isLoading) {
     return (
       <DashboardShell>
-        <div className="flex h-80 items-center justify-center text-muted-foreground">Loading site…</div>
+        <div className="flex h-80 items-center justify-center text-muted-foreground">
+          Loading site…
+        </div>
       </DashboardShell>
     );
   }
@@ -70,7 +72,9 @@ export default function SiteDetailPage() {
       <DashboardShell>
         <div className="flex h-80 flex-col items-center justify-center gap-4 text-muted-foreground">
           <div>Site not found</div>
-          <Button onClick={() => router.push(`/campgrounds/${campgroundId}/sites`)}>Back to sites</Button>
+          <Button onClick={() => router.push(`/campgrounds/${campgroundId}/sites`)}>
+            Back to sites
+          </Button>
         </div>
       </DashboardShell>
     );
@@ -102,21 +106,32 @@ export default function SiteDetailPage() {
             { label: "Campgrounds", href: "/campgrounds?all=true" },
             { label: `Campground ${campgroundId}`, href: `/campgrounds/${campgroundId}` },
             { label: "Sites", href: `/campgrounds/${campgroundId}/sites` },
-            { label: site.name || site.siteNumber }
+            { label: site.name || site.siteNumber },
           ]}
         />
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="Back to sites">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              aria-label="Back to sites"
+            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{site.name || `Site #${site.siteNumber}`}</h1>
-              <div className="text-sm text-muted-foreground">#{site.siteNumber} • {site.siteType}</div>
+              <h1 className="text-2xl font-bold text-foreground">
+                {site.name || `Site #${site.siteNumber}`}
+              </h1>
+              <div className="text-sm text-muted-foreground">
+                #{site.siteNumber} • {site.siteType}
+              </div>
             </div>
           </div>
-          <Badge variant={site.isActive ? "default" : "outline"}>{site.isActive ? "Active" : "Inactive"}</Badge>
+          <Badge variant={site.isActive ? "default" : "outline"}>
+            {site.isActive ? "Active" : "Inactive"}
+          </Badge>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -186,11 +201,16 @@ export default function SiteDetailPage() {
               <CardTitle>Photos</CardTitle>
             </CardHeader>
             <CardContent>
-              {photoList.length === 0 && <div className="text-xs text-muted-foreground">No photos for this site.</div>}
+              {photoList.length === 0 && (
+                <div className="text-xs text-muted-foreground">No photos for this site.</div>
+              )}
               {photoList.length > 0 && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {photoList.map((url) => (
-                    <div key={url} className="relative h-24 w-full overflow-hidden rounded border border-border bg-muted">
+                    <div
+                      key={url}
+                      className="relative h-24 w-full overflow-hidden rounded border border-border bg-muted"
+                    >
                       <img src={url} alt="Site photo" className="h-full w-full object-cover" />
                     </div>
                   ))}
@@ -204,8 +224,12 @@ export default function SiteDetailPage() {
               <CardTitle>Availability (next 14 days)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {statusQuery.isLoading && <div className="text-xs text-muted-foreground">Checking…</div>}
-              {statusQuery.isError && <div className="text-xs text-red-500">Failed to load status</div>}
+              {statusQuery.isLoading && (
+                <div className="text-xs text-muted-foreground">Checking…</div>
+              )}
+              {statusQuery.isError && (
+                <div className="text-xs text-red-500">Failed to load status</div>
+              )}
               {!status && !statusQuery.isLoading && !statusQuery.isError && (
                 <div className="text-xs text-muted-foreground">No status data.</div>
               )}
@@ -213,7 +237,9 @@ export default function SiteDetailPage() {
                 <div className="rounded border border-border px-3 py-2">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold capitalize">{status.status}</span>
-                    {status.statusDetail && <span className="text-xs text-muted-foreground">{status.statusDetail}</span>}
+                    {status.statusDetail && (
+                      <span className="text-xs text-muted-foreground">{status.statusDetail}</span>
+                    )}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Window: {todayIso} → {horizonIso}
@@ -228,8 +254,12 @@ export default function SiteDetailPage() {
               <CardTitle>Upcoming reservations</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {reservationsQuery.isLoading && <div className="text-xs text-muted-foreground">Loading…</div>}
-              {reservationsQuery.isError && <div className="text-xs text-red-500">Failed to load</div>}
+              {reservationsQuery.isLoading && (
+                <div className="text-xs text-muted-foreground">Loading…</div>
+              )}
+              {reservationsQuery.isError && (
+                <div className="text-xs text-red-500">Failed to load</div>
+              )}
               {upcomingReservations.length === 0 && !reservationsQuery.isLoading && (
                 <div className="text-xs text-muted-foreground">No upcoming stays on this site.</div>
               )}
@@ -237,9 +267,13 @@ export default function SiteDetailPage() {
                 <div key={res.id} className="rounded border border-border px-3 py-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">
-                      {res.guest ? `${res.guest.primaryFirstName} ${res.guest.primaryLastName}` : "Guest"}
+                      {res.guest
+                        ? `${res.guest.primaryFirstName} ${res.guest.primaryLastName}`
+                        : "Guest"}
                     </span>
-                    <Badge variant="outline" className="capitalize">{res.status.replace("_", " ")}</Badge>
+                    <Badge variant="outline" className="capitalize">
+                      {res.status.replace("_", " ")}
+                    </Badge>
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {res.arrivalDate} → {res.departureDate}
@@ -256,8 +290,12 @@ export default function SiteDetailPage() {
               <CardTitle>Open maintenance</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {maintenanceQuery.isLoading && <div className="text-xs text-muted-foreground">Loading…</div>}
-              {maintenanceQuery.isError && <div className="text-xs text-red-500">Failed to load maintenance</div>}
+              {maintenanceQuery.isLoading && (
+                <div className="text-xs text-muted-foreground">Loading…</div>
+              )}
+              {maintenanceQuery.isError && (
+                <div className="text-xs text-red-500">Failed to load maintenance</div>
+              )}
               {openMaintenance.length === 0 && !maintenanceQuery.isLoading && (
                 <div className="text-xs text-muted-foreground">No open tickets for this site.</div>
               )}
@@ -265,10 +303,14 @@ export default function SiteDetailPage() {
                 <div key={m.id} className="rounded border border-border px-3 py-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{m.title}</span>
-                    <Badge variant="outline" className="capitalize">{m.priority}</Badge>
+                    <Badge variant="outline" className="capitalize">
+                      {m.priority}
+                    </Badge>
                   </div>
                   <div className="text-xs text-muted-foreground">{m.status}</div>
-                  {m.dueDate && <div className="text-xs text-muted-foreground">Due {m.dueDate}</div>}
+                  {m.dueDate && (
+                    <div className="text-xs text-muted-foreground">Due {m.dueDate}</div>
+                  )}
                 </div>
               ))}
             </CardContent>
@@ -279,10 +321,16 @@ export default function SiteDetailPage() {
               <CardTitle>Blackouts</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm">
-              {blackoutQuery.isLoading && <div className="text-xs text-muted-foreground">Loading…</div>}
-              {blackoutQuery.isError && <div className="text-xs text-red-500">Failed to load blackouts</div>}
+              {blackoutQuery.isLoading && (
+                <div className="text-xs text-muted-foreground">Loading…</div>
+              )}
+              {blackoutQuery.isError && (
+                <div className="text-xs text-red-500">Failed to load blackouts</div>
+              )}
               {relevantBlackouts.length === 0 && !blackoutQuery.isLoading && (
-                <div className="text-xs text-muted-foreground">No blackout dates affecting this site.</div>
+                <div className="text-xs text-muted-foreground">
+                  No blackout dates affecting this site.
+                </div>
               )}
               {relevantBlackouts.map((b) => (
                 <div key={b.id} className="rounded border border-border px-3 py-2">

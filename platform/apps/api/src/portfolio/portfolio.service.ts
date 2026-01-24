@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from "../prisma/prisma.service";
 
 export interface DashboardWidget {
-  type: 'occupancy' | 'revenue' | 'bookings' | 'adr' | 'revpar' | 'chart';
+  type: "occupancy" | "revenue" | "bookings" | "adr" | "revpar" | "chart";
   position: { x: number; y: number; w: number; h: number };
   config?: Record<string, Prisma.InputJsonValue>;
 }
@@ -30,7 +30,7 @@ const toJsonInput = (value: unknown): Prisma.InputJsonValue | typeof Prisma.Json
   toJsonValue(value) ?? Prisma.JsonNull;
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -71,7 +71,7 @@ export class PortfolioService {
       include: {
         User: { select: { id: true, firstName: true, lastName: true } },
       },
-      orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -80,7 +80,7 @@ export class PortfolioService {
       where: { id },
       include: { Organization: true },
     });
-    if (!dashboard) throw new NotFoundException('Dashboard not found');
+    if (!dashboard) throw new NotFoundException("Dashboard not found");
     return dashboard;
   }
 
@@ -114,7 +114,7 @@ export class PortfolioService {
     orgId: string,
     campgroundId: string | null,
     date: Date,
-    metrics: { metricType: string; value: number }[]
+    metrics: { metricType: string; value: number }[],
   ) {
     const results = [];
 
@@ -127,7 +127,7 @@ export class PortfolioService {
           metricType: metric.metricType,
           metricDate: { lt: date },
         },
-        orderBy: { metricDate: 'desc' },
+        orderBy: { metricDate: "desc" },
       });
 
       const changePercent = previous
@@ -138,7 +138,7 @@ export class PortfolioService {
         where: {
           orgId_campgroundId_metricDate_metricType: {
             orgId,
-            campgroundId: campgroundId ?? '',
+            campgroundId: campgroundId ?? "",
             metricDate: date,
             metricType: metric.metricType,
           },
@@ -171,7 +171,7 @@ export class PortfolioService {
     campgroundId?: string,
     metricType?: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ) {
     return this.prisma.portfolioMetric.findMany({
       where: {
@@ -190,7 +190,7 @@ export class PortfolioService {
       include: {
         Campground: { select: { id: true, name: true } },
       },
-      orderBy: { metricDate: 'desc' },
+      orderBy: { metricDate: "desc" },
     });
   }
 
@@ -241,7 +241,7 @@ export class PortfolioService {
     name: string,
     rateConfig: Record<string, unknown>,
     targetCampIds: string[],
-    createdBy: string
+    createdBy: string,
   ) {
     return this.prisma.centralizedRatePush.create({
       data: {
@@ -250,7 +250,7 @@ export class PortfolioService {
         name,
         rateConfig: toJsonInput(rateConfig),
         targetCampIds,
-        status: 'draft',
+        status: "draft",
         createdBy,
         updatedAt: new Date(),
       },
@@ -260,13 +260,13 @@ export class PortfolioService {
   async listRatePushes(orgId: string) {
     return this.prisma.centralizedRatePush.findMany({
       where: { orgId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
   async applyRatePush(id: string, appliedBy: string) {
     const push = await this.prisma.centralizedRatePush.findUnique({ where: { id } });
-    if (!push) throw new NotFoundException('Rate push not found');
+    if (!push) throw new NotFoundException("Rate push not found");
 
     const results: Record<string, { success: boolean; error?: string }> = {};
 
@@ -279,17 +279,17 @@ export class PortfolioService {
       } catch (error) {
         results[campId] = {
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : "Unknown error",
         };
       }
     }
 
-    const allSuccess = Object.values(results).every(r => r.success);
+    const allSuccess = Object.values(results).every((r) => r.success);
 
     return this.prisma.centralizedRatePush.update({
       where: { id },
       data: {
-        status: allSuccess ? 'applied' : 'failed',
+        status: allSuccess ? "applied" : "failed",
         appliedAt: new Date(),
         appliedBy,
         results: toNullableJsonInput(results),
@@ -317,7 +317,7 @@ export class PortfolioService {
           campgroundId: camp.id,
           arrivalDate: { lte: date },
           departureDate: { gt: date },
-          status: { in: ['confirmed', 'checked_in'] },
+          status: { in: ["confirmed", "checked_in"] },
         },
       });
 
@@ -329,7 +329,7 @@ export class PortfolioService {
           campgroundId: camp.id,
           arrivalDate: { lte: date },
           departureDate: { gt: date },
-          status: { in: ['confirmed', 'checked_in', 'checked_out'] },
+          status: { in: ["confirmed", "checked_in", "checked_out"] },
         },
         _sum: { totalAmount: true },
       });
@@ -354,11 +354,11 @@ export class PortfolioService {
       });
 
       await this.recordMetrics(orgId, camp.id, date, [
-        { metricType: 'occupancy', value: occupancyPct },
-        { metricType: 'revenue', value: revenueCents },
-        { metricType: 'adr', value: adr },
-        { metricType: 'revpar', value: revpar },
-        { metricType: 'bookings', value: bookings },
+        { metricType: "occupancy", value: occupancyPct },
+        { metricType: "revenue", value: revenueCents },
+        { metricType: "adr", value: adr },
+        { metricType: "revpar", value: revpar },
+        { metricType: "bookings", value: bookings },
       ]);
     }
 
@@ -381,7 +381,7 @@ export class PortfolioService {
       orgId,
       null,
       date,
-      Object.entries(aggregates).map(([metricType, value]) => ({ metricType, value }))
+      Object.entries(aggregates).map(([metricType, value]) => ({ metricType, value })),
     );
   }
 }

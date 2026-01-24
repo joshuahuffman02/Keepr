@@ -8,10 +8,7 @@ const API_BASE =
     ? "https://api.keeprstay.com/api"
     : "http://localhost:4000/api");
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const token = req.nextUrl.searchParams.get("token");
 
@@ -29,9 +26,6 @@ export async function GET(
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
     console.error("[public-reservation-forms] Error:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch form submissions" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch form submissions" }, { status: 500 });
   }
 }

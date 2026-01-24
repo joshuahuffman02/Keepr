@@ -24,7 +24,7 @@ export function HelpTooltip({
   className = "",
   iconClassName = "",
   variant = "icon",
-  children
+  children,
 }: HelpTooltipProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -91,13 +91,16 @@ export function HelpTooltip({
       top: "bottom-full mb-2",
       bottom: "top-full mt-2",
       left: "right-full mr-2",
-      right: "left-full ml-2"
+      right: "left-full ml-2",
     };
 
     const alignments: Record<string, string> = {
       start: side === "top" || side === "bottom" ? "left-0" : "top-0",
-      center: side === "top" || side === "bottom" ? "left-1/2 -translate-x-1/2" : "top-1/2 -translate-y-1/2",
-      end: side === "top" || side === "bottom" ? "right-0" : "bottom-0"
+      center:
+        side === "top" || side === "bottom"
+          ? "left-1/2 -translate-x-1/2"
+          : "top-1/2 -translate-y-1/2",
+      end: side === "top" || side === "bottom" ? "right-0" : "bottom-0",
     };
 
     return `${positions[side]} ${alignments[align]}`;
@@ -189,10 +192,10 @@ export function HelpTooltip({
               side === "top"
                 ? "bottom-[-7px] border-b-2 border-r-2"
                 : side === "bottom"
-                ? "top-[-7px] border-t-2 border-l-2"
-                : side === "left"
-                ? "right-[-7px] border-t-2 border-r-2"
-                : "left-[-7px] border-b-2 border-l-2"
+                  ? "top-[-7px] border-t-2 border-l-2"
+                  : side === "left"
+                    ? "right-[-7px] border-t-2 border-r-2"
+                    : "left-[-7px] border-b-2 border-l-2"
             } ${
               align === "center"
                 ? side === "top" || side === "bottom"
@@ -207,7 +210,13 @@ export function HelpTooltip({
   );
 }
 
-export function HelpTooltipContent({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function HelpTooltipContent({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return <div className={`space-y-2 ${className}`}>{children}</div>;
 }
 
@@ -232,7 +241,12 @@ export function HelpTooltipList({ items }: { items: string[] }) {
 
 export function HelpTooltipLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} className="text-emerald-600 hover:text-emerald-700 underline font-medium" target="_blank" rel="noopener noreferrer">
+    <a
+      href={href}
+      className="text-emerald-600 hover:text-emerald-700 underline font-medium"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       {children}
     </a>
   );

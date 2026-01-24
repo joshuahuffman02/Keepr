@@ -56,11 +56,7 @@ export const ROLE_DEFAULT_MENUS: Record<UserRole, string[]> = {
   ],
 
   // Maintenance staff
-  maintenance: [
-    "/dashboard",
-    "/maintenance",
-    "/operations/tasks",
-  ],
+  maintenance: ["/dashboard", "/maintenance", "/operations/tasks"],
 
   // Admin (platform level)
   admin: [
@@ -77,10 +73,7 @@ export const ROLE_DEFAULT_MENUS: Record<UserRole, string[]> = {
 /**
  * Get default menu for a role, with optional campgroundId for dynamic pages
  */
-export function getDefaultMenuForRole(
-  role: UserRole,
-  campgroundId?: string
-): string[] {
+export function getDefaultMenuForRole(role: UserRole, campgroundId?: string): string[] {
   const menu = ROLE_DEFAULT_MENUS[role] || ROLE_DEFAULT_MENUS.front_desk;
 
   // If we have a campgroundId, add some dynamic pages
@@ -113,7 +106,7 @@ export function getDefaultMenuForRole(
  */
 export function inferRoleFromPermissions(
   permissions: Record<string, boolean>,
-  platformRole?: string | null
+  platformRole?: string | null,
 ): UserRole {
   if (platformRole) {
     return "admin";

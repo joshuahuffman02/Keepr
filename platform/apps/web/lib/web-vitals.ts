@@ -24,7 +24,7 @@ export const WEB_VITALS_THRESHOLDS: Record<MetricName, { good: number; poor: num
  */
 export function getMetricRating(
   name: MetricName,
-  value: number
+  value: number,
 ): "good" | "needs-improvement" | "poor" {
   const thresholds = WEB_VITALS_THRESHOLDS[name];
   if (value <= thresholds.good) return "good";
@@ -62,12 +62,12 @@ export function reportWebVitals(metric: Metric) {
       rating === "good"
         ? "\x1b[32m" // green
         : rating === "needs-improvement"
-        ? "\x1b[33m" // yellow
-        : "\x1b[31m"; // red
+          ? "\x1b[33m" // yellow
+          : "\x1b[31m"; // red
     const reset = "\x1b[0m";
 
     console.log(
-      `${color}[Web Vitals]${reset} ${name}: ${formatMetricValue(name, value)} (${rating})`
+      `${color}[Web Vitals]${reset} ${name}: ${formatMetricValue(name, value)} (${rating})`,
     );
   }
 
@@ -116,9 +116,7 @@ export async function initWebVitals() {
   if (typeof window === "undefined") return;
 
   try {
-    const { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } = await import(
-      "web-vitals"
-    );
+    const { onCLS, onFCP, onFID, onINP, onLCP, onTTFB } = await import("web-vitals");
 
     onCLS(reportWebVitals);
     onFCP(reportWebVitals);

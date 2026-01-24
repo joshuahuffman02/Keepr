@@ -1,8 +1,5 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import {
-  PublicEventsService,
-  PublicEventSearchResult
-} from "./public-events.service";
+import { PublicEventsService, PublicEventSearchResult } from "./public-events.service";
 import { EventType } from "@prisma/client";
 
 @Controller("public/events")
@@ -16,7 +13,7 @@ export class PublicEventsController {
     @Query("startDate") startDate?: string,
     @Query("endDate") endDate?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ): Promise<PublicEventSearchResult> {
     return this.eventsService.searchPublicEvents({
       state: state?.toUpperCase(),
@@ -24,7 +21,7 @@ export class PublicEventsController {
       startDate: startDate ? new Date(startDate) : undefined,
       endDate: endDate ? new Date(endDate) : undefined,
       limit: limit ? parseInt(limit, 10) : 24,
-      offset: offset ? parseInt(offset, 10) : 0
+      offset: offset ? parseInt(offset, 10) : 0,
     });
   }
 

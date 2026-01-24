@@ -164,7 +164,9 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
         </div>
         <div>
           <h1 className="text-2xl font-bold text-foreground">Staff Management</h1>
-          <p className="text-sm text-muted-foreground">Schedule, track time, and manage your team</p>
+          <p className="text-sm text-muted-foreground">
+            Schedule, track time, and manage your team
+          </p>
         </div>
       </div>
 
@@ -188,22 +190,22 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                   groupActive
                     ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted",
                 )}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
               >
                 <GroupIcon
-                  className={cn("w-4 h-4", groupActive ? "text-action-primary" : "text-muted-foreground")}
+                  className={cn(
+                    "w-4 h-4",
+                    groupActive ? "text-action-primary" : "text-muted-foreground",
+                  )}
                 />
                 <span className="hidden sm:inline">
                   {groupActive ? getActiveLabel(group) : group.label}
                 </span>
                 <ChevronDown
-                  className={cn(
-                    "w-3.5 h-3.5 transition-transform",
-                    isOpen && "rotate-180"
-                  )}
+                  className={cn("w-3.5 h-3.5 transition-transform", isOpen && "rotate-180")}
                 />
               </button>
 
@@ -227,15 +229,13 @@ export function StaffNavigation({ campgroundId }: StaffNavigationProps) {
                           onClick={() => setOpenGroup(null)}
                           className={cn(
                             "flex items-center gap-3 px-4 py-2.5 text-sm transition-colors",
-                            active
-                              ? "bg-teal-50 text-teal-700"
-                              : "text-foreground hover:bg-muted"
+                            active ? "bg-teal-50 text-teal-700" : "text-foreground hover:bg-muted",
                           )}
                         >
                           <Icon
                             className={cn(
                               "w-4 h-4",
-                              active ? "text-teal-600" : "text-muted-foreground"
+                              active ? "text-teal-600" : "text-muted-foreground",
                             )}
                           />
                           <span className="font-medium">{item.label}</span>

@@ -50,8 +50,14 @@ type PrismaMock = {
     update: jest.Mock<Promise<Session>, [{ where: { id: string }; data: Partial<SessionInput> }]>;
   };
   campground: {
-    findUnique: jest.Mock<Promise<{ id: string; slug: string; name: string } | null>, [{ where: { slug: string } }]>;
-    create: jest.Mock<Promise<{ id: string; slug: string; name: string }>, [{ data: { id?: string; name: string; slug: string } }]>;
+    findUnique: jest.Mock<
+      Promise<{ id: string; slug: string; name: string } | null>,
+      [{ where: { slug: string } }]
+    >;
+    create: jest.Mock<
+      Promise<{ id: string; slug: string; name: string }>,
+      [{ data: { id?: string; name: string; slug: string } }]
+    >;
   };
 };
 
@@ -68,7 +74,11 @@ const buildPrisma = (): PrismaMock => {
   return {
     onboardingInvite: {
       create: jest.fn(async ({ data }: { data: InviteInput }) => {
-        const invite: Invite = { ...data, id: data.id ?? `invite_${invites.length}`, OnboardingSession: null };
+        const invite: Invite = {
+          ...data,
+          id: data.id ?? `invite_${invites.length}`,
+          OnboardingSession: null,
+        };
         invites.push(invite);
         return invite;
       }),
@@ -77,12 +87,14 @@ const buildPrisma = (): PrismaMock => {
         if (where?.id) return invites.find((invite) => invite.id === where.id) ?? null;
         return null;
       }),
-      update: jest.fn(async ({ where, data }: { where: { id: string }; data: Partial<InviteInput> }) => {
-        const invite = invites.find((entry) => entry.id === where.id);
-        if (!invite) throw new Error("not found");
-        Object.assign(invite, data);
-        return invite;
-      }),
+      update: jest.fn(
+        async ({ where, data }: { where: { id: string }; data: Partial<InviteInput> }) => {
+          const invite = invites.find((entry) => entry.id === where.id);
+          if (!invite) throw new Error("not found");
+          Object.assign(invite, data);
+          return invite;
+        },
+      ),
     },
     onboardingSession: {
       create: jest.fn(async ({ data }: { data: SessionInput }) => {
@@ -92,20 +104,25 @@ const buildPrisma = (): PrismaMock => {
         if (invite) invite.OnboardingSession = session;
         return session;
       }),
-      findUnique: jest.fn(async ({ where }: { where: { id: string } }) => sessions.find((entry) => entry.id === where.id) ?? null),
-      update: jest.fn(async ({ where, data }: { where: { id: string }; data: Partial<SessionInput> }) => {
-        const session = sessions.find((entry) => entry.id === where.id);
-        if (!session) throw new Error("not found");
-        Object.assign(session, data);
-        return session;
-      }),
+      findUnique: jest.fn(
+        async ({ where }: { where: { id: string } }) =>
+          sessions.find((entry) => entry.id === where.id) ?? null,
+      ),
+      update: jest.fn(
+        async ({ where, data }: { where: { id: string }; data: Partial<SessionInput> }) => {
+          const session = sessions.find((entry) => entry.id === where.id);
+          if (!session) throw new Error("not found");
+          Object.assign(session, data);
+          return session;
+        },
+      ),
     },
     campground: {
       findUnique: jest.fn(async ({ where: _where }: { where: { slug: string } }) => null),
       create: jest.fn(async ({ data }: { data: { id?: string; name: string; slug: string } }) => ({
         id: data.id ?? `camp_${invites.length}`,
         name: data.name,
-        slug: data.slug
+        slug: data.slug,
       })),
     },
   };
@@ -137,7 +154,11 @@ describe("OnboardingService", () => {
   it("creates and resumes a session from the same invite token", async () => {
     const prisma = buildPrisma();
     await prisma.onboardingInvite.create({
-      data: { email: "owner@camp.com", token: "tok-123", expiresAt: new Date(Date.now() + 3600_000) },
+      data: {
+        email: "owner@camp.com",
+        token: "tok-123",
+        expiresAt: new Date(Date.now() + 3600_000),
+      },
     });
     const idempotency = buildIdempotency();
     const { service, close } = await createService(prisma, idempotency);
@@ -156,13 +177,19 @@ describe("OnboardingService", () => {
   it("rejects expired invites", async () => {
     const prisma = buildPrisma();
     await prisma.onboardingInvite.create({
-      data: { email: "owner@camp.com", token: "expired-token", expiresAt: new Date(Date.now() - 10_000) },
+      data: {
+        email: "owner@camp.com",
+        token: "expired-token",
+        expiresAt: new Date(Date.now() - 10_000),
+      },
     });
 
     const idempotency = buildIdempotency();
     const { service, close } = await createService(prisma, idempotency);
     try {
-      await expect(service.startSession({ token: "expired-token" })).rejects.toBeInstanceOf(UnauthorizedException);
+      await expect(service.startSession({ token: "expired-token" })).rejects.toBeInstanceOf(
+        UnauthorizedException,
+      );
     } finally {
       await close();
     }
@@ -175,14 +202,17 @@ describe("OnboardingService", () => {
         email: "owner@camp.com",
         token: "tok-abc",
         expiresAt: new Date(Date.now() + 3600_000),
-        organizationId: "org-1"
+        organizationId: "org-1",
       },
     });
     const idempotency = buildIdempotency({
       start: jest
         .fn()
         .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce({ status: IdempotencyStatus.succeeded, responseJson: { cached: true } }),
+        .mockResolvedValueOnce({
+          status: IdempotencyStatus.succeeded,
+          responseJson: { cached: true },
+        }),
     });
     const { service, close } = await createService(prisma, idempotency);
 
@@ -194,14 +224,14 @@ describe("OnboardingService", () => {
         invite.token,
         OnboardingStep.account_profile,
         { campgroundName: "Camp A", contactName: "Alex", contactEmail: "alex@camp.com" },
-        "idem-1"
+        "idem-1",
       );
       const second = await service.saveStep(
         session.id,
         invite.token,
         OnboardingStep.account_profile,
         { campgroundName: "Camp A", contactName: "Alex", contactEmail: "alex@camp.com" },
-        "idem-1"
+        "idem-1",
       );
 
       expect(second).toEqual({ cached: true });
@@ -217,7 +247,7 @@ describe("OnboardingService", () => {
         email: "owner@camp.com",
         token: "tok-bad",
         expiresAt: new Date(Date.now() + 3600_000),
-        organizationId: "org-1"
+        organizationId: "org-1",
       },
     });
     const idempotency = buildIdempotency();
@@ -227,7 +257,9 @@ describe("OnboardingService", () => {
       const { session } = await service.startSession({ token: invite.token });
 
       await expect(
-        service.saveStep(session.id, invite.token, OnboardingStep.account_profile, { contactName: "Missing email" })
+        service.saveStep(session.id, invite.token, OnboardingStep.account_profile, {
+          contactName: "Missing email",
+        }),
       ).rejects.toBeInstanceOf(BadRequestException);
     } finally {
       await close();

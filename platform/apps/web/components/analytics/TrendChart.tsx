@@ -36,7 +36,20 @@ const loadRecharts = async () => {
     ResponsiveContainer = rechartsModule.ResponsiveContainer;
     Legend = rechartsModule.Legend;
   }
-  return { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend };
+  return {
+    LineChart,
+    Line,
+    AreaChart,
+    Area,
+    BarChart,
+    Bar,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Legend,
+  };
 };
 
 interface TrendChartProps {
@@ -67,8 +80,7 @@ const formatCurrency = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value);
 
-const formatNumber = (value: number) =>
-  new Intl.NumberFormat("en-US").format(value);
+const formatNumber = (value: number) => new Intl.NumberFormat("en-US").format(value);
 
 export function TrendChart({
   title,
@@ -169,12 +181,25 @@ export function TrendChart({
         return (
           <AreaChartComponent {...commonProps}>
             {showGrid && <CartesianGridComponent strokeDasharray="3 3" stroke="#334155" />}
-            <XAxisComponent dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
+            <XAxisComponent
+              dataKey={xAxisKey}
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+            />
             <YAxisComponent
               tick={{ fill: "#94a3b8", fontSize: 12 }}
               stroke="#475569"
               tickFormatter={formatYAxis}
-              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+              label={
+                yAxisLabel
+                  ? {
+                      value: yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 },
+                    }
+                  : undefined
+              }
             />
             <TooltipComponent content={<CustomTooltip />} />
             {showLegend && <LegendComponent wrapperStyle={{ paddingTop: 10 }} />}
@@ -197,17 +222,36 @@ export function TrendChart({
         return (
           <BarChartComponent {...commonProps}>
             {showGrid && <CartesianGridComponent strokeDasharray="3 3" stroke="#334155" />}
-            <XAxisComponent dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
+            <XAxisComponent
+              dataKey={xAxisKey}
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+            />
             <YAxisComponent
               tick={{ fill: "#94a3b8", fontSize: 12 }}
               stroke="#475569"
               tickFormatter={formatYAxis}
-              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+              label={
+                yAxisLabel
+                  ? {
+                      value: yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 },
+                    }
+                  : undefined
+              }
             />
             <TooltipComponent content={<CustomTooltip />} />
             {showLegend && <LegendComponent wrapperStyle={{ paddingTop: 10 }} />}
             {dataKeys.map((dk) => (
-              <BarComponent key={dk.key} dataKey={dk.key} name={dk.name || dk.key} fill={dk.color} radius={[4, 4, 0, 0]} />
+              <BarComponent
+                key={dk.key}
+                dataKey={dk.key}
+                name={dk.name || dk.key}
+                fill={dk.color}
+                radius={[4, 4, 0, 0]}
+              />
             ))}
           </BarChartComponent>
         );
@@ -216,12 +260,25 @@ export function TrendChart({
         return (
           <LineChartComponent {...commonProps}>
             {showGrid && <CartesianGridComponent strokeDasharray="3 3" stroke="#334155" />}
-            <XAxisComponent dataKey={xAxisKey} tick={{ fill: "#94a3b8", fontSize: 12 }} stroke="#475569" />
+            <XAxisComponent
+              dataKey={xAxisKey}
+              tick={{ fill: "#94a3b8", fontSize: 12 }}
+              stroke="#475569"
+            />
             <YAxisComponent
               tick={{ fill: "#94a3b8", fontSize: 12 }}
               stroke="#475569"
               tickFormatter={formatYAxis}
-              label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 } } : undefined}
+              label={
+                yAxisLabel
+                  ? {
+                      value: yAxisLabel,
+                      angle: -90,
+                      position: "insideLeft",
+                      style: { textAnchor: "middle", fill: "#94a3b8", fontSize: 12 },
+                    }
+                  : undefined
+              }
             />
             <TooltipComponent content={<CustomTooltip />} />
             {showLegend && <LegendComponent wrapperStyle={{ paddingTop: 10 }} />}

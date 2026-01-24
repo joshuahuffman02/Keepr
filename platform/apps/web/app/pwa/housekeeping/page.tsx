@@ -40,8 +40,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const getString = (value: unknown): string | undefined =>
   typeof value === "string" ? value : undefined;
 
-const getBoolean = (value: unknown): boolean =>
-  typeof value === "boolean" ? value : false;
+const getBoolean = (value: unknown): boolean => (typeof value === "boolean" ? value : false);
 
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
@@ -199,11 +198,11 @@ export default function HousekeepingPwaPage() {
           ? {
               ...task,
               checklist: task.checklist.map((item) =>
-                item.id === itemId ? { ...item, completed } : item
+                item.id === itemId ? { ...item, completed } : item,
               ),
             }
-          : task
-      )
+          : task,
+      ),
     );
 
     if (selectedTask?.id === taskId) {
@@ -212,10 +211,10 @@ export default function HousekeepingPwaPage() {
           ? {
               ...prev,
               checklist: prev.checklist.map((item) =>
-                item.id === itemId ? { ...item, completed } : item
+                item.id === itemId ? { ...item, completed } : item,
               ),
             }
-          : null
+          : null,
       );
     }
 
@@ -241,9 +240,7 @@ export default function HousekeepingPwaPage() {
     if (!task) return;
 
     // Optimistic update
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, state: "done" } : t))
-    );
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, state: "done" } : t)));
     setSelectedTask(null);
 
     // Queue the update
@@ -266,9 +263,7 @@ export default function HousekeepingPwaPage() {
 
   const handleStartTask = async (taskId: string) => {
     // Optimistic update
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, state: "in_progress" } : t))
-    );
+    setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, state: "in_progress" } : t)));
 
     // Queue the update
     await queueOfflineAction({
@@ -289,7 +284,10 @@ export default function HousekeepingPwaPage() {
   };
 
   const statusBadge = (status: string) => {
-    const map: Record<string, { text: string; variant: "default" | "secondary" | "outline" | "destructive" }> = {
+    const map: Record<
+      string,
+      { text: string; variant: "default" | "secondary" | "outline" | "destructive" }
+    > = {
       pending: { text: "Pending", variant: "secondary" },
       in_progress: { text: "In Progress", variant: "default" },
       done: { text: "Done", variant: "outline" },
@@ -355,9 +353,7 @@ export default function HousekeepingPwaPage() {
         </div>
       </header>
 
-      {error && (
-        <div className="pwa-card p-3 text-sm text-red-100 border-red-500">{error}</div>
-      )}
+      {error && <div className="pwa-card p-3 text-sm text-red-100 border-red-500">{error}</div>}
 
       {selectedTask ? (
         <div className="pwa-card p-4 space-y-4">
@@ -418,9 +414,7 @@ export default function HousekeepingPwaPage() {
               <Button onClick={() => handleStartTask(selectedTask.id)}>Start Cleaning</Button>
             )}
             {selectedTask.state === "in_progress" && (
-              <Button onClick={() => handleCompleteTask(selectedTask.id)}>
-                Mark Complete
-              </Button>
+              <Button onClick={() => handleCompleteTask(selectedTask.id)}>Mark Complete</Button>
             )}
           </div>
         </div>
@@ -460,8 +454,8 @@ export default function HousekeepingPwaPage() {
                     </div>
                     {t.checklist.length > 0 && (
                       <div className="text-xs text-slate-500 mt-1">
-                        {t.checklist.filter((i) => i.completed).length}/{t.checklist.length}{" "}
-                        items done
+                        {t.checklist.filter((i) => i.completed).length}/{t.checklist.length} items
+                        done
                       </div>
                     )}
                   </div>
@@ -494,9 +488,7 @@ export default function HousekeepingPwaPage() {
                     >
                       <div>
                         <div className="text-sm font-medium">{s.siteName}</div>
-                        {s.zone && (
-                          <div className="text-xs text-slate-500">{s.zone}</div>
-                        )}
+                        {s.zone && <div className="text-xs text-slate-500">{s.zone}</div>}
                       </div>
                       {statusBadge(s.housekeepingStatus)}
                     </div>

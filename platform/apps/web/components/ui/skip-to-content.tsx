@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { cn } from "../../lib/utils"
+import * as React from "react";
+import { cn } from "../../lib/utils";
 
 /**
  * SkipToContent - WCAG 2.4.1 Bypass Blocks
@@ -19,10 +19,10 @@ export function SkipToContent() {
         "px-4 py-2 rounded-md",
         "font-semibold text-sm",
         "focus:outline-none focus:ring-4 focus:ring-action-primary focus:ring-offset-2",
-        "transition-all"
+        "transition-all",
       )}
     >
       Skip to main content
     </a>
-  )
+  );
 }

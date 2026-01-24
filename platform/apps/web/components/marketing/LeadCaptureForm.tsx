@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { FormEvent, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -71,11 +71,14 @@ export function LeadCaptureForm({
   return (
     <div className="bg-card rounded-2xl border border-border shadow-sm shadow-keepr-evergreen/10">
       <div className="border-b border-border p-6">
-        <div className="text-sm font-semibold text-keepr-evergreen">Lead capture (internal only)</div>
+        <div className="text-sm font-semibold text-keepr-evergreen">
+          Lead capture (internal only)
+        </div>
         <h3 className="text-xl font-bold text-foreground mt-1">{title}</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          We keep this in-app — no CRM calls are made. Leads are scoped per campground for easy routing with statuses
-          (new, contacted, qualified) visible in Admin &gt; Marketing &gt; Leads.
+          We keep this in-app — no CRM calls are made. Leads are scoped per campground for easy
+          routing with statuses (new, contacted, qualified) visible in Admin &gt; Marketing &gt;
+          Leads.
         </p>
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-4">

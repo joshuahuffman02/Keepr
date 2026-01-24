@@ -10,8 +10,27 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
-import { Trophy, Star, Car, Plus, Trash2, Download, ChevronDown, ChevronUp, Users, Crown, UserPlus, Merge } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import {
+  Trophy,
+  Star,
+  Car,
+  Plus,
+  Trash2,
+  Download,
+  ChevronDown,
+  ChevronUp,
+  Users,
+  Crown,
+  UserPlus,
+  Merge,
+} from "lucide-react";
 import { FilterChip } from "../../components/ui/filter-chip";
 import { StaggeredTableRow } from "../../components/ui/staggered-list";
 import { MergeGuestsDialog } from "../../components/guests/MergeGuestsDialog";
@@ -26,7 +45,7 @@ const TIER_COLORS: Record<string, string> = {
   Bronze: "bg-status-warning/80",
   Silver: "bg-muted-foreground",
   Gold: "bg-status-warning",
-  Platinum: "bg-foreground"
+  Platinum: "bg-foreground",
 };
 
 function GuestLoyaltyBadge({ guestId }: { guestId: string }) {
@@ -34,7 +53,7 @@ function GuestLoyaltyBadge({ guestId }: { guestId: string }) {
     queryKey: ["loyalty", guestId],
     queryFn: () => apiClient.getLoyaltyProfile(guestId),
     staleTime: 60000,
-    retry: false
+    retry: false,
   });
 
   if (!loyalty) return null;
@@ -54,13 +73,21 @@ function GuestLoyaltyBadge({ guestId }: { guestId: string }) {
 }
 
 // Full Rewards Section for Guest Detail
-function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string; expanded: boolean; onToggle: () => void }) {
+function GuestRewardsSection({
+  guestId,
+  expanded,
+  onToggle,
+}: {
+  guestId: string;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const { data: loyalty, isLoading } = useQuery({
     queryKey: ["loyalty", guestId],
     queryFn: () => apiClient.getLoyaltyProfile(guestId),
     staleTime: 60000,
     retry: false,
-    enabled: expanded
+    enabled: expanded,
   });
 
   return (
@@ -88,16 +115,25 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
               {/* Tier and Points */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className={cn("w-12 h-12 rounded-full flex items-center justify-center text-white", TIER_COLORS[loyalty.tier] || "bg-status-warning")}>
+                  <div
+                    className={cn(
+                      "w-12 h-12 rounded-full flex items-center justify-center text-white",
+                      TIER_COLORS[loyalty.tier] || "bg-status-warning",
+                    )}
+                  >
                     <Trophy className="h-6 w-6" />
                   </div>
                   <div>
                     <div className="text-lg font-bold text-foreground">{loyalty.tier} Member</div>
-                    <div className="text-sm text-muted-foreground">Member since {new Date(Date.now()).toLocaleDateString()}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Member since {new Date(Date.now()).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-status-success">{loyalty.pointsBalance.toLocaleString()}</div>
+                  <div className="text-2xl font-bold text-status-success">
+                    {loyalty.pointsBalance.toLocaleString()}
+                  </div>
                   <div className="text-xs text-muted-foreground">Points Balance</div>
                 </div>
               </div>
@@ -108,20 +144,25 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
                   <div className="flex justify-between text-xs text-muted-foreground mb-1">
                     <span>{loyalty.tier}</span>
                     <span>
-                      {loyalty.tier === "Bronze" ? "Silver (1,000 pts)" :
-                        loyalty.tier === "Silver" ? "Gold (5,000 pts)" :
-                          "Platinum (10,000 pts)"}
+                      {loyalty.tier === "Bronze"
+                        ? "Silver (1,000 pts)"
+                        : loyalty.tier === "Silver"
+                          ? "Gold (5,000 pts)"
+                          : "Platinum (10,000 pts)"}
                     </span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className="h-full bg-status-success transition-all"
                       style={{
-                        width: `${Math.min(100,
-                          loyalty.tier === "Bronze" ? (loyalty.pointsBalance / 1000) * 100 :
-                            loyalty.tier === "Silver" ? ((loyalty.pointsBalance - 1000) / 4000) * 100 :
-                              ((loyalty.pointsBalance - 5000) / 5000) * 100
-                        )}%`
+                        width: `${Math.min(
+                          100,
+                          loyalty.tier === "Bronze"
+                            ? (loyalty.pointsBalance / 1000) * 100
+                            : loyalty.tier === "Silver"
+                              ? ((loyalty.pointsBalance - 1000) / 4000) * 100
+                              : ((loyalty.pointsBalance - 5000) / 5000) * 100,
+                        )}%`,
                       }}
                     />
                   </div>
@@ -131,16 +172,29 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
               {/* Recent Transactions */}
               {loyalty.transactions && loyalty.transactions.length > 0 && (
                 <div className="mt-4">
-                  <h5 className="text-sm font-semibold text-muted-foreground mb-2">Recent Activity</h5>
+                  <h5 className="text-sm font-semibold text-muted-foreground mb-2">
+                    Recent Activity
+                  </h5>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {loyalty.transactions.slice(0, 10).map((tx) => (
-                      <div key={tx.id} className="flex items-center justify-between text-sm p-2 bg-card rounded border border-border">
+                      <div
+                        key={tx.id}
+                        className="flex items-center justify-between text-sm p-2 bg-card rounded border border-border"
+                      >
                         <div>
                           <div className="font-medium text-foreground">{tx.reason}</div>
-                          <div className="text-xs text-muted-foreground">{new Date(tx.createdAt).toLocaleDateString()}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(tx.createdAt).toLocaleDateString()}
+                          </div>
                         </div>
-                        <div className={cn("font-bold", tx.amount >= 0 ? "text-status-success" : "text-status-error")}>
-                          {tx.amount >= 0 ? "+" : ""}{tx.amount.toLocaleString()} pts
+                        <div
+                          className={cn(
+                            "font-bold",
+                            tx.amount >= 0 ? "text-status-success" : "text-status-error",
+                          )}
+                        >
+                          {tx.amount >= 0 ? "+" : ""}
+                          {tx.amount.toLocaleString()} pts
                         </div>
                       </div>
                     ))}
@@ -173,11 +227,19 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
   );
 }
 
-function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: string; expanded: boolean; onToggle: () => void }) {
+function GuestEquipmentSection({
+  guestId,
+  expanded,
+  onToggle,
+}: {
+  guestId: string;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
   const { data: equipment, isLoading } = useQuery({
     queryKey: ["guest-equipment", guestId],
     queryFn: () => apiClient.getGuestEquipment(guestId),
-    enabled: expanded
+    enabled: expanded,
   });
 
   const queryClient = useQueryClient();
@@ -188,30 +250,31 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
     model: "",
     length: "",
     plateNumber: "",
-    plateState: ""
+    plateState: "",
   });
 
   const createMutation = useMutation({
-    mutationFn: () => apiClient.createGuestEquipment(guestId, {
-      ...newEq,
-      length: newEq.length ? Number(newEq.length) : undefined,
-      make: newEq.make || undefined,
-      model: newEq.model || undefined,
-      plateNumber: newEq.plateNumber || undefined,
-      plateState: newEq.plateState || undefined
-    }),
+    mutationFn: () =>
+      apiClient.createGuestEquipment(guestId, {
+        ...newEq,
+        length: newEq.length ? Number(newEq.length) : undefined,
+        make: newEq.make || undefined,
+        model: newEq.model || undefined,
+        plateNumber: newEq.plateNumber || undefined,
+        plateState: newEq.plateState || undefined,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
       setIsAdding(false);
       setNewEq({ type: "rv", make: "", model: "", length: "", plateNumber: "", plateState: "" });
-    }
+    },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.deleteGuestEquipment(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guest-equipment", guestId] });
-    }
+    },
   });
 
   return (
@@ -237,13 +300,17 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
           ) : (
             <div className="space-y-3">
               {equipment?.map((eq) => (
-                <div key={eq.id} className="flex items-center justify-between bg-card p-3 rounded border border-border">
+                <div
+                  key={eq.id}
+                  className="flex items-center justify-between bg-card p-3 rounded border border-border"
+                >
                   <div>
                     <div className="font-medium text-foreground">
                       {eq.type.toUpperCase()} {eq.length ? `• ${eq.length}ft` : ""}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {eq.make} {eq.model} {eq.plateNumber ? `• ${eq.plateNumber} (${eq.plateState || "-"})` : ""}
+                      {eq.make} {eq.model}{" "}
+                      {eq.plateNumber ? `• ${eq.plateNumber} (${eq.plateState || "-"})` : ""}
                     </div>
                   </div>
                   <Button
@@ -271,7 +338,10 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
               {isAdding ? (
                 <div className="bg-card p-3 rounded border border-border space-y-3">
                   <div className="grid grid-cols-2 gap-2">
-                    <Select value={newEq.type} onValueChange={(value) => setNewEq({ ...newEq, type: value })}>
+                    <Select
+                      value={newEq.type}
+                      onValueChange={(value) => setNewEq({ ...newEq, type: value })}
+                    >
                       <SelectTrigger className="h-9" aria-label="Equipment type">
                         <SelectValue />
                       </SelectTrigger>
@@ -320,7 +390,11 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
                     />
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => createMutation.mutate()} disabled={createMutation.isPending}>
+                    <Button
+                      size="sm"
+                      onClick={() => createMutation.mutate()}
+                      disabled={createMutation.isPending}
+                    >
                       Save
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setIsAdding(false)}>
@@ -329,7 +403,12 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
                   </div>
                 </div>
               ) : (
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setIsAdding(true)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setIsAdding(true)}
+                >
                   <Plus className="h-4 w-4 mr-2" /> Add Equipment
                 </Button>
               )}
@@ -340,7 +419,6 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
     </div>
   );
 }
-
 
 import { useRouter } from "next/navigation";
 
@@ -389,7 +467,7 @@ export default function GuestsPage() {
     vip: false,
     leadSource: "",
     marketingOptIn: false,
-    repeatStays: ""
+    repeatStays: "",
   });
   const [expandedRewardsId, setExpandedRewardsId] = useState<string | null>(null);
   const [expandedEquipmentId, setExpandedEquipmentId] = useState<string | null>(null);
@@ -403,7 +481,16 @@ export default function GuestsPage() {
     // I'll try to fetch loyalty for all guests.
     const guests = guestsQuery.data;
     const csvRows = [];
-    csvRows.push(["First Name", "Last Name", "Email", "Phone", "Tier", "Points", "Total Stays", "Last Visit"]);
+    csvRows.push([
+      "First Name",
+      "Last Name",
+      "Email",
+      "Phone",
+      "Tier",
+      "Points",
+      "Total Stays",
+      "Last Visit",
+    ]);
 
     // Batch fetch loyalty profiles in a single API call
     const guestIds = guests.map((g) => g.id);
@@ -429,11 +516,11 @@ export default function GuestsPage() {
         g.tier,
         g.points,
         g.repeatStays || 0,
-        "N/A" // Last visit not easily available without more queries
+        "N/A", // Last visit not easily available without more queries
       ]);
     });
 
-    const csvContent = "data:text/csv;charset=utf-8," + csvRows.map(e => e.join(",")).join("\n");
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.map((e) => e.join(",")).join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -466,7 +553,7 @@ export default function GuestsPage() {
         vip: form.vip,
         leadSource: form.leadSource || undefined,
         marketingOptIn: form.marketingOptIn,
-        repeatStays: form.repeatStays ? Number(form.repeatStays) : undefined
+        repeatStays: form.repeatStays ? Number(form.repeatStays) : undefined,
       }),
     onSuccess: () => {
       setForm({
@@ -491,34 +578,40 @@ export default function GuestsPage() {
         vip: false,
         leadSource: "",
         marketingOptIn: false,
-        repeatStays: ""
+        repeatStays: "",
       });
       queryClient.invalidateQueries({ queryKey: ["guests"] });
     },
     onError: (err: unknown) => {
       toast({
         title: "Failed to save guest",
-        description: err instanceof Error ? err.message : "Please check required fields (name, valid email, phone).",
-        variant: "destructive"
+        description:
+          err instanceof Error
+            ? err.message
+            : "Please check required fields (name, valid email, phone).",
+        variant: "destructive",
       });
       console.error("Create guest failed", err);
-    }
+    },
   });
   const validateGuestForm = () => {
     const emailValid = /\S+@\S+\.\S+/.test(form.email.trim());
     const phoneDigits = form.phone.replace(/\D/g, "");
     const phoneValid = phoneDigits.length >= 7; // basic sanity
-    return emailValid && phoneValid && !!form.primaryFirstName.trim() && !!form.primaryLastName.trim();
+    return (
+      emailValid && phoneValid && !!form.primaryFirstName.trim() && !!form.primaryLastName.trim()
+    );
   };
   const updateGuest = useMutation({
-    mutationFn: (payload: { id: string; data: Partial<Guest> }) => apiClient.updateGuest(payload.id, payload.data),
+    mutationFn: (payload: { id: string; data: Partial<Guest> }) =>
+      apiClient.updateGuest(payload.id, payload.data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["guests"] });
-    }
+    },
   });
   const deleteGuest = useMutation({
     mutationFn: (id: string) => apiClient.deleteGuest(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["guests"] })
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["guests"] }),
   });
 
   const [sortBy, setSortBy] = useState<"name" | "email" | "phone" | "vip">("name");
@@ -526,7 +619,10 @@ export default function GuestsPage() {
   const [search, setSearch] = useState("");
   const [vipFilter, setVipFilter] = useState<"all" | "vip" | "regular">("all");
   const [showAddForm, setShowAddForm] = useState(false);
-  const [flash, setFlash] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+  const [flash, setFlash] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
   const [expandedGuestId, setExpandedGuestId] = useState<string | null>(null);
   const [selectedGuestIds, setSelectedGuestIds] = useState<Set<string>>(new Set());
   const [showMergeDialog, setShowMergeDialog] = useState(false);
@@ -631,16 +727,16 @@ export default function GuestsPage() {
         <Breadcrumbs items={[{ label: "Guests" }]} />
         <PageHeader
           eyebrow="Guests"
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted text-foreground">
                 <Users className="h-5 w-5" />
               </span>
               <span>Guest profiles</span>
             </span>
-          )}
+          }
           subtitle="Search, segment, and manage guest profiles."
-          actions={(
+          actions={
             <>
               <Button variant="secondary" onClick={handleExportCSV}>
                 <Download className="h-4 w-4 mr-2" />
@@ -655,7 +751,7 @@ export default function GuestsPage() {
                 {showAddForm ? "Hide form" : "Add guest"}
               </Button>
             </>
-          )}
+          }
         />
 
         {flash && (
@@ -700,7 +796,9 @@ export default function GuestsPage() {
               <div className="text-2xl font-semibold text-foreground flex items-center gap-2">
                 {vipGuests}
               </div>
-              <div className="text-xs text-muted-foreground">{totalGuests > 0 ? Math.round((vipGuests / totalGuests) * 100) : 0}% of total</div>
+              <div className="text-xs text-muted-foreground">
+                {totalGuests > 0 ? Math.round((vipGuests / totalGuests) * 100) : 0}% of total
+              </div>
             </CardContent>
           </Card>
           <Card className="border-border shadow-sm">
@@ -723,7 +821,9 @@ export default function GuestsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 space-y-1">
-              <div className="text-2xl font-semibold text-foreground">{filteredAndSortedGuests.length}</div>
+              <div className="text-2xl font-semibold text-foreground">
+                {filteredAndSortedGuests.length}
+              </div>
               <div className="text-xs text-muted-foreground">of {totalGuests} guests</div>
             </CardContent>
           </Card>
@@ -768,7 +868,9 @@ export default function GuestsPage() {
               <Select
                 value={vipFilter}
                 onValueChange={(value) =>
-                  setVipFilter(value === "vip" || value === "regular" || value === "all" ? value : "all")
+                  setVipFilter(
+                    value === "vip" || value === "regular" || value === "all" ? value : "all",
+                  )
                 }
               >
                 <SelectTrigger className="h-9 w-full sm:w-40" aria-label="VIP filter">
@@ -815,43 +917,43 @@ export default function GuestsPage() {
               </Button>
             </div>
 
-          {/* Active Filter Pills */}
-          {hasFilters && (
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60 mt-2">
-              <span className="text-xs text-muted-foreground font-medium">Active:</span>
-              {search.trim() && (
-                <FilterChip
-                  label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + '...' : search.trim()}"`}
-                  selected
-                  removable
-                  onRemove={() => setSearch("")}
-                  variant="subtle"
-                />
-              )}
-              {vipFilter !== "all" && (
-                <FilterChip
-                  label={`Status: ${vipFilter === "vip" ? "VIP only" : "Regular only"}`}
-                  selected
-                  removable
-                  onRemove={() => setVipFilter("all")}
-                  variant="subtle"
-                />
-              )}
-              {activeFilterCount > 1 && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-xs h-7 px-2"
-                  onClick={() => {
-                    setSearch("");
-                    setVipFilter("all");
-                  }}
-                >
-                  Clear all
-                </Button>
-              )}
-            </div>
-          )}
+            {/* Active Filter Pills */}
+            {hasFilters && (
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60 mt-2">
+                <span className="text-xs text-muted-foreground font-medium">Active:</span>
+                {search.trim() && (
+                  <FilterChip
+                    label={`Search: "${search.trim().length > 20 ? search.trim().slice(0, 20) + "..." : search.trim()}"`}
+                    selected
+                    removable
+                    onRemove={() => setSearch("")}
+                    variant="subtle"
+                  />
+                )}
+                {vipFilter !== "all" && (
+                  <FilterChip
+                    label={`Status: ${vipFilter === "vip" ? "VIP only" : "Regular only"}`}
+                    selected
+                    removable
+                    onRemove={() => setVipFilter("all")}
+                    variant="subtle"
+                  />
+                )}
+                {activeFilterCount > 1 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-xs h-7 px-2"
+                    onClick={() => {
+                      setSearch("");
+                      setVipFilter("all");
+                    }}
+                  >
+                    Clear all
+                  </Button>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -859,192 +961,194 @@ export default function GuestsPage() {
         {showAddForm && (
           <div id="guest-add-form" className="rounded-lg border border-border bg-card p-4">
             <h3 className="text-lg font-semibold text-foreground mb-3">Add new guest</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="First name"
-              value={form.primaryFirstName}
-              onChange={(e) => setForm((s) => ({ ...s, primaryFirstName: e.target.value }))}
-              aria-label="First name"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Last name"
-              value={form.primaryLastName}
-              onChange={(e) => setForm((s) => ({ ...s, primaryLastName: e.target.value }))}
-              aria-label="Last name"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
-              aria-label="Email"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Phone"
-              value={form.phone}
-              onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))}
-              aria-label="Phone"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Preferred contact (email/phone/sms)"
-              value={form.preferredContact}
-              onChange={(e) => setForm((s) => ({ ...s, preferredContact: e.target.value }))}
-              aria-label="Preferred contact method"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Preferred language"
-              value={form.preferredLanguage}
-              onChange={(e) => setForm((s) => ({ ...s, preferredLanguage: e.target.value }))}
-              aria-label="Preferred language"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Address 1"
-              value={form.address1}
-              onChange={(e) => setForm((s) => ({ ...s, address1: e.target.value }))}
-              aria-label="Address line 1"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Address 2"
-              value={form.address2}
-              onChange={(e) => setForm((s) => ({ ...s, address2: e.target.value }))}
-              aria-label="Address line 2"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="City"
-              value={form.city}
-              onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))}
-              aria-label="City"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="State/Province"
-              value={form.state}
-              onChange={(e) => setForm((s) => ({ ...s, state: e.target.value }))}
-              aria-label="State or province"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Postal code"
-              value={form.postalCode}
-              onChange={(e) => setForm((s) => ({ ...s, postalCode: e.target.value }))}
-              aria-label="Postal code"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Country"
-              value={form.country}
-              onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))}
-              aria-label="Country"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Rig type"
-              value={form.rigType}
-              onChange={(e) => setForm((s) => ({ ...s, rigType: e.target.value }))}
-              aria-label="Rig type"
-            />
-            <Input
-              type="number"
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Rig length (ft)"
-              value={form.rigLength}
-              onChange={(e) => setForm((s) => ({ ...s, rigLength: e.target.value }))}
-              aria-label="Rig length in feet"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Vehicle plate"
-              value={form.vehiclePlate}
-              onChange={(e) => setForm((s) => ({ ...s, vehiclePlate: e.target.value }))}
-              aria-label="Vehicle plate"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Vehicle state"
-              value={form.vehicleState}
-              onChange={(e) => setForm((s) => ({ ...s, vehicleState: e.target.value }))}
-              aria-label="Vehicle state"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2 md:col-span-2"
-              placeholder="Notes (optional)"
-              value={form.notes}
-              onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))}
-              aria-label="Notes"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Lead source"
-              value={form.leadSource}
-              onChange={(e) => setForm((s) => ({ ...s, leadSource: e.target.value }))}
-              aria-label="Lead source"
-            />
-            <Input
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Tags (comma separated)"
-              value={form.tags}
-              onChange={(e) => setForm((s) => ({ ...s, tags: e.target.value }))}
-              aria-label="Tags"
-            />
-            <Input
-              type="number"
-              className="rounded-md border border-border px-3 py-2"
-              placeholder="Repeat stays"
-              value={form.repeatStays}
-              onChange={(e) => setForm((s) => ({ ...s, repeatStays: e.target.value }))}
-              aria-label="Repeat stays"
-            />
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <Checkbox
-                checked={form.vip}
-                onCheckedChange={(checked) => setForm((s) => ({ ...s, vip: Boolean(checked) }))}
-                aria-label="VIP"
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="First name"
+                value={form.primaryFirstName}
+                onChange={(e) => setForm((s) => ({ ...s, primaryFirstName: e.target.value }))}
+                aria-label="First name"
               />
-              VIP
-            </label>
-            <label className="flex items-center gap-2 text-sm text-foreground">
-              <Checkbox
-                checked={form.marketingOptIn}
-                onCheckedChange={(checked) => setForm((s) => ({ ...s, marketingOptIn: Boolean(checked) }))}
-                aria-label="Marketing opt-in"
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Last name"
+                value={form.primaryLastName}
+                onChange={(e) => setForm((s) => ({ ...s, primaryLastName: e.target.value }))}
+                aria-label="Last name"
               />
-              Marketing opt-in
-            </label>
-          </div>
-          <div className="mt-3 flex gap-2">
-            <Button
-              disabled={createGuest.isPending || !validateGuestForm()}
-              onClick={() => {
-                if (!validateGuestForm()) {
-                  toast({
-                    title: "Missing or invalid info",
-                    description: "Enter first/last name, valid email, and phone (7+ digits).",
-                    variant: "destructive"
-                  });
-                  return;
-                }
-                createGuest.mutate();
-              }}
-            >
-              {createGuest.isPending ? "Saving..." : "Save guest"}
-            </Button>
-            <Button variant="ghost" onClick={() => setShowAddForm(false)}>
-              Cancel
-            </Button>
-            {createGuest.isError && (
-              <span role="alert" className="ml-3 text-sm text-status-error">
-                Failed to save guest
-              </span>
-            )}
-          </div>
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Email"
+                value={form.email}
+                onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
+                aria-label="Email"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Phone"
+                value={form.phone}
+                onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))}
+                aria-label="Phone"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Preferred contact (email/phone/sms)"
+                value={form.preferredContact}
+                onChange={(e) => setForm((s) => ({ ...s, preferredContact: e.target.value }))}
+                aria-label="Preferred contact method"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Preferred language"
+                value={form.preferredLanguage}
+                onChange={(e) => setForm((s) => ({ ...s, preferredLanguage: e.target.value }))}
+                aria-label="Preferred language"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Address 1"
+                value={form.address1}
+                onChange={(e) => setForm((s) => ({ ...s, address1: e.target.value }))}
+                aria-label="Address line 1"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Address 2"
+                value={form.address2}
+                onChange={(e) => setForm((s) => ({ ...s, address2: e.target.value }))}
+                aria-label="Address line 2"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="City"
+                value={form.city}
+                onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))}
+                aria-label="City"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="State/Province"
+                value={form.state}
+                onChange={(e) => setForm((s) => ({ ...s, state: e.target.value }))}
+                aria-label="State or province"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Postal code"
+                value={form.postalCode}
+                onChange={(e) => setForm((s) => ({ ...s, postalCode: e.target.value }))}
+                aria-label="Postal code"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Country"
+                value={form.country}
+                onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))}
+                aria-label="Country"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Rig type"
+                value={form.rigType}
+                onChange={(e) => setForm((s) => ({ ...s, rigType: e.target.value }))}
+                aria-label="Rig type"
+              />
+              <Input
+                type="number"
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Rig length (ft)"
+                value={form.rigLength}
+                onChange={(e) => setForm((s) => ({ ...s, rigLength: e.target.value }))}
+                aria-label="Rig length in feet"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Vehicle plate"
+                value={form.vehiclePlate}
+                onChange={(e) => setForm((s) => ({ ...s, vehiclePlate: e.target.value }))}
+                aria-label="Vehicle plate"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Vehicle state"
+                value={form.vehicleState}
+                onChange={(e) => setForm((s) => ({ ...s, vehicleState: e.target.value }))}
+                aria-label="Vehicle state"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2 md:col-span-2"
+                placeholder="Notes (optional)"
+                value={form.notes}
+                onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))}
+                aria-label="Notes"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Lead source"
+                value={form.leadSource}
+                onChange={(e) => setForm((s) => ({ ...s, leadSource: e.target.value }))}
+                aria-label="Lead source"
+              />
+              <Input
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Tags (comma separated)"
+                value={form.tags}
+                onChange={(e) => setForm((s) => ({ ...s, tags: e.target.value }))}
+                aria-label="Tags"
+              />
+              <Input
+                type="number"
+                className="rounded-md border border-border px-3 py-2"
+                placeholder="Repeat stays"
+                value={form.repeatStays}
+                onChange={(e) => setForm((s) => ({ ...s, repeatStays: e.target.value }))}
+                aria-label="Repeat stays"
+              />
+              <label className="flex items-center gap-2 text-sm text-foreground">
+                <Checkbox
+                  checked={form.vip}
+                  onCheckedChange={(checked) => setForm((s) => ({ ...s, vip: Boolean(checked) }))}
+                  aria-label="VIP"
+                />
+                VIP
+              </label>
+              <label className="flex items-center gap-2 text-sm text-foreground">
+                <Checkbox
+                  checked={form.marketingOptIn}
+                  onCheckedChange={(checked) =>
+                    setForm((s) => ({ ...s, marketingOptIn: Boolean(checked) }))
+                  }
+                  aria-label="Marketing opt-in"
+                />
+                Marketing opt-in
+              </label>
+            </div>
+            <div className="mt-3 flex gap-2">
+              <Button
+                disabled={createGuest.isPending || !validateGuestForm()}
+                onClick={() => {
+                  if (!validateGuestForm()) {
+                    toast({
+                      title: "Missing or invalid info",
+                      description: "Enter first/last name, valid email, and phone (7+ digits).",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  createGuest.mutate();
+                }}
+              >
+                {createGuest.isPending ? "Saving..." : "Save guest"}
+              </Button>
+              <Button variant="ghost" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </Button>
+              {createGuest.isError && (
+                <span role="alert" className="ml-3 text-sm text-status-error">
+                  Failed to save guest
+                </span>
+              )}
+            </div>
           </div>
         )}
 
@@ -1055,7 +1159,10 @@ export default function GuestsPage() {
               <tr>
                 <th className="px-3 py-2 w-10">
                   <Checkbox
-                    checked={selectedGuestIds.size === filteredAndSortedGuests.length && filteredAndSortedGuests.length > 0}
+                    checked={
+                      selectedGuestIds.size === filteredAndSortedGuests.length &&
+                      filteredAndSortedGuests.length > 0
+                    }
                     onCheckedChange={toggleSelectAll}
                     aria-label="Select all guests"
                   />
@@ -1091,148 +1198,195 @@ export default function GuestsPage() {
             <tbody className="divide-y">
               {filteredAndSortedGuests.map((g, index) => (
                 <Fragment key={g.id}>
-                <StaggeredTableRow index={index} className={cn("hover:bg-muted/60", selectedGuestIds.has(g.id) && "bg-status-success/10")}>
-                  <td className="px-3 py-2">
-                    <Checkbox
-                      checked={selectedGuestIds.has(g.id)}
-                      onCheckedChange={() => toggleGuestSelection(g.id)}
-                      aria-label={`Select ${g.primaryFirstName} ${g.primaryLastName}`}
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-foreground">
-                    <div className="font-medium">{g.primaryLastName}, {g.primaryFirstName}</div>
-                    {g.city && g.state && (
-                      <div className="text-xs text-muted-foreground">{g.city}, {g.state}</div>
+                  <StaggeredTableRow
+                    index={index}
+                    className={cn(
+                      "hover:bg-muted/60",
+                      selectedGuestIds.has(g.id) && "bg-status-success/10",
                     )}
-                  </td>
-                  <td className="px-3 py-2 text-foreground">{g.email}</td>
-                  <td className="px-3 py-2 text-foreground">{g.phone}</td>
-                  <td className="px-3 py-2">
-                    <div className="flex flex-wrap gap-1">
-                      {g.vip && (
-                        <span className="rounded-full border border-status-warning-border bg-status-warning-bg text-status-warning-text px-2 py-0.5 text-xs font-medium flex items-center gap-1">
-                          <Crown className="h-3 w-3" /> VIP
-                        </span>
-                      )}
-                      {g.marketingOptIn && (
-                        <span className="rounded-full border border-status-success-border bg-status-success-bg text-status-success-text px-2 py-0.5 text-xs">
-                          Opt-in
-                        </span>
-                      )}
-                      {!g.vip && !g.marketingOptIn && (
-                        <span className="text-muted-foreground text-xs">—</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-3 py-2">
-                    <GuestLoyaltyBadge guestId={g.id} />
-                  </td>
-                  <td className="px-3 py-2">
-                    <div className="flex flex-wrap gap-2">
-                      <Button size="sm" variant="outline" onClick={() => router.push(`/guests/${g.id}`)}>
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setExpandedGuestId(expandedGuestId === g.id ? null : g.id)}
-                        aria-expanded={expandedGuestId === g.id}
-                        aria-controls={`guest-details-${g.id}`}
-                      >
-                        {expandedGuestId === g.id ? "Hide" : "Expand"}
-                      </Button>
-                      <ConfirmDialog
-                        trigger={
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="text-status-error hover:text-status-error hover:bg-status-error/10"
-                            disabled={deleteGuest.isPending}
-                            aria-label={`Delete ${g.primaryFirstName} ${g.primaryLastName}`}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        }
-                        title="Delete guest?"
-                        description="This will permanently remove this guest and their history. This action cannot be undone."
-                        confirmLabel="Delete"
-                        variant="destructive"
-                        onConfirm={() => deleteGuest.mutate(g.id)}
-                        isPending={deleteGuest.isPending}
+                  >
+                    <td className="px-3 py-2">
+                      <Checkbox
+                        checked={selectedGuestIds.has(g.id)}
+                        onCheckedChange={() => toggleGuestSelection(g.id)}
+                        aria-label={`Select ${g.primaryFirstName} ${g.primaryLastName}`}
                       />
-                    </div>
-                  </td>
-                </StaggeredTableRow>
-                {/* Expanded row for additional details */}
-                {expandedGuestId === g.id && (
-                  <tr id={`guest-details-${g.id}`} className="bg-muted">
-                    <td colSpan={7} className="px-3 py-4">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Contact Info</h4>
-                          <div className="text-sm space-y-1">
-                            {g.preferredContact && (
-                              <div><span className="text-muted-foreground">Preferred:</span> {g.preferredContact}</div>
-                            )}
-                            {g.preferredLanguage && (
-                              <div><span className="text-muted-foreground">Language:</span> {g.preferredLanguage}</div>
-                            )}
-                            {g.address1 && (
-                              <div className="text-muted-foreground">
-                                {g.address1}
-                                {g.address2 && <>, {g.address2}</>}
-                                {g.city && <>, {g.city}</>}
-                                {g.state && <>, {g.state}</>}
-                                {g.postalCode && <> {g.postalCode}</>}
-                              </div>
-                            )}
-                          </div>
+                    </td>
+                    <td className="px-3 py-2 text-foreground">
+                      <div className="font-medium">
+                        {g.primaryLastName}, {g.primaryFirstName}
+                      </div>
+                      {g.city && g.state && (
+                        <div className="text-xs text-muted-foreground">
+                          {g.city}, {g.state}
                         </div>
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Equipment</h4>
-                          <div className="text-sm space-y-1">
-                            {g.rigType && (
-                              <div><span className="text-muted-foreground">Rig:</span> {g.rigType} {g.rigLength ? `• ${g.rigLength}ft` : ""}</div>
-                            )}
-                            {g.vehiclePlate && (
-                              <div><span className="text-muted-foreground">Vehicle:</span> {g.vehiclePlate} {g.vehicleState ? `(${g.vehicleState})` : ""}</div>
-                            )}
-                            {!g.rigType && !g.vehiclePlate && (
-                              <div className="text-muted-foreground">No equipment on file</div>
-                            )}
-                          </div>
-                          <GuestEquipmentSection
-                            guestId={g.id}
-                            expanded={expandedEquipmentId === g.id}
-                            onToggle={() => setExpandedEquipmentId(expandedEquipmentId === g.id ? null : g.id)}
-                          />
-                        </div>
-                        <div>
-                          <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">Other Info</h4>
-                          <div className="text-sm space-y-1">
-                            {g.leadSource && (
-                              <div><span className="text-muted-foreground">Source:</span> {g.leadSource}</div>
-                            )}
-                            {g.tags && (g.tags?.length ?? 0) > 0 && (
-                              <div><span className="text-muted-foreground">Tags:</span> {g.tags?.join(", ")}</div>
-                            )}
-                            {g.repeatStays && (g.repeatStays ?? 0) > 0 && (
-                              <div><span className="text-muted-foreground">Repeat stays:</span> {g.repeatStays}</div>
-                            )}
-                            {g.notes && (
-                              <div><span className="text-muted-foreground">Notes:</span> {g.notes}</div>
-                            )}
-                          </div>
-                          <GuestRewardsSection
-                            guestId={g.id}
-                            expanded={expandedRewardsId === g.id}
-                            onToggle={() => setExpandedRewardsId(expandedRewardsId === g.id ? null : g.id)}
-                          />
-                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 text-foreground">{g.email}</td>
+                    <td className="px-3 py-2 text-foreground">{g.phone}</td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-wrap gap-1">
+                        {g.vip && (
+                          <span className="rounded-full border border-status-warning-border bg-status-warning-bg text-status-warning-text px-2 py-0.5 text-xs font-medium flex items-center gap-1">
+                            <Crown className="h-3 w-3" /> VIP
+                          </span>
+                        )}
+                        {g.marketingOptIn && (
+                          <span className="rounded-full border border-status-success-border bg-status-success-bg text-status-success-text px-2 py-0.5 text-xs">
+                            Opt-in
+                          </span>
+                        )}
+                        {!g.vip && !g.marketingOptIn && (
+                          <span className="text-muted-foreground text-xs">—</span>
+                        )}
                       </div>
                     </td>
-                  </tr>
-                )}
+                    <td className="px-3 py-2">
+                      <GuestLoyaltyBadge guestId={g.id} />
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => router.push(`/guests/${g.id}`)}
+                        >
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setExpandedGuestId(expandedGuestId === g.id ? null : g.id)}
+                          aria-expanded={expandedGuestId === g.id}
+                          aria-controls={`guest-details-${g.id}`}
+                        >
+                          {expandedGuestId === g.id ? "Hide" : "Expand"}
+                        </Button>
+                        <ConfirmDialog
+                          trigger={
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-status-error hover:text-status-error hover:bg-status-error/10"
+                              disabled={deleteGuest.isPending}
+                              aria-label={`Delete ${g.primaryFirstName} ${g.primaryLastName}`}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          }
+                          title="Delete guest?"
+                          description="This will permanently remove this guest and their history. This action cannot be undone."
+                          confirmLabel="Delete"
+                          variant="destructive"
+                          onConfirm={() => deleteGuest.mutate(g.id)}
+                          isPending={deleteGuest.isPending}
+                        />
+                      </div>
+                    </td>
+                  </StaggeredTableRow>
+                  {/* Expanded row for additional details */}
+                  {expandedGuestId === g.id && (
+                    <tr id={`guest-details-${g.id}`} className="bg-muted">
+                      <td colSpan={7} className="px-3 py-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                              Contact Info
+                            </h4>
+                            <div className="text-sm space-y-1">
+                              {g.preferredContact && (
+                                <div>
+                                  <span className="text-muted-foreground">Preferred:</span>{" "}
+                                  {g.preferredContact}
+                                </div>
+                              )}
+                              {g.preferredLanguage && (
+                                <div>
+                                  <span className="text-muted-foreground">Language:</span>{" "}
+                                  {g.preferredLanguage}
+                                </div>
+                              )}
+                              {g.address1 && (
+                                <div className="text-muted-foreground">
+                                  {g.address1}
+                                  {g.address2 && <>, {g.address2}</>}
+                                  {g.city && <>, {g.city}</>}
+                                  {g.state && <>, {g.state}</>}
+                                  {g.postalCode && <> {g.postalCode}</>}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                              Equipment
+                            </h4>
+                            <div className="text-sm space-y-1">
+                              {g.rigType && (
+                                <div>
+                                  <span className="text-muted-foreground">Rig:</span> {g.rigType}{" "}
+                                  {g.rigLength ? `• ${g.rigLength}ft` : ""}
+                                </div>
+                              )}
+                              {g.vehiclePlate && (
+                                <div>
+                                  <span className="text-muted-foreground">Vehicle:</span>{" "}
+                                  {g.vehiclePlate} {g.vehicleState ? `(${g.vehicleState})` : ""}
+                                </div>
+                              )}
+                              {!g.rigType && !g.vehiclePlate && (
+                                <div className="text-muted-foreground">No equipment on file</div>
+                              )}
+                            </div>
+                            <GuestEquipmentSection
+                              guestId={g.id}
+                              expanded={expandedEquipmentId === g.id}
+                              onToggle={() =>
+                                setExpandedEquipmentId(expandedEquipmentId === g.id ? null : g.id)
+                              }
+                            />
+                          </div>
+                          <div>
+                            <h4 className="text-xs font-semibold text-muted-foreground uppercase mb-2">
+                              Other Info
+                            </h4>
+                            <div className="text-sm space-y-1">
+                              {g.leadSource && (
+                                <div>
+                                  <span className="text-muted-foreground">Source:</span>{" "}
+                                  {g.leadSource}
+                                </div>
+                              )}
+                              {g.tags && (g.tags?.length ?? 0) > 0 && (
+                                <div>
+                                  <span className="text-muted-foreground">Tags:</span>{" "}
+                                  {g.tags?.join(", ")}
+                                </div>
+                              )}
+                              {g.repeatStays && (g.repeatStays ?? 0) > 0 && (
+                                <div>
+                                  <span className="text-muted-foreground">Repeat stays:</span>{" "}
+                                  {g.repeatStays}
+                                </div>
+                              )}
+                              {g.notes && (
+                                <div>
+                                  <span className="text-muted-foreground">Notes:</span> {g.notes}
+                                </div>
+                              )}
+                            </div>
+                            <GuestRewardsSection
+                              guestId={g.id}
+                              expanded={expandedRewardsId === g.id}
+                              onToggle={() =>
+                                setExpandedRewardsId(expandedRewardsId === g.id ? null : g.id)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </Fragment>
               ))}
               {guestsQuery.isLoading && (
@@ -1240,7 +1394,10 @@ export default function GuestsPage() {
                   <td colSpan={7} className="px-4 py-8">
                     <div className="space-y-3">
                       {[...Array(3)].map((_, i) => (
-                        <div key={i} className="animate-pulse flex items-center gap-4 p-3 bg-muted/60 rounded">
+                        <div
+                          key={i}
+                          className="animate-pulse flex items-center gap-4 p-3 bg-muted/60 rounded"
+                        >
                           <div className="w-10 h-10 bg-muted rounded-full" />
                           <div className="flex-1 space-y-2">
                             <div className="h-4 bg-muted rounded w-48" />
@@ -1305,10 +1462,7 @@ export default function GuestsPage() {
                         </Button>
                       ) : (
                         <div className="flex gap-2 mt-2">
-                          <Button
-                            onClick={() => setShowAddForm(true)}
-                            className="gap-2"
-                          >
+                          <Button onClick={() => setShowAddForm(true)} className="gap-2">
                             <UserPlus className="h-4 w-4" />
                             Add Your First Guest
                           </Button>

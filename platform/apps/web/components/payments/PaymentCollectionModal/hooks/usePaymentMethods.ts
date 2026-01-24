@@ -35,7 +35,8 @@ export function usePaymentMethods(): UsePaymentMethodsResult {
     if (!config) return [];
 
     // Folio is disabled when paying for a reservation balance (circular logic)
-    const isReservationPayment = props.subject?.type === "reservation" || props.subject?.type === "balance";
+    const isReservationPayment =
+      props.subject?.type === "reservation" || props.subject?.type === "balance";
 
     return getAvailablePaymentMethods(props.context, config, {
       hasGuest: !!props.guestId,
@@ -45,7 +46,16 @@ export function usePaymentMethods(): UsePaymentMethodsResult {
       hasTerminalReaders: terminalReaders.some((r) => r.status === "online"),
       isReservationPayment,
     });
-  }, [config, props.context, props.guestId, props.subject, isOnline, savedCards.length, walletBalanceCents, terminalReaders]);
+  }, [
+    config,
+    props.context,
+    props.guestId,
+    props.subject,
+    isOnline,
+    savedCards.length,
+    walletBalanceCents,
+    terminalReaders,
+  ]);
 
   const isMethodAvailable = useMemo(() => {
     return (method: PaymentMethodType) => availableMethods.includes(method);
@@ -93,7 +103,7 @@ export function getMethodPriority(context: PaymentContext): PaymentMethodType[] 
  */
 export function sortMethodsByPriority(
   methods: PaymentMethodType[],
-  context: PaymentContext
+  context: PaymentContext,
 ): PaymentMethodType[] {
   const priority = getMethodPriority(context);
 

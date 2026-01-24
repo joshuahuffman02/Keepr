@@ -80,11 +80,23 @@ export class GuestImportService {
 
   // Target fields with their aliases for auto-mapping
   static readonly targetFields = [
-    { name: "firstName", aliases: ["first_name", "fname", "first", "given_name", "primary_first_name"] },
-    { name: "lastName", aliases: ["last_name", "lname", "last", "surname", "family_name", "primary_last_name"] },
+    {
+      name: "firstName",
+      aliases: ["first_name", "fname", "first", "given_name", "primary_first_name"],
+    },
+    {
+      name: "lastName",
+      aliases: ["last_name", "lname", "last", "surname", "family_name", "primary_last_name"],
+    },
     { name: "email", aliases: ["email_address", "e_mail", "emailaddress", "contact_email"] },
-    { name: "phone", aliases: ["phone_number", "telephone", "mobile", "cell", "primary_phone", "contact_phone"] },
-    { name: "address1", aliases: ["address", "street_address", "street", "address_line_1", "address_1"] },
+    {
+      name: "phone",
+      aliases: ["phone_number", "telephone", "mobile", "cell", "primary_phone", "contact_phone"],
+    },
+    {
+      name: "address1",
+      aliases: ["address", "street_address", "street", "address_line_1", "address_1"],
+    },
     { name: "address2", aliases: ["address_line_2", "apt", "suite", "unit", "address_2"] },
     { name: "city", aliases: ["town", "municipality"] },
     { name: "state", aliases: ["province", "region", "state_province"] },
@@ -101,7 +113,7 @@ export class GuestImportService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly csvParser: CsvParserService
+    private readonly csvParser: CsvParserService,
   ) {}
 
   /**
@@ -117,7 +129,7 @@ export class GuestImportService {
   async previewImport(
     campgroundId: string,
     csvContent: string,
-    fieldMappings: FieldMapping[]
+    fieldMappings: FieldMapping[],
   ): Promise<GuestImportPreview> {
     // Verify campground exists
     const campground = await this.prisma.campground.findUnique({
@@ -157,9 +169,7 @@ export class GuestImportService {
       select: { id: true, email: true, emailNormalized: true },
     });
 
-    const existingGuestMap = new Map(
-      existingGuests.map((g) => [g.emailNormalized, g])
-    );
+    const existingGuestMap = new Map(existingGuests.map((g) => [g.emailNormalized, g]));
 
     const errors: Array<{ row: number; message: string }> = [];
     const warnings: Array<{ row: number; message: string }> = [];
@@ -275,7 +285,7 @@ export class GuestImportService {
     campgroundId: string,
     csvContent: string,
     fieldMappings: FieldMapping[],
-    options: { updateExisting?: boolean; skipDuplicates?: boolean } = {}
+    options: { updateExisting?: boolean; skipDuplicates?: boolean } = {},
   ): Promise<GuestImportResult> {
     const preview = await this.previewImport(campgroundId, csvContent, fieldMappings);
 
@@ -343,7 +353,7 @@ export class GuestImportService {
     }
 
     this.logger.log(
-      `Guest import complete: ${created} created, ${updated} updated, ${skipped} skipped`
+      `Guest import complete: ${created} created, ${updated} updated, ${skipped} skipped`,
     );
 
     return {
@@ -386,9 +396,63 @@ export class GuestImportService {
   generateExampleCSV(): string {
     const headers = this.getTemplateHeaders();
     const exampleRows = [
-      ["John", "Smith", "john.smith@email.com", "555-123-4567", "123 Main St", "Apt 1", "Denver", "CO", "80202", "US", "Class A", "35", "ABC123", "CO", "Regular guest", "false", "repeat,family"],
-      ["Jane", "Doe", "jane.doe@email.com", "555-987-6543", "456 Oak Ave", "", "Boulder", "CO", "80301", "US", "Fifth Wheel", "28", "XYZ789", "TX", "", "true", "vip,snowbird"],
-      ["Bob", "Johnson", "bob.j@email.com", "555-555-5555", "789 Pine Rd", "", "Fort Collins", "CO", "80521", "US", "Travel Trailer", "22", "", "", "First time camper", "false", ""],
+      [
+        "John",
+        "Smith",
+        "john.smith@email.com",
+        "555-123-4567",
+        "123 Main St",
+        "Apt 1",
+        "Denver",
+        "CO",
+        "80202",
+        "US",
+        "Class A",
+        "35",
+        "ABC123",
+        "CO",
+        "Regular guest",
+        "false",
+        "repeat,family",
+      ],
+      [
+        "Jane",
+        "Doe",
+        "jane.doe@email.com",
+        "555-987-6543",
+        "456 Oak Ave",
+        "",
+        "Boulder",
+        "CO",
+        "80301",
+        "US",
+        "Fifth Wheel",
+        "28",
+        "XYZ789",
+        "TX",
+        "",
+        "true",
+        "vip,snowbird",
+      ],
+      [
+        "Bob",
+        "Johnson",
+        "bob.j@email.com",
+        "555-555-5555",
+        "789 Pine Rd",
+        "",
+        "Fort Collins",
+        "CO",
+        "80521",
+        "US",
+        "Travel Trailer",
+        "22",
+        "",
+        "",
+        "First time camper",
+        "false",
+        "",
+      ],
     ];
 
     return [headers.join(","), ...exampleRows.map((r) => r.join(","))].join("\n");

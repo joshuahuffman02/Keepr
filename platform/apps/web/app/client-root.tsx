@@ -15,7 +15,7 @@ import { EasterEggsProvider } from "@/contexts/EasterEggsContext";
 // Dynamically import FloatingTicketWidget to avoid hydration issues with useQuery
 const FloatingTicketWidget = dynamic(
   () => import("@/components/support/FloatingTicketWidget").then((mod) => mod.FloatingTicketWidget),
-  { ssr: false }
+  { ssr: false },
 );
 
 declare global {
@@ -44,10 +44,10 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     "/pricing",
     "/campground-management-software",
     "/rv-park-reservation-system",
-    "/switch-from-campspot"
+    "/switch-from-campspot",
   ];
   const shouldHideTicketWidget = hideTicketWidgetPaths.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
   );
 
   // Prompt reload when the service worker broadcasts activation.

@@ -113,11 +113,7 @@ function getAmenityIcon(amenity: string) {
   return iconMap[amenity.toLowerCase()] || <CheckCircle2 className="h-5 w-5" />;
 }
 
-export default async function CampgroundPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function CampgroundPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const campground = await getCampground(slug);
 
@@ -194,9 +190,7 @@ export default async function CampgroundPage({
               </div>
             )}
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              {campground.name}
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{campground.name}</h1>
 
             {(campground.city || campground.state) && (
               <p className="flex items-center gap-2 text-xl text-white/80 mb-6">
@@ -210,9 +204,7 @@ export default async function CampgroundPage({
                 <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 <span className="font-semibold">{campground.rating.toFixed(1)}</span>
                 {campground.reviewCount && (
-                  <span className="text-white/60">
-                    ({campground.reviewCount} reviews)
-                  </span>
+                  <span className="text-white/60">({campground.reviewCount} reviews)</span>
                 )}
               </div>
             )}
@@ -220,33 +212,21 @@ export default async function CampgroundPage({
             {/* CTA Buttons */}
             <div className="flex flex-wrap gap-4">
               {campground.isBookable ? (
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-emerald-600 hover:bg-emerald-500"
-                >
+                <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-500">
                   <Link href={`/booking/${campground.slug}`}>
                     <Calendar className="mr-2 h-5 w-5" />
                     Check Availability
                   </Link>
                 </Button>
               ) : campground.isClaimable ? (
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-emerald-600 hover:bg-emerald-500"
-                >
+                <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-500">
                   <Link href={`/claim/${campground.slug}`}>
                     <Shield className="mr-2 h-5 w-5" />
                     Claim This Listing
                   </Link>
                 </Button>
               ) : (
-                <Button
-                  asChild
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-500"
-                >
+                <Button asChild size="lg" className="bg-blue-600 hover:bg-blue-500">
                   <Link href="/signup">
                     <Users className="mr-2 h-5 w-5" />
                     Get Notified When Available
@@ -261,11 +241,7 @@ export default async function CampgroundPage({
                   variant="outline"
                   className="border-white/30 text-white hover:bg-white/10"
                 >
-                  <a
-                    href={campground.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <a href={campground.website} target="_blank" rel="noopener noreferrer">
                     <Globe className="mr-2 h-5 w-5" />
                     Visit Website
                   </a>
@@ -288,18 +264,14 @@ export default async function CampgroundPage({
                   <h2 className="text-2xl font-bold text-slate-900 mb-4">
                     About {campground.name}
                   </h2>
-                  <p className="text-slate-600 leading-relaxed">
-                    {campground.description}
-                  </p>
+                  <p className="text-slate-600 leading-relaxed">{campground.description}</p>
                 </div>
               )}
 
               {/* Site Types */}
               {campground.siteTypes.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                    Accommodation Types
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Accommodation Types</h2>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {campground.siteTypes.map((type) => (
                       <div
@@ -317,18 +289,14 @@ export default async function CampgroundPage({
               {/* Amenities */}
               {campground.amenities.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                    Amenities
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Amenities</h2>
                   <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {campground.amenities.map((amenity) => (
                       <div
                         key={amenity}
                         className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg"
                       >
-                        <span className="text-emerald-600">
-                          {getAmenityIcon(amenity)}
-                        </span>
+                        <span className="text-emerald-600">{getAmenityIcon(amenity)}</span>
                         <span className="text-slate-700">{amenity}</span>
                       </div>
                     ))}
@@ -339,9 +307,7 @@ export default async function CampgroundPage({
               {/* Nearby Attractions */}
               {campground.nearbyAttractions.length > 0 && (
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-900 mb-4">
-                    Nearby Attractions
-                  </h2>
+                  <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby Attractions</h2>
                   <div className="space-y-3">
                     {campground.nearbyAttractions.map((attraction) => (
                       <Link
@@ -352,9 +318,7 @@ export default async function CampgroundPage({
                         <div className="flex items-center gap-3">
                           <Mountain className="h-5 w-5 text-emerald-600" />
                           <div>
-                            <div className="font-medium text-slate-900">
-                              {attraction.name}
-                            </div>
+                            <div className="font-medium text-slate-900">{attraction.name}</div>
                             <div className="text-sm text-slate-500">
                               {attraction.type.replace(/_/g, " ")}
                             </div>
@@ -375,9 +339,7 @@ export default async function CampgroundPage({
             <div className="space-y-6">
               {/* Contact Card */}
               <div className="bg-slate-50 rounded-xl p-6">
-                <h3 className="text-lg font-bold text-slate-900 mb-4">
-                  Contact Information
-                </h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-4">Contact Information</h3>
                 <div className="space-y-4">
                   {campground.address && (
                     <div className="flex items-start gap-3">
@@ -419,9 +381,7 @@ export default async function CampgroundPage({
               {/* Price Range Card */}
               {campground.priceRange && (
                 <div className="bg-emerald-50 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">
-                    Price Range
-                  </h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Price Range</h3>
                   <div className="text-2xl font-bold text-emerald-600">
                     ${(campground.priceRange.min / 100).toFixed(0)} - $
                     {(campground.priceRange.max / 100).toFixed(0)}
@@ -433,12 +393,10 @@ export default async function CampgroundPage({
               {/* Claim CTA for Unclaimed */}
               {campground.claimStatus === "unclaimed" && (
                 <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">
-                    Own this campground?
-                  </h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Own this campground?</h3>
                   <p className="text-slate-600 text-sm mb-4">
-                    Claim your listing to manage reservations, update your profile,
-                    and attract more campers.
+                    Claim your listing to manage reservations, update your profile, and attract more
+                    campers.
                   </p>
                   <Button asChild className="w-full bg-amber-600 hover:bg-amber-500">
                     <Link href={`/claim/${campground.slug}`}>
@@ -452,9 +410,7 @@ export default async function CampgroundPage({
               {/* Total Sites */}
               {campground.totalSites && (
                 <div className="bg-slate-50 rounded-xl p-6">
-                  <div className="text-3xl font-bold text-slate-900">
-                    {campground.totalSites}
-                  </div>
+                  <div className="text-3xl font-bold text-slate-900">{campground.totalSites}</div>
                   <div className="text-slate-500">Total Sites</div>
                 </div>
               )}
@@ -492,9 +448,7 @@ export default async function CampgroundPage({
       {campground.state && (
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">
-              Explore More Campgrounds
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Explore More Campgrounds</h2>
             <div className="flex flex-wrap gap-4">
               <Link
                 href={`/camping/${campground.state.toLowerCase().replace(/\s+/g, "-")}`}

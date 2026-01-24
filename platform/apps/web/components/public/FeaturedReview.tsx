@@ -25,7 +25,9 @@ function StarRating({ rating }: { rating: number }) {
           key={star}
           className={cn(
             "h-4 w-4",
-            star <= rating ? "fill-keepr-clay text-keepr-clay" : "fill-keepr-charcoal/10 text-keepr-charcoal/30"
+            star <= rating
+              ? "fill-keepr-clay text-keepr-clay"
+              : "fill-keepr-charcoal/10 text-keepr-charcoal/30",
           )}
         />
       ))}
@@ -33,14 +35,9 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export function FeaturedReview({
-  review,
-  className,
-  variant = "light",
-}: FeaturedReviewProps) {
-  const truncatedComment = review.comment.length > 150
-    ? review.comment.slice(0, 150) + "..."
-    : review.comment;
+export function FeaturedReview({ review, className, variant = "light" }: FeaturedReviewProps) {
+  const truncatedComment =
+    review.comment.length > 150 ? review.comment.slice(0, 150) + "..." : review.comment;
 
   return (
     <div
@@ -49,7 +46,7 @@ export function FeaturedReview({
         variant === "light" && "bg-card shadow-lg border border-border",
         variant === "dark" && "bg-muted border border-border",
         variant === "glass" && "bg-card/10 backdrop-blur-sm border border-white/20",
-        className
+        className,
       )}
     >
       {/* Rating */}
@@ -61,7 +58,7 @@ export function FeaturedReview({
               "inline-flex items-center gap-1 text-xs font-medium",
               variant === "light" && "text-keepr-evergreen",
               variant === "dark" && "text-keepr-evergreen",
-              variant === "glass" && "text-keepr-clay-light"
+              variant === "glass" && "text-keepr-clay-light",
             )}
           >
             <CheckCircle2 className="h-3 w-3" />
@@ -76,7 +73,7 @@ export function FeaturedReview({
           "text-sm mb-3",
           variant === "light" && "text-foreground",
           variant === "dark" && "text-muted-foreground",
-          variant === "glass" && "text-white"
+          variant === "glass" && "text-white",
         )}
       >
         "{truncatedComment}"
@@ -90,7 +87,7 @@ export function FeaturedReview({
             "w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold",
             variant === "light" && "bg-keepr-evergreen/15 text-keepr-evergreen",
             variant === "dark" && "bg-keepr-evergreen/15 text-keepr-evergreen",
-            variant === "glass" && "bg-card/20 text-keepr-clay-light"
+            variant === "glass" && "bg-card/20 text-keepr-clay-light",
           )}
         >
           {review.guestName
@@ -106,7 +103,7 @@ export function FeaturedReview({
               "text-sm font-medium",
               variant === "light" && "text-foreground",
               variant === "dark" && "text-white",
-              variant === "glass" && "text-white"
+              variant === "glass" && "text-white",
             )}
           >
             {review.guestName}
@@ -117,7 +114,7 @@ export function FeaturedReview({
                 "text-xs",
                 variant === "light" && "text-muted-foreground",
                 variant === "dark" && "text-muted-foreground",
-                variant === "glass" && "text-white/70"
+                variant === "glass" && "text-white/70",
               )}
             >
               {[review.guestLocation, review.stayDate].filter(Boolean).join(" • ")}

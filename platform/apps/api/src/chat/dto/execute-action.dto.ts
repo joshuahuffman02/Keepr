@@ -1,5 +1,5 @@
-import { IsString, IsUUID, IsObject, IsOptional, MaxLength } from 'class-validator';
-import { z } from 'zod';
+import { IsString, IsUUID, IsObject, IsOptional, MaxLength } from "class-validator";
+import { z } from "zod";
 
 // Zod schema for validation
 export const executeActionSchema = z.object({
@@ -42,7 +42,7 @@ export interface ExecuteActionResponse {
   result?: unknown;
   error?: string;
   nextAction?: {
-    type: 'confirmation' | 'form' | 'selection';
+    type: "confirmation" | "form" | "selection";
     actionId: string;
     title: string;
     description: string;

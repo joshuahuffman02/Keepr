@@ -12,7 +12,7 @@ export default function JobsPage() {
   const qc = useQueryClient();
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const [selectedCampgroundId, setSelectedCampgroundId] = useState<string | null>(null);
 
@@ -23,8 +23,9 @@ export default function JobsPage() {
     if (typeof window !== "undefined") {
       stored = localStorage.getItem("campreserv:selectedCampground");
     }
-    const storedValid = stored && campgrounds.some(cg => cg.id === stored);
-    const currentValid = selectedCampgroundId && campgrounds.some(cg => cg.id === selectedCampgroundId);
+    const storedValid = stored && campgrounds.some((cg) => cg.id === stored);
+    const currentValid =
+      selectedCampgroundId && campgrounds.some((cg) => cg.id === selectedCampgroundId);
 
     if (!currentValid && storedValid && stored) {
       setSelectedCampgroundId(stored);
@@ -48,20 +49,20 @@ export default function JobsPage() {
     }
   }, []);
 
-  const campground = campgrounds.find(cg => cg.id === selectedCampgroundId) || campgrounds[0];
+  const campground = campgrounds.find((cg) => cg.id === selectedCampgroundId) || campgrounds[0];
 
   const jobsQuery = useQuery({
     queryKey: ["playbook-jobs", campground?.id],
     queryFn: () => apiClient.listPlaybookJobs(campground!.id, undefined),
     enabled: !!campground?.id,
-    refetchInterval: 15000
+    refetchInterval: 15000,
   });
 
   const retryMutation = useMutation({
     mutationFn: (jobId: string) => apiClient.retryPlaybookJob(jobId, campground?.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["playbook-jobs", campground?.id] });
-    }
+    },
   });
 
   const jobs = jobsQuery.data || [];
@@ -92,13 +93,19 @@ export default function JobsPage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {jobsQuery.isLoading && <div className="text-sm text-muted-foreground">Loading…</div>}
-            {!jobsQuery.isLoading && jobs.length === 0 && <div className="text-sm text-muted-foreground">No jobs found.</div>}
+            {!jobsQuery.isLoading && jobs.length === 0 && (
+              <div className="text-sm text-muted-foreground">No jobs found.</div>
+            )}
             {jobs.map((j) => (
-              <div key={j.id} className="border border-border rounded p-3 flex items-center justify-between gap-3">
+              <div
+                key={j.id}
+                className="border border-border rounded p-3 flex items-center justify-between gap-3"
+              >
                 <div className="flex-1">
                   <div className="text-sm font-semibold text-foreground">{j.playbookId}</div>
                   <div className="text-xs text-muted-foreground">
-                    Scheduled {formatDistanceToNow(new Date(j.scheduledAt), { addSuffix: true })} • Attempts {j.attempts}
+                    Scheduled {formatDistanceToNow(new Date(j.scheduledAt), { addSuffix: true })} •
+                    Attempts {j.attempts}
                     {j.lastError ? ` • Error: ${j.lastError}` : ""}
                   </div>
                 </div>
@@ -123,4 +130,3 @@ export default function JobsPage() {
     </div>
   );
 }
-

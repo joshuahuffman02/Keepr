@@ -81,15 +81,23 @@ function formatValue(value: unknown) {
   return serialized.length > 120 ? `${serialized.slice(0, 117)}...` : serialized;
 }
 
-export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId: string; enabled?: boolean }) {
+export function AiPartnerPanel({
+  campgroundId,
+  enabled = true,
+}: {
+  campgroundId: string;
+  enabled?: boolean;
+}) {
   const [messages, setMessages] = useState<PartnerMessage[]>([]);
   const [input, setInput] = useState("");
-  const [sessionId] = useState(() => `partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+  const [sessionId] = useState(
+    () => `partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`,
+  );
   const endRef = useRef<HTMLDivElement>(null);
 
   const history = useMemo(
     () => messages.map((msg) => ({ role: msg.role, content: msg.content })),
-    [messages]
+    [messages],
   );
 
   useEffect(() => {
@@ -97,7 +105,10 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
   }, [messages]);
 
   const chatMutation = useMutation({
-    mutationFn: (payload: { message: string; history: { role: "user" | "assistant"; content: string }[] }) =>
+    mutationFn: (payload: {
+      message: string;
+      history: { role: "user" | "assistant"; content: string }[];
+    }) =>
       apiClient.aiPartnerChat(campgroundId, {
         sessionId,
         message: payload.message,
@@ -177,14 +188,15 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-          Ask for availability checks, maintenance blocks, ops tasks, refunds, guest notes, or rate moves. Actions run with your permissions (beta), and I can guide anything I can't run.
+          Ask for availability checks, maintenance blocks, ops tasks, refunds, guest notes, or rate
+          moves. Actions run with your permissions (beta), and I can guide anything I can't run.
         </div>
 
         {!enabled && (
           <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Enable Reply Assist to activate Host for staff.
-        </div>
-      )}
+            Enable Reply Assist to activate Host for staff.
+          </div>
+        )}
 
         <div className="h-[420px] overflow-y-auto rounded-xl border border-border bg-card p-4">
           <div className="space-y-4">
@@ -195,13 +207,23 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
             )}
 
             {messages.map((msg) => (
-              <div key={msg.id} className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}>
+              <div
+                key={msg.id}
+                className={cn("flex gap-3", msg.role === "user" ? "justify-end" : "justify-start")}
+              >
                 {msg.role === "assistant" && (
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100">
                     <Bot className="h-4 w-4 text-emerald-600" />
                   </div>
                 )}
-                <div className={cn("max-w-[75%] rounded-2xl px-3 py-2 text-sm", msg.role === "user" ? "bg-emerald-500 text-foreground" : "bg-muted text-foreground")}>
+                <div
+                  className={cn(
+                    "max-w-[75%] rounded-2xl px-3 py-2 text-sm",
+                    msg.role === "user"
+                      ? "bg-emerald-500 text-foreground"
+                      : "bg-muted text-foreground",
+                  )}
+                >
                   <p className="whitespace-pre-wrap">{msg.content}</p>
 
                   {msg.denials?.length ? (
@@ -218,7 +240,9 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
 
                   {msg.questions?.length ? (
                     <div className="mt-3 space-y-2">
-                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Needs input</div>
+                      <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                        Needs input
+                      </div>
                       <div className="flex flex-wrap gap-2">
                         {msg.questions.map((question, idx) => (
                           <button
@@ -237,7 +261,10 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                   {msg.actionDrafts?.length ? (
                     <div className="mt-3 space-y-3">
                       {msg.actionDrafts.map((draft) => (
-                        <div key={draft.id} className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground">
+                        <div
+                          key={draft.id}
+                          className="rounded-lg border border-border bg-card p-3 text-xs text-muted-foreground"
+                        >
                           <div className="flex items-center justify-between">
                             <div className="text-sm font-semibold text-foreground">
                               {ACTION_LABELS[draft.actionType] || draft.actionType}
@@ -257,7 +284,9 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                           <div className="mt-2 flex flex-wrap gap-2">
                             <Badge variant="outline">Action: {draft.action}</Badge>
                             <Badge variant="outline">Resource: {draft.resource}</Badge>
-                            {draft.sensitivity && <Badge variant="outline">Sensitivity: {draft.sensitivity}</Badge>}
+                            {draft.sensitivity && (
+                              <Badge variant="outline">Sensitivity: {draft.sensitivity}</Badge>
+                            )}
                           </div>
 
                           {draft.parameters && Object.keys(draft.parameters).length > 0 && (
@@ -275,7 +304,10 @@ export function AiPartnerPanel({ campgroundId, enabled = true }: { campgroundId:
                             <div className="mt-3 rounded-lg border border-border bg-muted px-3 py-2 text-xs">
                               <div className="flex items-center justify-between">
                                 <span className="font-semibold text-foreground">Impact</span>
-                                <Badge variant={IMPACT_VARIANTS[draft.impact.level]} className="capitalize">
+                                <Badge
+                                  variant={IMPACT_VARIANTS[draft.impact.level]}
+                                  className="capitalize"
+                                >
                                   {draft.impact.level}
                                 </Badge>
                               </div>

@@ -113,7 +113,7 @@ export function ReportsV2Header({
   onOpenFilters,
   onSave,
   onExport,
-  actionsSlot
+  actionsSlot,
 }: ReportsV2HeaderProps) {
   const quickRanges = [
     { label: "Past 7 days", range: () => rangeFromToday(7) },
@@ -126,7 +126,7 @@ export function ReportsV2Header({
     { label: "YTD", range: rangeYearToDate },
     { label: "Past year", range: rangePastYear },
     { label: "Next 90 days", range: () => rangeNextDays(90) },
-    { label: "Next year", range: rangeNextYear }
+    { label: "Next year", range: rangeNextYear },
   ];
 
   return (
@@ -139,7 +139,9 @@ export function ReportsV2Header({
         <div className="flex items-center gap-3">
           <Badge variant={live ? "default" : "secondary"}>{live ? "Live" : "Paused"}</Badge>
           <div className="flex items-center gap-2">
-            <Label htmlFor="live-toggle" className="text-xs text-muted-foreground">Auto-refresh</Label>
+            <Label htmlFor="live-toggle" className="text-xs text-muted-foreground">
+              Auto-refresh
+            </Label>
             <Switch id="live-toggle" checked={live} onCheckedChange={onToggleLive} />
           </div>
         </div>
@@ -148,7 +150,9 @@ export function ReportsV2Header({
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2">
-            <Label htmlFor="range-start" className="text-xs text-muted-foreground">From</Label>
+            <Label htmlFor="range-start" className="text-xs text-muted-foreground">
+              From
+            </Label>
             <input
               id="range-start"
               type="date"
@@ -156,7 +160,9 @@ export function ReportsV2Header({
               onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value })}
               className="rounded-md border border-border bg-card px-2 py-1 text-sm text-foreground"
             />
-            <Label htmlFor="range-end" className="text-xs text-muted-foreground">To</Label>
+            <Label htmlFor="range-end" className="text-xs text-muted-foreground">
+              To
+            </Label>
             <input
               id="range-end"
               type="date"

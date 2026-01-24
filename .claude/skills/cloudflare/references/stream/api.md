@@ -7,23 +7,24 @@ Upload, playback, live streaming, and management APIs.
 ### Direct Creator Upload (Recommended)
 
 **Backend: Create upload URL**
+
 ```typescript
 async function createUploadURL(accountId: string, apiToken: string) {
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/direct_upload`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         maxDurationSeconds: 3600,
         expiry: new Date(Date.now() + 3600000).toISOString(),
         requireSignedURLs: true,
-        meta: { creator: 'user-123' }
-      })
-    }
+        meta: { creator: "user-123" },
+      }),
+    },
   );
   const data = await response.json();
   return { uploadURL: data.result.uploadURL, uid: data.result.uid };
@@ -31,11 +32,12 @@ async function createUploadURL(accountId: string, apiToken: string) {
 ```
 
 **Frontend: Upload to Stream**
+
 ```typescript
 async function uploadVideo(file: File, uploadURL: string) {
   const formData = new FormData();
-  formData.append('file', file);
-  return fetch(uploadURL, { method: 'POST', body: formData }).then(r => r.json());
+  formData.append("file", file);
+  return fetch(uploadURL, { method: "POST", body: formData }).then((r) => r.json());
 }
 ```
 
@@ -60,7 +62,9 @@ curl -X POST \
 ```html
 <iframe
   src="https://customer-<CODE>.cloudflarestream.com/<VIDEO_ID>/iframe?autoplay=true&muted=true"
-  style="border: none;" height="720" width="1280"
+  style="border: none;"
+  height="720"
+  width="1280"
   allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
   allowfullscreen="true"
 ></iframe>
@@ -97,13 +101,13 @@ async function getSignedToken(accountId: string, videoId: string, apiToken: stri
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${videoId}/token`,
     {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         exp: Math.floor(Date.now() / 1000) + 3600,
-        accessRules: [{ type: 'ip.geoip.country', action: 'allow', country: ['US'] }]
-      })
-    }
+        accessRules: [{ type: "ip.geoip.country", action: "allow", country: ["US"] }],
+      }),
+    },
   );
   return (await response.json()).result.token;
 }
@@ -120,19 +124,19 @@ async function createLiveInput(accountId: string, apiToken: string) {
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs`,
     {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        recording: { mode: 'automatic', timeoutSeconds: 30 },
-        deleteRecordingAfterDays: 30
-      })
-    }
+        recording: { mode: "automatic", timeoutSeconds: 30 },
+        deleteRecordingAfterDays: 30,
+      }),
+    },
   );
   const { result } = await response.json();
   return {
     uid: result.uid,
     rtmps: { url: result.rtmps.url, streamKey: result.rtmps.streamKey },
-    srt: { url: result.srt.url, streamId: result.srt.streamId, passphrase: result.srt.passphrase }
+    srt: { url: result.srt.url, streamId: result.srt.streamId, passphrase: result.srt.passphrase },
   };
 }
 ```
@@ -143,10 +147,10 @@ async function createLiveInput(accountId: string, apiToken: string) {
 async function getLiveStatus(accountId: string, liveInputId: string, apiToken: string) {
   const response = await fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs/${liveInputId}`,
-    { headers: { 'Authorization': `Bearer ${apiToken}` } }
+    { headers: { Authorization: `Bearer ${apiToken}` } },
   );
   const { result } = await response.json();
-  return { isLive: result.status?.current?.state === 'connected', recording: result.recording };
+  return { isLive: result.status?.current?.state === "connected", recording: result.recording };
 }
 ```
 
@@ -154,17 +158,20 @@ async function getLiveStatus(accountId: string, liveInputId: string, apiToken: s
 
 ```typescript
 async function createLiveOutput(
-  accountId: string, liveInputId: string, apiToken: string,
-  outputUrl: string, streamKey: string
+  accountId: string,
+  liveInputId: string,
+  apiToken: string,
+  outputUrl: string,
+  streamKey: string,
 ) {
   return fetch(
     `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs/${liveInputId}/outputs`,
     {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: `${outputUrl}/${streamKey}`, enabled: true })
-    }
-  ).then(r => r.json());
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ url: `${outputUrl}/${streamKey}`, enabled: true }),
+    },
+  ).then((r) => r.json());
 }
 ```
 
@@ -174,19 +181,18 @@ async function createLiveOutput(
 // List videos
 async function listVideos(accountId: string, apiToken: string, search?: string) {
   const params = new URLSearchParams(search ? { search } : {});
-  return fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?${params}`,
-    { headers: { 'Authorization': `Bearer ${apiToken}` } }
-  ).then(r => r.json());
+  return fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream?${params}`, {
+    headers: { Authorization: `Bearer ${apiToken}` },
+  }).then((r) => r.json());
 }
 
 // Update video
 async function updateVideo(accountId: string, videoId: string, apiToken: string, updates: unknown) {
   return fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${videoId}`, {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates)
-  }).then(r => r.json());
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  }).then((r) => r.json());
 }
 
 // Delete, clip: similar pattern with DELETE/POST

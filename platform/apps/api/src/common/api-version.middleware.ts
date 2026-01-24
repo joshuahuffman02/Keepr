@@ -80,7 +80,7 @@ export class ApiVersionMiddleware implements NestMiddleware {
     // Validate version is supported
     if (!SUPPORTED_VERSIONS.includes(version)) {
       throw new BadRequestException(
-        `API version "${version}" is not supported. Supported versions: ${SUPPORTED_VERSIONS.join(", ")}`
+        `API version "${version}" is not supported. Supported versions: ${SUPPORTED_VERSIONS.join(", ")}`,
       );
     }
 
@@ -97,7 +97,7 @@ export class ApiVersionMiddleware implements NestMiddleware {
       res.setHeader("Deprecation", versionConfig.deprecationDate || "true");
       res.setHeader(
         "X-API-Deprecation-Warning",
-        `API version ${version} is deprecated. Please migrate to the latest version.`
+        `API version ${version} is deprecated. Please migrate to the latest version.`,
       );
 
       if (versionConfig.sunsetDate) {
@@ -105,13 +105,10 @@ export class ApiVersionMiddleware implements NestMiddleware {
       }
 
       // Link to migration docs (can be configured)
-      res.setHeader(
-        "Link",
-        `</api/docs/migration>; rel="deprecation"; type="text/html"`
-      );
+      res.setHeader("Link", `</api/docs/migration>; rel="deprecation"; type="text/html"`);
 
       this.logger.warn(
-        `Deprecated API version ${version} used by ${req.ip} on ${req.method} ${req.path}`
+        `Deprecated API version ${version} used by ${req.ip} on ${req.method} ${req.path}`,
       );
     }
 

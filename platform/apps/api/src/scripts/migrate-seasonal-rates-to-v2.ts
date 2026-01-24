@@ -1,9 +1,15 @@
-import { PrismaClient, PricingRuleType, PricingStackMode, AdjustmentType, Prisma } from "@prisma/client";
+import {
+  PrismaClient,
+  PricingRuleType,
+  PricingStackMode,
+  AdjustmentType,
+  Prisma,
+} from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { randomUUID } from "crypto";
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
@@ -34,9 +40,9 @@ async function main() {
   const seasonalRates = await prisma.seasonalRate.findMany({
     where: {
       isActive: true,
-      ...(campgroundId ? { campgroundId } : {})
+      ...(campgroundId ? { campgroundId } : {}),
     },
-    include: { SiteClass: true }
+    include: { SiteClass: true },
   });
 
   if (!seasonalRates.length) {
@@ -59,7 +65,7 @@ async function main() {
       } else {
         const fallback = await prisma.siteClass.findUnique({
           where: { id: rate.siteClassId },
-          select: { id: true, defaultRate: true }
+          select: { id: true, defaultRate: true },
         });
         if (fallback) targetClasses = [fallback];
       }
@@ -67,7 +73,7 @@ async function main() {
       if (!siteClassesByCampground.has(rate.campgroundId)) {
         const classes = await prisma.siteClass.findMany({
           where: { campgroundId: rate.campgroundId, isActive: true },
-          select: { id: true, defaultRate: true }
+          select: { id: true, defaultRate: true },
         });
         siteClassesByCampground.set(rate.campgroundId, classes);
       }
@@ -97,8 +103,8 @@ async function main() {
           campgroundId: rate.campgroundId,
           siteClassId: siteClass.id,
           type: PricingRuleType.season,
-          calendarRefId
-        }
+          calendarRefId,
+        },
       });
 
       if (existing) {
@@ -151,7 +157,7 @@ async function main() {
 }
 
 main()
-  .catch(err => {
+  .catch((err) => {
     console.error("Migration failed", err);
     process.exitCode = 1;
   })

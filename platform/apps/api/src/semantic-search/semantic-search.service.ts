@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { OpenAIService } from '../openai/openai.service';
+import { Injectable, Logger, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { OpenAIService } from "../openai/openai.service";
 
 export interface SearchResult {
   id: string;
@@ -60,10 +60,10 @@ export class SemanticSearchService {
 
     // Amenities
     if (campground.amenities && campground.amenities.length > 0) {
-      parts.push(`Amenities: ${campground.amenities.join(', ')}`);
+      parts.push(`Amenities: ${campground.amenities.join(", ")}`);
     }
 
-    return parts.join('. ');
+    return parts.join(". ");
   }
 
   /**
@@ -97,7 +97,7 @@ export class SemanticSearchService {
 
     // Store in database using raw query (Prisma doesn't support Unsupported types in data)
     // Format as pgvector literal: [1.23,4.56,7.89]
-    const vectorLiteral = `[${embedding.join(',')}]`;
+    const vectorLiteral = `[${embedding.join(",")}]`;
     await this.prisma.$executeRaw`
       UPDATE "Campground"
       SET embedding = ${vectorLiteral}::vector
@@ -112,10 +112,7 @@ export class SemanticSearchService {
   /**
    * Generate embeddings for all campgrounds (or subset)
    */
-  async generateAllCampgroundEmbeddings(options: {
-    limit?: number;
-    onlyMissing?: boolean;
-  }) {
+  async generateAllCampgroundEmbeddings(options: { limit?: number; onlyMissing?: boolean }) {
     const { limit, onlyMissing = true } = options;
 
     // Get campgrounds that need embeddings (use raw query since Prisma doesn't support Unsupported types in where)
@@ -123,37 +120,65 @@ export class SemanticSearchService {
 
     if (onlyMissing) {
       campgrounds = limit
-        ? await this.prisma.$queryRaw<Array<{
-            id: string; name: string; city: string | null; state: string | null;
-            tagline: string | null; description: string | null; amenities: string[];
-          }>>`
+        ? await this.prisma.$queryRaw<
+            Array<{
+              id: string;
+              name: string;
+              city: string | null;
+              state: string | null;
+              tagline: string | null;
+              description: string | null;
+              amenities: string[];
+            }>
+          >`
             SELECT id, name, city, state, tagline, description, amenities
             FROM "Campground"
             WHERE embedding IS NULL
             LIMIT ${limit}
           `
-        : await this.prisma.$queryRaw<Array<{
-            id: string; name: string; city: string | null; state: string | null;
-            tagline: string | null; description: string | null; amenities: string[];
-          }>>`
+        : await this.prisma.$queryRaw<
+            Array<{
+              id: string;
+              name: string;
+              city: string | null;
+              state: string | null;
+              tagline: string | null;
+              description: string | null;
+              amenities: string[];
+            }>
+          >`
             SELECT id, name, city, state, tagline, description, amenities
             FROM "Campground"
             WHERE embedding IS NULL
           `;
     } else {
       campgrounds = limit
-        ? await this.prisma.$queryRaw<Array<{
-            id: string; name: string; city: string | null; state: string | null;
-            tagline: string | null; description: string | null; amenities: string[];
-          }>>`
+        ? await this.prisma.$queryRaw<
+            Array<{
+              id: string;
+              name: string;
+              city: string | null;
+              state: string | null;
+              tagline: string | null;
+              description: string | null;
+              amenities: string[];
+            }>
+          >`
             SELECT id, name, city, state, tagline, description, amenities
             FROM "Campground"
             LIMIT ${limit}
           `
-        : await this.prisma.$queryRaw<Array<{
-            id: string; name: string; city: string | null; state: string | null;
-            tagline: string | null; description: string | null; amenities: string[];
-          }>>`
+        : await this.prisma.$queryRaw<
+            Array<{
+              id: string;
+              name: string;
+              city: string | null;
+              state: string | null;
+              tagline: string | null;
+              description: string | null;
+              amenities: string[];
+            }>
+          >`
             SELECT id, name, city, state, tagline, description, amenities
             FROM "Campground"
           `;
@@ -172,7 +197,7 @@ export class SemanticSearchService {
 
       try {
         // Build texts for batch
-        const texts = batch.map(c => this.buildCampgroundText(c));
+        const texts = batch.map((c) => this.buildCampgroundText(c));
 
         // Generate embeddings
         const embeddings = await this.openai.generateEmbeddings(texts);
@@ -181,7 +206,7 @@ export class SemanticSearchService {
         // Format each embedding as pgvector literal: [1.23,4.56,7.89]
         await Promise.all(
           batch.map((campground, idx) => {
-            const vectorLiteral = `[${embeddings[idx].join(',')}]`;
+            const vectorLiteral = `[${embeddings[idx].join(",")}]`;
             return this.prisma.$executeRaw`
               UPDATE "Campground"
               SET embedding = ${vectorLiteral}::vector
@@ -216,7 +241,7 @@ export class SemanticSearchService {
     const queryEmbedding = await this.openai.generateEmbedding(query);
 
     // Format as pgvector literal: [1.23,4.56,7.89]
-    const vectorLiteral = `[${queryEmbedding.join(',')}]`;
+    const vectorLiteral = `[${queryEmbedding.join(",")}]`;
 
     // Search using pgvector cosine similarity
     const results = await this.prisma.$queryRaw<SearchResult[]>`

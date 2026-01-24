@@ -1,4 +1,13 @@
-import { IsString, IsOptional, IsInt, IsBoolean, IsIn, Min, ValidateNested, IsObject } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  IsIn,
+  Min,
+  ValidateNested,
+  IsObject,
+} from "class-validator";
 import { Type } from "class-transformer";
 
 // =============================================================================
@@ -6,8 +15,8 @@ import { Type } from "class-transformer";
 // =============================================================================
 
 export class CreateCustomerDto {
-    @IsString()
-    guestId!: string;
+  @IsString()
+  guestId!: string;
 }
 
 // =============================================================================
@@ -15,34 +24,34 @@ export class CreateCustomerDto {
 // =============================================================================
 
 export class CreateSetupIntentDto {
-    @IsString()
-    guestId!: string;
+  @IsString()
+  guestId!: string;
 
-    @IsOptional()
-    @IsObject()
-    metadata?: Record<string, string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, string>;
 }
 
 export class AttachPaymentMethodDto {
-    @IsString()
-    guestId!: string;
+  @IsString()
+  guestId!: string;
 
-    @IsString()
-    stripePaymentMethodId!: string;
+  @IsString()
+  stripePaymentMethodId!: string;
 
-    @IsOptional()
-    @IsString()
-    nickname?: string;
+  @IsOptional()
+  @IsString()
+  nickname?: string;
 
-    @IsOptional()
-    @IsBoolean()
-    setAsDefault?: boolean;
+  @IsOptional()
+  @IsBoolean()
+  setAsDefault?: boolean;
 }
 
 export class UpdatePaymentMethodDto {
-    @IsOptional()
-    @IsString()
-    nickname?: string;
+  @IsOptional()
+  @IsString()
+  nickname?: string;
 }
 
 // =============================================================================
@@ -50,34 +59,34 @@ export class UpdatePaymentMethodDto {
 // =============================================================================
 
 export class TerminalAddressDto {
-    @IsString()
-    line1!: string;
+  @IsString()
+  line1!: string;
 
-    @IsOptional()
-    @IsString()
-    line2?: string;
+  @IsOptional()
+  @IsString()
+  line2?: string;
 
-    @IsString()
-    city!: string;
+  @IsString()
+  city!: string;
 
-    @IsString()
-    state!: string;
+  @IsString()
+  state!: string;
 
-    @IsString()
-    postal_code!: string;
+  @IsString()
+  postal_code!: string;
 
-    @IsOptional()
-    @IsString()
-    country?: string;
+  @IsOptional()
+  @IsString()
+  country?: string;
 }
 
 export class CreateTerminalLocationDto {
-    @IsString()
-    displayName!: string;
+  @IsString()
+  displayName!: string;
 
-    @ValidateNested()
-    @Type(() => TerminalAddressDto)
-    address!: TerminalAddressDto;
+  @ValidateNested()
+  @Type(() => TerminalAddressDto)
+  address!: TerminalAddressDto;
 }
 
 // =============================================================================
@@ -85,20 +94,20 @@ export class CreateTerminalLocationDto {
 // =============================================================================
 
 export class RegisterTerminalReaderDto {
-    @IsString()
-    registrationCode!: string;
+  @IsString()
+  registrationCode!: string;
 
-    @IsString()
-    label!: string;
+  @IsString()
+  label!: string;
 
-    @IsOptional()
-    @IsString()
-    locationId?: string;
+  @IsOptional()
+  @IsString()
+  locationId?: string;
 }
 
 export class UpdateTerminalReaderDto {
-    @IsString()
-    label!: string;
+  @IsString()
+  label!: string;
 }
 
 // =============================================================================
@@ -106,37 +115,37 @@ export class UpdateTerminalReaderDto {
 // =============================================================================
 
 export class CreateTerminalPaymentDto {
-    @IsString()
-    readerId!: string;
+  @IsString()
+  readerId!: string;
 
-    @IsInt()
-    @Min(50)
-    amountCents!: number;
+  @IsInt()
+  @Min(50)
+  amountCents!: number;
 
-    @IsOptional()
-    @IsString()
-    currency?: string;
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
-    @IsOptional()
-    @IsString()
-    guestId?: string;
+  @IsOptional()
+  @IsString()
+  guestId?: string;
 
-    @IsOptional()
-    @IsString()
-    reservationId?: string;
+  @IsOptional()
+  @IsString()
+  reservationId?: string;
 
-    @IsOptional()
-    @IsBoolean()
-    saveCard?: boolean;
+  @IsOptional()
+  @IsBoolean()
+  saveCard?: boolean;
 
-    @IsOptional()
-    @IsObject()
-    metadata?: Record<string, string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, string>;
 }
 
 export class ProcessOnReaderDto {
-    @IsString()
-    readerId!: string;
+  @IsString()
+  readerId!: string;
 }
 
 // =============================================================================
@@ -144,52 +153,52 @@ export class ProcessOnReaderDto {
 // =============================================================================
 
 export class ChargeSavedCardDto {
-    @IsString()
-    guestId!: string;
+  @IsString()
+  guestId!: string;
 
-    @IsString()
-    paymentMethodId!: string;
+  @IsString()
+  paymentMethodId!: string;
 
-    @IsInt()
-    @Min(50)
-    amountCents!: number;
+  @IsInt()
+  @Min(50)
+  amountCents!: number;
 
-    @IsOptional()
-    @IsString()
-    currency?: string;
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
-    @IsOptional()
-    @IsString()
-    reservationId?: string;
+  @IsOptional()
+  @IsString()
+  reservationId?: string;
 
-    @IsOptional()
-    @IsString()
-    description?: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
 
-    @IsOptional()
-    @IsObject()
-    metadata?: Record<string, string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, string>;
 }
 
 export class ChargeDefaultCardDto {
-    @IsString()
-    guestId!: string;
+  @IsString()
+  guestId!: string;
 
-    @IsInt()
-    @Min(50)
-    amountCents!: number;
+  @IsInt()
+  @Min(50)
+  amountCents!: number;
 
-    @IsOptional()
-    @IsString()
-    currency?: string;
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
-    @IsOptional()
-    @IsString()
-    reservationId?: string;
+  @IsOptional()
+  @IsString()
+  reservationId?: string;
 
-    @IsOptional()
-    @IsObject()
-    metadata?: Record<string, string>;
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, string>;
 }
 
 // =============================================================================
@@ -197,16 +206,16 @@ export class ChargeDefaultCardDto {
 // =============================================================================
 
 export class ProcessRefundDto {
-    @IsOptional()
-    @IsInt()
-    @Min(1)
-    amountCents?: number;
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  amountCents?: number;
 
-    @IsOptional()
-    @IsIn(["duplicate", "fraudulent", "requested_by_customer"])
-    reason?: "duplicate" | "fraudulent" | "requested_by_customer";
+  @IsOptional()
+  @IsIn(["duplicate", "fraudulent", "requested_by_customer"])
+  reason?: "duplicate" | "fraudulent" | "requested_by_customer";
 
-    @IsOptional()
-    @IsString()
-    note?: string;
+  @IsOptional()
+  @IsString()
+  note?: string;
 }

@@ -24,8 +24,8 @@ export default function LocalizationPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">Regional Settings</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Set your campground's timezone, date format, and currency preferences.
-                These settings affect how dates and prices are displayed.
+                Set your campground's timezone, date format, and currency preferences. These
+                settings affect how dates and prices are displayed.
               </p>
               <div className="mt-4">
                 <Button asChild>

@@ -8,7 +8,7 @@ type DashboardRequest = Request & { organizationId?: string };
 @UseGuards(JwtAuthGuard)
 @Controller("dashboard")
 export class DashboardController {
-  constructor(private readonly dashboard: DashboardService) { }
+  constructor(private readonly dashboard: DashboardService) {}
 
   @Get("campgrounds/:campgroundId/summary")
   summary(@Param("campgroundId") campgroundId: string, @Req() req: DashboardRequest) {

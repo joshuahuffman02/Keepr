@@ -13,6 +13,7 @@ You are conducting a comprehensive UI/UX audit of the Keepr campground managemen
 First, discover ALL dashboard pages and audit each one systematically.
 
 **Find all dashboard pages:**
+
 ```bash
 find platform/apps/web/app -type f -name "page.tsx" | grep -v "\(public\)" | sort
 ```
@@ -62,6 +63,7 @@ Create a comprehensive audit document at `docs/DASHBOARD_AUDIT_RESULTS.md` with:
 # Dashboard Audit Results
 
 ## Summary
+
 - Total pages audited: X
 - Critical issues: X
 - Major issues: X
@@ -70,19 +72,24 @@ Create a comprehensive audit document at `docs/DASHBOARD_AUDIT_RESULTS.md` with:
 ## Page-by-Page Findings
 
 ### /dashboard
+
 **Status:** [Good / Needs Work / Critical]
 **Issues:**
+
 - [ ] Issue 1 (severity: critical/major/minor)
 - [ ] Issue 2
 
 ### /dashboard/reservations
+
 ...
 
 ## Common Patterns Needing Fix
+
 1. Pattern A appears on X pages
 2. Pattern B appears on Y pages
 
 ## Priority Fix Order
+
 1. Critical accessibility issues
 2. Broken functionality
 3. Inconsistent patterns
@@ -100,16 +107,19 @@ Work through fixes in priority order:
 **Fix Patterns:**
 
 For consistency issues, check existing well-designed pages as reference:
+
 - `platform/apps/web/app/dashboard/page.tsx` - Main dashboard
 - `platform/apps/web/components/ui/` - UI primitives
 
 For accessibility:
+
 - Add `aria-label` to icon-only buttons
 - Ensure all form fields have labels
 - Add `role="alert"` to error messages
 - Check focus states on interactive elements
 
 **After each fix:**
+
 - Run `pnpm build:web` to verify no errors
 - Mark the issue as complete in your audit document
 
@@ -140,24 +150,28 @@ Based on the codebase structure, audit these areas:
 ### Reference: Design System
 
 **Colors:**
+
 - Primary: `keepr-evergreen` (#1B4D3E)
 - Accent: `keepr-clay` (#C67B5C)
 - Background: `background` / `card` / `muted`
 - Text: `foreground` / `muted-foreground`
 
 **Spacing:**
+
 - Page padding: `px-6 py-8` or `p-6`
 - Card padding: `p-6`
 - Stack spacing: `space-y-4` or `space-y-6`
 - Grid gaps: `gap-4` or `gap-6`
 
 **Typography:**
+
 - Page titles: `text-2xl font-bold`
 - Section headings: `text-lg font-semibold`
 - Body: `text-sm` or `text-base`
 - Muted: `text-muted-foreground`
 
 **Components:**
+
 - Buttons: Use `<Button>` from `@/components/ui/button`
 - Cards: Use `<Card>` from `@/components/ui/card`
 - Forms: Use `<Input>`, `<Select>`, `<Label>` from ui components
@@ -166,6 +180,7 @@ Based on the codebase structure, audit these areas:
 ### Success Criteria
 
 The audit is complete when:
+
 - [ ] All dashboard pages have been reviewed
 - [ ] Findings are documented in `docs/DASHBOARD_AUDIT_RESULTS.md`
 - [ ] Critical and major issues are fixed

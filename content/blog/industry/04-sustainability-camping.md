@@ -17,12 +17,14 @@ Today's campers increasingly care about environmental impact. They notice—and 
 ## Why Sustainability Matters
 
 ### Guest Expectations
+
 - 73% of travelers prefer eco-friendly options
 - Millennials and Gen Z prioritize sustainability
 - Reviews mention sustainable practices
 - It's becoming a decision factor
 
 ### Business Benefits
+
 - Often reduces operational costs
 - Attracts conscious consumers
 - Positive brand perception
@@ -33,6 +35,7 @@ Today's campers increasingly care about environmental impact. They notice—and 
 ## Practical Sustainable Practices
 
 ### Low/No Cost
+
 - Recycling program clearly marked
 - LED lighting replacements
 - Low-flow fixtures
@@ -40,12 +43,14 @@ Today's campers increasingly care about environmental impact. They notice—and 
 - Composting (if feasible)
 
 ### Medium Investment
+
 - Solar lighting for paths/common areas
 - EV charging stations
 - Water collection systems
 - Energy-efficient appliances
 
 ### Higher Investment
+
 - Solar panels for buildings
 - Greywater systems
 - Green building practices
@@ -56,14 +61,17 @@ Today's campers increasingly care about environmental impact. They notice—and 
 ## Communicating Your Efforts
 
 **On your website:**
+
 > "We're committed to protecting the environment we all enjoy. Here's what we do: [list practices]"
 
 **At your campground:**
+
 - Clear recycling signage
 - Information about local ecosystem
 - Encourage Leave No Trace principles
 
 **Don't greenwash:**
+
 - Be honest about what you do
 - Don't exaggerate claims
 - Continuous improvement is okay
@@ -79,4 +87,4 @@ Today's campers increasingly care about environmental impact. They notice—and 
 
 ---
 
-*Keepr helps reduce paper waste with digital booking and communication. [Go green at campreserv.com](https://campreserv.com)*
+_Keepr helps reduce paper waste with digital booking and communication. [Go green at campreserv.com](https://campreserv.com)_

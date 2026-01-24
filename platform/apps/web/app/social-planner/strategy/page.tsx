@@ -38,20 +38,20 @@ export default function SocialPlannerStrategy() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
   const strategiesQuery = useQuery<SocialStrategy[]>({
     queryKey: ["social-strategies", campgroundId],
     queryFn: () => apiClient.listSocialStrategies(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const alertsQuery = useQuery<SocialAlert[]>({
     queryKey: ["social-alerts", campgroundId],
     queryFn: () => apiClient.listSocialAlerts(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const createStrategy = useMutation({
@@ -63,15 +63,15 @@ export default function SocialPlannerStrategy() {
           hero,
           topIdeas: topIdeas
             .split(",")
-            .map(i => i.trim())
-            .filter(Boolean)
-        }
+            .map((i) => i.trim())
+            .filter(Boolean),
+        },
       }),
     onSuccess: () => {
       setHero("");
       setTopIdeas("");
       qc.invalidateQueries({ queryKey: ["social-strategies", campgroundId] });
-    }
+    },
   });
 
   const createAlert = useMutation({
@@ -79,17 +79,17 @@ export default function SocialPlannerStrategy() {
       apiClient.createSocialAlert({
         campgroundId,
         category: alertCategory,
-        message: alertMessage
+        message: alertMessage,
       }),
     onSuccess: () => {
       setAlertMessage("");
       qc.invalidateQueries({ queryKey: ["social-alerts", campgroundId] });
-    }
+    },
   });
 
   const dismissAlert = useMutation({
     mutationFn: (id: string) => apiClient.dismissSocialAlert(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-alerts", campgroundId] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-alerts", campgroundId] }),
   });
 
   if (!campgroundId) {
@@ -99,7 +99,9 @@ export default function SocialPlannerStrategy() {
           <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600">
             ← Back to Social Planner
           </Link>
-          <p className="text-muted-foreground">Select a campground to manage strategy and alerts.</p>
+          <p className="text-muted-foreground">
+            Select a campground to manage strategy and alerts.
+          </p>
         </div>
       </DashboardShell>
     );
@@ -107,23 +109,47 @@ export default function SocialPlannerStrategy() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Strategy & alerts</p>
-          <h1 className="text-2xl font-bold text-foreground">Monthly plan, annual planner, and opportunity alerts</h1>
-          <p className="text-muted-foreground">Top 10 ideas, cadence, promos/events to push, and smart triggers you can toggle.</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Strategy & alerts
+          </p>
+          <h1 className="text-2xl font-bold text-foreground">
+            Monthly plan, annual planner, and opportunity alerts
+          </h1>
+          <p className="text-muted-foreground">
+            Top 10 ideas, cadence, promos/events to push, and smart triggers you can toggle.
+          </p>
         </div>
       </div>
 
       <div className="card p-4 mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-2">Monthly strategy</h3>
         <div className="grid md:grid-cols-3 gap-3">
-          <input className="input" type="month" value={month} onChange={e => setMonth(e.target.value)} />
-          <input className="input" placeholder="Hero content (e.g., summer kickoff)" value={hero} onChange={e => setHero(e.target.value)} />
-          <input className="input" placeholder="Top ideas (comma separated)" value={topIdeas} onChange={e => setTopIdeas(e.target.value)} />
+          <input
+            className="input"
+            type="month"
+            value={month}
+            onChange={(e) => setMonth(e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="Hero content (e.g., summer kickoff)"
+            value={hero}
+            onChange={(e) => setHero(e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="Top ideas (comma separated)"
+            value={topIdeas}
+            onChange={(e) => setTopIdeas(e.target.value)}
+          />
         </div>
         <button
           className="btn-primary mt-3"
@@ -146,17 +172,26 @@ export default function SocialPlannerStrategy() {
               return (
                 <div key={s.id} className="p-3 rounded border border-border bg-muted">
                   <div className="text-sm font-semibold text-foreground">
-                    {new Date(s.month).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
+                    {new Date(s.month).toLocaleDateString(undefined, {
+                      month: "long",
+                      year: "numeric",
+                    })}
                     {s.annual ? " (Annual)" : ""}
                   </div>
-                  <div className="text-xs text-muted-foreground">Hero: {plan.hero || plan.heroContent || "TBD"}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Hero: {plan.hero || plan.heroContent || "TBD"}
+                  </div>
                   {plan.topIdeas?.length ? (
-                    <div className="text-xs text-muted-foreground mt-1">Top ideas: {plan.topIdeas.join(", ")}</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Top ideas: {plan.topIdeas.join(", ")}
+                    </div>
                   ) : null}
                 </div>
               );
             })}
-            {!strategiesQuery.data?.length && <div className="text-sm text-muted-foreground">No strategies yet.</div>}
+            {!strategiesQuery.data?.length && (
+              <div className="text-sm text-muted-foreground">No strategies yet.</div>
+            )}
           </div>
         </div>
 
@@ -166,7 +201,11 @@ export default function SocialPlannerStrategy() {
             <h3 className="text-lg font-semibold text-foreground">Opportunity alerts</h3>
           </div>
           <div className="grid md:grid-cols-2 gap-2 mb-3">
-            <select className="input" value={alertCategory} onChange={e => setAlertCategory(e.target.value)}>
+            <select
+              className="input"
+              value={alertCategory}
+              onChange={(e) => setAlertCategory(e.target.value)}
+            >
               <option value="weather">Weather</option>
               <option value="occupancy">Occupancy</option>
               <option value="events">Events</option>
@@ -175,7 +214,12 @@ export default function SocialPlannerStrategy() {
               <option value="inactivity">Inactivity</option>
               <option value="inventory">Inventory</option>
             </select>
-            <input className="input" placeholder="Message" value={alertMessage} onChange={e => setAlertMessage(e.target.value)} />
+            <input
+              className="input"
+              placeholder="Message"
+              value={alertMessage}
+              onChange={(e) => setAlertMessage(e.target.value)}
+            />
           </div>
           <button
             className="btn-primary mb-3"
@@ -187,19 +231,27 @@ export default function SocialPlannerStrategy() {
 
           <div className="space-y-2">
             {(alertsQuery.data ?? []).map((alert) => (
-              <div key={alert.id} className="p-3 rounded border border-amber-100 bg-amber-50 flex items-center justify-between">
+              <div
+                key={alert.id}
+                className="p-3 rounded border border-amber-100 bg-amber-50 flex items-center justify-between"
+              >
                 <div>
                   <div className="text-sm font-semibold text-amber-900">{alert.message}</div>
                   <div className="text-xs text-amber-700 uppercase">{alert.category}</div>
                 </div>
                 {!alert.dismissed && (
-                  <button className="btn-secondary text-xs" onClick={() => dismissAlert.mutate(alert.id)}>
+                  <button
+                    className="btn-secondary text-xs"
+                    onClick={() => dismissAlert.mutate(alert.id)}
+                  >
                     Dismiss
                   </button>
                 )}
               </div>
             ))}
-            {!alertsQuery.data?.length && <div className="text-sm text-muted-foreground">No alerts configured.</div>}
+            {!alertsQuery.data?.length && (
+              <div className="text-sm text-muted-foreground">No alerts configured.</div>
+            )}
           </div>
         </div>
       </div>

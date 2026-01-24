@@ -88,21 +88,21 @@ export default {
     const cf = request.cf as any;
     const botMgmt = cf?.botManagement;
     const url = new URL(request.url);
-    
+
     if (botMgmt?.staticResource) return fetch(request); // Skip static
-    
+
     // API endpoints: require JS detection + good score
-    if (url.pathname.startsWith('/api/')) {
+    if (url.pathname.startsWith("/api/")) {
       const jsDetectionPassed = botMgmt?.jsDetection?.passed ?? false;
       const score = botMgmt?.score ?? 100;
-      
+
       if (!jsDetectionPassed || score < 30) {
-        return new Response('Unauthorized', { status: 401 });
+        return new Response("Unauthorized", { status: 401 });
       }
     }
-    
+
     return fetch(request);
-  }
+  },
 };
 ```
 

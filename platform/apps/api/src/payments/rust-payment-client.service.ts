@@ -189,7 +189,10 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
       const json: unknown = await response.json();
       return PaymentIntentResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust create intent failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust create intent failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -200,7 +203,7 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
    */
   async capturePaymentIntent(
     paymentIntentId: string,
-    dto: CapturePaymentIntentDto
+    dto: CapturePaymentIntentDto,
   ): Promise<CaptureResponse | null> {
     if (this.fallbackToLocal) {
       return null;
@@ -210,12 +213,15 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
-      const response = await fetch(`${this.baseUrl}/api/payments/intents/${paymentIntentId}/capture`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
-        body: JSON.stringify(dto),
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        `${this.baseUrl}/api/payments/intents/${paymentIntentId}/capture`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", ...getRequestHeaders() },
+          body: JSON.stringify(dto),
+          signal: controller.signal,
+        },
+      );
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -226,7 +232,10 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
       const json: unknown = await response.json();
       return CaptureResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust capture failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust capture failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -260,7 +269,10 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
       const json: unknown = await response.json();
       return RefundResponseSchema.parse(json);
     } catch (error) {
-      this.logger.warn("Rust refund failed, using local fallback", error instanceof Error ? error.message : error);
+      this.logger.warn(
+        "Rust refund failed, using local fallback",
+        error instanceof Error ? error.message : error,
+      );
       this.scheduleHealthCheck();
       return null;
     }
@@ -303,7 +315,7 @@ export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
   async processPayoutReconciliation(
     payoutId: string,
     campgroundId: string,
-    stripeAccountId: string
+    stripeAccountId: string,
   ): Promise<ReconciliationSummary | null> {
     if (this.fallbackToLocal) {
       return null;

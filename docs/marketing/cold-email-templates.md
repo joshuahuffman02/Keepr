@@ -11,6 +11,7 @@ These templates are designed for cold outreach to campground owners and operator
 **Best for:** First touch, unknown pain point
 
 **Subject Lines (test all):**
+
 - Question about [Park Name]'s reservation system
 - Quick question from a fellow camping enthusiast
 - Noticed [Park Name] on my trip planning
@@ -47,6 +48,7 @@ P.S. - We include AI pricing features that most competitors charge extra for. Mi
 **Best for:** When you know they use Campspot/Newbook/etc.
 
 **Subject Lines:**
+
 - Alternative to [Competitor] for [Park Name]
 - Question about your [Competitor] costs
 - Parks switching from [Competitor] - curious if you've considered it
@@ -86,6 +88,7 @@ P.S. - Here's a quick comparison if you want the numbers: [link to /compare/camp
 **Best for:** When you see evidence of a specific problem (old website, no online booking, etc.)
 
 **Subject Lines:**
+
 - Mobile booking for [Park Name]?
 - Quick thought on [Park Name]'s booking process
 - [Park Name] - spotted something that might help
@@ -122,6 +125,7 @@ P.S. - Our demo lets you play with real data: [link to /demo]
 **Best for:** Referencing recent industry trends, competitor news, etc.
 
 **Subject Lines:**
+
 - [Industry news topic] - thought of [Park Name]
 - After [event/news], had a question for you
 - [Recent trend] affecting parks like yours?
@@ -158,6 +162,7 @@ If not, no problem. I just share relevant industry stuff sometimes if you're int
 **Best for:** 5-7 days after first email, no response
 
 **Subject Lines:**
+
 - Following up - [original subject]
 - Quick follow up on Keepr
 - [First Name] - worth another look?
@@ -191,6 +196,7 @@ P.S. - Happy to send a comparison with whatever you're using now if you share th
 **Best for:** Final follow-up after 2-3 attempts
 
 **Subject Lines:**
+
 - Should I close your file?
 - Last question about [Park Name]
 - Signing off (unless...)
@@ -243,34 +249,38 @@ Best,
 
 ### Variables to Customize
 
-| Variable | How to Find |
-|----------|------------|
-| [First Name] | Website "About" page, LinkedIn |
-| [Park Name] | Obvious, but get the exact name |
-| [Region] | Their location |
-| [their actual size] | Count sites on their map, or estimate |
-| [Competitor] | Look for badges, booking widgets |
-| [specific observation] | Actually visit their booking flow |
+| Variable               | How to Find                           |
+| ---------------------- | ------------------------------------- |
+| [First Name]           | Website "About" page, LinkedIn        |
+| [Park Name]            | Obvious, but get the exact name       |
+| [Region]               | Their location                        |
+| [their actual size]    | Count sites on their map, or estimate |
+| [Competitor]           | Look for badges, booking widgets      |
+| [specific observation] | Actually visit their booking flow     |
 
 ---
 
 ## Sending Guidelines
 
 ### Volume
+
 - 20-30 personalized emails per day max
 - Quality over quantity
 
 ### Timing
+
 - Tuesday-Thursday, 9-11 AM local time
 - Avoid Mondays and Fridays
 - Avoid peak season (June-August) for best response
 
 ### Tracking
+
 - Track opens, replies, meetings booked
 - A/B test subject lines
 - Refine based on what works
 
 ### CRM Tags
+
 - First Contact Sent
 - Follow-up 1 Sent
 - Follow-up 2 Sent

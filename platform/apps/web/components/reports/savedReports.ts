@@ -43,7 +43,9 @@ export function listSavedReports(campgroundId?: string | null) {
   return campgroundId ? all.filter((r) => r.campgroundId === campgroundId) : all;
 }
 
-export function saveReport(report: Omit<SavedReport, "id" | "createdAt" | "updatedAt"> & { id?: string }) {
+export function saveReport(
+  report: Omit<SavedReport, "id" | "createdAt" | "updatedAt"> & { id?: string },
+) {
   const all = loadAll();
   const now = new Date().toISOString();
   const existingIdx = report.id ? all.findIndex((r) => r.id === report.id) : -1;
@@ -81,7 +83,7 @@ export function togglePinnedReport(id: string, pinned?: boolean) {
   all[idx] = {
     ...all[idx],
     pinned: nextPinned,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
   saveAll(all);
   return all[idx];

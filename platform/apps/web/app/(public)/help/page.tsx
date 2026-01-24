@@ -64,7 +64,8 @@ export default function PublicHelpPage() {
             Get the answers you need
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Quick guidance for booking, pricing, cancellations, and support. If you need a hand, our team is ready to help.
+            Quick guidance for booking, pricing, cancellations, and support. If you need a hand, our
+            team is ready to help.
           </p>
         </div>
 
@@ -102,8 +103,9 @@ export default function PublicHelpPage() {
           <div className="rounded-2xl border border-keepr-evergreen/20 bg-keepr-evergreen/10 p-8">
             <h2 className="text-2xl font-bold text-foreground mb-3">Cancellation policy</h2>
             <p className="text-sm text-muted-foreground">
-              Policies vary by campground. We recommend reviewing the policy on each listing before you book.
-              If you need help making a change, our support team can guide you through the options.
+              Policies vary by campground. We recommend reviewing the policy on each listing before
+              you book. If you need help making a change, our support team can guide you through the
+              options.
             </p>
             <div className="mt-6">
               <Link

@@ -24,10 +24,7 @@ interface SplitTenderManagerProps {
   disabled?: boolean;
 }
 
-export function SplitTenderManager({
-  onAddPayment,
-  disabled = false,
-}: SplitTenderManagerProps) {
+export function SplitTenderManager({ onAddPayment, disabled = false }: SplitTenderManagerProps) {
   const { state, actions } = usePaymentContext();
   const { tenderEntries, remainingCents, totalDueCents } = state;
 
@@ -69,28 +66,21 @@ export function SplitTenderManager({
           />
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-muted-foreground">
-            Paid: ${(totalPaid / 100).toFixed(2)}
-          </span>
-          <span className={cn(
-            "font-medium",
-            remainingCents > 0 ? "text-amber-600" : "text-emerald-600"
-          )}>
-            {remainingCents > 0
-              ? `Remaining: $${(remainingCents / 100).toFixed(2)}`
-              : "Fully paid"}
+          <span className="text-muted-foreground">Paid: ${(totalPaid / 100).toFixed(2)}</span>
+          <span
+            className={cn(
+              "font-medium",
+              remainingCents > 0 ? "text-amber-600" : "text-emerald-600",
+            )}
+          >
+            {remainingCents > 0 ? `Remaining: $${(remainingCents / 100).toFixed(2)}` : "Fully paid"}
           </span>
         </div>
       </div>
 
       {/* Add another payment button */}
       {remainingCents > 0 && (
-        <Button
-          variant="outline"
-          onClick={onAddPayment}
-          disabled={disabled}
-          className="w-full"
-        >
+        <Button variant="outline" onClick={onAddPayment} disabled={disabled} className="w-full">
           Add Another Payment
         </Button>
       )}
@@ -115,8 +105,8 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
         entry.status === "completed"
           ? "bg-emerald-50 border-emerald-200"
           : entry.status === "failed"
-          ? "bg-red-50 border-red-200"
-          : "bg-muted border-border"
+            ? "bg-red-50 border-red-200"
+            : "bg-muted border-border",
       )}
     >
       <div className="flex items-center gap-3">
@@ -126,8 +116,8 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
             entry.status === "completed"
               ? "bg-status-success-bg text-status-success"
               : entry.status === "failed"
-              ? "bg-status-error-bg text-status-error"
-              : "bg-muted text-muted-foreground"
+                ? "bg-status-error-bg text-status-error"
+                : "bg-muted text-muted-foreground",
           )}
         >
           <Icon className="h-4 w-4" />
@@ -139,8 +129,8 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
               entry.status === "completed"
                 ? "text-emerald-800"
                 : entry.status === "failed"
-                ? "text-red-800"
-                : "text-foreground"
+                  ? "text-red-800"
+                  : "text-foreground",
             )}
           >
             {methodInfo.label}
@@ -160,8 +150,8 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
             entry.status === "completed"
               ? "text-emerald-700"
               : entry.status === "failed"
-              ? "text-red-700"
-              : "text-foreground"
+                ? "text-red-700"
+                : "text-foreground",
           )}
         >
           ${(entry.amountCents / 100).toFixed(2)}

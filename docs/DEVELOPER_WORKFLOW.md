@@ -16,12 +16,12 @@ staging ───────────────┐
 
 ### Branch Types
 
-| Branch | Purpose | Deploys To |
-|--------|---------|------------|
-| `main` | Production code | keeprstay.com / api.keeprstay.com |
-| `staging` | Pre-production testing | staging.keeprstay.com / api-staging.keeprstay.com |
-| `feature/*` | New features | Preview URLs (Vercel only) |
-| `fix/*` | Bug fixes | Preview URLs (Vercel only) |
+| Branch      | Purpose                | Deploys To                                        |
+| ----------- | ---------------------- | ------------------------------------------------- |
+| `main`      | Production code        | keeprstay.com / api.keeprstay.com                 |
+| `staging`   | Pre-production testing | staging.keeprstay.com / api-staging.keeprstay.com |
+| `feature/*` | New features           | Preview URLs (Vercel only)                        |
+| `fix/*`     | Bug fixes              | Preview URLs (Vercel only)                        |
 
 ## Development Flow
 
@@ -102,8 +102,7 @@ git push -u origin feature/my-feature
 The CI pipeline runs on all PRs to `main` or `staging`:
 
 ```yaml
-Jobs:
-  lint        → ESLint checks
+Jobs: lint        → ESLint checks
   test-api    → API smoke tests with test database
   test-sdk    → SDK unit tests
   build       → Full build verification
@@ -112,11 +111,11 @@ Jobs:
 
 ### Deployment Targets
 
-| Environment | Frontend | API | Rust Services | Database |
-|-------------|----------|-----|---------------|----------|
-| Production | Vercel (main) | Railway (production) | Railway (production) | Supabase (main) |
-| Staging | Vercel (staging) | Railway (staging) | Railway (staging) | Supabase (staging branch) |
-| Preview | Vercel (auto) | N/A | N/A | N/A |
+| Environment | Frontend         | API                  | Rust Services        | Database                  |
+| ----------- | ---------------- | -------------------- | -------------------- | ------------------------- |
+| Production  | Vercel (main)    | Railway (production) | Railway (production) | Supabase (main)           |
+| Staging     | Vercel (staging) | Railway (staging)    | Railway (staging)    | Supabase (staging branch) |
+| Preview     | Vercel (auto)    | N/A                  | N/A                  | N/A                       |
 
 ## Environment Variables
 
@@ -203,11 +202,11 @@ If Playwright logs `UntrustedHost` errors, set `AUTH_TRUST_HOST=true` and `AUTH_
 
 ## URLs Reference
 
-| Environment | Frontend | API | Health Check |
-|-------------|----------|-----|--------------|
-| Production | https://keeprstay.com | https://api.keeprstay.com | /health |
-| Staging | https://staging.keeprstay.com | https://api-staging.keeprstay.com | /health |
-| Local | http://localhost:3000 | http://localhost:4000 | /health |
+| Environment | Frontend                      | API                               | Health Check |
+| ----------- | ----------------------------- | --------------------------------- | ------------ |
+| Production  | https://keeprstay.com         | https://api.keeprstay.com         | /health      |
+| Staging     | https://staging.keeprstay.com | https://api-staging.keeprstay.com | /health      |
+| Local       | http://localhost:3000         | http://localhost:4000             | /health      |
 
 ## Git Commit Conventions
 

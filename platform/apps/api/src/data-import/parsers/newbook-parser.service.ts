@@ -32,7 +32,7 @@ export class NewbookParserService {
 
     const normalizedHeaders = headers.map((h) => h.toLowerCase().replace(/[^a-z0-9]/g, ""));
     return newbookIndicators.some((indicator) =>
-      normalizedHeaders.some((h) => h.includes(indicator.replace(/[^a-z0-9]/g, "")))
+      normalizedHeaders.some((h) => h.includes(indicator.replace(/[^a-z0-9]/g, ""))),
     );
   }
 
@@ -45,14 +45,46 @@ export class NewbookParserService {
       { sourceField: "Site Name", targetField: "name" },
       { sourceField: "Category Name", targetField: "siteClassName" },
       { sourceField: "Site Type", targetField: "siteType", transform: this.mapSiteType },
-      { sourceField: "Max Guests", targetField: "maxOccupancy", transform: CsvParserService.transforms.toInteger },
-      { sourceField: "Max Length", targetField: "rigMaxLength", transform: CsvParserService.transforms.toInteger },
-      { sourceField: "Power", targetField: "hookupsPower", transform: CsvParserService.transforms.toBoolean },
-      { sourceField: "Water", targetField: "hookupsWater", transform: CsvParserService.transforms.toBoolean },
-      { sourceField: "Sewerage", targetField: "hookupsSewer", transform: CsvParserService.transforms.toBoolean },
-      { sourceField: "Pets Allowed", targetField: "petFriendly", transform: CsvParserService.transforms.toBoolean },
-      { sourceField: "Disabled Access", targetField: "accessible", transform: CsvParserService.transforms.toBoolean },
-      { sourceField: "Drive Through", targetField: "pullThrough", transform: CsvParserService.transforms.toBoolean },
+      {
+        sourceField: "Max Guests",
+        targetField: "maxOccupancy",
+        transform: CsvParserService.transforms.toInteger,
+      },
+      {
+        sourceField: "Max Length",
+        targetField: "rigMaxLength",
+        transform: CsvParserService.transforms.toInteger,
+      },
+      {
+        sourceField: "Power",
+        targetField: "hookupsPower",
+        transform: CsvParserService.transforms.toBoolean,
+      },
+      {
+        sourceField: "Water",
+        targetField: "hookupsWater",
+        transform: CsvParserService.transforms.toBoolean,
+      },
+      {
+        sourceField: "Sewerage",
+        targetField: "hookupsSewer",
+        transform: CsvParserService.transforms.toBoolean,
+      },
+      {
+        sourceField: "Pets Allowed",
+        targetField: "petFriendly",
+        transform: CsvParserService.transforms.toBoolean,
+      },
+      {
+        sourceField: "Disabled Access",
+        targetField: "accessible",
+        transform: CsvParserService.transforms.toBoolean,
+      },
+      {
+        sourceField: "Drive Through",
+        targetField: "pullThrough",
+        transform: CsvParserService.transforms.toBoolean,
+      },
       { sourceField: "Description", targetField: "description" },
     ];
   }
@@ -64,16 +96,32 @@ export class NewbookParserService {
     return [
       { sourceField: "First Name", targetField: "firstName" },
       { sourceField: "Surname", targetField: "lastName" },
-      { sourceField: "Email", targetField: "email", transform: CsvParserService.transforms.toEmail },
-      { sourceField: "Mobile", targetField: "phone", transform: CsvParserService.transforms.toPhone },
-      { sourceField: "Phone", targetField: "phone", transform: CsvParserService.transforms.toPhone },
+      {
+        sourceField: "Email",
+        targetField: "email",
+        transform: CsvParserService.transforms.toEmail,
+      },
+      {
+        sourceField: "Mobile",
+        targetField: "phone",
+        transform: CsvParserService.transforms.toPhone,
+      },
+      {
+        sourceField: "Phone",
+        targetField: "phone",
+        transform: CsvParserService.transforms.toPhone,
+      },
       { sourceField: "Street Address", targetField: "address1" },
       { sourceField: "Suburb", targetField: "city" },
       { sourceField: "State", targetField: "state" },
       { sourceField: "Postcode", targetField: "postalCode" },
       { sourceField: "Country", targetField: "country" },
       { sourceField: "Vehicle Type", targetField: "rigType" },
-      { sourceField: "Vehicle Length", targetField: "rigLength", transform: this.parseLengthWithUnit },
+      {
+        sourceField: "Vehicle Length",
+        targetField: "rigLength",
+        transform: this.parseLengthWithUnit,
+      },
       { sourceField: "Rego", targetField: "vehiclePlate" },
       { sourceField: "Notes", targetField: "notes" },
     ];
@@ -89,12 +137,32 @@ export class NewbookParserService {
       { sourceField: "Booking Name", targetField: "guestName" },
       { sourceField: "Arrival", targetField: "arrivalDate", transform: this.parseNewbookDate },
       { sourceField: "Departure", targetField: "departureDate", transform: this.parseNewbookDate },
-      { sourceField: "Adults", targetField: "adults", transform: CsvParserService.transforms.toInteger },
-      { sourceField: "Children", targetField: "children", transform: CsvParserService.transforms.toInteger },
-      { sourceField: "Calculated Stay Cost", targetField: "totalAmount", transform: this.parseNewbookAmount },
-      { sourceField: "Booking Client Account Balance", targetField: "balance", transform: this.parseNewbookAmount },
+      {
+        sourceField: "Adults",
+        targetField: "adults",
+        transform: CsvParserService.transforms.toInteger,
+      },
+      {
+        sourceField: "Children",
+        targetField: "children",
+        transform: CsvParserService.transforms.toInteger,
+      },
+      {
+        sourceField: "Calculated Stay Cost",
+        targetField: "totalAmount",
+        transform: this.parseNewbookAmount,
+      },
+      {
+        sourceField: "Booking Client Account Balance",
+        targetField: "balance",
+        transform: this.parseNewbookAmount,
+      },
       { sourceField: "Status", targetField: "status", transform: this.mapReservationStatus },
-      { sourceField: "Booking Duration", targetField: "nights", transform: this.parseBookingDuration },
+      {
+        sourceField: "Booking Duration",
+        targetField: "nights",
+        transform: this.parseBookingDuration,
+      },
       { sourceField: "Category Name", targetField: "siteClassName" },
     ];
   }
@@ -171,19 +239,31 @@ export class NewbookParserService {
     const normalized = value.toLowerCase().trim();
 
     // NewBook often uses category names
-    if (normalized.includes("caravan") || normalized.includes("rv") || normalized.includes("powered")) {
+    if (
+      normalized.includes("caravan") ||
+      normalized.includes("rv") ||
+      normalized.includes("powered")
+    ) {
       return "rv";
     }
     if (normalized.includes("tent") || normalized.includes("unpowered")) {
       return "tent";
     }
-    if (normalized.includes("cabin") || normalized.includes("cottage") || normalized.includes("ensuite")) {
+    if (
+      normalized.includes("cabin") ||
+      normalized.includes("cottage") ||
+      normalized.includes("ensuite")
+    ) {
       return "cabin";
     }
     if (normalized.includes("group") || normalized.includes("rally")) {
       return "group";
     }
-    if (normalized.includes("glamp") || normalized.includes("safari") || normalized.includes("bell tent")) {
+    if (
+      normalized.includes("glamp") ||
+      normalized.includes("safari") ||
+      normalized.includes("bell tent")
+    ) {
       return "glamping";
     }
 

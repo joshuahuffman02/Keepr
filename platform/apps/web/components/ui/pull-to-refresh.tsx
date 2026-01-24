@@ -55,7 +55,7 @@ export function PullToRefresh({
       startY.current = e.touches[0].clientY;
       currentY.current = startY.current;
     },
-    [disabled, pullState]
+    [disabled, pullState],
   );
 
   const handleTouchMove = useCallback(
@@ -89,7 +89,7 @@ export function PullToRefresh({
         setPullState(adjustedPull >= threshold ? "ready" : "pulling");
       }
     },
-    [disabled, pullState, threshold, maxPull]
+    [disabled, pullState, threshold, maxPull],
   );
 
   const handleTouchEnd = useCallback(async () => {
@@ -141,7 +141,7 @@ export function PullToRefresh({
       <div
         className={cn(
           "absolute left-0 right-0 flex items-center justify-center transition-opacity duration-200 pointer-events-none z-10",
-          pullDistance > 0 ? "opacity-100" : "opacity-0"
+          pullDistance > 0 ? "opacity-100" : "opacity-0",
         )}
         style={{
           top: 0,
@@ -153,7 +153,7 @@ export function PullToRefresh({
           className={cn(
             "flex flex-col items-center justify-center gap-1 transition-all duration-200",
             pullState === "ready" && "text-emerald-600",
-            pullState === "refreshing" && "text-emerald-600"
+            pullState === "refreshing" && "text-emerald-600",
           )}
         >
           {pullState === "refreshing" ? (
@@ -162,7 +162,7 @@ export function PullToRefresh({
             <ArrowDown
               className={cn(
                 "h-6 w-6 transition-transform duration-200",
-                pullState === "ready" && "rotate-180"
+                pullState === "ready" && "rotate-180",
               )}
               style={{
                 transform: `rotate(${progress * 180}deg)`,

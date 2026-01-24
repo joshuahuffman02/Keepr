@@ -7,8 +7,23 @@ import { PageHeader } from "@/components/ui/layout/PageHeader";
 import { AlertTriangle, CheckCircle2, ClipboardList, Clock, RefreshCw } from "lucide-react";
 
 // Types matching the new unified op-tasks schema
-type OpTaskCategory = "turnover" | "housekeeping" | "maintenance" | "inspection" | "grounds" | "pool" | "front_desk" | "custom";
-type OpTaskState = "pending" | "assigned" | "in_progress" | "blocked" | "completed" | "verified" | "cancelled";
+type OpTaskCategory =
+  | "turnover"
+  | "housekeeping"
+  | "maintenance"
+  | "inspection"
+  | "grounds"
+  | "pool"
+  | "front_desk"
+  | "custom";
+type OpTaskState =
+  | "pending"
+  | "assigned"
+  | "in_progress"
+  | "blocked"
+  | "completed"
+  | "verified"
+  | "cancelled";
 type OpTaskPriority = "low" | "medium" | "high" | "urgent";
 type OpSlaStatus = "on_track" | "at_risk" | "breached";
 type OpTaskFilter = {
@@ -249,10 +264,23 @@ const normalizeOpTask = (value: unknown): OpTask | null => {
   const createdAt = readString(value.createdAt);
   const updatedAt = readString(value.updatedAt);
 
-  if (!id || !campgroundId || !categoryValue || !title || !priorityValue || !stateValue || !createdAt || !updatedAt) {
+  if (
+    !id ||
+    !campgroundId ||
+    !categoryValue ||
+    !title ||
+    !priorityValue ||
+    !stateValue ||
+    !createdAt ||
+    !updatedAt
+  ) {
     return null;
   }
-  if (!isOpTaskCategory(categoryValue) || !isOpTaskPriority(priorityValue) || !isOpTaskState(stateValue)) {
+  if (
+    !isOpTaskCategory(categoryValue) ||
+    !isOpTaskPriority(priorityValue) ||
+    !isOpTaskState(stateValue)
+  ) {
     return null;
   }
 
@@ -322,7 +350,9 @@ const normalizeOpTasks = (value: unknown): OpTask[] => {
   }, []);
 };
 
-const parseChecklistTemplate = (value: unknown): Array<{ id: string; text: string }> | undefined => {
+const parseChecklistTemplate = (
+  value: unknown,
+): Array<{ id: string; text: string }> | undefined => {
   if (!Array.isArray(value)) return undefined;
   const items = value.reduce<Array<{ id: string; text: string }>>((acc, item) => {
     if (!isRecord(item)) return acc;
@@ -417,7 +447,13 @@ const parseSlaCurrent = (value: unknown): SlaDashboardMetrics["current"] | null 
   const atRisk = readNumber(value.atRisk);
   const breached = readNumber(value.breached);
   const total = readNumber(value.total);
-  if (onTrack === undefined || atRisk === undefined || breached === undefined || total === undefined) return null;
+  if (
+    onTrack === undefined ||
+    atRisk === undefined ||
+    breached === undefined ||
+    total === undefined
+  )
+    return null;
   return { onTrack, atRisk, breached, total };
 };
 
@@ -427,7 +463,13 @@ const parseSlaToday = (value: unknown): SlaDashboardMetrics["today"] | null => {
   const onTime = readNumber(value.onTime);
   const late = readNumber(value.late);
   const complianceRate = readNumber(value.complianceRate);
-  if (completed === undefined || onTime === undefined || late === undefined || complianceRate === undefined) return null;
+  if (
+    completed === undefined ||
+    onTime === undefined ||
+    late === undefined ||
+    complianceRate === undefined
+  )
+    return null;
   return { completed, onTime, late, complianceRate };
 };
 
@@ -458,10 +500,30 @@ const normalizeLeaderboardEntry = (value: unknown): LeaderboardEntry | null => {
   const tasksCompleted = readNumber(value.tasksCompleted);
   const streak = readNumber(value.streak);
   const badges = readNumber(value.badges);
-  if (!userId || !userName || totalPoints === undefined || periodPoints === undefined || rank === undefined || level === undefined || tasksCompleted === undefined || streak === undefined || badges === undefined) {
+  if (
+    !userId ||
+    !userName ||
+    totalPoints === undefined ||
+    periodPoints === undefined ||
+    rank === undefined ||
+    level === undefined ||
+    tasksCompleted === undefined ||
+    streak === undefined ||
+    badges === undefined
+  ) {
     return null;
   }
-  return { userId, userName, totalPoints, periodPoints, rank, level, tasksCompleted, streak, badges };
+  return {
+    userId,
+    userName,
+    totalPoints,
+    periodPoints,
+    rank,
+    level,
+    tasksCompleted,
+    streak,
+    badges,
+  };
 };
 
 const normalizeLeaderboard = (value: unknown): LeaderboardEntry[] => {
@@ -506,7 +568,19 @@ const normalizeStaffProfile = (value: unknown): StaffProfile | null => {
   const longestStreak = readNumber(value.longestStreak);
   const totalTasksCompleted = readNumber(value.totalTasksCompleted);
   const slaComplianceRate = readNumber(value.slaComplianceRate);
-  if (!userId || !userName || level === undefined || totalPoints === undefined || weekPoints === undefined || monthPoints === undefined || xpToNextLevel === undefined || currentStreak === undefined || longestStreak === undefined || totalTasksCompleted === undefined || slaComplianceRate === undefined) {
+  if (
+    !userId ||
+    !userName ||
+    level === undefined ||
+    totalPoints === undefined ||
+    weekPoints === undefined ||
+    monthPoints === undefined ||
+    xpToNextLevel === undefined ||
+    currentStreak === undefined ||
+    longestStreak === undefined ||
+    totalTasksCompleted === undefined ||
+    slaComplianceRate === undefined
+  ) {
     return null;
   }
 
@@ -515,18 +589,18 @@ const normalizeStaffProfile = (value: unknown): StaffProfile | null => {
   const badgesValue = value.badges;
   const badges = Array.isArray(badgesValue)
     ? badgesValue.reduce<StaffProfile["badges"]>((acc, badge) => {
-      const normalized = normalizeStaffBadge(badge);
-      if (normalized) acc.push(normalized);
-      return acc;
-    }, [])
+        const normalized = normalizeStaffBadge(badge);
+        if (normalized) acc.push(normalized);
+        return acc;
+      }, [])
     : [];
   const activityValue = value.recentActivity;
   const recentActivity = Array.isArray(activityValue)
     ? activityValue.reduce<StaffProfile["recentActivity"]>((acc, entry) => {
-      const normalized = normalizeStaffActivity(entry);
-      if (normalized) acc.push(normalized);
-      return acc;
-    }, [])
+        const normalized = normalizeStaffActivity(entry);
+        if (normalized) acc.push(normalized);
+        return acc;
+      }, [])
     : [];
 
   return {
@@ -559,7 +633,17 @@ const normalizeBadge = (value: unknown): Badge | null => {
   const tier = readString(value.tier);
   const points = readNumber(value.points);
   const earnedCount = readNumber(value.earnedCount);
-  if (!id || !code || !name || !description || !icon || !category || !tier || points === undefined || earnedCount === undefined) {
+  if (
+    !id ||
+    !code ||
+    !name ||
+    !description ||
+    !icon ||
+    !category ||
+    !tier ||
+    points === undefined ||
+    earnedCount === undefined
+  ) {
     return null;
   }
   return { id, code, name, description, icon, category, tier, points, earnedCount };
@@ -576,13 +660,37 @@ const normalizeBadges = (value: unknown): Badge[] => {
 
 // Visual configuration
 const STATE_CONFIG: Record<OpTaskState, { label: string; color: string; bgColor: string }> = {
-  pending: { label: "Pending", color: "text-status-warning", bgColor: "bg-status-warning/15 border-status-warning/30" },
-  assigned: { label: "Assigned", color: "text-purple-800", bgColor: "bg-purple-100 border-purple-200" },
-  in_progress: { label: "In Progress", color: "text-status-info", bgColor: "bg-status-info/15 border-status-info/30" },
-  blocked: { label: "Blocked", color: "text-status-error", bgColor: "bg-status-error/15 border-status-error/30" },
-  completed: { label: "Completed", color: "text-status-success", bgColor: "bg-status-success/15 border-status-success/30" },
+  pending: {
+    label: "Pending",
+    color: "text-status-warning",
+    bgColor: "bg-status-warning/15 border-status-warning/30",
+  },
+  assigned: {
+    label: "Assigned",
+    color: "text-purple-800",
+    bgColor: "bg-purple-100 border-purple-200",
+  },
+  in_progress: {
+    label: "In Progress",
+    color: "text-status-info",
+    bgColor: "bg-status-info/15 border-status-info/30",
+  },
+  blocked: {
+    label: "Blocked",
+    color: "text-status-error",
+    bgColor: "bg-status-error/15 border-status-error/30",
+  },
+  completed: {
+    label: "Completed",
+    color: "text-status-success",
+    bgColor: "bg-status-success/15 border-status-success/30",
+  },
   verified: { label: "Verified", color: "text-teal-800", bgColor: "bg-teal-100 border-teal-200" },
-  cancelled: { label: "Cancelled", color: "text-muted-foreground", bgColor: "bg-muted border-border" },
+  cancelled: {
+    label: "Cancelled",
+    color: "text-muted-foreground",
+    bgColor: "bg-muted border-border",
+  },
 };
 
 const SLA_CONFIG: Record<OpSlaStatus, { label: string; color: string; icon: string }> = {
@@ -684,7 +792,7 @@ export default function OperationsPage() {
 
       if (activeTab === "leaderboard") {
         const [leaderboardData, myStatsData, badgesData] = await Promise.all([
-          apiClient.getLeaderboard(selectedCampgroundId, { period: 'week', limit: 20 }),
+          apiClient.getLeaderboard(selectedCampgroundId, { period: "week", limit: 20 }),
           apiClient.getMyGamificationStats(selectedCampgroundId).catch(() => null),
           apiClient.getBadges(selectedCampgroundId),
         ]);
@@ -715,13 +823,16 @@ export default function OperationsPage() {
   };
 
   // Group tasks for kanban
-  const tasksByState = useMemo(() => ({
-    pending: tasks.filter(t => t.state === "pending"),
-    assigned: tasks.filter(t => t.state === "assigned"),
-    in_progress: tasks.filter(t => t.state === "in_progress"),
-    blocked: tasks.filter(t => t.state === "blocked"),
-    completed: tasks.filter(t => t.state === "completed" || t.state === "verified"),
-  }), [tasks]);
+  const tasksByState = useMemo(
+    () => ({
+      pending: tasks.filter((t) => t.state === "pending"),
+      assigned: tasks.filter((t) => t.state === "assigned"),
+      in_progress: tasks.filter((t) => t.state === "in_progress"),
+      blocked: tasks.filter((t) => t.state === "blocked"),
+      completed: tasks.filter((t) => t.state === "completed" || t.state === "verified"),
+    }),
+    [tasks],
+  );
 
   // Format helpers
   const formatDate = (d?: string) => {
@@ -768,16 +879,16 @@ export default function OperationsPage() {
       <div className="p-4 md:p-6 max-w-[1800px] mx-auto">
         <PageHeader
           eyebrow="Operations"
-          title={(
+          title={
             <span className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-status-info/15 text-status-info">
                 <ClipboardList className="h-5 w-5" />
               </span>
               <span>Operations</span>
             </span>
-          )}
+          }
           subtitle="Manage tasks, turnovers, maintenance, and team assignments."
-          actions={(
+          actions={
             <div className="flex flex-wrap gap-2">
               {activeTab === "templates" && (
                 <button
@@ -802,7 +913,7 @@ export default function OperationsPage() {
                 <span>+</span> <span className="hidden sm:inline">New</span> Task
               </button>
             </div>
-          )}
+          }
           className="mb-6"
         />
 
@@ -946,22 +1057,25 @@ function TaskBoardTab({
   formatDate: (d?: string) => string;
   formatTimeRemaining: (d?: string) => string | null;
 }) {
-  const [viewMode, setViewMode] = useState<'board' | 'list'>('board');
-  const [mobileStateFilter, setMobileStateFilter] = useState<OpTaskState | 'all'>('all');
+  const [viewMode, setViewMode] = useState<"board" | "list">("board");
+  const [mobileStateFilter, setMobileStateFilter] = useState<OpTaskState | "all">("all");
 
   // Stats calculation
-  const stats = useMemo(() => ({
-    total: tasks.length,
-    pending: tasksByState.pending?.length || 0,
-    inProgress: tasksByState.in_progress?.length || 0,
-    breached: tasks.filter(t => t.slaStatus === "breached").length,
-    atRisk: tasks.filter(t => t.slaStatus === "at_risk").length,
-  }), [tasks, tasksByState]);
+  const stats = useMemo(
+    () => ({
+      total: tasks.length,
+      pending: tasksByState.pending?.length || 0,
+      inProgress: tasksByState.in_progress?.length || 0,
+      breached: tasks.filter((t) => t.slaStatus === "breached").length,
+      atRisk: tasks.filter((t) => t.slaStatus === "at_risk").length,
+    }),
+    [tasks, tasksByState],
+  );
 
   // Filter tasks for mobile list view
   const filteredTasks = useMemo(() => {
-    if (mobileStateFilter === 'all') return tasks;
-    return tasks.filter(t => t.state === mobileStateFilter);
+    if (mobileStateFilter === "all") return tasks;
+    return tasks.filter((t) => t.state === mobileStateFilter);
   }, [tasks, mobileStateFilter]);
 
   const stateTabs: Array<{ id: OpTaskState | "all"; label: string; count: number }> = [
@@ -1003,11 +1117,14 @@ function TaskBoardTab({
         />
         <StatsCard
           label="Done Today"
-          value={tasks.filter(t =>
-            t.state === "completed" &&
-            t.completedAt &&
-            new Date(t.completedAt).toDateString() === new Date().toDateString()
-          ).length}
+          value={
+            tasks.filter(
+              (t) =>
+                t.state === "completed" &&
+                t.completedAt &&
+                new Date(t.completedAt).toDateString() === new Date().toDateString(),
+            ).length
+          }
           icon={<CheckCircle2 className="h-4 w-4 text-emerald-600" />}
           tone="text-emerald-600"
         />
@@ -1019,18 +1136,18 @@ function TaskBoardTab({
           {/* View mode toggle */}
           <div className="flex bg-muted/60 rounded-lg p-1 mr-auto md:mr-2">
             <button
-              onClick={() => setViewMode('board')}
+              onClick={() => setViewMode("board")}
               className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-                viewMode === 'board' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
+                viewMode === "board" ? "bg-card shadow text-foreground" : "text-muted-foreground"
               }`}
             >
               <span className="hidden sm:inline">Board</span>
               <span className="sm:hidden">B</span>
             </button>
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => setViewMode("list")}
               className={`px-3 py-1.5 text-xs font-medium rounded transition-colors min-h-[36px] ${
-                viewMode === 'list' ? 'bg-card shadow text-foreground' : 'text-muted-foreground'
+                viewMode === "list" ? "bg-card shadow text-foreground" : "text-muted-foreground"
               }`}
             >
               <span className="hidden sm:inline">List</span>
@@ -1049,7 +1166,9 @@ function TaskBoardTab({
           >
             <option value="">All Types</option>
             {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-              <option key={key} value={key}>{config.icon} {config.label}</option>
+              <option key={key} value={key}>
+                {config.icon} {config.label}
+              </option>
             ))}
           </select>
 
@@ -1078,8 +1197,10 @@ function TaskBoardTab({
               className="px-2 md:px-3 py-2 bg-muted/30 border border-border rounded-lg text-sm min-h-[44px] hidden sm:block"
             >
               <option value="">All Teams</option>
-              {teams.map(team => (
-                <option key={team.id} value={team.id}>{team.name}</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
               ))}
             </select>
           )}
@@ -1098,7 +1219,7 @@ function TaskBoardTab({
       {/* Board View */}
       {loading ? (
         <LoadingSpinner />
-      ) : viewMode === 'board' ? (
+      ) : viewMode === "board" ? (
         <div className="flex gap-3 md:gap-4 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory md:snap-none">
           <KanbanColumn
             title="Pending"
@@ -1152,8 +1273,8 @@ function TaskBoardTab({
                 onClick={() => setMobileStateFilter(tab.id)}
                 className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors min-h-[44px] ${
                   mobileStateFilter === tab.id
-                    ? 'bg-status-success/15 text-status-success'
-                    : 'bg-muted text-muted-foreground hover:bg-muted'
+                    ? "bg-status-success/15 text-status-success"
+                    : "bg-muted text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {tab.label} <span className="text-xs opacity-70">({tab.count})</span>
@@ -1169,7 +1290,7 @@ function TaskBoardTab({
             </div>
           ) : (
             <div className="space-y-2">
-              {filteredTasks.map(task => (
+              {filteredTasks.map((task) => (
                 <MobileTaskRow
                   key={task.id}
                   task={task}
@@ -1191,7 +1312,7 @@ function StatsCard({
   icon,
   tone = "text-foreground",
   subtext,
-  subtextTone = "text-muted-foreground"
+  subtextTone = "text-muted-foreground",
 }: {
   label: string;
   value: number;
@@ -1203,16 +1324,16 @@ function StatsCard({
   return (
     <div className="bg-card rounded-xl border border-border p-3 md:p-4 shadow-sm transition-colors">
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
-        {icon && (
-          <span className="rounded-lg bg-muted/60 p-2">
-            {icon}
-          </span>
-        )}
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {label}
+        </span>
+        {icon && <span className="rounded-lg bg-muted/60 p-2">{icon}</span>}
       </div>
       <div className="mt-2 flex items-baseline gap-2">
         <span className={`text-xl md:text-2xl font-semibold ${tone}`}>{value}</span>
-        {subtext && <span className={`text-[11px] md:text-xs font-semibold ${subtextTone}`}>{subtext}</span>}
+        {subtext && (
+          <span className={`text-[11px] md:text-xs font-semibold ${subtextTone}`}>{subtext}</span>
+        )}
       </div>
     </div>
   );
@@ -1239,7 +1360,9 @@ function KanbanColumn({
     <div className="flex-shrink-0 w-[280px] md:w-[300px] snap-center md:snap-align-none">
       <div className="flex items-center gap-2 mb-3 md:mb-4 px-1">
         <h3 className="font-semibold text-foreground text-sm md:text-base">{title}</h3>
-        <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config.bgColor} ${config.color}`}>
+        <span
+          className={`px-2 py-0.5 rounded-full text-xs font-medium border ${config.bgColor} ${config.color}`}
+        >
           {tasks.length}
         </span>
       </div>
@@ -1249,7 +1372,7 @@ function KanbanColumn({
             No tasks
           </div>
         ) : (
-          tasks.map(task => (
+          tasks.map((task) => (
             <TaskCard
               key={task.id}
               task={task}
@@ -1285,7 +1408,9 @@ function TaskCard({
       {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-lg" title={categoryConfig.label}>{categoryConfig.icon}</span>
+          <span className="text-lg" title={categoryConfig.label}>
+            {categoryConfig.icon}
+          </span>
           <span className="font-medium text-foreground text-sm line-clamp-1">{task.title}</span>
         </div>
         {slaConfig && (
@@ -1302,7 +1427,20 @@ function TaskCard({
       <div className="space-y-2 text-xs mb-3">
         {/* Location */}
         <div className="flex items-center gap-2 text-muted-foreground">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
           <span>{task.site?.name || task.locationDescription || "-"}</span>
         </div>
 
@@ -1314,10 +1452,15 @@ function TaskCard({
 
         {/* Due time */}
         {task.slaDueAt && (
-          <div className={`flex items-center gap-2 ${
-            task.slaStatus === "breached" ? "text-status-error font-medium" :
-            task.slaStatus === "at_risk" ? "text-status-warning" : "text-muted-foreground"
-          }`}>
+          <div
+            className={`flex items-center gap-2 ${
+              task.slaStatus === "breached"
+                ? "text-status-error font-medium"
+                : task.slaStatus === "at_risk"
+                  ? "text-status-warning"
+                  : "text-muted-foreground"
+            }`}
+          >
             <span>Due:</span>
             <span>{timeRemaining}</span>
           </div>
@@ -1345,7 +1488,7 @@ function TaskCard({
               />
             </div>
             <span className="text-muted-foreground">
-              {task.checklist.filter(i => i.completed).length}/{task.checklist.length}
+              {task.checklist.filter((i) => i.completed).length}/{task.checklist.length}
             </span>
           </div>
         )}
@@ -1434,7 +1577,9 @@ function MobileTaskRow({
         <div className="relative">
           <span className="text-xl">{categoryConfig.icon}</span>
           {slaConfig && (
-            <span className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${slaConfig.color} border-2 border-white`} />
+            <span
+              className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${slaConfig.color} border-2 border-white`}
+            />
           )}
         </div>
 
@@ -1445,12 +1590,22 @@ function MobileTaskRow({
             <span className={`w-2 h-2 rounded-full flex-shrink-0 ${priorityConfig.dot}`} />
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-            <span className={`px-1.5 py-0.5 rounded ${stateConfig.bgColor} ${stateConfig.color} text-[10px] font-medium`}>
+            <span
+              className={`px-1.5 py-0.5 rounded ${stateConfig.bgColor} ${stateConfig.color} text-[10px] font-medium`}
+            >
               {stateConfig.label}
             </span>
             {task.site?.name && <span>Site: {task.site.name}</span>}
             {timeRemaining && (
-              <span className={task.slaStatus === 'breached' ? 'text-status-error font-medium' : task.slaStatus === 'at_risk' ? 'text-status-warning' : ''}>
+              <span
+                className={
+                  task.slaStatus === "breached"
+                    ? "text-status-error font-medium"
+                    : task.slaStatus === "at_risk"
+                      ? "text-status-warning"
+                      : ""
+                }
+              >
                 Due: {timeRemaining}
               </span>
             )}
@@ -1458,8 +1613,22 @@ function MobileTaskRow({
         </div>
 
         {/* Expand indicator */}
-        <span className={`text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        <span
+          className={`text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </span>
       </button>
 
@@ -1467,9 +1636,7 @@ function MobileTaskRow({
       {expanded && (
         <div className="px-4 pb-4 pt-2 border-t border-border space-y-3">
           {/* Description */}
-          {task.description && (
-            <p className="text-sm text-muted-foreground">{task.description}</p>
-          )}
+          {task.description && <p className="text-sm text-muted-foreground">{task.description}</p>}
 
           {/* Details */}
           <div className="flex flex-wrap gap-2 text-xs">
@@ -1498,7 +1665,7 @@ function MobileTaskRow({
                 />
               </div>
               <span className="text-xs text-muted-foreground">
-                {task.checklist.filter(i => i.completed).length}/{task.checklist.length}
+                {task.checklist.filter((i) => i.completed).length}/{task.checklist.length}
               </span>
             </div>
           )}
@@ -1507,7 +1674,10 @@ function MobileTaskRow({
           <div className="flex gap-2 pt-2">
             {task.state === "pending" && (
               <button
-                onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateTaskState(task.id, "in_progress");
+                }}
                 className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Start Task
@@ -1515,7 +1685,10 @@ function MobileTaskRow({
             )}
             {task.state === "assigned" && (
               <button
-                onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateTaskState(task.id, "in_progress");
+                }}
                 className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Start Work
@@ -1524,13 +1697,19 @@ function MobileTaskRow({
             {task.state === "in_progress" && (
               <>
                 <button
-                  onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "completed"); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateTaskState(task.id, "completed");
+                  }}
                   className="flex-1 px-4 py-3 bg-status-success text-white rounded-lg text-sm font-medium active:bg-status-success/90 transition-colors min-h-[48px]"
                 >
                   Complete
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "blocked"); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    updateTaskState(task.id, "blocked");
+                  }}
                   className="px-4 py-3 bg-status-error/15 text-status-error rounded-lg text-sm font-medium active:bg-status-error/25 transition-colors min-h-[48px]"
                 >
                   Block
@@ -1539,7 +1718,10 @@ function MobileTaskRow({
             )}
             {task.state === "blocked" && (
               <button
-                onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "in_progress"); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateTaskState(task.id, "in_progress");
+                }}
                 className="flex-1 px-4 py-3 bg-status-info text-white rounded-lg text-sm font-medium active:bg-status-info/90 transition-colors min-h-[48px]"
               >
                 Resume
@@ -1547,7 +1729,10 @@ function MobileTaskRow({
             )}
             {(task.state === "completed" || task.state === "verified") && (
               <button
-                onClick={(e) => { e.stopPropagation(); updateTaskState(task.id, "pending"); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateTaskState(task.id, "pending");
+                }}
                 className="flex-1 px-4 py-3 bg-muted text-foreground rounded-lg text-sm font-medium active:bg-muted transition-colors min-h-[48px]"
               >
                 Reopen
@@ -1577,18 +1762,20 @@ function SlaDashboardTab({
   formatDate: (d?: string) => string;
   formatTimeRemaining: (d?: string) => string | null;
 }) {
-  const breachedTasks = useMemo(() =>
-    tasks.filter(t => t.slaStatus === "breached").sort((a, b) =>
-      new Date(a.slaDueAt || 0).getTime() - new Date(b.slaDueAt || 0).getTime()
-    ),
-    [tasks]
+  const breachedTasks = useMemo(
+    () =>
+      tasks
+        .filter((t) => t.slaStatus === "breached")
+        .sort((a, b) => new Date(a.slaDueAt || 0).getTime() - new Date(b.slaDueAt || 0).getTime()),
+    [tasks],
   );
 
-  const atRiskTasks = useMemo(() =>
-    tasks.filter(t => t.slaStatus === "at_risk").sort((a, b) =>
-      new Date(a.slaDueAt || 0).getTime() - new Date(b.slaDueAt || 0).getTime()
-    ),
-    [tasks]
+  const atRiskTasks = useMemo(
+    () =>
+      tasks
+        .filter((t) => t.slaStatus === "at_risk")
+        .sort((a, b) => new Date(a.slaDueAt || 0).getTime() - new Date(b.slaDueAt || 0).getTime()),
+    [tasks],
   );
 
   if (loading) return <LoadingSpinner />;
@@ -1599,19 +1786,27 @@ function SlaDashboardTab({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="text-sm text-muted-foreground mb-2">Current On Track</div>
-          <div className="text-3xl font-bold text-status-success">{slaMetrics?.current.onTrack || 0}</div>
+          <div className="text-3xl font-bold text-status-success">
+            {slaMetrics?.current.onTrack || 0}
+          </div>
         </div>
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="text-sm text-muted-foreground mb-2">At Risk</div>
-          <div className="text-3xl font-bold text-status-warning">{slaMetrics?.current.atRisk || 0}</div>
+          <div className="text-3xl font-bold text-status-warning">
+            {slaMetrics?.current.atRisk || 0}
+          </div>
         </div>
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="text-sm text-muted-foreground mb-2">Breached</div>
-          <div className="text-3xl font-bold text-status-error">{slaMetrics?.current.breached || 0}</div>
+          <div className="text-3xl font-bold text-status-error">
+            {slaMetrics?.current.breached || 0}
+          </div>
         </div>
         <div className="bg-card rounded-xl border border-border p-6">
           <div className="text-sm text-muted-foreground mb-2">Today's Compliance</div>
-          <div className="text-3xl font-bold text-status-info">{slaMetrics?.today.complianceRate || 100}%</div>
+          <div className="text-3xl font-bold text-status-info">
+            {slaMetrics?.today.complianceRate || 100}%
+          </div>
         </div>
       </div>
 
@@ -1620,15 +1815,21 @@ function SlaDashboardTab({
         <h3 className="text-lg font-semibold text-foreground mb-4">Today's Performance</h3>
         <div className="grid grid-cols-3 gap-6">
           <div>
-            <div className="text-2xl font-bold text-foreground">{slaMetrics?.today.completed || 0}</div>
+            <div className="text-2xl font-bold text-foreground">
+              {slaMetrics?.today.completed || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Tasks Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-status-success">{slaMetrics?.today.onTime || 0}</div>
+            <div className="text-2xl font-bold text-status-success">
+              {slaMetrics?.today.onTime || 0}
+            </div>
             <div className="text-sm text-muted-foreground">On Time</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-status-error">{slaMetrics?.today.late || 0}</div>
+            <div className="text-2xl font-bold text-status-error">
+              {slaMetrics?.today.late || 0}
+            </div>
             <div className="text-sm text-muted-foreground">Late</div>
           </div>
         </div>
@@ -1638,12 +1839,31 @@ function SlaDashboardTab({
       {breachedTasks.length > 0 && (
         <div className="bg-card rounded-xl border border-status-error/30 p-6">
           <h3 className="text-lg font-semibold text-status-error mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+              <path d="M12 9v4" />
+              <path d="M12 17h.01" />
+            </svg>
             SLA Breached ({breachedTasks.length})
           </h3>
           <div className="space-y-3">
-            {breachedTasks.map(task => (
-              <SlaTaskRow key={task.id} task={task} formatDate={formatDate} formatTimeRemaining={formatTimeRemaining} />
+            {breachedTasks.map((task) => (
+              <SlaTaskRow
+                key={task.id}
+                task={task}
+                formatDate={formatDate}
+                formatTimeRemaining={formatTimeRemaining}
+              />
             ))}
           </div>
         </div>
@@ -1656,8 +1876,13 @@ function SlaDashboardTab({
             At Risk ({atRiskTasks.length})
           </h3>
           <div className="space-y-3">
-            {atRiskTasks.map(task => (
-              <SlaTaskRow key={task.id} task={task} formatDate={formatDate} formatTimeRemaining={formatTimeRemaining} />
+            {atRiskTasks.map((task) => (
+              <SlaTaskRow
+                key={task.id}
+                task={task}
+                formatDate={formatDate}
+                formatTimeRemaining={formatTimeRemaining}
+              />
             ))}
           </div>
         </div>
@@ -1692,13 +1917,16 @@ function SlaTaskRow({
         <div>
           <div className="font-medium text-foreground">{task.title}</div>
           <div className="text-xs text-muted-foreground">
-            {task.site?.name || task.locationDescription} • {task.assignedToTeam?.name || "Unassigned"}
+            {task.site?.name || task.locationDescription} •{" "}
+            {task.assignedToTeam?.name || "Unassigned"}
           </div>
         </div>
       </div>
-      <div className={`text-sm font-medium ${
-        task.slaStatus === "breached" ? "text-status-error" : "text-status-warning"
-      }`}>
+      <div
+        className={`text-sm font-medium ${
+          task.slaStatus === "breached" ? "text-status-error" : "text-status-warning"
+        }`}
+      >
         {timeRemaining}
       </div>
     </div>
@@ -1730,8 +1958,9 @@ function TemplatesTab({
           <div>
             <h4 className="font-medium text-blue-900">Task Templates & Automation</h4>
             <p className="text-sm text-blue-700 mt-1">
-              Create templates for common tasks, set up recurring schedules, and configure event triggers
-              to automatically generate tasks when guests check out, reservations are made, and more.
+              Create templates for common tasks, set up recurring schedules, and configure event
+              triggers to automatically generate tasks when guests check out, reservations are made,
+              and more.
             </p>
           </div>
         </div>
@@ -1741,11 +1970,13 @@ function TemplatesTab({
       {templates.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
           <h3 className="text-lg font-medium text-foreground">No Templates Yet</h3>
-          <p className="text-muted-foreground mt-1 mb-4">Create your first template to standardize common tasks</p>
+          <p className="text-muted-foreground mt-1 mb-4">
+            Create your first template to standardize common tasks
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {templates.map(template => (
+          {templates.map((template) => (
             <TemplateCard key={template.id} template={template} onRefresh={onRefresh} />
           ))}
         </div>
@@ -1754,13 +1985,7 @@ function TemplatesTab({
   );
 }
 
-function TemplateCard({
-  template,
-  onRefresh,
-}: {
-  template: OpTemplate;
-  onRefresh: () => void;
-}) {
+function TemplateCard({ template, onRefresh }: { template: OpTemplate; onRefresh: () => void }) {
   const categoryConfig = CATEGORY_CONFIG[template.category];
   const priorityConfig = PRIORITY_CONFIG[template.priority];
 
@@ -1774,7 +1999,9 @@ function TemplateCard({
           </span>
         </div>
         {!template.isActive && (
-          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Inactive</span>
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+            Inactive
+          </span>
         )}
       </div>
 
@@ -1788,12 +2015,8 @@ function TemplateCard({
           <span className={`w-2 h-2 rounded-full ${priorityConfig.dot}`} />
           {priorityConfig.label}
         </span>
-        {template.slaMinutes && (
-          <span>{template.slaMinutes}min SLA</span>
-        )}
-        {template.checklistTemplate && (
-          <span>{template.checklistTemplate.length} items</span>
-        )}
+        {template.slaMinutes && <span>{template.slaMinutes}min SLA</span>}
+        {template.checklistTemplate && <span>{template.checklistTemplate.length} items</span>}
       </div>
 
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
@@ -1830,11 +2053,13 @@ function TeamsTab({
       {teams.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-border rounded-xl">
           <h3 className="text-lg font-medium text-foreground">No Teams Yet</h3>
-          <p className="text-muted-foreground mt-1 mb-4">Create teams to organize your staff and assign tasks</p>
+          <p className="text-muted-foreground mt-1 mb-4">
+            Create teams to organize your staff and assign tasks
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {teams.map(team => (
+          {teams.map((team) => (
             <TeamCard key={team.id} team={team} onRefresh={onRefresh} />
           ))}
         </div>
@@ -1843,13 +2068,7 @@ function TeamsTab({
   );
 }
 
-function TeamCard({
-  team,
-  onRefresh,
-}: {
-  team: OpTeam;
-  onRefresh: () => void;
-}) {
+function TeamCard({ team, onRefresh }: { team: OpTeam; onRefresh: () => void }) {
   return (
     <div className="bg-card rounded-xl border border-border p-5 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
@@ -1860,7 +2079,9 @@ function TeamCard({
           {team.name.charAt(0).toUpperCase()}
         </div>
         {!team.isActive && (
-          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">Inactive</span>
+          <span className="text-xs px-2 py-0.5 rounded bg-muted text-muted-foreground">
+            Inactive
+          </span>
         )}
       </div>
 
@@ -1913,7 +2134,9 @@ function CreateTaskModal({
     async function loadSites() {
       try {
         const data = await apiClient.getSites(campgroundId);
-        setSites(data.map((site: SiteRecord) => ({ id: site.id, name: site.siteNumber || site.name })));
+        setSites(
+          data.map((site: SiteRecord) => ({ id: site.id, name: site.siteNumber || site.name })),
+        );
       } catch (err) {
         console.error("Failed to load sites:", err);
       }
@@ -1924,7 +2147,7 @@ function CreateTaskModal({
   // Apply template when selected
   useEffect(() => {
     if (templateId) {
-      const template = templates.find(t => t.id === templateId);
+      const template = templates.find((t) => t.id === templateId);
       if (template) {
         setTitle(template.name);
         setDescription(template.description || "");
@@ -1968,23 +2191,34 @@ function CreateTaskModal({
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Create Task</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-muted-foreground text-2xl"
+          >
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Template selector */}
           {templates.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Use Template (optional)</label>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Use Template (optional)
+              </label>
               <select
                 value={templateId}
-                onChange={e => setTemplateId(e.target.value)}
+                onChange={(e) => setTemplateId(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">Start from scratch</option>
-                {templates.filter(t => t.isActive).map(t => (
-                  <option key={t.id} value={t.id}>{CATEGORY_CONFIG[t.category].icon} {t.name}</option>
-                ))}
+                {templates
+                  .filter((t) => t.isActive)
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {CATEGORY_CONFIG[t.category].icon} {t.name}
+                    </option>
+                  ))}
               </select>
             </div>
           )}
@@ -2003,7 +2237,9 @@ function CreateTaskModal({
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                  <option key={key} value={key}>{config.icon} {config.label}</option>
+                  <option key={key} value={key}>
+                    {config.icon} {config.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -2020,7 +2256,9 @@ function CreateTaskModal({
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
-                  <option key={key} value={key}>{config.label}</option>
+                  <option key={key} value={key}>
+                    {config.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -2031,7 +2269,7 @@ function CreateTaskModal({
             <input
               type="text"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Clean cabin after checkout"
               required
@@ -2042,7 +2280,7 @@ function CreateTaskModal({
             <label className="block text-sm font-medium text-foreground mb-1">Description</label>
             <textarea
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               rows={2}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm resize-none"
               placeholder="Additional details or instructions..."
@@ -2054,12 +2292,14 @@ function CreateTaskModal({
               <label className="block text-sm font-medium text-foreground mb-1">Site</label>
               <select
                 value={siteId}
-                onChange={e => setSiteId(e.target.value)}
+                onChange={(e) => setSiteId(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">No specific site</option>
-                {sites.map(site => (
-                  <option key={site.id} value={site.id}>{site.name}</option>
+                {sites.map((site) => (
+                  <option key={site.id} value={site.id}>
+                    {site.name}
+                  </option>
                 ))}
               </select>
             </div>
@@ -2068,7 +2308,7 @@ function CreateTaskModal({
               <input
                 type="text"
                 value={locationDescription}
-                onChange={e => setLocationDescription(e.target.value)}
+                onChange={(e) => setLocationDescription(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
                 placeholder="e.g., Pool area"
                 disabled={!!siteId}
@@ -2078,24 +2318,32 @@ function CreateTaskModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Assign to Team</label>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Assign to Team
+              </label>
               <select
                 value={assignedToTeamId}
-                onChange={e => setAssignedToTeamId(e.target.value)}
+                onChange={(e) => setAssignedToTeamId(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 <option value="">Unassigned</option>
-                {teams.filter(t => t.isActive).map(team => (
-                  <option key={team.id} value={team.id}>{team.name}</option>
-                ))}
+                {teams
+                  .filter((t) => t.isActive)
+                  .map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Due Date/Time</label>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Due Date/Time
+              </label>
               <input
                 type="datetime-local"
                 value={slaDueAt}
-                onChange={e => setSlaDueAt(e.target.value)}
+                onChange={(e) => setSlaDueAt(e.target.value)}
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               />
             </div>
@@ -2164,9 +2412,10 @@ function CreateTemplateModal({
         description: description || undefined,
         priority,
         slaMinutes: slaMinutes ? parseInt(slaMinutes) : undefined,
-        checklistTemplate: checklistItems.length > 0
-          ? checklistItems.map((text, i) => ({ id: `item-${i}`, text }))
-          : undefined,
+        checklistTemplate:
+          checklistItems.length > 0
+            ? checklistItems.map((text, i) => ({ id: `item-${i}`, text }))
+            : undefined,
       });
       onCreated();
     } catch (err) {
@@ -2181,16 +2430,23 @@ function CreateTemplateModal({
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-card border-b border-border px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Create Template</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-muted-foreground text-2xl"
+          >
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Template Name *</label>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Template Name *
+            </label>
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Cabin Turnover Checklist"
               required
@@ -2211,12 +2467,16 @@ function CreateTemplateModal({
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                  <option key={key} value={key}>{config.icon} {config.label}</option>
+                  <option key={key} value={key}>
+                    {config.icon} {config.label}
+                  </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">Default Priority</label>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Default Priority
+              </label>
               <select
                 value={priority}
                 onChange={(e) => {
@@ -2228,7 +2488,9 @@ function CreateTemplateModal({
                 className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               >
                 {Object.entries(PRIORITY_CONFIG).map(([key, config]) => (
-                  <option key={key} value={key}>{config.label}</option>
+                  <option key={key} value={key}>
+                    {config.label}
+                  </option>
                 ))}
               </select>
             </div>
@@ -2238,7 +2500,7 @@ function CreateTemplateModal({
             <label className="block text-sm font-medium text-foreground mb-1">Description</label>
             <textarea
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               rows={2}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm resize-none"
               placeholder="What is this template for?"
@@ -2250,20 +2512,27 @@ function CreateTemplateModal({
             <input
               type="number"
               value={slaMinutes}
-              onChange={e => setSlaMinutes(e.target.value)}
+              onChange={(e) => setSlaMinutes(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., 60 for 1 hour"
               min="1"
             />
-            <p className="text-xs text-muted-foreground mt-1">How long staff has to complete tasks from this template</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              How long staff has to complete tasks from this template
+            </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">Checklist Items</label>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Checklist Items
+            </label>
             {checklistItems.length > 0 && (
               <div className="space-y-2 mb-3">
                 {checklistItems.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg"
+                  >
                     <span className="text-sm text-foreground flex-1">{item}</span>
                     <button
                       type="button"
@@ -2280,10 +2549,10 @@ function CreateTemplateModal({
               <input
                 type="text"
                 value={newChecklistItem}
-                onChange={e => setNewChecklistItem(e.target.value)}
+                onChange={(e) => setNewChecklistItem(e.target.value)}
                 className="flex-1 px-3 py-2 border border-border rounded-lg text-sm"
                 placeholder="Add checklist item..."
-                onKeyPress={e => e.key === "Enter" && (e.preventDefault(), addChecklistItem())}
+                onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addChecklistItem())}
               />
               <button
                 type="button"
@@ -2361,7 +2630,12 @@ function CreateTeamModal({
       <div className="bg-card rounded-2xl shadow-2xl w-full max-w-md">
         <div className="border-b border-border px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Create Team</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-muted-foreground text-2xl">×</button>
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-muted-foreground text-2xl"
+          >
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -2370,7 +2644,7 @@ function CreateTeamModal({
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 border border-border rounded-lg text-sm"
               placeholder="e.g., Housekeeping, Maintenance"
               required
@@ -2380,7 +2654,7 @@ function CreateTeamModal({
           <div>
             <label className="block text-sm font-medium text-foreground mb-2">Team Color</label>
             <div className="flex gap-2">
-              {colorOptions.map(c => (
+              {colorOptions.map((c) => (
                 <button
                   key={c}
                   type="button"
@@ -2476,7 +2750,8 @@ function LeaderboardTab({
       <div className="text-center py-16">
         <h3 className="text-xl font-semibold text-foreground mb-2">Set Up Gamification</h3>
         <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-          Motivate your team with points, badges, and leaderboards. Track performance and celebrate achievements!
+          Motivate your team with points, badges, and leaderboards. Track performance and celebrate
+          achievements!
         </p>
         <button
           onClick={seedBadges}
@@ -2501,7 +2776,9 @@ function LeaderboardTab({
             </div>
             <div className="text-right">
               <div className="text-4xl font-bold text-foreground">Level {myStats.level}</div>
-              <p className="text-muted-foreground text-sm">{LEVEL_TITLES[myStats.level - 1] || "Superstar"}</p>
+              <p className="text-muted-foreground text-sm">
+                {LEVEL_TITLES[myStats.level - 1] || "Superstar"}
+              </p>
             </div>
           </div>
 
@@ -2514,7 +2791,9 @@ function LeaderboardTab({
             <div className="h-3 bg-muted rounded-full overflow-hidden">
               <div
                 className="h-full bg-status-success rounded-full transition-all duration-500"
-                style={{ width: `${Math.min(100, (myStats.totalPoints / (myStats.totalPoints + myStats.xpToNextLevel)) * 100)}%` }}
+                style={{
+                  width: `${Math.min(100, (myStats.totalPoints / (myStats.totalPoints + myStats.xpToNextLevel)) * 100)}%`,
+                }}
               />
             </div>
           </div>
@@ -2522,7 +2801,9 @@ function LeaderboardTab({
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-muted rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-foreground">{myStats.totalTasksCompleted}</div>
+              <div className="text-2xl font-bold text-foreground">
+                {myStats.totalTasksCompleted}
+              </div>
               <div className="text-sm text-muted-foreground">Tasks Done</div>
             </div>
             <div className="bg-muted rounded-lg p-3 text-center">
@@ -2530,7 +2811,9 @@ function LeaderboardTab({
               <div className="text-sm text-muted-foreground">Day Streak</div>
             </div>
             <div className="bg-muted rounded-lg p-3 text-center">
-              <div className="text-2xl font-bold text-foreground">{Math.round(myStats.slaComplianceRate)}%</div>
+              <div className="text-2xl font-bold text-foreground">
+                {Math.round(myStats.slaComplianceRate)}%
+              </div>
               <div className="text-sm text-muted-foreground">On Time</div>
             </div>
             <div className="bg-muted rounded-lg p-3 text-center">
@@ -2544,10 +2827,10 @@ function LeaderboardTab({
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-sm text-muted-foreground mb-2">Your Badges</p>
               <div className="flex flex-wrap gap-2">
-                {myStats.badges.map(badge => (
+                {myStats.badges.map((badge) => (
                   <span
                     key={badge.id}
-                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${TIER_CONFIG[badge.tier]?.bg || 'bg-muted'} ${TIER_CONFIG[badge.tier]?.color || 'text-foreground'}`}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${TIER_CONFIG[badge.tier]?.bg || "bg-muted"} ${TIER_CONFIG[badge.tier]?.color || "text-foreground"}`}
                     title={badge.name}
                   >
                     <span>{badge.icon}</span>
@@ -2584,13 +2867,19 @@ function LeaderboardTab({
 
         {leaderboard.length === 0 ? (
           <div className="p-8 text-center text-muted-foreground">
-            <p>No activity yet this {period === 'week' ? 'week' : period === 'month' ? 'month' : 'period'}.</p>
+            <p>
+              No activity yet this{" "}
+              {period === "week" ? "week" : period === "month" ? "month" : "period"}.
+            </p>
             <p className="text-sm mt-1">Complete tasks to appear on the leaderboard!</p>
           </div>
         ) : (
           <div className="divide-y divide-border">
             {leaderboard.map((entry, index) => (
-              <div key={entry.userId} className={`px-6 py-4 flex items-center gap-4 ${index < 3 ? 'bg-amber-50/50' : ''}`}>
+              <div
+                key={entry.userId}
+                className={`px-6 py-4 flex items-center gap-4 ${index < 3 ? "bg-amber-50/50" : ""}`}
+              >
                 {/* Rank */}
                 <div className="w-10 text-center">
                   {index === 0 ? (
@@ -2641,14 +2930,16 @@ function LeaderboardTab({
           </h3>
         </div>
         <div className="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {badges.map(badge => (
+          {badges.map((badge) => (
             <div
               key={badge.id}
-              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? 'border-status-success/30 bg-status-success/15' : 'border-border bg-muted'} text-center`}
+              className={`p-4 rounded-xl border-2 ${badge.earnedCount > 0 ? "border-status-success/30 bg-status-success/15" : "border-border bg-muted"} text-center`}
             >
               <div className="text-3xl mb-2">{badge.icon}</div>
               <div className="font-medium text-foreground text-sm">{badge.name}</div>
-              <div className={`text-xs ${TIER_CONFIG[badge.tier]?.color || 'text-muted-foreground'} capitalize mb-1`}>
+              <div
+                className={`text-xs ${TIER_CONFIG[badge.tier]?.color || "text-muted-foreground"} capitalize mb-1`}
+              >
                 {badge.tier}
               </div>
               <div className="text-xs text-muted-foreground mb-2">{badge.description}</div>

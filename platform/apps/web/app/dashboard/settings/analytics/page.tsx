@@ -25,7 +25,7 @@ export default function AnalyticsSettingsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["campground-analytics", campgroundId],
     queryFn: () => apiClient.getCampground(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function AnalyticsSettingsPage() {
     mutationFn: () =>
       apiClient.updateCampgroundAnalytics(campgroundId, {
         gaMeasurementId: gaId || null,
-        metaPixelId: pixelId || null
+        metaPixelId: pixelId || null,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campground-analytics", campgroundId] });
@@ -46,7 +46,7 @@ export default function AnalyticsSettingsPage() {
     },
     onError: (err: Error) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
-    }
+    },
   });
 
   const handleSave = () => {
@@ -59,7 +59,8 @@ export default function AnalyticsSettingsPage() {
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Analytics & Tracking</h1>
           <p className="text-muted-foreground text-sm">
-            Set per-campground tracking IDs for Google Analytics (GA4) and Meta Pixel. These load on public park pages only.
+            Set per-campground tracking IDs for Google Analytics (GA4) and Meta Pixel. These load on
+            public park pages only.
           </p>
         </div>
 
@@ -106,4 +107,3 @@ export default function AnalyticsSettingsPage() {
     </div>
   );
 }
-

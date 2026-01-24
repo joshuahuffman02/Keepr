@@ -11,8 +11,8 @@ export class CampaignsScheduler {
   constructor(
     private readonly prisma: PrismaService,
     private readonly campaigns: CampaignsService,
-    private readonly queue: JobQueueService
-  ) { }
+    private readonly queue: JobQueueService,
+  ) {}
 
   @Cron("*/1 * * * *")
   async dispatchScheduled() {
@@ -20,21 +20,24 @@ export class CampaignsScheduler {
     const due = await this.prisma.campaign.findMany({
       where: {
         status: CampaignStatus.scheduled,
-        scheduledAt: { lte: now }
+        scheduledAt: { lte: now },
       },
-      select: { id: true }
+      select: { id: true },
     });
     await Promise.all(
       due.map((c) =>
-        this.queue.enqueue(
-          "campaign-dispatch",
-          () => this.campaigns.sendNow(c.id),
-          { jobName: `campaign-${c.id}`, timeoutMs: 20000, concurrency: 2 }
-        ).catch((err) => {
-          this.logger.warn(`Failed to dispatch scheduled campaign ${c.id}: ${err instanceof Error ? err.message : err}`);
-        })
-      )
+        this.queue
+          .enqueue("campaign-dispatch", () => this.campaigns.sendNow(c.id), {
+            jobName: `campaign-${c.id}`,
+            timeoutMs: 20000,
+            concurrency: 2,
+          })
+          .catch((err) => {
+            this.logger.warn(
+              `Failed to dispatch scheduled campaign ${c.id}: ${err instanceof Error ? err.message : err}`,
+            );
+          }),
+      ),
     );
   }
 }
-

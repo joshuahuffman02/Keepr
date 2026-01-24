@@ -26,5 +26,3 @@ export class PricingSuggestDto {
   @Max(1)
   demandIndex?: number;
 }
-
-

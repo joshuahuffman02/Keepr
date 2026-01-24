@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-type HapticPattern = "light" | "medium" | "heavy" | "success" | "warning" | "error" | "selection" | number | number[];
+type HapticPattern =
+  | "light"
+  | "medium"
+  | "heavy"
+  | "success"
+  | "warning"
+  | "error"
+  | "selection"
+  | number
+  | number[];
 
 interface UseHapticOptions {
   /** Whether haptic feedback is enabled (respects user preference) */
@@ -31,10 +40,10 @@ const PATTERNS: Record<string, number | number[]> = {
   light: 10,
   medium: 25,
   heavy: 50,
-  success: [10, 50, 10],       // Quick double tap
-  warning: [25, 50, 25, 50],   // Two medium taps
-  error: [50, 100, 50],        // Strong double tap
-  selection: 5,                // Ultra-light for selections
+  success: [10, 50, 10], // Quick double tap
+  warning: [25, 50, 25, 50], // Two medium taps
+  error: [50, 100, 50], // Strong double tap
+  selection: 5, // Ultra-light for selections
 };
 
 const DEFAULT_STORAGE_KEY = "campreserv:haptic-enabled";
@@ -90,7 +99,7 @@ export function useHaptic(options: UseHapticOptions = {}): UseHapticReturn {
         // Ignore storage errors
       }
     },
-    [storageKey]
+    [storageKey],
   );
 
   const trigger = useCallback(
@@ -113,7 +122,7 @@ export function useHaptic(options: UseHapticOptions = {}): UseHapticReturn {
         // Ignore errors (e.g., user hasn't interacted yet)
       }
     },
-    [isSupported, isEnabled]
+    [isSupported, isEnabled],
   );
 
   const toggle = useCallback(() => {

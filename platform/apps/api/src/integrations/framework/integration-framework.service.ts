@@ -19,7 +19,7 @@ const toStringValue = (value: unknown): string | undefined =>
   typeof value === "string" ? value : undefined;
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -43,7 +43,7 @@ export class IntegrationFrameworkService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly encryption: CredentialEncryptionService
+    private readonly encryption: CredentialEncryptionService,
   ) {}
 
   /**
@@ -74,7 +74,7 @@ export class IntegrationFrameworkService {
   async initiateOAuth(
     campgroundId: string,
     slug: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<OAuthUrlResult> {
     const definition = await this.getDefinitionBySlug(slug);
     if (definition.authType !== "oauth2") {
@@ -97,7 +97,7 @@ export class IntegrationFrameworkService {
     slug: string,
     code: string,
     state: string,
-    redirectUri: string
+    redirectUri: string,
   ): Promise<{ success: boolean; connectionId?: string; error?: string }> {
     const stateData = this.encryption.parseOAuthState(state);
     if (!stateData) {
@@ -120,7 +120,7 @@ export class IntegrationFrameworkService {
         stateData.campgroundId,
         slug,
         result.credentials,
-        {}
+        {},
       );
 
       return { success: true, connectionId: connection.id };
@@ -138,7 +138,7 @@ export class IntegrationFrameworkService {
     campgroundId: string,
     slug: string,
     credentials: IntegrationCredentials,
-    config?: Record<string, unknown>
+    config?: Record<string, unknown>,
   ): Promise<{ success: boolean; connectionId?: string; error?: string }> {
     const definition = await this.getDefinitionBySlug(slug);
     const provider = this.getProvider(slug);
@@ -160,7 +160,7 @@ export class IntegrationFrameworkService {
       campgroundId,
       slug,
       credentials,
-      config || {}
+      config || {},
     );
 
     // Log the connection
@@ -182,7 +182,9 @@ export class IntegrationFrameworkService {
    */
   async disconnect(campgroundId: string, slug: string): Promise<{ success: boolean }> {
     const connection = await this.prisma.marketplaceConnection.findUnique({
-      where: { campgroundId_definitionId: { campgroundId, definitionId: await this.getDefinitionId(slug) } },
+      where: {
+        campgroundId_definitionId: { campgroundId, definitionId: await this.getDefinitionId(slug) },
+      },
     });
 
     if (!connection) {
@@ -216,7 +218,7 @@ export class IntegrationFrameworkService {
       syncType?: "full" | "incremental";
       direction?: "inbound" | "outbound" | "bidirectional";
       entityTypes?: string[];
-    } = {}
+    } = {},
   ): Promise<SyncResult> {
     const connection = await this.prisma.marketplaceConnection.findUnique({
       where: { id: connectionId },
@@ -233,7 +235,9 @@ export class IntegrationFrameworkService {
 
     const provider = this.getProvider(connection.IntegrationDefinition.slug);
     if (!provider) {
-      throw new BadRequestException(`Provider ${connection.IntegrationDefinition.slug} not available`);
+      throw new BadRequestException(
+        `Provider ${connection.IntegrationDefinition.slug} not available`,
+      );
     }
 
     // Decrypt credentials
@@ -283,7 +287,7 @@ export class IntegrationFrameworkService {
       await this.prisma.marketplaceSyncLog.update({
         where: { id: log.id },
         data: {
-          status: result.success ? "success" : (result.recordsFailed > 0 ? "partial" : "failed"),
+          status: result.success ? "success" : result.recordsFailed > 0 ? "partial" : "failed",
           recordsProcessed: result.recordsProcessed,
           recordsFailed: result.recordsFailed,
           recordsSkipped: result.recordsSkipped,
@@ -327,7 +331,7 @@ export class IntegrationFrameworkService {
     payload: unknown,
     rawBody: string,
     signature?: string,
-    campgroundId?: string
+    campgroundId?: string,
   ): Promise<WebhookResult> {
     const provider = this.getProvider(slug);
     if (!provider?.handleWebhook) {
@@ -351,7 +355,7 @@ export class IntegrationFrameworkService {
       const isValid = this.encryption.verifyHmacSignature(
         rawBody,
         connection.webhookSecret,
-        signature
+        signature,
       );
       if (!isValid) {
         this.logger.warn(`Invalid webhook signature for ${slug}`);
@@ -360,15 +364,14 @@ export class IntegrationFrameworkService {
     }
 
     try {
-      const credentials = connection
-        ? this.decryptCredentials(connection.credentials)
-        : {};
+      const credentials = connection ? this.decryptCredentials(connection.credentials) : {};
 
       const webhookPayload: WebhookPayload = {
         provider: slug,
-        eventType: toStringValue(isRecord(payload) ? payload.type : undefined)
-          ?? toStringValue(isRecord(payload) ? payload.event : undefined)
-          ?? "unknown",
+        eventType:
+          toStringValue(isRecord(payload) ? payload.type : undefined) ??
+          toStringValue(isRecord(payload) ? payload.event : undefined) ??
+          "unknown",
         payload,
         signature,
         timestamp: Date.now(),
@@ -426,7 +429,10 @@ export class IntegrationFrameworkService {
   /**
    * Get connection status for a campground
    */
-  async getConnectionStatus(campgroundId: string, slug: string): Promise<{
+  async getConnectionStatus(
+    campgroundId: string,
+    slug: string,
+  ): Promise<{
     connected: boolean;
     status?: string;
     lastSyncAt?: Date;
@@ -481,7 +487,7 @@ export class IntegrationFrameworkService {
     campgroundId: string,
     slug: string,
     credentials: IntegrationCredentials,
-    config: Record<string, unknown>
+    config: Record<string, unknown>,
   ) {
     const definitionId = await this.getDefinitionId(slug);
     const encryptedCredentials = this.encryption.encrypt(credentials);
@@ -541,7 +547,7 @@ export class IntegrationFrameworkService {
       recordsFailed: number;
       triggeredBy?: string;
       metadata?: Record<string, unknown>;
-    }
+    },
   ) {
     return this.prisma.marketplaceSyncLog.create({
       data: {

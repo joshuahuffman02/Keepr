@@ -59,12 +59,15 @@ export class OAuth2Service {
   private readonly issuer: string;
 
   // In-memory store for authorization codes (TODO: move to Redis for production)
-  private readonly authCodes = new Map<string, { data: AuthorizationCodeData; expiresAt: number }>();
+  private readonly authCodes = new Map<
+    string,
+    { data: AuthorizationCodeData; expiresAt: number }
+  >();
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly config: ConfigService
+    private readonly config: ConfigService,
   ) {
     this.accessTokenTtl = this.config.get<number>("OAUTH2_ACCESS_TOKEN_TTL", 3600); // 1 hour
     this.refreshTokenTtl = this.config.get<number>("OAUTH2_REFRESH_TOKEN_TTL", 2592000); // 30 days
@@ -86,9 +89,8 @@ export class OAuth2Service {
     // Validate scopes
     const requestedScopes = parseScopes(opts.scope);
     const allowedScopes = client.scopes.length > 0 ? client.scopes : DEFAULT_API_SCOPES;
-    const grantedScopes = requestedScopes.length > 0
-      ? validateScopes(requestedScopes, allowedScopes)
-      : allowedScopes;
+    const grantedScopes =
+      requestedScopes.length > 0 ? validateScopes(requestedScopes, allowedScopes) : allowedScopes;
 
     if (grantedScopes.length === 0 && requestedScopes.length > 0) {
       this.throwOAuth2Error("invalid_scope", "None of the requested scopes are allowed");
@@ -137,7 +139,10 @@ export class OAuth2Service {
 
     // For public clients, PKCE is required
     if (!client.isConfidential && !opts.codeChallenge) {
-      this.throwOAuth2Error("invalid_request", "PKCE code_challenge is required for public clients");
+      this.throwOAuth2Error(
+        "invalid_request",
+        "PKCE code_challenge is required for public clients",
+      );
     }
 
     // Generate authorization code
@@ -227,7 +232,12 @@ export class OAuth2Service {
     }
 
     // Generate tokens
-    const tokens = await this.generateTokens(client.id, client.campgroundId, codeData.scope, codeData.userId);
+    const tokens = await this.generateTokens(
+      client.id,
+      client.campgroundId,
+      codeData.scope,
+      codeData.userId,
+    );
 
     // Store token in database
     await this.persistToken(client.id, tokens, codeData.scope, codeData.userId);
@@ -267,7 +277,7 @@ export class OAuth2Service {
       token.oAuthClientId,
       token.OAuthClient.campgroundId,
       scopes,
-      token.userId || undefined
+      token.userId || undefined,
     );
 
     // Revoke old token
@@ -315,7 +325,10 @@ export class OAuth2Service {
   /**
    * Revoke a token
    */
-  async revokeToken(token: string, tokenTypeHint?: "access_token" | "refresh_token"): Promise<void> {
+  async revokeToken(
+    token: string,
+    tokenTypeHint?: "access_token" | "refresh_token",
+  ): Promise<void> {
     const tokenHash = this.hashToken(token);
 
     // Try to find by access token first if hinted or not specified
@@ -446,9 +459,10 @@ export class OAuth2Service {
 
     const scopes = opts.scopes && opts.scopes.length > 0 ? opts.scopes : DEFAULT_API_SCOPES;
 
-    const grantTypes = opts.grantTypes && opts.grantTypes.length > 0
-      ? opts.grantTypes
-      : [OAuth2GrantType.CLIENT_CREDENTIALS];
+    const grantTypes =
+      opts.grantTypes && opts.grantTypes.length > 0
+        ? opts.grantTypes
+        : [OAuth2GrantType.CLIENT_CREDENTIALS];
     const isConfidential = opts.isConfidential ?? true;
 
     const client = await this.prisma.oAuthClient.create({
@@ -519,7 +533,7 @@ export class OAuth2Service {
     clientDbId: string,
     campgroundId: string,
     scopes: string[],
-    userId?: string
+    userId?: string,
   ): Promise<TokenGenerationResult> {
     const accessToken = randomBytes(32).toString("hex");
     const refreshToken = randomBytes(48).toString("hex");
@@ -536,7 +550,7 @@ export class OAuth2Service {
     clientDbId: string,
     tokens: TokenGenerationResult,
     scopes: string[],
-    userId?: string
+    userId?: string,
   ): Promise<void> {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + this.accessTokenTtl * 1000);

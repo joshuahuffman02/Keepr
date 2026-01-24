@@ -74,7 +74,9 @@ export class HttpBackupProvider implements BackupProvider {
   private getFetch(): typeof fetch {
     const fetchFn = globalThis.fetch;
     if (!fetchFn) {
-      throw new ServiceUnavailableException("global fetch is unavailable; provide a fetch polyfill");
+      throw new ServiceUnavailableException(
+        "global fetch is unavailable; provide a fetch polyfill",
+      );
     }
     return fetchFn;
   }
@@ -98,7 +100,9 @@ export class HttpBackupProvider implements BackupProvider {
         if (attempt > this.retries) break;
       }
     }
-    throw new ServiceUnavailableException(getErrorMessage(lastError) || "Backup provider request failed");
+    throw new ServiceUnavailableException(
+      getErrorMessage(lastError) || "Backup provider request failed",
+    );
   }
 
   async healthCheck() {
@@ -113,9 +117,12 @@ export class HttpBackupProvider implements BackupProvider {
 
   async getLatestBackup(campgroundId: string) {
     this.ensureConfigured();
-    const res = await this.fetchWithRetry(`${this.base}/campgrounds/${campgroundId}/backups/latest`, {
-      headers: this.headers()
-    });
+    const res = await this.fetchWithRetry(
+      `${this.base}/campgrounds/${campgroundId}/backups/latest`,
+      {
+        headers: this.headers(),
+      },
+    );
     if (!res.ok) {
       throw new ServiceUnavailableException(`Backup provider error ${res.status}`);
     }
@@ -126,16 +133,19 @@ export class HttpBackupProvider implements BackupProvider {
     return {
       lastBackupAt: typeof body.lastBackupAt === "string" ? body.lastBackupAt : null,
       location: typeof body.location === "string" ? body.location : null,
-      verifiedAt: typeof body.verifiedAt === "string" ? body.verifiedAt : null
+      verifiedAt: typeof body.verifiedAt === "string" ? body.verifiedAt : null,
     };
   }
 
   async runRestoreDrill(campgroundId: string) {
     this.ensureConfigured();
-    const res = await this.fetchWithRetry(`${this.base}/campgrounds/${campgroundId}/backups/restore-check`, {
-      method: "POST",
-      headers: this.headers()
-    });
+    const res = await this.fetchWithRetry(
+      `${this.base}/campgrounds/${campgroundId}/backups/restore-check`,
+      {
+        method: "POST",
+        headers: this.headers(),
+      },
+    );
     if (!res.ok) {
       const body = await res.text();
       throw new ServiceUnavailableException(body || `Restore drill failed (${res.status})`);
@@ -147,7 +157,7 @@ export class HttpBackupProvider implements BackupProvider {
     return {
       ok: body.ok === true,
       verifiedAt: typeof body.verifiedAt === "string" ? body.verifiedAt : null,
-      message: typeof body.message === "string" ? body.message : null
+      message: typeof body.message === "string" ? body.message : null,
     };
   }
 }
@@ -156,7 +166,10 @@ export class HttpBackupProvider implements BackupProvider {
 export class BackupService {
   private readonly statusByCampground = new Map<string, BackupStatus>();
 
-  constructor(private readonly prisma: PrismaService, private readonly provider: BackupProvider) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly provider: BackupProvider,
+  ) {}
 
   private seedStatus(campgroundId: string, retentionDays: number): BackupStatus {
     const status: BackupStatus = {
@@ -172,15 +185,15 @@ export class BackupService {
       restoreSimulation: {
         status: "idle",
         lastRunAt: null,
-        message: "No restore drill run"
-      }
+        message: "No restore drill run",
+      },
     };
     return status;
   }
 
   private async resolveRetentionDays(campgroundId: string) {
     const privacySetting = await this.prisma.privacySetting?.findUnique?.({
-      where: { campgroundId }
+      where: { campgroundId },
     });
     return privacySetting?.backupRetentionDays ?? 30;
   }
@@ -203,14 +216,16 @@ export class BackupService {
       lastVerifiedAt: latest.verifiedAt,
       lastRestoreDrillAt: null,
       retentionDays,
-      nextBackupDueAt: new Date(lastBackupAtDate.getTime() + retentionDays * 24 * 60 * 60 * 1000).toISOString(),
+      nextBackupDueAt: new Date(
+        lastBackupAtDate.getTime() + retentionDays * 24 * 60 * 60 * 1000,
+      ).toISOString(),
       status: stale ? "stale" : "healthy",
       restoreSimulation: {
         status: "idle",
         lastRunAt: null,
-        message: "No restore drill run"
+        message: "No restore drill run",
       },
-      providerHealth: health
+      providerHealth: health,
     };
     this.statusByCampground.set(campgroundId, status);
     return status;
@@ -227,22 +242,23 @@ export class BackupService {
     const drillResult: RestoreSimulation = {
       status: "ok",
       lastRunAt: drill.verifiedAt || now.toISOString(),
-      message: drill.message || "Restore verification succeeded"
+      message: drill.message || "Restore verification succeeded",
     };
     const updated: BackupStatus = {
       ...current,
       retentionDays,
       lastRestoreDrillAt: drillResult.lastRunAt,
-      lastVerifiedAt: drill.verifiedAt ?? current.lastVerifiedAt ?? current.lastBackupAt ?? drillResult.lastRunAt,
+      lastVerifiedAt:
+        drill.verifiedAt ?? current.lastVerifiedAt ?? current.lastBackupAt ?? drillResult.lastRunAt,
       restoreSimulation: drillResult,
-      status: "healthy"
+      status: "healthy",
     };
     this.statusByCampground.set(campgroundId, updated);
 
     return {
       ...updated,
       startedAt: now.toISOString(),
-      completedAt: now.toISOString()
+      completedAt: now.toISOString(),
     };
   }
 }

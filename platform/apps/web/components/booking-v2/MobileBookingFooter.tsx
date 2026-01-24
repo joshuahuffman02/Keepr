@@ -89,10 +89,7 @@ export function MobileBookingFooter({
 
       {/* Footer bar */}
       <motion.div
-        className={cn(
-          "bg-card border-t border-border shadow-lg z-50",
-          className
-        )}
+        className={cn("bg-card border-t border-border shadow-lg z-50", className)}
         initial={prefersReducedMotion ? {} : { y: 100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
@@ -110,9 +107,7 @@ export function MobileBookingFooter({
               <div className="p-4 space-y-3">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-foreground">
-                    Booking Summary
-                  </h3>
+                  <h3 className="font-semibold text-foreground">Booking Summary</h3>
                   <button
                     onClick={() => setIsExpanded(false)}
                     className="p-1 rounded-full hover:bg-muted"
@@ -124,9 +119,7 @@ export function MobileBookingFooter({
                 {/* Site class */}
                 {siteClassName && (
                   <div className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground">
-                      {siteClassName}
-                    </span>
+                    <span className="font-medium text-foreground">{siteClassName}</span>
                   </div>
                 )}
 
@@ -135,7 +128,8 @@ export function MobileBookingFooter({
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span>
-                      {formatDate(arrivalDate)} - {formatDate(departureDate)} ({nights} night{nights !== 1 ? "s" : ""})
+                      {formatDate(arrivalDate)} - {formatDate(departureDate)} ({nights} night
+                      {nights !== 1 ? "s" : ""})
                     </span>
                   </div>
                 )}
@@ -144,25 +138,16 @@ export function MobileBookingFooter({
                 {breakdown && breakdown.length > 0 && (
                   <div className="space-y-2 pt-2 border-t border-border">
                     {breakdown.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="flex justify-between text-sm"
-                      >
+                      <div key={idx} className="flex justify-between text-sm">
                         <span
                           className={cn(
-                            item.isDiscount
-                              ? "text-emerald-600"
-                              : "text-muted-foreground"
+                            item.isDiscount ? "text-emerald-600" : "text-muted-foreground",
                           )}
                         >
                           {item.label}
                         </span>
                         <span
-                          className={cn(
-                            item.isDiscount
-                              ? "text-emerald-600"
-                              : "text-foreground"
-                          )}
+                          className={cn(item.isDiscount ? "text-emerald-600" : "text-foreground")}
                         >
                           {item.isDiscount ? "-" : ""}
                           {formatCurrency(Math.abs(item.amount))}
@@ -186,10 +171,7 @@ export function MobileBookingFooter({
         <div className="safe-area-inset-bottom">
           <div className="flex items-center gap-4 p-4">
             {/* Price info (tappable to expand) */}
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="flex-1 text-left"
-            >
+            <button onClick={() => setIsExpanded(!isExpanded)} className="flex-1 text-left">
               <div className="flex items-center gap-2">
                 <div>
                   <div className="flex items-baseline gap-1">

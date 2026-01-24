@@ -707,12 +707,7 @@ export interface FeatureBundle {
   priority: "essential" | "recommended" | "optional";
 }
 
-const TEAM_SIZE_ORDER: TeamSize[] = [
-  "solo",
-  "small_team",
-  "medium_team",
-  "large_team",
-];
+const TEAM_SIZE_ORDER: TeamSize[] = ["solo", "small_team", "medium_team", "large_team"];
 
 function teamSizeGte(current: TeamSize, min: TeamSize): boolean {
   return TEAM_SIZE_ORDER.indexOf(current) >= TEAM_SIZE_ORDER.indexOf(min);
@@ -786,11 +781,7 @@ export const FEATURE_BUNDLES: FeatureBundle[] = [
     id: "seasonal_longterm",
     name: "Seasonal & Long-term",
     description: "Monthly guests and utilities billing",
-    features: [
-      "seasonal_rates_cards",
-      "utilities_billing",
-      "repeat_charges",
-    ],
+    features: ["seasonal_rates_cards", "utilities_billing", "repeat_charges"],
     triggers: {
       operations: ["seasonals", "utilities"],
       parkTypes: ["seasonal", "mobile"],
@@ -801,12 +792,7 @@ export const FEATURE_BUNDLES: FeatureBundle[] = [
     id: "marketing_suite",
     name: "Marketing",
     description: "Promotions, campaigns, and social media",
-    features: [
-      "promotions",
-      "email_campaigns",
-      "social_planner",
-      "referrals",
-    ],
+    features: ["promotions", "email_campaigns", "social_planner", "referrals"],
     triggers: {
       operations: ["marketing"],
     },
@@ -818,12 +804,7 @@ export const FEATURE_BUNDLES: FeatureBundle[] = [
     id: "team_management",
     name: "Team Management",
     description: "Staff scheduling and management",
-    features: [
-      "team_members",
-      "staff_scheduling",
-      "time_clock",
-      "gamification",
-    ],
+    features: ["team_members", "staff_scheduling", "time_clock", "gamification"],
     triggers: {
       teamSizeMin: "medium_team",
     },
@@ -921,9 +902,7 @@ export interface FeatureRecommendations {
 /**
  * Calculate feature recommendations based on quiz answers
  */
-export function getRecommendedFeatures(
-  answers: QuizAnswers
-): FeatureRecommendations {
+export function getRecommendedFeatures(answers: QuizAnswers): FeatureRecommendations {
   const setupNow = new Set<string>();
   const setupLater = new Set<string>();
 
@@ -972,10 +951,7 @@ export function getRecommendedFeatures(
 /**
  * Calculate how well a bundle matches the quiz answers (0-1)
  */
-function calculateBundleScore(
-  bundle: FeatureBundle,
-  answers: QuizAnswers
-): number {
+function calculateBundleScore(bundle: FeatureBundle, answers: QuizAnswers): number {
   const { triggers } = bundle;
   let totalCriteria = 0;
   let matchedCriteria = 0;
@@ -991,9 +967,7 @@ function calculateBundleScore(
   // Check operations match (any match counts)
   if (triggers.operations && triggers.operations.length > 0) {
     totalCriteria++;
-    const hasMatch = triggers.operations.some((op) =>
-      answers.operations.includes(op)
-    );
+    const hasMatch = triggers.operations.some((op) => answers.operations.includes(op));
     if (hasMatch) {
       matchedCriteria++;
     }
@@ -1010,20 +984,14 @@ function calculateBundleScore(
   // Check amenities match (any match counts)
   if (triggers.amenities && triggers.amenities.length > 0) {
     totalCriteria++;
-    const hasMatch = triggers.amenities.some((am) =>
-      answers.amenities.includes(am)
-    );
+    const hasMatch = triggers.amenities.some((am) => answers.amenities.includes(am));
     if (hasMatch) {
       matchedCriteria++;
     }
   }
 
   // Check tech level match
-  if (
-    triggers.techLevels &&
-    triggers.techLevels.length > 0 &&
-    answers.techLevel
-  ) {
+  if (triggers.techLevels && triggers.techLevels.length > 0 && answers.techLevel) {
     totalCriteria++;
     if (triggers.techLevels.includes(answers.techLevel)) {
       matchedCriteria++;
@@ -1047,9 +1015,7 @@ function calculateBundleScore(
  * Features with no dependencies come first
  */
 export function getOrderedFeatures(selectedKeys: string[]): SetupableFeature[] {
-  const features = SETUPABLE_FEATURES.filter((f) =>
-    selectedKeys.includes(f.key)
-  );
+  const features = SETUPABLE_FEATURES.filter((f) => selectedKeys.includes(f.key));
   const ordered: SetupableFeature[] = [];
   const visited = new Set<string>();
   const visiting = new Set<string>(); // For cycle detection
@@ -1094,9 +1060,7 @@ export function getFeatureByKey(key: string): SetupableFeature | undefined {
 /**
  * Get all features in a category
  */
-export function getFeaturesByCategory(
-  category: PageCategory
-): SetupableFeature[] {
+export function getFeaturesByCategory(category: PageCategory): SetupableFeature[] {
   return SETUPABLE_FEATURES.filter((f) => f.category === category);
 }
 

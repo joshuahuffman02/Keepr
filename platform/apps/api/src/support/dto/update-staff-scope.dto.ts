@@ -21,4 +21,3 @@ export class UpdateStaffScopeDto {
   @IsBooleanString()
   platformActive?: string | null;
 }
-

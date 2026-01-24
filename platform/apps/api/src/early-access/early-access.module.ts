@@ -8,7 +8,7 @@ import { EmailModule } from "../email/email.module";
   imports: [PrismaModule, EmailModule],
   controllers: [EarlyAccessController],
   providers: [EarlyAccessService],
-  exports: [EarlyAccessService]
+  exports: [EarlyAccessService],
 })
 export class EarlyAccessModule implements OnModuleInit {
   private readonly logger = new Logger(EarlyAccessModule.name);

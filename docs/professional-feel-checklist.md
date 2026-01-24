@@ -6,6 +6,7 @@ Scope: Brand, marketing pages, and in-app UX (not tied to any single feature).
 Use this as a QA list before launch and as a guiding rubric for new UI work.
 
 ## 1) Visual system consistency
+
 - [x] A defined typography pairing (headline + body) with a documented type scale.
   - NOTE: Documented in `docs/typography-scale.md`; font tokens set in `platform/apps/web/app/globals.css`.
 - [x] Color tokens for brand, neutrals, semantic states, and data viz.
@@ -16,17 +17,20 @@ Use this as a QA list before launch and as a guiding rubric for new UI work.
 - [ ] Buttons, inputs, tables, cards, modals, and alerts share a single design language.
 
 **Container & Breakpoints:**
+
 - Container: centered, 2rem padding, max-width 1400px at 2xl
 - Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px), 2xl (1536px)
 
 **Design Language Audit Findings:**
 INCONSISTENCIES PREVENT COMPLETION - requires standardization:
+
 - Border-radius: button/input use rounded-md (6px), card uses rounded-xl (12px), dialog/alert use rounded-lg (8px)
 - Focus rings: button/input use ring-4, table rows use ring-2
 - Shadows: card uses shadow, dialog uses shadow-lg, button/input/table/alert have none
 - Border colors: mix of explicit border-slate-200 and implicit border
 
 ## 2) Navigation and information architecture
+
 - [x] Primary nav groups match how operators think (Bookings, Ops, Guests, Revenue, Integrations).
 - [ ] Each section has a clear landing page with a visible next step.
 - [ ] Breadcrumbs or clear sub-nav for deep pages.
@@ -34,18 +38,21 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 - [x] Search is globally available (or obvious per major section).
 
 ## 3) Marketing page structure
+
 - [ ] Each product page follows a consistent pattern: hero -> outcomes -> features -> proof -> FAQ -> CTA.
 - [ ] Proof blocks (logos, stats, testimonials) appear above the fold or immediately after outcomes.
 - [ ] One CTA per page section (no competing CTAs).
 - [ ] Resources/FAQ provide just enough depth without burying the core story.
 
 ## 4) Copy system (tone, clarity, and intent)
+
 - [ ] Headlines are benefit-first and plain-language.
 - [ ] Every feature line answers "so what?" with a concrete operator outcome.
 - [ ] Microcopy in forms is precise (what happens next, what is required, why).
 - [x] Error messages are actionable (what broke and how to fix it).
 
 ## 5) Trust and credibility
+
 - [ ] Visible claims are quantified (saves time, reduces no-shows, increases direct bookings).
 - [ ] Security/compliance posture stated plainly (PCI, SOC, GDPR if applicable).
   - NOTE: /security page exists with good content, needs trust badges on marketing pages
@@ -55,6 +62,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - NOTE: Case studies are mock examples flagged as placeholders in `platform/apps/web/app/(public)/case-studies/CaseStudiesClient.tsx:5`.
 
 ## 6) Conversion UX polish
+
 - [ ] All CTAs have a single, predictable flow (no dead ends).
   - NOTE: `/contact` and `/help/contact` now submit real tickets via `/api/tickets`; remaining CTAs still need audit.
 - [ ] Forms are short, progressive, and include validation feedback.
@@ -65,6 +73,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - NOTE: GA4/Meta config UI exists but scripts not loaded; CRM stubbed
 
 ## 7) Product UX intuitiveness
+
 - [x] Default views are useful without configuration.
   - DONE: Dashboard shows arrivals/departures/occupancy/balances immediately
 - [ ] Empty states include suggested actions (first booking, import, setup).
@@ -79,6 +88,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 - [x] Inline help exists for complex forms (tooltips or "Learn more").
 
 ## 8) Data clarity and reporting
+
 - [ ] Dashboards answer the top 3 operator questions without drilling.
   - NOTE: Arrivals/departures/balances visible (2.5/3); Revenue metric missing from dashboard
 - [ ] Charts have clear labels, units, and date ranges.
@@ -89,6 +99,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - NOTE: Gaps in permission changes and seasonal rates
 
 ## 9) Performance and accessibility
+
 - [ ] Core Web Vitals are in the green for public pages.
   - NOTE: web-vitals.ts monitoring exists but analytics endpoint incomplete (TODO)
 - [x] Inputs and tables are keyboard friendly.
@@ -98,6 +109,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
   - DONE: 53+ motion-safe: instances, proper reduced motion support throughout
 
 ## 10) Release notes and product cadence
+
 - [x] Release notes have "New", "Update", "Enhancement" tags with dates.
 - [ ] Each update includes: What changed, Why it matters, Who it helps.
   - NOTE: Only a few updates have these fields; most update entries omit them (e.g., `platform/apps/web/lib/roadmap-data.ts:610`).
@@ -106,6 +118,7 @@ INCONSISTENCIES PREVENT COMPLETION - requires standardization:
 - [x] Public roadmap or changelog makes the product feel actively maintained.
 
 ## 11) Design QA before shipping
+
 - [ ] Cross-browser check (Chrome, Safari, Firefox).
 - [ ] Mobile layout reviewed for every major page.
 - [ ] All primary flows tested with real data.
@@ -140,6 +153,7 @@ Campreserv has a well-defined core UI token system built on shadcn/ui with seman
 ### Architecture
 
 All color tokens use HSL values with CSS custom properties (--token-name) and are mapped through Tailwind config. This enables:
+
 - Dark mode support (automatic theme switching)
 - Consistent color usage across components
 - Single source of truth for all UI colors
@@ -150,11 +164,13 @@ All color tokens use HSL values with CSS custom properties (--token-name) and ar
 #### 1. Brand Colors
 
 **Primary (Blue)**
+
 - `primary` - hsl(217 91% 60%) - Blue-500 base
 - `primary-foreground` - White text on primary background
 - Used for: Main brand elements, primary navigation, key CTAs
 
 **Accent (Emerald/Teal)**
+
 - `action-primary` - hsl(158 64% 52%) - Emerald-600
 - `action-primary-hover` - hsl(158 64% 42%) - Emerald-700
 - Used for: Primary action buttons, main CTAs, success states
@@ -163,18 +179,21 @@ All color tokens use HSL values with CSS custom properties (--token-name) and ar
 #### 2. Neutrals
 
 **Backgrounds**
+
 - `background` - hsl(210 40% 98%) - Slate-50 (light) / Slate-900 (dark)
 - `foreground` - hsl(222 47% 11%) - Slate-900 (light) / Slate-50 (dark)
 - `card` - White (light) / Slate-800 (dark)
 - `popover` - White (light) / Slate-800 (dark)
 
 **UI Elements**
+
 - `border` - hsl(214 32% 91%) - Slate-200
 - `input` - hsl(214 32% 91%) - Slate-200
 - `muted` - hsl(210 40% 96%) - Slate-100
 - `muted-foreground` - hsl(215 16% 47%) - Slate-600
 
 **Secondary/Tertiary Actions**
+
 - `secondary` - hsl(210 40% 96%) - Slate-100
 - `secondary-foreground` - hsl(222 47% 11%) - Slate-900
 - `action-secondary` - Lighter gray for secondary buttons
@@ -183,6 +202,7 @@ All color tokens use HSL values with CSS custom properties (--token-name) and ar
 #### 3. Semantic Status States
 
 Each status has 5 variants for maximum flexibility:
+
 - DEFAULT - Main color
 - foreground - Text on colored background
 - bg - Light background for badges/pills
@@ -190,6 +210,7 @@ Each status has 5 variants for maximum flexibility:
 - text - Text color on light backgrounds
 
 **Success (Green)**
+
 - `status-success` - hsl(158 64% 52%) - Emerald-600
 - `status-success-bg` - hsl(152 57% 96%) - Emerald-50
 - `status-success-border` - hsl(149 61% 86%) - Emerald-200
@@ -197,6 +218,7 @@ Each status has 5 variants for maximum flexibility:
 - Used for: Confirmed bookings, completed payments, successful operations
 
 **Warning (Amber)**
+
 - `status-warning` - hsl(38 92% 50%) - Amber-500
 - `status-warning-bg` - hsl(48 100% 96%) - Amber-50
 - `status-warning-border` - hsl(48 96% 76%) - Amber-200
@@ -204,6 +226,7 @@ Each status has 5 variants for maximum flexibility:
 - Used for: Balance due, pending actions, attention needed
 
 **Error (Red)**
+
 - `status-error` - hsl(0 84% 60%) - Red-500
 - `status-error-bg` - hsl(0 86% 97%) - Red-50
 - `status-error-border` - hsl(0 72% 91%) - Red-200
@@ -212,6 +235,7 @@ Each status has 5 variants for maximum flexibility:
 - Used for: Cancellations, failed payments, errors, destructive actions
 
 **Info (Blue)**
+
 - `status-info` - hsl(217 91% 60%) - Blue-500
 - `status-info-bg` - hsl(214 100% 97%) - Blue-50
 - `status-info-border` - hsl(213 97% 87%) - Blue-200
@@ -226,12 +250,14 @@ Chart and heatmap tokens now exist and are mapped through Tailwind.
 - Heatmap: `heatmap-low`, `heatmap-mid`, `heatmap-high`
 
 Remaining gaps:
+
 - Diverging palette for positive/negative comparisons
 - Contrast testing on chart overlays and annotations
 
 ### Usage Patterns
 
 **In Tailwind Classes:**
+
 ```tsx
 <button className="bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover">
   Book Now
@@ -243,6 +269,7 @@ Remaining gaps:
 ```
 
 **In Custom CSS:**
+
 ```css
 .custom-component {
   background: hsl(var(--status-warning-bg));
@@ -253,11 +280,13 @@ Remaining gaps:
 ### Special Effects
 
 **Glassmorphism** (matching onboarding UI):
+
 - `.glass` - Semi-transparent white/dark background with backdrop blur
 - `.glass-strong` - Stronger blur variant
 - `.glass-card` - Complete glass card with border and shadow
 
 **Glow Effects:**
+
 - `.glow-emerald` - Emerald shadow for focus states
 - `.hover-glow` - Subtle emerald shadow on hover
 - `.focus-glow` - Focus state with emerald glow
@@ -265,6 +294,7 @@ Remaining gaps:
 ### Dark Mode Support
 
 All tokens automatically adjust for dark mode using the `.dark` class. Dark mode values are carefully chosen to maintain:
+
 - WCAG AAA contrast ratios where possible
 - Visual hierarchy consistency
 - Reduced eye strain (darker backgrounds, adjusted saturation)

@@ -11,11 +11,13 @@
 ### What's Already Working
 
 #### 1. **pgvector Setup** ✅
+
 - PostgreSQL vector extension enabled in Supabase
 - Embedding column added directly to Campground model
 - 1536-dimension vectors (OpenAI text-embedding-3-small)
 
 #### 2. **Backend Implementation** ✅
+
 - **OpenAI Service** (`src/openai/openai.service.ts`)
   - Embedding generation
   - Batch processing (100 items at once)
@@ -34,6 +36,7 @@
   - `GET /api/semantic-search/stats` - Embedding coverage
 
 #### 3. **Frontend Implementation** ✅
+
 - **Search Page** (`/app/(public)/search/page.tsx`)
   - Dedicated semantic search results page
   - AI branding with Sparkles icon
@@ -49,6 +52,7 @@
   - AI-powered badge
 
 #### 4. **Current Status** ✅
+
 - **5,176 campgrounds** have embeddings (100% coverage)
 - Semantic search fully functional
 - Working queries:
@@ -57,7 +61,9 @@
   - "family friendly campground with playground" → 47% match
 
 #### 5. **Key Files** 📁
+
 **Backend:**
+
 - `platform/apps/api/src/openai/openai.service.ts` - OpenAI integration
 - `platform/apps/api/src/semantic-search/semantic-search.service.ts` - Search logic
 - `platform/apps/api/src/semantic-search/semantic-search.controller.ts` - API endpoints
@@ -65,6 +71,7 @@
 - `platform/apps/api/prisma/schema.prisma` - Campground.embedding field
 
 **Frontend:**
+
 - `platform/apps/web/app/(public)/search/page.tsx` - Search results page
 - `platform/apps/web/app/(public)/search/SemanticSearchResults.tsx` - Search component
 - `platform/apps/web/app/(public)/camping/CampingSearchForm.tsx` - Main search form
@@ -81,6 +88,7 @@ These are **optional enhancements** you can add when needed:
 ## 📚 Implementation Reference
 
 **Note:** The following sections document how semantic search was implemented. Keep as reference for:
+
 - Understanding the architecture
 - Adding new AI features
 - Onboarding new developers
@@ -92,11 +100,13 @@ These are **optional enhancements** you can add when needed:
 ### 1. Enable pgvector in Railway
 
 **Via Railway Dashboard:**
+
 1. Go to your PostgreSQL service
 2. Settings → Extensions
 3. Enable "pgvector"
 
 **Or via SQL:**
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
@@ -136,9 +146,9 @@ npx prisma migrate dev --name add_vector_embeddings
 Create `platform/apps/api/src/embeddings/embeddings.service.ts`:
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import OpenAI from 'openai';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable } from "@nestjs/common";
+import OpenAI from "openai";
+import { PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class EmbeddingsService {
@@ -153,7 +163,7 @@ export class EmbeddingsService {
   // Generate embedding for text
   async generateEmbedding(text: string): Promise<number[]> {
     const response = await this.openai.embeddings.create({
-      model: 'text-embedding-3-small', // $0.02 per 1M tokens
+      model: "text-embedding-3-small", // $0.02 per 1M tokens
       input: text,
     });
     return response.data[0].embedding;
@@ -170,7 +180,7 @@ export class EmbeddingsService {
     const content = `
       ${campground.name}
       ${campground.description}
-      ${campground.amenities.map(a => a.name).join(', ')}
+      ${campground.amenities.map((a) => a.name).join(", ")}
       ${campground.location}
     `.trim();
 
@@ -227,6 +237,7 @@ async search(@Query('q') query: string) {
 ```
 
 **Example queries that now work:**
+
 - "campground near water with WiFi" ✅
 - "quiet spot for families" ✅
 - "pet-friendly with full hookups" ✅
@@ -236,11 +247,13 @@ async search(@Query('q') query: string) {
 ## 💡 AI-Powered Features You Can Build
 
 ### 1. **Smart Search** (Implemented above)
+
 - Semantic search instead of keyword matching
 - Understands user intent
 - "quiet family campground" finds right results
 
 ### 2. **Personalized Recommendations**
+
 ```typescript
 async getRecommendations(userId: string) {
   // Get user's past reservations
@@ -258,6 +271,7 @@ async getRecommendations(userId: string) {
 ```
 
 ### 3. **AI Chat Support**
+
 ```typescript
 async chatSupport(message: string, conversationHistory: Message[]) {
   // RAG: Retrieve relevant campground info
@@ -282,6 +296,7 @@ async chatSupport(message: string, conversationHistory: Message[]) {
 ```
 
 ### 4. **Auto-Generated Descriptions**
+
 ```typescript
 async generateCampgroundDescription(campgroundId: string) {
   const campground = await this.prisma.campground.findUnique({
@@ -307,6 +322,7 @@ async generateCampgroundDescription(campgroundId: string) {
 ```
 
 ### 5. **Smart Pricing Suggestions**
+
 ```typescript
 async suggestPricing(campgroundId: string, date: Date) {
   // Get historical data
@@ -340,15 +356,16 @@ async suggestPricing(campgroundId: string, date: Date) {
 
 ## 💰 OpenAI API Costs
 
-| Model | Cost | Use Case |
-|-------|------|----------|
-| text-embedding-3-small | $0.02 / 1M tokens | Embeddings (recommended) |
-| text-embedding-3-large | $0.13 / 1M tokens | Higher quality |
-| gpt-4-turbo | $0.01 / 1K tokens | Chat, descriptions |
-| gpt-4 | $0.03 / 1K tokens | Complex reasoning |
-| gpt-3.5-turbo | $0.001 / 1K tokens | Simple tasks |
+| Model                  | Cost               | Use Case                 |
+| ---------------------- | ------------------ | ------------------------ |
+| text-embedding-3-small | $0.02 / 1M tokens  | Embeddings (recommended) |
+| text-embedding-3-large | $0.13 / 1M tokens  | Higher quality           |
+| gpt-4-turbo            | $0.01 / 1K tokens  | Chat, descriptions       |
+| gpt-4                  | $0.03 / 1K tokens  | Complex reasoning        |
+| gpt-3.5-turbo          | $0.001 / 1K tokens | Simple tasks             |
 
 **Cost estimate for 1000 campgrounds:**
+
 - Generate embeddings: ~$0.10 (one-time)
 - 1000 searches/day: ~$1/month
 - Total: **~$2-5/month** for AI features
@@ -358,21 +375,25 @@ async suggestPricing(campgroundId: string, date: Date) {
 ## 🚀 Implementation Roadmap
 
 ### Phase 1: Add pgvector (Now - 15 min)
+
 - [ ] Enable pgvector extension
 - [ ] Add Prisma schema
 - [ ] Run migration
 
 ### Phase 2: Basic Embeddings (1 hour)
+
 - [ ] Create embeddings service
 - [ ] Embed all campgrounds
 - [ ] Add cron job to embed new campgrounds
 
 ### Phase 3: Semantic Search (2 hours)
+
 - [ ] Implement search endpoint
 - [ ] Update frontend search UI
 - [ ] Test with real queries
 
 ### Phase 4: Advanced Features (Optional)
+
 - [ ] Personalized recommendations
 - [ ] AI chat support
 - [ ] Auto-generated descriptions
@@ -383,12 +404,13 @@ async suggestPricing(campgroundId: string, date: Date) {
 ## 📊 Monitoring AI Features
 
 **Track these metrics in Sentry:**
+
 ```typescript
 // Track OpenAI API calls
 Sentry.addBreadcrumb({
-  message: 'OpenAI API call',
+  message: "OpenAI API call",
   data: {
-    model: 'text-embedding-3-small',
+    model: "text-embedding-3-small",
     tokens: response.usage.total_tokens,
     cost: calculateCost(response.usage),
   },
@@ -396,7 +418,7 @@ Sentry.addBreadcrumb({
 
 // Track search quality
 Sentry.addBreadcrumb({
-  message: 'Semantic search',
+  message: "Semantic search",
   data: {
     query: query,
     results: results.length,
@@ -406,6 +428,7 @@ Sentry.addBreadcrumb({
 ```
 
 **Cost tracking:**
+
 ```typescript
 // Track monthly OpenAI spend
 const costPerToken = 0.00000002; // $0.02 per 1M tokens
@@ -413,8 +436,8 @@ const monthlyCost = totalTokensUsed * costPerToken;
 
 if (monthlyCost > 100) {
   // Alert if spending too much
-  Sentry.captureMessage('High OpenAI API costs', {
-    level: 'warning',
+  Sentry.captureMessage("High OpenAI API costs", {
+    level: "warning",
     extra: { monthlyCost },
   });
 }
@@ -425,6 +448,7 @@ if (monthlyCost > 100) {
 ## 🔐 Security Best Practices
 
 **1. Never expose API key to frontend:**
+
 ```typescript
 // ❌ WRONG
 const openai = new OpenAI({ apiKey: process.env.NEXT_PUBLIC_OPENAI_KEY });
@@ -434,6 +458,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 ```
 
 **2. Rate limit AI endpoints:**
+
 ```typescript
 @UseGuards(ThrottlerGuard)
 @Throttle({ default: { limit: 10, ttl: 60000 } }) // 10 requests per minute
@@ -444,6 +469,7 @@ async search(@Query('q') query: string) {
 ```
 
 **3. Validate inputs:**
+
 ```typescript
 const SearchSchema = z.object({
   query: z.string().min(1).max(500), // Max 500 chars
@@ -458,14 +484,17 @@ const { query, limit } = SearchSchema.parse(req.query);
 ## 🎓 Resources
 
 **pgvector:**
+
 - Docs: https://github.com/pgvector/pgvector
 - Prisma + pgvector: https://www.prisma.io/docs/orm/prisma-schema/data-model/unsupported-types
 
 **OpenAI:**
+
 - Embeddings guide: https://platform.openai.com/docs/guides/embeddings
 - API docs: https://platform.openai.com/docs/api-reference
 
 **RAG (Retrieval Augmented Generation):**
+
 - Guide: https://platform.openai.com/docs/guides/retrieval-augmented-generation
 - Best practices: Ask Claude!
 
@@ -484,6 +513,7 @@ const { query, limit } = SearchSchema.parse(req.query);
 ## Summary
 
 ### Completed (Phase 1-3) ✅
+
 - ✅ OpenAI integrated with API key
 - ✅ pgvector enabled in Supabase PostgreSQL
 - ✅ Semantic search fully implemented (backend + frontend)
@@ -491,6 +521,7 @@ const { query, limit } = SearchSchema.parse(req.query);
 - ✅ Natural language search working in production
 
 ### Optional Next Steps (Phase 4)
+
 - 🔲 Personalized recommendations based on user history
 - 🔲 AI chat support with RAG
 - 🔲 Auto-generated campground descriptions
@@ -498,6 +529,7 @@ const { query, limit } = SearchSchema.parse(req.query);
 - 🔲 Automated cron job for new campground embeddings
 
 ### Cost Monitoring 💰
+
 - **Current usage:** ~$0.10 for 5,176 embeddings (one-time)
 - **Ongoing:** ~$0.000002 per search query
 - **Model:** text-embedding-3-small (most cost-effective)

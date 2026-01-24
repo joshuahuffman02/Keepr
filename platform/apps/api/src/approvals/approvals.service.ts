@@ -20,9 +20,7 @@ export class ApprovalsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(campgroundId?: string) {
-    const where: Prisma.ApprovalRequestWhereInput = campgroundId
-      ? { campgroundId }
-      : {};
+    const where: Prisma.ApprovalRequestWhereInput = campgroundId ? { campgroundId } : {};
 
     const [requests, policies] = await Promise.all([
       this.prisma.approvalRequest.findMany({
@@ -83,7 +81,7 @@ export class ApprovalsService {
       payload.type,
       payload.amount,
       payload.currency,
-      payload.campgroundId
+      payload.campgroundId,
     );
 
     const requiredApprovals = policy?.approversNeeded ?? 1;
@@ -214,9 +212,7 @@ export class ApprovalsService {
 
   async policiesList(campgroundId?: string) {
     const policies = await this.prisma.approvalPolicy.findMany({
-      where: campgroundId
-        ? { OR: [{ campgroundId }, { campgroundId: null }] }
-        : {},
+      where: campgroundId ? { OR: [{ campgroundId }, { campgroundId: null }] } : {},
       orderBy: { createdAt: "desc" },
     });
 
@@ -260,9 +256,7 @@ export class ApprovalsService {
         approversNeeded: payload.approversNeeded ?? 1,
         description: payload.description,
         approverRoles: payload.approverRoles ?? [],
-        Campground: payload.campgroundId
-          ? { connect: { id: payload.campgroundId } }
-          : undefined,
+        Campground: payload.campgroundId ? { connect: { id: payload.campgroundId } } : undefined,
         User: payload.createdById ? { connect: { id: payload.createdById } } : undefined,
         updatedAt: new Date(),
       },
@@ -293,7 +287,7 @@ export class ApprovalsService {
       description?: string | null;
       approverRoles?: UserRole[];
       isActive?: boolean;
-    }
+    },
   ) {
     const existing = await this.prisma.approvalPolicy.findUnique({
       where: { id },
@@ -352,15 +346,13 @@ export class ApprovalsService {
     type: string,
     amountCents: number,
     currency: string,
-    campgroundId?: string
+    campgroundId?: string,
   ) {
     // First try campground-specific policies, then fall back to global
     const policies = await this.prisma.approvalPolicy.findMany({
       where: {
         isActive: true,
-        OR: campgroundId
-          ? [{ campgroundId }, { campgroundId: null }]
-          : [{ campgroundId: null }],
+        OR: campgroundId ? [{ campgroundId }, { campgroundId: null }] : [{ campgroundId: null }],
       },
       orderBy: [
         { campgroundId: "desc" }, // Campground-specific first

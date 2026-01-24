@@ -129,7 +129,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
   if (value === null) return true;
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return true;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean")
+    return true;
   if (Array.isArray(value)) return value.every(isJsonValue);
   if (isRecord(value)) return Object.values(value).every(isJsonValue);
   return false;
@@ -153,7 +154,7 @@ export class WebhooksController {
     private readonly prisma: PrismaService,
     private readonly deliveryService: WebhookDeliveryService,
     private readonly logsService: WebhookLogsService,
-    private readonly securityService: WebhookSecurityService
+    private readonly securityService: WebhookSecurityService,
   ) {}
 
   // ============================================
@@ -238,10 +239,7 @@ export class WebhooksController {
    */
   @Get("endpoints/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  async getEndpoint(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async getEndpoint(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     const endpoint = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
       include: {
@@ -270,9 +268,7 @@ export class WebhooksController {
     // Validate event types
     const validation = validateEventTypes(dto.eventTypes);
     if (!validation.valid) {
-      throw new BadRequestException(
-        `Invalid event types: ${validation.invalid.join(", ")}`
-      );
+      throw new BadRequestException(`Invalid event types: ${validation.invalid.join(", ")}`);
     }
 
     // Generate secret
@@ -291,9 +287,7 @@ export class WebhooksController {
       },
     });
 
-    this.logger.log(
-      `Created webhook endpoint ${endpoint.id} for campground ${dto.campgroundId}`
-    );
+    this.logger.log(`Created webhook endpoint ${endpoint.id} for campground ${dto.campgroundId}`);
 
     // Return full secret only on creation
     return {
@@ -306,8 +300,7 @@ export class WebhooksController {
         createdAt: endpoint.createdAt,
       },
       secret, // Full secret - show only once
-      message:
-        "Save this secret securely. It will not be shown again.",
+      message: "Save this secret securely. It will not be shown again.",
     };
   }
 
@@ -319,7 +312,7 @@ export class WebhooksController {
   async updateEndpoint(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @Body() dto: UpdateWebhookEndpointDto
+    @Body() dto: UpdateWebhookEndpointDto,
   ) {
     const existing = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
@@ -333,9 +326,7 @@ export class WebhooksController {
     if (dto.eventTypes) {
       const validation = validateEventTypes(dto.eventTypes);
       if (!validation.valid) {
-        throw new BadRequestException(
-          `Invalid event types: ${validation.invalid.join(", ")}`
-        );
+        throw new BadRequestException(`Invalid event types: ${validation.invalid.join(", ")}`);
       }
     }
 
@@ -359,7 +350,7 @@ export class WebhooksController {
   async toggleEndpoint(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @Body() dto: ToggleWebhookDto
+    @Body() dto: ToggleWebhookDto,
   ) {
     const existing = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
@@ -377,9 +368,7 @@ export class WebhooksController {
       },
     });
 
-    this.logger.log(
-      `Webhook endpoint ${id} ${dto.isActive ? "enabled" : "disabled"}`
-    );
+    this.logger.log(`Webhook endpoint ${id} ${dto.isActive ? "enabled" : "disabled"}`);
 
     return updated;
   }
@@ -389,10 +378,7 @@ export class WebhooksController {
    */
   @Post("endpoints/:id/rotate-secret")
   @Roles(UserRole.owner)
-  async rotateSecret(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async rotateSecret(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     const existing = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
     });
@@ -423,10 +409,7 @@ export class WebhooksController {
    */
   @Delete("endpoints/:id")
   @Roles(UserRole.owner)
-  async deleteEndpoint(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async deleteEndpoint(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     const existing = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
     });
@@ -454,7 +437,7 @@ export class WebhooksController {
   async testWebhook(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @Body() dto: TestWebhookDto
+    @Body() dto: TestWebhookDto,
   ) {
     const endpoint = await this.prisma.webhookEndpoint.findFirst({
       where: { id, campgroundId },
@@ -475,7 +458,7 @@ export class WebhooksController {
       const example = getEventExample(eventType);
       if (!example) {
         throw new BadRequestException(
-          `No example payload available for event type '${dto.eventType}'`
+          `No example payload available for event type '${dto.eventType}'`,
         );
       }
       payload = {
@@ -499,10 +482,7 @@ export class WebhooksController {
     };
 
     const body = JSON.stringify(eventPayload);
-    const { signature, timestamp } = this.securityService.generateSignature(
-      endpoint.secret,
-      body
-    );
+    const { signature, timestamp } = this.securityService.generateSignature(endpoint.secret, body);
 
     // Create delivery record
     const delivery = await this.prisma.webhookDelivery.create({
@@ -522,7 +502,7 @@ export class WebhooksController {
       delivery.id,
       endpoint.url,
       endpoint.secret,
-      body
+      body,
     );
 
     return {
@@ -576,10 +556,7 @@ export class WebhooksController {
    */
   @Get("logs/:id")
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
-  async getLogEntry(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async getLogEntry(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
@@ -597,10 +574,7 @@ export class WebhooksController {
    */
   @Post("logs/:id/replay")
   @Roles(UserRole.owner, UserRole.manager)
-  async replayDelivery(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async replayDelivery(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     // Verify the delivery belongs to this campground
     const delivery = await this.prisma.webhookDelivery.findFirst({
       where: { id, WebhookEndpoint: { campgroundId } },
@@ -626,7 +600,7 @@ export class WebhooksController {
       delivery.id,
       delivery.WebhookEndpoint.url,
       delivery.WebhookEndpoint.secret,
-      body
+      body,
     );
 
     return {
@@ -646,16 +620,13 @@ export class WebhooksController {
   @Roles(UserRole.owner, UserRole.manager)
   async getDeadLetterQueue(
     @Query("campgroundId") campgroundId: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
 
-    return this.deliveryService.getDeadLetterQueue(
-      campgroundId,
-      limit ? parseInt(limit, 10) : 50
-    );
+    return this.deliveryService.getDeadLetterQueue(campgroundId, limit ? parseInt(limit, 10) : 50);
   }
 
   /**
@@ -663,10 +634,7 @@ export class WebhooksController {
    */
   @Post("dead-letter/:id/retry")
   @Roles(UserRole.owner, UserRole.manager)
-  async retryDeadLetter(
-    @Param("id") id: string,
-    @Query("campgroundId") campgroundId: string
-  ) {
+  async retryDeadLetter(@Param("id") id: string, @Query("campgroundId") campgroundId: string) {
     // Verify ownership
     const delivery = await this.prisma.webhookDelivery.findFirst({
       where: { id, WebhookEndpoint: { campgroundId }, status: "dead_letter" },
@@ -674,7 +642,7 @@ export class WebhooksController {
 
     if (!delivery) {
       throw new NotFoundException(
-        `Dead letter entry ${id} not found in campground ${campgroundId}`
+        `Dead letter entry ${id} not found in campground ${campgroundId}`,
       );
     }
 
@@ -690,10 +658,7 @@ export class WebhooksController {
    */
   @Get("stats")
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
-  async getStats(
-    @Query("campgroundId") campgroundId: string,
-    @Query("days") days?: string
-  ) {
+  async getStats(@Query("campgroundId") campgroundId: string, @Query("days") days?: string) {
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
@@ -752,5 +717,4 @@ export class WebhooksController {
 
 const WEBHOOK_EVENTS = new Set<string>(getAllEventTypes());
 
-const isWebhookEvent = (value: string): value is WebhookEvent =>
-  WEBHOOK_EVENTS.has(value);
+const isWebhookEvent = (value: string): value is WebhookEvent => WEBHOOK_EVENTS.has(value);

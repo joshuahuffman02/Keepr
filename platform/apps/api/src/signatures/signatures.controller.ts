@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { Roles, RolesGuard } from "../auth/guards/roles.guard";
 import { JwtAuthGuard } from "../auth/guards";
 import { ScopeGuard } from "../permissions/scope.guard";
@@ -18,7 +28,7 @@ type AuthenticatedRequest = Omit<Request, "user"> & { user: AuthUser };
 
 @Controller("signatures")
 export class SignaturesController {
-  constructor(private readonly signatures: SignaturesService) { }
+  constructor(private readonly signatures: SignaturesService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
@@ -50,7 +60,11 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/paper-signed")
-  async markPaperSigned(@Req() req: AuthenticatedRequest, @Param("id") id: string, @Body() dto: Omit<MarkPaperSignedDto, "id">) {
+  async markPaperSigned(
+    @Req() req: AuthenticatedRequest,
+    @Param("id") id: string,
+    @Body() dto: Omit<MarkPaperSignedDto, "id">,
+  ) {
     return this.signatures.markPaperSigned({ ...dto, id }, req.user.id);
   }
 
@@ -60,7 +74,11 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/waive")
-  async waiveSignature(@Req() req: AuthenticatedRequest, @Param("id") id: string, @Body() dto: Omit<WaiveSignatureDto, "id">) {
+  async waiveSignature(
+    @Req() req: AuthenticatedRequest,
+    @Param("id") id: string,
+    @Body() dto: Omit<WaiveSignatureDto, "id">,
+  ) {
     return this.signatures.waiveSignature({ ...dto, id }, req.user.id);
   }
 
@@ -108,7 +126,7 @@ export class SignaturesController {
     @Query("status") status?: string,
     @Query("guestId") guestId?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     return this.signatures.listContracts(campgroundId, {
       seasonYear: seasonYear ? parseInt(seasonYear, 10) : undefined,
@@ -116,7 +134,7 @@ export class SignaturesController {
       status: status?.includes(",") ? status.split(",") : status,
       guestId,
       limit: limit ? parseInt(limit, 10) : undefined,
-      offset: offset ? parseInt(offset, 10) : undefined
+      offset: offset ? parseInt(offset, 10) : undefined,
     });
   }
 
@@ -127,12 +145,12 @@ export class SignaturesController {
   async getContractStats(
     @Query("campgroundId") campgroundId: string,
     @Query("seasonYear") seasonYear?: string,
-    @Query("documentType") documentType?: string
+    @Query("documentType") documentType?: string,
   ) {
     return this.signatures.getContractStats(
       campgroundId,
       seasonYear ? parseInt(seasonYear, 10) : undefined,
-      documentType
+      documentType,
     );
   }
 

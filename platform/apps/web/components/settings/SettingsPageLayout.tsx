@@ -51,12 +51,8 @@ export function SettingsPageLayout({
       <div>
         <div className="flex items-center gap-2">
           <Icon className="h-6 w-6 text-muted-foreground" />
-          <h2 className="text-2xl font-bold text-foreground">
-            {title}
-          </h2>
-          {helpTopicId && (
-            <HelpAnchor topicId={helpTopicId} label={`${title} help`} />
-          )}
+          <h2 className="text-2xl font-bold text-foreground">{title}</h2>
+          {helpTopicId && <HelpAnchor topicId={helpTopicId} label={`${title} help`} />}
         </div>
         <p className="text-muted-foreground mt-1">{description}</p>
       </div>

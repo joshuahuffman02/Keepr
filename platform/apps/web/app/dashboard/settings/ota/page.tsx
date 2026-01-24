@@ -8,18 +8,55 @@ import { registerBackgroundSync } from "@/lib/offline-queue";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient, type OtaChannel, type OtaMapping } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import {
-  Globe, Shield, CheckCircle2, AlertCircle, Clock, RefreshCw, Plus,
-  Zap, ChevronRight, ExternalLink, Calendar, ArrowRightLeft, Loader2,
-  Sparkles, Lock, Eye, EyeOff, Link2, Download, Upload, XCircle,
-  PartyPopper, Wifi, WifiOff, Settings2, HelpCircle, Layers, MapPin
+  Globe,
+  Shield,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  RefreshCw,
+  Plus,
+  Zap,
+  ChevronRight,
+  ExternalLink,
+  Calendar,
+  ArrowRightLeft,
+  Loader2,
+  Sparkles,
+  Lock,
+  Eye,
+  EyeOff,
+  Link2,
+  Download,
+  Upload,
+  XCircle,
+  PartyPopper,
+  Wifi,
+  WifiOff,
+  Settings2,
+  HelpCircle,
+  Layers,
+  MapPin,
 } from "lucide-react";
 
 const providerOptions = [
@@ -27,13 +64,13 @@ const providerOptions = [
   { value: "Spot2Nite", label: "Spot2Nite", icon: "moon" },
   { value: "Outdoorsy", label: "Outdoorsy", icon: "truck" },
   { value: "Airbnb", label: "Airbnb", icon: "home" },
-  { value: "Other", label: "Other", icon: "link" }
+  { value: "Other", label: "Other", icon: "link" },
 ];
 
 const statusOptions = [
   { value: "disabled", label: "Disabled", description: "Channel is off" },
   { value: "pull", label: "Pull bookings only", description: "Import reservations from OTA" },
-  { value: "two_way", label: "Two-way sync", description: "Full availability & booking sync" }
+  { value: "two_way", label: "Two-way sync", description: "Full availability & booking sync" },
 ];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -46,9 +83,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 };
 
 const isOtaMapping = (value: unknown): value is OtaMapping =>
-  isRecord(value) &&
-  typeof value.id === "string" &&
-  typeof value.externalId === "string";
+  isRecord(value) && typeof value.id === "string" && typeof value.externalId === "string";
 
 const getChannelMappings = (mappings: OtaChannel["mappings"]) =>
   Array.isArray(mappings) ? mappings.filter(isOtaMapping) : [];
@@ -63,12 +98,10 @@ function EmptyChannelsState({ onCreateClick }: { onCreateClick: () => void }) {
             <Globe className="h-10 w-10" />
           </div>
 
-          <h3 className="text-2xl font-bold text-foreground mb-3">
-            Connect Your First Channel
-          </h3>
+          <h3 className="text-2xl font-bold text-foreground mb-3">Connect Your First Channel</h3>
           <p className="text-muted-foreground max-w-md mx-auto mb-8">
-            Sync your availability with Hipcamp, Airbnb, and other booking platforms.
-            Never worry about double bookings again.
+            Sync your availability with Hipcamp, Airbnb, and other booking platforms. Never worry
+            about double bookings again.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -108,7 +141,7 @@ function FirstChannelCelebration({
   open,
   onClose,
   channelName,
-  provider
+  provider,
 }: {
   open: boolean;
   onClose: () => void;
@@ -123,12 +156,10 @@ function FirstChannelCelebration({
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-status-info/15 text-status-info mb-4">
           <CheckCircle2 className="h-8 w-8" />
         </div>
-        <h3 className="text-xl font-bold text-foreground mb-2">
-          Channel Created!
-        </h3>
+        <h3 className="text-xl font-bold text-foreground mb-2">Channel Created!</h3>
         <p className="text-muted-foreground mb-6">
-          <span className="font-medium text-status-info">{channelName}</span> has been set up.
-          Now let's connect it to {provider}.
+          <span className="font-medium text-status-info">{channelName}</span> has been set up. Now
+          let's connect it to {provider}.
         </p>
 
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-left">
@@ -139,15 +170,21 @@ function FirstChannelCelebration({
           <ol className="text-sm text-amber-700 space-y-2 list-decimal list-inside">
             <li>
               <strong>Get your iCal URL from {provider}</strong>
-              <p className="text-xs text-amber-600 ml-5">Find this in your {provider} listing settings</p>
+              <p className="text-xs text-amber-600 ml-5">
+                Find this in your {provider} listing settings
+              </p>
             </li>
             <li>
               <strong>Add a mapping below</strong>
-              <p className="text-xs text-amber-600 ml-5">Enter your {provider} listing ID and paste the iCal URL</p>
+              <p className="text-xs text-amber-600 ml-5">
+                Enter your {provider} listing ID and paste the iCal URL
+              </p>
             </li>
             <li>
               <strong>Test with "Import now"</strong>
-              <p className="text-xs text-amber-600 ml-5">This will pull reservations from {provider} to verify it works</p>
+              <p className="text-xs text-amber-600 ml-5">
+                This will pull reservations from {provider} to verify it works
+              </p>
             </li>
           </ol>
         </div>
@@ -172,14 +209,14 @@ function ChannelCard({
   channel,
   isSelected,
   onSelect,
-  errorCount
+  errorCount,
 }: {
   channel: OtaChannel;
   isSelected: boolean;
   onSelect: () => void;
   errorCount: number;
 }) {
-  const provider = providerOptions.find(p => p.value === channel.provider);
+  const provider = providerOptions.find((p) => p.value === channel.provider);
   const mappingCount = getChannelMappings(channel.mappings).length;
   const needsSetup = mappingCount === 0;
 
@@ -199,17 +236,19 @@ function ChannelCard({
           ? "border-status-info/40 bg-status-info/10 shadow-sm"
           : needsSetup
             ? "border-status-warning/40 bg-status-warning/10 hover:border-status-warning/60"
-            : "border-border bg-card hover:border-border/80 hover:shadow-sm"
+            : "border-border bg-card hover:border-border/80 hover:shadow-sm",
       )}
       aria-pressed={isSelected}
       aria-label={`${channel.name} channel, ${channel.status === "two_way" ? "two-way sync" : channel.status === "pull" ? "pull only" : "disabled"}${needsSetup ? ", needs setup" : ""}`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
-            isSelected ? "bg-status-info/15" : needsSetup ? "bg-status-warning/15" : "bg-muted"
-          )}>
+          <div
+            className={cn(
+              "w-12 h-12 rounded-xl flex items-center justify-center text-2xl",
+              isSelected ? "bg-status-info/15" : needsSetup ? "bg-status-warning/15" : "bg-muted",
+            )}
+          >
             {provider?.icon || "🔗"}
           </div>
           <div>
@@ -219,7 +258,10 @@ function ChannelCard({
         </div>
         <div className="flex flex-col items-end gap-1">
           {needsSetup ? (
-            <Badge variant="outline" className="text-status-warning border-status-warning/30 bg-status-warning/15">
+            <Badge
+              variant="outline"
+              className="text-status-warning border-status-warning/30 bg-status-warning/15"
+            >
               <AlertCircle className="h-3 w-3 mr-1" />
               Needs setup
             </Badge>
@@ -227,7 +269,10 @@ function ChannelCard({
             <StatusBadge status={channel.status} />
           )}
           {errorCount > 0 && (
-            <Badge variant="outline" className="text-status-warning-text border-status-warning-border bg-status-warning-bg">
+            <Badge
+              variant="outline"
+              className="text-status-warning-text border-status-warning-border bg-status-warning-bg"
+            >
               <AlertCircle className="h-3 w-3 mr-1" />
               {errorCount} errors
             </Badge>
@@ -312,7 +357,7 @@ function SecureInput({
   id,
   value,
   onChange,
-  placeholder
+  placeholder,
 }: {
   id: string;
   value: string;
@@ -358,7 +403,7 @@ export default function OtaSettingsPage() {
     propertyId: "",
     apiKey: "",
     channelId: "",
-    notes: ""
+    notes: "",
   });
   const [form, setForm] = useState({
     name: "",
@@ -369,13 +414,13 @@ export default function OtaSettingsPage() {
     rateMultiplier: "1.00",
     sendEmailNotifications: false,
     ignoreSiteRestrictions: false,
-    ignoreCategoryRestrictions: false
+    ignoreCategoryRestrictions: false,
   });
   const [selectedChannelId, setSelectedChannelId] = useState<string | null>(null);
   const [mappingForm, setMappingForm] = useState({
     externalId: "",
     siteId: "",
-    status: "mapped"
+    status: "mapped",
   });
   const [icalUrlDrafts, setIcalUrlDrafts] = useState<Record<string, string>>({});
   // Bulk site mapping: siteId -> externalId (OTA listing ID)
@@ -397,14 +442,14 @@ export default function OtaSettingsPage() {
     queryKey: ["ota-config", campgroundId],
     queryFn: () => apiClient.getOtaConfig(campgroundId),
     enabled: !!campgroundId,
-    staleTime: 15_000
+    staleTime: 15_000,
   });
 
   const otaSyncStatusQuery = useQuery({
     queryKey: ["ota-sync-status", campgroundId],
     queryFn: () => apiClient.getOtaSyncStatus(campgroundId),
     enabled: !!campgroundId,
-    staleTime: 15_000
+    staleTime: 15_000,
   });
 
   useEffect(() => {
@@ -415,7 +460,7 @@ export default function OtaSettingsPage() {
         propertyId: otaConfigQuery.data.propertyId ?? "",
         apiKey: otaConfigQuery.data.apiKey ?? "",
         channelId: otaConfigQuery.data.channelId ?? "",
-        notes: otaConfigQuery.data.notes ?? ""
+        notes: otaConfigQuery.data.notes ?? "",
       });
     }
   }, [otaConfigQuery.data]);
@@ -424,39 +469,39 @@ export default function OtaSettingsPage() {
     queryKey: ["ota-channels", campgroundId],
     queryFn: () => apiClient.listOtaChannels(campgroundId),
     enabled: !!campgroundId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   const sitesQuery = useQuery({
     queryKey: ["sites", campgroundId],
     queryFn: () => apiClient.getSites(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const siteClassesQuery = useQuery({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const mappingsQuery = useQuery({
     queryKey: ["ota-mappings", selectedChannelId],
     queryFn: () => apiClient.listOtaMappings(selectedChannelId!, campgroundId),
-    enabled: !!selectedChannelId
+    enabled: !!selectedChannelId,
   });
 
   const importsQuery = useQuery({
     queryKey: ["ota-imports", selectedChannelId],
     queryFn: () => apiClient.listOtaImports(selectedChannelId!, campgroundId),
     enabled: !!selectedChannelId,
-    staleTime: 15_000
+    staleTime: 15_000,
   });
 
   const logsQuery = useQuery({
     queryKey: ["ota-logs", selectedChannelId],
     queryFn: () => apiClient.listOtaLogs(selectedChannelId!, campgroundId),
     enabled: !!selectedChannelId,
-    staleTime: 15_000
+    staleTime: 15_000,
   });
 
   // Sync existing mappings to the drafts when mappings load
@@ -482,10 +527,10 @@ export default function OtaSettingsPage() {
     setSavingMappings(true);
     try {
       const existingBySiteId = new Map(
-        (mappingsQuery.data || []).filter(m => m.siteId).map(m => [m.siteId, m])
+        (mappingsQuery.data || []).filter((m) => m.siteId).map((m) => [m.siteId, m]),
       );
       const existingBySiteClassId = new Map(
-        (mappingsQuery.data || []).filter(m => m.siteClassId).map(m => [m.siteClassId, m])
+        (mappingsQuery.data || []).filter((m) => m.siteClassId).map((m) => [m.siteClassId, m]),
       );
 
       const promises: Promise<unknown>[] = [];
@@ -498,20 +543,28 @@ export default function OtaSettingsPage() {
         if (newExternalId && !existing) {
           // Create new mapping
           promises.push(
-            apiClient.upsertOtaMapping(selectedChannelId, {
-              externalId: newExternalId,
-              siteId: site.id,
-              status: "mapped"
-            }, campgroundId)
+            apiClient.upsertOtaMapping(
+              selectedChannelId,
+              {
+                externalId: newExternalId,
+                siteId: site.id,
+                status: "mapped",
+              },
+              campgroundId,
+            ),
           );
         } else if (newExternalId && existing && existing.externalId !== newExternalId) {
           // Update existing mapping
           promises.push(
-            apiClient.upsertOtaMapping(selectedChannelId, {
-              externalId: newExternalId,
-              siteId: site.id,
-              status: "mapped"
-            }, campgroundId)
+            apiClient.upsertOtaMapping(
+              selectedChannelId,
+              {
+                externalId: newExternalId,
+                siteId: site.id,
+                status: "mapped",
+              },
+              campgroundId,
+            ),
           );
         }
       }
@@ -524,20 +577,28 @@ export default function OtaSettingsPage() {
         if (newExternalId && !existing) {
           // Create new mapping
           promises.push(
-            apiClient.upsertOtaMapping(selectedChannelId, {
-              externalId: newExternalId,
-              siteClassId: siteClass.id,
-              status: "mapped"
-            }, campgroundId)
+            apiClient.upsertOtaMapping(
+              selectedChannelId,
+              {
+                externalId: newExternalId,
+                siteClassId: siteClass.id,
+                status: "mapped",
+              },
+              campgroundId,
+            ),
           );
         } else if (newExternalId && existing && existing.externalId !== newExternalId) {
           // Update existing mapping
           promises.push(
-            apiClient.upsertOtaMapping(selectedChannelId, {
-              externalId: newExternalId,
-              siteClassId: siteClass.id,
-              status: "mapped"
-            }, campgroundId)
+            apiClient.upsertOtaMapping(
+              selectedChannelId,
+              {
+                externalId: newExternalId,
+                siteClassId: siteClass.id,
+                status: "mapped",
+              },
+              campgroundId,
+            ),
           );
         }
       }
@@ -549,19 +610,19 @@ export default function OtaSettingsPage() {
       if (promises.length > 0) {
         toast({
           title: "Mappings saved",
-          description: `Updated ${promises.length} mapping${promises.length === 1 ? "" : "s"}.`
+          description: `Updated ${promises.length} mapping${promises.length === 1 ? "" : "s"}.`,
         });
       } else {
         toast({
           title: "No changes",
-          description: "All mappings are already up to date."
+          description: "All mappings are already up to date.",
         });
       }
     } catch (err: unknown) {
       toast({
         title: "Failed to save mappings",
         description: getErrorMessage(err, "An error occurred"),
-        variant: "destructive"
+        variant: "destructive",
       });
     } finally {
       setSavingMappings(false);
@@ -575,14 +636,15 @@ export default function OtaSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ["ota-sync-status", campgroundId] });
       toast({
         title: "Credentials saved",
-        description: "Your OTA connection settings have been securely stored."
+        description: "Your OTA connection settings have been securely stored.",
       });
     },
-    onError: (err: Error) => toast({
-      title: "Failed to save",
-      description: err.message,
-      variant: "destructive"
-    })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to save",
+        description: err.message,
+        variant: "destructive",
+      }),
   });
 
   const createChannel = useMutation({
@@ -596,7 +658,7 @@ export default function OtaSettingsPage() {
         rateMultiplier: parseFloat(form.rateMultiplier || "1") || 1,
         sendEmailNotifications: form.sendEmailNotifications,
         ignoreSiteRestrictions: form.ignoreSiteRestrictions,
-        ignoreCategoryRestrictions: form.ignoreCategoryRestrictions
+        ignoreCategoryRestrictions: form.ignoreCategoryRestrictions,
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ota-channels", campgroundId] });
@@ -609,33 +671,39 @@ export default function OtaSettingsPage() {
       setForm((f) => ({ ...f, name: "", rateMultiplier: "1.00" }));
       setShowCreateForm(false);
     },
-    onError: (err: Error) => toast({
-      title: "Connection failed",
-      description: err.message,
-      variant: "destructive"
-    })
+    onError: (err: Error) =>
+      toast({
+        title: "Connection failed",
+        description: err.message,
+        variant: "destructive",
+      }),
   });
 
   const upsertMapping = useMutation({
     mutationFn: () =>
-      apiClient.upsertOtaMapping(selectedChannelId!, {
-        externalId: mappingForm.externalId.trim(),
-        siteId: mappingForm.siteId || undefined,
-        status: mappingForm.status
-      }, campgroundId),
+      apiClient.upsertOtaMapping(
+        selectedChannelId!,
+        {
+          externalId: mappingForm.externalId.trim(),
+          siteId: mappingForm.siteId || undefined,
+          status: mappingForm.status,
+        },
+        campgroundId,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["ota-mappings", selectedChannelId] });
       toast({
         title: "Mapping saved",
-        description: "Your listing is now connected to the selected site."
+        description: "Your listing is now connected to the selected site.",
       });
       setMappingForm({ externalId: "", siteId: "", status: "mapped" });
     },
-    onError: (err: Error) => toast({
-      title: "Failed to save mapping",
-      description: err.message,
-      variant: "destructive"
-    })
+    onError: (err: Error) =>
+      toast({
+        title: "Failed to save mapping",
+        description: err.message,
+        variant: "destructive",
+      }),
   });
 
   const ensureIcalToken = useMutation({
@@ -644,11 +712,12 @@ export default function OtaSettingsPage() {
       queryClient.invalidateQueries({ queryKey: ["ota-mappings", selectedChannelId] });
       toast({
         title: "Calendar link ready",
-        description: "Copy the iCal URL to share your availability."
+        description: "Copy the iCal URL to share your availability.",
       });
       setIcalUrlDrafts((prev) => ({ ...prev, [mappingId]: prev[mappingId] || "" }));
     },
-    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const setIcalUrl = useMutation({
@@ -657,12 +726,13 @@ export default function OtaSettingsPage() {
     onSuccess: () => {
       toast({
         title: "Import feed saved",
-        description: "We'll sync reservations from this calendar."
+        description: "We'll sync reservations from this calendar.",
       });
       queryClient.invalidateQueries({ queryKey: ["ota-mappings", selectedChannelId] });
       void registerBackgroundSync();
     },
-    onError: (err: Error) => toast({ title: "Error", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   const importIcal = useMutation({
@@ -670,12 +740,13 @@ export default function OtaSettingsPage() {
     onSuccess: (res) => {
       toast({
         title: "Import complete",
-        description: `Successfully imported ${res.imported} reservation${res.imported !== 1 ? "s" : ""}.`
+        description: `Successfully imported ${res.imported} reservation${res.imported !== 1 ? "s" : ""}.`,
       });
       queryClient.invalidateQueries({ queryKey: ["ota-logs", selectedChannelId] });
       void registerBackgroundSync();
     },
-    onError: (err: Error) => toast({ title: "Import failed", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Import failed", description: err.message, variant: "destructive" }),
   });
 
   const pushAvailability = useMutation({
@@ -683,16 +754,17 @@ export default function OtaSettingsPage() {
     onSuccess: (res) => {
       toast({
         title: "Sync started",
-        description: `Pushing availability to ${res.mappingCount ?? 0} listing${res.mappingCount !== 1 ? "s" : ""}...`
+        description: `Pushing availability to ${res.mappingCount ?? 0} listing${res.mappingCount !== 1 ? "s" : ""}...`,
       });
       queryClient.invalidateQueries({ queryKey: ["ota-logs", selectedChannelId] });
     },
-    onError: (err: Error) => toast({ title: "Sync failed", description: err.message, variant: "destructive" })
+    onError: (err: Error) =>
+      toast({ title: "Sync failed", description: err.message, variant: "destructive" }),
   });
 
   const selectedChannel = useMemo(
     () => channelsQuery.data?.find((c) => c.id === selectedChannelId) ?? null,
-    [channelsQuery.data, selectedChannelId]
+    [channelsQuery.data, selectedChannelId],
   );
 
   const syncStatus =
@@ -703,19 +775,23 @@ export default function OtaSettingsPage() {
           lastSyncStatus: otaConfigQuery.data.lastSyncStatus || "not_started",
           lastSyncAt: otaConfigQuery.data.lastSyncAt ?? null,
           lastSyncMessage: otaConfigQuery.data.lastSyncMessage ?? "Not synced yet.",
-          pendingSyncs: otaConfigQuery.data.pendingSyncs ?? 0
+          pendingSyncs: otaConfigQuery.data.pendingSyncs ?? 0,
         }
       : {
           campgroundId,
           lastSyncStatus: "not_started",
           lastSyncAt: null,
           lastSyncMessage: "Not synced yet.",
-          pendingSyncs: 0
+          pendingSyncs: 0,
         });
 
   const handleCreateChannel = () => {
     if (!form.name.trim()) {
-      toast({ title: "Name required", description: "Give your channel a name.", variant: "destructive" });
+      toast({
+        title: "Name required",
+        description: "Give your channel a name.",
+        variant: "destructive",
+      });
       return;
     }
     createChannel.mutate();
@@ -732,11 +808,11 @@ export default function OtaSettingsPage() {
       lastSyncStatus: "stubbed",
       lastSyncAt: now,
       lastSyncMessage: "Manual sync check completed.",
-      pendingSyncs: 0
+      pendingSyncs: 0,
     });
     toast({
       title: "Sync verified",
-      description: "Connection status has been updated."
+      description: "Connection status has been updated.",
     });
   };
 
@@ -755,7 +831,10 @@ export default function OtaSettingsPage() {
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4" data-testid="ota-header">
+      <div
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        data-testid="ota-header"
+      >
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
             <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-status-info/15 text-status-info">
@@ -777,7 +856,9 @@ export default function OtaSettingsPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigator.serviceWorker?.controller?.postMessage({ type: "TRIGGER_SYNC" })}
+            onClick={() =>
+              navigator.serviceWorker?.controller?.postMessage({ type: "TRIGGER_SYNC" })
+            }
             data-testid="ota-sync-trigger"
             className="gap-2"
           >
@@ -1008,15 +1089,17 @@ export default function OtaSettingsPage() {
                     <div key={i} className="h-24 rounded-xl bg-muted animate-pulse" />
                   ))}
                 </div>
-              ) : channelsQuery.data?.map((ch) => (
-                <ChannelCard
-                  key={ch.id}
-                  channel={ch}
-                  isSelected={selectedChannelId === ch.id}
-                  onSelect={() => setSelectedChannelId(ch.id)}
-                  errorCount={channelErrorCount(ch)}
-                />
-              ))}
+              ) : (
+                channelsQuery.data?.map((ch) => (
+                  <ChannelCard
+                    key={ch.id}
+                    channel={ch}
+                    isSelected={selectedChannelId === ch.id}
+                    onSelect={() => setSelectedChannelId(ch.id)}
+                    errorCount={channelErrorCount(ch)}
+                  />
+                ))
+              )}
             </div>
           </div>
 
@@ -1031,7 +1114,10 @@ export default function OtaSettingsPage() {
                     <div>
                       <p className="font-medium">Error loading channel data</p>
                       <p className="text-sm text-red-600">
-                        {mappingsQuery.error?.message || importsQuery.error?.message || logsQuery.error?.message || "An unexpected error occurred"}
+                        {mappingsQuery.error?.message ||
+                          importsQuery.error?.message ||
+                          logsQuery.error?.message ||
+                          "An unexpected error occurred"}
                       </p>
                       <Button
                         variant="outline"
@@ -1060,7 +1146,8 @@ export default function OtaSettingsPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center text-3xl">
-                          {providerOptions.find(p => p.value === selectedChannel.provider)?.icon || "🔗"}
+                          {providerOptions.find((p) => p.value === selectedChannel.provider)
+                            ?.icon || "🔗"}
                         </div>
                         <div>
                           <CardTitle className="flex items-center gap-2">
@@ -1068,7 +1155,8 @@ export default function OtaSettingsPage() {
                             <StatusBadge status={selectedChannel.status} />
                           </CardTitle>
                           <CardDescription>
-                            {selectedChannel.provider} · Rate: {selectedChannel.rateMultiplier?.toFixed(2) ?? "1.00"}x
+                            {selectedChannel.provider} · Rate:{" "}
+                            {selectedChannel.rateMultiplier?.toFixed(2) ?? "1.00"}x
                           </CardDescription>
                         </div>
                       </div>
@@ -1106,7 +1194,10 @@ export default function OtaSettingsPage() {
                       </div>
                       <Button
                         onClick={saveAllMappings}
-                        disabled={savingMappings || (!sitesQuery.data?.length && !siteClassesQuery.data?.length)}
+                        disabled={
+                          savingMappings ||
+                          (!sitesQuery.data?.length && !siteClassesQuery.data?.length)
+                        }
                         className="bg-emerald-600 hover:bg-emerald-700"
                       >
                         {savingMappings ? (
@@ -1127,7 +1218,7 @@ export default function OtaSettingsPage() {
                           "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors",
                           mappingMode === "sites"
                             ? "border-blue-600 text-blue-600"
-                            : "border-transparent text-muted-foreground hover:text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
                         )}
                       >
                         <MapPin className="h-4 w-4" />
@@ -1142,7 +1233,7 @@ export default function OtaSettingsPage() {
                           "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 transition-colors",
                           mappingMode === "classes"
                             ? "border-blue-600 text-blue-600"
-                            : "border-transparent text-muted-foreground hover:text-foreground"
+                            : "border-transparent text-muted-foreground hover:text-foreground",
                         )}
                       >
                         <Layers className="h-4 w-4" />
@@ -1160,19 +1251,25 @@ export default function OtaSettingsPage() {
                         <div>
                           {mappingMode === "sites" ? (
                             <>
-                              <p className="font-medium">1:1 Site Mapping (one OTA listing per site)</p>
+                              <p className="font-medium">
+                                1:1 Site Mapping (one OTA listing per site)
+                              </p>
                               <p className="mt-1 text-blue-700">
-                                Use this when each site has its own listing on {selectedChannel?.provider || "the OTA"}.
-                                The OTA will show each site as a separate bookable unit.
+                                Use this when each site has its own listing on{" "}
+                                {selectedChannel?.provider || "the OTA"}. The OTA will show each
+                                site as a separate bookable unit.
                               </p>
                             </>
                           ) : (
                             <>
-                              <p className="font-medium">Pooled Inventory (one OTA listing per site class)</p>
+                              <p className="font-medium">
+                                Pooled Inventory (one OTA listing per site class)
+                              </p>
                               <p className="mt-1 text-blue-700">
-                                Use this when you have one listing representing multiple interchangeable sites.
-                                For example, "Standard RV Sites" with 10 available spots. The OTA shows 1 listing
-                                with availability based on any site in the class being free.
+                                Use this when you have one listing representing multiple
+                                interchangeable sites. For example, "Standard RV Sites" with 10
+                                available spots. The OTA shows 1 listing with availability based on
+                                any site in the class being free.
                               </p>
                             </>
                           )}
@@ -1198,49 +1295,67 @@ export default function OtaSettingsPage() {
                                 <TableRow>
                                   <TableCell colSpan={4} className="text-center py-8">
                                     <Loader2 className="h-6 w-6 mx-auto animate-spin text-muted-foreground" />
-                                    <p className="mt-2 text-sm text-muted-foreground">Loading sites...</p>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                      Loading sites...
+                                    </p>
                                   </TableCell>
                                 </TableRow>
                               ) : sitesQuery.data?.length ? (
                                 sitesQuery.data.map((site) => {
-                                  const existingMapping = mappingsQuery.data?.find(m => m.siteId === site.id);
+                                  const existingMapping = mappingsQuery.data?.find(
+                                    (m) => m.siteId === site.id,
+                                  );
                                   const currentValue = siteMappingDrafts[site.id] || "";
                                   const hasChanged = existingMapping
                                     ? currentValue !== existingMapping.externalId
                                     : currentValue.trim() !== "";
 
                                   return (
-                                    <TableRow key={site.id} className={hasChanged ? "bg-amber-50/50" : ""}>
+                                    <TableRow
+                                      key={site.id}
+                                      className={hasChanged ? "bg-amber-50/50" : ""}
+                                    >
                                       <TableCell>
                                         <div className="font-medium">{site.name}</div>
                                       </TableCell>
                                       <TableCell>
                                         <Input
                                           value={currentValue}
-                                          onChange={(e) => setSiteMappingDrafts(prev => ({
-                                            ...prev,
-                                            [site.id]: e.target.value
-                                          }))}
+                                          onChange={(e) =>
+                                            setSiteMappingDrafts((prev) => ({
+                                              ...prev,
+                                              [site.id]: e.target.value,
+                                            }))
+                                          }
                                           placeholder="Enter listing ID..."
                                           className={cn(
                                             "font-mono text-sm",
-                                            hasChanged && "border-amber-400 bg-amber-50"
+                                            hasChanged && "border-amber-400 bg-amber-50",
                                           )}
                                         />
                                       </TableCell>
                                       <TableCell>
                                         {existingMapping ? (
-                                          <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-50">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-emerald-700 border-emerald-200 bg-emerald-50"
+                                          >
                                             <CheckCircle2 className="h-3 w-3 mr-1" />
                                             Mapped
                                           </Badge>
                                         ) : currentValue.trim() ? (
-                                          <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-amber-700 border-amber-200 bg-amber-50"
+                                          >
                                             <Clock className="h-3 w-3 mr-1" />
                                             Unsaved
                                           </Badge>
                                         ) : (
-                                          <Badge variant="outline" className="text-muted-foreground">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-muted-foreground"
+                                          >
                                             Not mapped
                                           </Badge>
                                         )}
@@ -1251,7 +1366,9 @@ export default function OtaSettingsPage() {
                                             <Button
                                               size="sm"
                                               variant="ghost"
-                                              onClick={() => ensureIcalToken.mutate(existingMapping.id)}
+                                              onClick={() =>
+                                                ensureIcalToken.mutate(existingMapping.id)
+                                              }
                                               disabled={ensureIcalToken.isPending}
                                               className="text-blue-600 h-8 px-2"
                                               title="Get iCal feed"
@@ -1276,10 +1393,15 @@ export default function OtaSettingsPage() {
                                 })
                               ) : (
                                 <TableRow>
-                                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                                  <TableCell
+                                    colSpan={4}
+                                    className="text-center py-8 text-muted-foreground"
+                                  >
                                     <AlertCircle className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                     <p>No sites found in this campground.</p>
-                                    <p className="text-sm mt-1">Add sites first, then come back to map them.</p>
+                                    <p className="text-sm mt-1">
+                                      Add sites first, then come back to map them.
+                                    </p>
                                   </TableCell>
                                 </TableRow>
                               )}
@@ -1291,10 +1413,11 @@ export default function OtaSettingsPage() {
                         {sitesQuery.data && sitesQuery.data.length > 0 && (
                           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                             <div>
-                              {mappingsQuery.data?.filter(m => m.siteId).length || 0} of {sitesQuery.data.length} sites mapped
+                              {mappingsQuery.data?.filter((m) => m.siteId).length || 0} of{" "}
+                              {sitesQuery.data.length} sites mapped
                             </div>
-                            {Object.keys(siteMappingDrafts).some(siteId => {
-                              const existing = mappingsQuery.data?.find(m => m.siteId === siteId);
+                            {Object.keys(siteMappingDrafts).some((siteId) => {
+                              const existing = mappingsQuery.data?.find((m) => m.siteId === siteId);
                               const draft = siteMappingDrafts[siteId];
                               return existing ? draft !== existing.externalId : draft?.trim();
                             }) && (
@@ -1327,21 +1450,30 @@ export default function OtaSettingsPage() {
                                 <TableRow>
                                   <TableCell colSpan={5} className="text-center py-8">
                                     <Loader2 className="h-6 w-6 mx-auto animate-spin text-muted-foreground" />
-                                    <p className="mt-2 text-sm text-muted-foreground">Loading site classes...</p>
+                                    <p className="mt-2 text-sm text-muted-foreground">
+                                      Loading site classes...
+                                    </p>
                                   </TableCell>
                                 </TableRow>
                               ) : siteClassesQuery.data?.length ? (
                                 siteClassesQuery.data.map((siteClass) => {
-                                  const existingMapping = mappingsQuery.data?.find(m => m.siteClassId === siteClass.id);
+                                  const existingMapping = mappingsQuery.data?.find(
+                                    (m) => m.siteClassId === siteClass.id,
+                                  );
                                   const currentValue = siteClassMappingDrafts[siteClass.id] || "";
                                   const hasChanged = existingMapping
                                     ? currentValue !== existingMapping.externalId
                                     : currentValue.trim() !== "";
                                   // Count sites in this class
-                                  const siteCount = sitesQuery.data?.filter(s => s.siteClassId === siteClass.id).length || 0;
+                                  const siteCount =
+                                    sitesQuery.data?.filter((s) => s.siteClassId === siteClass.id)
+                                      .length || 0;
 
                                   return (
-                                    <TableRow key={siteClass.id} className={hasChanged ? "bg-amber-50/50" : ""}>
+                                    <TableRow
+                                      key={siteClass.id}
+                                      className={hasChanged ? "bg-amber-50/50" : ""}
+                                    >
                                       <TableCell>
                                         <div className="font-medium">{siteClass.name}</div>
                                         {siteClass.description && (
@@ -1359,30 +1491,41 @@ export default function OtaSettingsPage() {
                                       <TableCell>
                                         <Input
                                           value={currentValue}
-                                          onChange={(e) => setSiteClassMappingDrafts(prev => ({
-                                            ...prev,
-                                            [siteClass.id]: e.target.value
-                                          }))}
+                                          onChange={(e) =>
+                                            setSiteClassMappingDrafts((prev) => ({
+                                              ...prev,
+                                              [siteClass.id]: e.target.value,
+                                            }))
+                                          }
                                           placeholder="Enter listing ID..."
                                           className={cn(
                                             "font-mono text-sm",
-                                            hasChanged && "border-amber-400 bg-amber-50"
+                                            hasChanged && "border-amber-400 bg-amber-50",
                                           )}
                                         />
                                       </TableCell>
                                       <TableCell>
                                         {existingMapping ? (
-                                          <Badge variant="outline" className="text-emerald-700 border-emerald-200 bg-emerald-50">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-emerald-700 border-emerald-200 bg-emerald-50"
+                                          >
                                             <CheckCircle2 className="h-3 w-3 mr-1" />
                                             Mapped
                                           </Badge>
                                         ) : currentValue.trim() ? (
-                                          <Badge variant="outline" className="text-amber-700 border-amber-200 bg-amber-50">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-amber-700 border-amber-200 bg-amber-50"
+                                          >
                                             <Clock className="h-3 w-3 mr-1" />
                                             Unsaved
                                           </Badge>
                                         ) : (
-                                          <Badge variant="outline" className="text-muted-foreground">
+                                          <Badge
+                                            variant="outline"
+                                            className="text-muted-foreground"
+                                          >
                                             Not mapped
                                           </Badge>
                                         )}
@@ -1393,7 +1536,9 @@ export default function OtaSettingsPage() {
                                             <Button
                                               size="sm"
                                               variant="ghost"
-                                              onClick={() => ensureIcalToken.mutate(existingMapping.id)}
+                                              onClick={() =>
+                                                ensureIcalToken.mutate(existingMapping.id)
+                                              }
                                               disabled={ensureIcalToken.isPending}
                                               className="text-blue-600 h-8 px-2"
                                               title="Get iCal feed"
@@ -1418,10 +1563,16 @@ export default function OtaSettingsPage() {
                                 })
                               ) : (
                                 <TableRow>
-                                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                  <TableCell
+                                    colSpan={5}
+                                    className="text-center py-8 text-muted-foreground"
+                                  >
                                     <Layers className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                                     <p>No site classes found in this campground.</p>
-                                    <p className="text-sm mt-1">Create site classes first, or use "Map by Site" for 1:1 mapping.</p>
+                                    <p className="text-sm mt-1">
+                                      Create site classes first, or use "Map by Site" for 1:1
+                                      mapping.
+                                    </p>
                                   </TableCell>
                                 </TableRow>
                               )}
@@ -1433,10 +1584,13 @@ export default function OtaSettingsPage() {
                         {siteClassesQuery.data && siteClassesQuery.data.length > 0 && (
                           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
                             <div>
-                              {mappingsQuery.data?.filter(m => m.siteClassId).length || 0} of {siteClassesQuery.data.length} site classes mapped
+                              {mappingsQuery.data?.filter((m) => m.siteClassId).length || 0} of{" "}
+                              {siteClassesQuery.data.length} site classes mapped
                             </div>
-                            {Object.keys(siteClassMappingDrafts).some(siteClassId => {
-                              const existing = mappingsQuery.data?.find(m => m.siteClassId === siteClassId);
+                            {Object.keys(siteClassMappingDrafts).some((siteClassId) => {
+                              const existing = mappingsQuery.data?.find(
+                                (m) => m.siteClassId === siteClassId,
+                              );
                               const draft = siteClassMappingDrafts[siteClassId];
                               return existing ? draft !== existing.externalId : draft?.trim();
                             }) && (
@@ -1479,16 +1633,22 @@ export default function OtaSettingsPage() {
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {importsQuery.data?.length ? (
                           importsQuery.data.slice(0, 5).map((imp) => (
-                            <div key={imp.id} className="flex items-center justify-between p-2 rounded-lg bg-muted">
+                            <div
+                              key={imp.id}
+                              className="flex items-center justify-between p-2 rounded-lg bg-muted"
+                            >
                               <div>
                                 <p className="font-mono text-sm">{imp.externalReservationId}</p>
-                                <p className="text-xs text-muted-foreground">{imp.message || "Imported"}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {imp.message || "Imported"}
+                                </p>
                               </div>
                               <Badge
                                 variant="outline"
-                                className={imp.status === "success"
-                                  ? "text-emerald-700 border-emerald-200"
-                                  : "text-amber-700 border-amber-200"
+                                className={
+                                  imp.status === "success"
+                                    ? "text-emerald-700 border-emerald-200"
+                                    : "text-amber-700 border-amber-200"
                                 }
                               >
                                 {imp.status}
@@ -1496,7 +1656,9 @@ export default function OtaSettingsPage() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-center text-sm text-muted-foreground py-4">No imports yet</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">
+                            No imports yet
+                          </p>
                         )}
                       </div>
                     </CardContent>
@@ -1527,7 +1689,10 @@ export default function OtaSettingsPage() {
                       <div className="space-y-2 max-h-48 overflow-y-auto">
                         {logsQuery.data?.length ? (
                           logsQuery.data.slice(0, 5).map((log) => (
-                            <div key={log.id} className="flex items-center justify-between p-2 rounded-lg bg-muted">
+                            <div
+                              key={log.id}
+                              className="flex items-center justify-between p-2 rounded-lg bg-muted"
+                            >
                               <div className="flex items-center gap-2">
                                 {log.direction === "push" ? (
                                   <Upload className="h-4 w-4 text-blue-500" />
@@ -1537,15 +1702,18 @@ export default function OtaSettingsPage() {
                                 <div>
                                   <p className="text-sm font-medium capitalize">{log.eventType}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    {log.createdAt ? new Date(log.createdAt).toLocaleTimeString() : ""}
+                                    {log.createdAt
+                                      ? new Date(log.createdAt).toLocaleTimeString()
+                                      : ""}
                                   </p>
                                 </div>
                               </div>
                               <Badge
                                 variant="outline"
-                                className={log.status === "success"
-                                  ? "text-emerald-700 border-emerald-200"
-                                  : "text-muted-foreground"
+                                className={
+                                  log.status === "success"
+                                    ? "text-emerald-700 border-emerald-200"
+                                    : "text-muted-foreground"
                                 }
                               >
                                 {log.status}
@@ -1553,7 +1721,9 @@ export default function OtaSettingsPage() {
                             </div>
                           ))
                         ) : (
-                          <p className="text-center text-sm text-muted-foreground py-4">No activity yet</p>
+                          <p className="text-center text-sm text-muted-foreground py-4">
+                            No activity yet
+                          </p>
                         )}
                       </div>
                     </CardContent>
@@ -1627,7 +1797,9 @@ export default function OtaSettingsPage() {
                     <Input
                       id="account-id"
                       value={otaConfigDraft.externalAccountId}
-                      onChange={(e) => setOtaConfigDraft((f) => ({ ...f, externalAccountId: e.target.value }))}
+                      onChange={(e) =>
+                        setOtaConfigDraft((f) => ({ ...f, externalAccountId: e.target.value }))
+                      }
                       placeholder="Your partner account ID"
                     />
                   </div>
@@ -1636,7 +1808,9 @@ export default function OtaSettingsPage() {
                     <Input
                       id="property-id"
                       value={otaConfigDraft.propertyId}
-                      onChange={(e) => setOtaConfigDraft((f) => ({ ...f, propertyId: e.target.value }))}
+                      onChange={(e) =>
+                        setOtaConfigDraft((f) => ({ ...f, propertyId: e.target.value }))
+                      }
                       placeholder="Property or listing reference"
                     />
                   </div>

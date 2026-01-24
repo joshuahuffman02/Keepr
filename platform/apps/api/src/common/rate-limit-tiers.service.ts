@@ -311,9 +311,7 @@ export class RateLimitTiersService {
       const toRemove = this.usageMap.size - this.maxMapSize;
       const keys = Array.from(this.usageMap.keys()).slice(0, toRemove);
       keys.forEach((k) => this.usageMap.delete(k));
-      this.logger.warn(
-        `Rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`
-      );
+      this.logger.warn(`Rate limit map exceeded ${this.maxMapSize}, removed ${toRemove} entries`);
     }
   }
 }

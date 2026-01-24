@@ -60,9 +60,7 @@ export function PaymentSetupProgress({
       aria-label="Payment setup progress"
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-status-info-text">
-          Getting started with payments
-        </h3>
+        <h3 className="text-sm font-medium text-status-info-text">Getting started with payments</h3>
         <span className="rounded-full border border-status-info-border bg-status-info-bg px-2 py-0.5 text-xs text-status-info-text">
           {completedCount} of {steps.length} complete
         </span>
@@ -78,9 +76,13 @@ export function PaymentSetupProgress({
                   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-300",
                   step.completed
                     ? "bg-status-success text-status-success-foreground motion-safe:animate-in motion-safe:zoom-in"
-                    : "bg-card border-2 border-border text-muted-foreground"
+                    : "bg-card border-2 border-border text-muted-foreground",
                 )}
-                aria-current={!step.completed && steps.slice(0, index).every(s => s.completed) ? "step" : undefined}
+                aria-current={
+                  !step.completed && steps.slice(0, index).every((s) => s.completed)
+                    ? "step"
+                    : undefined
+                }
               >
                 {step.completed ? (
                   <Check className="w-4 h-4" aria-hidden="true" />
@@ -92,10 +94,12 @@ export function PaymentSetupProgress({
                 </span>
               </div>
               <div className="hidden sm:block">
-                <p className={cn(
-                  "text-sm font-medium",
-                  step.completed ? "text-status-success-text" : "text-muted-foreground"
-                )}>
+                <p
+                  className={cn(
+                    "text-sm font-medium",
+                    step.completed ? "text-status-success-text" : "text-muted-foreground",
+                  )}
+                >
                   {step.label}
                 </p>
                 <p className="text-xs text-muted-foreground">{step.description}</p>
@@ -107,7 +111,7 @@ export function PaymentSetupProgress({
               <div
                 className={cn(
                   "hidden sm:block h-0.5 w-8 mx-3 transition-colors duration-300",
-                  step.completed ? "bg-status-success/30" : "bg-muted"
+                  step.completed ? "bg-status-success/30" : "bg-muted",
                 )}
                 aria-hidden="true"
               />

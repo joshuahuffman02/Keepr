@@ -16,16 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Plus,
-  Truck,
-  Pencil,
-  Trash2,
-  Info,
-  Ruler,
-  Link2,
-  MoreHorizontal,
-} from "lucide-react";
+import { Plus, Truck, Pencil, Trash2, Info, Ruler, Link2, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,16 +38,86 @@ interface EquipmentType {
 
 // Mock data based on domain knowledge
 const initialEquipmentTypes: EquipmentType[] = [
-  { id: "1", name: "Travel Trailer", requiresLength: true, requiresTow: true, bufferLength: 5, isActive: true },
-  { id: "2", name: "Fifth Wheel", requiresLength: true, requiresTow: true, bufferLength: 5, isActive: true },
-  { id: "3", name: "Class A Motorhome", requiresLength: true, requiresTow: false, bufferLength: 0, isActive: true },
-  { id: "4", name: "Class B Van", requiresLength: false, requiresTow: false, bufferLength: 0, isActive: true },
-  { id: "5", name: "Class C Motorhome", requiresLength: true, requiresTow: false, bufferLength: 0, isActive: true },
-  { id: "6", name: "Pop-up/Folding", requiresLength: false, requiresTow: true, bufferLength: 0, isActive: true },
-  { id: "7", name: "Toy Hauler", requiresLength: true, requiresTow: true, bufferLength: 5, isActive: true },
-  { id: "8", name: "Truck Camper", requiresLength: false, requiresTow: false, bufferLength: 0, isActive: true },
-  { id: "9", name: "Tent", requiresLength: false, requiresTow: false, bufferLength: 0, isActive: true },
-  { id: "10", name: "Vehicle Only", requiresLength: false, requiresTow: false, bufferLength: 0, isActive: true },
+  {
+    id: "1",
+    name: "Travel Trailer",
+    requiresLength: true,
+    requiresTow: true,
+    bufferLength: 5,
+    isActive: true,
+  },
+  {
+    id: "2",
+    name: "Fifth Wheel",
+    requiresLength: true,
+    requiresTow: true,
+    bufferLength: 5,
+    isActive: true,
+  },
+  {
+    id: "3",
+    name: "Class A Motorhome",
+    requiresLength: true,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "4",
+    name: "Class B Van",
+    requiresLength: false,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "5",
+    name: "Class C Motorhome",
+    requiresLength: true,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "6",
+    name: "Pop-up/Folding",
+    requiresLength: false,
+    requiresTow: true,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "7",
+    name: "Toy Hauler",
+    requiresLength: true,
+    requiresTow: true,
+    bufferLength: 5,
+    isActive: true,
+  },
+  {
+    id: "8",
+    name: "Truck Camper",
+    requiresLength: false,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "9",
+    name: "Tent",
+    requiresLength: false,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
+  {
+    id: "10",
+    name: "Vehicle Only",
+    requiresLength: false,
+    requiresTow: false,
+    bufferLength: 0,
+    isActive: true,
+  },
 ];
 
 export default function EquipmentTypesPage() {
@@ -78,18 +139,21 @@ export default function EquipmentTypesPage() {
     setEditingType(null);
   }, []);
 
-  const openEditor = useCallback((type: EquipmentType | null) => {
-    if (type) {
-      setEditingType(type);
-      setFormName(type.name);
-      setFormRequiresLength(type.requiresLength);
-      setFormRequiresTow(type.requiresTow);
-      setFormBufferLength(type.bufferLength);
-    } else {
-      resetForm();
-    }
-    setIsEditorOpen(true);
-  }, [resetForm]);
+  const openEditor = useCallback(
+    (type: EquipmentType | null) => {
+      if (type) {
+        setEditingType(type);
+        setFormName(type.name);
+        setFormRequiresLength(type.requiresLength);
+        setFormRequiresTow(type.requiresTow);
+        setFormBufferLength(type.bufferLength);
+      } else {
+        resetForm();
+      }
+      setIsEditorOpen(true);
+    },
+    [resetForm],
+  );
 
   const handleSave = useCallback(() => {
     if (!formName.trim()) return;
@@ -104,9 +168,7 @@ export default function EquipmentTypesPage() {
 
     if (editingType) {
       setEquipmentTypes((prev) =>
-        prev.map((t) =>
-          t.id === editingType.id ? { ...t, ...typeData } : t
-        )
+        prev.map((t) => (t.id === editingType.id ? { ...t, ...typeData } : t)),
       );
     } else {
       const newType: EquipmentType = {
@@ -126,9 +188,7 @@ export default function EquipmentTypesPage() {
 
   const handleToggleActive = useCallback((id: string) => {
     setEquipmentTypes((prev) =>
-      prev.map((t) =>
-        t.id === id ? { ...t, isActive: !t.isActive } : t
-      )
+      prev.map((t) => (t.id === id ? { ...t, isActive: !t.isActive } : t)),
     );
   }, []);
 
@@ -182,7 +242,7 @@ export default function EquipmentTypesPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted text-muted-foreground",
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -211,9 +271,9 @@ export default function EquipmentTypesPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Equipment types help match guests to appropriate sites. When a guest specifies their
-          RV type and length, the system ensures they're assigned to a compatible site.
-          Buffer lengths are added to the RV length for towed vehicles.
+          Equipment types help match guests to appropriate sites. When a guest specifies their RV
+          type and length, the system ensures they're assigned to a compatible site. Buffer lengths
+          are added to the RV length for towed vehicles.
         </AlertDescription>
       </Alert>
 
@@ -242,10 +302,7 @@ export default function EquipmentTypesPage() {
                 {item.isActive ? "Deactivate" : "Activate"}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleDelete(item.id)}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={() => handleDelete(item.id)} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>
@@ -263,9 +320,7 @@ export default function EquipmentTypesPage() {
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {editingType ? "Edit Equipment Type" : "Add Equipment Type"}
-            </DialogTitle>
+            <DialogTitle>{editingType ? "Edit Equipment Type" : "Add Equipment Type"}</DialogTitle>
             <DialogDescription>
               Configure equipment requirements for site matching
             </DialogDescription>

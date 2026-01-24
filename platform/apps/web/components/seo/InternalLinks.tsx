@@ -166,9 +166,7 @@ export function SiteTypeLinks({
             className="inline-flex items-center gap-2 px-4 py-2 bg-card border border-border hover:border-keepr-evergreen/30 rounded-lg text-sm text-foreground hover:text-keepr-evergreen transition-colors"
           >
             {siteType.label}
-            <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
-              {siteType.count}
-            </span>
+            <span className="text-xs bg-muted px-2 py-0.5 rounded-full">{siteType.count}</span>
           </Link>
         ))}
       </div>
@@ -191,7 +189,7 @@ export function QuickLink({ href, children, className }: QuickLinkProps) {
       href={href}
       className={cn(
         "inline-flex items-center gap-1 text-keepr-evergreen hover:text-keepr-evergreen-light font-medium group",
-        className
+        className,
       )}
     >
       {children}
@@ -294,7 +292,12 @@ export function AvailabilityCta({
   className,
 }: AvailabilityCtaProps) {
   return (
-    <div className={cn("bg-keepr-evergreen/10 border border-keepr-evergreen/20 rounded-xl p-6", className)}>
+    <div
+      className={cn(
+        "bg-keepr-evergreen/10 border border-keepr-evergreen/20 rounded-xl p-6",
+        className,
+      )}
+    >
       <div className="flex items-start gap-4">
         <div className="h-12 w-12 rounded-full bg-keepr-evergreen/15 flex items-center justify-center flex-shrink-0">
           <Calendar className="h-6 w-6 text-keepr-evergreen" />

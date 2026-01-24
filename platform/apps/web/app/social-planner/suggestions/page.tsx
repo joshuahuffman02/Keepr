@@ -30,7 +30,7 @@ export default function SocialPlannerSuggestions() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("new");
   const { data: campgrounds = [] } = useQuery<Campground[]>({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
@@ -42,7 +42,7 @@ export default function SocialPlannerSuggestions() {
       }
       return apiClient.listSocialSuggestions(campgroundId, statusFilter);
     },
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const refresh = useMutation({
@@ -54,11 +54,18 @@ export default function SocialPlannerSuggestions() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["social-suggestions", campgroundId] });
-      toast({ title: "Suggestions refreshed", description: "New ideas fetched without duplicates." });
+      toast({
+        title: "Suggestions refreshed",
+        description: "New ideas fetched without duplicates.",
+      });
     },
     onError: (error) => {
-      toast({ variant: "destructive", title: "Refresh failed", description: getErrorMessage(error) });
-    }
+      toast({
+        variant: "destructive",
+        title: "Refresh failed",
+        description: getErrorMessage(error),
+      });
+    },
   });
 
   const accept = useMutation({
@@ -71,8 +78,12 @@ export default function SocialPlannerSuggestions() {
       toast({ title: "Accepted", description: "Suggestion accepted." });
     },
     onError: (error) => {
-      toast({ variant: "destructive", title: "Accept failed", description: getErrorMessage(error) });
-    }
+      toast({
+        variant: "destructive",
+        title: "Accept failed",
+        description: getErrorMessage(error),
+      });
+    },
   });
 
   const dismiss = useMutation({
@@ -85,8 +96,12 @@ export default function SocialPlannerSuggestions() {
       toast({ title: "Dismissed", description: "Suggestion dismissed." });
     },
     onError: (error) => {
-      toast({ variant: "destructive", title: "Dismiss failed", description: getErrorMessage(error) });
-    }
+      toast({
+        variant: "destructive",
+        title: "Dismiss failed",
+        description: getErrorMessage(error),
+      });
+    },
   });
 
   const addToCalendar = useMutation({
@@ -102,7 +117,7 @@ export default function SocialPlannerSuggestions() {
         scheduledFor: suggestion.proposedDate || new Date().toISOString(),
         suggestionId: suggestion.id,
         caption: suggestion.message,
-        ideaParkingLot: false
+        ideaParkingLot: false,
       });
     },
     onSuccess: (_data, suggestion) => {
@@ -111,11 +126,18 @@ export default function SocialPlannerSuggestions() {
         if (!prev) return prev;
         return prev.filter((item) => item.id !== suggestion.id);
       });
-      toast({ title: "Added to calendar", description: "Scheduled post created; suggestion marked scheduled." });
+      toast({
+        title: "Added to calendar",
+        description: "Scheduled post created; suggestion marked scheduled.",
+      });
     },
     onError: (error) => {
-      toast({ variant: "destructive", title: "Add to calendar failed", description: getErrorMessage(error) });
-    }
+      toast({
+        variant: "destructive",
+        title: "Add to calendar failed",
+        description: getErrorMessage(error),
+      });
+    },
   });
 
   if (!campgroundId) {
@@ -133,14 +155,21 @@ export default function SocialPlannerSuggestions() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Suggestions</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Suggestions
+          </p>
           <h1 className="text-2xl font-bold text-foreground">Rule-based ideas & alerts</h1>
-          <p className="text-muted-foreground">Occupancy, events, deals, seasonal, and historical heuristics. No external AI required.</p>
+          <p className="text-muted-foreground">
+            Occupancy, events, deals, seasonal, and historical heuristics. No external AI required.
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <select
@@ -156,71 +185,86 @@ export default function SocialPlannerSuggestions() {
             <option value="dismissed">Dismissed</option>
             <option value="">All</option>
           </select>
-        <button
-          className="btn-secondary flex items-center"
-          onClick={() => refresh.mutate()}
-          disabled={!campgroundId || refresh.isPending}
-        >
-          <RefreshCw className="h-4 w-4 mr-1" /> Refresh ideas
-        </button>
+          <button
+            className="btn-secondary flex items-center"
+            onClick={() => refresh.mutate()}
+            disabled={!campgroundId || refresh.isPending}
+          >
+            <RefreshCw className="h-4 w-4 mr-1" /> Refresh ideas
+          </button>
         </div>
       </div>
 
-          <div className="grid gap-3">
+      <div className="grid gap-3">
         {suggestionsQuery.data?.map((suggestion) => {
           const reasonEntries = isRecord(suggestion.reason)
             ? Object.entries(suggestion.reason)
             : [];
 
           return (
-          <div key={suggestion.id} className="card p-4">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase text-muted-foreground">{suggestion.type}</p>
-                <h3 className="text-lg font-semibold text-foreground">{suggestion.message}</h3>
-                    <div className="text-xs text-muted-foreground mt-1">Generated: {new Date(suggestion.createdAt || Date.now()).toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground flex gap-2 mt-2">
-                  {suggestion.category && <span className="badge">{suggestion.category}</span>}
-                  {suggestion.platform && <span className="badge bg-status-success/15 text-status-success">{suggestion.platform}</span>}
-                  {suggestion.proposedDate && <span className="badge bg-status-info/15 text-status-info">Target {new Date(suggestion.proposedDate).toLocaleDateString()}</span>}
-                </div>
-              </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="btn-secondary flex items-center text-emerald-700"
-                      onClick={() => accept.mutate(suggestion.id)}
-                      disabled={accept.isPending || suggestion.status !== "new"}
-                    >
-                      <CheckCircle2 className="h-4 w-4 mr-1" /> Accept
-                    </button>
-                    <button
-                      className="btn-secondary flex items-center text-amber-700"
-                      onClick={() => dismiss.mutate(suggestion.id)}
-                      disabled={dismiss.isPending || suggestion.status !== "new"}
-                    >
-                      <AlertTriangle className="h-4 w-4 mr-1" /> Dismiss
-                    </button>
-                    {suggestion.status && suggestion.status !== "new" && (
-                      <span className="text-xs text-muted-foreground">Status: {suggestion.status}</span>
+            <div key={suggestion.id} className="card p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-xs uppercase text-muted-foreground">{suggestion.type}</p>
+                  <h3 className="text-lg font-semibold text-foreground">{suggestion.message}</h3>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Generated: {new Date(suggestion.createdAt || Date.now()).toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex gap-2 mt-2">
+                    {suggestion.category && <span className="badge">{suggestion.category}</span>}
+                    {suggestion.platform && (
+                      <span className="badge bg-status-success/15 text-status-success">
+                        {suggestion.platform}
+                      </span>
+                    )}
+                    {suggestion.proposedDate && (
+                      <span className="badge bg-status-info/15 text-status-info">
+                        Target {new Date(suggestion.proposedDate).toLocaleDateString()}
+                      </span>
                     )}
                   </div>
-            </div>
-            {reasonEntries.length > 0 && (
-              <div className="mt-2 text-xs text-muted-foreground bg-muted p-2 rounded border border-border flex flex-wrap gap-2">
-                {reasonEntries.map(([key, val]) => {
-                  const label = key.replace(/([A-Z])/g, " $1").toLowerCase();
-                  const display =
-                    key.toLowerCase().includes("ratio") && typeof val === "number"
-                      ? `${Math.round(val * 100)}%`
-                      : String(val);
-                  return (
-                    <span key={`${suggestion.id}-${key}`} className="badge bg-card text-foreground border border-border">
-                      {label}: {display}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="btn-secondary flex items-center text-emerald-700"
+                    onClick={() => accept.mutate(suggestion.id)}
+                    disabled={accept.isPending || suggestion.status !== "new"}
+                  >
+                    <CheckCircle2 className="h-4 w-4 mr-1" /> Accept
+                  </button>
+                  <button
+                    className="btn-secondary flex items-center text-amber-700"
+                    onClick={() => dismiss.mutate(suggestion.id)}
+                    disabled={dismiss.isPending || suggestion.status !== "new"}
+                  >
+                    <AlertTriangle className="h-4 w-4 mr-1" /> Dismiss
+                  </button>
+                  {suggestion.status && suggestion.status !== "new" && (
+                    <span className="text-xs text-muted-foreground">
+                      Status: {suggestion.status}
                     </span>
-                  );
-                })}
+                  )}
+                </div>
               </div>
-            )}
+              {reasonEntries.length > 0 && (
+                <div className="mt-2 text-xs text-muted-foreground bg-muted p-2 rounded border border-border flex flex-wrap gap-2">
+                  {reasonEntries.map(([key, val]) => {
+                    const label = key.replace(/([A-Z])/g, " $1").toLowerCase();
+                    const display =
+                      key.toLowerCase().includes("ratio") && typeof val === "number"
+                        ? `${Math.round(val * 100)}%`
+                        : String(val);
+                    return (
+                      <span
+                        key={`${suggestion.id}-${key}`}
+                        className="badge bg-card text-foreground border border-border"
+                      >
+                        {label}: {display}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
               <div className="flex gap-2 mt-3">
                 <button
                   className="btn-primary flex items-center text-white"
@@ -230,10 +274,13 @@ export default function SocialPlannerSuggestions() {
                   <PlusCircle className="h-4 w-4 mr-1" /> Add to calendar
                 </button>
               </div>
-          </div>
-        )})}
+            </div>
+          );
+        })}
         {!suggestionsQuery.data?.length && (
-          <div className="text-sm text-muted-foreground">No suggestions yet. Refresh to generate ideas from your data.</div>
+          <div className="text-sm text-muted-foreground">
+            No suggestions yet. Refresh to generate ideas from your data.
+          </div>
         )}
       </div>
     </DashboardShell>

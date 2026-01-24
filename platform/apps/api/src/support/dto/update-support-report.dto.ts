@@ -10,4 +10,3 @@ export class UpdateSupportReportDto {
   @IsString()
   assigneeId?: string | null;
 }
-

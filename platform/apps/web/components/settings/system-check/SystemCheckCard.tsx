@@ -72,7 +72,7 @@ export function SystemCheckCard({
   const [resolvedIds, setResolvedIds] = useState<Set<string>>(new Set());
 
   const actionableCount = issues.filter(
-    (i) => i.severity !== "info" && !resolvedIds.has(i.id)
+    (i) => i.severity !== "info" && !resolvedIds.has(i.id),
   ).length;
 
   const visibleIssues = issues.filter((i) => !resolvedIds.has(i.id));
@@ -100,9 +100,7 @@ export function SystemCheckCard({
             <CheckCircle2 className="h-6 w-6 text-status-success" />
           </div>
           <h3 className="font-medium text-foreground">All systems go!</h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            No configuration issues detected
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">No configuration issues detected</p>
           {onRefresh && (
             <Button
               variant="ghost"
@@ -138,12 +136,7 @@ export function SystemCheckCard({
             </Badge>
           )}
           {onRefresh && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onRefresh}
-              disabled={isLoading}
-            >
+            <Button variant="ghost" size="sm" onClick={onRefresh} disabled={isLoading}>
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -166,25 +159,15 @@ export function SystemCheckCard({
                 key={issue.id}
                 className={cn(
                   "flex items-start gap-3 py-3 group transition-all duration-300",
-                  compact ? "py-2" : "py-3"
+                  compact ? "py-2" : "py-3",
                 )}
               >
-                <div
-                  className={cn(
-                    "flex-shrink-0 p-1.5 rounded-lg",
-                    config.bg
-                  )}
-                >
-                  <Icon
-                    className={cn("h-4 w-4", config.color)}
-                    aria-hidden="true"
-                  />
+                <div className={cn("flex-shrink-0 p-1.5 rounded-lg", config.bg)}>
+                  <Icon className={cn("h-4 w-4", config.color)} aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">
-                      {issue.message}
-                    </span>
+                    <span className="text-sm font-medium text-foreground">{issue.message}</span>
                     <Badge
                       variant="secondary"
                       className={cn("text-[10px] px-1.5 py-0", config.badge)}
@@ -193,9 +176,7 @@ export function SystemCheckCard({
                     </Badge>
                   </div>
                   {issue.description && !compact && (
-                    <p className="text-sm text-muted-foreground mt-0.5">
-                      {issue.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground mt-0.5">{issue.description}</p>
                   )}
                 </div>
 
@@ -222,9 +203,7 @@ export function SystemCheckCard({
                         onClick={() => handleFix(issue)}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        {isFixing ? (
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        ) : null}
+                        {isFixing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                         {issue.actionLabel || "Fix now"}
                       </Button>
                     )}

@@ -1,21 +1,21 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { LogoImage } from '@/components/brand';
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LogoImage } from "@/components/brand";
 
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const pathname = usePathname();
-  const isOwnersPage = pathname === '/owners' || pathname?.startsWith('/owners/');
-  const isPricingPage = pathname === '/pricing' || pathname?.startsWith('/pricing/');
-  const ownersBase = isOwnersPage ? '' : '/owners';
-  const compareMenuId = 'marketing-compare-menu';
-  const mobileMenuId = 'marketing-mobile-menu';
+  const isOwnersPage = pathname === "/owners" || pathname?.startsWith("/owners/");
+  const isPricingPage = pathname === "/pricing" || pathname?.startsWith("/pricing/");
+  const ownersBase = isOwnersPage ? "" : "/owners";
+  const compareMenuId = "marketing-compare-menu";
+  const mobileMenuId = "marketing-mobile-menu";
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -29,24 +29,20 @@ export function MarketingHeader() {
     }
   }, [mobileMenuOpen]);
 
-  const pricingHref = isOwnersPage
-    ? '#pricing'
-    : isPricingPage
-      ? '#pricing'
-      : '/pricing';
+  const pricingHref = isOwnersPage ? "#pricing" : isPricingPage ? "#pricing" : "/pricing";
 
   const navigation = [
-    { name: 'Features', href: `${ownersBase}#features` },
-    { name: 'Pricing', href: pricingHref },
-    { name: 'Demo', href: '/demo' },
-    { name: 'ROI Calculator', href: '/roi-calculator' },
+    { name: "Features", href: `${ownersBase}#features` },
+    { name: "Pricing", href: pricingHref },
+    { name: "Demo", href: "/demo" },
+    { name: "ROI Calculator", href: "/roi-calculator" },
   ];
 
   const compareLinks = [
-    { name: 'vs Campspot', href: '/compare/campspot' },
-    { name: 'vs Newbook', href: '/compare/newbook' },
-    { name: 'vs CampLife', href: '/compare/camplife' },
-    { name: 'Switch from Campspot', href: '/switch-from-campspot' },
+    { name: "vs Campspot", href: "/compare/campspot" },
+    { name: "vs Newbook", href: "/compare/newbook" },
+    { name: "vs CampLife", href: "/compare/camplife" },
+    { name: "Switch from Campspot", href: "/switch-from-campspot" },
   ];
 
   return (
@@ -55,7 +51,11 @@ export function MarketingHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/owners" className="flex items-center" aria-label="Keepr for Campground Owners">
+            <Link
+              href="/owners"
+              className="flex items-center"
+              aria-label="Keepr for Campground Owners"
+            >
               <LogoImage size="md" />
             </Link>
           </div>
@@ -77,7 +77,7 @@ export function MarketingHeader() {
                 onClick={() => setCompareOpen(!compareOpen)}
                 onBlur={() => setTimeout(() => setCompareOpen(false), 150)}
                 onKeyDown={(event) => {
-                  if (event.key === 'Escape') {
+                  if (event.key === "Escape") {
                     setCompareOpen(false);
                   }
                 }}
@@ -87,7 +87,9 @@ export function MarketingHeader() {
                 aria-controls={compareMenuId}
               >
                 Compare
-                <ChevronDown className={`h-4 w-4 transition-transform ${compareOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${compareOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {compareOpen && (
                 <div
@@ -167,7 +169,9 @@ export function MarketingHeader() {
             ))}
             {/* Compare Links */}
             <div className="px-3 py-2">
-              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Compare</div>
+              <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                Compare
+              </div>
               {compareLinks.map((link) => (
                 <Link
                   key={link.href}

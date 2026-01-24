@@ -28,86 +28,100 @@ const HELP_KNOWLEDGE = [
     id: "dashboard-overview",
     title: "Dashboard at a Glance",
     keywords: ["dashboard", "overview", "metrics", "occupancy", "revenue", "arrivals"],
-    summary: "See occupancy, revenue, arrivals, and alerts in one place. Use the date selector to change time windows and click widgets to drill into reports."
+    summary:
+      "See occupancy, revenue, arrivals, and alerts in one place. Use the date selector to change time windows and click widgets to drill into reports.",
   },
   {
     id: "calendar-availability",
     title: "Calendar & Availability",
     keywords: ["calendar", "availability", "reservations", "dates", "schedule"],
-    summary: "View site availability by date range. Drag across dates to create reservations, click booking blocks to edit. Use filters to show certain classes or statuses."
+    summary:
+      "View site availability by date range. Drag across dates to create reservations, click booking blocks to edit. Use filters to show certain classes or statuses.",
   },
   {
     id: "booking-new",
     title: "Create a New Reservation",
     keywords: ["booking", "reservation", "new", "create", "book"],
-    summary: "Start bookings from the Booking page or drag-select on calendar. Choose dates, guest count, site, enter contact info, and collect payment."
+    summary:
+      "Start bookings from the Booking page or drag-select on calendar. Choose dates, guest count, site, enter contact info, and collect payment.",
   },
   {
     id: "reservation-manage",
     title: "Manage an Existing Reservation",
     keywords: ["reservation", "edit", "change", "modify", "update", "assign"],
-    summary: "Search reservations by name, code, or dates. Change dates/sites (system checks conflicts), add charges/refunds, log notes for staff."
+    summary:
+      "Search reservations by name, code, or dates. Change dates/sites (system checks conflicts), add charges/refunds, log notes for staff.",
   },
   {
     id: "check-in-out",
     title: "Check-In and Check-Out",
     keywords: ["check-in", "check-out", "arrival", "departure", "front desk"],
-    summary: "Open Due for Arrival/Departure lists. Confirm identity and balance, collect payments, mark status, notify housekeeping if needed."
+    summary:
+      "Open Due for Arrival/Departure lists. Confirm identity and balance, collect payments, mark status, notify housekeeping if needed.",
   },
   {
     id: "guests-profiles",
     title: "Guest Profiles & History",
     keywords: ["guests", "profile", "history", "contact"],
-    summary: "Search guests by name/email/phone. View past stays, balance history, saved payment methods. Add notes or flags for special handling."
+    summary:
+      "Search guests by name/email/phone. View past stays, balance history, saved payment methods. Add notes or flags for special handling.",
   },
   {
     id: "payments-collect",
     title: "Collect a Payment",
     keywords: ["payment", "collect", "charge", "card", "cash", "pos"],
-    summary: "Open reservation Billing tab, click Collect Payment, choose method, enter amount, process and issue receipt."
+    summary:
+      "Open reservation Billing tab, click Collect Payment, choose method, enter amount, process and issue receipt.",
   },
   {
     id: "payments-refund",
     title: "Issue a Refund",
     keywords: ["refund", "return", "cancel payment"],
-    summary: "From Billing tab, select Refund, choose original payment, enter amount and reason. System records audit trail."
+    summary:
+      "From Billing tab, select Refund, choose original payment, enter amount and reason. System records audit trail.",
   },
   {
     id: "stripe-connect",
     title: "Connect Stripe",
     keywords: ["stripe", "payment gateway", "connect", "setup payments"],
-    summary: "Go to Settings > Payments to connect your Stripe account. This enables you to accept credit card payments from guests."
+    summary:
+      "Go to Settings > Payments to connect your Stripe account. This enables you to accept credit card payments from guests.",
   },
   {
     id: "pricing-rules",
     title: "Pricing Rules & Overrides",
     keywords: ["pricing", "rates", "seasons", "discount", "price"],
-    summary: "Open Pricing to manage rate cards. Add rules for adjustments, set seasonal windows, minimum nights, and preview final prices."
+    summary:
+      "Open Pricing to manage rate cards. Add rules for adjustments, set seasonal windows, minimum nights, and preview final prices.",
   },
   {
     id: "site-classes",
     title: "Manage Site Classes",
     keywords: ["site class", "hookups", "amenities", "group sites"],
-    summary: "Group sites by hookups/size/amenities. Create classes with shared pricing rules. Assign sites to classes."
+    summary:
+      "Group sites by hookups/size/amenities. Create classes with shared pricing rules. Assign sites to classes.",
   },
   {
     id: "sites-management",
     title: "Manage Sites & Amenities",
     keywords: ["sites", "add site", "edit site", "amenities"],
-    summary: "Add site number/name, hookups, max length. Assign to class for pricing. Set status (active, offline, maintenance)."
+    summary:
+      "Add site number/name, hookups, max length. Assign to class for pricing. Set status (active, offline, maintenance).",
   },
   {
     id: "users-roles",
     title: "Users & Roles",
     keywords: ["users", "roles", "staff", "permissions", "invite", "access"],
-    summary: "Invite users by email, assign roles, adjust permissions. Assign campground access. Deactivate users who no longer need access."
+    summary:
+      "Invite users by email, assign roles, adjust permissions. Assign campground access. Deactivate users who no longer need access.",
   },
   {
     id: "support-contact",
     title: "Contact Support",
     keywords: ["support", "help", "contact", "issue", "problem"],
-    summary: "Check help panel first. Use in-app chat or email support@keeprstay.com. Include reservation IDs or screenshots."
-  }
+    summary:
+      "Check help panel first. Use in-app chat or email support@keeprstay.com. Include reservation IDs or screenshots.",
+  },
 ];
 
 @Injectable()
@@ -116,7 +130,7 @@ export class AiSupportService {
 
   constructor(
     private readonly aiProvider: AiProviderService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -129,9 +143,7 @@ export class AiSupportService {
     const relevantArticles = this.findRelevantArticles(message);
 
     // Build context from relevant articles
-    const helpContext = relevantArticles
-      .map((a) => `- ${a.title}: ${a.summary}`)
-      .join("\n");
+    const helpContext = relevantArticles.map((a) => `- ${a.title}: ${a.summary}`).join("\n");
 
     const systemPrompt = `You are a helpful support assistant for Keepr, a campground management software. Your role is to help campground owners and staff use the platform effectively.
 
@@ -190,7 +202,7 @@ If the user's question is outside your knowledge, suggest they:
         userId,
         sessionId,
         maxTokens: 400,
-        temperature: 0.7
+        temperature: 0.7,
       });
 
       // Determine if we should show ticket prompt
@@ -199,13 +211,13 @@ If the user's question is outside your knowledge, suggest they:
       // Format help articles for response
       const helpArticles = relevantArticles.slice(0, 3).map((a) => ({
         title: a.title,
-        url: `/help#${a.id}`
+        url: `/help#${a.id}`,
       }));
 
       return {
         message: response.content,
         helpArticles: helpArticles.length > 0 ? helpArticles : undefined,
-        showTicketPrompt
+        showTicketPrompt,
       };
     } catch (error) {
       this.logger.error("Support chat error:", error);
@@ -221,9 +233,9 @@ If the user's question is outside your knowledge, suggest they:
         helpArticles: [
           { title: "Help Center", url: "/help" },
           { title: "FAQs", url: "/help/faq" },
-          { title: "Contact Support", url: "/help/contact" }
+          { title: "Contact Support", url: "/help/contact" },
         ],
-        showTicketPrompt: true
+        showTicketPrompt: true,
       };
     }
   }
@@ -281,7 +293,7 @@ If the user's question is outside your knowledge, suggest they:
       "bug",
       "error",
       "broken",
-      "doesn't work"
+      "doesn't work",
     ];
 
     const lowerQuestion = question.toLowerCase();
@@ -289,8 +301,7 @@ If the user's question is outside your knowledge, suggest they:
 
     // Show ticket prompt if question or response mentions issues
     return ticketIndicators.some(
-      (indicator) =>
-        lowerQuestion.includes(indicator) || lowerResponse.includes(indicator)
+      (indicator) => lowerQuestion.includes(indicator) || lowerResponse.includes(indicator),
     );
   }
 
@@ -301,13 +312,13 @@ If the user's question is outside your knowledge, suggest they:
   private async getDefaultCampgroundId(): Promise<string> {
     const campground = await this.prisma.campground.findFirst({
       where: { aiEnabled: true },
-      select: { id: true }
+      select: { id: true },
     });
 
     if (!campground) {
       // Use any campground as fallback
       const anyCampground = await this.prisma.campground.findFirst({
-        select: { id: true }
+        select: { id: true },
       });
       if (!anyCampground) {
         throw new NotFoundException("No campgrounds available for AI support");

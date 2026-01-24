@@ -6,7 +6,6 @@ import { PrismaModule } from "../prisma/prisma.module";
 @Module({
   imports: [UsageTrackerModule, PrismaModule],
   providers: [SmsService],
-  exports: [SmsService]
+  exports: [SmsService],
 })
-export class SmsModule { }
-
+export class SmsModule {}

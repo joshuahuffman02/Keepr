@@ -40,7 +40,8 @@ export const greetings: Record<TimeOfDay, GreetingConfig> = {
   },
   night: {
     headline: "Plan Tomorrow's Adventure",
-    subheadline: "Dream under the stars tonight. Book your perfect campsite while the world sleeps.",
+    subheadline:
+      "Dream under the stars tonight. Book your perfect campsite while the world sleeps.",
     gradientFrom: "from-indigo-700",
     gradientVia: "via-purple-700",
     gradientTo: "to-slate-800",
@@ -56,11 +57,7 @@ export function getGreeting(timeOfDay: TimeOfDay): GreetingConfig {
 
 // Alternative headlines for variety (can be used for A/B testing or randomization)
 export const alternativeHeadlines: Record<TimeOfDay, string[]> = {
-  morning: [
-    "Wake Up to Adventure",
-    "Early Bird Gets the Campsite",
-    "Start Fresh, Camp Happy",
-  ],
+  morning: ["Wake Up to Adventure", "Early Bird Gets the Campsite", "Start Fresh, Camp Happy"],
   afternoon: [
     "Sunshine and Campfires Await",
     "Your Next Adventure Starts Now",

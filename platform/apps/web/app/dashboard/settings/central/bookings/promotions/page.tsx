@@ -174,7 +174,10 @@ export default function PromotionsPage() {
       const payload = {
         code: formData.code.toUpperCase().trim(),
         type: formData.type,
-        value: formData.type === "percentage" ? Number(formData.value) : Math.round(Number(formData.value) * 100),
+        value:
+          formData.type === "percentage"
+            ? Number(formData.value)
+            : Math.round(Number(formData.value) * 100),
         validFrom: formData.validFrom || undefined,
         validTo: formData.validTo || undefined,
         usageLimit: formData.usageLimit ? Number(formData.usageLimit) : undefined,
@@ -253,9 +256,7 @@ export default function PromotionsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
-          <p className="text-muted-foreground mt-1">
-            Create promo codes and special offers
-          </p>
+          <p className="text-muted-foreground mt-1">Create promo codes and special offers</p>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -269,9 +270,7 @@ export default function PromotionsPage() {
       <div className="max-w-5xl space-y-6">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
-          <p className="text-muted-foreground mt-1">
-            Create promo codes and special offers
-          </p>
+          <p className="text-muted-foreground mt-1">Create promo codes and special offers</p>
         </div>
         <Card>
           <CardContent className="py-8 text-center">
@@ -289,9 +288,7 @@ export default function PromotionsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Promotions</h2>
-          <p className="text-muted-foreground mt-1">
-            Create promo codes and special offers
-          </p>
+          <p className="text-muted-foreground mt-1">Create promo codes and special offers</p>
         </div>
         <Button onClick={openCreateModal}>
           <Plus className="h-4 w-4 mr-2" />
@@ -303,8 +300,8 @@ export default function PromotionsPage() {
       <Alert className="bg-amber-50 border-amber-200">
         <Tag className="h-4 w-4 text-amber-600" />
         <AlertDescription className="text-amber-800">
-          Promo codes can be applied during booking to give guests discounts.
-          Set expiration dates and usage limits to control availability.
+          Promo codes can be applied during booking to give guests discounts. Set expiration dates
+          and usage limits to control availability.
         </AlertDescription>
       </Alert>
 
@@ -358,12 +355,10 @@ export default function PromotionsPage() {
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Tag className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No promotions yet
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No promotions yet</h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Create promo codes to offer discounts to your guests.
-              Perfect for seasonal specials, returning customers, or marketing campaigns.
+              Create promo codes to offer discounts to your guests. Perfect for seasonal specials,
+              returning customers, or marketing campaigns.
             </p>
             <Button onClick={openCreateModal}>
               <Plus className="h-4 w-4 mr-2" />
@@ -378,15 +373,14 @@ export default function PromotionsPage() {
               <CardContent className="py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <Switch
-                      checked={promo.isActive}
-                      onCheckedChange={() => handleToggle(promo)}
-                    />
-                    <div className={`p-3 rounded-lg ${
-                      promo.type === "percentage"
-                        ? "bg-status-info/15 text-status-info"
-                        : "bg-status-success/15 text-status-success"
-                    }`}>
+                    <Switch checked={promo.isActive} onCheckedChange={() => handleToggle(promo)} />
+                    <div
+                      className={`p-3 rounded-lg ${
+                        promo.type === "percentage"
+                          ? "bg-status-info/15 text-status-info"
+                          : "bg-status-success/15 text-status-success"
+                      }`}
+                    >
                       {promo.type === "percentage" ? (
                         <Percent className="h-5 w-5" />
                       ) : (
@@ -401,7 +395,8 @@ export default function PromotionsPage() {
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground mt-1">
-                        <span className="font-semibold text-foreground">{formatValue(promo)}</span> off
+                        <span className="font-semibold text-foreground">{formatValue(promo)}</span>{" "}
+                        off
                         {promo.description && ` • ${promo.description}`}
                       </div>
                     </div>
@@ -410,7 +405,9 @@ export default function PromotionsPage() {
                     <div className="text-sm text-right">
                       <div className="text-muted-foreground">
                         {promo.usageLimit ? (
-                          <span>{promo.usageCount} / {promo.usageLimit} used</span>
+                          <span>
+                            {promo.usageCount} / {promo.usageLimit} used
+                          </span>
                         ) : (
                           <span>{promo.usageCount} uses</span>
                         )}
@@ -425,7 +422,12 @@ export default function PromotionsPage() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" aria-label="More options" className="h-8 w-8">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="More options"
+                          className="h-8 w-8"
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -460,9 +462,7 @@ export default function PromotionsPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>
-              {editingPromotion ? "Edit Promotion" : "Create Promotion"}
-            </DialogTitle>
+            <DialogTitle>{editingPromotion ? "Edit Promotion" : "Create Promotion"}</DialogTitle>
             <DialogDescription>
               {editingPromotion
                 ? "Update the promotion details."
@@ -563,11 +563,7 @@ export default function PromotionsPage() {
               <Label htmlFor="is-active">Active</Label>
             </div>
 
-            {error && (
-              <div className="p-3 bg-red-50 text-red-600 text-sm rounded-md">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded-md">{error}</div>}
 
             <div className="flex gap-3 pt-4">
               <Button variant="outline" className="flex-1" onClick={() => setIsModalOpen(false)}>
@@ -588,7 +584,10 @@ export default function PromotionsPage() {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Promotion</AlertDialogTitle>

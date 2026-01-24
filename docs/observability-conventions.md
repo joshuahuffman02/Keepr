@@ -5,11 +5,13 @@ API, and Rust services. It complements `docs/observability-slos.md` and the
 runbooks in `docs/dr-readiness.md` and `docs/post-completion-polish.md`.
 
 ## Goals
+
 - Correlate every request across web -> API -> Rust.
 - Ensure health/readiness endpoints are reliable and predictable.
 - Keep logs structured so alerts and dashboards are consistent.
 
 ## Trace + request correlation
+
 - **Inbound request ID**: API reads `x-request-id` in
   `platform/apps/api/src/common/filters/all-exceptions.filter.ts`. Web should
   forward `x-request-id` when calling the API.
@@ -24,6 +26,7 @@ runbooks in `docs/dr-readiness.md` and `docs/post-completion-polish.md`.
   clients can log the correlation key.
 
 ## Logging fields (minimum set)
+
 - `requestId` (from `x-request-id`)
 - `traceId` / `spanId` (when tracing is enabled)
 - `campgroundId`, `orgId`, `userId` (when available)
@@ -33,12 +36,14 @@ The API logger attaches `requestId` and `traceId`/`spanId` when request context
 is available.
 
 ## Access logs
+
 - API access logs emit a structured `http_request` entry with method, path,
   status, duration, and scope identifiers.
 - Disable in tests by default; set `ACCESS_LOGS_ENABLED=false` to turn off in
   other environments.
 
 ## Sentry + OTel conventions
+
 - **Sentry**: Web and API require `SENTRY_DSN`. Use `SENTRY_ENVIRONMENT` to
   separate staging vs production.
 - **OTel**: Use `OTEL_EXPORTER_OTLP_ENDPOINT` and `OTEL_SERVICE_NAME` when
@@ -49,11 +54,12 @@ is available.
   - `keepr-availability`
   - `keepr-auth`
   - `keepr-payments`
-  Rust services initialize OTel exporters only when `OTEL_ENABLED=true` or
-  `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
-  Web tracing uses `@vercel/otel` with the same OTLP endpoint and service name.
+    Rust services initialize OTel exporters only when `OTEL_ENABLED=true` or
+    `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
+    Web tracing uses `@vercel/otel` with the same OTLP endpoint and service name.
 
 ## Health + readiness endpoints
+
 - **API liveness**: `/health` (no dependency checks).
 - **API readiness**: `/ready` (DB/Redis/queue reachability).
 - **Rust liveness/readiness**: `/health` and `/ready` (lightweight process checks).
@@ -61,6 +67,7 @@ is available.
 - Use `/health` for uptime monitors, `/ready` for deploy gating.
 
 ## Reliability guardrails
+
 - Alert on readiness failures >2 minutes.
 - Track error rate and latency SLOs defined in `docs/observability-slos.md`.
 - Keep queue lag and background job failures visible in `/api/observability/snapshot`.

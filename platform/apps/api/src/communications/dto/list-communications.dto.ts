@@ -31,4 +31,3 @@ export class ListCommunicationsDto {
   @IsString()
   cursor?: string;
 }
-

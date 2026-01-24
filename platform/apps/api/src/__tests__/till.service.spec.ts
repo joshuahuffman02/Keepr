@@ -78,7 +78,7 @@ describe("TillService", () => {
     prisma.tillSession.findFirst.mockResolvedValue({ id: "existing" });
 
     await expect(
-      service.open({ terminalId: "term-1", openingFloatCents: 1000, currency: "usd" }, actor)
+      service.open({ terminalId: "term-1", openingFloatCents: 1000, currency: "usd" }, actor),
     ).rejects.toBeInstanceOf(BadRequestException);
 
     expect(prisma.tillSession.create).not.toHaveBeenCalled();
@@ -94,9 +94,9 @@ describe("TillService", () => {
       TillMovement: [],
     });
 
-    await expect(service.recordCashSale("session-1", 5000, "eur", "cart-1", actor)).rejects.toBeInstanceOf(
-      BadRequestException
-    );
+    await expect(
+      service.recordCashSale("session-1", 5000, "eur", "cart-1", actor),
+    ).rejects.toBeInstanceOf(BadRequestException);
 
     expect(prisma.tillMovement.create).not.toHaveBeenCalled();
   });
@@ -111,12 +111,16 @@ describe("TillService", () => {
       TillMovement: [{ type: TillMovementType.cash_sale, amountCents: 500, currency: "usd" }],
     });
 
-    await expect(service.paidOut("session-1", { amountCents: 200, note: "petty cash" }, actor)).rejects.toBeInstanceOf(
-      BadRequestException
-    );
+    await expect(
+      service.paidOut("session-1", { amountCents: 200, note: "petty cash" }, actor),
+    ).rejects.toBeInstanceOf(BadRequestException);
 
     await expect(
-      service.paidOut("session-1", { amountCents: 2000, reasonCode: "petty", note: "petty cash" }, actor)
+      service.paidOut(
+        "session-1",
+        { amountCents: 2000, reasonCode: "petty", note: "petty cash" },
+        actor,
+      ),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
@@ -152,15 +156,19 @@ describe("TillService", () => {
 
     expect(result.overShortToleranceBreached).toBe(true);
     expect(audit.record).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "till_closed_alert", entityId: "session-1" })
+      expect.objectContaining({ action: "till_closed_alert", entityId: "session-1" }),
     );
   });
 
   it("prevents opening multiple sessions per user", async () => {
-    prisma.tillSession.findFirst.mockResolvedValue({ id: "existing", openedByUserId: actor.id, terminalId: "term-1" });
+    prisma.tillSession.findFirst.mockResolvedValue({
+      id: "existing",
+      openedByUserId: actor.id,
+      terminalId: "term-1",
+    });
 
     await expect(
-      service.open({ terminalId: "term-2", openingFloatCents: 1000, currency: "usd" }, actor)
+      service.open({ terminalId: "term-2", openingFloatCents: 1000, currency: "usd" }, actor),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 

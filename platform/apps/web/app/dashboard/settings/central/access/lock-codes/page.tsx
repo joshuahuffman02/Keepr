@@ -82,7 +82,13 @@ const lockCodeTypes: LockCode["type"][] = ["gate", "cabin", "amenity", "wifi", "
 const lockCodeTypeSet = new Set<string>(lockCodeTypes);
 const isLockCodeType = (value: string): value is LockCode["type"] => lockCodeTypeSet.has(value);
 
-const rotationOptions: LockCode["rotationSchedule"][] = ["none", "daily", "weekly", "monthly", "per-guest"];
+const rotationOptions: LockCode["rotationSchedule"][] = [
+  "none",
+  "daily",
+  "weekly",
+  "monthly",
+  "per-guest",
+];
 const rotationOptionSet = new Set<string>(rotationOptions);
 const isRotationSchedule = (value: string): value is LockCode["rotationSchedule"] =>
   rotationOptionSet.has(value);
@@ -108,9 +114,7 @@ const toLockCode = (value: unknown): LockCode | null => {
     : [];
   const rawRotation = getString(value.rotationSchedule) ?? "none";
   const normalizedRotation = rawRotation.replace("_", "-");
-  const rotationSchedule = isRotationSchedule(normalizedRotation)
-    ? normalizedRotation
-    : "none";
+  const rotationSchedule = isRotationSchedule(normalizedRotation) ? normalizedRotation : "none";
   return {
     id,
     name,
@@ -169,9 +173,9 @@ const rotationLabels = {
 // API functions
 const fetchLockCodes = async (campgroundId: string): Promise<LockCode[]> => {
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes`, {
-    credentials: 'include',
+    credentials: "include",
   });
-  if (!response.ok) throw new Error('Failed to fetch lock codes');
+  if (!response.ok) throw new Error("Failed to fetch lock codes");
   const data = await response.json();
   // Transform backend data to frontend format
   if (!Array.isArray(data)) {
@@ -182,47 +186,51 @@ const fetchLockCodes = async (campgroundId: string): Promise<LockCode[]> => {
 
 const createLockCode = async (campgroundId: string, data: Partial<LockCode>): Promise<LockCode> => {
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       ...data,
-      rotationSchedule: data.rotationSchedule?.replace('-', '_') || 'none',
+      rotationSchedule: data.rotationSchedule?.replace("-", "_") || "none",
     }),
   });
-  if (!response.ok) throw new Error('Failed to create lock code');
+  if (!response.ok) throw new Error("Failed to create lock code");
   return response.json();
 };
 
-const updateLockCode = async (campgroundId: string, id: string, data: Partial<LockCode>): Promise<LockCode> => {
+const updateLockCode = async (
+  campgroundId: string,
+  id: string,
+  data: Partial<LockCode>,
+): Promise<LockCode> => {
   const payload: Record<string, unknown> = { ...data };
-  if (payload.rotationSchedule && typeof payload.rotationSchedule === 'string') {
-    payload.rotationSchedule = payload.rotationSchedule.replace('-', '_');
+  if (payload.rotationSchedule && typeof payload.rotationSchedule === "string") {
+    payload.rotationSchedule = payload.rotationSchedule.replace("-", "_");
   }
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify(payload),
   });
-  if (!response.ok) throw new Error('Failed to update lock code');
+  if (!response.ok) throw new Error("Failed to update lock code");
   return response.json();
 };
 
 const deleteLockCode = async (campgroundId: string, id: string): Promise<void> => {
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}`, {
-    method: 'DELETE',
-    credentials: 'include',
+    method: "DELETE",
+    credentials: "include",
   });
-  if (!response.ok) throw new Error('Failed to delete lock code');
+  if (!response.ok) throw new Error("Failed to delete lock code");
 };
 
 const rotateLockCode = async (campgroundId: string, id: string): Promise<LockCode> => {
   const response = await fetch(`${API_BASE}/campgrounds/${campgroundId}/lock-codes/${id}/rotate`, {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
   });
-  if (!response.ok) throw new Error('Failed to rotate lock code');
+  if (!response.ok) throw new Error("Failed to rotate lock code");
   return response.json();
 };
 
@@ -238,7 +246,11 @@ export default function LockCodesPage() {
   const queryClient = useQueryClient();
 
   // Fetch lock codes from API
-  const { data: codes = [], isLoading, error } = useQuery({
+  const {
+    data: codes = [],
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["lock-codes", campgroundId],
     queryFn: () => fetchLockCodes(campgroundId!),
     enabled: isHydrated && !!campgroundId,
@@ -262,20 +274,23 @@ export default function LockCodesPage() {
     setEditingCode(null);
   }, []);
 
-  const openEditor = useCallback((code: LockCode | null) => {
-    if (code) {
-      setEditingCode(code);
-      setFormName(code.name);
-      setFormCode(code.code);
-      setFormType(code.type);
-      setFormRotation(code.rotationSchedule);
-      setFormShowConfirmation(code.showOnConfirmation);
-      setFormShowCheckin(code.showAtCheckin);
-    } else {
-      resetForm();
-    }
-    setIsEditorOpen(true);
-  }, [resetForm]);
+  const openEditor = useCallback(
+    (code: LockCode | null) => {
+      if (code) {
+        setEditingCode(code);
+        setFormName(code.name);
+        setFormCode(code.code);
+        setFormType(code.type);
+        setFormRotation(code.rotationSchedule);
+        setFormShowConfirmation(code.showOnConfirmation);
+        setFormShowCheckin(code.showAtCheckin);
+      } else {
+        resetForm();
+      }
+      setIsEditorOpen(true);
+    },
+    [resetForm],
+  );
 
   // Mutations
   const createMutation = useMutation({
@@ -287,10 +302,10 @@ export default function LockCodesPage() {
       resetForm();
     },
     onError: (error: Error) => {
-      toast({ 
-        title: "Failed to create lock code", 
+      toast({
+        title: "Failed to create lock code",
         description: error.message,
-        variant: "destructive" 
+        variant: "destructive",
       });
     },
   });
@@ -305,10 +320,10 @@ export default function LockCodesPage() {
       resetForm();
     },
     onError: (error: Error) => {
-      toast({ 
-        title: "Failed to update lock code", 
+      toast({
+        title: "Failed to update lock code",
         description: error.message,
-        variant: "destructive" 
+        variant: "destructive",
       });
     },
   });
@@ -320,10 +335,10 @@ export default function LockCodesPage() {
       toast({ title: "Lock code deleted successfully" });
     },
     onError: (error: Error) => {
-      toast({ 
-        title: "Failed to delete lock code", 
+      toast({
+        title: "Failed to delete lock code",
         description: error.message,
-        variant: "destructive" 
+        variant: "destructive",
       });
     },
   });
@@ -335,10 +350,10 @@ export default function LockCodesPage() {
       toast({ title: "Lock code rotated successfully" });
     },
     onError: (error: Error) => {
-      toast({ 
-        title: "Failed to rotate lock code", 
+      toast({
+        title: "Failed to rotate lock code",
         description: error.message,
-        variant: "destructive" 
+        variant: "destructive",
       });
     },
   });
@@ -362,22 +377,41 @@ export default function LockCodesPage() {
     } else {
       createMutation.mutate(codeData);
     }
-  }, [editingCode, formName, formCode, formType, formRotation, formShowConfirmation, formShowCheckin, createMutation, updateMutation]);
+  }, [
+    editingCode,
+    formName,
+    formCode,
+    formType,
+    formRotation,
+    formShowConfirmation,
+    formShowCheckin,
+    createMutation,
+    updateMutation,
+  ]);
 
-  const handleDelete = useCallback((id: string) => {
-    deleteMutation.mutate(id);
-  }, [deleteMutation]);
+  const handleDelete = useCallback(
+    (id: string) => {
+      deleteMutation.mutate(id);
+    },
+    [deleteMutation],
+  );
 
-  const handleToggleActive = useCallback((code: LockCode) => {
-    updateMutation.mutate({
-      id: code.id,
-      data: { isActive: !code.isActive },
-    });
-  }, [updateMutation]);
+  const handleToggleActive = useCallback(
+    (code: LockCode) => {
+      updateMutation.mutate({
+        id: code.id,
+        data: { isActive: !code.isActive },
+      });
+    },
+    [updateMutation],
+  );
 
-  const handleRotateCode = useCallback((id: string) => {
-    rotateMutation.mutate(id);
-  }, [rotateMutation]);
+  const handleRotateCode = useCallback(
+    (id: string) => {
+      rotateMutation.mutate(id);
+    },
+    [rotateMutation],
+  );
 
   const handleCopyCode = useCallback((id: string, code: string) => {
     navigator.clipboard.writeText(code);
@@ -480,7 +514,7 @@ export default function LockCodesPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted text-muted-foreground",
           )}
         >
           {item.isActive ? "Active" : "Disabled"}
@@ -504,9 +538,7 @@ export default function LockCodesPage() {
       <div className="max-w-5xl space-y-6">
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            Failed to load lock codes. Please try again later.
-          </AlertDescription>
+          <AlertDescription>Failed to load lock codes. Please try again later.</AlertDescription>
         </Alert>
       </div>
     );
@@ -532,9 +564,9 @@ export default function LockCodesPage() {
       <Alert className="bg-amber-50 border-amber-200">
         <AlertTriangle className="h-4 w-4 text-amber-500" />
         <AlertDescription className="text-amber-800">
-          <strong>Security Notice:</strong> Lock codes are now fetched from the backend API. 
-          Never hardcode credentials in the frontend code. All access codes should be stored 
-          securely in the database with proper encryption and access controls.
+          <strong>Security Notice:</strong> Lock codes are now fetched from the backend API. Never
+          hardcode credentials in the frontend code. All access codes should be stored securely in
+          the database with proper encryption and access controls.
         </AlertDescription>
       </Alert>
 
@@ -595,7 +627,8 @@ export default function LockCodesPage() {
         emptyState={{
           icon: Key,
           title: "No lock codes configured",
-          description: "Add codes for gates, cabins, WiFi, and amenities to get started. Lock codes should be configured through the backend API for security.",
+          description:
+            "Add codes for gates, cabins, WiFi, and amenities to get started. Lock codes should be configured through the backend API for security.",
         }}
       />
 
@@ -603,12 +636,8 @@ export default function LockCodesPage() {
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              {editingCode ? "Edit Lock Code" : "Add Lock Code"}
-            </DialogTitle>
-            <DialogDescription>
-              Configure access codes for your property
-            </DialogDescription>
+            <DialogTitle>{editingCode ? "Edit Lock Code" : "Add Lock Code"}</DialogTitle>
+            <DialogDescription>Configure access codes for your property</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
@@ -640,17 +669,17 @@ export default function LockCodesPage() {
                   {lockCodeTypes.map((key) => {
                     const config = typeConfig[key];
                     return (
-                    <SelectItem key={key} value={key}>
-                      <div className="flex items-center gap-2">
-                        <config.icon className="h-4 w-4" />
-                        <div>
-                          <span>{config.label}</span>
-                          <span className="text-muted-foreground ml-2 text-xs">
-                            {config.description}
-                          </span>
+                      <SelectItem key={key} value={key}>
+                        <div className="flex items-center gap-2">
+                          <config.icon className="h-4 w-4" />
+                          <div>
+                            <span>{config.label}</span>
+                            <span className="text-muted-foreground ml-2 text-xs">
+                              {config.description}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </SelectItem>
+                      </SelectItem>
                     );
                   })}
                 </SelectContent>
@@ -667,11 +696,7 @@ export default function LockCodesPage() {
                   onChange={(e) => setFormCode(e.target.value)}
                   className="font-mono"
                 />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={generateRandomCode}
-                >
+                <Button type="button" variant="outline" onClick={generateRandomCode}>
                   <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
@@ -711,9 +736,7 @@ export default function LockCodesPage() {
                   <Label htmlFor="show-confirmation" className="font-normal">
                     Confirmation Email
                   </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Include in booking confirmation
-                  </p>
+                  <p className="text-sm text-muted-foreground">Include in booking confirmation</p>
                 </div>
                 <Switch
                   id="show-confirmation"
@@ -727,9 +750,7 @@ export default function LockCodesPage() {
                   <Label htmlFor="show-checkin" className="font-normal">
                     Check-in Instructions
                   </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Show during self check-in
-                  </p>
+                  <p className="text-sm text-muted-foreground">Show during self check-in</p>
                 </div>
                 <Switch
                   id="show-checkin"
@@ -746,7 +767,12 @@ export default function LockCodesPage() {
             </Button>
             <Button
               onClick={handleSave}
-              disabled={!formName.trim() || !formCode.trim() || createMutation.isPending || updateMutation.isPending}
+              disabled={
+                !formName.trim() ||
+                !formCode.trim() ||
+                createMutation.isPending ||
+                updateMutation.isPending
+              }
             >
               {(createMutation.isPending || updateMutation.isPending) && (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -758,7 +784,10 @@ export default function LockCodesPage() {
       </Dialog>
 
       {/* Delete Lock Code Confirmation */}
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Lock Code</AlertDialogTitle>
@@ -784,12 +813,16 @@ export default function LockCodesPage() {
       </AlertDialog>
 
       {/* Rotate Lock Code Confirmation */}
-      <AlertDialog open={!!rotateConfirmId} onOpenChange={(open) => !open && setRotateConfirmId(null)}>
+      <AlertDialog
+        open={!!rotateConfirmId}
+        onOpenChange={(open) => !open && setRotateConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Rotate Lock Code</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to rotate this lock code? This will generate a new code and the old code will no longer work.
+              Are you sure you want to rotate this lock code? This will generate a new code and the
+              old code will no longer work.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

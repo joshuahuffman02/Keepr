@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  ScrollText,
-  Check,
-  ChevronRight,
-  ChevronDown,
-  Edit3,
-  FileText,
-  Info,
-} from "lucide-react";
+import { ScrollText, Check, ChevronRight, ChevronDown, Edit3, FileText, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -189,22 +181,18 @@ export function ParkRules({
 }: ParkRulesProps) {
   const prefersReducedMotion = useReducedMotion();
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(
-    initialData?.templateId || "standard"
+    initialData?.templateId || "standard",
   );
   const [customRules, setCustomRules] = useState(initialData?.customRules || "");
   const [isCustomizing, setIsCustomizing] = useState(false);
-  const [requireSignature, setRequireSignature] = useState(
-    initialData?.requireSignature ?? true
-  );
+  const [requireSignature, setRequireSignature] = useState(initialData?.requireSignature ?? true);
   const [enforcement, setEnforcement] = useState<ParkRulesData["enforcement"]>(
-    initialData?.enforcement || "pre_checkin"
+    initialData?.enforcement || "pre_checkin",
   );
   const [saving, setSaving] = useState(false);
   const [expandedTemplate, setExpandedTemplate] = useState<string | null>(null);
 
-  const selectedTemplateData = RULE_TEMPLATES.find(
-    (t) => t.id === selectedTemplate
-  );
+  const selectedTemplateData = RULE_TEMPLATES.find((t) => t.id === selectedTemplate);
 
   const handleSave = async () => {
     setSaving(true);
@@ -241,12 +229,8 @@ export function ParkRules({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-violet-500/20 mb-4">
             <ScrollText className="w-8 h-8 text-violet-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Park Rules & Policies
-          </h2>
-          <p className="text-slate-400">
-            Set up rules that guests will acknowledge
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Park Rules & Policies</h2>
+          <p className="text-slate-400">Set up rules that guests will acknowledge</p>
         </motion.div>
 
         {/* Template selection */}
@@ -270,7 +254,7 @@ export function ParkRules({
                       "border rounded-xl transition-all overflow-hidden",
                       isSelected
                         ? "border-emerald-500 bg-emerald-500/5"
-                        : "border-slate-700 bg-slate-800/30"
+                        : "border-slate-700 bg-slate-800/30",
                     )}
                   >
                     <button
@@ -280,13 +264,13 @@ export function ParkRules({
                       <div
                         className={cn(
                           "w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0",
-                          isSelected ? "bg-emerald-500/20" : "bg-slate-700"
+                          isSelected ? "bg-emerald-500/20" : "bg-slate-700",
                         )}
                       >
                         <FileText
                           className={cn(
                             "w-5 h-5",
-                            isSelected ? "text-emerald-400" : "text-slate-400"
+                            isSelected ? "text-emerald-400" : "text-slate-400",
                           )}
                         />
                       </div>
@@ -294,14 +278,12 @@ export function ParkRules({
                         <h3
                           className={cn(
                             "font-medium",
-                            isSelected ? "text-emerald-400" : "text-white"
+                            isSelected ? "text-emerald-400" : "text-white",
                           )}
                         >
                           {template.name}
                         </h3>
-                        <p className="text-sm text-slate-500">
-                          {template.description}
-                        </p>
+                        <p className="text-sm text-slate-500">{template.description}</p>
                       </div>
                       <div className="flex items-center gap-2">
                         {isSelected && (
@@ -317,16 +299,14 @@ export function ParkRules({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setExpandedTemplate(
-                              isExpanded ? null : template.id
-                            );
+                            setExpandedTemplate(isExpanded ? null : template.id);
                           }}
                           className="p-1 text-slate-500 hover:text-slate-300"
                         >
                           <ChevronDown
                             className={cn(
                               "w-5 h-5 transition-transform",
-                              isExpanded && "rotate-180"
+                              isExpanded && "rotate-180",
                             )}
                           />
                         </button>
@@ -376,9 +356,7 @@ export function ParkRules({
             className="space-y-3"
           >
             <div className="flex items-center justify-between">
-              <Label className="text-sm text-slate-400">
-                Your Park Rules
-              </Label>
+              <Label className="text-sm text-slate-400">Your Park Rules</Label>
               <button
                 onClick={() => setIsCustomizing(false)}
                 className="text-sm text-slate-500 hover:text-slate-300"
@@ -412,7 +390,7 @@ export function ParkRules({
                   "p-3 rounded-lg border text-left transition-all",
                   enforcement === option.id
                     ? "border-emerald-500 bg-emerald-500/10"
-                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600"
+                    : "border-slate-700 bg-slate-800/30 hover:border-slate-600",
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -421,7 +399,7 @@ export function ParkRules({
                       "w-4 h-4 rounded-full border-2 flex items-center justify-center",
                       enforcement === option.id
                         ? "border-emerald-500 bg-emerald-500"
-                        : "border-slate-600"
+                        : "border-slate-600",
                     )}
                   >
                     {enforcement === option.id && (
@@ -432,9 +410,7 @@ export function ParkRules({
                     <p
                       className={cn(
                         "font-medium",
-                        enforcement === option.id
-                          ? "text-emerald-400"
-                          : "text-white"
+                        enforcement === option.id ? "text-emerald-400" : "text-white",
                       )}
                     >
                       {option.label}
@@ -456,14 +432,9 @@ export function ParkRules({
         >
           <div>
             <p className="font-medium text-white">Require Signature</p>
-            <p className="text-sm text-slate-500">
-              Guests must digitally sign to acknowledge
-            </p>
+            <p className="text-sm text-slate-500">Guests must digitally sign to acknowledge</p>
           </div>
-          <Switch
-            checked={requireSignature}
-            onCheckedChange={setRequireSignature}
-          />
+          <Switch checked={requireSignature} onCheckedChange={setRequireSignature} />
         </motion.div>
 
         {/* Info box */}
@@ -475,11 +446,8 @@ export function ParkRules({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">
-              Need more policies?
-            </span>{" "}
-            You can add waivers, liability forms, pet agreements, and more in
-            your dashboard settings.
+            <span className="text-slate-300 font-medium">Need more policies?</span> You can add
+            waivers, liability forms, pet agreements, and more in your dashboard settings.
           </div>
         </motion.div>
 
@@ -492,16 +460,12 @@ export function ParkRules({
         >
           <Button
             onClick={handleSave}
-            disabled={
-              saving ||
-              isLoading ||
-              (!selectedTemplate && !customRules.trim())
-            }
+            disabled={saving || isLoading || (!selectedTemplate && !customRules.trim())}
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
               "hover:from-emerald-400 hover:to-teal-400",
-              "disabled:opacity-50"
+              "disabled:opacity-50",
             )}
           >
             {saving ? "Saving..." : "Save Park Rules"}

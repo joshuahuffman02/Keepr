@@ -57,12 +57,12 @@ export function defaultConfig(): RalphConfig {
       { name: "lint", command: "pnpm lint" },
       { name: "typecheck", command: "pnpm typecheck" },
       { name: "test", command: "pnpm test" },
-      { name: "smoke", command: "pnpm smoke" }
+      { name: "smoke", command: "pnpm smoke" },
     ],
     taskFile: "TASK.md",
     phasesFile: "PHASES.md",
     stateFile: DEFAULT_STATE_FILE,
-    stopOnFailure: true
+    stopOnFailure: true,
   };
 }
 
@@ -75,10 +75,7 @@ export function loadConfig(rootDir: string, configFile = "ralph.config.json"): R
   return normalizeConfig(raw);
 }
 
-export function writeDefaultConfig(
-  rootDir: string,
-  configFile = "ralph.config.json"
-): RalphConfig {
+export function writeDefaultConfig(rootDir: string, configFile = "ralph.config.json"): RalphConfig {
   const configPath = path.resolve(rootDir, configFile);
   if (!fs.existsSync(configPath)) {
     const config = defaultConfig();
@@ -98,7 +95,7 @@ export function createInitialState(now = new Date()): RalphState {
     status: "idle",
     iterations: [],
     createdAt: stamp,
-    updatedAt: stamp
+    updatedAt: stamp,
   };
 }
 
@@ -116,7 +113,7 @@ export function saveState(rootDir: string, config: RalphConfig, state: RalphStat
   ensureDir(path.dirname(statePath));
   const updated = {
     ...state,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
   fs.writeFileSync(statePath, JSON.stringify(updated, null, 2));
   return updated;
@@ -126,7 +123,7 @@ export function runIteration(
   rootDir: string,
   config: RalphConfig,
   state: RalphState,
-  options: RunOptions = {}
+  options: RunOptions = {},
 ): RalphIteration {
   if (state.status === "complete") {
     throw new Error("Ralph loop is already complete.");
@@ -149,7 +146,7 @@ export function runIteration(
         exitCode: null,
         startedAt: stamp,
         finishedAt: stamp,
-        durationMs: 0
+        durationMs: 0,
       });
       continue;
     }
@@ -159,7 +156,7 @@ export function runIteration(
       cwd: rootDir,
       shell: true,
       stdio: options.stdio ?? "inherit",
-      env: process.env
+      env: process.env,
     });
     const checkEnd = new Date();
     const exitCode = typeof result.status === "number" ? result.status : 1;
@@ -171,7 +168,7 @@ export function runIteration(
       exitCode,
       startedAt: checkStart.toISOString(),
       finishedAt: checkEnd.toISOString(),
-      durationMs: checkEnd.getTime() - checkStart.getTime()
+      durationMs: checkEnd.getTime() - checkStart.getTime(),
     });
 
     if (status === "failed" && config.stopOnFailure) {
@@ -180,15 +177,13 @@ export function runIteration(
   }
 
   const finishedAt = new Date();
-  const iterationStatus = checks.every((check) => check.status === "passed")
-    ? "passed"
-    : "failed";
+  const iterationStatus = checks.every((check) => check.status === "passed") ? "passed" : "failed";
   const iteration: RalphIteration = {
     index: state.iterations.length + 1,
     startedAt: startedAt.toISOString(),
     finishedAt: finishedAt.toISOString(),
     status: iterationStatus,
-    checks
+    checks,
   };
 
   state.iterations.push(iteration);
@@ -207,9 +202,7 @@ export function formatStatus(rootDir: string, config: RalphConfig, state: RalphS
   lines.push("Ralph loop status");
   lines.push(`Task: ${config.taskFile} (${fs.existsSync(taskPath) ? "ok" : "missing"})`);
   lines.push(`Phases: ${config.phasesFile} (${fs.existsSync(phasesPath) ? "ok" : "missing"})`);
-  lines.push(
-    `Iterations: ${state.iterations.length}/${config.maxIterations} (${state.status})`
-  );
+  lines.push(`Iterations: ${state.iterations.length}/${config.maxIterations} (${state.status})`);
 
   if (!last) {
     lines.push("No iterations recorded.");
@@ -261,7 +254,7 @@ function normalizeConfig(raw: unknown): RalphConfig {
     taskFile: typeof data.taskFile === "string" ? data.taskFile : "TASK.md",
     phasesFile: typeof data.phasesFile === "string" ? data.phasesFile : "PHASES.md",
     stateFile: typeof data.stateFile === "string" ? data.stateFile : DEFAULT_STATE_FILE,
-    stopOnFailure: typeof data.stopOnFailure === "boolean" ? data.stopOnFailure : true
+    stopOnFailure: typeof data.stopOnFailure === "boolean" ? data.stopOnFailure : true,
   };
 }
 
@@ -269,8 +262,7 @@ function normalizeState(raw: unknown): RalphState {
   const data = isRecord(raw) ? raw : {};
   const status: LoopStatus =
     data.status === "complete" || data.status === "failed" ? data.status : "idle";
-  const createdAt =
-    typeof data.createdAt === "string" ? data.createdAt : new Date().toISOString();
+  const createdAt = typeof data.createdAt === "string" ? data.createdAt : new Date().toISOString();
   const updatedAt = typeof data.updatedAt === "string" ? data.updatedAt : createdAt;
   const iterations: RalphIteration[] = [];
 
@@ -287,7 +279,7 @@ function normalizeState(raw: unknown): RalphState {
     status,
     iterations,
     createdAt,
-    updatedAt
+    updatedAt,
   };
 }
 
@@ -310,7 +302,8 @@ function normalizeIteration(value: unknown): RalphIteration | null {
     return null;
   }
 
-  const index = typeof value.index === "number" && Number.isInteger(value.index) ? value.index : null;
+  const index =
+    typeof value.index === "number" && Number.isInteger(value.index) ? value.index : null;
   const startedAt = typeof value.startedAt === "string" ? value.startedAt : null;
   const finishedAt = typeof value.finishedAt === "string" ? value.finishedAt : null;
   const status = value.status === "passed" || value.status === "failed" ? value.status : null;
@@ -334,7 +327,7 @@ function normalizeIteration(value: unknown): RalphIteration | null {
     startedAt,
     finishedAt,
     status,
-    checks
+    checks,
   };
 }
 
@@ -373,6 +366,6 @@ function normalizeCheckResult(value: unknown): CheckResult | null {
     exitCode,
     startedAt,
     finishedAt,
-    durationMs
+    durationMs,
   };
 }

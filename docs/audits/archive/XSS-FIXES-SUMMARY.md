@@ -11,6 +11,7 @@ Fixed Cross-Site Scripting (XSS) vulnerabilities in 2 frontend files by adding p
 **Vulnerability**: Campground description rendered with `dangerouslySetInnerHTML` without sanitization.
 
 **Fix Applied**:
+
 - Added DOMPurify import: `import DOMPurify from "dompurify";`
 - Changed line 381 from:
   ```tsx
@@ -30,14 +31,16 @@ Fixed Cross-Site Scripting (XSS) vulnerabilities in 2 frontend files by adding p
 **Vulnerability**: Map popup HTML built using template strings with unsanitized campground data (name, city, state).
 
 **Fix Applied**:
+
 - Added HTML escape function before the component (lines 118-124):
   ```typescript
   const escapeHtml = (str: string): string =>
-    str.replace(/&/g, "&amp;")
-       .replace(/</g, "&lt;")
-       .replace(/>/g, "&gt;")
-       .replace(/"/g, "&quot;")
-       .replace(/'/g, "&#039;");
+    str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   ```
 - Updated popup content (lines 335-336) from:
   ```tsx
@@ -72,6 +75,7 @@ Fixed Cross-Site Scripting (XSS) vulnerabilities in 2 frontend files by adding p
 ## Security Impact
 
 Both vulnerabilities were **HIGH severity**:
+
 - **CVSS Score**: 7.1-8.8 (High)
 - **Attack Vector**: Network-based, low complexity
 - **Impact**: Session hijacking, data theft, unauthorized actions

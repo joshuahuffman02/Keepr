@@ -10,12 +10,14 @@ When working in the NestJS API:
 ## Service Methods
 
 1. **Always validate before mutating**
+
    ```typescript
    const record = await this.prisma.model.findUnique({ where: { id } });
    if (!record) throw new NotFoundException(`Model ${id} not found`);
    ```
 
 2. **Use transactions for multi-step operations**
+
    ```typescript
    await this.prisma.$transaction(async (tx) => {
      // All operations use tx, not this.prisma
@@ -33,6 +35,7 @@ When working in the NestJS API:
 ## Controllers
 
 1. **Always add guards** - No unprotected endpoints
+
    ```typescript
    @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
    ```
@@ -77,6 +80,7 @@ Railway PostgreSQL has limited connections (~20-25 max). We already have 50+ sch
    - Consider if an on-demand endpoint would work instead
 
 2. **Never schedule at :00 minutes** - stagger timing
+
    ```typescript
    // BAD - collides with other jobs
    @Cron("0 * * * *")
@@ -104,6 +108,7 @@ Railway has strict connection limits. The app uses a shared Prisma pool.
 4. **Use transactions sparingly** - they hold connections until complete
 
 Environment variables for Railway:
+
 ```
 DATABASE_POOL_SIZE=5      # Keep low for Railway
 DATABASE_POOL_TIMEOUT=10  # Fail fast if no connections

@@ -99,7 +99,7 @@ export function useChatConversations({
       }
 
       setConversations((prev) =>
-        nextCursor ? [...prev, ...data.conversations] : data.conversations
+        nextCursor ? [...prev, ...data.conversations] : data.conversations,
       );
       setNextCursor(data.nextCursor);
       setHasMore(data.hasMore);

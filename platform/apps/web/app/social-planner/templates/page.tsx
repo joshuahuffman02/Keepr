@@ -19,14 +19,14 @@ export default function SocialPlannerTemplates() {
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
   const campgroundId = campgrounds[0]?.id;
 
   const templatesQuery = useQuery<SocialTemplate[]>({
     queryKey: ["social-templates", campgroundId],
     queryFn: () => apiClient.listSocialTemplates(campgroundId!),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const quickUse = useMutation({
@@ -40,9 +40,9 @@ export default function SocialPlannerTemplates() {
         caption: tpl.defaultCaption || tpl.summary,
         hashtags: tpl.hashtagSet || [],
         templateId: tpl.id,
-        ideaParkingLot: true
+        ideaParkingLot: true,
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] })
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["social-posts", campgroundId] }),
   });
 
   const createTemplate = useMutation({
@@ -55,15 +55,15 @@ export default function SocialPlannerTemplates() {
         defaultCaption: caption,
         hashtagSet: hashtags
           .split(",")
-          .map(h => h.trim())
-          .filter(Boolean)
+          .map((h) => h.trim())
+          .filter(Boolean),
       }),
     onSuccess: () => {
       setName("");
       setCaption("");
       setHashtags("");
       qc.invalidateQueries({ queryKey: ["social-templates", campgroundId] });
-    }
+    },
   });
 
   if (!campgroundId) {
@@ -81,29 +81,41 @@ export default function SocialPlannerTemplates() {
 
   return (
     <DashboardShell>
-      <Link href="/social-planner" className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2">
+      <Link
+        href="/social-planner"
+        className="text-sm text-emerald-700 hover:text-emerald-600 inline-block mb-2"
+      >
         ← Back to Social Planner
       </Link>
       <div className="flex items-center justify-between mb-4">
         <div>
-          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Template library</p>
+          <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">
+            Template library
+          </p>
           <h1 className="text-2xl font-bold text-foreground">Reusable fills & styles</h1>
-          <p className="text-muted-foreground">Deals, spotlights, events, weather, reviews, countdowns, and more.</p>
+          <p className="text-muted-foreground">
+            Deals, spotlights, events, weather, reviews, countdowns, and more.
+          </p>
         </div>
       </div>
 
       <div className="card p-4 mb-4">
         <h3 className="text-lg font-semibold text-foreground mb-2">Create template</h3>
         <div className="grid md:grid-cols-5 gap-3">
-          <input className="input" placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
-          <select className="input" value={category} onChange={e => setCategory(e.target.value)}>
+          <input
+            className="input"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <select className="input" value={category} onChange={(e) => setCategory(e.target.value)}>
             <option value="promo">Deal / promo</option>
             <option value="events">Events</option>
             <option value="reviews">Reviews</option>
             <option value="local_attractions">Local attractions</option>
             <option value="countdown">Countdown</option>
           </select>
-          <select className="input" value={style} onChange={e => setStyle(e.target.value)}>
+          <select className="input" value={style} onChange={(e) => setStyle(e.target.value)}>
             <option value="clean_promo">Clean promo</option>
             <option value="story_vertical">Story vertical</option>
             <option value="photo_quote">Photo + quote</option>
@@ -111,8 +123,18 @@ export default function SocialPlannerTemplates() {
             <option value="comparison">Comparison</option>
             <option value="countdown">Countdown</option>
           </select>
-          <input className="input" placeholder="Default caption" value={caption} onChange={e => setCaption(e.target.value)} />
-          <input className="input" placeholder="#hashtags, comma separated" value={hashtags} onChange={e => setHashtags(e.target.value)} />
+          <input
+            className="input"
+            placeholder="Default caption"
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+          />
+          <input
+            className="input"
+            placeholder="#hashtags, comma separated"
+            value={hashtags}
+            onChange={(e) => setHashtags(e.target.value)}
+          />
         </div>
         <button
           className="btn-primary mt-3 flex items-center"
@@ -136,9 +158,13 @@ export default function SocialPlannerTemplates() {
               </div>
               {tpl.category && <span className="badge">{tpl.category}</span>}
             </div>
-            <p className="text-sm text-muted-foreground line-clamp-2">{tpl.defaultCaption || "Caption fill-ins TBD."}</p>
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {tpl.defaultCaption || "Caption fill-ins TBD."}
+            </p>
             {tpl.hashtagSet?.length ? (
-              <div className="mt-2 text-xs text-muted-foreground">Hashtags: {tpl.hashtagSet.join(", ")}</div>
+              <div className="mt-2 text-xs text-muted-foreground">
+                Hashtags: {tpl.hashtagSet.join(", ")}
+              </div>
             ) : null}
             <button
               className="btn-secondary mt-3 w-full flex items-center justify-center text-emerald-700"
@@ -149,7 +175,9 @@ export default function SocialPlannerTemplates() {
             </button>
           </div>
         ))}
-        {!templatesQuery.data?.length && <div className="text-sm text-muted-foreground">No templates yet.</div>}
+        {!templatesQuery.data?.length && (
+          <div className="text-sm text-muted-foreground">No templates yet.</div>
+        )}
       </div>
     </DashboardShell>
   );

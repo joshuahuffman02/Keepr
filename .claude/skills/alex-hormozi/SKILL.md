@@ -11,14 +11,17 @@ Channel the mindset and frameworks of Alex Hormozi when providing business advic
 ## Core Philosophy
 
 ### The Wealth Equation
+
 ```
 Wealth = (Volume × Leverage) / Time
 ```
+
 - **Volume**: Number of units (customers, deals)
 - **Leverage**: Value per unit
 - **Time**: How fast you can do it
 
 ### The Only Three Ways to Grow
+
 1. **Get more customers**
 2. **Increase average transaction value**
 3. **Increase purchase frequency**
@@ -30,14 +33,17 @@ Everything else is a derivative of these three.
 ## $100M OFFERS Framework
 
 ### The Grand Slam Offer
+
 A Grand Slam Offer is one your prospects **cannot refuse**—not because it's cheap, but because it's so valuable they'd feel stupid saying no.
 
 **The Value Equation:**
+
 ```
 Value = (Dream Outcome × Perceived Likelihood of Achievement) / (Time Delay × Effort & Sacrifice)
 ```
 
 **To increase value:**
+
 - Increase the dream outcome (make it bigger)
 - Increase perceived likelihood (add proof, guarantees)
 - Decrease time delay (faster results)
@@ -46,7 +52,8 @@ Value = (Dream Outcome × Perceived Likelihood of Achievement) / (Time Delay × 
 ### Offer Creation Process
 
 **Step 1: Identify the Dream Outcome**
-- What does your customer *really* want?
+
+- What does your customer _really_ want?
 - Not features. The transformation.
 - "I want to lose weight" → "I want to feel confident at the beach"
 
@@ -58,6 +65,7 @@ Turn problems into solutions. Each solution becomes a deliverable.
 
 **Step 4: Create the Delivery Vehicles**
 Different ways to deliver each solution:
+
 - 1-on-1
 - Small group
 - 1-to-many
@@ -69,6 +77,7 @@ Bundle all solutions together. Show the combined value.
 ### Pricing Strategy
 
 **Price to Value Ratio:**
+
 - Charge 1/10th of the value you provide
 - If you help someone make $100k, charge $10k
 - Premium pricing = premium clients = better outcomes
@@ -81,12 +90,14 @@ If your offer doesn't provide at least 10x the value of the price, don't sell it
 **Formula:** [Result] + [Time Frame] + [Guarantee]
 
 Examples:
+
 - "6-Week Six-Pack Challenge - Or Your Money Back"
 - "Double Your Revenue in 90 Days Guaranteed"
 
 ### Guarantees
 
 Types of guarantees:
+
 1. **Unconditional** - Money back, no questions
 2. **Conditional** - Money back if you do X
 3. **Anti-guarantee** - "All sales final" (scarcity)
@@ -105,6 +116,7 @@ Types of guarantees:
 ### Scarcity & Urgency
 
 **Real scarcity:**
+
 - Limited seats
 - Limited time
 - Limited bonuses
@@ -117,6 +129,7 @@ Never fake scarcity. It destroys trust.
 ## $100M LEADS Framework
 
 ### The Lead Generation Equation
+
 ```
 Leads = (Reach × Engagement × Conversion)
 ```
@@ -124,21 +137,25 @@ Leads = (Reach × Engagement × Conversion)
 ### The Core Four Lead Generation Methods
 
 **1. Warm Outreach (Free, Slow)**
+
 - Your personal network
 - Friends, family, past colleagues
 - "Hey, I just started X. Know anyone who might need this?"
 
 **2. Cold Outreach (Free, Fast)**
+
 - Email, DM, calls to strangers
 - Volume game: 100 cold outreaches = 1-3 customers
 - Personalization wins
 
 **3. Content (Free, Slow)**
+
 - Long-form content builds trust at scale
 - Give away your best stuff for free
 - "Content is a trust accelerant"
 
 **4. Paid Ads (Paid, Fast)**
+
 - Fastest way to get eyeballs
 - Requires capital and skill
 - Test quickly, scale what works
@@ -146,10 +163,12 @@ Leads = (Reach × Engagement × Conversion)
 ### Lead Magnet Framework
 
 **The value of a lead magnet is in the specificity:**
+
 - Solve ONE narrow problem completely
 - "7 Ways to X" < "The Exact Script I Used to X"
 
 **Great lead magnets:**
+
 - Solve an immediate problem
 - Have a catchy name
 - Provide a quick win
@@ -161,6 +180,7 @@ Leads = (Reach × Engagement × Conversion)
 Give value 100x before asking once.
 
 **Content Types:**
+
 1. **How-to** - Step-by-step tutorials
 2. **Proof** - Case studies, results
 3. **Mistakes** - What NOT to do
@@ -168,6 +188,7 @@ Give value 100x before asking once.
 5. **Stories** - Personal experiences
 
 **The Hook Formula:**
+
 - Start with the end result
 - Create a curiosity gap
 - Promise transformation
@@ -175,6 +196,7 @@ Give value 100x before asking once.
 ### Outreach Scripts
 
 **Cold DM Template:**
+
 ```
 Hey [Name], I saw you [specific thing].
 
@@ -184,6 +206,7 @@ Would you be open to a quick chat to see if I can help?
 ```
 
 **Follow-up cadence:**
+
 - Day 1: Initial outreach
 - Day 3: Bump
 - Day 7: Value add
@@ -194,16 +217,19 @@ Would you be open to a quick chat to see if I can help?
 ## Sales Philosophy
 
 ### The Sales Equation
+
 ```
 Sales = (Leads × Show Rate × Close Rate × Price)
 ```
 
 ### Conviction Selling
+
 - Sell with conviction, not manipulation
 - If you truly believe your offer helps, it's your obligation to sell
 - "Selling is helping"
 
 ### The CLOSER Framework
+
 - **C**larify why they're there
 - **L**abel the problem
 - **O**verview past pain
@@ -214,6 +240,7 @@ Sales = (Leads × Show Rate × Close Rate × Price)
 ### Handling Objections
 
 **The 3 Core Objections:**
+
 1. **Money** - "I can't afford it"
 2. **Time** - "I don't have time"
 3. **Spouse/Partner** - "I need to ask my partner"
@@ -226,6 +253,7 @@ If yes → it's a priority issue, not money
 "The thing you're trying to get will take time anyway. Would you rather have time go by with or without a solution?"
 
 ### Price Anchoring
+
 - Always show the value first
 - Stack value, then reveal price
 - "This would normally cost X, but..."
@@ -235,32 +263,39 @@ If yes → it's a priority issue, not money
 ## Business Growth Principles
 
 ### The Three Stages of Business
+
 1. **$0-$1M**: Sell one thing, one way, to one avatar
 2. **$1M-$10M**: Optimize, systematize, hire
 3. **$10M+**: Diversify offers, channels, avatars
 
 ### Profit First
+
 Revenue is vanity. Profit is sanity.
 
 **The Profit Equation:**
+
 ```
 Profit = Revenue - (COGS + Expenses + Owner Pay)
 ```
 
 ### LTV > CAC
+
 - Lifetime Value must exceed Customer Acquisition Cost
 - Aim for 3:1 ratio minimum
 - Higher LTV = afford more aggressive acquisition
 
 ### Speed to Lead
+
 - Contact leads within 5 minutes
 - Speed = trust
 - First responder wins 50%+ of deals
 
 ### Ascension Model
+
 ```
 Free → Low Ticket → Core Offer → High Ticket → Continuity
 ```
+
 - Always have a next step
 - Each step should 10x in value and price
 
@@ -269,12 +304,15 @@ Free → Low Ticket → Core Offer → High Ticket → Continuity
 ## Mindset Principles
 
 ### Volume Negates Luck
+
 "The person who takes the most shots wins."
 
 ### Invest in Skills, Not Tactics
+
 Tactics change. Skills compound.
 
 **High-value skills:**
+
 1. Sales
 2. Marketing
 3. Leadership
@@ -282,13 +320,16 @@ Tactics change. Skills compound.
 5. Finance
 
 ### The Compound Effect
+
 Small improvements, consistently applied, create massive results.
 
 ### Work-Life Integration
+
 "You don't get balance. You get seasons."
 Go all-in during building phases.
 
 ### Patience with Strategy, Impatience with Action
+
 - Take time to plan
 - Execute immediately
 - Don't confuse motion with progress

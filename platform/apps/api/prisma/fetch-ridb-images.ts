@@ -17,13 +17,13 @@ if (!RIDB_API_KEY) {
 }
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL
+  connectionString: process.env.DATABASE_URL || process.env.PLATFORM_DATABASE_URL,
 });
 // @ts-ignore Prisma 7 adapter signature
 const prisma = new PrismaClient({ adapter });
 
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Extract RIDB facility ID from slug (e.g., "brasstown-falls-243858" -> "243858")
@@ -46,9 +46,9 @@ async function fetchFacilityMedia(facilityId: string): Promise<string | null> {
       `${RIDB_BASE_URL}/facilities/${facilityId}/media?apikey=${RIDB_API_KEY}`,
       {
         headers: {
-          'Accept': 'application/json'
-        }
-      }
+          Accept: "application/json",
+        },
+      },
     );
 
     if (!response.ok) {
@@ -62,8 +62,8 @@ async function fetchFacilityMedia(facilityId: string): Promise<string | null> {
 
     // Find best image - prefer larger images
     const images = media
-      .filter(m => m.MediaType === 'Image' && m.URL)
-      .sort((a, b) => ((b.Width || 0) * (b.Height || 0)) - ((a.Width || 0) * (a.Height || 0)));
+      .filter((m) => m.MediaType === "Image" && m.URL)
+      .sort((a, b) => (b.Width || 0) * (b.Height || 0) - (a.Width || 0) * (a.Height || 0));
 
     return images[0]?.URL || null;
   } catch (error) {
@@ -76,7 +76,7 @@ async function main() {
   console.log("Fetching campgrounds without images...\n");
 
   // Use raw SQL for null checks which are tricky in Prisma
-  const campgrounds = await prisma.$queryRaw<{id: string, name: string, slug: string}[]>`
+  const campgrounds = await prisma.$queryRaw<{ id: string; name: string; slug: string }[]>`
     SELECT id, name, slug FROM "Campground"
     WHERE "isExternal" = true
       AND "heroImageUrl" IS NULL
@@ -94,7 +94,9 @@ async function main() {
     const cg = campgrounds[i];
     const facilityId = cg.slug ? extractFacilityId(cg.slug) : null;
 
-    process.stdout.write(`[${i + 1}/${campgrounds.length}] ${cg.name.substring(0, 35).padEnd(35)} `);
+    process.stdout.write(
+      `[${i + 1}/${campgrounds.length}] ${cg.name.substring(0, 35).padEnd(35)} `,
+    );
 
     if (!facilityId) {
       console.log(`- No RIDB ID`);
@@ -107,7 +109,7 @@ async function main() {
     if (imageUrl) {
       await prisma.campground.update({
         where: { id: cg.id },
-        data: { heroImageUrl: imageUrl }
+        data: { heroImageUrl: imageUrl },
       });
       console.log(`-> Got image`);
       updated++;
@@ -127,7 +129,7 @@ async function main() {
 
   // Check remaining
   const remaining = await prisma.campground.count({
-    where: { isExternal: true, heroImageUrl: null }
+    where: { isExternal: true, heroImageUrl: null },
   });
   console.log(`Still without images: ${remaining}`);
 

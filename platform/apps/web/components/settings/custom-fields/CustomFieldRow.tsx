@@ -68,20 +68,10 @@ const displayLabels: Record<DisplayContext, string> = {
   registration: "Registration",
 };
 
-export function CustomFieldRow({
-  field,
-  onEdit,
-  onDelete,
-  onToggleActive,
-}: CustomFieldRowProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: field.id });
+export function CustomFieldRow({ field, onEdit, onDelete, onToggleActive }: CustomFieldRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: field.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -98,7 +88,7 @@ export function CustomFieldRow({
         "flex items-center gap-3 p-4 rounded-lg border bg-card group",
         "transition-all duration-200",
         isDragging && "shadow-lg ring-2 ring-emerald-500 z-50",
-        !field.isActive && "opacity-60"
+        !field.isActive && "opacity-60",
       )}
     >
       {/* Drag Handle */}
@@ -120,7 +110,10 @@ export function CustomFieldRow({
         <div className="flex items-center gap-2">
           <p className="font-medium text-foreground truncate">{field.question}</p>
           {field.isRequired && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-status-warning-bg text-status-warning-text">
+            <Badge
+              variant="secondary"
+              className="text-[10px] px-1.5 py-0 bg-status-warning-bg text-status-warning-text"
+            >
               Required
             </Badge>
           )}
@@ -151,13 +144,7 @@ export function CustomFieldRow({
 
       {/* Actions */}
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onEdit}
-          className="h-8 w-8"
-          aria-label="Edit"
-        >
+        <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8" aria-label="Edit">
           <Pencil className="h-4 w-4" />
           <span className="sr-only">Edit</span>
         </Button>

@@ -79,8 +79,8 @@ export default async function CampgroundsIndexPage() {
           Find Your Perfect Campground
         </h1>
         <p className="text-xl text-slate-600 mt-4 max-w-2xl mx-auto">
-          Discover {campgrounds.length.toLocaleString()}+ campgrounds, RV parks, and
-          cabins across the United States
+          Discover {campgrounds.length.toLocaleString()}+ campgrounds, RV parks, and cabins across
+          the United States
         </p>
 
         {/* Search CTA */}
@@ -90,9 +90,7 @@ export default async function CampgroundsIndexPage() {
             className="flex items-center gap-3 px-6 py-4 bg-white border-2 border-slate-200 hover:border-emerald-300 rounded-xl text-left transition-colors group"
           >
             <Search className="h-5 w-5 text-slate-400 group-hover:text-emerald-500" />
-            <span className="text-slate-500">
-              Search by location, name, or amenities...
-            </span>
+            <span className="text-slate-500">Search by location, name, or amenities...</span>
           </Link>
         </div>
       </header>
@@ -100,10 +98,7 @@ export default async function CampgroundsIndexPage() {
       {/* Featured Campgrounds */}
       {featuredCampgrounds.length > 0 && (
         <section className="mb-16" aria-labelledby="featured-heading">
-          <h2
-            id="featured-heading"
-            className="text-2xl font-bold text-slate-900 mb-6"
-          >
+          <h2 id="featured-heading" className="text-2xl font-bold text-slate-900 mb-6">
             Top-Rated Campgrounds
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -190,28 +185,25 @@ export default async function CampgroundsIndexPage() {
         </h2>
         <div className="prose prose-slate max-w-none">
           <p>
-            Keepr makes it easy to discover and book campgrounds across the
-            United States. Whether you're planning a family RV trip, a romantic cabin
-            getaway, or a rustic tent camping adventure, we have options for every
-            type of camper.
+            Keepr makes it easy to discover and book campgrounds across the United States. Whether
+            you're planning a family RV trip, a romantic cabin getaway, or a rustic tent camping
+            adventure, we have options for every type of camper.
           </p>
           <h3>Types of Camping Available</h3>
           <ul>
             <li>
-              <strong>RV Sites</strong> - Full hookup sites with water, electric, and
-              sewer connections
+              <strong>RV Sites</strong> - Full hookup sites with water, electric, and sewer
+              connections
             </li>
             <li>
-              <strong>Tent Camping</strong> - Primitive and improved tent sites in
-              scenic locations
+              <strong>Tent Camping</strong> - Primitive and improved tent sites in scenic locations
             </li>
             <li>
-              <strong>Cabin Rentals</strong> - Cozy cabins with amenities from rustic
-              to luxury
+              <strong>Cabin Rentals</strong> - Cozy cabins with amenities from rustic to luxury
             </li>
             <li>
-              <strong>Glamping</strong> - Unique accommodations like yurts, treehouses,
-              and safari tents
+              <strong>Glamping</strong> - Unique accommodations like yurts, treehouses, and safari
+              tents
             </li>
           </ul>
           <h3>Why Book with Keepr?</h3>
@@ -229,8 +221,7 @@ export default async function CampgroundsIndexPage() {
       <section className="bg-emerald-600 rounded-2xl p-6 md:p-8 text-center text-white">
         <h2 className="text-2xl font-bold">Ready to Start Your Adventure?</h2>
         <p className="mt-2 text-emerald-100">
-          Search campgrounds by location, dates, and amenities to find your perfect
-          spot.
+          Search campgrounds by location, dates, and amenities to find your perfect spot.
         </p>
         <Link
           href="/"

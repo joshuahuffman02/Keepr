@@ -10,9 +10,7 @@ export default function APIPage() {
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">API Keys</h2>
-        <p className="text-muted-foreground mt-1">
-          Manage API access for developers
-        </p>
+        <p className="text-muted-foreground mt-1">Manage API access for developers</p>
       </div>
 
       <Card>
@@ -24,8 +22,8 @@ export default function APIPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">Developer Settings</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Generate API keys, configure webhooks, and access developer
-                documentation for integrating with external systems.
+                Generate API keys, configure webhooks, and access developer documentation for
+                integrating with external systems.
               </p>
               <div className="mt-4">
                 <Button asChild>

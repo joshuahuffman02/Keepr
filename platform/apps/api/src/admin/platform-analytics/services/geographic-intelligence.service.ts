@@ -58,7 +58,12 @@ export class GeographicIntelligenceService {
     const uniqueStates = new Set<string>();
 
     for (const guest of guestsWithLocation) {
-      if (guest.country && guest.country !== "US" && guest.country !== "USA" && guest.country !== "United States") {
+      if (
+        guest.country &&
+        guest.country !== "US" &&
+        guest.country !== "USA" &&
+        guest.country !== "United States"
+      ) {
         international++;
       }
 
@@ -68,8 +73,7 @@ export class GeographicIntelligenceService {
       }
     }
 
-    const topState = Object.entries(stateCounts)
-      .sort((a, b) => b[1] - a[1])[0];
+    const topState = Object.entries(stateCounts).sort((a, b) => b[1] - a[1])[0];
 
     // Calculate average travel distance (simplified - based on state-level data)
     const distances = await this.getTravelDistanceAnalysis(dateRange);
@@ -79,9 +83,8 @@ export class GeographicIntelligenceService {
       topOriginState: topState?.[0] || "N/A",
       averageTravelDistance: avgDistance,
       uniqueStates: uniqueStates.size,
-      internationalPercentage: guestsWithLocation.length > 0
-        ? (international / guestsWithLocation.length) * 100
-        : 0,
+      internationalPercentage:
+        guestsWithLocation.length > 0 ? (international / guestsWithLocation.length) * 100 : 0,
     };
   }
 
@@ -128,7 +131,10 @@ export class GeographicIntelligenceService {
     });
 
     // Group by state
-    const byState: Record<string, { guests: Set<string>; reservations: number; revenue: number; distances: number[] }> = {};
+    const byState: Record<
+      string,
+      { guests: Set<string>; reservations: number; revenue: number; distances: number[] }
+    > = {};
 
     for (const res of reservations) {
       const state = res.Guest?.state || "Unknown";
@@ -153,23 +159,26 @@ export class GeographicIntelligenceService {
             stateCenter.lat,
             stateCenter.lng,
             campgroundLat,
-            campgroundLng
+            campgroundLng,
           );
           byState[state].distances.push(distance);
         }
       }
     }
 
-    return Object.entries(byState).map(([state, data]) => ({
-      state,
-      country: "US", // Simplified
-      guestCount: data.guests.size,
-      reservations: data.reservations,
-      revenue: data.revenue,
-      averageDistance: data.distances.length > 0
-        ? data.distances.reduce((a, b) => a + b, 0) / data.distances.length
-        : 0,
-    })).sort((a, b) => b.guestCount - a.guestCount);
+    return Object.entries(byState)
+      .map(([state, data]) => ({
+        state,
+        country: "US", // Simplified
+        guestCount: data.guests.size,
+        reservations: data.reservations,
+        revenue: data.revenue,
+        averageDistance:
+          data.distances.length > 0
+            ? data.distances.reduce((a, b) => a + b, 0) / data.distances.length
+            : 0,
+      }))
+      .sort((a, b) => b.guestCount - a.guestCount);
   }
 
   /**
@@ -206,7 +215,7 @@ export class GeographicIntelligenceService {
             stateCenter.lat,
             stateCenter.lng,
             campgroundLat,
-            campgroundLng
+            campgroundLng,
           );
           distances.push({ distance, spend: res.totalAmount || 0 });
         }
@@ -259,7 +268,22 @@ export class GeographicIntelligenceService {
     // Define US regions
     const regions: Record<string, string[]> = {
       Northeast: ["ME", "NH", "VT", "MA", "RI", "CT", "NY", "NJ", "PA"],
-      Southeast: ["DE", "MD", "VA", "WV", "NC", "SC", "GA", "FL", "KY", "TN", "AL", "MS", "AR", "LA"],
+      Southeast: [
+        "DE",
+        "MD",
+        "VA",
+        "WV",
+        "NC",
+        "SC",
+        "GA",
+        "FL",
+        "KY",
+        "TN",
+        "AL",
+        "MS",
+        "AR",
+        "LA",
+      ],
       Midwest: ["OH", "IN", "IL", "MI", "WI", "MN", "IA", "MO", "ND", "SD", "NE", "KS"],
       Southwest: ["TX", "OK", "NM", "AZ"],
       West: ["CO", "WY", "MT", "ID", "WA", "OR", "CA", "NV", "UT", "AK", "HI"],
@@ -288,9 +312,9 @@ export class GeographicIntelligenceService {
       const state = res.Guest?.state;
       if (!state) continue;
 
-      const region = Object.entries(regions).find(([_, states]) =>
-        states.includes(state.toUpperCase())
-      )?.[0] || "Other";
+      const region =
+        Object.entries(regions).find(([_, states]) => states.includes(state.toUpperCase()))?.[0] ||
+        "Other";
 
       const month = res.createdAt.toISOString().slice(0, 7);
 
@@ -313,8 +337,10 @@ export class GeographicIntelligenceService {
     const dLng = this.toRad(lng2 - lng1);
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
@@ -328,7 +354,7 @@ export class GeographicIntelligenceService {
    */
   private getStateCenterCoordinates(state: string): { lat: number; lng: number } | null {
     const centers: Record<string, { lat: number; lng: number }> = {
-      AL: { lat: 32.806671, lng: -86.791130 },
+      AL: { lat: 32.806671, lng: -86.79113 },
       AK: { lat: 61.370716, lng: -152.404419 },
       AZ: { lat: 33.729759, lng: -111.431221 },
       AR: { lat: 34.969704, lng: -92.373123 },
@@ -343,8 +369,8 @@ export class GeographicIntelligenceService {
       IL: { lat: 40.349457, lng: -88.986137 },
       IN: { lat: 39.849426, lng: -86.258278 },
       IA: { lat: 42.011539, lng: -93.210526 },
-      KS: { lat: 38.526600, lng: -96.726486 },
-      KY: { lat: 37.668140, lng: -84.670067 },
+      KS: { lat: 38.5266, lng: -96.726486 },
+      KY: { lat: 37.66814, lng: -84.670067 },
       LA: { lat: 31.169546, lng: -91.867805 },
       ME: { lat: 44.693947, lng: -69.381927 },
       MD: { lat: 39.063946, lng: -76.802101 },
@@ -354,7 +380,7 @@ export class GeographicIntelligenceService {
       MS: { lat: 32.741646, lng: -89.678696 },
       MO: { lat: 38.456085, lng: -92.288368 },
       MT: { lat: 46.921925, lng: -110.454353 },
-      NE: { lat: 41.125370, lng: -98.268082 },
+      NE: { lat: 41.12537, lng: -98.268082 },
       NV: { lat: 38.313515, lng: -117.055374 },
       NH: { lat: 43.452492, lng: -71.563896 },
       NJ: { lat: 40.298904, lng: -74.521011 },
@@ -366,7 +392,7 @@ export class GeographicIntelligenceService {
       OK: { lat: 35.565342, lng: -96.928917 },
       OR: { lat: 44.572021, lng: -122.070938 },
       PA: { lat: 40.590752, lng: -77.209755 },
-      RI: { lat: 41.680893, lng: -71.511780 },
+      RI: { lat: 41.680893, lng: -71.51178 },
       SC: { lat: 33.856892, lng: -80.945007 },
       SD: { lat: 44.299782, lng: -99.438828 },
       TN: { lat: 35.747845, lng: -86.692345 },
@@ -377,7 +403,7 @@ export class GeographicIntelligenceService {
       WA: { lat: 47.400902, lng: -121.490494 },
       WV: { lat: 38.491226, lng: -80.954456 },
       WI: { lat: 44.268543, lng: -89.616508 },
-      WY: { lat: 42.755966, lng: -107.302490 },
+      WY: { lat: 42.755966, lng: -107.30249 },
     };
 
     return centers[state.toUpperCase()] || null;

@@ -17,14 +17,17 @@ interface SentimentBadgeProps {
 type SentimentKey = Exclude<Sentiment, null | undefined>;
 type UrgencyKey = Exclude<UrgencyLevel, null | undefined>;
 
-const sentimentConfig: Record<SentimentKey, { icon: LucideIcon; label: string; bg: string; border: string; text: string; iconColor: string }> = {
+const sentimentConfig: Record<
+  SentimentKey,
+  { icon: LucideIcon; label: string; bg: string; border: string; text: string; iconColor: string }
+> = {
   positive: {
     icon: ThumbsUp,
     label: "Positive",
     bg: "bg-green-50",
     border: "border-green-200",
     text: "text-green-700",
-    iconColor: "text-green-500"
+    iconColor: "text-green-500",
   },
   neutral: {
     icon: Minus,
@@ -32,7 +35,7 @@ const sentimentConfig: Record<SentimentKey, { icon: LucideIcon; label: string; b
     bg: "bg-muted",
     border: "border-border",
     text: "text-muted-foreground",
-    iconColor: "text-muted-foreground"
+    iconColor: "text-muted-foreground",
   },
   negative: {
     icon: ThumbsDown,
@@ -40,11 +43,22 @@ const sentimentConfig: Record<SentimentKey, { icon: LucideIcon; label: string; b
     bg: "bg-red-50",
     border: "border-red-200",
     text: "text-red-700",
-    iconColor: "text-red-500"
-  }
+    iconColor: "text-red-500",
+  },
 };
 
-const urgencyConfig: Record<Extract<UrgencyKey, "critical" | "high">, { icon: LucideIcon; label: string; bg: string; border: string; text: string; iconColor: string; pulse: boolean }> = {
+const urgencyConfig: Record<
+  Extract<UrgencyKey, "critical" | "high">,
+  {
+    icon: LucideIcon;
+    label: string;
+    bg: string;
+    border: string;
+    text: string;
+    iconColor: string;
+    pulse: boolean;
+  }
+> = {
   critical: {
     icon: AlertTriangle,
     label: "Critical",
@@ -52,7 +66,7 @@ const urgencyConfig: Record<Extract<UrgencyKey, "critical" | "high">, { icon: Lu
     border: "border-red-300",
     text: "text-red-800",
     iconColor: "text-red-600",
-    pulse: true
+    pulse: true,
   },
   high: {
     icon: Zap,
@@ -61,14 +75,17 @@ const urgencyConfig: Record<Extract<UrgencyKey, "critical" | "high">, { icon: Lu
     border: "border-amber-300",
     text: "text-amber-800",
     iconColor: "text-amber-600",
-    pulse: false
-  }
+    pulse: false,
+  },
 };
 
-const sizeConfig: Record<NonNullable<SentimentBadgeProps["size"]>, { badge: string; icon: string }> = {
+const sizeConfig: Record<
+  NonNullable<SentimentBadgeProps["size"]>,
+  { badge: string; icon: string }
+> = {
   sm: { badge: "px-1.5 py-0.5 text-xs gap-1", icon: "h-3 w-3" },
   md: { badge: "px-2 py-1 text-xs gap-1.5", icon: "h-3.5 w-3.5" },
-  lg: { badge: "px-2.5 py-1.5 text-sm gap-2", icon: "h-4 w-4" }
+  lg: { badge: "px-2.5 py-1.5 text-sm gap-2", icon: "h-4 w-4" },
 };
 
 export function SentimentBadge({
@@ -76,7 +93,7 @@ export function SentimentBadge({
   urgencyLevel,
   showLabel = true,
   size = "sm",
-  className
+  className,
 }: SentimentBadgeProps) {
   // Show urgency badge if critical or high
   if (urgencyLevel === "critical" || urgencyLevel === "high") {
@@ -93,7 +110,7 @@ export function SentimentBadge({
           config.text,
           sizeStyles.badge,
           config.pulse && "animate-pulse",
-          className
+          className,
         )}
         title={config.label}
       >
@@ -120,7 +137,7 @@ export function SentimentBadge({
         config.border,
         config.text,
         sizeStyles.badge,
-        className
+        className,
       )}
       title={config.label}
     >
@@ -154,12 +171,20 @@ export function SentimentScore({ score, size = "sm", className }: SentimentScore
   const width = size === "sm" ? "w-16" : "w-24";
 
   return (
-    <div className={cn("relative", width, height, "bg-muted rounded-full border border-border", className)}>
+    <div
+      className={cn(
+        "relative",
+        width,
+        height,
+        "bg-muted rounded-full border border-border",
+        className,
+      )}
+    >
       {/* Indicator dot */}
       <div
         className={cn(
           "absolute top-1/2 -translate-y-1/2 w-2 h-2 rounded-full border border-white shadow",
-          bgColor
+          bgColor,
         )}
         style={{ left: `calc(${position}% - 4px)` }}
       />

@@ -7,7 +7,14 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 
@@ -34,14 +41,14 @@ export default function PayoutDetailPage() {
     queryKey: ["payout-detail", campgroundId, payoutId],
     queryFn: () => apiClient.getPayout(campgroundId, payoutId),
     enabled: !!campgroundId && !!payoutId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   const { data: recon } = useQuery({
     queryKey: ["payout-recon", campgroundId, payoutId],
     queryFn: () => apiClient.getPayoutRecon(campgroundId, payoutId),
     enabled: !!campgroundId && !!payoutId,
-    staleTime: 30_000
+    staleTime: 30_000,
   });
 
   return (
@@ -77,7 +84,9 @@ export default function PayoutDetailPage() {
             <CardTitle className="flex items-center gap-2">
               <span>{data?.stripePayoutId ?? payoutId}</span>
               {data?.status && (
-                <Badge className="bg-status-info/15 text-status-info">{data.status.replace("_", " ")}</Badge>
+                <Badge className="bg-status-info/15 text-status-info">
+                  {data.status.replace("_", " ")}
+                </Badge>
               )}
             </CardTitle>
           </CardHeader>
@@ -85,7 +94,13 @@ export default function PayoutDetailPage() {
             <div className="flex gap-4">
               <div>Amount: {formatMoney(data?.amountCents, data?.currency?.toUpperCase())}</div>
               <div>Fee: {formatMoney(data?.feeCents ?? 0, data?.currency?.toUpperCase())}</div>
-              <div>Net: {formatMoney((data?.amountCents ?? 0) - (data?.feeCents ?? 0), data?.currency?.toUpperCase())}</div>
+              <div>
+                Net:{" "}
+                {formatMoney(
+                  (data?.amountCents ?? 0) - (data?.feeCents ?? 0),
+                  data?.currency?.toUpperCase(),
+                )}
+              </div>
             </div>
             <div className="text-xs text-muted-foreground">
               Arrival: {data?.arrivalDate ? format(new Date(data.arrivalDate), "yyyy-MM-dd") : "—"}
@@ -93,7 +108,9 @@ export default function PayoutDetailPage() {
             {recon && (
               <div className="text-xs text-foreground flex flex-col gap-1">
                 <div>
-                  Recon — Net: {formatMoney(recon.payoutNetCents)} | Lines: {formatMoney(recon.lineSumCents)} | Ledger: {formatMoney(recon.ledgerNetCents)} | Drift vs Ledger: {formatMoney(recon.driftVsLedgerCents)}
+                  Recon — Net: {formatMoney(recon.payoutNetCents)} | Lines:{" "}
+                  {formatMoney(recon.lineSumCents)} | Ledger: {formatMoney(recon.ledgerNetCents)} |
+                  Drift vs Ledger: {formatMoney(recon.driftVsLedgerCents)}
                 </div>
                 {Math.abs(recon.driftVsLedgerCents) > DRIFT_THRESHOLD_CENTS && (
                   <Badge className="bg-status-warning/15 text-status-warning w-fit">
@@ -124,22 +141,30 @@ export default function PayoutDetailPage() {
               <TableBody>
                 {isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">Loading...</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      Loading...
+                    </TableCell>
                   </TableRow>
                 )}
                 {!isLoading && data?.lines?.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">No lines.</TableCell>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No lines.
+                    </TableCell>
                   </TableRow>
                 )}
                 {data?.lines?.map((line) => (
                   <TableRow key={line.id}>
                     <TableCell className="text-xs">{line.type}</TableCell>
-                    <TableCell className="text-xs">{formatMoney(line.amountCents, line.currency?.toUpperCase())}</TableCell>
+                    <TableCell className="text-xs">
+                      {formatMoney(line.amountCents, line.currency?.toUpperCase())}
+                    </TableCell>
                     <TableCell className="text-xs font-mono">{line.reservationId ?? "—"}</TableCell>
                     <TableCell className="text-xs">{line.description ?? "—"}</TableCell>
                     <TableCell className="text-xs font-mono">{line.chargeId ?? "—"}</TableCell>
-                    <TableCell className="text-xs font-mono">{line.paymentIntentId ?? "—"}</TableCell>
+                    <TableCell className="text-xs font-mono">
+                      {line.paymentIntentId ?? "—"}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

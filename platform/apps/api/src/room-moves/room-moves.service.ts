@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { HousekeepingService } from '../housekeeping/housekeeping.service';
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { HousekeepingService } from "../housekeeping/housekeeping.service";
 import { randomUUID } from "crypto";
 
 @Injectable()
@@ -28,15 +28,15 @@ export class RoomMovesService {
     });
 
     if (!reservation) {
-      throw new NotFoundException('Reservation not found');
+      throw new NotFoundException("Reservation not found");
     }
 
-    if (reservation.status !== 'checked_in') {
-      throw new BadRequestException('Room moves can only be requested for checked-in reservations');
+    if (reservation.status !== "checked_in") {
+      throw new BadRequestException("Room moves can only be requested for checked-in reservations");
     }
 
     if (!reservation.siteId) {
-      throw new BadRequestException('Reservation is missing a site assignment');
+      throw new BadRequestException("Reservation is missing a site assignment");
     }
 
     const toSite = await this.prisma.site.findUnique({
@@ -45,11 +45,11 @@ export class RoomMovesService {
     });
 
     if (!toSite) {
-      throw new NotFoundException('Destination site not found');
+      throw new NotFoundException("Destination site not found");
     }
 
     if (toSite.campgroundId !== reservation.campgroundId) {
-      throw new BadRequestException('Destination site must be in the same property');
+      throw new BadRequestException("Destination site must be in the same property");
     }
 
     // Check availability of destination site
@@ -57,14 +57,14 @@ export class RoomMovesService {
       where: {
         siteId: data.toSiteId,
         id: { not: data.reservationId },
-        status: { in: ['confirmed', 'checked_in'] },
+        status: { in: ["confirmed", "checked_in"] },
         arrivalDate: { lte: reservation.departureDate },
         departureDate: { gte: data.moveDate },
       },
     });
 
     if (conflictingReservation) {
-      throw new BadRequestException('Destination site is not available for the remaining stay');
+      throw new BadRequestException("Destination site is not available for the remaining stay");
     }
 
     // Calculate price difference
@@ -80,7 +80,7 @@ export class RoomMovesService {
       // Simplified calculation - would need to consider actual pricing
       const remainingNights = Math.ceil(
         (new Date(reservation.departureDate).getTime() - data.moveDate.getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       const fromRate = fromSiteClass.defaultRate ?? 0;
       const toRate = toSite.SiteClass.defaultRate ?? 0;
@@ -98,7 +98,7 @@ export class RoomMovesService {
         moveReason: data.moveReason,
         isComplimentary: data.isComplimentary ?? false,
         priceDifference: data.isComplimentary ? 0 : priceDifference,
-        status: 'requested',
+        status: "requested",
         requestedById: data.requestedById,
         notes: data.notes,
         updatedAt: new Date(),
@@ -129,17 +129,17 @@ export class RoomMovesService {
     });
 
     if (!moveRequest) {
-      throw new NotFoundException('Move request not found');
+      throw new NotFoundException("Move request not found");
     }
 
-    if (moveRequest.status !== 'requested') {
+    if (moveRequest.status !== "requested") {
       throw new BadRequestException(`Cannot approve a ${moveRequest.status} move request`);
     }
 
     return this.prisma.roomMoveRequest.update({
       where: { id },
       data: {
-        status: 'approved',
+        status: "approved",
         approvedById,
       },
     });
@@ -151,11 +151,11 @@ export class RoomMovesService {
     });
 
     if (!moveRequest) {
-      throw new NotFoundException('Move request not found');
+      throw new NotFoundException("Move request not found");
     }
 
-    if (moveRequest.status !== 'approved') {
-      throw new BadRequestException('Move request must be approved before completing');
+    if (moveRequest.status !== "approved") {
+      throw new BadRequestException("Move request must be approved before completing");
     }
 
     // Update reservation with new site
@@ -167,21 +167,18 @@ export class RoomMovesService {
     // Update housekeeping status for old site
     await this.housekeepingService.updateSiteHousekeepingStatus(
       moveRequest.fromSiteId,
-      'vacant_dirty'
+      "vacant_dirty",
     );
 
     // Update housekeeping status for new site
-    await this.housekeepingService.updateSiteHousekeepingStatus(
-      moveRequest.toSiteId,
-      'occupied'
-    );
+    await this.housekeepingService.updateSiteHousekeepingStatus(moveRequest.toSiteId, "occupied");
 
     // Price difference is tracked on moveRequest; ledger integration would be added here for full accounting
 
     return this.prisma.roomMoveRequest.update({
       where: { id },
       data: {
-        status: 'completed',
+        status: "completed",
         completedById,
         completedAt: new Date(),
       },
@@ -194,16 +191,16 @@ export class RoomMovesService {
     });
 
     if (!moveRequest) {
-      throw new NotFoundException('Move request not found');
+      throw new NotFoundException("Move request not found");
     }
 
-    if (moveRequest.status === 'completed') {
-      throw new BadRequestException('Cannot cancel a completed move request');
+    if (moveRequest.status === "completed") {
+      throw new BadRequestException("Cannot cancel a completed move request");
     }
 
     return this.prisma.roomMoveRequest.update({
       where: { id },
-      data: { status: 'cancelled' },
+      data: { status: "cancelled" },
     });
   }
 
@@ -222,7 +219,7 @@ export class RoomMovesService {
     });
 
     if (!moveRequest) {
-      throw new NotFoundException('Move request not found');
+      throw new NotFoundException("Move request not found");
     }
 
     const {
@@ -247,7 +244,7 @@ export class RoomMovesService {
         Site_RoomMoveRequest_fromSiteIdToSite: { select: { name: true } },
         Site_RoomMoveRequest_toSiteIdToSite: { select: { name: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return moveRequests.map((moveRequest) => {
@@ -268,7 +265,7 @@ export class RoomMovesService {
     const moveRequests = await this.prisma.roomMoveRequest.findMany({
       where: {
         Reservation: { campgroundId },
-        status: { in: ['requested', 'approved'] },
+        status: { in: ["requested", "approved"] },
       },
       include: {
         Reservation: {
@@ -279,7 +276,7 @@ export class RoomMovesService {
         Site_RoomMoveRequest_fromSiteIdToSite: { select: { name: true } },
         Site_RoomMoveRequest_toSiteIdToSite: { select: { name: true } },
       },
-      orderBy: { moveDate: 'asc' },
+      orderBy: { moveDate: "asc" },
     });
 
     return moveRequests.map((moveRequest) => {
@@ -311,7 +308,7 @@ export class RoomMovesService {
           gte: today,
           lt: tomorrow,
         },
-        status: 'approved',
+        status: "approved",
       },
       include: {
         Reservation: {
@@ -322,7 +319,7 @@ export class RoomMovesService {
         Site_RoomMoveRequest_fromSiteIdToSite: { select: { name: true } },
         Site_RoomMoveRequest_toSiteIdToSite: { select: { name: true } },
       },
-      orderBy: { moveDate: 'asc' },
+      orderBy: { moveDate: "asc" },
     });
 
     return moveRequests.map((moveRequest) => {

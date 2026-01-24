@@ -10,21 +10,25 @@
 > — Greg Brockman, Former CTO of OpenAI
 
 Since this project is built with AI assistance (Claude), Rust's compiler provides a critical safety net:
+
 - **TypeScript:** Compiles ✅ → Runs with bugs 💥
 - **Rust:** Compiles ✅ → Actually works ✅
 
 ## Critical Components to Migrate
 
 ### Priority 1: Payment Processing 🔴 CRITICAL
+
 **Why:** Can't afford bugs with money
 **Risk if not done:** Financial losses, chargebacks, legal issues
 **Effort:** Medium (2-3 days)
 
 **Files to migrate:**
+
 - `platform/apps/api/src/payments/payments.service.ts`
 - `platform/apps/api/src/payments/stripe.service.ts`
 
 **New Rust service:**
+
 ```
 platform/services/payment-processor-rs/
   src/
@@ -35,6 +39,7 @@ platform/services/payment-processor-rs/
 ```
 
 **API contract:**
+
 ```rust
 POST /process-payment
 {
@@ -55,15 +60,18 @@ Response:
 ---
 
 ### Priority 2: Availability Calculator 🟡 HIGH
+
 **Why:** Complex date/range logic prone to edge cases
 **Risk if not done:** Double bookings, customer complaints
 **Effort:** High (4-5 days)
 
 **Files to migrate:**
+
 - `platform/apps/api/src/reservations/availability.service.ts`
 - `platform/apps/api/src/dynamic-pricing/pricing.service.ts`
 
 **New Rust service:**
+
 ```
 platform/services/availability-rs/
   src/
@@ -75,6 +83,7 @@ platform/services/availability-rs/
 ```
 
 **API contract:**
+
 ```rust
 POST /check-availability
 {
@@ -95,15 +104,18 @@ Response:
 ---
 
 ### Priority 3: Authentication/Security 🟡 HIGH
+
 **Why:** Security-critical, can't have vulnerabilities
 **Risk if not done:** Account takeovers, data breaches
 **Effort:** Medium (3-4 days)
 
 **Files to migrate:**
+
 - `platform/apps/api/src/auth/jwt.service.ts`
 - `platform/apps/api/src/auth/password.service.ts`
 
 **New Rust service:**
+
 ```
 platform/services/auth-service-rs/
   src/
@@ -115,6 +127,7 @@ platform/services/auth-service-rs/
 ```
 
 **API contract:**
+
 ```rust
 POST /auth/verify-token
 {
@@ -132,11 +145,13 @@ Response:
 ---
 
 ### Priority 4: Math-Heavy Features 🟢 MEDIUM
+
 **Why:** Calculations need to be exact
 **Risk if not done:** Pricing errors, accounting issues
 **Effort:** Low (1-2 days per feature)
 
 **Candidates:**
+
 - Tax calculations
 - Discount calculations
 - Revenue reporting aggregations
@@ -147,6 +162,7 @@ Response:
 ## Migration Strategy
 
 ### Phase 1: Setup (Do Now)
+
 - [x] Add Rust to tech stack in CLAUDE.md
 - [x] Create `.claude/rules/rust.md`
 - [x] Add Rust build commands
@@ -154,6 +170,7 @@ Response:
 - [ ] Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
 
 ### Phase 2: First Service (After first 10 customers)
+
 **Start with:** Payment Processing (highest risk)
 
 1. Create new Rust service alongside existing TypeScript
@@ -165,16 +182,19 @@ Response:
 7. Decommission TypeScript version
 
 ### Phase 3: Second Service (After 50 customers)
+
 **Next:** Availability Calculator
 
 Repeat same process as Phase 2.
 
 ### Phase 4: Third Service (After 100 customers)
+
 **Next:** Authentication
 
 Repeat same process as Phase 2.
 
 ### Phase 5: Remaining Features (Ongoing)
+
 Migrate math-heavy features as needed.
 
 ---
@@ -182,6 +202,7 @@ Migrate math-heavy features as needed.
 ## Before You Start
 
 ### Prerequisites
+
 ```bash
 # Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
@@ -196,12 +217,15 @@ cargo install cargo-edit   # Easier dependency management
 ```
 
 ### Learning Resources
+
 - [The Rust Book](https://doc.rust-lang.org/book/) - Official guide (Chapters 1-10)
 - [Rustlings](https://github.com/rust-lang/rustlings) - Interactive exercises
 - Ask Claude to explain Rust concepts as you go
 
 ### Testing Strategy
+
 Every Rust service must have:
+
 1. Unit tests (test each function)
 2. Integration tests (test HTTP API)
 3. Shadow mode deployment (run alongside TypeScript for 1 week)
@@ -212,6 +236,7 @@ Every Rust service must have:
 ## Success Metrics
 
 **How to know migration is successful:**
+
 - ✅ Zero runtime errors in Rust services (if it compiles, it works)
 - ✅ 50% fewer bugs in migrated features
 - ✅ Faster response times (2-10x improvement)
@@ -223,6 +248,7 @@ Every Rust service must have:
 ## Rollback Plan
 
 If Rust service has issues:
+
 1. Switch traffic back to TypeScript immediately
 2. Debug Rust service in isolation
 3. Fix issues
@@ -236,6 +262,7 @@ Keep TypeScript services for at least 1 month after Rust migration.
 ## Next Steps (When You're Ready)
 
 **When you have your first customer:**
+
 1. Review this plan
 2. Pick Priority 1 (Payment Processing)
 3. Tell Claude: "Let's migrate payment processing to Rust"

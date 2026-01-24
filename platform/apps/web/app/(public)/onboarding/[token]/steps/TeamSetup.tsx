@@ -49,10 +49,25 @@ const SPRING_CONFIG: { type: "spring"; stiffness: number; damping: number } = {
 
 const ROLES = [
   { value: "manager", label: "Manager", description: "Full access to all features", icon: Shield },
-  { value: "front_desk", label: "Front Desk", description: "Reservations and check-ins", icon: User },
-  { value: "maintenance", label: "Maintenance", description: "Site status and work orders", icon: User },
+  {
+    value: "front_desk",
+    label: "Front Desk",
+    description: "Reservations and check-ins",
+    icon: User,
+  },
+  {
+    value: "maintenance",
+    label: "Maintenance",
+    description: "Site status and work orders",
+    icon: User,
+  },
   { value: "finance", label: "Finance", description: "Reports and payments", icon: User },
-  { value: "marketing", label: "Marketing", description: "Promotions and communications", icon: User },
+  {
+    value: "marketing",
+    label: "Marketing",
+    description: "Promotions and communications",
+    icon: User,
+  },
   { value: "readonly", label: "View Only", description: "Read-only access", icon: User },
 ];
 
@@ -234,12 +249,8 @@ export function TeamSetup({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-500/20 mb-4">
             <Users className="w-8 h-8 text-blue-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Invite Your Team
-          </h2>
-          <p className="text-slate-400">
-            Add staff members who will help manage your campground
-          </p>
+          <h2 className="text-xl font-semibold text-white mb-2">Invite Your Team</h2>
+          <p className="text-slate-400">Add staff members who will help manage your campground</p>
         </motion.div>
 
         {/* Info box */}
@@ -251,9 +262,9 @@ export function TeamSetup({
         >
           <Info className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">How it works:</span>{" "}
-            Each team member will receive an email invitation to set up their account.
-            You can add more members later from your dashboard settings.
+            <span className="text-slate-300 font-medium">How it works:</span> Each team member will
+            receive an email invitation to set up their account. You can add more members later from
+            your dashboard settings.
           </div>
         </motion.div>
 
@@ -310,7 +321,7 @@ export function TeamSetup({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             {validMembers.length > 0

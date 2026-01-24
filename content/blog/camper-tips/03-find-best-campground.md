@@ -18,30 +18,33 @@ With thousands of campgrounds to choose from, finding the right one can feel ove
 
 What matters most?
 
-| Priority | Questions to Ask |
-|----------|-----------------|
-| Location | How far will you travel? Near attractions? |
-| Amenities | Showers? Pool? WiFi? Full hookups? |
-| Environment | Wooded? Lakefront? Mountain? Desert? |
-| Vibe | Quiet and private? Social and active? |
-| Budget | What can you spend per night? |
+| Priority    | Questions to Ask                           |
+| ----------- | ------------------------------------------ |
+| Location    | How far will you travel? Near attractions? |
+| Amenities   | Showers? Pool? WiFi? Full hookups?         |
+| Environment | Wooded? Lakefront? Mountain? Desert?       |
+| Vibe        | Quiet and private? Social and active?      |
+| Budget      | What can you spend per night?              |
 
 ---
 
 ## Step 2: Search the Right Places
 
 ### Campground Directories
+
 - Hipcamp (unique spots)
 - Recreation.gov (public lands)
 - The Dyrt (reviews)
 - Campendium (community reviews)
 
 ### Search Engines
+
 - Google Maps (shows nearby options)
 - "[Location] campgrounds" searches
 - Image searches for visual research
 
 ### Direct Websites
+
 - State park systems
 - National park service
 - Private campground chains
@@ -51,22 +54,26 @@ What matters most?
 ## Step 3: Evaluate Options
 
 ### Read Reviews Carefully
+
 - Look for recent reviews
 - Read the 3-star reviews (most balanced)
 - Note what reviewers value (quiet vs. activities)
 - Check for consistent complaints
 
 ### Study Photos
+
 - Official photos vs. guest photos
 - Look at actual sites, not just common areas
 - Check for maintenance and cleanliness
 
 ### Check Amenities
+
 - Match to your needs
 - Verify what's included vs. extra
 - Check seasonal availability
 
 ### Consider Location
+
 - Distance to activities you want
 - Noise sources (roads, trains)
 - Cell service if needed
@@ -77,6 +84,7 @@ What matters most?
 ## Step 4: Verify Details
 
 Before booking:
+
 - [ ] Confirm dates and availability
 - [ ] Understand cancellation policy
 - [ ] Note check-in/check-out times
@@ -104,4 +112,4 @@ Before booking:
 
 ---
 
-*Find your next adventure at [campreserv.com](https://campreserv.com)*
+_Find your next adventure at [campreserv.com](https://campreserv.com)_

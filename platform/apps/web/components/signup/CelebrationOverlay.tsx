@@ -10,12 +10,7 @@ interface CelebrationOverlayProps {
   icon?: React.ReactNode;
 }
 
-export function CelebrationOverlay({
-  show,
-  title,
-  subtitle,
-  icon
-}: CelebrationOverlayProps) {
+export function CelebrationOverlay({ show, title, subtitle, icon }: CelebrationOverlayProps) {
   const prefersReducedMotion = useReducedMotion();
 
   if (!show) return null;
@@ -31,9 +26,7 @@ export function CelebrationOverlay({
         initial={prefersReducedMotion ? { opacity: 0 } : { scale: 0.5, opacity: 0 }}
         animate={prefersReducedMotion ? { opacity: 1 } : { scale: 1, opacity: 1 }}
         transition={
-          prefersReducedMotion
-            ? { duration: 0.2 }
-            : { type: "spring", stiffness: 200, damping: 15 }
+          prefersReducedMotion ? { duration: 0.2 } : { type: "spring", stiffness: 200, damping: 15 }
         }
         className="text-center"
       >
@@ -41,9 +34,7 @@ export function CelebrationOverlay({
           initial={prefersReducedMotion ? {} : { scale: 0, rotate: -180 }}
           animate={prefersReducedMotion ? {} : { scale: 1, rotate: 0 }}
           transition={
-            prefersReducedMotion
-              ? {}
-              : { delay: 0.1, type: "spring", stiffness: 200, damping: 15 }
+            prefersReducedMotion ? {} : { delay: 0.1, type: "spring", stiffness: 200, damping: 15 }
           }
           className="mb-6"
         >

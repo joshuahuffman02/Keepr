@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Post, Patch, Delete, Param, Query, UseGuards, Headers, Req, Res } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  UseGuards,
+  Headers,
+  Req,
+  Res,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { UserRole } from "@prisma/client";
@@ -12,7 +25,7 @@ import type { Request, Response } from "express";
 
 @Controller("integrations")
 export class IntegrationsController {
-  constructor(private readonly integrations: IntegrationsService) { }
+  constructor(private readonly integrations: IntegrationsService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
@@ -45,7 +58,7 @@ export class IntegrationsController {
   getOAuthUrl(
     @Param("provider") provider: string,
     @Query("campgroundId") campgroundId: string,
-    @Query("redirectUri") redirectUri?: string
+    @Query("redirectUri") redirectUri?: string,
   ) {
     return this.integrations.getOAuthAuthorizationUrl(provider, campgroundId, redirectUri);
   }
@@ -59,7 +72,7 @@ export class IntegrationsController {
     @Query("code") code: string,
     @Query("state") state: string,
     @Query("error") error?: string,
-    @Res() res?: Response
+    @Res() res?: Response,
   ) {
     const result = await this.integrations.handleOAuthCallback(provider, code, state, error);
 
@@ -122,7 +135,7 @@ export class IntegrationsController {
     @Req() req: RawBodyRequest<Request>,
     @Headers("x-signature") signature?: string,
     @Headers("x-hmac-signature") altSignature?: string,
-    @Headers("x-campground-id") campgroundId?: string
+    @Headers("x-campground-id") campgroundId?: string,
   ) {
     const raw = req.rawBody ? req.rawBody.toString() : JSON.stringify(body);
     const hubSignature = req.headers["x-hub-signature"];

@@ -18,7 +18,7 @@ const client = new DeveloperApiClient({
   clientId: process.env.KEEPR_CLIENT_ID!,
   clientSecret: process.env.KEEPR_CLIENT_SECRET!,
   campgroundId: "your-camp-id",
-  scopes: ["reservations:read", "reservations:write"]
+  scopes: ["reservations:read", "reservations:write"],
 });
 ```
 
@@ -31,7 +31,7 @@ const reservation = await client.createReservation({
   guestId: "guest-123",
   arrivalDate: "2024-08-01",
   departureDate: "2024-08-05",
-  adults: 2
+  adults: 2,
 });
 
 // Update
@@ -50,7 +50,13 @@ For tests or local demos without hitting the API, use the in-memory mock:
 
 ```ts
 const mock = DeveloperApiClient.createMock();
-await mock.createReservation({ siteId: "1", guestId: "g1", arrivalDate: "2024-08-01", departureDate: "2024-08-03", adults: 2 });
+await mock.createReservation({
+  siteId: "1",
+  guestId: "g1",
+  arrivalDate: "2024-08-01",
+  departureDate: "2024-08-03",
+  adults: 2,
+});
 const all = await mock.listReservations();
 ```
 
@@ -60,25 +66,37 @@ const all = await mock.listReservations();
 import { DeveloperApiClient } from "@keepr/sdk";
 
 // Stub fetch to return a token, then CRUD responses.
-global.fetch = vi.fn()
+global.fetch = vi
+  .fn()
   // token
-  .mockResolvedValueOnce(new Response(JSON.stringify({
-    access_token: "mock-access",
-    refresh_token: "mock-refresh",
-    expires_in: 3600,
-    scope: "reservations:read reservations:write"
-  }), { status: 200, headers: { "content-type": "application/json" } }))
-  // create -> update -> delete -> list ...
+  .mockResolvedValueOnce(
+    new Response(
+      JSON.stringify({
+        access_token: "mock-access",
+        refresh_token: "mock-refresh",
+        expires_in: 3600,
+        scope: "reservations:read reservations:write",
+      }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    ),
+  );
+// create -> update -> delete -> list ...
 
 const client = new DeveloperApiClient({
   baseUrl: "https://api.example.com",
   clientId: "client-id",
   clientSecret: "client-secret",
   campgroundId: "camp-1",
-  scopes: ["reservations:read", "reservations:write"]
+  scopes: ["reservations:read", "reservations:write"],
 });
 
-await client.createReservation({ siteId: "1", guestId: "g1", arrivalDate: "2024-08-01", departureDate: "2024-08-03", adults: 2 });
+await client.createReservation({
+  siteId: "1",
+  guestId: "g1",
+  arrivalDate: "2024-08-01",
+  departureDate: "2024-08-03",
+  adults: 2,
+});
 await client.listReservations();
 ```
 
@@ -87,4 +105,3 @@ await client.listReservations();
 ```bash
 pnpm test
 ```
-

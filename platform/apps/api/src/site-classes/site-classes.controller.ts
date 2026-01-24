@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { SiteClassesService } from "./site-classes.service";
 import { CreateSiteClassDto } from "./dto/create-site-class.dto";
@@ -21,10 +21,11 @@ import { ScopeGuard } from "../permissions/scope.guard";
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class SiteClassesController {
-  constructor(private readonly siteClasses: SiteClassesService) { }
+  constructor(private readonly siteClasses: SiteClassesService) {}
 
   private requireCampgroundId(req: AuthRequest, fallback?: string): string {
-    const campgroundId = fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
+    const campgroundId =
+      fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
@@ -32,15 +33,18 @@ export class SiteClassesController {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "platform_superadmin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" ||
+      user?.platformRole === "platform_superadmin" ||
+      user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
 
-    const userCampgroundIds = user?.memberships
-      ?.flatMap((membership) => (membership.campgroundId ? [membership.campgroundId] : [])) ?? [];
+    const userCampgroundIds =
+      user?.memberships?.flatMap((membership) =>
+        membership.campgroundId ? [membership.campgroundId] : [],
+      ) ?? [];
     if (!userCampgroundIds.includes(campgroundId)) {
       throw new BadRequestException("You do not have access to this campground");
     }
@@ -56,7 +60,7 @@ export class SiteClassesController {
   getById(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -67,7 +71,7 @@ export class SiteClassesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() body: Omit<CreateSiteClassDto, "campgroundId">,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.siteClasses.create({ campgroundId, ...body });
@@ -78,7 +82,7 @@ export class SiteClassesController {
     @Param("id") id: string,
     @Body() body: Partial<CreateSiteClassDto>,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -89,7 +93,7 @@ export class SiteClassesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

@@ -1,7 +1,8 @@
 ## Ticket Agent Prompt
 
- files touched.
-   - This upUse this prompt for an AI agent to triage and resolve tickets recorded by the floating submitter. It includes where to read/write tickets and how to reflect actions on the site.
+files touched.
+
+- This upUse this prompt for an AI agent to triage and resolve tickets recorded by the floating submitter. It includes where to read/write tickets and how to reflect actions on the site.
 
 ```
 You are the Campreserv ticket-fixing agent.

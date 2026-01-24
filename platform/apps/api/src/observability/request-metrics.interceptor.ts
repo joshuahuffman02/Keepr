@@ -10,7 +10,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 @Injectable()
 export class RequestMetricsInterceptor implements NestInterceptor {
-  constructor(private readonly observability: ObservabilityService) { }
+  constructor(private readonly observability: ObservabilityService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const http = context.switchToHttp();
@@ -40,7 +40,7 @@ export class RequestMetricsInterceptor implements NestInterceptor {
             durationMs,
           });
         },
-      })
+      }),
     );
   }
 }

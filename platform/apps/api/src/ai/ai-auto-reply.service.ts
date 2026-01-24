@@ -32,7 +32,7 @@ export class AiAutoReplyService {
     private readonly aiProvider: AiProviderService,
     private readonly aiPrivacy: AiPrivacyService,
     private readonly configService: AiAutopilotConfigService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   // ==================== DRAFT CRUD ====================
@@ -134,9 +134,7 @@ export class AiAutoReplyService {
         data: { autoSendScheduledAt: sendAt },
       });
 
-      this.logger.log(
-        `Scheduled auto-send for draft ${draft.id} at ${sendAt.toISOString()}`
-      );
+      this.logger.log(`Scheduled auto-send for draft ${draft.id} at ${sendAt.toISOString()}`);
     }
 
     return draft;
@@ -157,13 +155,11 @@ export class AiAutoReplyService {
     });
 
     // Build context summary
-    const contextSummary = await this.configService.buildContextSummary(
-      communication.campgroundId
-    );
+    const contextSummary = await this.configService.buildContextSummary(communication.campgroundId);
 
     // Anonymize the message
     const { anonymizedText, tokenMap } = this.aiPrivacy.anonymize(
-      communication.body || communication.subject || ""
+      communication.body || communication.subject || "",
     );
 
     // Build the system prompt
@@ -217,15 +213,10 @@ ${communication.Guest ? `Guest name: ${communication.Guest.primaryFirstName || "
       const parsed = JSON.parse(response.content);
 
       // De-anonymize the reply
-      const deanonymizedReply = this.aiPrivacy.deanonymize(
-        parsed.reply || "",
-        tokenMap
-      );
+      const deanonymizedReply = this.aiPrivacy.deanonymize(parsed.reply || "", tokenMap);
 
       // Find which context IDs were actually used (simplified - just return first few)
-      const usedContextIds = contextItems
-        .slice(0, 3)
-        .map((c) => c.id);
+      const usedContextIds = contextItems.slice(0, 3).map((c) => c.id);
 
       return {
         content: deanonymizedReply,
@@ -424,7 +415,13 @@ ${communication.Guest ? `Guest name: ${communication.Guest.primaryFirstName || "
   /**
    * Check if it's currently quiet hours for a campground
    */
-  private isQuietHours(campground: { quietHoursStart?: string | null; quietHoursEnd?: string | null; timezone?: string | null } | null): boolean {
+  private isQuietHours(
+    campground: {
+      quietHoursStart?: string | null;
+      quietHoursEnd?: string | null;
+      timezone?: string | null;
+    } | null,
+  ): boolean {
     if (!campground?.quietHoursStart || !campground?.quietHoursEnd) {
       return false;
     }

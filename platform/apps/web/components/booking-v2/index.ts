@@ -10,25 +10,12 @@ export {
   type BookingStepV2,
 } from "./BookingProgressBar";
 
-export {
-  PriceSummary,
-  PriceSummaryPlaceholder,
-} from "./PriceSummary";
+export { PriceSummary, PriceSummaryPlaceholder } from "./PriceSummary";
 
-export {
-  MobileBookingFooter,
-  MobileBookingFooterPlaceholder,
-} from "./MobileBookingFooter";
+export { MobileBookingFooter, MobileBookingFooterPlaceholder } from "./MobileBookingFooter";
 
-export {
-  SiteClassCard,
-  SiteClassGrid,
-  SiteClassEmpty,
-} from "./SiteClassCard";
+export { SiteClassCard, SiteClassGrid, SiteClassEmpty } from "./SiteClassCard";
 
-export {
-  SitePickerUpgrade,
-  SitePickerBanner,
-} from "./SitePickerUpgrade";
+export { SitePickerUpgrade, SitePickerBanner } from "./SitePickerUpgrade";
 
 export { CompactGuestForm } from "./CompactGuestForm";

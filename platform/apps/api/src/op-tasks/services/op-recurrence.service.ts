@@ -1,10 +1,6 @@
-import {
-  Injectable,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../prisma/prisma.service';
+import { Injectable, NotFoundException, Logger } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../../prisma/prisma.service";
 import {
   OpRecurrenceRule,
   OpRecurrencePattern,
@@ -13,12 +9,9 @@ import {
   OpTriggerEvent,
   OpTaskTemplate,
   Prisma,
-} from '@prisma/client';
+} from "@prisma/client";
 import { randomUUID } from "crypto";
-import {
-  CreateOpRecurrenceRuleDto,
-  UpdateOpRecurrenceRuleDto,
-} from '../dto/op-task.dto';
+import { CreateOpRecurrenceRuleDto, UpdateOpRecurrenceRuleDto } from "../dto/op-task.dto";
 
 type CampgroundSeason = {
   timezone: string | null;
@@ -53,7 +46,8 @@ const normalizeChecklistTemplate = (value: unknown): ChecklistTemplateItem[] => 
       text: item.text,
       required: item.required === true ? true : undefined,
       category: typeof item.category === "string" ? item.category : undefined,
-      estimatedMinutes: typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
+      estimatedMinutes:
+        typeof item.estimatedMinutes === "number" ? item.estimatedMinutes : undefined,
     });
   }
   return items;
@@ -69,7 +63,7 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
 };
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -85,16 +79,13 @@ export class OpRecurrenceService {
   /**
    * Create a new recurrence rule
    */
-  async create(
-    campgroundId: string,
-    dto: CreateOpRecurrenceRuleDto,
-  ): Promise<OpRecurrenceRule> {
+  async create(campgroundId: string, dto: CreateOpRecurrenceRuleDto): Promise<OpRecurrenceRule> {
     // Verify template exists
     const template = await this.prisma.opTaskTemplate.findFirst({
       where: { id: dto.templateId, campgroundId },
     });
     if (!template) {
-      throw new NotFoundException('Template not found');
+      throw new NotFoundException("Template not found");
     }
 
     // Calculate next generation time
@@ -147,7 +138,7 @@ export class OpRecurrenceService {
         ...(options?.pattern && { pattern: options.pattern }),
         ...(options?.isActive !== undefined && { isActive: options.isActive }),
       },
-      orderBy: [{ pattern: 'asc' }, { name: 'asc' }],
+      orderBy: [{ pattern: "asc" }, { name: "asc" }],
       include: {
         OpTaskTemplate: true,
         OpTeam: true,
@@ -172,7 +163,7 @@ export class OpRecurrenceService {
     });
 
     if (!rule) {
-      throw new NotFoundException('Recurrence rule not found');
+      throw new NotFoundException("Recurrence rule not found");
     }
 
     return rule;
@@ -184,7 +175,7 @@ export class OpRecurrenceService {
   async update(id: string, dto: UpdateOpRecurrenceRuleDto): Promise<OpRecurrenceRule> {
     const existing = await this.prisma.opRecurrenceRule.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Recurrence rule not found');
+      throw new NotFoundException("Recurrence rule not found");
     }
 
     if (dto.templateId) {
@@ -192,7 +183,7 @@ export class OpRecurrenceService {
         where: { id: dto.templateId, campgroundId: existing.campgroundId },
       });
       if (!template) {
-        throw new NotFoundException('Template not found');
+        throw new NotFoundException("Template not found");
       }
     }
 
@@ -241,7 +232,7 @@ export class OpRecurrenceService {
   async delete(id: string): Promise<void> {
     const existing = await this.prisma.opRecurrenceRule.findUnique({ where: { id } });
     if (!existing) {
-      throw new NotFoundException('Recurrence rule not found');
+      throw new NotFoundException("Recurrence rule not found");
     }
 
     await this.prisma.opRecurrenceRule.delete({ where: { id } });
@@ -252,7 +243,7 @@ export class OpRecurrenceService {
    */
   @Cron(CronExpression.EVERY_10_MINUTES)
   async processRecurrenceRules(): Promise<void> {
-    this.logger.log('Processing recurrence rules...');
+    this.logger.log("Processing recurrence rules...");
 
     const now = new Date();
 
@@ -274,7 +265,9 @@ export class OpRecurrenceService {
       try {
         await this.generateTasksForRule(rule);
       } catch (error: unknown) {
-        this.logger.error(`Failed to generate tasks for rule ${rule.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        this.logger.error(
+          `Failed to generate tasks for rule ${rule.id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       }
     }
   }
@@ -282,15 +275,15 @@ export class OpRecurrenceService {
   /**
    * Generate tasks for a specific rule
    */
-  async generateTasksForRule(
-    rule: RecurrenceRuleWithTemplateAndCampground,
-  ): Promise<OpTask[]> {
+  async generateTasksForRule(rule: RecurrenceRuleWithTemplateAndCampground): Promise<OpTask[]> {
     // Check seasonal rules
     if (rule.pattern === OpRecurrencePattern.seasonal) {
-      const campground = rule.Campground ?? await this.prisma.campground.findUnique({
-        where: { id: rule.campgroundId },
-        select: { seasonStart: true, seasonEnd: true },
-      });
+      const campground =
+        rule.Campground ??
+        (await this.prisma.campground.findUnique({
+          where: { id: rule.campgroundId },
+          select: { seasonStart: true, seasonEnd: true },
+        }));
 
       if (campground?.seasonStart && campground?.seasonEnd) {
         const now = new Date();
@@ -371,9 +364,7 @@ export class OpRecurrenceService {
         id: randomUUID(),
         campgroundId: rule.campgroundId,
         category: rule.OpTaskTemplate.category,
-        title: siteId
-          ? `${rule.OpTaskTemplate.name} - ${locationDesc}`
-          : rule.OpTaskTemplate.name,
+        title: siteId ? `${rule.OpTaskTemplate.name} - ${locationDesc}` : rule.OpTaskTemplate.name,
         description: rule.OpTaskTemplate.description,
         priority: rule.OpTaskTemplate.priority,
         siteId: siteId,
@@ -381,23 +372,24 @@ export class OpRecurrenceService {
         assignedToUserId: rule.assignToUserId ?? rule.OpTaskTemplate.defaultAssigneeId,
         assignedToTeamId: rule.assignToTeamId ?? rule.OpTaskTemplate.defaultTeamId,
         slaDueAt,
-        slaStatus: 'on_track',
-        checklist: toNullableJsonInput((() => {
-          const templateItems = normalizeChecklistTemplate(rule.OpTaskTemplate.checklistTemplate);
-          if (templateItems.length === 0) return null;
-          return templateItems.map((item) => ({
-            ...item,
-            completed: false,
-          }));
-        })()),
+        slaStatus: "on_track",
+        checklist: toNullableJsonInput(
+          (() => {
+            const templateItems = normalizeChecklistTemplate(rule.OpTaskTemplate.checklistTemplate);
+            if (templateItems.length === 0) return null;
+            return templateItems.map((item) => ({
+              ...item,
+              completed: false,
+            }));
+          })(),
+        ),
         checklistProgress: 0,
         templateId: rule.templateId,
         recurrenceRuleId: rule.id,
         sourceEvent: OpTriggerEvent.manual,
-        createdById: 'system',
-        state: rule.assignToUserId || rule.assignToTeamId
-          ? OpTaskState.assigned
-          : OpTaskState.pending,
+        createdById: "system",
+        state:
+          rule.assignToUserId || rule.assignToTeamId ? OpTaskState.assigned : OpTaskState.pending,
         updatedAt: new Date(),
       },
     });
@@ -546,27 +538,27 @@ export class OpRecurrenceService {
   getSuggestedRules(): Partial<CreateOpRecurrenceRuleDto>[] {
     return [
       {
-        name: 'Daily Bathroom Cleaning',
+        name: "Daily Bathroom Cleaning",
         pattern: OpRecurrencePattern.daily,
         generateAtHour: 7,
-        locationFilter: 'Bathhouse A',
+        locationFilter: "Bathhouse A",
       },
       {
-        name: 'Weekly Deep Clean (Mon/Fri)',
+        name: "Weekly Deep Clean (Mon/Fri)",
         pattern: OpRecurrencePattern.weekly,
         daysOfWeek: [1, 5], // Monday and Friday
         generateAtHour: 6,
       },
       {
-        name: 'Daily Garbage Collection',
+        name: "Daily Garbage Collection",
         pattern: OpRecurrencePattern.daily,
         generateAtHour: 8,
       },
       {
-        name: 'Pool Daily Check',
+        name: "Pool Daily Check",
         pattern: OpRecurrencePattern.seasonal,
         generateAtHour: 7,
-        locationFilter: 'Pool Area',
+        locationFilter: "Pool Area",
       },
     ];
   }
@@ -581,7 +573,7 @@ export class OpRecurrenceService {
     });
 
     if (!rule) {
-      throw new NotFoundException('Recurrence rule not found');
+      throw new NotFoundException("Recurrence rule not found");
     }
 
     return this.generateTasksForRule(rule);

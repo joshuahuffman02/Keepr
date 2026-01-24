@@ -40,7 +40,7 @@ export function useScrollAnimation(options: UseScrollAnimationOptions = {}) {
           setIsInView(false);
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin },
     );
 
     observer.observe(element);
@@ -60,8 +60,8 @@ export const scrollAnimationVariants = {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-    }
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
   },
 
   // Fade in from sides
@@ -70,8 +70,8 @@ export const scrollAnimationVariants = {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-    }
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
   },
 
   fadeRight: {
@@ -79,8 +79,8 @@ export const scrollAnimationVariants = {
     visible: {
       opacity: 1,
       x: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
-    }
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    },
   },
 
   // Scale in - good for cards
@@ -89,8 +89,8 @@ export const scrollAnimationVariants = {
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] }
-    }
+      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+    },
   },
 
   // Stagger container for child animations
@@ -100,9 +100,9 @@ export const scrollAnimationVariants = {
       opacity: 1,
       transition: {
         staggerChildren: 0.08,
-        delayChildren: 0.1
-      }
-    }
+        delayChildren: 0.1,
+      },
+    },
   },
 
   // Fast stagger for grids
@@ -112,9 +112,9 @@ export const scrollAnimationVariants = {
       opacity: 1,
       transition: {
         staggerChildren: 0.05,
-        delayChildren: 0.05
-      }
-    }
+        delayChildren: 0.05,
+      },
+    },
   },
 
   // Pop in - playful entrance
@@ -126,9 +126,9 @@ export const scrollAnimationVariants = {
       transition: {
         type: "spring",
         stiffness: 400,
-        damping: 25
-      }
-    }
+        damping: 25,
+      },
+    },
   },
 
   // Subtle slide - minimal movement
@@ -137,9 +137,9 @@ export const scrollAnimationVariants = {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.4, ease: "easeOut" }
-    }
-  }
+      transition: { duration: 0.4, ease: "easeOut" },
+    },
+  },
 };
 
 /**
@@ -159,8 +159,8 @@ export function createStaggerVariant(staggerDelay = 0.08, initialDelay = 0.1) {
       opacity: 1,
       transition: {
         staggerChildren: staggerDelay,
-        delayChildren: initialDelay
-      }
-    }
+        delayChildren: initialDelay,
+      },
+    },
   };
 }

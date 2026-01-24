@@ -127,6 +127,7 @@ Edit: `/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/apps/web/l
 - Consider both direct and indirect beneficiaries
 
 **Examples:**
+
 - "Front desk staff making reservations and guests using the booking engine."
 - "Maintenance staff and managers tracking facility issues."
 - "Owners and revenue managers optimizing pricing strategies."
@@ -136,6 +137,7 @@ Edit: `/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/apps/web/l
 ### New (type: 'new')
 
 Use for:
+
 - Brand new features never before available
 - Major capabilities that unlock new workflows
 - New integrations or modules
@@ -145,6 +147,7 @@ Use for:
 ### Update (type: 'update')
 
 Use for:
+
 - Changes to existing features
 - Functionality replacements
 - API or data model changes
@@ -154,6 +157,7 @@ Use for:
 ### Enhancement (type: 'enhancement')
 
 Use for:
+
 - Improvements to existing features
 - UX polish and usability gains
 - Performance optimizations
@@ -163,6 +167,7 @@ Use for:
 ### Fix (type: 'fix')
 
 Use for:
+
 - Bug fixes
 - Security patches
 - Data correction issues
@@ -208,7 +213,7 @@ Example: `dynamic-pricing-1.3.0.png`
 ### In Update Object
 
 ```typescript
-screenshot: '/images/updates/dynamic-pricing-1.3.0.png'
+screenshot: "/images/updates/dynamic-pricing-1.3.0.png";
 ```
 
 ## Adding Demo Videos
@@ -229,7 +234,7 @@ screenshot: '/images/updates/dynamic-pricing-1.3.0.png'
 ### In Update Object
 
 ```typescript
-videoUrl: 'https://youtu.be/abc123xyz'
+videoUrl: "https://youtu.be/abc123xyz";
 ```
 
 ## Timeline and Versioning
@@ -237,6 +242,7 @@ videoUrl: 'https://youtu.be/abc123xyz'
 ### Version Numbers
 
 Use semantic versioning:
+
 - Major: Breaking changes (2.0.0)
 - Minor: New features (1.3.0)
 - Patch: Bug fixes (1.2.1)
@@ -244,6 +250,7 @@ Use semantic versioning:
 ### Update Frequency
 
 Aim for:
+
 - Weekly for small improvements and fixes
 - Bi-weekly for feature releases
 - Monthly for major platform updates
@@ -259,6 +266,7 @@ Aim for:
 ### Tags Strategy
 
 Use 3-6 tags per update:
+
 - Feature area (booking, pricing, maintenance)
 - User role (manager, staff, guest)
 - Technology (api, mobile, ai)
@@ -281,6 +289,7 @@ Always link updates to roadmap phases using `phaseId`. This creates a narrative 
 If a feature ships in phases, add follow-up updates rather than editing the original.
 
 **Example:**
+
 - Dec 10: "Charity Round-Up - Planning"
 - Dec 17: "Charity Round-Up - Complete"
 

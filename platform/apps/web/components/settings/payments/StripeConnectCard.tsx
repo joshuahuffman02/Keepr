@@ -48,9 +48,11 @@ export function StripeConnectCard({
   }, [capabilitiesFetchedAt]);
 
   const achActive = capabilities?.us_bank_account_ach_payments === "active";
-  const walletsActive = capabilities?.card_payments === "active" && capabilities?.transfers === "active";
+  const walletsActive =
+    capabilities?.card_payments === "active" && capabilities?.transfers === "active";
   const appleActive = capabilities?.apple_pay === "active";
-  const googleActive = capabilities?.google_pay === "active" || capabilities?.link_payments === "active";
+  const googleActive =
+    capabilities?.google_pay === "active" || capabilities?.link_payments === "active";
 
   const lastRefreshedLabel = useMemo(() => {
     if (!capabilitiesFetchedAt) return "Never";
@@ -62,10 +64,12 @@ export function StripeConnectCard({
   }, [capabilitiesFetchedAt]);
 
   return (
-    <Card className={cn(
-      "transition-all duration-300",
-      isConnected && "border-emerald-200 bg-emerald-50/30"
-    )}>
+    <Card
+      className={cn(
+        "transition-all duration-300",
+        isConnected && "border-emerald-200 bg-emerald-50/30",
+      )}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
@@ -102,7 +106,10 @@ export function StripeConnectCard({
             <div className="flex-1 min-w-0">
               <p className="font-medium text-emerald-900">Ready to accept payments</p>
               <p className="text-sm text-emerald-700 truncate">
-                Account: <code className="bg-emerald-100 px-1.5 py-0.5 rounded text-xs">{stripeAccountId}</code>
+                Account:{" "}
+                <code className="bg-emerald-100 px-1.5 py-0.5 rounded text-xs">
+                  {stripeAccountId}
+                </code>
               </p>
             </div>
           </div>
@@ -113,16 +120,8 @@ export function StripeConnectCard({
           <div className="space-y-3">
             <h4 className="text-sm font-medium text-foreground">Payment methods</h4>
             <div className="grid grid-cols-2 gap-2">
-              <CapabilityBadge
-                label="Cards"
-                active={walletsActive}
-                description="Credit & debit"
-              />
-              <CapabilityBadge
-                label="ACH"
-                active={achActive}
-                description="Bank transfers"
-              />
+              <CapabilityBadge label="Cards" active={walletsActive} description="Credit & debit" />
+              <CapabilityBadge label="ACH" active={achActive} description="Bank transfers" />
               <CapabilityBadge
                 label="Apple Pay"
                 active={appleActive}
@@ -137,9 +136,7 @@ export function StripeConnectCard({
 
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>Last checked: {lastRefreshedLabel}</span>
-              {capabilitiesStale && (
-                <span className="text-amber-600">(may be outdated)</span>
-              )}
+              {capabilitiesStale && <span className="text-amber-600">(may be outdated)</span>}
             </div>
           </div>
         )}
@@ -169,7 +166,7 @@ export function StripeConnectCard({
             variant={isConnected ? "outline" : "default"}
             className={cn(
               "transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none",
-              !isConnected && "bg-emerald-600 hover:bg-emerald-700"
+              !isConnected && "bg-emerald-600 hover:bg-emerald-700",
             )}
           >
             {isConnecting ? (
@@ -233,23 +230,20 @@ function CapabilityBadge({ label, active, description }: CapabilityBadgeProps) {
     <div
       className={cn(
         "flex items-center gap-2 p-2.5 rounded-lg border transition-colors",
-        active
-          ? "bg-emerald-50 border-emerald-200"
-          : "bg-muted border-border"
+        active ? "bg-emerald-50 border-emerald-200" : "bg-muted border-border",
       )}
     >
       <div
-        className={cn(
-          "w-2 h-2 rounded-full flex-shrink-0",
-          active ? "bg-emerald-500" : "bg-muted"
-        )}
+        className={cn("w-2 h-2 rounded-full flex-shrink-0", active ? "bg-emerald-500" : "bg-muted")}
         aria-hidden="true"
       />
       <div className="min-w-0">
-        <p className={cn(
-          "text-sm font-medium",
-          active ? "text-emerald-900" : "text-muted-foreground"
-        )}>
+        <p
+          className={cn(
+            "text-sm font-medium",
+            active ? "text-emerald-900" : "text-muted-foreground",
+          )}
+        >
           {label}
         </p>
         <p className="text-xs text-muted-foreground truncate">{description}</p>

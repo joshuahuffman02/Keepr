@@ -144,8 +144,7 @@ const parseReviews = (value: unknown): Review[] => {
   }, []);
 };
 
-const parseAmenities = (value: unknown): string[] =>
-  isStringArray(value) ? value : [];
+const parseAmenities = (value: unknown): string[] => (isStringArray(value) ? value : []);
 
 const parseEvents = (value: unknown): CampgroundEvent[] => {
   if (!Array.isArray(value)) return [];
@@ -200,28 +199,24 @@ export function CampgroundV2Client({
 
   // Form state
   const [arrivalDate, setArrivalDate] = useState(
-    searchParams?.get("arrival") || defaultDates.arrival
+    searchParams?.get("arrival") || defaultDates.arrival,
   );
   const [departureDate, setDepartureDate] = useState(
-    searchParams?.get("departure") || defaultDates.departure
+    searchParams?.get("departure") || defaultDates.departure,
   );
   const paramGuests = searchParams?.get("guests");
   const paramAdults = searchParams?.get("adults");
   const paramChildren = searchParams?.get("children");
   const totalGuests =
     paramGuests ||
-    (paramAdults
-      ? (Number(paramAdults) + Number(paramChildren || 0)).toString()
-      : "2");
+    (paramAdults ? (Number(paramAdults) + Number(paramChildren || 0)).toString() : "2");
   const [guests, setGuests] = useState(totalGuests);
 
   // Fetch value stack (guarantees, bonuses, charity)
   const { data: valueStack } = useQuery({
     queryKey: ["value-stack", campground?.id],
     queryFn: async () => {
-      const res = await fetch(
-        `/api/public/campgrounds/${campground!.id}/value-stack`
-      );
+      const res = await fetch(`/api/public/campgrounds/${campground!.id}/value-stack`);
       return res.ok ? res.json() : null;
     },
     enabled: !!campground?.id,
@@ -330,16 +325,16 @@ export function CampgroundV2Client({
       </section>
 
       {/* Main content */}
-      <main
-        id="main-content"
-        className="max-w-7xl mx-auto px-4 md:px-6 py-8 overflow-hidden"
-      >
+      <main id="main-content" className="max-w-7xl mx-auto px-4 md:px-6 py-8 overflow-hidden">
         {/* Breadcrumbs */}
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
             { label: "Campgrounds", href: "/explore" },
-            { label: campground?.state || "State", href: `/camping/${campground?.state?.toLowerCase().replace(/\s+/g, '-')}` },
+            {
+              label: campground?.state || "State",
+              href: `/camping/${campground?.state?.toLowerCase().replace(/\s+/g, "-")}`,
+            },
             { label: campground?.name || "Campground" },
           ]}
           className="mb-6 text-sm text-slate-500"
@@ -363,18 +358,15 @@ export function CampgroundV2Client({
                         {campground?.city}, {campground?.state}
                       </span>
                     </div>
-                    {campground?.reviewScore &&
-                      Number(campground.reviewCount) > 0 && (
-                        <div className="flex items-center gap-1.5">
-                          <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                          <span className="font-medium">
-                            {Number(campground.reviewScore).toFixed(1)}
-                          </span>
-                          <span className="text-slate-500">
-                            ({campground.reviewCount} reviews)
-                          </span>
-                        </div>
-                      )}
+                    {campground?.reviewScore && Number(campground.reviewCount) > 0 && (
+                      <div className="flex items-center gap-1.5">
+                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                        <span className="font-medium">
+                          {Number(campground.reviewScore).toFixed(1)}
+                        </span>
+                        <span className="text-slate-500">({campground.reviewCount} reviews)</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -471,12 +463,15 @@ export function CampgroundV2Client({
             {campground?.description && (
               <FadeInSection delay={0.1}>
                 <section className="space-y-4">
-                  <h2 className="text-xl font-semibold text-slate-900">
-                    About {campground.name}
-                  </h2>
+                  <h2 className="text-xl font-semibold text-slate-900">About {campground.name}</h2>
                   <div
                     className="text-slate-600 prose prose-sm prose-slate max-w-none [&>p]:mb-4"
-                    dangerouslySetInnerHTML={{ __html: DOMPurify?.sanitize(campground.description || "") || campground.description || "" }}
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        DOMPurify?.sanitize(campground.description || "") ||
+                        campground.description ||
+                        "",
+                    }}
                   />
                 </section>
               </FadeInSection>
@@ -516,10 +511,7 @@ export function CampgroundV2Client({
               <>
                 <hr className="border-slate-200" />
                 <FadeInSection delay={0.1}>
-                  <AmenitiesSection
-                    amenities={amenities}
-                    siteClasses={siteClasses}
-                  />
+                  <AmenitiesSection amenities={amenities} siteClasses={siteClasses} />
                 </FadeInSection>
               </>
             )}
@@ -532,9 +524,7 @@ export function CampgroundV2Client({
                   <ReviewsSection
                     reviews={reviews}
                     averageRating={
-                      campground?.reviewScore
-                        ? Number(campground.reviewScore)
-                        : undefined
+                      campground?.reviewScore ? Number(campground.reviewScore) : undefined
                     }
                     totalCount={campground?.reviewCount ?? undefined}
                   />
@@ -548,15 +538,10 @@ export function CampgroundV2Client({
                 <hr className="border-slate-200" />
                 <FadeInSection delay={0.1}>
                   <section className="space-y-4">
-                    <h2 className="text-xl font-semibold text-slate-900">
-                      Upcoming Events
-                    </h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Upcoming Events</h2>
                     <div className="grid gap-4 md:grid-cols-2">
                       {events.slice(0, 4).map((event) => (
-                        <Card
-                          key={event.id}
-                          className="p-4 hover:shadow-md transition-shadow"
-                        >
+                        <Card key={event.id} className="p-4 hover:shadow-md transition-shadow">
                           <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
                             <Calendar className="h-4 w-4" />
                             <span>
@@ -566,9 +551,7 @@ export function CampgroundV2Client({
                                 ` - ${event.endDate.split("T")[0]}`}
                             </span>
                           </div>
-                          <h3 className="font-semibold text-slate-900">
-                            {event.title}
-                          </h3>
+                          <h3 className="font-semibold text-slate-900">{event.title}</h3>
                           {event.description && (
                             <p className="text-sm text-slate-600 mt-1 line-clamp-2">
                               {event.description}
@@ -578,9 +561,7 @@ export function CampgroundV2Client({
                             className="flex items-center p-0 h-auto mt-2 text-emerald-600 text-sm font-medium hover:underline"
                             onClick={() => {
                               setArrivalDate(event.startDate?.split("T")[0] || arrivalDate);
-                              setDepartureDate(
-                                event.endDate?.split("T")[0] || departureDate
-                              );
+                              setDepartureDate(event.endDate?.split("T")[0] || departureDate);
                             }}
                           >
                             Book for this event
@@ -600,17 +581,13 @@ export function CampgroundV2Client({
                 <hr className="border-slate-200" />
                 <FadeInSection delay={0.1}>
                   <section className="space-y-4">
-                    <h2 className="text-xl font-semibold text-slate-900">
-                      Location & Contact
-                    </h2>
+                    <h2 className="text-xl font-semibold text-slate-900">Location & Contact</h2>
                     <div className="grid gap-4 md:grid-cols-2">
                       <div className="space-y-3">
                         <div className="flex items-center gap-3">
                           <MapPin className="h-5 w-5 text-slate-400" />
                           <div>
-                            <div className="font-medium text-slate-900">
-                              Address
-                            </div>
+                            <div className="font-medium text-slate-900">Address</div>
                             <div className="text-sm text-slate-600">
                               {campground?.city}, {campground?.state}
                             </div>
@@ -620,9 +597,7 @@ export function CampgroundV2Client({
                           <div className="flex items-center gap-3">
                             <Phone className="h-5 w-5 text-slate-400" />
                             <div>
-                              <div className="font-medium text-slate-900">
-                                Phone
-                              </div>
+                              <div className="font-medium text-slate-900">Phone</div>
                               <a
                                 href={`tel:${phone}`}
                                 className="text-sm text-emerald-600 hover:underline"
@@ -638,9 +613,7 @@ export function CampgroundV2Client({
                           <div className="flex items-center gap-3">
                             <Globe className="h-5 w-5 text-slate-400" />
                             <div>
-                              <div className="font-medium text-slate-900">
-                                Website
-                              </div>
+                              <div className="font-medium text-slate-900">Website</div>
                               <a
                                 href={website}
                                 target="_blank"
@@ -663,9 +636,7 @@ export function CampgroundV2Client({
             {!isExternal && <WhyBookDirect campgroundName={campground?.name} />}
 
             {/* Trust badges */}
-            {!isExternal && (
-              <TrustBadges variant="stacked" className="justify-start" />
-            )}
+            {!isExternal && <TrustBadges variant="stacked" className="justify-start" />}
 
             {/* RIDB Attribution */}
             {seededDataSource === "recreation_gov" && (
@@ -691,11 +662,7 @@ export function CampgroundV2Client({
                   campgroundName={campground?.name || "Campground"}
                   campgroundSlug={slug}
                   siteClasses={siteClasses}
-                  reviewScore={
-                    campground?.reviewScore
-                      ? Number(campground.reviewScore)
-                      : undefined
-                  }
+                  reviewScore={campground?.reviewScore ? Number(campground.reviewScore) : undefined}
                   reviewCount={campground?.reviewCount ?? undefined}
                   arrivalDate={arrivalDate}
                   departureDate={departureDate}
@@ -715,10 +682,7 @@ export function CampgroundV2Client({
 
       {/* AI Chat Widget */}
       {campground?.id && !isExternal && (
-        <AiChatWidget
-          campgroundId={campground.id}
-          campgroundName={campground.name}
-        />
+        <AiChatWidget campgroundId={campground.id} campgroundName={campground.name} />
       )}
 
       {/* Mobile Booking Bar */}
@@ -727,15 +691,11 @@ export function CampgroundV2Client({
           priceFrom={
             siteClasses.length > 0
               ? Math.min(
-                  ...siteClasses
-                    .map((sc) => (sc.defaultRate || 0) / 100)
-                    .filter((p) => p > 0)
+                  ...siteClasses.map((sc) => (sc.defaultRate || 0) / 100).filter((p) => p > 0),
                 ) || null
               : null
           }
-          reviewScore={
-            campground?.reviewScore ? Number(campground.reviewScore) : undefined
-          }
+          reviewScore={campground?.reviewScore ? Number(campground.reviewScore) : undefined}
           reviewCount={campground?.reviewCount ?? undefined}
           arrivalDate={arrivalDate}
           departureDate={departureDate}

@@ -20,7 +20,7 @@ export class PosProviderRegistry {
     toast: ToastAdapter,
     lightspeed: LightspeedAdapter,
     shopify: ShopifyPosAdapter,
-    vend: VendAdapter
+    vend: VendAdapter,
   ) {
     this.adapters = new Map();
     if (clover?.provider) this.adapters.set(clover.provider, clover);
@@ -43,8 +43,8 @@ export class PosProviderRegistry {
    * Get adapters that support inventory sync capabilities.
    */
   getInventorySyncAdapters(): PosProviderAdapter[] {
-    return Array.from(this.adapters.values()).filter(
-      (adapter) => adapter.supportsInventorySync?.()
+    return Array.from(this.adapters.values()).filter((adapter) =>
+      adapter.supportsInventorySync?.(),
     );
   }
 }

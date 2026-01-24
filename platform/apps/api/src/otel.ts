@@ -12,7 +12,9 @@ if (enabled) {
   const exporterUrl = process.env.OTEL_EXPORTER_OTLP_ENDPOINT;
   if (!exporterUrl) {
     // eslint-disable-next-line no-console
-    console.warn("OTEL_ENABLED is true but OTEL_EXPORTER_OTLP_ENDPOINT is not set; skipping OTel setup.");
+    console.warn(
+      "OTEL_ENABLED is true but OTEL_EXPORTER_OTLP_ENDPOINT is not set; skipping OTel setup.",
+    );
   } else {
     const serviceName = process.env.OTEL_SERVICE_NAME || "keepr-api";
     const sdk = new NodeSDK({
@@ -24,16 +26,20 @@ if (enabled) {
     });
 
     Promise.resolve(sdk.start()).catch((error: unknown) => {
-        // eslint-disable-next-line no-console
-        console.warn(`OTel initialization failed: ${error instanceof Error ? error.message : String(error)}`);
-      });
+      // eslint-disable-next-line no-console
+      console.warn(
+        `OTel initialization failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    });
 
     const shutdown = async () => {
       try {
         await sdk.shutdown();
       } catch (error) {
         // eslint-disable-next-line no-console
-        console.warn(`OTel shutdown failed: ${error instanceof Error ? error.message : String(error)}`);
+        console.warn(
+          `OTel shutdown failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     };
 

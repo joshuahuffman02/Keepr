@@ -174,7 +174,8 @@ export class PortfoliosService {
 
   report(portfolioId: string) {
     const portfolio = this.portfolios.find((p) => p.id === portfolioId) ?? this.portfolios[0];
-    if (!portfolio) return { portfolioId, metrics: [], rollup: null, asOf: new Date().toISOString() };
+    if (!portfolio)
+      return { portfolioId, metrics: [], rollup: null, asOf: new Date().toISOString() };
 
     const metrics = portfolio.parks.map((park) => ({
       parkId: park.id,
@@ -198,7 +199,7 @@ export class PortfoliosService {
         acc.revpar += m.revpar;
         return acc;
       },
-      { revenueHome: 0, occupancy: 0, adr: 0, revpar: 0 }
+      { revenueHome: 0, occupancy: 0, adr: 0, revpar: 0 },
     );
 
     const count = metrics.length || 1;
@@ -238,4 +239,3 @@ export class PortfoliosService {
     };
   }
 }
-

@@ -9,11 +9,7 @@ interface AnimatedCounterProps {
   duration?: number;
 }
 
-export function AnimatedCounter({
-  value,
-  className = "",
-  duration = 1000
-}: AnimatedCounterProps) {
+export function AnimatedCounter({ value, className = "", duration = 1000 }: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(value);
   const prefersReducedMotion = useReducedMotion();
 

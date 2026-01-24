@@ -11,6 +11,6 @@ import { PermissionsModule } from "../permissions/permissions.module";
   imports: [PermissionsModule],
   controllers: [BillingController, BillingDashboardController],
   providers: [BillingService, BillingDashboardService, BillingJobs, PrismaService],
-  exports: [BillingService, BillingDashboardService]
+  exports: [BillingService, BillingDashboardService],
 })
 export class BillingModule {}

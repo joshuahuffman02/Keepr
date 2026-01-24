@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { PricingV2Service } from "./pricing-v2.service";
 import { CreatePricingRuleV2Dto } from "./dto/create-pricing-rule-v2.dto";
@@ -26,7 +26,8 @@ export class PricingV2Controller {
   constructor(private readonly pricing: PricingV2Service) {}
 
   private requireCampgroundId(req: AuthRequest, fallback?: string): string {
-    const campgroundId = fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
+    const campgroundId =
+      fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
@@ -34,15 +35,18 @@ export class PricingV2Controller {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "platform_superadmin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" ||
+      user?.platformRole === "platform_superadmin" ||
+      user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
 
-    const userCampgroundIds = user?.memberships
-      ?.flatMap((membership) => (membership.campgroundId ? [membership.campgroundId] : [])) ?? [];
+    const userCampgroundIds =
+      user?.memberships?.flatMap((membership) =>
+        membership.campgroundId ? [membership.campgroundId] : [],
+      ) ?? [];
     if (!userCampgroundIds.includes(campgroundId)) {
       throw new BadRequestException("You do not have access to this campground");
     }
@@ -60,7 +64,7 @@ export class PricingV2Controller {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreatePricingRuleV2Dto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.pricing.create(campgroundId, dto);
@@ -72,7 +76,7 @@ export class PricingV2Controller {
     @Param("id") id: string,
     @Body() dto: UpdatePricingRuleV2Dto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -84,7 +88,7 @@ export class PricingV2Controller {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

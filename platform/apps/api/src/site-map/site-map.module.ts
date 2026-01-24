@@ -6,6 +6,6 @@ import { UploadsModule } from "../uploads/uploads.module";
   imports: [UploadsModule],
   controllers: [SiteMapController],
   providers: [SiteMapService],
-  exports: [SiteMapService]
+  exports: [SiteMapService],
 })
 export class SiteMapModule {}

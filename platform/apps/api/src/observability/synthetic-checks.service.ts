@@ -65,8 +65,11 @@ interface CheckConfig {
 export class SyntheticChecksService implements OnModuleInit {
   private readonly logger = new Logger(SyntheticChecksService.name);
   private readonly enabled =
-    (process.env.SYNTHETIC_CHECKS_ENABLED ?? process.env.SYNTHETICS_ENABLED ?? "true")
-      .toLowerCase() === "true";
+    (
+      process.env.SYNTHETIC_CHECKS_ENABLED ??
+      process.env.SYNTHETICS_ENABLED ??
+      "true"
+    ).toLowerCase() === "true";
   private readonly budgetMs = Number(process.env.SYNTHETIC_BUDGET_MS ?? 3000);
   private readonly historyMaxSize = Number(process.env.SYNTHETIC_HISTORY_SIZE ?? 100);
   private readonly alertAfterFailures = Number(process.env.SYNTHETIC_ALERT_FAILURES ?? 3);
@@ -91,7 +94,7 @@ export class SyntheticChecksService implements OnModuleInit {
 
   constructor(
     private readonly observability: ObservabilityService,
-    private readonly alertSinks: AlertSinksService
+    private readonly alertSinks: AlertSinksService,
   ) {}
 
   onModuleInit() {
@@ -192,7 +195,7 @@ export class SyntheticChecksService implements OnModuleInit {
       await this.withTimeout(
         this.prismaService.$queryRaw`SELECT 1`,
         config.timeoutMs,
-        "Database check timeout"
+        "Database check timeout",
       );
 
       const latencyMs = Date.now() - start;
@@ -235,11 +238,7 @@ export class SyntheticChecksService implements OnModuleInit {
 
     const start = Date.now();
     try {
-      await this.withTimeout(
-        this.redisService.ping(),
-        config.timeoutMs,
-        "Redis check timeout"
-      );
+      await this.withTimeout(this.redisService.ping(), config.timeoutMs, "Redis check timeout");
 
       const latencyMs = Date.now() - start;
       const ok = latencyMs <= this.budgetMs;
@@ -290,7 +289,7 @@ export class SyntheticChecksService implements OnModuleInit {
           },
         }),
         config.timeoutMs,
-        "Stripe check timeout"
+        "Stripe check timeout",
       );
 
       const latencyMs = Date.now() - start;
@@ -344,7 +343,7 @@ export class SyntheticChecksService implements OnModuleInit {
             },
           }),
           config.timeoutMs,
-          "Email check timeout"
+          "Email check timeout",
         );
       } else if (hasPostmark) {
         await this.withTimeout(
@@ -356,7 +355,7 @@ export class SyntheticChecksService implements OnModuleInit {
             },
           }),
           config.timeoutMs,
-          "Email check timeout"
+          "Email check timeout",
         );
       } else {
         // For SMTP, we just verify configuration exists
@@ -401,7 +400,7 @@ export class SyntheticChecksService implements OnModuleInit {
         result.name,
         true, // Skipped checks are "ok"
         result.latencyMs,
-        result.message
+        result.message,
       );
       return;
     }
@@ -434,12 +433,12 @@ export class SyntheticChecksService implements OnModuleInit {
           consecutiveFailures: newFailures,
           latencyMs: result.latencyMs,
           lastError: result.message,
-        }
+        },
       );
 
       this.alertedChecks.add(result.name);
       this.logger.error(
-        `Synthetic check ${result.name} failed ${newFailures} consecutive times - alert sent`
+        `Synthetic check ${result.name} failed ${newFailures} consecutive times - alert sent`,
       );
     }
 
@@ -455,7 +454,7 @@ export class SyntheticChecksService implements OnModuleInit {
           check: result.name,
           latencyMs: result.latencyMs,
           previousFailures: currentFailures,
-        }
+        },
       );
 
       this.logger.log(`Synthetic check ${result.name} recovered after ${currentFailures} failures`);

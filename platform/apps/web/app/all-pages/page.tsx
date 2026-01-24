@@ -22,23 +22,16 @@ export default function AllPagesPage() {
 
   // Get selected campground for resolving dynamic pages
   const selectedCampground =
-    typeof window !== "undefined"
-      ? localStorage.getItem("campreserv:selectedCampground")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
 
   // Resolve all pages for this campground
-  const allPages = useMemo(
-    () => resolvePages(selectedCampground || null),
-    [selectedCampground]
-  );
+  const allPages = useMemo(() => resolvePages(selectedCampground || null), [selectedCampground]);
 
   // Filter by permissions (basic check)
   const platformRole = whoami?.user?.platformRole ?? null;
   const allowedPermissions = useMemo(() => {
     const entries = Object.entries(whoami?.allowed ?? {});
-    return new Set(
-      entries.filter(([, value]) => Boolean(value)).map(([key]) => key)
-    );
+    return new Set(entries.filter(([, value]) => Boolean(value)).map(([key]) => key));
   }, [whoami?.allowed]);
   const accessiblePages = useMemo(() => {
     return allPages.filter((page) => {
@@ -64,10 +57,7 @@ export default function AllPagesPage() {
   }, [accessiblePages, searchQuery, selectedCategory]);
 
   // Group by category for display
-  const pagesByCategory = useMemo(
-    () => getPagesByCategory(filteredPages),
-    [filteredPages]
-  );
+  const pagesByCategory = useMemo(() => getPagesByCategory(filteredPages), [filteredPages]);
 
   // Only show categories that have accessible pages
   const availableCategories = useMemo((): Array<PageCategory | "all"> => {
@@ -75,26 +65,29 @@ export default function AllPagesPage() {
     for (const page of accessiblePages) {
       categoriesWithPages.add(page.category);
     }
-    return ["all", ...Array.from(categoriesWithPages).sort((a, b) => {
-      const order: PageCategory[] = [
-        "operations",
-        "guests",
-        "finance",
-        "marketing",
-        "reports",
-        "store",
-        "staff",
-        "settings",
-        "admin"
-      ];
-      return order.indexOf(a) - order.indexOf(b);
-    })];
+    return [
+      "all",
+      ...Array.from(categoriesWithPages).sort((a, b) => {
+        const order: PageCategory[] = [
+          "operations",
+          "guests",
+          "finance",
+          "marketing",
+          "reports",
+          "store",
+          "staff",
+          "settings",
+          "admin",
+        ];
+        return order.indexOf(a) - order.indexOf(b);
+      }),
+    ];
   }, [accessiblePages]);
 
   const categories = availableCategories;
   const groupedCategories = useMemo(
     () => categories.filter((category): category is PageCategory => category !== "all"),
-    [categories]
+    [categories],
   );
 
   return (
@@ -131,7 +124,7 @@ export default function AllPagesPage() {
                 "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
                 selectedCategory === cat
                   ? "bg-teal-500 text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200",
               )}
             >
               {cat === "all" ? "All" : CATEGORY_INFO[cat]?.label || cat}
@@ -229,7 +222,7 @@ function PageCard({ page, isPinned, onTogglePin }: PageCardProps) {
           "absolute top-3 right-3 w-8 h-8 rounded-lg flex items-center justify-center transition-all",
           isPinned
             ? "bg-status-warning/15 text-status-warning"
-            : "bg-slate-100 text-slate-400 opacity-0 group-hover:opacity-100"
+            : "bg-slate-100 text-slate-400 opacity-0 group-hover:opacity-100",
         )}
         title={isPinned ? "Unpin from menu" : "Pin to menu"}
       >

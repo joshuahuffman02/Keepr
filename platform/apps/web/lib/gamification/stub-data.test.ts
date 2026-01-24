@@ -16,7 +16,14 @@ describe("stub-data gamification", () => {
     // reset toggles between tests
     const all = listCampgrounds();
     all.forEach((cg) => {
-      updateOptIn({ enabled: true, enabledRoles: ["owner", "manager", "front_desk", "maintenance"], manualAwardsAllowed: true }, cg.id);
+      updateOptIn(
+        {
+          enabled: true,
+          enabledRoles: ["owner", "manager", "front_desk", "maintenance"],
+          manualAwardsAllowed: true,
+        },
+        cg.id,
+      );
     });
   });
 
@@ -83,4 +90,3 @@ describe("stub-data gamification", () => {
     expect(afterEnabled.balance.totalXp).toBeGreaterThan(beforeEnabled.balance.totalXp);
   });
 });
-

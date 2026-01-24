@@ -10,7 +10,7 @@ const API_BASE =
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ campgroundId: string }> }
+  { params }: { params: Promise<{ campgroundId: string }> },
 ) {
   const { campgroundId } = await params;
   const url = `${API_BASE}/public/campgrounds/${campgroundId}/value-stack`;
@@ -25,9 +25,6 @@ export async function GET(
     return NextResponse.json(data, { status: res.status });
   } catch (err) {
     console.error("[public-value-stack] Error:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch value stack" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch value stack" }, { status: 500 });
   }
 }

@@ -9,4 +9,3 @@ export class UpdateAiSettingsDto {
   @MaxLength(200)
   openaiApiKey?: string;
 }
-

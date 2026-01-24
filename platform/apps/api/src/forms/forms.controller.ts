@@ -1,9 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, Req, BadRequestException, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  Req,
+  BadRequestException,
+  Query,
+} from "@nestjs/common";
 import { FormsService } from "./forms.service";
 import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
 import { ScopeGuard } from "../permissions/scope.guard";
 import { UserRole } from "@prisma/client";
-import { CreateFormTemplateDto, UpdateFormTemplateDto, CreateFormSubmissionDto, UpdateFormSubmissionDto } from "./dto/form-template.dto";
+import {
+  CreateFormTemplateDto,
+  UpdateFormTemplateDto,
+  CreateFormSubmissionDto,
+  UpdateFormSubmissionDto,
+} from "./dto/form-template.dto";
 import type { Request } from "express";
 
 type CampgroundRequest = Request & { campgroundId?: string | null };
@@ -55,7 +72,7 @@ export class FormsController {
   listForReservation(
     @Param("reservationId") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.forms.listSubmissions({ reservationId, campgroundId: requiredCampgroundId });
@@ -66,7 +83,7 @@ export class FormsController {
   listForGuest(
     @Param("guestId") guestId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.forms.listSubmissions({ guestId, campgroundId: requiredCampgroundId });
@@ -81,7 +98,11 @@ export class FormsController {
 
   @Patch("forms/submissions/:id")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  updateSubmission(@Param("id") id: string, @Body() body: UpdateFormSubmissionDto, @Req() req: Request) {
+  updateSubmission(
+    @Param("id") id: string,
+    @Body() body: UpdateFormSubmissionDto,
+    @Req() req: Request,
+  ) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.updateSubmission(id, body, campgroundId);
   }

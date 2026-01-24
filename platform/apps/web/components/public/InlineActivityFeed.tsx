@@ -46,15 +46,15 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
 
       // Recent activity - "Someone just viewed X campground"
       const recentView = stats.recentActivity.find(
-        (a) => a.type === "page_view" && a.campgroundName
+        (a) => a.type === "page_view" && a.campgroundName,
       );
       if (recentView && recentView.campgroundName) {
         const timeText =
           recentView.minutesAgo === 0
             ? "just now"
             : recentView.minutesAgo === 1
-            ? "1 minute ago"
-            : `${recentView.minutesAgo} minutes ago`;
+              ? "1 minute ago"
+              : `${recentView.minutesAgo} minutes ago`;
         result.push({
           highlight: `Someone viewed ${recentView.campgroundName}`,
           rest: timeText,
@@ -63,9 +63,7 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
       }
 
       // Recent search activity
-      const recentSearch = stats.recentActivity.find(
-        (a) => a.type === "search" && a.state
-      );
+      const recentSearch = stats.recentActivity.find((a) => a.type === "search" && a.state);
       if (recentSearch && recentSearch.state) {
         result.push({
           highlight: `Camper searching for sites`,
@@ -124,7 +122,11 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
     if (result.length === 0) {
       result.push(
         { highlight: "Campgrounds nationwide", rest: "waiting to be discovered", priority: 99 },
-        { highlight: "Plan your next adventure", rest: "with real-time availability", priority: 100 }
+        {
+          highlight: "Plan your next adventure",
+          rest: "with real-time availability",
+          priority: 100,
+        },
       );
     }
 
@@ -185,8 +187,8 @@ export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
               transition={{ duration: 0.3 }}
               className="text-sm text-muted-foreground"
             >
-              <span className="font-semibold text-foreground">{message.highlight}</span>
-              {" "}{message.rest}
+              <span className="font-semibold text-foreground">{message.highlight}</span>{" "}
+              {message.rest}
             </motion.p>
           </AnimatePresence>
         </div>

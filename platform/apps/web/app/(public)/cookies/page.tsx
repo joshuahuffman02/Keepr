@@ -18,8 +18,8 @@ export default function CookiesPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-4">What are cookies?</h2>
             <p className="text-muted-foreground">
-              Cookies are small text files stored on your device that help websites remember
-              your preferences, keep you signed in, and understand how people use the site.
+              Cookies are small text files stored on your device that help websites remember your
+              preferences, keep you signed in, and understand how people use the site.
             </p>
           </section>
 
@@ -36,16 +36,16 @@ export default function CookiesPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-4">Types of cookies we use</h2>
             <p className="text-muted-foreground">
-              We use essential cookies for site functionality, analytics cookies to understand
-              usage patterns, and functional cookies to personalize your experience.
+              We use essential cookies for site functionality, analytics cookies to understand usage
+              patterns, and functional cookies to personalize your experience.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-bold text-foreground mb-4">Your choices</h2>
             <p className="text-muted-foreground">
-              You can control cookies through your browser settings. Disabling certain cookies
-              may affect site functionality, such as saved searches or login sessions.
+              You can control cookies through your browser settings. Disabling certain cookies may
+              affect site functionality, such as saved searches or login sessions.
             </p>
           </section>
 

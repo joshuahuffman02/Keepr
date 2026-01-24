@@ -1,4 +1,5 @@
 # Competitive Roadmap
+
 ## Keepr - Path to Market Leadership
 
 **Positioning**: The Modern Alternative to Legacy Campground Software
@@ -12,6 +13,7 @@
 **Core Message**: "Built for how campgrounds run today, not 2010."
 
 **Key Differentiators**:
+
 - AI-powered (competitors have zero AI)
 - Modern tech stack (React/Node vs PHP)
 - Mobile-first design
@@ -19,12 +21,14 @@
 - No marketplace commission
 
 **Content Pillars**:
+
 1. "Switching from [Competitor]" guides
 2. "Why [Competitor] isn't cutting it anymore"
 3. Feature comparison pages
 4. ROI calculators (show cost savings)
 
 **SEO Targets**:
+
 - "Campspot alternative"
 - "Newbook vs Keepr"
 - "Best campground management software 2025"
@@ -33,12 +37,14 @@
 ### Comparison Landing Pages
 
 Create dedicated pages:
+
 - `/compare/campspot`
 - `/compare/newbook`
 - `/compare/firefly`
 - `/compare/rms`
 
 Each page should:
+
 - Acknowledge what they do well
 - Highlight where we're better
 - Show migration path
@@ -49,6 +55,7 @@ Each page should:
 ## 2. Booking Calendar - Critical Upgrade
 
 ### Current State
+
 - Functional but basic
 - Missing key features competitors have
 - Not competitive with Campspot, Newbook, K2
@@ -85,6 +92,7 @@ Each page should:
 ### Technical Approach
 
 Consider:
+
 - **React Big Calendar** - flexible but needs customization
 - **FullCalendar** - feature-rich, good for resource views
 - **Custom build** - full control, more effort
@@ -98,12 +106,14 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 ### Requirements
 
 **Core Functionality**:
+
 - Visual campground map
 - Click site to book/view availability
 - Real-time status (available, occupied, blocked)
 - Mobile-friendly touch interactions
 
 **Integration Points**:
+
 - Booking flow starts from map click
 - Availability filter applies to map
 - Reservation details on hover/tap
@@ -111,6 +121,7 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 ### Implementation Options
 
 **Option A: Custom SVG Map**
+
 - Owner uploads campground image
 - Admin draws clickable regions
 - Store coordinates in database
@@ -118,6 +129,7 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 - Cons: Manual setup, no mapping features
 
 **Option B: Mapbox/Google Maps Integration**
+
 - Plot sites as markers on real map
 - Satellite imagery background
 - GPS coordinates for navigation
@@ -125,6 +137,7 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 - Cons: Requires accurate GPS data
 
 **Option C: Map Builder Tool**
+
 - Drag-and-drop site placement
 - Grid/template system
 - Auto-generate from site list
@@ -134,6 +147,7 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 **Recommendation**: Start with Option A (SVG), add Option B for premium tier.
 
 ### UI Components Needed
+
 - Map canvas component
 - Site marker component
 - Legend/key
@@ -145,6 +159,7 @@ Recommendation: Start with FullCalendar Pro ($599/year), customize heavily.
 ## 4. Bulletproof Onboarding & Data Import
 
 ### Philosophy
+
 > "If migration is scary, they won't switch. Make it feel like unpacking a bag, not moving houses."
 
 ### Import Categories
@@ -217,6 +232,7 @@ Step 6: Verification
 ### Validation Rules
 
 **Reservations Import Validation**:
+
 ```
 1. Guest exists (or create from data)
 2. Site exists (or fail with clear message)
@@ -227,6 +243,7 @@ Step 6: Verification
 ```
 
 **Accounting Validation**:
+
 ```
 1. Sum of payments = paid amount
 2. Balance = total - paid
@@ -237,16 +254,19 @@ Step 6: Verification
 ### Competitor-Specific Parsers
 
 **Campspot**:
+
 - Export format: CSV
 - Key fields mapping
 - Known quirks/gotchas
 
 **Newbook**:
+
 - Export format: XML/CSV
 - Key fields mapping
 - Date format handling
 
 **RMS**:
+
 - Export format: CSV
 - Key fields mapping
 - Multi-property handling
@@ -254,6 +274,7 @@ Step 6: Verification
 ### Error Recovery
 
 Every import step should be:
+
 - **Reversible**: Can undo entire import
 - **Partial**: Can complete valid records, skip invalid
 - **Documented**: Clear log of what happened
@@ -270,6 +291,7 @@ Campground owners need visibility into what they're being charged and why.
 ### Billing Dashboard Components
 
 **Summary Card**:
+
 ```
 ┌─────────────────────────────────────────┐
 │ Current Period: Dec 1 - Dec 31, 2024    │
@@ -286,12 +308,14 @@ Campground owners need visibility into what they're being charged and why.
 ```
 
 **Detailed Breakdown**:
+
 - Per-booking fee breakdown by reservation
 - SMS usage log with message preview
 - AI token usage breakdown
 - Historical billing (past 12 months)
 
 **Invoice Section**:
+
 - Download PDF invoices
 - View payment history
 - Update payment method
@@ -314,6 +338,7 @@ Campground owners need visibility into what they're being charged and why.
 ### Implementation Requirements
 
 **Database**:
+
 ```prisma
 model BillingPeriod {
   id              String    @id @default(cuid())
@@ -354,6 +379,7 @@ enum LineItemType {
 ```
 
 **API Endpoints**:
+
 ```
 GET  /api/billing/current          - Current period summary
 GET  /api/billing/history          - Past billing periods
@@ -365,6 +391,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 ```
 
 **Stripe Integration**:
+
 - Create metered billing items
 - Track usage events
 - Generate invoices
@@ -378,6 +405,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 ### Requirements
 
 **Email Provider**:
+
 - Transactional emails (confirmations, receipts)
 - Marketing emails (optional)
 - Custom domain support
@@ -385,6 +413,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 - Analytics (opens, clicks)
 
 **SMS Provider**:
+
 - Two-way messaging
 - US/Canada numbers
 - Toll-free or local numbers
@@ -439,6 +468,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 ### Features to Build
 
 **Email**:
+
 - [ ] Provider integration (Resend)
 - [ ] Template system with variables
 - [ ] Custom domain (DKIM/SPF)
@@ -447,6 +477,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 - [ ] Analytics dashboard
 
 **SMS**:
+
 - [ ] Provider integration (Twilio)
 - [ ] Number provisioning per campground
 - [ ] Two-way conversation threading
@@ -459,6 +490,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 ## 7. Modern Dashboard UI/UX
 
 ### Current Assessment
+
 - Functional but not "wow"
 - Feels like a utility, not a premium product
 - Missing modern touches competitors don't have
@@ -466,6 +498,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 ### "Modern" Checklist
 
 **Visual Polish**:
+
 - [ ] Smooth animations/transitions
 - [ ] Skeleton loading states
 - [ ] Micro-interactions (hover, click feedback)
@@ -474,6 +507,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 - [ ] Quality iconography
 
 **UX Improvements**:
+
 - [ ] Command palette (Cmd+K)
 - [ ] Global search
 - [ ] Keyboard shortcuts
@@ -483,6 +517,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 - [ ] Smart notifications
 
 **Data Visualization**:
+
 - [ ] Beautiful charts (not basic)
 - [ ] Real-time updates
 - [ ] Interactive filters
@@ -490,6 +525,7 @@ GET  /api/billing/usage/ai         - AI usage detail
 - [ ] Comparison views
 
 **Mobile Experience**:
+
 - [ ] True mobile optimization
 - [ ] Touch-friendly targets
 - [ ] Swipe gestures
@@ -498,16 +534,17 @@ GET  /api/billing/usage/ai         - AI usage detail
 
 ### Component Upgrades
 
-| Component | Current | Target |
-|-----------|---------|--------|
-| Tables | Basic HTML | Tanstack Table with sorting, filters |
-| Charts | Chart.js | Recharts or Tremor |
-| Forms | Basic inputs | React Hook Form + shadcn |
-| Modals | Basic | Animated sheets/dialogs |
-| Navigation | Sidebar | Collapsible + command palette |
-| Empty States | Text only | Illustrated + CTAs |
+| Component    | Current      | Target                               |
+| ------------ | ------------ | ------------------------------------ |
+| Tables       | Basic HTML   | Tanstack Table with sorting, filters |
+| Charts       | Chart.js     | Recharts or Tremor                   |
+| Forms        | Basic inputs | React Hook Form + shadcn             |
+| Modals       | Basic        | Animated sheets/dialogs              |
+| Navigation   | Sidebar      | Collapsible + command palette        |
+| Empty States | Text only    | Illustrated + CTAs                   |
 
 ### Inspiration Sources
+
 - Linear (issue tracker) - animations, command palette
 - Vercel Dashboard - clean, minimal
 - Stripe Dashboard - data-rich, professional
@@ -517,31 +554,34 @@ GET  /api/billing/usage/ai         - AI usage detail
 
 ## Priority Matrix
 
-| Feature | Impact | Effort | Priority |
-|---------|--------|--------|----------|
-| Onboarding/Import | Critical | High | **P0** |
-| Campground Billing | Critical | Medium | **P0** |
-| Booking Calendar | Critical | High | **P1** |
-| Email/SMS Integration | High | Medium | **P1** |
-| Site Map | High | Medium | **P1** |
-| Dashboard UI/UX | Medium | Medium | **P2** |
-| Marketing Positioning | High | Low | **P2** |
+| Feature               | Impact   | Effort | Priority |
+| --------------------- | -------- | ------ | -------- |
+| Onboarding/Import     | Critical | High   | **P0**   |
+| Campground Billing    | Critical | Medium | **P0**   |
+| Booking Calendar      | Critical | High   | **P1**   |
+| Email/SMS Integration | High     | Medium | **P1**   |
+| Site Map              | High     | Medium | **P1**   |
+| Dashboard UI/UX       | Medium   | Medium | **P2**   |
+| Marketing Positioning | High     | Low    | **P2**   |
 
 ---
 
 ## Implementation Order
 
 ### Phase 1: Foundation (Weeks 1-4)
+
 1. Email/SMS integration (needed for everything else)
 2. Campground billing portal (need to charge customers)
 3. Basic data import (CSV at minimum)
 
 ### Phase 2: Core Product (Weeks 5-8)
+
 4. Booking calendar upgrade (main differentiator)
 5. Advanced import (competitor-specific)
 6. Import verification/accounting checks
 
 ### Phase 3: Polish (Weeks 9-12)
+
 7. Interactive site map
 8. Dashboard UI modernization
 9. Marketing comparison pages
@@ -550,14 +590,14 @@ GET  /api/billing/usage/ai         - AI usage detail
 
 ## Success Metrics
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Onboarding completion rate | Unknown | >80% |
-| Time to first booking | Unknown | <48 hours |
-| Calendar interactions/day | Unknown | Increase 50% |
-| Support tickets (migration) | High | Reduce 70% |
-| NPS score | Unknown | >50 |
+| Metric                      | Current | Target       |
+| --------------------------- | ------- | ------------ |
+| Onboarding completion rate  | Unknown | >80%         |
+| Time to first booking       | Unknown | <48 hours    |
+| Calendar interactions/day   | Unknown | Increase 50% |
+| Support tickets (migration) | High    | Reduce 70%   |
+| NPS score                   | Unknown | >50          |
 
 ---
 
-*"Don't just be an alternative. Be the obvious upgrade."*
+_"Don't just be an alternative. Be the obvious upgrade."_

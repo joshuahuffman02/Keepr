@@ -30,9 +30,7 @@ export default function Error({
             We apologize for the inconvenience. An unexpected error has occurred.
           </p>
           {error.digest && (
-            <p className="text-xs text-slate-400 font-mono">
-              Error ID: {error.digest}
-            </p>
+            <p className="text-xs text-slate-400 font-mono">Error ID: {error.digest}</p>
           )}
         </div>
 

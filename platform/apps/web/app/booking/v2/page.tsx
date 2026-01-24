@@ -15,7 +15,7 @@ import {
   Sparkles,
   Users,
   X,
-  UserPlus
+  UserPlus,
 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
@@ -24,8 +24,21 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 
 type Guest = Awaited<ReturnType<typeof apiClient.getGuests>>[number];
@@ -54,7 +67,13 @@ type CreateReservationPayload = Parameters<typeof apiClient.createReservation>[0
 
 export default function BookingV2Page() {
   return (
-    <Suspense fallback={<DashboardShell><div className="p-8 text-center text-slate-500">Loading...</div></DashboardShell>}>
+    <Suspense
+      fallback={
+        <DashboardShell>
+          <div className="p-8 text-center text-slate-500">Loading...</div>
+        </DashboardShell>
+      }
+    >
       <BookingV2Content />
     </Suspense>
   );
@@ -68,15 +87,17 @@ function BookingV2Content() {
 
   const { data: campgrounds = [] } = useQuery<Campground[]>({
     queryKey: ["campgrounds"],
-    queryFn: () => apiClient.getCampgrounds()
+    queryFn: () => apiClient.getCampgrounds(),
   });
 
   const [campgroundId, setCampgroundId] = useState<string>("");
 
   useEffect(() => {
     if (campgrounds.length === 0) return;
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
-    const candidate = stored && campgrounds.some((cg) => cg.id === stored) ? stored : campgrounds[0].id;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const candidate =
+      stored && campgrounds.some((cg) => cg.id === stored) ? stored : campgrounds[0].id;
     setCampgroundId((prev) => prev || candidate);
   }, [campgrounds]);
 
@@ -90,19 +111,19 @@ function BookingV2Content() {
 
   const guestsQuery = useQuery<Guest[]>({
     queryKey: ["guests"],
-    queryFn: () => apiClient.getGuests()
+    queryFn: () => apiClient.getGuests(),
   });
 
   const siteClassesQuery = useQuery<SiteClass[]>({
     queryKey: ["site-classes", campgroundId],
     queryFn: () => apiClient.getSiteClasses(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const seasonalRatesQuery = useQuery<SeasonalRate[]>({
     queryKey: ["seasonal-rates", campgroundId],
     queryFn: () => apiClient.getSeasonalRates(campgroundId),
-    enabled: !!campgroundId
+    enabled: !!campgroundId,
   });
 
   const [form, setForm] = useState<ReservationPayload>({
@@ -116,7 +137,7 @@ function BookingV2Content() {
     children: 0,
     pets: 0,
     notes: "",
-    pricingType: "transient"
+    pricingType: "transient",
   });
 
   const [guestSearch, setGuestSearch] = useState("");
@@ -149,9 +170,9 @@ function BookingV2Content() {
     queryFn: () =>
       apiClient.getSitesWithStatus(campgroundId, {
         arrivalDate: form.arrivalDate,
-        departureDate: form.departureDate
+        departureDate: form.departureDate,
       }),
-    enabled: !!campgroundId && !!form.arrivalDate && !!form.departureDate
+    enabled: !!campgroundId && !!form.arrivalDate && !!form.departureDate,
   });
 
   const availableSites: Site[] = useMemo(() => {
@@ -176,7 +197,7 @@ function BookingV2Content() {
       const payload: CreateReservationPayload = {
         ...data,
         status: "pending",
-        totalAmount: 0
+        totalAmount: 0,
       };
       return apiClient.createReservation(payload);
     },
@@ -185,7 +206,7 @@ function BookingV2Content() {
       queryClient.invalidateQueries({ queryKey: ["reservations"] });
       setConfirmation(res);
     },
-    onError: () => toast({ title: "Could not create reservation", variant: "destructive" })
+    onError: () => toast({ title: "Could not create reservation", variant: "destructive" }),
   });
 
   const [confirmation, setConfirmation] = useState<ReservationConfirmation | null>(null);
@@ -208,12 +229,19 @@ function BookingV2Content() {
   const arrivalDate = form.arrivalDate ? new Date(form.arrivalDate) : null;
   const departureDate = form.departureDate ? new Date(form.departureDate) : null;
   const nights =
-    arrivalDate && departureDate ? Math.max(1, Math.round((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24))) : 0;
+    arrivalDate && departureDate
+      ? Math.max(
+          1,
+          Math.round((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)),
+        )
+      : 0;
 
   const selectedGuest = (guestsQuery.data ?? []).find((g) => g.id === form.guestId);
   const selectedSite: Site | undefined = availableSites.find((s) => s.id === form.siteId);
   const selectedClass = siteClassesQuery.data?.find((sc) => sc.id === form.siteClassId);
-  const selectedGuestName = selectedGuest ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}` : "";
+  const selectedGuestName = selectedGuest
+    ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}`
+    : "";
 
   useEffect(() => {
     if (!showGuestDropdown) return;
@@ -228,15 +256,15 @@ function BookingV2Content() {
     return () => document.removeEventListener("mousedown", handler);
   }, [showGuestDropdown]);
 
-  const selectedSeasonalRate = seasonalRatesQuery.data?.find(r => r.id === form.seasonalRateId);
+  const selectedSeasonalRate = seasonalRatesQuery.data?.find((r) => r.id === form.seasonalRateId);
 
   useEffect(() => {
     if (selectedSeasonalRate && form.pricingType === "seasonal") {
       if (selectedSeasonalRate.startDate && selectedSeasonalRate.endDate) {
-        setForm(p => ({
+        setForm((p) => ({
           ...p,
           arrivalDate: selectedSeasonalRate.startDate!.split("T")[0],
-          departureDate: selectedSeasonalRate.endDate!.split("T")[0]
+          departureDate: selectedSeasonalRate.endDate!.split("T")[0],
         }));
       }
     }
@@ -247,9 +275,13 @@ function BookingV2Content() {
       <div className="space-y-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Booking · {selectedCampground?.name ?? "Campground"}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Booking · {selectedCampground?.name ?? "Campground"}
+            </p>
             <h1 className="text-3xl font-bold text-slate-900">New reservation</h1>
-            <p className="text-sm text-slate-600">Pick guest, dates, site, and confirm in one flow.</p>
+            <p className="text-sm text-slate-600">
+              Pick guest, dates, site, and confirm in one flow.
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Select value={campgroundId} onValueChange={setCampgroundId}>
@@ -257,7 +289,7 @@ function BookingV2Content() {
                 <SelectValue placeholder="Select campground" />
               </SelectTrigger>
               <SelectContent>
-            {campgrounds.map((cg) => (
+                {campgrounds.map((cg) => (
                   <SelectItem key={cg.id} value={cg.id}>
                     {cg.name}
                   </SelectItem>
@@ -275,13 +307,17 @@ function BookingV2Content() {
                 <div>
                   <div className="text-xs uppercase font-semibold text-slate-500">Step 1</div>
                   <h3 className="text-lg font-semibold text-slate-900">Stay Type</h3>
-                  <p className="text-xs text-slate-500">Choose between a short-term or a long-term seasonal stay.</p>
+                  <p className="text-xs text-slate-500">
+                    Choose between a short-term or a long-term seasonal stay.
+                  </p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <button
                   type="button"
-                  onClick={() => setForm(p => ({ ...p, pricingType: "transient", seasonalRateId: undefined }))}
+                  onClick={() =>
+                    setForm((p) => ({ ...p, pricingType: "transient", seasonalRateId: undefined }))
+                  }
                   className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "transient" ? "border-status-success bg-status-success/15 text-status-success ring-2 ring-status-success/20" : "border-slate-200 hover:border-slate-300"}`}
                 >
                   <div className="font-semibold">Transient</div>
@@ -289,7 +325,7 @@ function BookingV2Content() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm(p => ({ ...p, pricingType: "seasonal" }))}
+                  onClick={() => setForm((p) => ({ ...p, pricingType: "seasonal" }))}
                   className={`flex-1 p-3 rounded-lg border text-center transition-all ${form.pricingType === "seasonal" ? "border-status-success bg-status-success/15 text-status-success ring-2 ring-status-success/20" : "border-slate-200 hover:border-slate-300"}`}
                 >
                   <div className="font-semibold">Seasonal</div>
@@ -302,19 +338,21 @@ function BookingV2Content() {
                   <Label>Select Seasonal Rate Plan</Label>
                   <Select
                     value={form.seasonalRateId}
-                    onValueChange={(v) => setForm(p => ({ ...p, seasonalRateId: v }))}
+                    onValueChange={(v) => setForm((p) => ({ ...p, seasonalRateId: v }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Chose a plan..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {seasonalRatesQuery.data?.map(rate => (
+                      {seasonalRatesQuery.data?.map((rate) => (
                         <SelectItem key={rate.id} value={rate.id}>
                           {rate.name} — ${(rate.amount / 100).toFixed(2)} ({rate.rateType})
                         </SelectItem>
                       ))}
                       {seasonalRatesQuery.data?.length === 0 && (
-                        <div className="p-2 text-sm text-slate-500">No seasonal rates configured for this park.</div>
+                        <div className="p-2 text-sm text-slate-500">
+                          No seasonal rates configured for this park.
+                        </div>
                       )}
                     </SelectContent>
                   </Select>
@@ -407,7 +445,9 @@ function BookingV2Content() {
                       )}
                     </div>
                   )}
-                  <p className="text-xs text-slate-500 mt-1">Rich search by name or email; add new guests from the guests page.</p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Rich search by name or email; add new guests from the guests page.
+                  </p>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1">
@@ -453,11 +493,19 @@ function BookingV2Content() {
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="space-y-1">
                   <Label>Arrival</Label>
-                  <Input type="date" value={form.arrivalDate} onChange={(e) => setForm((p) => ({ ...p, arrivalDate: e.target.value }))} />
+                  <Input
+                    type="date"
+                    value={form.arrivalDate}
+                    onChange={(e) => setForm((p) => ({ ...p, arrivalDate: e.target.value }))}
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label>Departure</Label>
-                  <Input type="date" value={form.departureDate} onChange={(e) => setForm((p) => ({ ...p, departureDate: e.target.value }))} />
+                  <Input
+                    type="date"
+                    value={form.departureDate}
+                    onChange={(e) => setForm((p) => ({ ...p, departureDate: e.target.value }))}
+                  />
                 </div>
               </div>
             </Card>
@@ -473,7 +521,12 @@ function BookingV2Content() {
                   </p>
                 </div>
                 <div className="w-48">
-                  <Select value={form.siteClassId || "all"} onValueChange={(v) => setForm((p) => ({ ...p, siteClassId: v === "all" ? "" : v }))}>
+                  <Select
+                    value={form.siteClassId || "all"}
+                    onValueChange={(v) =>
+                      setForm((p) => ({ ...p, siteClassId: v === "all" ? "" : v }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="All classes" />
                     </SelectTrigger>
@@ -511,14 +564,19 @@ function BookingV2Content() {
                       key={s.id}
                       type="button"
                       onClick={() => setForm((p) => ({ ...p, siteId: s.id }))}
-                      className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition hover:border-status-success/30 ${form.siteId === s.id ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-slate-200 bg-white text-slate-700"
-                        }`}
+                      className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm transition hover:border-status-success/30 ${
+                        form.siteId === s.id
+                          ? "border-status-success/30 bg-status-success/15 text-status-success"
+                          : "border-slate-200 bg-white text-slate-700"
+                      }`}
                     >
                       <span className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-slate-400" />
                         {s.name}
                       </span>
-                      {form.siteId === s.id ? <CheckCircle className="h-4 w-4 text-status-success" /> : null}
+                      {form.siteId === s.id ? (
+                        <CheckCircle className="h-4 w-4 text-status-success" />
+                      ) : null}
                     </button>
                   ))}
                 {availableSites.length === 0 && (
@@ -558,17 +616,26 @@ function BookingV2Content() {
                   <p className="text-xs uppercase font-semibold text-slate-500">Summary</p>
                   <h3 className="text-lg font-semibold text-slate-900">Review & confirm</h3>
                 </div>
-                {readyToSubmit ? <Badge variant="secondary">Ready</Badge> : <Badge variant="outline">Incomplete</Badge>}
+                {readyToSubmit ? (
+                  <Badge variant="secondary">Ready</Badge>
+                ) : (
+                  <Badge variant="outline">Incomplete</Badge>
+                )}
               </div>
               <div className="space-y-2 text-sm text-slate-700">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-slate-400" />
-                  <span>{selectedGuest ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}` : "Select guest"}</span>
+                  <span>
+                    {selectedGuest
+                      ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}`
+                      : "Select guest"}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-slate-400" />
                   <span>
-                    {form.arrivalDate || "Arrival"} → {form.departureDate || "Departure"} {nights ? `(${nights} nights)` : ""}
+                    {form.arrivalDate || "Arrival"} → {form.departureDate || "Departure"}{" "}
+                    {nights ? `(${nights} nights)` : ""}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -581,18 +648,25 @@ function BookingV2Content() {
                 </div>
                 {form.pricingType === "seasonal" && selectedSeasonalRate && (
                   <div className="mt-2 pt-2 border-t border-slate-100">
-                    <div className="text-xs uppercase font-semibold text-slate-500 mb-1">Seasonal Plan</div>
+                    <div className="text-xs uppercase font-semibold text-slate-500 mb-1">
+                      Seasonal Plan
+                    </div>
                     <div className="flex items-center gap-2 text-status-success font-medium">
                       <CreditCard className="h-4 w-4" />
                       <span>{selectedSeasonalRate.name}</span>
                     </div>
                     <div className="text-xs text-slate-500 mt-1">
-                      Billing: {selectedSeasonalRate.paymentSchedule} · {selectedSeasonalRate.pricingStructure}
+                      Billing: {selectedSeasonalRate.paymentSchedule} ·{" "}
+                      {selectedSeasonalRate.pricingStructure}
                     </div>
                   </div>
                 )}
               </div>
-              <Button className="w-full" onClick={handleCreate} disabled={!readyToSubmit || createReservation.isPending}>
+              <Button
+                className="w-full"
+                onClick={handleCreate}
+                disabled={!readyToSubmit || createReservation.isPending}
+              >
                 {createReservation.isPending ? "Creating..." : "Create reservation"}
               </Button>
               <p className="text-xs text-slate-500">
@@ -609,10 +683,16 @@ function BookingV2Content() {
                 <div className="text-sm text-slate-800">
                   ID: {confirmation.id ?? "—"}
                   <br />
-                  Guest: {selectedGuest ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}` : ""}
+                  Guest:{" "}
+                  {selectedGuest
+                    ? `${selectedGuest.primaryFirstName} ${selectedGuest.primaryLastName}`
+                    : ""}
                 </div>
                 <div className="flex items-center gap-2 text-sm">
-                  <Link href="/reservations" className="text-status-success font-semibold flex items-center gap-1">
+                  <Link
+                    href="/reservations"
+                    className="text-status-success font-semibold flex items-center gap-1"
+                  >
                     Go to reservations <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
@@ -624,10 +704,15 @@ function BookingV2Content() {
                 <CreditCard className="h-4 w-4 text-slate-400" />
                 <div>
                   <div className="text-sm font-semibold text-slate-900">Need payment now?</div>
-                  <div className="text-xs text-slate-500">Take payment on the reservation after creation or in POS.</div>
+                  <div className="text-xs text-slate-500">
+                    Take payment on the reservation after creation or in POS.
+                  </div>
                 </div>
               </div>
-              <Link href="/pos" className="text-sm font-semibold text-status-success flex items-center gap-1">
+              <Link
+                href="/pos"
+                className="text-sm font-semibold text-status-success flex items-center gap-1"
+              >
                 Open POS <ArrowRight className="h-4 w-4" />
               </Link>
             </Card>

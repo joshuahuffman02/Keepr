@@ -10,7 +10,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { PricingService } from "./pricing.service";
 import { CreatePricingRuleDto } from "./dto/create-pricing-rule.dto";
@@ -22,10 +22,11 @@ import { ScopeGuard } from "../permissions/scope.guard";
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
 @Controller()
 export class PricingController {
-  constructor(private readonly pricing: PricingService) { }
+  constructor(private readonly pricing: PricingService) {}
 
   private requireCampgroundId(req: AuthRequest, fallback?: string): string {
-    const campgroundId = fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
+    const campgroundId =
+      fallback || req.campgroundId || getHeaderValue(req.headers, "x-campground-id");
     if (!campgroundId) {
       throw new BadRequestException("campgroundId is required");
     }
@@ -33,15 +34,18 @@ export class PricingController {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "platform_superadmin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" ||
+      user?.platformRole === "platform_superadmin" ||
+      user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
 
-    const userCampgroundIds = user?.memberships
-      ?.flatMap((membership) => (membership.campgroundId ? [membership.campgroundId] : [])) ?? [];
+    const userCampgroundIds =
+      user?.memberships?.flatMap((membership) =>
+        membership.campgroundId ? [membership.campgroundId] : [],
+      ) ?? [];
     if (!userCampgroundIds.includes(campgroundId)) {
       throw new BadRequestException("You do not have access to this campground");
     }
@@ -59,7 +63,7 @@ export class PricingController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreatePricingRuleDto,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.pricing.create(campgroundId, dto);
@@ -71,7 +75,7 @@ export class PricingController {
     @Param("id") id: string,
     @Body() dto: Partial<CreatePricingRuleDto>,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -83,7 +87,7 @@ export class PricingController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: AuthRequest
+    @Req() req: AuthRequest,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

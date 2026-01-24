@@ -14,9 +14,9 @@ import { PaymentsModule } from "../payments/payments.module";
 import { PermissionsModule } from "../permissions/permissions.module";
 
 @Module({
-    imports: [PrismaModule, forwardRef(() => InventoryModule), PaymentsModule, PermissionsModule],
-    controllers: [StoreController, LocationController, TransferController, FulfillmentController],
-    providers: [StoreService, LocationService, TransferService, FulfillmentService, EmailService],
-    exports: [StoreService, LocationService, TransferService, FulfillmentService],
+  imports: [PrismaModule, forwardRef(() => InventoryModule), PaymentsModule, PermissionsModule],
+  controllers: [StoreController, LocationController, TransferController, FulfillmentController],
+  providers: [StoreService, LocationService, TransferService, FulfillmentService, EmailService],
+  exports: [StoreService, LocationService, TransferService, FulfillmentService],
 })
 export class StoreModule {}

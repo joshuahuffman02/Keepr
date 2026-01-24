@@ -123,7 +123,7 @@ For API support, contact: support@keeprstay.com
  */
 export function configureSwagger(
   app: INestApplication,
-  options: SwaggerOptions = {}
+  options: SwaggerOptions = {},
 ): OpenAPIObject {
   const {
     title = "Keepr API",
@@ -137,11 +137,7 @@ export function configureSwagger(
     .setTitle(title)
     .setDescription(description)
     .setVersion(version)
-    .setContact(
-      "Keepr API Support",
-      "https://keeprstay.com/developers",
-      "support@keeprstay.com"
-    )
+    .setContact("Keepr API Support", "https://keeprstay.com/developers", "support@keeprstay.com")
     .setLicense("Proprietary", "https://keeprstay.com/terms")
     .setTermsOfService("https://keeprstay.com/terms")
     .addServer("https://api.keeprstay.com", "Production")
@@ -154,7 +150,7 @@ export function configureSwagger(
         bearerFormat: "JWT",
         description: "Enter your API access token",
       },
-      "bearer"
+      "bearer",
     )
     // OAuth2 client credentials
     .addOAuth2(
@@ -190,7 +186,7 @@ export function configureSwagger(
           },
         },
       },
-      "oauth2"
+      "oauth2",
     )
     // API key in header
     .addApiKey(
@@ -200,7 +196,7 @@ export function configureSwagger(
         in: "header",
         description: "Legacy API key authentication",
       },
-      "api-key"
+      "api-key",
     )
     // Common headers
     .addGlobalParameters({

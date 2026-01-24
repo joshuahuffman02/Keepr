@@ -28,7 +28,9 @@ const isImportStatus = (value: string): value is ImportStatus => value in RESERV
 const normalizeReservationStatus = (value?: string): ImportStatus | undefined =>
   value && isImportStatus(value) ? value : undefined;
 
-export function mapCampspotToInternal(payload: CampspotReservation): Partial<ReservationImportRecord> {
+export function mapCampspotToInternal(
+  payload: CampspotReservation,
+): Partial<ReservationImportRecord> {
   return {
     externalId: payload.reservationNumber,
     siteId: payload.siteExternalId,
@@ -60,4 +62,5 @@ export function mapInternalToCampspot(reservation: ReservationImportRecord) {
 }
 
 // Additional transform stubs for later enrichment
-export const campspotNotes = "Map add-ons, taxes, and discounts to line items during import/export.";
+export const campspotNotes =
+  "Map add-ons, taxes, and discounts to line items during import/export.";

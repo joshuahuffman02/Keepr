@@ -17,24 +17,29 @@ Camping is already one of the most affordable vacation options. With smart plann
 ## Gear Savings
 
 ### Don't Buy New
+
 - Borrow from friends and family
 - Buy used (Facebook Marketplace, thrift stores)
 - Rent for first trips (REI and others)
 - Watch for sales (end of season especially)
 
 ### Essential vs. Nice-to-Have
+
 **Must have:**
+
 - Shelter (tent or car)
 - Sleep system (bag, pad)
 - Cooking setup (stove, pot)
 - Light source
 
 **Can wait:**
+
 - Fancy chairs
 - All the gadgets
 - Brand-name everything
 
 ### Multi-Use Items
+
 - Tarp: shade, rain cover, ground cover
 - Bandana: towel, napkin, pot holder
 - Large pot: cooking, washing, storage
@@ -44,18 +49,21 @@ Camping is already one of the most affordable vacation options. With smart plann
 ## Campsite Savings
 
 ### Free/Low-Cost Options
+
 - Dispersed camping on public land (free)
 - National Forests (often free)
 - BLM land (usually free)
 - State park primitive sites (cheaper)
 
 ### Discount Strategies
+
 - Annual park passes (pays off quickly)
 - Weekday camping (often cheaper)
 - Off-season rates
 - Loyalty programs
 
 ### Bookings
+
 - Book early for popular spots
 - Check for last-minute availability
 - Call directly for unadvertised deals
@@ -65,11 +73,13 @@ Camping is already one of the most affordable vacation options. With smart plann
 ## Food Savings
 
 ### Eat Before You Go
+
 - Shop at home (cheaper than camp stores)
 - Prep ingredients before leaving
 - Make simple meal plans
 
 ### Budget Meal Ideas
+
 - Hot dogs and beans
 - Pasta with sauce
 - Eggs any style
@@ -77,6 +87,7 @@ Camping is already one of the most affordable vacation options. With smart plann
 - One-pot meals
 
 ### Avoid
+
 - Buying at camp stores (premium prices)
 - Over-buying (food waste)
 - Elaborate cooking (expensive ingredients)
@@ -86,11 +97,13 @@ Camping is already one of the most affordable vacation options. With smart plann
 ## Other Savings
 
 ### Transportation
+
 - Carpool with friends
 - Choose closer campgrounds
 - Combine camping with other travel
 
 ### Activities
+
 - Hiking is free
 - Swimming in lakes/rivers
 - Nature exploration
@@ -98,6 +111,7 @@ Camping is already one of the most affordable vacation options. With smart plann
 - Campfire time
 
 ### Energy
+
 - Skip sites with hookups (cheaper)
 - Use solar for small charging
 - Reduce power needs
@@ -106,13 +120,13 @@ Camping is already one of the most affordable vacation options. With smart plann
 
 ## Sample Budget Weekend
 
-| Item | Cost |
-|------|------|
-| Campsite (2 nights) | $50 |
-| Food (family of 4) | $50 |
-| Gas | $40 |
-| Firewood | $15 |
-| **Total** | **$155** |
+| Item                | Cost     |
+| ------------------- | -------- |
+| Campsite (2 nights) | $50      |
+| Food (family of 4)  | $50      |
+| Gas                 | $40      |
+| Firewood            | $15      |
+| **Total**           | **$155** |
 
 Compare to hotel weekend: $300-500+
 
@@ -127,4 +141,4 @@ Compare to hotel weekend: $300-500+
 
 ---
 
-*Find affordable campsites at [campreserv.com](https://campreserv.com)*
+_Find affordable campsites at [campreserv.com](https://campreserv.com)_

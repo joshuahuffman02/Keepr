@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Param, Post, Req, ForbiddenException, NotFoundException, Patch, UseGuards, Delete, BadRequestException, Query } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  ForbiddenException,
+  NotFoundException,
+  Patch,
+  UseGuards,
+  Delete,
+  BadRequestException,
+  Query,
+} from "@nestjs/common";
 import { CampgroundsService } from "./campgrounds.service";
 import { CreateCampgroundDto } from "./dto/create-campground.dto";
 import type { Request } from "express";
@@ -25,7 +39,7 @@ export class CampgroundsController {
   constructor(
     private readonly campgrounds: CampgroundsService,
     private readonly prisma: PrismaService,
-  ) { }
+  ) {}
 
   // Public endpoints (no auth required)
   @Get("public/campgrounds")
@@ -37,7 +51,8 @@ export class CampgroundsController {
   async getPublicBySlug(@Param("slug") slug: string) {
     const campground = await this.campgrounds.findBySlug(slug);
     if (!campground) throw new NotFoundException("Campground not found");
-    if (!campground.isPublished && !campground.isExternal) throw new NotFoundException("Campground not found");
+    if (!campground.isPublished && !campground.isExternal)
+      throw new NotFoundException("Campground not found");
     return campground;
   }
 
@@ -52,10 +67,7 @@ export class CampgroundsController {
    * Preview endpoint for onboarding - allows viewing unpublished campgrounds with valid token
    */
   @Get("public/campgrounds/:slug/preview")
-  async getPreviewBySlug(
-    @Param("slug") slug: string,
-    @Query("token") token: string,
-  ) {
+  async getPreviewBySlug(@Param("slug") slug: string, @Query("token") token: string) {
     if (!token) throw new BadRequestException("Preview token required");
 
     // Find the onboarding invite by token, then get the session and campground
@@ -63,7 +75,7 @@ export class CampgroundsController {
       where: { token },
       include: {
         OnboardingSession: {
-          include: { Campground: true }
+          include: { Campground: true },
         },
         Campground: true, // Invite may have campground directly
       },
@@ -101,11 +113,12 @@ export class CampgroundsController {
     const org = req.organizationId ?? null;
 
     // SECURITY: Platform admins can see all, others only see their memberships
-    const isPlatformStaff = user?.platformRole === 'platform_admin' ||
-                            user?.platformRole === 'support_agent' ||
-                            user?.platformRole === 'support_lead' ||
-                            user?.platformRole === 'regional_support' ||
-                            user?.platformRole === 'ops_engineer';
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" ||
+      user?.platformRole === "support_agent" ||
+      user?.platformRole === "support_lead" ||
+      user?.platformRole === "regional_support" ||
+      user?.platformRole === "ops_engineer";
 
     if (isPlatformStaff) {
       return this.campgrounds.listAll(org || undefined);
@@ -126,11 +139,12 @@ export class CampgroundsController {
     const org = req.organizationId ?? null;
 
     // SECURITY: Platform admins can access any, others need membership
-    const isPlatformStaff = user?.platformRole === 'platform_admin' ||
-                            user?.platformRole === 'support_agent' ||
-                            user?.platformRole === 'support_lead' ||
-                            user?.platformRole === 'regional_support' ||
-                            user?.platformRole === 'ops_engineer';
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" ||
+      user?.platformRole === "support_agent" ||
+      user?.platformRole === "support_lead" ||
+      user?.platformRole === "regional_support" ||
+      user?.platformRole === "ops_engineer";
 
     if (!isPlatformStaff) {
       const memberCampgroundIds = user?.memberships?.map((m) => m.campgroundId) ?? [];
@@ -150,10 +164,15 @@ export class CampgroundsController {
   updateStoreHours(
     @Param("id") id: string,
     @Body() body: { storeOpenHour?: number; storeCloseHour?: number },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
-    return this.campgrounds.updateStoreHours(id, body.storeOpenHour, body.storeCloseHour, org || undefined);
+    return this.campgrounds.updateStoreHours(
+      id,
+      body.storeOpenHour,
+      body.storeCloseHour,
+      org || undefined,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
@@ -162,7 +181,7 @@ export class CampgroundsController {
   updateOrderWebhook(
     @Param("id") id: string,
     @Body() body: { orderWebhookUrl?: string },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateOrderWebhook(id, body.orderWebhookUrl, org || undefined);
@@ -174,7 +193,7 @@ export class CampgroundsController {
   updateSla(
     @Param("id") id: string,
     @Body() body: { slaMinutes: number },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateSlaMinutes(id, body.slaMinutes, org || undefined);
@@ -185,8 +204,13 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/ops")
   updateOpsSettings(
     @Param("id") id: string,
-    @Body() body: { quietHoursStart?: string | null; quietHoursEnd?: string | null; routingAssigneeId?: string | null },
-    @Req() req: CampgroundsRequest
+    @Body()
+    body: {
+      quietHoursStart?: string | null;
+      quietHoursEnd?: string | null;
+      routingAssigneeId?: string | null;
+    },
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateOpsSettings(id, body, org || undefined);
@@ -198,7 +222,7 @@ export class CampgroundsController {
   verifySenderDomain(
     @Param("id") id: string,
     @Body() body: { domain: string },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.verifySenderDomain(id, body.domain, org || undefined);
@@ -209,7 +233,7 @@ export class CampgroundsController {
   updateAnalytics(
     @Param("id") id: string,
     @Body() body: { gaMeasurementId?: string | null; metaPixelId?: string | null },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateAnalytics(id, body, org || undefined);
@@ -220,8 +244,14 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/nps")
   updateNpsSettings(
     @Param("id") id: string,
-    @Body() body: { npsAutoSendEnabled?: boolean; npsSendHour?: number | null; npsTemplateId?: string | null; npsSchedule?: unknown },
-    @Req() req: CampgroundsRequest
+    @Body()
+    body: {
+      npsAutoSendEnabled?: boolean;
+      npsSendHour?: number | null;
+      npsTemplateId?: string | null;
+      npsSchedule?: unknown;
+    },
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateNpsSettings(id, body, org || undefined);
@@ -230,10 +260,7 @@ export class CampgroundsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
   @Get("campgrounds/:id/sms-settings")
-  getSmsSettings(
-    @Param("id") id: string,
-    @Req() req: CampgroundsRequest
-  ) {
+  getSmsSettings(@Param("id") id: string, @Req() req: CampgroundsRequest) {
     const org = req.organizationId ?? null;
     return this.campgrounds.getSmsSettings(id, org || undefined);
   }
@@ -243,14 +270,15 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/sms-settings")
   updateSmsSettings(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       smsEnabled?: boolean;
       twilioAccountSid?: string | null;
       twilioAuthToken?: string | null;
       twilioFromNumber?: string | null;
       smsWelcomeMessage?: string | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateSmsSettings(id, body, org || undefined);
@@ -260,7 +288,8 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/branding")
   updateBranding(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       logoUrl?: string | null;
       primaryColor?: string | null;
       accentColor?: string | null;
@@ -271,7 +300,7 @@ export class CampgroundsController {
       receiptFooter?: string | null;
       brandingNote?: string | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId ?? null;
     return this.campgrounds.updateBranding(id, body, org || undefined);
@@ -280,7 +309,11 @@ export class CampgroundsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
   @Patch("campgrounds/:id/photos")
-  updatePhotos(@Param("id") id: string, @Body() body: UpdatePhotosDto, @Req() req: CampgroundsRequest) {
+  updatePhotos(
+    @Param("id") id: string,
+    @Body() body: UpdatePhotosDto,
+    @Req() req: CampgroundsRequest,
+  ) {
     const org = req.organizationId || null;
     const actorId = req?.user?.id || null;
     return this.campgrounds.updatePhotos(id, body, org || undefined, actorId || undefined);
@@ -292,7 +325,7 @@ export class CampgroundsController {
   updateFaqs(
     @Param("id") id: string,
     @Body() body: { faqs: Array<{ id: string; question: string; answer: string; order: number }> },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId || null;
     return this.campgrounds.updateFaqs(id, body.faqs, org || undefined);
@@ -302,7 +335,8 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/policies")
   updatePolicies(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       cancellationPolicyType?: string | null;
       cancellationWindowHours?: number | null;
       cancellationFeeType?: string | null;
@@ -310,7 +344,7 @@ export class CampgroundsController {
       cancellationFeePercent?: number | null;
       cancellationNotes?: string | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId || null;
     return this.campgrounds.updatePolicies(id, body, org || undefined);
@@ -320,14 +354,15 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/financials")
   updateFinancials(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       currency?: string | null;
       taxId?: string | null;
       taxIdName?: string | null;
       taxState?: number | null;
       taxLocal?: number | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId || null;
     return this.campgrounds.updateFinancials(id, body, org || undefined);
@@ -337,7 +372,8 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/accessibility")
   updateAccessibilitySettings(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       adaAssessment?: unknown;
       adaCertificationLevel?: string;
       adaAccessibleSiteCount?: number;
@@ -347,7 +383,7 @@ export class CampgroundsController {
       adaVerifiedAt?: string | null;
       adaVerifiedBy?: string | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId || null;
     return this.campgrounds.updateAccessibilitySettings(id, body, org || undefined);
@@ -357,7 +393,8 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/security")
   updateSecuritySettings(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       securityAssessment?: unknown;
       securityCertificationLevel?: string;
       securityAssessmentUpdatedAt?: string;
@@ -367,7 +404,7 @@ export class CampgroundsController {
       securityAuditorEmail?: string | null;
       securityAuditorOrg?: string | null;
     },
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const org = req.organizationId || null;
     return this.campgrounds.updateSecuritySettings(id, body, org || undefined);
@@ -383,7 +420,7 @@ export class CampgroundsController {
   @Post("organizations/:organizationId/campgrounds")
   create(
     @Param("organizationId") organizationId: string,
-    @Body() body: Omit<CreateCampgroundDto, "organizationId">
+    @Body() body: Omit<CreateCampgroundDto, "organizationId">,
   ) {
     // Creation remains admin-only; owners should not hit this. If an org is provided, we allow only if it matches header.
     // In a real app, we'd check a role; for now, require header match when provided.
@@ -397,12 +434,12 @@ export class CampgroundsController {
   async remove(@Param("id") id: string, @CurrentUser() user: AuthUser) {
     // SECURITY: Only owners and platform admins can delete campgrounds
     // Additional ownership check for non-platform-admins
-    if (user.platformRole !== 'platform_admin') {
+    if (user.platformRole !== "platform_admin") {
       const hasOwnership = user.memberships?.some(
-        (m) => m.campgroundId === id && m.role === 'owner'
+        (m) => m.campgroundId === id && m.role === "owner",
       );
       if (!hasOwnership) {
-        throw new ForbiddenException('Only campground owners can delete their campground');
+        throw new ForbiddenException("Only campground owners can delete their campground");
       }
     }
     return this.campgrounds.remove(id);
@@ -425,9 +462,18 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/deposit")
   async updateDepositRule(
     @Param("id") id: string,
-    @Body() body: { depositRule?: string; depositPercentage?: number | null; depositConfig?: unknown }
+    @Body()
+    body: { depositRule?: string; depositPercentage?: number | null; depositConfig?: unknown },
   ) {
-    const allowed = ["none", "full", "half", "first_night", "first_night_fees", "percentage", "percentage_50"];
+    const allowed = [
+      "none",
+      "full",
+      "half",
+      "first_night",
+      "first_night_fees",
+      "percentage",
+      "percentage_50",
+    ];
     const incomingRule = body.depositRule;
     const incomingPct = body.depositPercentage ?? null;
 
@@ -474,9 +520,9 @@ export class CampgroundsController {
         email: body.email,
         firstName: body.firstName,
         lastName: body.lastName,
-        role: body.role
+        role: body.role,
       },
-      actorId
+      actorId,
     );
   }
 
@@ -487,7 +533,7 @@ export class CampgroundsController {
     @Param("campgroundId") campgroundId: string,
     @Param("membershipId") membershipId: string,
     @Body() body: UpdateMemberRoleDto,
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const actorId = req?.user?.id;
     return this.campgrounds.updateMemberRole(campgroundId, membershipId, body.role, actorId);
@@ -499,7 +545,7 @@ export class CampgroundsController {
   removeMember(
     @Param("campgroundId") campgroundId: string,
     @Param("membershipId") membershipId: string,
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const actorId = req?.user?.id;
     return this.campgrounds.removeMember(campgroundId, membershipId, actorId);
@@ -511,7 +557,7 @@ export class CampgroundsController {
   resendInvite(
     @Param("campgroundId") campgroundId: string,
     @Param("membershipId") membershipId: string,
-    @Req() req: CampgroundsRequest
+    @Req() req: CampgroundsRequest,
   ) {
     const actorId = req?.user?.id;
     return this.campgrounds.resendInvite(campgroundId, membershipId, actorId);

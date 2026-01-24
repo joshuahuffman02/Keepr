@@ -6,7 +6,7 @@ import { JwtAuthGuard } from "../auth/guards";
 @UseGuards(JwtAuthGuard)
 @Controller("organizations")
 export class OrganizationsController {
-  constructor(private readonly orgs: OrganizationsService) { }
+  constructor(private readonly orgs: OrganizationsService) {}
 
   @Get()
   findAll() {

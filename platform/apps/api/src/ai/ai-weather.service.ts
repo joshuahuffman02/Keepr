@@ -69,9 +69,7 @@ const serializeWeather = (weather: WeatherData): Prisma.InputJsonValue => ({
   })),
 });
 
-const serializeNotifications = (
-  notifications: WeatherNotification[]
-): Prisma.InputJsonValue =>
+const serializeNotifications = (notifications: WeatherNotification[]): Prisma.InputJsonValue =>
   notifications.map((notification) => ({
     guestId: notification.guestId,
     reservationId: notification.reservationId,
@@ -88,7 +86,7 @@ export class AiWeatherService {
     private readonly prisma: PrismaService,
     private readonly configService: AiAutopilotConfigService,
     private readonly autonomousAction: AiAutonomousActionService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   // ==================== WEATHER DATA ====================
@@ -134,9 +132,7 @@ export class AiWeatherService {
         feelsLike: Math.round(currentData.main?.feels_like ?? 0),
         humidity: currentData.main?.humidity ?? 0,
         windSpeed: Math.round(currentData.wind?.speed ?? 0),
-        windGust: currentData.wind?.gust
-          ? Math.round(currentData.wind.gust)
-          : undefined,
+        windGust: currentData.wind?.gust ? Math.round(currentData.wind.gust) : undefined,
         description: currentData.weather?.[0]?.description ?? "Unknown",
         icon: currentData.weather?.[0]?.icon ?? "01d",
         alerts: (oneCallData.alerts ?? []).map((alert) => ({
@@ -204,7 +200,7 @@ export class AiWeatherService {
       status?: string;
       alertType?: string;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const { status, alertType, limit = 20 } = options;
 
@@ -246,7 +242,10 @@ export class AiWeatherService {
     const alerts: WeatherAlertDraft[] = [];
 
     // Check for extreme conditions
-    if (weather.windSpeed >= triggers.stormWindMph || weather.windGust && weather.windGust >= triggers.stormWindMph) {
+    if (
+      weather.windSpeed >= triggers.stormWindMph ||
+      (weather.windGust && weather.windGust >= triggers.stormWindMph)
+    ) {
       alerts.push({
         alertType: "storm",
         severity: weather.windSpeed >= 60 ? "warning" : "advisory",
@@ -331,7 +330,7 @@ export class AiWeatherService {
    */
   private async getAffectedGuests(
     campgroundId: string,
-    startDate: Date
+    startDate: Date,
   ): Promise<{ count: number; dates: Date[] }> {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 3); // Look at next 3 days
@@ -444,7 +443,7 @@ export class AiWeatherService {
    */
   private generateAlertEmailHtml(
     alert: AiWeatherAlert,
-    reservation: ReservationWithCampground
+    reservation: ReservationWithCampground,
   ): string {
     const campgroundName = reservation.Campground?.name || "the campground";
     const campgroundPhone = reservation.Campground?.phone || "";
@@ -589,15 +588,13 @@ export class AiWeatherService {
 
         checked++;
       } catch (error) {
-        this.logger.error(
-          `Failed to check weather for ${config.campgroundId}: ${error}`
-        );
+        this.logger.error(`Failed to check weather for ${config.campgroundId}: ${error}`);
       }
     }
 
     if (alertsCreated > 0) {
       this.logger.log(
-        `Weather check complete: ${checked} campgrounds, ${alertsCreated} alerts created`
+        `Weather check complete: ${checked} campgrounds, ${alertsCreated} alerts created`,
       );
     }
   }

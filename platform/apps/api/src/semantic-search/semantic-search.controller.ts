@@ -1,7 +1,16 @@
-import { Controller, Post, Body, Param, Get, Query, Logger, BadRequestException } from '@nestjs/common';
-import { SemanticSearchService } from './semantic-search.service';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Get,
+  Query,
+  Logger,
+  BadRequestException,
+} from "@nestjs/common";
+import { SemanticSearchService } from "./semantic-search.service";
 
-@Controller('semantic-search')
+@Controller("semantic-search")
 export class SemanticSearchController {
   private readonly logger = new Logger(SemanticSearchController.name);
 
@@ -11,8 +20,8 @@ export class SemanticSearchController {
    * Generate embedding for a single campground
    * POST /api/semantic-search/campgrounds/:id/embedding
    */
-  @Post('campgrounds/:id/embedding')
-  async generateCampgroundEmbedding(@Param('id') campgroundId: string) {
+  @Post("campgrounds/:id/embedding")
+  async generateCampgroundEmbedding(@Param("id") campgroundId: string) {
     this.logger.log(`Generating embedding for campground ${campgroundId}`);
 
     const result = await this.semanticSearchService.generateCampgroundEmbedding(campgroundId);
@@ -33,15 +42,17 @@ export class SemanticSearchController {
    *   - limit: number of campgrounds to process (default: all)
    *   - onlyMissing: only generate for campgrounds without embeddings (default: true)
    */
-  @Post('campgrounds/embeddings/generate-all')
+  @Post("campgrounds/embeddings/generate-all")
   async generateAllEmbeddings(
-    @Query('limit') limit?: string,
-    @Query('onlyMissing') onlyMissing?: string,
+    @Query("limit") limit?: string,
+    @Query("onlyMissing") onlyMissing?: string,
   ) {
     const limitNum = limit ? parseInt(limit, 10) : undefined;
-    const onlyMissingBool = onlyMissing !== 'false'; // default true
+    const onlyMissingBool = onlyMissing !== "false"; // default true
 
-    this.logger.log(`Generating embeddings for ${limitNum || 'all'} campgrounds (onlyMissing: ${onlyMissingBool})`);
+    this.logger.log(
+      `Generating embeddings for ${limitNum || "all"} campgrounds (onlyMissing: ${onlyMissingBool})`,
+    );
 
     const result = await this.semanticSearchService.generateAllCampgroundEmbeddings({
       limit: limitNum,
@@ -60,14 +71,12 @@ export class SemanticSearchController {
    *
    * Body: { query: string, limit?: number }
    */
-  @Post('search')
-  async search(
-    @Body() body: { query: string; limit?: number },
-  ) {
+  @Post("search")
+  async search(@Body() body: { query: string; limit?: number }) {
     const { query, limit = 10 } = body;
 
     if (!query || query.trim().length === 0) {
-      throw new BadRequestException('Query cannot be empty');
+      throw new BadRequestException("Query cannot be empty");
     }
 
     this.logger.log(`Semantic search: "${query}" (limit: ${limit})`);
@@ -85,7 +94,7 @@ export class SemanticSearchController {
    * Get embedding stats
    * GET /api/semantic-search/stats
    */
-  @Get('stats')
+  @Get("stats")
   async getStats() {
     const stats = await this.semanticSearchService.getEmbeddingStats();
 

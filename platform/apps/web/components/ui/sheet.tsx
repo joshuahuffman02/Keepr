@@ -77,7 +77,7 @@ export function SheetOverlay({ className }: SheetOverlayProps) {
         "fixed inset-0 z-50 bg-black/50 backdrop-blur-sm",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",
         "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        className
+        className,
       )}
       data-state={isOpen ? "open" : "closed"}
       onClick={onClose}
@@ -153,7 +153,7 @@ export function SheetContent({ side = "bottom", className, children }: SheetCont
         side === "bottom" && "rounded-t-2xl max-h-[85vh]",
         side === "top" && "rounded-b-2xl",
         (side === "left" || side === "right") && "w-3/4 sm:max-w-sm h-full",
-        className
+        className,
       )}
       data-state={isOpen ? "open" : "closed"}
       style={{ transform }}
@@ -185,11 +185,7 @@ interface SheetTitleProps {
 }
 
 export function SheetTitle({ className, children }: SheetTitleProps) {
-  return (
-    <h2 className={cn("text-lg font-semibold text-foreground", className)}>
-      {children}
-    </h2>
-  );
+  return <h2 className={cn("text-lg font-semibold text-foreground", className)}>{children}</h2>;
 }
 
 interface SheetDescriptionProps {
@@ -198,11 +194,7 @@ interface SheetDescriptionProps {
 }
 
 export function SheetDescription({ className, children }: SheetDescriptionProps) {
-  return (
-    <p className={cn("text-sm text-muted-foreground", className)}>
-      {children}
-    </p>
-  );
+  return <p className={cn("text-sm text-muted-foreground", className)}>{children}</p>;
 }
 
 interface SheetTriggerProps {
@@ -236,7 +228,12 @@ interface SheetFooterProps {
 
 export function SheetFooter({ className, children }: SheetFooterProps) {
   return (
-    <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4", className)}>
+    <div
+      className={cn(
+        "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pt-4",
+        className,
+      )}
+    >
       {children}
     </div>
   );

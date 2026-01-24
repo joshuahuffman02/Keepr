@@ -1,80 +1,72 @@
 {
-  "builtTestProducts" : [
+  "builtTestProducts": [
     {
-      "binaryPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.xctest/Contents/MacOS/CampreservUIPackageTests",
-      "packagePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI",
-      "productName" : "CampreservUIPackageTests"
+      "binaryPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.xctest/Contents/MacOS/CampreservUIPackageTests",
+      "packagePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI",
+      "productName": "CampreservUIPackageTests"
     }
   ],
-  "copyCommands" : {
-
+  "copyCommands": {},
+  "explicitTargetDependencyImportCheckingMode": {
+    "none": {}
   },
-  "explicitTargetDependencyImportCheckingMode" : {
-    "none" : {
-
-    }
-  },
-  "generatedSourceTargetSet" : [
-
-  ],
-  "pluginDescriptions" : [
-
-  ],
-  "swiftCommands" : {
-    "C.CampreservUI-arm64-apple-macosx26.0-debug.module" : {
-      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
-      "fileList" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources",
-      "importPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
-      "inputs" : [
+  "generatedSourceTargetSet": [],
+  "pluginDescriptions": [],
+  "swiftCommands": {
+    "C.CampreservUI-arm64-apple-macosx26.0-debug.module": {
+      "executable": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources",
+      "importPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
+      "inputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/FormField.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/FormField.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/LoadingView.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/LoadingView.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/PrimaryButton.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/PrimaryButton.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/StatusBadge.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/StatusBadge.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources"
         }
       ],
-      "isLibrary" : true,
-      "moduleName" : "CampreservUI",
-      "moduleOutputPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule",
-      "objects" : [
+      "isLibrary": true,
+      "moduleName": "CampreservUI",
+      "moduleOutputPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule",
+      "objects": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o",
@@ -85,7 +77,7 @@
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o"
       ],
-      "otherArguments" : [
+      "otherArguments": [
         "-target",
         "arm64-apple-macosx10.13",
         "-incremental",
@@ -140,51 +132,51 @@
         "-package-name",
         "campreservui"
       ],
-      "outputFileMapPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/output-file-map.json",
-      "outputs" : [
+      "outputFileMapPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/output-file-map.json",
+      "outputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule"
         }
       ],
-      "prepareForIndexing" : false,
-      "sources" : [
+      "prepareForIndexing": false,
+      "sources": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift",
@@ -195,38 +187,38 @@
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift",
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift"
       ],
-      "tempsPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build",
-      "wholeModuleOptimization" : false
+      "tempsPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build",
+      "wholeModuleOptimization": false
     },
-    "C.CampreservUIPackageTests-arm64-apple-macosx26.0-debug.module" : {
-      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
-      "fileList" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources",
-      "importPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
-      "inputs" : [
+    "C.CampreservUIPackageTests-arm64-apple-macosx26.0-debug.module": {
+      "executable": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources",
+      "importPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
+      "inputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources"
         }
       ],
-      "isLibrary" : true,
-      "moduleName" : "CampreservUIPackageTests",
-      "moduleOutputPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUIPackageTests.swiftmodule",
-      "objects" : [
+      "isLibrary": true,
+      "moduleName": "CampreservUIPackageTests",
+      "moduleOutputPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUIPackageTests.swiftmodule",
+      "objects": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/runner.swift.o"
       ],
-      "otherArguments" : [
+      "otherArguments": [
         "-target",
         "arm64-apple-macosx10.13",
         "-incremental",
@@ -281,53 +273,53 @@
         "-package-name",
         "campreservui"
       ],
-      "outputFileMapPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/output-file-map.json",
-      "outputs" : [
+      "outputFileMapPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/output-file-map.json",
+      "outputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/runner.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/runner.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUIPackageTests.swiftmodule"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUIPackageTests.swiftmodule"
         }
       ],
-      "prepareForIndexing" : false,
-      "sources" : [
+      "prepareForIndexing": false,
+      "sources": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
       ],
-      "tempsPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build",
-      "wholeModuleOptimization" : false
+      "tempsPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build",
+      "wholeModuleOptimization": false
     },
-    "C.CampreservUITests-arm64-apple-macosx26.0-debug.module" : {
-      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
-      "fileList" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources",
-      "importPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
-      "inputs" : [
+    "C.CampreservUITests-arm64-apple-macosx26.0-debug.module": {
+      "executable": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources",
+      "importPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules",
+      "inputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUI.swiftmodule"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources"
         }
       ],
-      "isLibrary" : true,
-      "moduleName" : "CampreservUITests",
-      "moduleOutputPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule",
-      "objects" : [
+      "isLibrary": true,
+      "moduleName": "CampreservUITests",
+      "moduleOutputPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule",
+      "objects": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o"
       ],
-      "otherArguments" : [
+      "otherArguments": [
         "-target",
         "arm64-apple-macosx14.0",
         "-incremental",
@@ -381,30 +373,28 @@
         "-package-name",
         "campreservui"
       ],
-      "outputFileMapPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/output-file-map.json",
-      "outputs" : [
+      "outputFileMapPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/output-file-map.json",
+      "outputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/Modules/CampreservUITests.swiftmodule"
         }
       ],
-      "prepareForIndexing" : false,
-      "sources" : [
+      "prepareForIndexing": false,
+      "sources": [
         "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift"
       ],
-      "tempsPath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build",
-      "wholeModuleOptimization" : false
+      "tempsPath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build",
+      "wholeModuleOptimization": false
     }
   },
-  "swiftFrontendCommands" : {
-
-  },
-  "swiftTargetScanArgs" : {
-    "CampreservUI" : [
+  "swiftFrontendCommands": {},
+  "swiftTargetScanArgs": {
+    "CampreservUI": [
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
       "-module-name",
       "CampreservUI",
@@ -478,7 +468,7 @@
       "-driver-use-frontend-path",
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
     ],
-    "CampreservUIPackageTests" : [
+    "CampreservUIPackageTests": [
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
       "-module-name",
       "CampreservUIPackageTests",
@@ -544,7 +534,7 @@
       "-driver-use-frontend-path",
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
     ],
-    "CampreservUITests" : [
+    "CampreservUITests": [
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
       "-module-name",
       "CampreservUITests",
@@ -610,181 +600,168 @@
       "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
     ]
   },
-  "targetDependencyMap" : {
-    "CampreservUI" : [
-
-    ],
-    "CampreservUIPackageTests" : [
-      "CampreservUITests",
-      "CampreservUI"
-    ],
-    "CampreservUITests" : [
-      "CampreservUI"
-    ]
+  "targetDependencyMap": {
+    "CampreservUI": [],
+    "CampreservUIPackageTests": ["CampreservUITests", "CampreservUI"],
+    "CampreservUITests": ["CampreservUI"]
   },
-  "testDiscoveryCommands" : {
-
-  },
-  "testEntryPointCommands" : {
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift" : {
-      "inputs" : [
-
-      ],
-      "outputs" : [
+  "testDiscoveryCommands": {},
+  "testEntryPointCommands": {
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift": {
+      "inputs": [],
+      "outputs": [
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
         }
       ]
     }
   },
-  "traitConfiguration" : {
-    "default" : {
-
-    }
+  "traitConfiguration": {
+    "default": {}
   },
-  "writeCommands" : {
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources" : {
-      "alwaysOutOfDate" : false,
-      "inputs" : [
+  "writeCommands": {
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources": {
+      "alwaysOutOfDate": false,
+      "inputs": [
         {
-          "kind" : "virtual",
-          "name" : "<sources-file-list>"
+          "kind": "virtual",
+          "name": "<sources-file-list>"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/CampreservUI.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/Card.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/ErrorView.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/FormField.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/FormField.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/LoadingView.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/LoadingView.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/PrimaryButton.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/PrimaryButton.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/StatusBadge.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Components/StatusBadge.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Colors.swift"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Sources/CampreservUI/Styles/Typography.swift"
         }
       ],
-      "outputFilePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources"
+      "outputFilePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/sources"
     },
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources" : {
-      "alwaysOutOfDate" : false,
-      "inputs" : [
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources": {
+      "alwaysOutOfDate": false,
+      "inputs": [
         {
-          "kind" : "virtual",
-          "name" : "<sources-file-list>"
+          "kind": "virtual",
+          "name": "<sources-file-list>"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.derived/runner.swift"
         }
       ],
-      "outputFilePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources"
+      "outputFilePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/sources"
     },
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.product/Objects.LinkFileList" : {
-      "alwaysOutOfDate" : false,
-      "inputs" : [
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.product/Objects.LinkFileList": {
+      "alwaysOutOfDate": false,
+      "inputs": [
         {
-          "kind" : "virtual",
-          "name" : "<link-file-list>"
+          "kind": "virtual",
+          "name": "<link-file-list>"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/CampreservUI.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Card.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Colors.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/ErrorView.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/FormField.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/LoadingView.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/PrimaryButton.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/StatusBadge.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUI.build/Typography.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/runner.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.build/runner.swift.o"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/CampreservUITests.swift.o"
         }
       ],
-      "outputFilePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.product/Objects.LinkFileList"
+      "outputFilePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUIPackageTests.product/Objects.LinkFileList"
     },
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources" : {
-      "alwaysOutOfDate" : false,
-      "inputs" : [
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources": {
+      "alwaysOutOfDate": false,
+      "inputs": [
         {
-          "kind" : "virtual",
-          "name" : "<sources-file-list>"
+          "kind": "virtual",
+          "name": "<sources-file-list>"
         },
         {
-          "kind" : "file",
-          "name" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift"
+          "kind": "file",
+          "name": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/Tests/CampreservUITests/CampreservUITests.swift"
         }
       ],
-      "outputFilePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources"
+      "outputFilePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/CampreservUITests.build/sources"
     },
-    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt" : {
-      "alwaysOutOfDate" : true,
-      "inputs" : [
+    "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt": {
+      "alwaysOutOfDate": true,
+      "inputs": [
         {
-          "kind" : "virtual",
-          "name" : "<swift-get-version>"
+          "kind": "virtual",
+          "name": "<swift-get-version>"
         },
         {
-          "kind" : "file",
-          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+          "kind": "file",
+          "name": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
         }
       ],
-      "outputFilePath" : "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
+      "outputFilePath": "/Users/josh/Documents/GitHub/Campreserv (broken) copy/mobile/ios/Packages/CampreservUI/.build/arm64-apple-macosx/debug/swift-version--58304C5D6DBC2206.txt"
     }
   }
 }

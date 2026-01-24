@@ -10,7 +10,6 @@ import { ScheduleModule } from "@nestjs/schedule";
 @Module({
   imports: [EmailModule, SmsModule, ScheduleModule.forRoot()],
   controllers: [CampaignsController],
-  providers: [CampaignsService, CampaignsScheduler]
+  providers: [CampaignsService, CampaignsScheduler],
 })
-export class CampaignsModule { }
-
+export class CampaignsModule {}

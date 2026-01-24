@@ -26,90 +26,90 @@ Keep responses operational and direct.
 `;
 
 type AgentServices = {
-    pricingV2: PricingV2Service;
-    seasonalRates: SeasonalRatesService;
-    reservations: ReservationsService;
-    maintenance: MaintenanceService;
-    repeatCharges: RepeatChargesService;
+  pricingV2: PricingV2Service;
+  seasonalRates: SeasonalRatesService;
+  reservations: ReservationsService;
+  maintenance: MaintenanceService;
+  repeatCharges: RepeatChargesService;
 };
 
 type AdkRunOptions = Record<string, unknown>;
 
 type AdkRunner = {
-    run: (input: string, options?: AdkRunOptions) => Promise<unknown>;
+  run: (input: string, options?: AdkRunOptions) => Promise<unknown>;
 };
 
 type AdkRuntime = AdkModule & {
-    llmAgent: (config: {
-        name: string;
-        instructions: string;
-        tools: unknown[];
-    }) => unknown;
-    orchestrator: (config: {
-        name: string;
-        instructions: string;
-        agents: unknown[];
-    }) => AdkRunner;
+  llmAgent: (config: { name: string; instructions: string; tools: unknown[] }) => unknown;
+  orchestrator: (config: { name: string; instructions: string; agents: unknown[] }) => AdkRunner;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
-    typeof value === "object" && value !== null;
+  typeof value === "object" && value !== null;
 
 const isAdkRuntimeModule = (value: unknown): value is { adk: AdkRuntime } => {
-    if (!isRecord(value)) return false;
-    const adk = value.adk;
-    if (!isRecord(adk)) return false;
-    return typeof adk.tool === "function"
-        && typeof adk.llmAgent === "function"
-        && typeof adk.orchestrator === "function";
+  if (!isRecord(value)) return false;
+  const adk = value.adk;
+  if (!isRecord(adk)) return false;
+  return (
+    typeof adk.tool === "function" &&
+    typeof adk.llmAgent === "function" &&
+    typeof adk.orchestrator === "function"
+  );
 };
 
 export const createAgentRegistry = (services: AgentServices) => {
-    let runnerPromise: Promise<AdkRunner> | null = null;
-    let loadError: Error | null = null;
+  let runnerPromise: Promise<AdkRunner> | null = null;
+  let loadError: Error | null = null;
 
-    const loadRunner = async () => {
-        if (loadError) {
-            throw loadError;
+  const loadRunner = async () => {
+    if (loadError) {
+      throw loadError;
+    }
+    if (!runnerPromise) {
+      runnerPromise = (async () => {
+        const mod = await import("@google/adk");
+        if (!isAdkRuntimeModule(mod)) {
+          throw new Error("ADK module missing expected runtime exports.");
         }
-        if (!runnerPromise) {
-            runnerPromise = (async () => {
-                const mod = await import("@google/adk");
-                if (!isAdkRuntimeModule(mod)) {
-                    throw new Error("ADK module missing expected runtime exports.");
-                }
-                const { adk } = mod;
+        const { adk } = mod;
 
-                const revenueAgent = adk.llmAgent({
-                    name: "RevenueManager",
-                    instructions: REVENUE_MANAGER_PROMPT,
-                    tools: createRevenueTools(adk, services.pricingV2, services.seasonalRates),
-                });
+        const revenueAgent = adk.llmAgent({
+          name: "RevenueManager",
+          instructions: REVENUE_MANAGER_PROMPT,
+          tools: createRevenueTools(adk, services.pricingV2, services.seasonalRates),
+        });
 
-                const opsAgent = adk.llmAgent({
-                    name: "OperationsChief",
-                    instructions: OPERATIONS_CHIEF_PROMPT,
-                    tools: createOpsTools(adk, services.reservations, services.maintenance, services.repeatCharges),
-                });
+        const opsAgent = adk.llmAgent({
+          name: "OperationsChief",
+          instructions: OPERATIONS_CHIEF_PROMPT,
+          tools: createOpsTools(
+            adk,
+            services.reservations,
+            services.maintenance,
+            services.repeatCharges,
+          ),
+        });
 
-                return adk.orchestrator({
-                    name: "ActivePartnerOrchestrator",
-                    instructions: "You are the Active AI Partner for a campground owner. Route the user to the correct expert based on their goal.",
-                    agents: [revenueAgent, opsAgent],
-                });
-            })().catch((err: Error) => {
-                loadError = err;
-                runnerPromise = null;
-                throw err;
-            });
-        }
-        return runnerPromise;
-    };
+        return adk.orchestrator({
+          name: "ActivePartnerOrchestrator",
+          instructions:
+            "You are the Active AI Partner for a campground owner. Route the user to the correct expert based on their goal.",
+          agents: [revenueAgent, opsAgent],
+        });
+      })().catch((err: Error) => {
+        loadError = err;
+        runnerPromise = null;
+        throw err;
+      });
+    }
+    return runnerPromise;
+  };
 
-    return {
-        async run(input: string, options?: AdkRunOptions) {
-            const runner = await loadRunner();
-            return runner.run(input, options);
-        }
-    };
+  return {
+    async run(input: string, options?: AdkRunOptions) {
+      const runner = await loadRunner();
+      return runner.run(input, options);
+    },
+  };
 };

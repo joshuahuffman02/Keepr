@@ -102,11 +102,7 @@ export function BookingSidebar({
   const { data: availableSites } = useQuery({
     queryKey: ["public-availability", campgroundSlug, arrivalDate, departureDate, previewToken],
     queryFn: () =>
-      apiClient.getPublicAvailability(
-        campgroundSlug,
-        { arrivalDate, departureDate },
-        previewToken
-      ),
+      apiClient.getPublicAvailability(campgroundSlug, { arrivalDate, departureDate }, previewToken),
     enabled: !!campgroundSlug && !!arrivalDate && !!departureDate && nights > 0,
     staleTime: 60 * 1000,
   });
@@ -115,16 +111,13 @@ export function BookingSidebar({
   const quoteSiteId = useMemo(() => {
     if (!selectedSiteClassId || !availableSites) return null;
     const available = availableSites.find(
-      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available"
+      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available",
     );
     return available?.id || null;
   }, [selectedSiteClassId, availableSites]);
 
   // Fetch real quote when we have dates + site
-  const {
-    data: quote,
-    isLoading: isLoadingQuote,
-  } = useQuery({
+  const { data: quote, isLoading: isLoadingQuote } = useQuery({
     queryKey: [
       "public-quote",
       campgroundSlug,
@@ -195,7 +188,7 @@ export function BookingSidebar({
     <motion.div
       className={cn(
         "bg-card border border-border rounded-2xl shadow-xl overflow-hidden",
-        className
+        className,
       )}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -219,15 +212,11 @@ export function BookingSidebar({
           ) : lowestPrice ? (
             <div className="flex items-baseline gap-1">
               <span className="text-sm text-muted-foreground">from</span>
-              <span className="text-2xl font-bold text-foreground">
-                ${lowestPrice.toFixed(0)}
-              </span>
+              <span className="text-2xl font-bold text-foreground">${lowestPrice.toFixed(0)}</span>
               <span className="text-muted-foreground">/ night</span>
             </div>
           ) : (
-            <span className="text-lg font-medium text-muted-foreground">
-              Check availability
-            </span>
+            <span className="text-lg font-medium text-muted-foreground">Check availability</span>
           )}
 
           {reviewScore && reviewCount && reviewCount > 0 && (
@@ -241,10 +230,7 @@ export function BookingSidebar({
 
         {/* High demand badge */}
         {isHighDemand && (
-          <Badge
-            variant="secondary"
-            className="bg-rose-50 text-rose-700 border-rose-200 mt-2"
-          >
+          <Badge variant="secondary" className="bg-rose-50 text-rose-700 border-rose-200 mt-2">
             <Zap className="h-3 w-3 mr-1" />
             Popular choice
           </Badge>
@@ -353,7 +339,8 @@ export function BookingSidebar({
             aria-expanded={showPriceBreakdown}
           >
             <span className="underline decoration-dashed underline-offset-4">
-              ${(effectiveNightlyRate / 100).toFixed(0)} x {quote.nights} night{quote.nights === 1 ? "" : "s"}
+              ${(effectiveNightlyRate / 100).toFixed(0)} x {quote.nights} night
+              {quote.nights === 1 ? "" : "s"}
             </span>
             {showPriceBreakdown ? (
               <ChevronUp className="h-4 w-4" />
@@ -370,9 +357,7 @@ export function BookingSidebar({
             >
               {priceBreakdown.map((item, idx) => (
                 <div key={idx} className="flex justify-between text-muted-foreground">
-                  <span className={item.isDiscount ? "text-emerald-600" : ""}>
-                    {item.label}
-                  </span>
+                  <span className={item.isDiscount ? "text-emerald-600" : ""}>{item.label}</span>
                   <span className={item.isDiscount ? "text-emerald-600" : ""}>
                     {item.isDiscount ? "-" : ""}${(item.amount / 100).toFixed(2)}
                   </span>
@@ -382,9 +367,7 @@ export function BookingSidebar({
                 <span>Total</span>
                 <span>${(totalAmount / 100).toFixed(2)}</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Includes taxes, fees, and all charges
-              </p>
+              <p className="text-xs text-muted-foreground">Includes taxes, fees, and all charges</p>
             </motion.div>
           )}
         </div>
@@ -407,9 +390,7 @@ export function BookingSidebar({
         >
           Reserve
         </Button>
-        <p className="text-center text-xs text-muted-foreground mt-2">
-          You won't be charged yet
-        </p>
+        <p className="text-center text-xs text-muted-foreground mt-2">You won't be charged yet</p>
       </div>
 
       {/* Charity badge */}
@@ -418,8 +399,7 @@ export function BookingSidebar({
           <div className="flex items-center gap-2 p-3 bg-rose-50 rounded-lg border border-rose-100">
             <Heart className="h-4 w-4 text-rose-500 flex-shrink-0" />
             <p className="text-xs text-rose-700">
-              Part of your booking supports{" "}
-              <span className="font-medium">{charityName}</span>
+              Part of your booking supports <span className="font-medium">{charityName}</span>
             </p>
           </div>
         </div>

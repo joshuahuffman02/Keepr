@@ -45,7 +45,7 @@ import {
   Loader2,
   PartyPopper,
   Move,
-  RotateCw
+  RotateCw,
 } from "lucide-react";
 
 type Point = { x: number; y: number };
@@ -60,8 +60,22 @@ type EditorSite = {
 
 type SiteMapData = {
   config?: unknown | null;
-  sites?: Array<{ siteId: string; shapeId?: string | null; geometry?: unknown; centroid?: unknown; label?: string | null; rotation?: number | null }>;
-  shapes?: Array<{ id: string; name?: string | null; geometry?: unknown; centroid?: unknown; metadata?: unknown; assignedSiteId?: string | null }>;
+  sites?: Array<{
+    siteId: string;
+    shapeId?: string | null;
+    geometry?: unknown;
+    centroid?: unknown;
+    label?: string | null;
+    rotation?: number | null;
+  }>;
+  shapes?: Array<{
+    id: string;
+    name?: string | null;
+    geometry?: unknown;
+    centroid?: unknown;
+    metadata?: unknown;
+    assignedSiteId?: string | null;
+  }>;
 };
 
 type SiteMapEditorProps = {
@@ -91,10 +105,11 @@ type DragMode = "vertex" | "move" | "rotate" | "resize";
 const pointInPolygon = (point: Point, polygon: Point[]): boolean => {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].x, yi = polygon[i].y;
-    const xj = polygon[j].x, yj = polygon[j].y;
-    if (((yi > point.y) !== (yj > point.y)) &&
-        (point.x < (xj - xi) * (point.y - yi) / (yj - yi) + xi)) {
+    const xi = polygon[i].x,
+      yi = polygon[i].y;
+    const xj = polygon[j].x,
+      yj = polygon[j].y;
+    if (yi > point.y !== yj > point.y && point.x < ((xj - xi) * (point.y - yi)) / (yj - yi) + xi) {
       inside = !inside;
     }
   }
@@ -103,8 +118,8 @@ const pointInPolygon = (point: Point, polygon: Point[]): boolean => {
 
 // Get bounding box of points
 const getBoundingBox = (points: Point[]): { min: Point; max: Point; center: Point } => {
-  const xs = points.map(p => p.x);
-  const ys = points.map(p => p.y);
+  const xs = points.map((p) => p.x);
+  const ys = points.map((p) => p.y);
   const min = { x: Math.min(...xs), y: Math.min(...ys) };
   const max = { x: Math.max(...xs), y: Math.max(...ys) };
   const center = { x: (min.x + max.x) / 2, y: (min.y + max.y) / 2 };
@@ -115,29 +130,29 @@ const getBoundingBox = (points: Point[]): { min: Point; max: Point; center: Poin
 const rotatePoints = (points: Point[], center: Point, angleDelta: number): Point[] => {
   const cos = Math.cos(angleDelta);
   const sin = Math.sin(angleDelta);
-  return points.map(p => {
+  return points.map((p) => {
     const dx = p.x - center.x;
     const dy = p.y - center.y;
     return {
       x: center.x + dx * cos - dy * sin,
-      y: center.y + dx * sin + dy * cos
+      y: center.y + dx * sin + dy * cos,
     };
   });
 };
 
 // Scale points from a center
 const scalePoints = (points: Point[], center: Point, scaleX: number, scaleY: number): Point[] => {
-  return points.map(p => ({
+  return points.map((p) => ({
     x: center.x + (p.x - center.x) * scaleX,
-    y: center.y + (p.y - center.y) * scaleY
+    y: center.y + (p.y - center.y) * scaleY,
   }));
 };
 
 // Translate all points by delta
 const translatePoints = (points: Point[], delta: Point): Point[] => {
-  return points.map(p => ({
+  return points.map((p) => ({
     x: p.x + delta.x,
-    y: p.y + delta.y
+    y: p.y + delta.y,
   }));
 };
 
@@ -180,7 +195,12 @@ const extractPoints = (geometry: unknown): Point[] => {
     if (type === "Polygon" && Array.isArray(coordinates) && Array.isArray(coordinates[0])) {
       return coordinates[0].map(normalizePoint).filter(isPoint);
     }
-    if (type === "MultiPolygon" && Array.isArray(coordinates) && Array.isArray(coordinates[0]) && Array.isArray(coordinates[0][0])) {
+    if (
+      type === "MultiPolygon" &&
+      Array.isArray(coordinates) &&
+      Array.isArray(coordinates[0]) &&
+      Array.isArray(coordinates[0][0])
+    ) {
       return coordinates[0][0].map(normalizePoint).filter(isPoint);
     }
     if (type === "LineString" && Array.isArray(coordinates)) {
@@ -202,8 +222,12 @@ const extractRect = (geometry: unknown) => {
   if (!isRecord(geometry)) return null;
   const x = geometry.x ?? geometry.left ?? geometry.minX;
   const y = geometry.y ?? geometry.top ?? geometry.minY;
-  const width = geometry.width ?? (isNumber(geometry.right) && isNumber(x) ? Number(geometry.right) - Number(x) : null);
-  const height = geometry.height ?? (isNumber(geometry.bottom) && isNumber(y) ? Number(geometry.bottom) - Number(y) : null);
+  const width =
+    geometry.width ??
+    (isNumber(geometry.right) && isNumber(x) ? Number(geometry.right) - Number(x) : null);
+  const height =
+    geometry.height ??
+    (isNumber(geometry.bottom) && isNumber(y) ? Number(geometry.bottom) - Number(y) : null);
   if (isNumber(x) && isNumber(y) && isNumber(width) && isNumber(height)) {
     return { x: Number(x), y: Number(y), width: Number(width), height: Number(height) };
   }
@@ -217,7 +241,7 @@ const geometryToPoints = (geometry: unknown): Point[] => {
       { x: rect.x, y: rect.y },
       { x: rect.x + rect.width, y: rect.y },
       { x: rect.x + rect.width, y: rect.y + rect.height },
-      { x: rect.x, y: rect.y + rect.height }
+      { x: rect.x, y: rect.y + rect.height },
     ];
   }
   return extractPoints(geometry);
@@ -239,7 +263,8 @@ const cloneGeometry = <T,>(value: T): T => {
 const centroidFromPoints = (points: Point[]): Point | null => {
   if (points.length < 3) {
     if (points.length === 1) return points[0];
-    if (points.length === 2) return { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
+    if (points.length === 2)
+      return { x: (points[0].x + points[1].x) / 2, y: (points[0].y + points[1].y) / 2 };
     return null;
   }
   let area = 0;
@@ -264,13 +289,26 @@ const centroidFromPoints = (points: Point[]): Point | null => {
 const getBoundsFromConfig = (bounds: unknown): Bounds | null => {
   if (!bounds) return null;
   if (Array.isArray(bounds) && bounds.length >= 4 && bounds.every(isNumber)) {
-    return { minX: Number(bounds[0]), minY: Number(bounds[1]), maxX: Number(bounds[2]), maxY: Number(bounds[3]) };
+    return {
+      minX: Number(bounds[0]),
+      minY: Number(bounds[1]),
+      maxX: Number(bounds[2]),
+      maxY: Number(bounds[3]),
+    };
   }
   if (!isRecord(bounds)) return null;
   const minX = bounds.minX ?? bounds.left ?? bounds.x;
   const minY = bounds.minY ?? bounds.top ?? bounds.y;
-  const maxX = bounds.maxX ?? bounds.right ?? (isNumber(bounds.width) && isNumber(bounds.x) ? Number(bounds.x) + Number(bounds.width) : null);
-  const maxY = bounds.maxY ?? bounds.bottom ?? (isNumber(bounds.height) && isNumber(bounds.y) ? Number(bounds.y) + Number(bounds.height) : null);
+  const maxX =
+    bounds.maxX ??
+    bounds.right ??
+    (isNumber(bounds.width) && isNumber(bounds.x) ? Number(bounds.x) + Number(bounds.width) : null);
+  const maxY =
+    bounds.maxY ??
+    bounds.bottom ??
+    (isNumber(bounds.height) && isNumber(bounds.y)
+      ? Number(bounds.y) + Number(bounds.height)
+      : null);
   if (isNumber(minX) && isNumber(minY) && isNumber(maxX) && isNumber(maxY)) {
     return { minX: Number(minX), minY: Number(minY), maxX: Number(maxX), maxY: Number(maxY) };
   }
@@ -291,16 +329,12 @@ const snapToAngle = (point: Point, anchor: Point): Point => {
   const distance = Math.hypot(dx, dy);
   return {
     x: anchor.x + Math.cos(snapped) * distance,
-    y: anchor.y + Math.sin(snapped) * distance
+    y: anchor.y + Math.sin(snapped) * distance,
   };
 };
 
 // Generate preset shape points
-const generatePresetPoints = (
-  type: PresetShape,
-  center: Point,
-  size: number = 60
-): Point[] => {
+const generatePresetPoints = (type: PresetShape, center: Point, size: number = 60): Point[] => {
   const half = size / 2;
   switch (type) {
     case "square":
@@ -308,7 +342,7 @@ const generatePresetPoints = (
         { x: center.x - half, y: center.y - half },
         { x: center.x + half, y: center.y - half },
         { x: center.x + half, y: center.y + half },
-        { x: center.x - half, y: center.y + half }
+        { x: center.x - half, y: center.y + half },
       ];
     case "rectangle":
       const width = size * 1.5;
@@ -317,7 +351,7 @@ const generatePresetPoints = (
         { x: center.x - width / 2, y: center.y - height / 2 },
         { x: center.x + width / 2, y: center.y - height / 2 },
         { x: center.x + width / 2, y: center.y + height / 2 },
-        { x: center.x - width / 2, y: center.y + height / 2 }
+        { x: center.x - width / 2, y: center.y + height / 2 },
       ];
     case "circle":
       // Approximate circle with 16 points
@@ -327,7 +361,7 @@ const generatePresetPoints = (
         const angle = (i / segments) * Math.PI * 2;
         points.push({
           x: center.x + Math.cos(angle) * half,
-          y: center.y + Math.sin(angle) * half
+          y: center.y + Math.sin(angle) * half,
         });
       }
       return points;
@@ -336,7 +370,7 @@ const generatePresetPoints = (
       return [
         { x: center.x, y: center.y - triHeight / 2 },
         { x: center.x + half, y: center.y + triHeight / 2 },
-        { x: center.x - half, y: center.y + triHeight / 2 }
+        { x: center.x - half, y: center.y + triHeight / 2 },
       ];
     default:
       return [];
@@ -403,7 +437,10 @@ const KeyboardShortcutsHelp = ({ open, onClose }: { open: boolean; onClose: () =
         aria-modal="true"
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 id="shortcuts-title" className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <h2
+            id="shortcuts-title"
+            className="text-lg font-semibold text-foreground flex items-center gap-2"
+          >
             <Keyboard className="h-5 w-5" />
             Keyboard Shortcuts
           </h2>
@@ -417,7 +454,10 @@ const KeyboardShortcutsHelp = ({ open, onClose }: { open: boolean; onClose: () =
         </div>
         <div className="space-y-2">
           {shortcuts.map((s) => (
-            <div key={s.key} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+            <div
+              key={s.key}
+              className="flex items-center justify-between py-2 border-b border-border last:border-0"
+            >
               <kbd className="px-2 py-1 bg-muted rounded text-sm font-mono text-foreground">
                 {s.key}
               </kbd>
@@ -437,7 +477,7 @@ export function SiteMapEditor({
   sites,
   isLoading,
   onSaved,
-  className
+  className,
 }: SiteMapEditorProps) {
   const { toast } = useToast();
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -468,7 +508,9 @@ export function SiteMapEditor({
   const [showCelebration, setShowCelebration] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [quickAssignShapeId, setQuickAssignShapeId] = useState<string | null>(null);
-  const [quickAssignPosition, setQuickAssignPosition] = useState<{ x: number; y: number } | null>(null);
+  const [quickAssignPosition, setQuickAssignPosition] = useState<{ x: number; y: number } | null>(
+    null,
+  );
   const [quickAssignSearch, setQuickAssignSearch] = useState("");
 
   // Confirmation dialog states
@@ -517,7 +559,7 @@ export function SiteMapEditor({
     img.onload = () => {
       setImageSize({
         width: img.naturalWidth || img.width || 1000,
-        height: img.naturalHeight || img.height || 1000
+        height: img.naturalHeight || img.height || 1000,
       });
     };
     img.onerror = () => setImageSize(null);
@@ -623,7 +665,7 @@ export function SiteMapEditor({
         geometry: shape.geometry,
         centroid: shape.centroid,
         metadata: shape.metadata,
-        isNew: false
+        isNew: false,
       });
     });
     Object.values(draftShapes).forEach((draft) => {
@@ -653,17 +695,17 @@ export function SiteMapEditor({
 
   const selectedSite = useMemo(
     () => sites.find((site) => site.id === selectedSiteId) ?? null,
-    [sites, selectedSiteId]
+    [sites, selectedSiteId],
   );
 
   const selectedSiteAssignedShapeId = useMemo(
     () => (selectedSiteId ? assignedShapeBySite.get(selectedSiteId) : undefined),
-    [assignedShapeBySite, selectedSiteId]
+    [assignedShapeBySite, selectedSiteId],
   );
 
   const selectedShapeAssignedSiteId = useMemo(
     () => (selectedShapeId ? assignedSiteByShape.get(selectedShapeId) : undefined),
-    [assignedSiteByShape, selectedShapeId]
+    [assignedSiteByShape, selectedShapeId],
   );
 
   const pendingShapeCount = useMemo(() => Object.keys(draftShapes).length, [draftShapes]);
@@ -671,7 +713,7 @@ export function SiteMapEditor({
 
   const assignedShapeCount = useMemo(
     () => shapeList.filter((shape) => assignedSiteByShape.has(shape.id)).length,
-    [assignedSiteByShape, shapeList]
+    [assignedSiteByShape, shapeList],
   );
 
   const unassignedShapeCount = shapeList.length - assignedShapeCount;
@@ -680,7 +722,8 @@ export function SiteMapEditor({
     const term = search.trim().toLowerCase();
     if (!term) return sites;
     return sites.filter((site) => {
-      const label = `${site.siteNumber ?? ""} ${site.name ?? ""} ${site.mapLabel ?? ""}`.toLowerCase();
+      const label =
+        `${site.siteNumber ?? ""} ${site.name ?? ""} ${site.mapLabel ?? ""}`.toLowerCase();
       return label.includes(term);
     });
   }, [search, sites]);
@@ -690,7 +733,7 @@ export function SiteMapEditor({
     if (!term) return shapeList;
     return shapeList.filter((shape) => {
       const assignedSiteId = assignedSiteByShape.get(shape.id);
-      const siteLabel = assignedSiteId ? siteLabelById.get(assignedSiteId) ?? "" : "";
+      const siteLabel = assignedSiteId ? (siteLabelById.get(assignedSiteId) ?? "") : "";
       const label = `${shape.name ?? ""} ${shape.id} ${siteLabel}`.toLowerCase();
       return label.includes(term);
     });
@@ -707,10 +750,12 @@ export function SiteMapEditor({
         minX: configBounds.minX,
         minY: configBounds.minY,
         width: configBounds.maxX - configBounds.minX,
-        height: configBounds.maxY - configBounds.minY
+        height: configBounds.maxY - configBounds.minY,
       };
     }
-    const points = Array.from(mergedShapes.values()).flatMap((layout) => geometryToPoints(layout.geometry));
+    const points = Array.from(mergedShapes.values()).flatMap((layout) =>
+      geometryToPoints(layout.geometry),
+    );
     if (points.length) {
       const minX = Math.min(...points.map((p) => p.x));
       const minY = Math.min(...points.map((p) => p.y));
@@ -719,7 +764,12 @@ export function SiteMapEditor({
       const width = maxX - minX || 100;
       const height = maxY - minY || 100;
       const pad = Math.max(width, height) * 0.04;
-      return { minX: minX - pad, minY: minY - pad, width: width + pad * 2, height: height + pad * 2 };
+      return {
+        minX: minX - pad,
+        minY: minY - pad,
+        width: width + pad * 2,
+        height: height + pad * 2,
+      };
     }
     return { minX: 0, minY: 0, width: 1000, height: 600 };
   }, [imageSize, mapData?.config, mergedShapes]);
@@ -761,7 +811,7 @@ export function SiteMapEditor({
       const offsetY = (rect.height - contentHeight) / 2;
       rawPoint = {
         x: (event.clientX - rect.left - offsetX) / scale + viewBox.minX,
-        y: (event.clientY - rect.top - offsetY) / scale + viewBox.minY
+        y: (event.clientY - rect.top - offsetY) / scale + viewBox.minY,
       };
     }
     if (!rawPoint) return null;
@@ -775,7 +825,7 @@ export function SiteMapEditor({
       const size = clampGrid(gridSize);
       point = {
         x: Math.round(point.x / size) * size,
-        y: Math.round(point.y / size) * size
+        y: Math.round(point.y / size) * size,
       };
     }
     return { x: roundPoint(point.x), y: roundPoint(point.y) };
@@ -856,9 +906,19 @@ export function SiteMapEditor({
         const scaleY = originalHeight > 0 ? newHeight / originalHeight : 1;
 
         // Scale from anchor point
-        const scaled = initialPoints.map(p => ({
-          x: anchor.x + (p.x - anchor.x) * scaleX * (point.x < anchor.x ? -1 : 1) * (resizeCorner === 0 || resizeCorner === 3 ? -1 : 1),
-          y: anchor.y + (p.y - anchor.y) * scaleY * (point.y < anchor.y ? -1 : 1) * (resizeCorner === 0 || resizeCorner === 1 ? -1 : 1)
+        const scaled = initialPoints.map((p) => ({
+          x:
+            anchor.x +
+            (p.x - anchor.x) *
+              scaleX *
+              (point.x < anchor.x ? -1 : 1) *
+              (resizeCorner === 0 || resizeCorner === 3 ? -1 : 1),
+          y:
+            anchor.y +
+            (p.y - anchor.y) *
+              scaleY *
+              (point.y < anchor.y ? -1 : 1) *
+              (resizeCorner === 0 || resizeCorner === 1 ? -1 : 1),
         }));
         setEditingPoints(scaled);
       }
@@ -889,7 +949,11 @@ export function SiteMapEditor({
 
   const handleRedrawSelected = () => {
     if (!selectedShapeId) {
-      toast({ title: "Select a shape first", description: "Choose a shape to redraw.", variant: "destructive" });
+      toast({
+        title: "Select a shape first",
+        description: "Choose a shape to redraw.",
+        variant: "destructive",
+      });
       return;
     }
     handleStartDraw(selectedShapeId);
@@ -904,12 +968,16 @@ export function SiteMapEditor({
 
   const createShapeFromPoints = (points: Point[], targetId?: string | null) => {
     if (points.length < 3) {
-      toast({ title: "Add at least 3 points", description: "Polygons need three or more points.", variant: "destructive" });
+      toast({
+        title: "Add at least 3 points",
+        description: "Polygons need three or more points.",
+        variant: "destructive",
+      });
       return;
     }
     const geometry = {
       type: "Polygon",
-      coordinates: [points.map((p) => [p.x, p.y])]
+      coordinates: [points.map((p) => [p.x, p.y])],
     };
     const centroid = centroidFromPoints(points);
     const shapeId = targetId ?? drawTargetId ?? createDraftId();
@@ -925,8 +993,8 @@ export function SiteMapEditor({
         geometry,
         centroid,
         metadata: baseShape?.metadata,
-        isNew
-      }
+        isNew,
+      },
     }));
     setSelectedShapeId(shapeId);
     setIsDrawing(false);
@@ -940,7 +1008,10 @@ export function SiteMapEditor({
       triggerCelebration();
     }
 
-    toast({ title: "Shape created!", description: "Don't forget to save and assign it to a site." });
+    toast({
+      title: "Shape created!",
+      description: "Don't forget to save and assign it to a site.",
+    });
   };
 
   const handleFinish = () => {
@@ -961,7 +1032,11 @@ export function SiteMapEditor({
 
   const handleDuplicateShape = () => {
     if (!selectedGeometry) {
-      toast({ title: "No shape selected", description: "Select a shape to duplicate.", variant: "destructive" });
+      toast({
+        title: "No shape selected",
+        description: "Select a shape to duplicate.",
+        variant: "destructive",
+      });
       return;
     }
     const draftId = createDraftId();
@@ -975,8 +1050,8 @@ export function SiteMapEditor({
         geometry: cloneGeometry(selectedGeometry),
         centroid,
         metadata: selectedShape?.metadata,
-        isNew: true
-      }
+        isNew: true,
+      },
     }));
     setSelectedShapeId(draftId);
     toast({ title: "Shape duplicated", description: "Assign the new shape to a site when ready." });
@@ -987,7 +1062,7 @@ export function SiteMapEditor({
     if (!selectedShapeId || points.length < 3) return;
     const geometry = {
       type: "Polygon",
-      coordinates: [points.map((p) => [p.x, p.y])]
+      coordinates: [points.map((p) => [p.x, p.y])],
     };
     const centroid = centroidFromPoints(points);
     const baseShape = mergedShapes.get(selectedShapeId);
@@ -1000,8 +1075,8 @@ export function SiteMapEditor({
         geometry,
         centroid,
         metadata: baseShape.metadata,
-        isNew: baseShape.isNew
-      }
+        isNew: baseShape.isNew,
+      },
     }));
     setEditingPoints(null);
     setDragIndex(null);
@@ -1032,7 +1107,10 @@ export function SiteMapEditor({
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
-      if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) {
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+      ) {
         return;
       }
 
@@ -1064,14 +1142,14 @@ export function SiteMapEditor({
 
       // Toggle snap
       if (event.key === "s" || event.key === "S") {
-        setSnapToGrid(prev => !prev);
+        setSnapToGrid((prev) => !prev);
         announce(snapToGrid ? "Snap disabled" : "Snap enabled");
         return;
       }
 
       // Toggle fullscreen
       if (event.key === "f" || event.key === "F") {
-        setIsFullscreen(prev => !prev);
+        setIsFullscreen((prev) => !prev);
         return;
       }
 
@@ -1120,7 +1198,17 @@ export function SiteMapEditor({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [announce, dragIndex, handleFinish, handleUndo, isDrawing, showShortcuts, snapToGrid, quickAssignShapeId, closeQuickAssign]);
+  }, [
+    announce,
+    dragIndex,
+    handleFinish,
+    handleUndo,
+    isDrawing,
+    showShortcuts,
+    snapToGrid,
+    quickAssignShapeId,
+    closeQuickAssign,
+  ]);
 
   const handleSaveShapes = async () => {
     if (!campgroundId) return;
@@ -1137,13 +1225,16 @@ export function SiteMapEditor({
         name: shape.name ?? null,
         geometry: shape.geometry,
         centroid: shape.centroid,
-        metadata: shape.metadata
+        metadata: shape.metadata,
       }));
 
       await apiClient.upsertCampgroundMapShapes(campgroundId, {
-        shapes: shapesPayload
+        shapes: shapesPayload,
       });
-      toast({ title: "Shapes saved!", description: `${entries.length} shape${entries.length > 1 ? 's' : ''} saved successfully.` });
+      toast({
+        title: "Shapes saved!",
+        description: `${entries.length} shape${entries.length > 1 ? "s" : ""} saved successfully.`,
+      });
       setDraftShapes({});
       if (hasNewShapes) {
         setSelectedShapeId("");
@@ -1158,7 +1249,12 @@ export function SiteMapEditor({
     }
   };
 
-  const executeAssignment = async (siteId: string, shapeId: string, needsReassign: boolean, needsReplace: boolean) => {
+  const executeAssignment = async (
+    siteId: string,
+    shapeId: string,
+    needsReassign: boolean,
+    needsReplace: boolean,
+  ) => {
     if (!campgroundId) return;
     const siteLabel = siteLabelById.get(siteId) ?? siteId;
     const shapeLabel = shapeLabelById.get(shapeId) ?? shapeId;
@@ -1174,10 +1270,10 @@ export function SiteMapEditor({
         await apiClient.unassignCampgroundMapSite(campgroundId, siteId);
       }
 
-      const site = sites.find(s => s.id === siteId);
+      const site = sites.find((s) => s.id === siteId);
       const label = site?.mapLabel ?? site?.siteNumber ?? site?.name ?? null;
       await apiClient.upsertCampgroundMapAssignments(campgroundId, {
-        assignments: [{ siteId, shapeId, label }]
+        assignments: [{ siteId, shapeId, label }],
       });
       toast({ title: "Assigned!", description: `${shapeLabel} mapped to ${siteLabel}.` });
       announce(`Shape assigned to ${siteLabel}`);
@@ -1193,15 +1289,25 @@ export function SiteMapEditor({
   const handleAssignShape = async () => {
     if (!campgroundId) return;
     if (!selectedSiteId || !selectedShapeId) {
-      toast({ title: "Select a site and shape", description: "Choose both before assigning.", variant: "destructive" });
+      toast({
+        title: "Select a site and shape",
+        description: "Choose both before assigning.",
+        variant: "destructive",
+      });
       return;
     }
     if (selectedShape?.isNew || draftShapes[selectedShapeId]?.isNew) {
-      toast({ title: "Save the shape first", description: "New shapes must be saved before assigning." });
+      toast({
+        title: "Save the shape first",
+        description: "New shapes must be saved before assigning.",
+      });
       return;
     }
     if (draftShapes[selectedShapeId]) {
-      toast({ title: "Save edits first", description: "Save shape edits before assigning so geometry is current." });
+      toast({
+        title: "Save edits first",
+        description: "Save shape edits before assigning so geometry is current.",
+      });
       return;
     }
 
@@ -1274,7 +1380,11 @@ export function SiteMapEditor({
   const handleUnassignSite = async () => {
     if (!campgroundId) return;
     if (!selectedSiteId) {
-      toast({ title: "Select a site", description: "Choose a site to unassign.", variant: "destructive" });
+      toast({
+        title: "Select a site",
+        description: "Choose a site to unassign.",
+        variant: "destructive",
+      });
       return;
     }
     if (!selectedSiteAssignedShapeId) {
@@ -1309,7 +1419,7 @@ export function SiteMapEditor({
       if (rect) {
         setQuickAssignPosition({
           x: event.clientX - rect.left,
-          y: event.clientY - rect.top
+          y: event.clientY - rect.top,
         });
         setQuickAssignShapeId(shapeId);
         setQuickAssignSearch("");
@@ -1327,11 +1437,17 @@ export function SiteMapEditor({
     const shape = mergedShapes.get(shapeId);
 
     if (shape?.isNew || draftShapes[shapeId]?.isNew) {
-      toast({ title: "Save the shape first", description: "New shapes must be saved before assigning." });
+      toast({
+        title: "Save the shape first",
+        description: "New shapes must be saved before assigning.",
+      });
       return;
     }
     if (draftShapes[shapeId]) {
-      toast({ title: "Save edits first", description: "Save shape edits before assigning so geometry is current." });
+      toast({
+        title: "Save edits first",
+        description: "Save shape edits before assigning so geometry is current.",
+      });
       return;
     }
 
@@ -1365,10 +1481,10 @@ export function SiteMapEditor({
         await apiClient.unassignCampgroundMapSite(campgroundId, siteId);
       }
 
-      const site = sites.find(s => s.id === siteId);
+      const site = sites.find((s) => s.id === siteId);
       const label = site?.mapLabel ?? site?.siteNumber ?? site?.name ?? null;
       await apiClient.upsertCampgroundMapAssignments(campgroundId, {
-        assignments: [{ siteId, shapeId, label }]
+        assignments: [{ siteId, shapeId, label }],
       });
       toast({ title: "Assigned!", description: `${shapeLabel} mapped to ${siteLabel}.` });
       announce(`Shape assigned to ${siteLabel}`);
@@ -1396,7 +1512,8 @@ export function SiteMapEditor({
     const term = quickAssignSearch.trim().toLowerCase();
     const filtered = term
       ? sites.filter((site) => {
-          const label = `${site.siteNumber ?? ""} ${site.name ?? ""} ${site.mapLabel ?? ""}`.toLowerCase();
+          const label =
+            `${site.siteNumber ?? ""} ${site.name ?? ""} ${site.mapLabel ?? ""}`.toLowerCase();
           return label.includes(term);
         })
       : sites;
@@ -1412,11 +1529,16 @@ export function SiteMapEditor({
   const handleDeleteShape = async () => {
     if (!campgroundId) return;
     if (!selectedShapeId) {
-      toast({ title: "Select a shape", description: "Choose a shape to delete.", variant: "destructive" });
+      toast({
+        title: "Select a shape",
+        description: "Choose a shape to delete.",
+        variant: "destructive",
+      });
       return;
     }
     const draftShape = draftShapes[selectedShapeId];
-    const isDraftOnly = draftShape?.isNew && !existingShapes.find((shape) => shape.id === selectedShapeId);
+    const isDraftOnly =
+      draftShape?.isNew && !existingShapes.find((shape) => shape.id === selectedShapeId);
     if (isDraftOnly) {
       setDraftShapes((prev) => {
         const next = { ...prev };
@@ -1431,7 +1553,9 @@ export function SiteMapEditor({
 
     const shapeLabel = shapeLabelById.get(selectedShapeId) ?? selectedShapeId;
     const assignedSiteId = selectedShapeAssignedSiteId;
-    const assignedLabel = assignedSiteId ? siteLabelById.get(assignedSiteId) ?? assignedSiteId : null;
+    const assignedLabel = assignedSiteId
+      ? (siteLabelById.get(assignedSiteId) ?? assignedSiteId)
+      : null;
 
     setDeleteShapeConfirm({
       shapeId: selectedShapeId,
@@ -1483,14 +1607,18 @@ export function SiteMapEditor({
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn("rounded-xl border-2 border-dashed border-border bg-muted p-8 text-center", className)}
+        className={cn(
+          "rounded-xl border-2 border-dashed border-border bg-muted p-8 text-center",
+          className,
+        )}
       >
         <div className="mx-auto w-16 h-16 rounded-full bg-status-success/15 flex items-center justify-center mb-4">
           <Sparkles className="h-8 w-8 text-status-success" />
         </div>
         <h3 className="font-semibold text-foreground mb-2">Ready to map your campground?</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          Upload a map image above to get started. You'll be able to draw site boundaries and assign them to your sites.
+          Upload a map image above to get started. You'll be able to draw site boundaries and assign
+          them to your sites.
         </p>
       </motion.div>
     );
@@ -1500,7 +1628,7 @@ export function SiteMapEditor({
     isFullscreen
       ? "fixed inset-0 z-50 bg-card p-4 shadow-2xl"
       : "rounded-xl border border-border bg-card p-4",
-    className
+    className,
   );
 
   const presetButtons: { type: PresetShape; icon: typeof Square; label: string; key: string }[] = [
@@ -1536,8 +1664,8 @@ export function SiteMapEditor({
               {isDrawing
                 ? "Click to add points, Enter to finish, Esc to cancel"
                 : selectedPreset !== "freeform"
-                ? `Click on the map to place a ${selectedPreset}`
-                : "Select a preset shape or draw freeform polygons"}
+                  ? `Click on the map to place a ${selectedPreset}`
+                  : "Select a preset shape or draw freeform polygons"}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -1560,7 +1688,11 @@ export function SiteMapEditor({
               onClick={() => setIsFullscreen((prev) => !prev)}
               className="transition-transform active:scale-95"
             >
-              {isFullscreen ? <Minimize2 className="h-4 w-4 mr-1.5" /> : <Maximize2 className="h-4 w-4 mr-1.5" />}
+              {isFullscreen ? (
+                <Minimize2 className="h-4 w-4 mr-1.5" />
+              ) : (
+                <Maximize2 className="h-4 w-4 mr-1.5" />
+              )}
               {isFullscreen ? "Exit" : "Fullscreen"}
             </Button>
             <Button
@@ -1569,7 +1701,11 @@ export function SiteMapEditor({
               onClick={() => setShowPanels((prev) => !prev)}
               className="transition-transform active:scale-95"
             >
-              {showPanels ? <PanelLeftClose className="h-4 w-4 mr-1.5" /> : <PanelLeft className="h-4 w-4 mr-1.5" />}
+              {showPanels ? (
+                <PanelLeftClose className="h-4 w-4 mr-1.5" />
+              ) : (
+                <PanelLeft className="h-4 w-4 mr-1.5" />
+              )}
               {showPanels ? "Hide" : "Show"} Panels
             </Button>
           </div>
@@ -1593,7 +1729,7 @@ export function SiteMapEditor({
                     "transition-all",
                     selectedPreset === type
                       ? "bg-status-success hover:bg-status-success/90 text-status-success-foreground shadow-md scale-105"
-                      : "hover:border-status-success/50"
+                      : "hover:border-status-success/50",
                   )}
                 >
                   <Icon className="h-4 w-4 mr-1.5" />
@@ -1615,7 +1751,7 @@ export function SiteMapEditor({
                 disabled={isDrawing}
                 className={cn(
                   "transition-all",
-                  isDrawing && "bg-status-info hover:bg-status-info/90 text-status-info-foreground"
+                  isDrawing && "bg-status-info hover:bg-status-info/90 text-status-info-foreground",
                 )}
               >
                 <Pencil className="h-4 w-4 mr-1.5" />
@@ -1657,11 +1793,21 @@ export function SiteMapEditor({
           {isDrawing && (
             <>
               <div className="h-6 w-px bg-muted mx-2" />
-              <Button size="sm" variant="outline" onClick={handleUndo} disabled={draftPoints.length === 0}>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleUndo}
+                disabled={draftPoints.length === 0}
+              >
                 <RotateCcw className="h-4 w-4 mr-1.5" />
                 Undo
               </Button>
-              <Button size="sm" onClick={handleFinish} disabled={draftPoints.length < 3} className="bg-status-success hover:bg-status-success/90 text-status-success-foreground">
+              <Button
+                size="sm"
+                onClick={handleFinish}
+                disabled={draftPoints.length < 3}
+                className="bg-status-success hover:bg-status-success/90 text-status-success-foreground"
+              >
                 <CheckCircle2 className="h-4 w-4 mr-1.5" />
                 Finish ({draftPoints.length} pts)
               </Button>
@@ -1673,199 +1819,240 @@ export function SiteMapEditor({
           className={cn(
             "grid gap-4",
             showPanels ? "lg:grid-cols-[320px,1fr]" : "grid-cols-1",
-            isFullscreen && "h-[calc(100vh-200px)]"
+            isFullscreen && "h-[calc(100vh-200px)]",
           )}
         >
           {showPanels && (
-          <div className={cn("space-y-4", isFullscreen && "h-full overflow-auto pr-1")}>
-            {/* Shapes Panel */}
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="rounded-lg border border-border bg-card p-3"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Shapes</div>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs">{assignedShapeCount} assigned</Badge>
-                  <Badge variant="outline" className="text-xs">{unassignedShapeCount} free</Badge>
-                </div>
-              </div>
-              <Input
-                placeholder="Search shapes..."
-                value={shapeSearch}
-                onChange={(e) => setShapeSearch(e.target.value)}
-                className="mb-2"
-              />
-              <div className="max-h-[200px] space-y-1 overflow-auto pr-1">
-                {filteredShapes.map((shape) => {
-                  const assignedSiteId = assignedSiteByShape.get(shape.id);
-                  const assignedLabel = assignedSiteId ? siteLabelById.get(assignedSiteId) ?? assignedSiteId : "Unassigned";
-                  const isActive = selectedShapeId === shape.id;
-                  const isDraft = Boolean(draftShapes[shape.id]);
-                  const label = shapeLabelById.get(shape.id) ?? shape.id;
-                  return (
-                    <motion.button
-                      key={shape.id}
-                      type="button"
-                      onClick={() => setSelectedShapeId(shape.id)}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      className={cn(
-                        "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
-                        isActive
-                          ? "border-blue-400 bg-blue-50 shadow-sm"
-                          : "border-border hover:border-blue-300 hover:bg-muted"
-                      )}
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium text-foreground">{label}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {assignedSiteId ? `→ ${assignedLabel}` : "Unassigned"}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        {isDraft && <Badge variant="secondary" className="text-[10px]">Draft</Badge>}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-                {!filteredShapes.length && (
-                  <div className="rounded-lg border border-dashed border-border p-4 text-center">
-                    <p className="text-xs text-muted-foreground">No shapes yet</p>
-                    <p className="text-xs text-muted-foreground mt-1">Use the toolbar above to create shapes</p>
+            <div className={cn("space-y-4", isFullscreen && "h-full overflow-auto pr-1")}>
+              {/* Shapes Panel */}
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="rounded-lg border border-border bg-card p-3"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Shapes
                   </div>
-                )}
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="sm" variant="outline" onClick={handleDuplicateShape} disabled={!selectedGeometry || assigning}>
-                      <Copy className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Duplicate shape</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button size="sm" variant="outline" onClick={handleDeleteShape} disabled={!selectedShapeId || assigning}>
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete shape</TooltipContent>
-                </Tooltip>
-                <Button
-                  size="sm"
-                  onClick={handleSaveShapes}
-                  disabled={savingShapes || !hasPendingShapes}
-                  className="ml-auto bg-status-success hover:bg-status-success/90 text-white transition-transform active:scale-95"
-                >
-                  {savingShapes ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Save className="h-3.5 w-3.5 mr-1.5" />}
-                  Save {hasPendingShapes && `(${pendingShapeCount})`}
-                </Button>
-              </div>
-            </motion.div>
-
-            {/* Sites Panel */}
-            <motion.div
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.05 }}
-              className="rounded-lg border border-border bg-card p-3"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Site Assignments</div>
-                <Badge variant="secondary" className="text-xs">
-                  {assignedSiteIds.size}/{sites.length} mapped
-                </Badge>
-              </div>
-              <Input
-                placeholder="Search sites..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="mb-2"
-              />
-              <div className="max-h-[240px] space-y-1 overflow-auto pr-1">
-                {filteredSites.map((site) => {
-                  const isMapped = assignedSiteIds.has(site.id);
-                  const isActive = selectedSiteId === site.id;
-                  const assignedShapeId = assignedShapeBySite.get(site.id);
-                  const shapeLabel = assignedShapeId ? shapeLabelById.get(assignedShapeId) ?? assignedShapeId : null;
-                  const label = site.siteNumber || site.mapLabel || site.name || site.id;
-                  return (
-                    <motion.button
-                      key={site.id}
-                      type="button"
-                      onClick={() => setSelectedSiteId(site.id)}
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.99 }}
-                      className={cn(
-                        "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
-                        isActive
-                          ? "border-emerald-400 bg-emerald-50 shadow-sm"
-                          : "border-border hover:border-status-success/50 hover:bg-muted"
-                      )}
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium text-foreground">{label}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {shapeLabel ? `← ${shapeLabel}` : "No shape assigned"}
-                        </span>
-                      </div>
-                      <Badge
-                        variant={isMapped ? "default" : "secondary"}
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      {assignedShapeCount} assigned
+                    </Badge>
+                    <Badge variant="outline" className="text-xs">
+                      {unassignedShapeCount} free
+                    </Badge>
+                  </div>
+                </div>
+                <Input
+                  placeholder="Search shapes..."
+                  value={shapeSearch}
+                  onChange={(e) => setShapeSearch(e.target.value)}
+                  className="mb-2"
+                />
+                <div className="max-h-[200px] space-y-1 overflow-auto pr-1">
+                  {filteredShapes.map((shape) => {
+                    const assignedSiteId = assignedSiteByShape.get(shape.id);
+                    const assignedLabel = assignedSiteId
+                      ? (siteLabelById.get(assignedSiteId) ?? assignedSiteId)
+                      : "Unassigned";
+                    const isActive = selectedShapeId === shape.id;
+                    const isDraft = Boolean(draftShapes[shape.id]);
+                    const label = shapeLabelById.get(shape.id) ?? shape.id;
+                    return (
+                      <motion.button
+                        key={shape.id}
+                        type="button"
+                        onClick={() => setSelectedShapeId(shape.id)}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         className={cn(
-                          "text-[10px]",
-                          isMapped && "bg-status-success/15 text-status-success"
+                          "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
+                          isActive
+                            ? "border-blue-400 bg-blue-50 shadow-sm"
+                            : "border-border hover:border-blue-300 hover:bg-muted",
                         )}
                       >
-                        {isMapped ? "Mapped" : "Unmapped"}
-                      </Badge>
-                    </motion.button>
-                  );
-                })}
-                {!filteredSites.length && (
-                  <div className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center">
-                    No matching sites
+                        <div className="flex flex-col">
+                          <span className="font-medium text-foreground">{label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {assignedSiteId ? `→ ${assignedLabel}` : "Unassigned"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {isDraft && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              Draft
+                            </Badge>
+                          )}
+                        </div>
+                      </motion.button>
+                    );
+                  })}
+                  {!filteredShapes.length && (
+                    <div className="rounded-lg border border-dashed border-border p-4 text-center">
+                      <p className="text-xs text-muted-foreground">No shapes yet</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Use the toolbar above to create shapes
+                      </p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleDuplicateShape}
+                        disabled={!selectedGeometry || assigning}
+                      >
+                        <Copy className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Duplicate shape</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleDeleteShape}
+                        disabled={!selectedShapeId || assigning}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Delete shape</TooltipContent>
+                  </Tooltip>
+                  <Button
+                    size="sm"
+                    onClick={handleSaveShapes}
+                    disabled={savingShapes || !hasPendingShapes}
+                    className="ml-auto bg-status-success hover:bg-status-success/90 text-white transition-transform active:scale-95"
+                  >
+                    {savingShapes ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    ) : (
+                      <Save className="h-3.5 w-3.5 mr-1.5" />
+                    )}
+                    Save {hasPendingShapes && `(${pendingShapeCount})`}
+                  </Button>
+                </div>
+              </motion.div>
+
+              {/* Sites Panel */}
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.05 }}
+                className="rounded-lg border border-border bg-card p-3"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Site Assignments
                   </div>
-                )}
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
-                <Button
-                  size="sm"
-                  onClick={handleAssignShape}
-                  disabled={!selectedSiteId || !selectedShapeId || assigning}
-                  className="bg-status-success hover:bg-status-success/90 text-status-success-foreground transition-transform active:scale-95"
-                >
-                  {assigning ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <Link2 className="h-3.5 w-3.5 mr-1.5" />}
-                  Assign
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handleUnassignSite}
-                  disabled={!selectedSiteId || !selectedSiteAssignedShapeId || assigning}
-                >
-                  <Unlink className="h-3.5 w-3.5 mr-1.5" />
-                  Unassign
-                </Button>
-              </div>
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Select a shape and site, then click Assign to link them.
-              </p>
-            </motion.div>
-          </div>
+                  <Badge variant="secondary" className="text-xs">
+                    {assignedSiteIds.size}/{sites.length} mapped
+                  </Badge>
+                </div>
+                <Input
+                  placeholder="Search sites..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="mb-2"
+                />
+                <div className="max-h-[240px] space-y-1 overflow-auto pr-1">
+                  {filteredSites.map((site) => {
+                    const isMapped = assignedSiteIds.has(site.id);
+                    const isActive = selectedSiteId === site.id;
+                    const assignedShapeId = assignedShapeBySite.get(site.id);
+                    const shapeLabel = assignedShapeId
+                      ? (shapeLabelById.get(assignedShapeId) ?? assignedShapeId)
+                      : null;
+                    const label = site.siteNumber || site.mapLabel || site.name || site.id;
+                    return (
+                      <motion.button
+                        key={site.id}
+                        type="button"
+                        onClick={() => setSelectedSiteId(site.id)}
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        className={cn(
+                          "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left text-sm transition-all",
+                          isActive
+                            ? "border-emerald-400 bg-emerald-50 shadow-sm"
+                            : "border-border hover:border-status-success/50 hover:bg-muted",
+                        )}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium text-foreground">{label}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {shapeLabel ? `← ${shapeLabel}` : "No shape assigned"}
+                          </span>
+                        </div>
+                        <Badge
+                          variant={isMapped ? "default" : "secondary"}
+                          className={cn(
+                            "text-[10px]",
+                            isMapped && "bg-status-success/15 text-status-success",
+                          )}
+                        >
+                          {isMapped ? "Mapped" : "Unmapped"}
+                        </Badge>
+                      </motion.button>
+                    );
+                  })}
+                  {!filteredSites.length && (
+                    <div className="rounded-lg border border-dashed border-border p-3 text-xs text-muted-foreground text-center">
+                      No matching sites
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2 pt-3 border-t border-border">
+                  <Button
+                    size="sm"
+                    onClick={handleAssignShape}
+                    disabled={!selectedSiteId || !selectedShapeId || assigning}
+                    className="bg-status-success hover:bg-status-success/90 text-status-success-foreground transition-transform active:scale-95"
+                  >
+                    {assigning ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" />
+                    ) : (
+                      <Link2 className="h-3.5 w-3.5 mr-1.5" />
+                    )}
+                    Assign
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleUnassignSite}
+                    disabled={!selectedSiteId || !selectedSiteAssignedShapeId || assigning}
+                  >
+                    <Unlink className="h-3.5 w-3.5 mr-1.5" />
+                    Unassign
+                  </Button>
+                </div>
+                <p className="mt-2 text-[11px] text-muted-foreground">
+                  Select a shape and site, then click Assign to link them.
+                </p>
+              </motion.div>
+            </div>
           )}
 
           {/* Canvas */}
-          <div className={cn("relative rounded-xl border border-border bg-muted p-2", isFullscreen && "h-full")}>
+          <div
+            className={cn(
+              "relative rounded-xl border border-border bg-muted p-2",
+              isFullscreen && "h-full",
+            )}
+          >
             <svg
               ref={svgRef}
               viewBox={`${viewBox.minX} ${viewBox.minY} ${viewBox.width} ${viewBox.height}`}
               className={cn(
                 isFullscreen ? "h-full w-full" : "h-[620px] w-full",
                 isDrawing && "cursor-crosshair",
-                selectedPreset !== "freeform" && !isDrawing && "cursor-copy"
+                selectedPreset !== "freeform" && !isDrawing && "cursor-copy",
               )}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -1908,7 +2095,8 @@ export function SiteMapEditor({
                         opacity={isDraft ? 0.95 : 0.85}
                         className={cn(
                           "transition-all duration-150",
-                          !isDrawing && "cursor-pointer hover:opacity-100 hover:stroke-blue-500 hover:stroke-[3]"
+                          !isDrawing &&
+                            "cursor-pointer hover:opacity-100 hover:stroke-blue-500 hover:stroke-[3]",
                         )}
                         style={{ pointerEvents: isDrawing ? "none" : "auto" }}
                         onPointerDown={(e) => {
@@ -1924,7 +2112,7 @@ export function SiteMapEditor({
                           y={centroid.y}
                           textAnchor="middle"
                           dominantBaseline="middle"
-                        className="fill-status-success text-[12px] font-semibold pointer-events-none"
+                          className="fill-status-success text-[12px] font-semibold pointer-events-none"
                           style={{ textShadow: "0 1px 2px rgba(255,255,255,0.8)" }}
                         >
                           {siteLabel}
@@ -1971,10 +2159,21 @@ export function SiteMapEditor({
 
               {/* Draft polygon being drawn */}
               {draftPolygon && (
-                <path d={draftPolygon} fill="rgba(59,130,246,0.2)" stroke="#2563eb" strokeWidth={2.5} />
+                <path
+                  d={draftPolygon}
+                  fill="rgba(59,130,246,0.2)"
+                  stroke="#2563eb"
+                  strokeWidth={2.5}
+                />
               )}
               {draftLine && (
-                <path d={draftLine} fill="none" stroke="#2563eb" strokeDasharray="4 3" strokeWidth={2} />
+                <path
+                  d={draftLine}
+                  fill="none"
+                  stroke="#2563eb"
+                  strokeDasharray="4 3"
+                  strokeWidth={2}
+                />
               )}
               {draftPoints.map((point, idx) => (
                 <circle
@@ -1989,58 +2188,123 @@ export function SiteMapEditor({
               ))}
 
               {/* Transform controls for selected shape */}
-              {!isDrawing && activePoints.length >= 3 && (() => {
-                const bbox = getBoundingBox(activePoints);
-                const center = centroidFromPoints(activePoints) ?? bbox.center;
-                const handleSize = Math.min(viewBox.width, viewBox.height) * 0.012;
-                const rotateHandleDistance = handleSize * 4;
+              {!isDrawing &&
+                activePoints.length >= 3 &&
+                (() => {
+                  const bbox = getBoundingBox(activePoints);
+                  const center = centroidFromPoints(activePoints) ?? bbox.center;
+                  const handleSize = Math.min(viewBox.width, viewBox.height) * 0.012;
+                  const rotateHandleDistance = handleSize * 4;
 
-                // Corner positions for resize handles
-                const corners = [
-                  { x: bbox.min.x, y: bbox.min.y, cursor: "nwse-resize" }, // TL
-                  { x: bbox.max.x, y: bbox.min.y, cursor: "nesw-resize" }, // TR
-                  { x: bbox.max.x, y: bbox.max.y, cursor: "nwse-resize" }, // BR
-                  { x: bbox.min.x, y: bbox.max.y, cursor: "nesw-resize" }, // BL
-                ];
+                  // Corner positions for resize handles
+                  const corners = [
+                    { x: bbox.min.x, y: bbox.min.y, cursor: "nwse-resize" }, // TL
+                    { x: bbox.max.x, y: bbox.min.y, cursor: "nesw-resize" }, // TR
+                    { x: bbox.max.x, y: bbox.max.y, cursor: "nwse-resize" }, // BR
+                    { x: bbox.min.x, y: bbox.max.y, cursor: "nesw-resize" }, // BL
+                  ];
 
-                return (
-                  <g>
-                    {/* Bounding box outline */}
-                    <rect
-                      x={bbox.min.x}
-                      y={bbox.min.y}
-                      width={bbox.max.x - bbox.min.x}
-                      height={bbox.max.y - bbox.min.y}
-                      fill="none"
-                      stroke="#94a3b8"
-                      strokeWidth={1}
-                      strokeDasharray="4 2"
-                      className="pointer-events-none"
-                    />
-
-                    {/* Rotation handle - above center */}
+                  return (
                     <g>
-                      {/* Line from center to rotation handle */}
-                      <line
-                        x1={center.x}
-                        y1={bbox.min.y}
-                        x2={center.x}
-                        y2={bbox.min.y - rotateHandleDistance}
+                      {/* Bounding box outline */}
+                      <rect
+                        x={bbox.min.x}
+                        y={bbox.min.y}
+                        width={bbox.max.x - bbox.min.x}
+                        height={bbox.max.y - bbox.min.y}
+                        fill="none"
                         stroke="#94a3b8"
                         strokeWidth={1}
-                        strokeDasharray="2 2"
+                        strokeDasharray="4 2"
                         className="pointer-events-none"
                       />
-                      {/* Rotation handle circle */}
+
+                      {/* Rotation handle - above center */}
+                      <g>
+                        {/* Line from center to rotation handle */}
+                        <line
+                          x1={center.x}
+                          y1={bbox.min.y}
+                          x2={center.x}
+                          y2={bbox.min.y - rotateHandleDistance}
+                          stroke="#94a3b8"
+                          strokeWidth={1}
+                          strokeDasharray="2 2"
+                          className="pointer-events-none"
+                        />
+                        {/* Rotation handle circle */}
+                        <circle
+                          cx={center.x}
+                          cy={bbox.min.y - rotateHandleDistance}
+                          r={handleSize}
+                          fill="#f97316"
+                          stroke="#fff"
+                          strokeWidth={2}
+                          className="cursor-grab"
+                          style={{ cursor: "grab" }}
+                          onPointerDown={(event) => {
+                            event.stopPropagation();
+                            const point = getSvgPoint(event);
+                            if (!point) return;
+                            setEditingPoints([...activePoints]);
+                            setInitialPoints([...activePoints]);
+                            setDragStart(point);
+                            setDragMode("rotate");
+                            event.currentTarget.setPointerCapture(event.pointerId);
+                            announce("Drag to rotate shape");
+                          }}
+                        />
+                        {/* Rotation icon indicator */}
+                        <text
+                          x={center.x}
+                          y={bbox.min.y - rotateHandleDistance}
+                          textAnchor="middle"
+                          dominantBaseline="middle"
+                          className="fill-white text-[8px] font-bold pointer-events-none select-none"
+                          style={{ fontSize: handleSize * 0.8 }}
+                        >
+                          ↻
+                        </text>
+                      </g>
+
+                      {/* Resize handles at corners */}
+                      {corners.map((corner, idx) => (
+                        <rect
+                          key={`resize-${idx}`}
+                          x={corner.x - handleSize / 2}
+                          y={corner.y - handleSize / 2}
+                          width={handleSize}
+                          height={handleSize}
+                          fill="#8b5cf6"
+                          stroke="#fff"
+                          strokeWidth={2}
+                          rx={2}
+                          style={{ cursor: corner.cursor }}
+                          onPointerDown={(event) => {
+                            event.stopPropagation();
+                            const point = getSvgPoint(event);
+                            if (!point) return;
+                            setEditingPoints([...activePoints]);
+                            setInitialPoints([...activePoints]);
+                            setDragStart(point);
+                            setDragMode("resize");
+                            setResizeCorner(idx);
+                            event.currentTarget.setPointerCapture(event.pointerId);
+                            announce("Drag to resize shape");
+                          }}
+                        />
+                      ))}
+
+                      {/* Center move handle */}
                       <circle
                         cx={center.x}
-                        cy={bbox.min.y - rotateHandleDistance}
-                        r={handleSize}
-                        fill="#f97316"
+                        cy={center.y}
+                        r={handleSize * 1.2}
+                        fill="#3b82f6"
                         stroke="#fff"
                         strokeWidth={2}
-                        className="cursor-grab"
-                        style={{ cursor: "grab" }}
+                        className="cursor-move"
+                        style={{ cursor: "move" }}
                         onPointerDown={(event) => {
                           event.stopPropagation();
                           const point = getSvgPoint(event);
@@ -2048,88 +2312,25 @@ export function SiteMapEditor({
                           setEditingPoints([...activePoints]);
                           setInitialPoints([...activePoints]);
                           setDragStart(point);
-                          setDragMode("rotate");
+                          setDragMode("move");
                           event.currentTarget.setPointerCapture(event.pointerId);
-                          announce("Drag to rotate shape");
+                          announce("Drag to move shape");
                         }}
                       />
-                      {/* Rotation icon indicator */}
+                      {/* Move icon */}
                       <text
                         x={center.x}
-                        y={bbox.min.y - rotateHandleDistance}
+                        y={center.y}
                         textAnchor="middle"
                         dominantBaseline="middle"
                         className="fill-white text-[8px] font-bold pointer-events-none select-none"
                         style={{ fontSize: handleSize * 0.8 }}
                       >
-                        ↻
+                        ✥
                       </text>
                     </g>
-
-                    {/* Resize handles at corners */}
-                    {corners.map((corner, idx) => (
-                      <rect
-                        key={`resize-${idx}`}
-                        x={corner.x - handleSize / 2}
-                        y={corner.y - handleSize / 2}
-                        width={handleSize}
-                        height={handleSize}
-                        fill="#8b5cf6"
-                        stroke="#fff"
-                        strokeWidth={2}
-                        rx={2}
-                        style={{ cursor: corner.cursor }}
-                        onPointerDown={(event) => {
-                          event.stopPropagation();
-                          const point = getSvgPoint(event);
-                          if (!point) return;
-                          setEditingPoints([...activePoints]);
-                          setInitialPoints([...activePoints]);
-                          setDragStart(point);
-                          setDragMode("resize");
-                          setResizeCorner(idx);
-                          event.currentTarget.setPointerCapture(event.pointerId);
-                          announce("Drag to resize shape");
-                        }}
-                      />
-                    ))}
-
-                    {/* Center move handle */}
-                    <circle
-                      cx={center.x}
-                      cy={center.y}
-                      r={handleSize * 1.2}
-                      fill="#3b82f6"
-                      stroke="#fff"
-                      strokeWidth={2}
-                      className="cursor-move"
-                      style={{ cursor: "move" }}
-                      onPointerDown={(event) => {
-                        event.stopPropagation();
-                        const point = getSvgPoint(event);
-                        if (!point) return;
-                        setEditingPoints([...activePoints]);
-                        setInitialPoints([...activePoints]);
-                        setDragStart(point);
-                        setDragMode("move");
-                        event.currentTarget.setPointerCapture(event.pointerId);
-                        announce("Drag to move shape");
-                      }}
-                    />
-                    {/* Move icon */}
-                    <text
-                      x={center.x}
-                      y={center.y}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="fill-white text-[8px] font-bold pointer-events-none select-none"
-                      style={{ fontSize: handleSize * 0.8 }}
-                    >
-                      ✥
-                    </text>
-                  </g>
-                );
-              })()}
+                  );
+                })()}
 
               {/* Vertex handles for selected shape */}
               {!isDrawing &&
@@ -2188,8 +2389,14 @@ export function SiteMapEditor({
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
                   className="absolute z-50 bg-card rounded-xl shadow-2xl border border-border p-3 w-64"
                   style={{
-                    left: Math.min(quickAssignPosition.x, (svgRef.current?.getBoundingClientRect()?.width ?? 300) - 280),
-                    top: Math.min(quickAssignPosition.y + 10, (svgRef.current?.getBoundingClientRect()?.height ?? 400) - 300),
+                    left: Math.min(
+                      quickAssignPosition.x,
+                      (svgRef.current?.getBoundingClientRect()?.width ?? 300) - 280,
+                    ),
+                    top: Math.min(
+                      quickAssignPosition.y + 10,
+                      (svgRef.current?.getBoundingClientRect()?.height ?? 400) - 300,
+                    ),
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -2226,18 +2433,19 @@ export function SiteMapEditor({
                             "w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-sm text-left transition-all",
                             "hover:bg-status-success/10 hover:border-status-success/50",
                             "border border-transparent",
-                            isMapped && "opacity-60"
+                            isMapped && "opacity-60",
                           )}
                         >
-                          <span className="font-medium text-foreground truncate">
-                            {label}
-                          </span>
+                          <span className="font-medium text-foreground truncate">{label}</span>
                           {isMapped ? (
                             <Badge variant="secondary" className="text-[10px] ml-2 shrink-0">
                               Mapped
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-[10px] ml-2 shrink-0 text-status-success border-status-success/50">
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] ml-2 shrink-0 text-status-success border-status-success/50"
+                            >
                               Available
                             </Badge>
                           )}
@@ -2263,57 +2471,62 @@ export function SiteMapEditor({
       </div>
 
       {/* Reassign Shape Confirmation Dialog */}
-      <AlertDialog open={!!reassignConfirm} onOpenChange={(open) => !open && setReassignConfirm(null)}>
+      <AlertDialog
+        open={!!reassignConfirm}
+        onOpenChange={(open) => !open && setReassignConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reassign Shape</AlertDialogTitle>
             <AlertDialogDescription>
-              "{reassignConfirm?.shapeLabel}" is already assigned to {reassignConfirm?.oldSiteLabel}.
-              Do you want to reassign it to {reassignConfirm?.newSiteLabel}?
+              "{reassignConfirm?.shapeLabel}" is already assigned to {reassignConfirm?.oldSiteLabel}
+              . Do you want to reassign it to {reassignConfirm?.newSiteLabel}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReassignConfirmed}>
-              Reassign Shape
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleReassignConfirmed}>Reassign Shape</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Replace Shape Confirmation Dialog */}
-      <AlertDialog open={!!replaceConfirm} onOpenChange={(open) => !open && setReplaceConfirm(null)}>
+      <AlertDialog
+        open={!!replaceConfirm}
+        onOpenChange={(open) => !open && setReplaceConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Replace Shape</AlertDialogTitle>
             <AlertDialogDescription>
-              "{replaceConfirm?.siteLabel}" already has a shape assigned.
-              Do you want to replace it with "{replaceConfirm?.shapeLabel}"?
+              "{replaceConfirm?.siteLabel}" already has a shape assigned. Do you want to replace it
+              with "{replaceConfirm?.shapeLabel}"?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleReplaceConfirmed}>
-              Replace Shape
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleReplaceConfirmed}>Replace Shape</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Quick Replace Shape Confirmation Dialog */}
-      <AlertDialog open={!!quickReplaceConfirm} onOpenChange={(open) => {
-        if (!open) {
-          setQuickReplaceConfirm(null);
-          setQuickAssignShapeId(null);
-          setQuickAssignPosition(null);
-        }
-      }}>
+      <AlertDialog
+        open={!!quickReplaceConfirm}
+        onOpenChange={(open) => {
+          if (!open) {
+            setQuickReplaceConfirm(null);
+            setQuickAssignShapeId(null);
+            setQuickAssignPosition(null);
+          }
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Replace Shape</AlertDialogTitle>
             <AlertDialogDescription>
-              "{quickReplaceConfirm?.siteLabel}" already has a shape.
-              Do you want to replace it with "{quickReplaceConfirm?.shapeLabel}"?
+              "{quickReplaceConfirm?.siteLabel}" already has a shape. Do you want to replace it with
+              "{quickReplaceConfirm?.shapeLabel}"?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -2326,7 +2539,10 @@ export function SiteMapEditor({
       </AlertDialog>
 
       {/* Delete Shape Confirmation Dialog */}
-      <AlertDialog open={!!deleteShapeConfirm} onOpenChange={(open) => !open && setDeleteShapeConfirm(null)}>
+      <AlertDialog
+        open={!!deleteShapeConfirm}
+        onOpenChange={(open) => !open && setDeleteShapeConfirm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Shape</AlertDialogTitle>

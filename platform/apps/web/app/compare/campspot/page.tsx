@@ -145,7 +145,8 @@ export default function CompareCampspotPage() {
               Why Parks Are Switching from Campspot
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              We talked to dozens of park owners. Here's what they told us about their Campspot experience.
+              We talked to dozens of park owners. Here's what they told us about their Campspot
+              experience.
             </p>
           </div>
 
@@ -276,7 +277,7 @@ export default function CompareCampspotPage() {
                         </td>
                         <td className="p-4 text-center">
                           {feature.campspot === true ? (
-                          <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.campspot === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
@@ -332,9 +333,7 @@ export default function CompareCampspotPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-slate-50 rounded-3xl p-8 md:p-12 border border-slate-200">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Calculate Your Savings
-              </h2>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Calculate Your Savings</h2>
               <p className="text-slate-600">
                 See how much you could save by switching from Campspot to Keepr.
               </p>
@@ -364,10 +363,16 @@ export default function CompareCampspotPage() {
             <div className="text-center">
               <p className="text-slate-600 mb-4">
                 <strong>Example:</strong> A park with 300 bookings/month saves{" "}
-                <span className="text-keepr-evergreen font-bold">$210/month</span> just on per-booking fees,
-                plus keeps an extra <span className="text-keepr-evergreen font-bold">10%</span> of every marketplace booking.
+                <span className="text-keepr-evergreen font-bold">$210/month</span> just on
+                per-booking fees, plus keeps an extra{" "}
+                <span className="text-keepr-evergreen font-bold">10%</span> of every marketplace
+                booking.
               </p>
-              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
+              <Button
+                asChild
+                size="lg"
+                className="bg-keepr-evergreen hover:bg-keepr-evergreen-light"
+              >
                 <Link href="/roi-calculator">
                   Calculate Your Exact Savings
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -387,8 +392,8 @@ export default function CompareCampspotPage() {
                 Switching is Easier Than You Think
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                We handle the heavy lifting. Export your data from Campspot, and we'll import it for you.
-                Most parks go live in 48 hours or less.
+                We handle the heavy lifting. Export your data from Campspot, and we'll import it for
+                you. Most parks go live in 48 hours or less.
               </p>
 
               <div className="space-y-4">
@@ -439,7 +444,8 @@ export default function CompareCampspotPage() {
             Ready to Switch from Campspot?
           </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Join the growing number of parks that made the switch. No contracts, no risk, 30-day money-back guarantee.
+            Join the growing number of parks that made the switch. No contracts, no risk, 30-day
+            money-back guarantee.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

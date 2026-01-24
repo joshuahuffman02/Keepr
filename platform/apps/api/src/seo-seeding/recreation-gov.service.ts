@@ -151,12 +151,10 @@ export class RecreationGovService {
    * Search for facilities (campgrounds) on Recreation.gov
    */
   async searchFacilities(
-    params: RecreationGovSearchParams = {}
+    params: RecreationGovSearchParams = {},
   ): Promise<RecreationGovSearchResult> {
     if (!this.apiKey) {
-      this.logger.warn(
-        "RECREATION_GOV_API_KEY not set. Using mock data for development."
-      );
+      this.logger.warn("RECREATION_GOV_API_KEY not set. Using mock data for development.");
       return this.getMockSearchResult();
     }
 
@@ -167,12 +165,10 @@ export class RecreationGovService {
     if (params.limit) searchParams.set("limit", String(params.limit));
     if (params.offset) searchParams.set("offset", String(params.offset));
     if (params.latitude) searchParams.set("latitude", String(params.latitude));
-    if (params.longitude)
-      searchParams.set("longitude", String(params.longitude));
+    if (params.longitude) searchParams.set("longitude", String(params.longitude));
     if (params.radius) searchParams.set("radius", String(params.radius));
     if (params.activity) searchParams.set("activity", params.activity);
-    if (params.lastupdated)
-      searchParams.set("lastupdated", params.lastupdated);
+    if (params.lastupdated) searchParams.set("lastupdated", params.lastupdated);
 
     // Only include facility types that are campgrounds
     searchParams.set("facilitytype", "camping");
@@ -189,7 +185,7 @@ export class RecreationGovService {
 
       if (!response.ok) {
         throw new BadGatewayException(
-          `Recreation.gov API error: ${response.status} ${response.statusText}`
+          `Recreation.gov API error: ${response.status} ${response.statusText}`,
         );
       }
 
@@ -226,16 +222,14 @@ export class RecreationGovService {
 
       if (!response.ok) {
         throw new BadGatewayException(
-          `Recreation.gov API error: ${response.status} ${response.statusText}`
+          `Recreation.gov API error: ${response.status} ${response.statusText}`,
         );
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      this.logger.error(
-        `Failed to fetch facility ${facilityId} from Recreation.gov: ${error}`
-      );
+      this.logger.error(`Failed to fetch facility ${facilityId} from Recreation.gov: ${error}`);
       throw error;
     }
   }
@@ -245,7 +239,7 @@ export class RecreationGovService {
    */
   async getCampgroundsByState(
     stateCode: string,
-    onProgress?: (processed: number, total: number) => void
+    onProgress?: (processed: number, total: number) => void,
   ): Promise<RecreationGovFacility[]> {
     const allFacilities: RecreationGovFacility[] = [];
     const pageSize = 50;
@@ -279,11 +273,7 @@ export class RecreationGovService {
    * Fetch all campgrounds nationwide (with pagination and rate limiting)
    */
   async getAllCampgrounds(
-    onProgress?: (
-      processed: number,
-      total: number,
-      currentState: string
-    ) => void
+    onProgress?: (processed: number, total: number, currentState: string) => void,
   ): Promise<RecreationGovFacility[]> {
     const states = [
       "AL",
@@ -354,7 +344,7 @@ export class RecreationGovService {
         }
 
         this.logger.log(
-          `Found ${stateFacilities.length} campgrounds in ${state}. Total: ${totalProcessed}`
+          `Found ${stateFacilities.length} campgrounds in ${state}. Total: ${totalProcessed}`,
         );
       } catch (error) {
         this.logger.error(`Failed to fetch campgrounds for ${state}: ${error}`);
@@ -373,7 +363,7 @@ export class RecreationGovService {
    */
   mapFacilityToCampground(
     facility: RecreationGovFacility,
-    organizationId: string
+    organizationId: string,
   ): {
     name: string;
     slug: string;
@@ -398,11 +388,8 @@ export class RecreationGovService {
     externalUrl?: string;
   } {
     const address = facility.FACILITYADDRESS?.[0];
-    const photos = facility.MEDIA?.filter((m) => m.MediaType === "Image").map(
-      (m) => m.URL
-    ) || [];
-    const activities =
-      facility.ACTIVITY?.map((a) => a.ActivityName.toLowerCase()) || [];
+    const photos = facility.MEDIA?.filter((m) => m.MediaType === "Image").map((m) => m.URL) || [];
+    const activities = facility.ACTIVITY?.map((a) => a.ActivityName.toLowerCase()) || [];
 
     // Extract amenities from activities and facility type
     const amenities = this.extractAmenities(activities, facility);
@@ -435,10 +422,7 @@ export class RecreationGovService {
     };
   }
 
-  private extractAmenities(
-    activities: string[],
-    facility: RecreationGovFacility
-  ): string[] {
+  private extractAmenities(activities: string[], facility: RecreationGovFacility): string[] {
     const amenities: string[] = [];
 
     // Map activities to amenities
@@ -480,27 +464,24 @@ export class RecreationGovService {
     const hasElectric = facility.CAMPSITE?.some((site) =>
       site.ATTRIBUTES?.some(
         (attr) =>
-          attr.AttributeName.toLowerCase().includes("electric") &&
-          attr.AttributeValue !== "No"
-      )
+          attr.AttributeName.toLowerCase().includes("electric") && attr.AttributeValue !== "No",
+      ),
     );
     if (hasElectric) amenities.push("Electric Hookups");
 
     const hasWater = facility.CAMPSITE?.some((site) =>
       site.ATTRIBUTES?.some(
         (attr) =>
-          attr.AttributeName.toLowerCase().includes("water hookup") &&
-          attr.AttributeValue !== "No"
-      )
+          attr.AttributeName.toLowerCase().includes("water hookup") && attr.AttributeValue !== "No",
+      ),
     );
     if (hasWater) amenities.push("Water Hookups");
 
     const hasSewer = facility.CAMPSITE?.some((site) =>
       site.ATTRIBUTES?.some(
         (attr) =>
-          attr.AttributeName.toLowerCase().includes("sewer") &&
-          attr.AttributeValue !== "No"
-      )
+          attr.AttributeName.toLowerCase().includes("sewer") && attr.AttributeValue !== "No",
+      ),
     );
     if (hasSewer) amenities.push("Sewer Hookups");
 

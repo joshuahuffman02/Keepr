@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Post, BadRequestException, UseGuards, Query, InternalServerErrorException, Patch, Param, HttpCode, Logger } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  BadRequestException,
+  UseGuards,
+  Query,
+  InternalServerErrorException,
+  Patch,
+  Param,
+  HttpCode,
+  Logger,
+} from "@nestjs/common";
 import { Cron } from "@nestjs/schedule";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCommunicationDto } from "./dto/create-communication.dto";
@@ -117,11 +130,13 @@ export class CommunicationsController {
     private readonly observability: ObservabilityService,
     private readonly alerting: AlertingService,
     private readonly aiAutoReplyService: AiAutoReplyService,
-    private readonly aiSentimentService: AiSentimentService
-  ) { }
+    private readonly aiSentimentService: AiSentimentService,
+  ) {}
 
   private readonly commsMetricsEnabled =
-    (process.env.ENABLE_COMMS_METRICS ?? process.env.comms_alerts_enabled ?? "true").toString().toLowerCase() === "true";
+    (process.env.ENABLE_COMMS_METRICS ?? process.env.comms_alerts_enabled ?? "true")
+      .toString()
+      .toLowerCase() === "true";
 
   private normalizePostmarkStatus(recordType?: string) {
     const rt = (recordType || "").toLowerCase();
@@ -164,12 +179,12 @@ export class CommunicationsController {
     }
     if (!allowedList.includes(domain)) {
       throw new BadRequestException(
-        `Unverified sender domain ${domain}. Configure SPF/DKIM/DMARC and add to EMAIL_SENDER_DOMAINS.`
+        `Unverified sender domain ${domain}. Configure SPF/DKIM/DMARC and add to EMAIL_SENDER_DOMAINS.`,
       );
     }
     if (verifiedList.length > 0 && !verifiedList.includes(domain)) {
       throw new BadRequestException(
-        `Sender domain ${domain} is not verified (SPF/DKIM/DMARC). Add to EMAIL_VERIFIED_DOMAINS after provider verification.`
+        `Sender domain ${domain} is not verified (SPF/DKIM/DMARC). Add to EMAIL_VERIFIED_DOMAINS after provider verification.`,
       );
     }
     return domain;
@@ -208,7 +223,7 @@ export class CommunicationsController {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit"
+      second: "2-digit",
     });
     const parts = dtf.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
       if (part.type !== "literal") acc[part.type] = part.value;
@@ -220,17 +235,28 @@ export class CommunicationsController {
       day: Number(parts.day),
       hour: Number(parts.hour),
       minute: Number(parts.minute),
-      second: Number(parts.second)
+      second: Number(parts.second),
     };
   }
 
   private getTimezoneOffsetMinutes(date: Date, timeZone: string) {
     const parts = this.getLocalTimeParts(date, timeZone);
-    const asUTC = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+    const asUTC = Date.UTC(
+      parts.year,
+      parts.month - 1,
+      parts.day,
+      parts.hour,
+      parts.minute,
+      parts.second,
+    );
     return (asUTC - date.getTime()) / 60000;
   }
 
-  private buildZonedDate(parts: { year: number; month: number; day: number }, time: { hour: number; minute: number }, timeZone: string) {
+  private buildZonedDate(
+    parts: { year: number; month: number; day: number },
+    time: { hour: number; minute: number },
+    timeZone: string,
+  ) {
     const baseUtc = Date.UTC(parts.year, parts.month - 1, parts.day, time.hour, time.minute, 0, 0);
     const offsetMinutes = this.getTimezoneOffsetMinutes(new Date(baseUtc), timeZone);
     return new Date(baseUtc - offsetMinutes * 60000);
@@ -244,13 +270,22 @@ export class CommunicationsController {
     channel: "email" | "sms",
     recipient: string | null,
     _body: SendCommunicationDto,
-    campgroundId: string
+    campgroundId: string,
   ) {
-    const normalized = channel === "email" ? this.normalizeEmail(recipient ?? "") : this.normalizePhone(recipient ?? "");
-    const consentRequiredSetting = await this.prisma.privacySetting.findUnique({ where: { campgroundId } });
+    const normalized =
+      channel === "email"
+        ? this.normalizeEmail(recipient ?? "")
+        : this.normalizePhone(recipient ?? "");
+    const consentRequiredSetting = await this.prisma.privacySetting.findUnique({
+      where: { campgroundId },
+    });
     const consentRequired = consentRequiredSetting?.consentRequired !== false;
     if (!consentRequired) {
-      return { consentOk: true, consentSource: "disabled", consentCheckedAt: new Date().toISOString() };
+      return {
+        consentOk: true,
+        consentSource: "disabled",
+        consentCheckedAt: new Date().toISOString(),
+      };
     }
 
     if (!normalized) {
@@ -259,7 +294,7 @@ export class CommunicationsController {
 
     const latest = await this.prisma.consentLog.findFirst({
       where: { campgroundId, subject: normalized, consentType: channel },
-      orderBy: { grantedAt: "desc" }
+      orderBy: { grantedAt: "desc" },
     });
 
     if (!latest || latest.revokedAt || (latest.expiresAt && latest.expiresAt < new Date())) {
@@ -271,7 +306,7 @@ export class CommunicationsController {
       consentSource: "consent_log",
       consentCheckedAt: new Date().toISOString(),
       consentSubject: normalized,
-      consentGrantedAt: latest.grantedAt
+      consentGrantedAt: latest.grantedAt,
     };
   }
 
@@ -289,7 +324,7 @@ export class CommunicationsController {
   private requireTemplateForOutbound(body: SendCommunicationDto, channel: "email" | "sms") {
     if (!body.templateId) {
       throw new BadRequestException(
-        `Template is required for outbound ${channel}. Raw bodies are not permitted without an approved template.`
+        `Template is required for outbound ${channel}. Raw bodies are not permitted without an approved template.`,
       );
     }
   }
@@ -314,7 +349,7 @@ export class CommunicationsController {
 
     const guest = await this.prisma.guest.findFirst({
       where: { phone: { contains: normalized } },
-      select: { id: true }
+      select: { id: true },
     });
 
     if (!guest) return { guestId: null, reservationId: null, campgroundId: null };
@@ -322,10 +357,14 @@ export class CommunicationsController {
     const reservation = await this.prisma.reservation.findFirst({
       where: { guestId: guest.id },
       orderBy: { createdAt: "desc" },
-      select: { id: true, campgroundId: true }
+      select: { id: true, campgroundId: true },
     });
 
-    return { guestId: guest.id, reservationId: reservation?.id ?? null, campgroundId: reservation?.campgroundId ?? null };
+    return {
+      guestId: guest.id,
+      reservationId: reservation?.id ?? null,
+      campgroundId: reservation?.campgroundId ?? null,
+    };
   }
 
   private ensureWebhookToken(token?: string) {
@@ -340,14 +379,24 @@ export class CommunicationsController {
     return token === expected;
   }
 
-  private recordComms(status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed", meta?: Record<string, unknown>) {
+  private recordComms(
+    status: "delivered" | "sent" | "bounced" | "spam_complaint" | "failed",
+    meta?: Record<string, unknown>,
+  ) {
     if (!this.commsMetricsEnabled) return;
     this.observability.recordCommsStatus(status, meta);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "write" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+    UserRole.readonly,
+  )
   @Post("communications")
   async create(@Body() body: CreateCommunicationDto) {
     if (!body.guestId && !body.reservationId) {
@@ -369,15 +418,22 @@ export class CommunicationsController {
         provider: body.provider ?? null,
         providerMessageId: body.providerMessageId ?? null,
         toAddress: body.toAddress ?? null,
-        fromAddress: body.fromAddress ?? null
-      }
+        fromAddress: body.fromAddress ?? null,
+      },
     });
     return communication;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "read" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+    UserRole.readonly,
+  )
   @Get("communications")
   async list(@Query() query: ListCommunicationsDto) {
     if (!query.campgroundId) throw new BadRequestException("campgroundId is required");
@@ -393,7 +449,7 @@ export class CommunicationsController {
       where,
       orderBy: { createdAt: "desc" },
       take: limit + 1,
-      ...(query.cursor ? { skip: 1, cursor: { id: query.cursor } } : {})
+      ...(query.cursor ? { skip: 1, cursor: { id: query.cursor } } : {}),
     });
 
     const hasMore = communications.length > limit;
@@ -401,7 +457,7 @@ export class CommunicationsController {
 
     return {
       items,
-      nextCursor: hasMore ? items[items.length - 1].id : null
+      nextCursor: hasMore ? items[items.length - 1].id : null,
     };
   }
 
@@ -410,7 +466,13 @@ export class CommunicationsController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "write" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+  )
   @Post("communications/send")
   async send(@Body() body: SendCommunicationDto) {
     if (!body.campgroundId) throw new BadRequestException("campgroundId is required");
@@ -422,15 +484,28 @@ export class CommunicationsController {
     }
     const campground = await this.prisma.campground.findUnique({
       where: { id: body.campgroundId },
-      select: { id: true, quietHoursStart: true, quietHoursEnd: true, timezone: true, parkTimeZone: true }
+      select: {
+        id: true,
+        quietHoursStart: true,
+        quietHoursEnd: true,
+        timezone: true,
+        parkTimeZone: true,
+      },
     });
     if (!campground) throw new BadRequestException("Invalid campgroundId");
 
     if (body.type === "email") {
       if (!body.toAddress) throw new BadRequestException("toAddress is required for email");
       this.requireTemplateForOutbound(body, "email");
-      const template = body.templateId ? await this.requireTemplateApproval(body.templateId, body.campgroundId) : null;
-      const consentMeta = await this.ensureChannelConsent("email", body.toAddress, body, body.campgroundId);
+      const template = body.templateId
+        ? await this.requireTemplateApproval(body.templateId, body.campgroundId)
+        : null;
+      const consentMeta = await this.ensureChannelConsent(
+        "email",
+        body.toAddress,
+        body,
+        body.campgroundId,
+      );
       if (this.isQuietHours(campground, new Date()) && !body.quietHoursOverride) {
         throw new BadRequestException("Quiet hours in effect; try again later or override");
       }
@@ -450,7 +525,7 @@ export class CommunicationsController {
           direction: "outbound",
           subject,
           body: html,
-          preview: html ? html.slice(0, 280) : subject ?? null,
+          preview: html ? html.slice(0, 280) : (subject ?? null),
           status: "queued",
           provider: "postmark",
           providerMessageId: null,
@@ -464,16 +539,16 @@ export class CommunicationsController {
             consentCheckedAt: consentMeta.consentCheckedAt,
             consentSubject: consentMeta.consentSubject ?? null,
             consentGrantedAt: consentMeta.consentGrantedAt ?? null,
-            clientConsentProvided: clientConsentProvided || undefined
-          }
-        }
+            clientConsentProvided: clientConsentProvided || undefined,
+          },
+        },
       });
 
       try {
         const result = await this.emailService.sendEmail({
           to: body.toAddress,
           subject,
-          html
+          html,
         });
         const updated = await prisma.communication.update({
           where: { id: comm.id },
@@ -486,8 +561,8 @@ export class CommunicationsController {
               ...(isRecord(comm.metadata) ? comm.metadata : {}),
               provider: result.provider,
               fallback: result.fallback,
-            }
-          }
+            },
+          },
         });
         this.recordComms("sent", { campgroundId: body.campgroundId, provider: result.provider });
         return updated;
@@ -496,10 +571,16 @@ export class CommunicationsController {
           where: { id: comm.id },
           data: {
             status: "failed",
-            metadata: { ...(isRecord(comm.metadata) ? comm.metadata : {}), error: getErrorMessage(err) }
-          }
+            metadata: {
+              ...(isRecord(comm.metadata) ? comm.metadata : {}),
+              error: getErrorMessage(err),
+            },
+          },
         });
-        this.recordComms("failed", { campgroundId: body.campgroundId, error: getErrorMessage(err) });
+        this.recordComms("failed", {
+          campgroundId: body.campgroundId,
+          error: getErrorMessage(err),
+        });
         throw new InternalServerErrorException("Failed to send email");
       }
     }
@@ -514,7 +595,11 @@ export class CommunicationsController {
       }
       const normalizedPhone = this.normalizePhone(toPhone);
       const campgroundFromPhone = process.env.TWILIO_FROM_NUMBER || body.fromAddress || "";
-      const conversationId = this.generateSmsConversationId(normalizedPhone, campgroundFromPhone, body.campgroundId);
+      const conversationId = this.generateSmsConversationId(
+        normalizedPhone,
+        campgroundFromPhone,
+        body.campgroundId,
+      );
       const comm = await prisma.communication.create({
         data: {
           id: randomUUID(),
@@ -538,33 +623,48 @@ export class CommunicationsController {
             consentCheckedAt: consentMeta.consentCheckedAt,
             consentSubject: consentMeta.consentSubject ?? null,
             consentGrantedAt: consentMeta.consentGrantedAt ?? null,
-            clientConsentProvided: clientConsentProvided || undefined
-          }
-        }
+            clientConsentProvided: clientConsentProvided || undefined,
+          },
+        },
       });
 
       try {
-        const result = await this.smsService.sendSms({ to: normalizedPhone, body: body.body ?? "" });
+        const result = await this.smsService.sendSms({
+          to: normalizedPhone,
+          body: body.body ?? "",
+        });
         const updated = await prisma.communication.update({
           where: { id: comm.id },
           data: {
             status: result.success ? "sent" : "failed",
             provider: result.provider,
             providerMessageId: result.providerMessageId ?? null,
-            metadata: { ...(isRecord(comm.metadata) ? comm.metadata : {}), fallback: result.fallback }
-          }
+            metadata: {
+              ...(isRecord(comm.metadata) ? comm.metadata : {}),
+              fallback: result.fallback,
+            },
+          },
         });
         if (result.success) {
           this.recordComms("sent", { campgroundId: body.campgroundId, provider: result.provider });
         } else {
-          this.recordComms("failed", { campgroundId: body.campgroundId, provider: result.provider });
-          await this.alerting.dispatch(
-            "SMS send failure",
-            `Failed to send SMS via ${result.provider} to ${normalizedPhone}`,
-            "error",
-            `sms-send-failure-${comm.id}`,
-            { campgroundId: body.campgroundId, provider: result.provider, fallback: result.fallback }
-          ).catch(() => undefined);
+          this.recordComms("failed", {
+            campgroundId: body.campgroundId,
+            provider: result.provider,
+          });
+          await this.alerting
+            .dispatch(
+              "SMS send failure",
+              `Failed to send SMS via ${result.provider} to ${normalizedPhone}`,
+              "error",
+              `sms-send-failure-${comm.id}`,
+              {
+                campgroundId: body.campgroundId,
+                provider: result.provider,
+                fallback: result.fallback,
+              },
+            )
+            .catch(() => undefined);
         }
         if (!result.success) throw new InternalServerErrorException("Failed to send sms");
         return updated;
@@ -573,17 +673,25 @@ export class CommunicationsController {
           where: { id: comm.id },
           data: {
             status: "failed",
-            metadata: { ...(isRecord(comm.metadata) ? comm.metadata : {}), error: getErrorMessage(err) }
-          }
+            metadata: {
+              ...(isRecord(comm.metadata) ? comm.metadata : {}),
+              error: getErrorMessage(err),
+            },
+          },
         });
-        this.recordComms("failed", { campgroundId: body.campgroundId, error: getErrorMessage(err) });
-        await this.alerting.dispatch(
-          "SMS send failure",
-          `SMS send errored for ${normalizedPhone}`,
-          "error",
-          `sms-send-error-${comm.id}`,
-          { campgroundId: body.campgroundId, error: getErrorMessage(err) }
-        ).catch(() => undefined);
+        this.recordComms("failed", {
+          campgroundId: body.campgroundId,
+          error: getErrorMessage(err),
+        });
+        await this.alerting
+          .dispatch(
+            "SMS send failure",
+            `SMS send errored for ${normalizedPhone}`,
+            "error",
+            `sms-send-error-${comm.id}`,
+            { campgroundId: body.campgroundId, error: getErrorMessage(err) },
+          )
+          .catch(() => undefined);
         throw new InternalServerErrorException("Failed to send sms");
       }
     }
@@ -600,20 +708,27 @@ export class CommunicationsController {
         direction: "outbound",
         subject: body.subject ?? null,
         body: body.body ?? null,
-        preview: body.body ? body.body.slice(0, 280) : body.subject ?? null,
+        preview: body.body ? body.body.slice(0, 280) : (body.subject ?? null),
         status: "sent",
         provider: body.provider ?? null,
         providerMessageId: body.providerMessageId ?? null,
         toAddress: body.toAddress ?? null,
-        fromAddress: body.fromAddress ?? null
-      }
+        fromAddress: body.fromAddress ?? null,
+      },
     });
     return comm;
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "read" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+    UserRole.readonly,
+  )
   @Get("communications/sender-status")
   async senderStatus() {
     const allowedList = (process.env.EMAIL_SENDER_DOMAINS || "campreserv.com")
@@ -629,7 +744,9 @@ export class CommunicationsController {
       domain: d,
       allowed: true,
       verified: verifiedList.includes(d),
-      issues: verifiedList.includes(d) ? [] : ["Domain not in EMAIL_VERIFIED_DOMAINS (SPF/DKIM/DMARC not confirmed)"]
+      issues: verifiedList.includes(d)
+        ? []
+        : ["Domain not in EMAIL_VERIFIED_DOMAINS (SPF/DKIM/DMARC not confirmed)"],
     }));
     const smsConfigured = Boolean(process.env.TWILIO_WEBHOOK_TOKEN);
     const commsAlertsEnabled = this.commsMetricsEnabled;
@@ -642,7 +759,7 @@ export class CommunicationsController {
       smsWebhookConfigured: smsConfigured,
       commsAlertsEnabled,
       enforcement: "fail_closed",
-      note: "Domains must be listed in EMAIL_SENDER_DOMAINS and EMAIL_VERIFIED_DOMAINS after provider verification (SPF/DKIM/DMARC)."
+      note: "Domains must be listed in EMAIL_SENDER_DOMAINS and EMAIL_VERIFIED_DOMAINS after provider verification (SPF/DKIM/DMARC).",
     };
   }
 
@@ -662,9 +779,12 @@ export class CommunicationsController {
       throw new BadRequestException("Missing required Twilio fields");
     }
 
-    const { guestId, reservationId, campgroundId } = await this.resolveGuestAndReservationByPhone(from);
+    const { guestId, reservationId, campgroundId } =
+      await this.resolveGuestAndReservationByPhone(from);
     const resolvedCampgroundId = body.campgroundId ?? campgroundId ?? "";
-    const conversationId = resolvedCampgroundId ? this.generateSmsConversationId(from, to, resolvedCampgroundId) : null;
+    const conversationId = resolvedCampgroundId
+      ? this.generateSmsConversationId(from, to, resolvedCampgroundId)
+      : null;
 
     const communication = await this.prisma.communication.create({
       data: {
@@ -684,8 +804,8 @@ export class CommunicationsController {
         providerMessageId: messageSid,
         toAddress: to,
         fromAddress: from,
-        receivedAt: new Date()
-      }
+        receivedAt: new Date(),
+      },
     });
 
     // Trigger AI processing (fire and forget)
@@ -717,23 +837,29 @@ export class CommunicationsController {
       throw new BadRequestException("Missing MessageSid");
     }
     const status = this.normalizeTwilioStatus(
-      readString(body.MessageStatus ?? body.SmsStatus) ?? ""
+      readString(body.MessageStatus ?? body.SmsStatus) ?? "",
     );
 
     await this.prisma.communication.updateMany({
       where: { providerMessageId: messageSid },
-      data: { status, metadata: body }
+      data: { status, metadata: body },
     });
 
     if (status === "failed") {
       this.recordComms("failed", { provider: "twilio" });
-      await this.alerting.dispatch(
-        "SMS delivery failure",
-        `Twilio reported failure for message ${messageSid}`,
-        "error",
-        `sms-delivery-failure-${messageSid}`,
-        { status: readString(body.MessageStatus ?? body.SmsStatus), to: body.To, from: body.From }
-      ).catch(() => undefined);
+      await this.alerting
+        .dispatch(
+          "SMS delivery failure",
+          `Twilio reported failure for message ${messageSid}`,
+          "error",
+          `sms-delivery-failure-${messageSid}`,
+          {
+            status: readString(body.MessageStatus ?? body.SmsStatus),
+            to: body.To,
+            from: body.From,
+          },
+        )
+        .catch(() => undefined);
     } else if (status === "delivered") {
       this.recordComms("delivered", { provider: "twilio" });
     } else if (status === "sent" || status === "queued") {
@@ -764,17 +890,17 @@ export class CommunicationsController {
     const normalizedFrom = this.normalizeEmail(from);
     const guest = normalizedFrom
       ? await this.prisma.guest.findFirst({
-        where: { email: { equals: normalizedFrom, mode: "insensitive" } },
-        select: { id: true }
-      })
+          where: { email: { equals: normalizedFrom, mode: "insensitive" } },
+          select: { id: true },
+        })
       : null;
 
     const reservation = guest
       ? await this.prisma.reservation.findFirst({
-        where: { guestId: guest.id },
-        orderBy: { createdAt: "desc" },
-        select: { id: true, campgroundId: true }
-      })
+          where: { guestId: guest.id },
+          orderBy: { createdAt: "desc" },
+          select: { id: true, campgroundId: true },
+        })
       : null;
 
     const communication = await this.prisma.communication.create({
@@ -788,14 +914,14 @@ export class CommunicationsController {
         direction: "inbound",
         subject: subject ?? null,
         body: textBody ?? null,
-        preview: textBody ? textBody.slice(0, 280) : subject ?? null,
+        preview: textBody ? textBody.slice(0, 280) : (subject ?? null),
         status: "received",
         provider: "postmark",
         providerMessageId: messageId,
         toAddress: to,
         fromAddress: from,
-        receivedAt: new Date()
-      }
+        receivedAt: new Date(),
+      },
     });
 
     // Trigger AI processing (fire and forget)
@@ -830,19 +956,20 @@ export class CommunicationsController {
     const status = this.normalizePostmarkStatus(body.RecordType);
     const bounceTypeRaw = body.BounceType;
     const bounceType = (bounceTypeRaw || "").toString().toLowerCase();
-    const isHardFail = status === "bounced" || status === "spam_complaint" || bounceType === "hardbounce";
+    const isHardFail =
+      status === "bounced" || status === "spam_complaint" || bounceType === "hardbounce";
     const finalStatus = isHardFail ? "failed" : status;
     const metadata = {
       ...body,
       normalizedStatus: status,
       bounceType: bounceTypeRaw,
       bounceSubType: body.BounceSubType,
-      description: body.Description
+      description: body.Description,
     };
 
     await this.prisma.communication.updateMany({
       where: { providerMessageId: messageId },
-      data: { status: finalStatus, metadata }
+      data: { status: finalStatus, metadata },
     });
 
     if (finalStatus === "failed" || finalStatus === "bounced") {
@@ -852,7 +979,7 @@ export class CommunicationsController {
         `Postmark message ${messageId} bounced (${bounceType || status})`,
         "warning",
         `postmark-bounce-${messageId}`,
-        { bounceType: bounceTypeRaw || body.BounceType, description: body.Description }
+        { bounceType: bounceTypeRaw || body.BounceType, description: body.Description },
       );
     } else if (finalStatus === "spam_complaint") {
       this.recordComms("spam_complaint", { provider: "postmark" });
@@ -861,7 +988,7 @@ export class CommunicationsController {
         `Postmark complaint for message ${messageId}`,
         "error",
         `postmark-complaint-${messageId}`,
-        { bounceType, description: body.Description }
+        { bounceType, description: body.Description },
       );
     } else if (finalStatus === "delivered" || finalStatus === "sent") {
       this.recordComms("delivered", { provider: "postmark" });
@@ -876,13 +1003,16 @@ export class CommunicationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing)
   @Get("communications/templates")
-  async listTemplates(@Query("campgroundId") campgroundId?: string, @Query("status") status?: string) {
+  async listTemplates(
+    @Query("campgroundId") campgroundId?: string,
+    @Query("status") status?: string,
+  ) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const where: Prisma.CommunicationTemplateWhereInput = { campgroundId };
     if (status) where.status = status;
     const templates = await this.prisma.communicationTemplate.findMany({
       where,
-      orderBy: [{ updatedAt: "desc" }]
+      orderBy: [{ updatedAt: "desc" }],
     });
     return templates;
   }
@@ -890,7 +1020,9 @@ export class CommunicationsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing)
   @Post("communications/templates")
-  async createTemplate(@Body() body: { campgroundId: string; name: string; subject?: string; bodyHtml?: string }) {
+  async createTemplate(
+    @Body() body: { campgroundId: string; name: string; subject?: string; bodyHtml?: string },
+  ) {
     if (!body.campgroundId || !body.name) {
       throw new BadRequestException("campgroundId and name are required");
     }
@@ -904,8 +1036,8 @@ export class CommunicationsController {
         status: "draft",
         version: 1,
         auditLog: [{ action: "created", at: new Date().toISOString() }],
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
     return template;
   }
@@ -915,8 +1047,15 @@ export class CommunicationsController {
   @Patch("communications/templates/:id")
   async updateTemplate(
     @Param("id") id: string,
-    @Body() body: { name?: string; subject?: string; bodyHtml?: string; status?: string; campgroundId?: string },
-    @Query("campgroundId") campgroundId?: string
+    @Body()
+    body: {
+      name?: string;
+      subject?: string;
+      bodyHtml?: string;
+      status?: string;
+      campgroundId?: string;
+    },
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
@@ -948,12 +1087,11 @@ export class CommunicationsController {
     const auditEntry = {
       action: "updated",
       at: new Date().toISOString(),
-      changes
+      changes,
     };
-    const auditLog = toJsonValue([
-      ...(Array.isArray(existing.auditLog) ? existing.auditLog : []),
-      auditEntry
-    ]) ?? [];
+    const auditLog =
+      toJsonValue([...(Array.isArray(existing.auditLog) ? existing.auditLog : []), auditEntry]) ??
+      [];
 
     const updated = await this.prisma.communicationTemplate.update({
       where: { id },
@@ -962,8 +1100,8 @@ export class CommunicationsController {
         subject: body.subject ?? existing.subject,
         bodyHtml: body.bodyHtml ?? existing.bodyHtml,
         status: body.status ?? existing.status,
-        auditLog
-      }
+        auditLog,
+      },
     });
     return updated;
   }
@@ -977,35 +1115,43 @@ export class CommunicationsController {
     if (status) where.status = status;
     return this.prisma.communicationPlaybookJob.findMany({
       where,
-      orderBy: [{ scheduledAt: "asc" }]
+      orderBy: [{ scheduledAt: "asc" }],
     });
   }
 
   private async processJob(job: CommunicationJob) {
     const playbook = await this.prisma.communicationPlaybook.findUnique({
       where: { id: job.playbookId },
-      include: { Campground: true, CommunicationTemplate: true }
+      include: { Campground: true, CommunicationTemplate: true },
     });
     if (!playbook || !playbook.enabled) {
-      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Playbook disabled" } });
+      await this.prisma.communicationPlaybookJob.update({
+        where: { id: job.id },
+        data: { status: "skipped", lastError: "Playbook disabled" },
+      });
       return;
     }
     const campground = playbook.Campground;
     const template = playbook.CommunicationTemplate;
     if (!template || template.status !== "approved") {
-      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Template not approved" } });
+      await this.prisma.communicationPlaybookJob.update({
+        where: { id: job.id },
+        data: { status: "skipped", lastError: "Template not approved" },
+      });
       return;
     }
     const now = new Date();
     if (this.isQuietHours(campground, now)) {
       // reschedule to quietHoursEnd in campground timezone
-      const [eh, em] = (campground.quietHoursEnd || "08:00").split(":").map((n: string) => Number(n));
+      const [eh, em] = (campground.quietHoursEnd || "08:00")
+        .split(":")
+        .map((n: string) => Number(n));
       const tz = this.campgroundTz(campground);
       const localParts = this.getLocalTimeParts(now, tz);
       const next = this.buildZonedDate(
         { year: localParts.year, month: localParts.month, day: localParts.day },
         { hour: eh || 8, minute: em || 0 },
-        tz
+        tz,
       );
       if (next <= now) {
         const tomorrow = new Date(next.getTime() + 24 * 60 * 60 * 1000);
@@ -1014,27 +1160,35 @@ export class CommunicationsController {
           this.buildZonedDate(
             { year: tomorrowParts.year, month: tomorrowParts.month, day: tomorrowParts.day },
             { hour: eh || 8, minute: em || 0 },
-            tz
-          ).getTime()
+            tz,
+          ).getTime(),
         );
       }
       await this.prisma.communicationPlaybookJob.update({
         where: { id: job.id },
-        data: { scheduledAt: next, attempts: job.attempts + 1 }
+        data: { scheduledAt: next, attempts: job.attempts + 1 },
       });
       return;
     }
 
     const reservation = job.reservationId
-      ? await this.prisma.reservation.findUnique({ where: { id: job.reservationId }, include: { Guest: true } })
+      ? await this.prisma.reservation.findUnique({
+          where: { id: job.reservationId },
+          include: { Guest: true },
+        })
       : null;
-    const guest = reservation?.Guest || (job.guestId ? await this.prisma.guest.findUnique({ where: { id: job.guestId } }) : null);
+    const guest =
+      reservation?.Guest ||
+      (job.guestId ? await this.prisma.guest.findUnique({ where: { id: job.guestId } }) : null);
 
     const toEmail = guest?.email || reservation?.Guest?.email;
     const toPhone = guest?.phone || reservation?.Guest?.phone;
 
     try {
-      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "processing", attempts: job.attempts + 1 } });
+      await this.prisma.communicationPlaybookJob.update({
+        where: { id: job.id },
+        data: { status: "processing", attempts: job.attempts + 1 },
+      });
 
       if (playbook.type === "nps") {
         if (!toEmail) throw new BadRequestException("Missing recipient email");
@@ -1050,23 +1204,26 @@ export class CommunicationsController {
           channel: "email",
           email: toEmail,
           templateId: templateId ?? undefined,
-          expireDays: 30
+          expireDays: 30,
         });
       } else if (playbook.channel === "email") {
         if (!toEmail) throw new BadRequestException("Missing recipient email");
         await this.emailService.sendEmail({
           to: toEmail,
           subject: template.subject || "Message from campground",
-          html: template.bodyHtml || ""
+          html: template.bodyHtml || "",
         });
       } else if (playbook.channel === "sms") {
         if (!toPhone) throw new BadRequestException("Missing recipient phone");
-        await this.smsService.sendSms({ to: toPhone, body: template.bodyHtml || template.subject || "Message" });
+        await this.smsService.sendSms({
+          to: toPhone,
+          body: template.bodyHtml || template.subject || "Message",
+        });
       }
 
       await this.prisma.communicationPlaybookJob.update({
         where: { id: job.id },
-        data: { status: "sent", lastError: null }
+        data: { status: "sent", lastError: null },
       });
     } catch (err) {
       const attempts = job.attempts + 1;
@@ -1079,8 +1236,8 @@ export class CommunicationsController {
           status: attempts >= maxAttempts ? "failed" : "pending",
           scheduledAt: attempts >= maxAttempts ? job.scheduledAt : nextTime,
           attempts,
-          lastError: getErrorMessage(err) || "Send failed"
-        }
+          lastError: getErrorMessage(err) || "Send failed",
+        },
       });
     }
   }
@@ -1094,10 +1251,10 @@ export class CommunicationsController {
       where: {
         status: "pending",
         scheduledAt: { lte: now },
-        ...(campgroundId ? { campgroundId } : {})
+        ...(campgroundId ? { campgroundId } : {}),
       },
       orderBy: { scheduledAt: "asc" },
-      take: 25
+      take: 25,
     });
     for (const job of jobs) {
       await this.processJob(job);
@@ -1124,8 +1281,8 @@ export class CommunicationsController {
       data: {
         status: "pending",
         scheduledAt: new Date(),
-        lastError: null
-      }
+        lastError: null,
+      },
     });
     return updated;
   }
@@ -1138,30 +1295,30 @@ export class CommunicationsController {
       where: {
         ...(campgroundId ? { campgroundId } : {}),
         status: { not: "cancelled" },
-        totalAmount: { gt: 0 }
+        totalAmount: { gt: 0 },
       },
-      select: { id: true, campgroundId: true, guestId: true, totalAmount: true, paidAmount: true }
+      select: { id: true, campgroundId: true, guestId: true, totalAmount: true, paidAmount: true },
     });
 
-    const due = reservations.filter(r => Number(r.paidAmount || 0) < Number(r.totalAmount || 0));
+    const due = reservations.filter((r) => Number(r.paidAmount || 0) < Number(r.totalAmount || 0));
 
     const playbooks = await this.prisma.communicationPlaybook.findMany({
       where: {
         ...(campgroundId ? { campgroundId } : {}),
         type: "unpaid",
         enabled: true,
-        templateId: { not: null }
-      }
+        templateId: { not: null },
+      },
     });
 
     let enqueued = 0;
     for (const pb of playbooks) {
       if (!pb.templateId) continue;
       const tpl = await this.prisma.communicationTemplate.findFirst({
-        where: { id: pb.templateId, status: "approved" }
+        where: { id: pb.templateId, status: "approved" },
       });
       if (!tpl) continue;
-      for (const r of due.filter(d => d.campgroundId === pb.campgroundId)) {
+      for (const r of due.filter((d) => d.campgroundId === pb.campgroundId)) {
         const scheduledAt = new Date();
         if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
           scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
@@ -1175,8 +1332,8 @@ export class CommunicationsController {
             guestId: r.guestId,
             status: "pending",
             scheduledAt,
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
         enqueued++;
       }
@@ -1192,7 +1349,7 @@ export class CommunicationsController {
     @Param("id") id: string,
     @Body() body: { reason?: string },
     @Query("campgroundId") campgroundId?: string,
-    @Query("actorId") actorId?: string
+    @Query("actorId") actorId?: string,
   ) {
     const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
@@ -1203,20 +1360,19 @@ export class CommunicationsController {
       action: "approved",
       at: new Date().toISOString(),
       actorId: actorId ?? null,
-      reason: body.reason ?? null
+      reason: body.reason ?? null,
     };
-    const auditLog = toJsonValue([
-      ...(Array.isArray(existing.auditLog) ? existing.auditLog : []),
-      auditEntry
-    ]) ?? [];
+    const auditLog =
+      toJsonValue([...(Array.isArray(existing.auditLog) ? existing.auditLog : []), auditEntry]) ??
+      [];
     const updated = await this.prisma.communicationTemplate.update({
       where: { id },
       data: {
         status: "approved",
         approvedById: actorId ?? null,
         approvedAt: new Date(),
-        auditLog
-      }
+        auditLog,
+      },
     });
     return updated;
   }
@@ -1228,7 +1384,7 @@ export class CommunicationsController {
     @Param("id") id: string,
     @Body() body: { reason?: string },
     @Query("campgroundId") campgroundId?: string,
-    @Query("actorId") actorId?: string
+    @Query("actorId") actorId?: string,
   ) {
     const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
@@ -1239,20 +1395,19 @@ export class CommunicationsController {
       action: "rejected",
       at: new Date().toISOString(),
       actorId: actorId ?? null,
-      reason: body.reason ?? null
+      reason: body.reason ?? null,
     };
-    const auditLog = toJsonValue([
-      ...(Array.isArray(existing.auditLog) ? existing.auditLog : []),
-      auditEntry
-    ]) ?? [];
+    const auditLog =
+      toJsonValue([...(Array.isArray(existing.auditLog) ? existing.auditLog : []), auditEntry]) ??
+      [];
     const updated = await this.prisma.communicationTemplate.update({
       where: { id },
       data: {
         status: "rejected",
         approvedById: null,
         approvedAt: null,
-        auditLog
-      }
+        auditLog,
+      },
     });
     return updated;
   }
@@ -1268,7 +1423,7 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     return this.prisma.communicationPlaybook.findMany({
       where: { campgroundId },
-      orderBy: { updatedAt: "desc" }
+      orderBy: { updatedAt: "desc" },
     });
   }
 
@@ -1276,7 +1431,8 @@ export class CommunicationsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing)
   @Post("communications/playbooks")
   async createPlaybook(
-    @Body() body: {
+    @Body()
+    body: {
       campgroundId: string;
       type: string;
       enabled?: boolean;
@@ -1287,9 +1443,10 @@ export class CommunicationsController {
       quietHoursEnd?: string;
       throttlePerMinute?: number;
       routingAssigneeId?: string;
-    }
+    },
   ) {
-    if (!body.campgroundId || !body.type) throw new BadRequestException("campgroundId and type are required");
+    if (!body.campgroundId || !body.type)
+      throw new BadRequestException("campgroundId and type are required");
     return this.prisma.communicationPlaybook.create({
       data: {
         id: randomUUID(),
@@ -1303,8 +1460,8 @@ export class CommunicationsController {
         quietHoursEnd: body.quietHoursEnd ?? null,
         throttlePerMinute: body.throttlePerMinute ?? null,
         routingAssigneeId: body.routingAssigneeId ?? null,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
   }
 
@@ -1313,7 +1470,8 @@ export class CommunicationsController {
   @Patch("communications/playbooks/:id")
   async updatePlaybook(
     @Param("id") id: string,
-    @Body() body: {
+    @Body()
+    body: {
       campgroundId?: string;
       enabled?: boolean;
       templateId?: string | null;
@@ -1324,7 +1482,7 @@ export class CommunicationsController {
       throttlePerMinute?: number | null;
       routingAssigneeId?: string | null;
     },
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const existing = await this.prisma.communicationPlaybook.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Playbook not found");
@@ -1337,12 +1495,21 @@ export class CommunicationsController {
         enabled: body.enabled ?? existing.enabled,
         templateId: body.templateId !== undefined ? body.templateId : existing.templateId,
         channel: body.channel !== undefined ? body.channel : existing.channel,
-        offsetMinutes: body.offsetMinutes !== undefined ? body.offsetMinutes : existing.offsetMinutes,
-        quietHoursStart: body.quietHoursStart !== undefined ? body.quietHoursStart : existing.quietHoursStart,
-        quietHoursEnd: body.quietHoursEnd !== undefined ? body.quietHoursEnd : existing.quietHoursEnd,
-        throttlePerMinute: body.throttlePerMinute !== undefined ? body.throttlePerMinute : existing.throttlePerMinute,
-        routingAssigneeId: body.routingAssigneeId !== undefined ? body.routingAssigneeId : existing.routingAssigneeId
-      }
+        offsetMinutes:
+          body.offsetMinutes !== undefined ? body.offsetMinutes : existing.offsetMinutes,
+        quietHoursStart:
+          body.quietHoursStart !== undefined ? body.quietHoursStart : existing.quietHoursStart,
+        quietHoursEnd:
+          body.quietHoursEnd !== undefined ? body.quietHoursEnd : existing.quietHoursEnd,
+        throttlePerMinute:
+          body.throttlePerMinute !== undefined
+            ? body.throttlePerMinute
+            : existing.throttlePerMinute,
+        routingAssigneeId:
+          body.routingAssigneeId !== undefined
+            ? body.routingAssigneeId
+            : existing.routingAssigneeId,
+      },
     });
   }
 
@@ -1355,7 +1522,14 @@ export class CommunicationsController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "read" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+    UserRole.readonly,
+  )
   @Get("communications/sms/conversations")
   async listSmsConversations(@Query("campgroundId") campgroundId?: string) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
@@ -1405,10 +1579,11 @@ export class CommunicationsController {
       messageCount: Number(conv.messageCount),
       unreadCount: Number(conv.unreadCount),
       guestId: conv.guestId,
-      guestName: conv.guestFirstName || conv.guestLastName
-        ? `${conv.guestFirstName || ""} ${conv.guestLastName || ""}`.trim()
-        : null,
-      phoneNumber: conv.lastMessageDirection === "inbound" ? conv.fromAddress : conv.toAddress
+      guestName:
+        conv.guestFirstName || conv.guestLastName
+          ? `${conv.guestFirstName || ""} ${conv.guestLastName || ""}`.trim()
+          : null,
+      phoneNumber: conv.lastMessageDirection === "inbound" ? conv.fromAddress : conv.toAddress,
     }));
   }
 
@@ -1417,12 +1592,19 @@ export class CommunicationsController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @RequireScope({ resource: "communications", action: "read" })
-  @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.marketing, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.front_desk,
+    UserRole.finance,
+    UserRole.marketing,
+    UserRole.readonly,
+  )
   @Get("communications/sms/conversations/:conversationId")
   async getSmsConversation(
     @Param("conversationId") conversationId: string,
     @Query("campgroundId") campgroundId?: string,
-    @Query("limit") limit?: string
+    @Query("limit") limit?: string,
   ) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const take = Math.min(Number(limit) || 50, 200);
@@ -1431,7 +1613,7 @@ export class CommunicationsController {
       where: {
         campgroundId,
         conversationId,
-        type: "sms"
+        type: "sms",
       },
       orderBy: { createdAt: "asc" },
       take,
@@ -1441,8 +1623,8 @@ export class CommunicationsController {
             id: true,
             primaryFirstName: true,
             primaryLastName: true,
-            phone: true
-          }
+            phone: true,
+          },
         },
         Reservation: {
           select: {
@@ -1452,25 +1634,25 @@ export class CommunicationsController {
             status: true,
             Site: {
               select: {
-                siteNumber: true
-              }
-            }
-          }
-        }
-      }
+                siteNumber: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     const mappedMessages = messages.map(({ Guest, Reservation, ...rest }) => {
       const reservation = Reservation
         ? {
-          ...Reservation,
-          site: Reservation.Site ?? null
-        }
+            ...Reservation,
+            site: Reservation.Site ?? null,
+          }
         : null;
       return {
         ...rest,
         guest: Guest ?? null,
-        reservation
+        reservation,
       };
     });
 
@@ -1486,7 +1668,7 @@ export class CommunicationsController {
   @Post("communications/sms/conversations/:conversationId/reply")
   async replySmsConversation(
     @Param("conversationId") conversationId: string,
-    @Body() body: { campgroundId: string; message: string; toPhone?: string }
+    @Body() body: { campgroundId: string; message: string; toPhone?: string },
   ) {
     if (!body.campgroundId || !body.message) {
       throw new BadRequestException("campgroundId and message are required");
@@ -1497,9 +1679,9 @@ export class CommunicationsController {
       where: {
         campgroundId: body.campgroundId,
         conversationId,
-        type: "sms"
+        type: "sms",
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     if (!lastMessage) {
@@ -1507,7 +1689,9 @@ export class CommunicationsController {
     }
 
     // Determine the recipient (the other party in the conversation)
-    const toPhone = body.toPhone || (lastMessage.direction === "inbound" ? lastMessage.fromAddress : lastMessage.toAddress);
+    const toPhone =
+      body.toPhone ||
+      (lastMessage.direction === "inbound" ? lastMessage.fromAddress : lastMessage.toAddress);
     if (!toPhone) {
       throw new BadRequestException("Could not determine recipient phone number");
     }
@@ -1532,8 +1716,8 @@ export class CommunicationsController {
         provider: "twilio",
         providerMessageId: null,
         toAddress: normalizedPhone,
-        fromAddress: campgroundFromPhone
-      }
+        fromAddress: campgroundFromPhone,
+      },
     });
 
     try {
@@ -1544,8 +1728,8 @@ export class CommunicationsController {
           status: result.success ? "sent" : "failed",
           provider: result.provider,
           providerMessageId: result.providerMessageId ?? null,
-          sentAt: new Date()
-        }
+          sentAt: new Date(),
+        },
       });
 
       if (result.success) {
@@ -1558,7 +1742,7 @@ export class CommunicationsController {
     } catch (err) {
       await this.prisma.communication.update({
         where: { id: comm.id },
-        data: { status: "failed", metadata: { error: getErrorMessage(err) } }
+        data: { status: "failed", metadata: { error: getErrorMessage(err) } },
       });
       this.recordComms("failed", { campgroundId: body.campgroundId, error: getErrorMessage(err) });
       throw new InternalServerErrorException("Failed to send SMS reply");
@@ -1574,7 +1758,7 @@ export class CommunicationsController {
   @Patch("communications/sms/conversations/:conversationId/read")
   async markSmsConversationRead(
     @Param("conversationId") conversationId: string,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
 
@@ -1585,11 +1769,11 @@ export class CommunicationsController {
         conversationId,
         type: "sms",
         direction: "inbound",
-        status: "received"
+        status: "received",
       },
       data: {
-        status: "delivered"
-      }
+        status: "delivered",
+      },
     });
 
     return { updated: result.count };

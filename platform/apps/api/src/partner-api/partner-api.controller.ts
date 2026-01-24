@@ -1,14 +1,5 @@
 import type { Request } from "express";
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-  Req,
-} from "@nestjs/common";
+import { Controller, Post, Get, Body, Param, Query, UseGuards, Req } from "@nestjs/common";
 import { ApiTokenGuard } from "../developer-api/guards/api-token.guard";
 import { ApiScopeGuard } from "../developer-api/guards/api-scope.guard";
 import { ApiScopes } from "../developer-api/decorators/api-scopes.decorator";
@@ -46,7 +37,7 @@ export class PartnerApiController {
     @Query("categoryId") categoryId?: string,
     @Query("search") search?: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     const principal = req.apiPrincipal;
     return this.partnerApi.listProducts(principal.campgroundId, {
@@ -76,10 +67,7 @@ export class PartnerApiController {
   @ApiScopes("inventory:read")
   async getProductBatches(@Req() req: ApiRequest, @Param("sku") sku: string) {
     const principal = req.apiPrincipal;
-    const product = await this.partnerApi.getProductBySku(
-      principal.campgroundId,
-      sku
-    );
+    const product = await this.partnerApi.getProductBySku(principal.campgroundId, sku);
     return { batches: product.batches };
   }
 
@@ -102,11 +90,7 @@ export class PartnerApiController {
   @ApiScopes("pos:write")
   async recordSale(@Req() req: ApiRequest, @Body() dto: RecordSaleDto) {
     const principal = req.apiPrincipal;
-    return this.partnerApi.recordSale(
-      principal.campgroundId,
-      principal.apiClientId,
-      dto
-    );
+    return this.partnerApi.recordSale(principal.campgroundId, principal.apiClientId, dto);
   }
 
   /**
@@ -118,7 +102,7 @@ export class PartnerApiController {
   async recordRefund(
     @Req() req: ApiRequest,
     @Param("saleId") saleId: string,
-    @Body() dto: RecordRefundDto
+    @Body() dto: RecordRefundDto,
   ) {
     const principal = req.apiPrincipal;
     return this.partnerApi.recordRefund(principal.campgroundId, saleId, dto);

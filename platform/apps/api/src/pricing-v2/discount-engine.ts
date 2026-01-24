@@ -56,10 +56,12 @@ function effectiveValue(base: number, discount: DiscountCandidate): number {
 export function resolveDiscounts(
   baseAmount: number,
   candidates: DiscountCandidate[],
-  options: ResolveOptions = {}
+  options: ResolveOptions = {},
 ): ResolutionResult {
   const maxFraction = options.maxDiscountFraction ?? DEFAULT_MAX_FRACTION;
-  const nonStackable: DiscountCandidate[] = candidates.filter((c) => c.stackingRule === "non_stackable");
+  const nonStackable: DiscountCandidate[] = candidates.filter(
+    (c) => c.stackingRule === "non_stackable",
+  );
   const stackable: DiscountCandidate[] = candidates.filter((c) => c.stackingRule === "stackable");
 
   // Pick best non-stackable (highest effective value; tie-breaker priority asc)
@@ -78,12 +80,14 @@ export function resolveDiscounts(
     applied.push({
       id: bestNonStackable.candidate.id,
       sourceType: bestNonStackable.candidate.sourceType,
-      appliedAmount: roundCurrency(bestNonStackable.value)
+      appliedAmount: roundCurrency(bestNonStackable.value),
     });
     total += bestNonStackable.value;
     nonStackable
       .filter((c) => c.id !== bestNonStackable.candidate.id)
-      .forEach((c) => rejected.push({ id: c.id, reason: "non_stackable_best_value_selected_elsewhere" }));
+      .forEach((c) =>
+        rejected.push({ id: c.id, reason: "non_stackable_best_value_selected_elsewhere" }),
+      );
   }
 
   for (const cand of stackable) {
@@ -91,7 +95,7 @@ export function resolveDiscounts(
     applied.push({
       id: cand.id,
       sourceType: cand.sourceType,
-      appliedAmount: roundCurrency(val)
+      appliedAmount: roundCurrency(val),
     });
     total += val;
   }
@@ -112,11 +116,10 @@ export function resolveDiscounts(
     applied,
     rejected,
     totalDiscount: roundCurrency(total),
-    capped
+    capped,
   };
 }
 
 function roundCurrency(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
-

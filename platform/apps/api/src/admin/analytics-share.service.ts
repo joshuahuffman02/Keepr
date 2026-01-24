@@ -6,12 +6,7 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { GuestAnalyticsService } from "./guest-analytics.service";
-import {
-  AnalyticsType,
-  ShareAccessLevel,
-  SegmentScope,
-  Prisma,
-} from "@prisma/client";
+import { AnalyticsType, ShareAccessLevel, SegmentScope, Prisma } from "@prisma/client";
 import * as crypto from "crypto";
 
 interface CreateShareRequest {
@@ -32,21 +27,15 @@ interface CreateShareRequest {
 export class AnalyticsShareService {
   constructor(
     private prisma: PrismaService,
-    private guestAnalyticsService: GuestAnalyticsService
+    private guestAnalyticsService: GuestAnalyticsService,
   ) {}
 
-  async createShareLink(
-    request: CreateShareRequest,
-    userId: string,
-    userEmail: string
-  ) {
+  async createShareLink(request: CreateShareRequest, userId: string, userEmail: string) {
     // Generate a secure token
     const token = this.generateToken();
 
     // Hash password if provided
-    const hashedPassword = request.password
-      ? await this.hashPassword(request.password)
-      : null;
+    const hashedPassword = request.password ? await this.hashPassword(request.password) : null;
 
     // Calculate expiration
     const expiresAt = request.expiresIn
@@ -56,8 +45,8 @@ export class AnalyticsShareService {
     const scope = request.campgroundId
       ? SegmentScope.campground
       : request.organizationId
-      ? SegmentScope.organization
-      : SegmentScope.global;
+        ? SegmentScope.organization
+        : SegmentScope.global;
     const data: Prisma.AnalyticsShareLinkUncheckedCreateInput = {
       id: crypto.randomUUID(),
       token,
@@ -139,7 +128,7 @@ export class AnalyticsShareService {
     // Fetch the analytics data
     const data = await this.fetchAnalyticsData(
       shareLink.analyticsType,
-      shareLink.dateRange || "last_30_days"
+      shareLink.dateRange || "last_30_days",
     );
 
     return {
@@ -154,10 +143,7 @@ export class AnalyticsShareService {
     };
   }
 
-  private async fetchAnalyticsData(
-    analyticsType: AnalyticsType,
-    dateRange: string
-  ) {
+  private async fetchAnalyticsData(analyticsType: AnalyticsType, dateRange: string) {
     switch (analyticsType) {
       case AnalyticsType.overview:
         return this.guestAnalyticsService.getOverview(dateRange);
@@ -257,7 +243,7 @@ export class AnalyticsShareService {
       expiresAt?: Date | null;
       maxViews?: number | null;
       accessLevel?: ShareAccessLevel;
-    }
+    },
   ) {
     const shareLink = await this.prisma.analyticsShareLink.findUnique({
       where: { id },
@@ -297,9 +283,7 @@ export class AnalyticsShareService {
   private async hashPassword(password: string): Promise<string> {
     const iterations = 600000; // OWASP 2023 recommendation for PBKDF2-SHA512
     const salt = crypto.randomBytes(16).toString("hex");
-    const hash = crypto
-      .pbkdf2Sync(password, salt, iterations, 64, "sha512")
-      .toString("hex");
+    const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, "sha512").toString("hex");
     return `${iterations}:${salt}:${hash}`;
   }
 
@@ -313,10 +297,7 @@ export class AnalyticsShareService {
    * If a legacy hash is successfully verified, it should be upgraded
    * to the modern format on the next password change.
    */
-  private async verifyPassword(
-    password: string,
-    storedHash: string
-  ): Promise<boolean> {
+  private async verifyPassword(password: string, storedHash: string): Promise<boolean> {
     const parts = storedHash.split(":");
 
     let iterations: number;
@@ -338,9 +319,7 @@ export class AnalyticsShareService {
       return false;
     }
 
-    const verifyHash = crypto
-      .pbkdf2Sync(password, salt, iterations, 64, "sha512")
-      .toString("hex");
+    const verifyHash = crypto.pbkdf2Sync(password, salt, iterations, 64, "sha512").toString("hex");
     return hash === verifyHash;
   }
 }

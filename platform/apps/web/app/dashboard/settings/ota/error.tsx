@@ -26,12 +26,9 @@ export default function OtaError({
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-xl font-bold text-foreground">
-            OTA Channels Error
-          </h1>
+          <h1 className="text-xl font-bold text-foreground">OTA Channels Error</h1>
           <p className="text-muted-foreground">
-            There was an error loading the OTA Channels page. This might be a
-            temporary issue.
+            There was an error loading the OTA Channels page. This might be a temporary issue.
           </p>
 
           {/* Show error details in development */}
@@ -50,24 +47,16 @@ export default function OtaError({
           )}
 
           {error.digest && (
-            <p className="text-xs text-muted-foreground font-mono">
-              Error ID: {error.digest}
-            </p>
+            <p className="text-xs text-muted-foreground font-mono">Error ID: {error.digest}</p>
           )}
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button
-            onClick={reset}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white"
-          >
+          <Button onClick={reset} className="bg-emerald-600 hover:bg-emerald-700 text-white">
             <RefreshCw className="h-4 w-4 mr-2" />
             Try again
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => window.location.reload()}
-          >
+          <Button variant="outline" onClick={() => window.location.reload()}>
             Refresh page
           </Button>
         </div>

@@ -18,16 +18,16 @@ Organization (multi-tenant root)
 
 ### Key Schemas
 
-| Schema | Description |
-|--------|-------------|
-| `OrganizationSchema` | Multi-tenant root with billing info |
-| `CampgroundSchema` | Property with location, branding, settings |
-| `SiteClassSchema` | Site category (RV, Tent, Cabin, etc.) |
-| `SiteSchema` | Individual bookable unit |
-| `GuestSchema` | Customer with contact info & preferences |
-| `ReservationSchema` | Booking with dates, pricing, status |
-| `PaymentSchema` | Payment transaction |
-| `LedgerEntrySchema` | Accounting entry |
+| Schema               | Description                                |
+| -------------------- | ------------------------------------------ |
+| `OrganizationSchema` | Multi-tenant root with billing info        |
+| `CampgroundSchema`   | Property with location, branding, settings |
+| `SiteClassSchema`    | Site category (RV, Tent, Cabin, etc.)      |
+| `SiteSchema`         | Individual bookable unit                   |
+| `GuestSchema`        | Customer with contact info & preferences   |
+| `ReservationSchema`  | Booking with dates, pricing, status        |
+| `PaymentSchema`      | Payment transaction                        |
+| `LedgerEntrySchema`  | Accounting entry                           |
 
 ## Reservation Status Flow
 
@@ -62,8 +62,9 @@ const price = 99.99; // Floating point issues!
 ```
 
 Use `@keepr/shared` format utilities for display:
+
 ```typescript
-import { formatCents } from '@keepr/shared';
+import { formatCents } from "@keepr/shared";
 formatCents(9999); // "$99.99"
 ```
 
@@ -73,23 +74,23 @@ Deposits use a tiered system based on booking value and timing:
 
 ```typescript
 interface DepositConfig {
-  tiers: DepositTier[];      // Amount-based tiers
-  seasons: DepositSeason[];  // Seasonal overrides
+  tiers: DepositTier[]; // Amount-based tiers
+  seasons: DepositSeason[]; // Seasonal overrides
   schedule: DepositScheduleEntry[]; // Payment schedule
 }
 ```
 
 ## User Roles
 
-| Role | Description |
-|------|-------------|
-| `owner` | Full access, org-level |
-| `manager` | Full campground access |
-| `front_desk` | Reservations, guests |
-| `maintenance` | Maintenance tickets |
-| `finance` | Reports, payments |
-| `marketing` | Campaigns, reviews |
-| `readonly` | View only |
+| Role          | Description            |
+| ------------- | ---------------------- |
+| `owner`       | Full access, org-level |
+| `manager`     | Full campground access |
+| `front_desk`  | Reservations, guests   |
+| `maintenance` | Maintenance tickets    |
+| `finance`     | Reports, payments      |
+| `marketing`   | Campaigns, reviews     |
+| `readonly`    | View only              |
 
 ## Validation Patterns
 
@@ -98,7 +99,7 @@ interface DepositConfig {
 Use `Create*Schema` variants which omit auto-generated fields:
 
 ```typescript
-import { CreateReservationSchema, CreateGuestSchema } from '@keepr/shared';
+import { CreateReservationSchema, CreateGuestSchema } from "@keepr/shared";
 
 // These omit: id, createdAt, updatedAt
 const validGuest = CreateGuestSchema.parse(input);
@@ -115,14 +116,17 @@ const UpdateGuestSchema = GuestSchema.partial();
 ## Common Fields
 
 ### Timestamps
+
 - `createdAt` - ISO 8601 string
 - `updatedAt` - ISO 8601 string
 
 ### IDs
+
 - All IDs use CUID format
 - Validated with `z.string().cuid()`
 
 ### Nullable vs Optional
+
 - `nullish()` - can be null, undefined, or omitted
 - `optional()` - can be undefined or omitted
 - `nullable()` - can be null but not omitted
@@ -134,8 +138,8 @@ import {
   ReservationSchema,
   CreateReservationSchema,
   type Reservation,
-  type CreateReservationDto
-} from '@keepr/shared';
+  type CreateReservationDto,
+} from "@keepr/shared";
 
 // Validate API response
 const reservation = ReservationSchema.parse(apiResponse);

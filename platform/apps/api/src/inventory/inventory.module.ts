@@ -11,24 +11,24 @@ import { PosModule } from "../pos/pos.module";
 import { DeveloperApiModule } from "../developer-api/developer-api.module";
 
 @Module({
-    imports: [
-        PrismaModule,
-        forwardRef(() => StoreModule),
-        forwardRef(() => PosModule),
-        DeveloperApiModule,
-    ],
-    controllers: [BatchInventoryController, MarkdownRulesController],
-    providers: [
-        BatchInventoryService,
-        MarkdownRulesService,
-        ExpirationAlertService,
-        SlowMovingInventoryService,
-    ],
-    exports: [
-        BatchInventoryService,
-        MarkdownRulesService,
-        ExpirationAlertService,
-        SlowMovingInventoryService,
-    ],
+  imports: [
+    PrismaModule,
+    forwardRef(() => StoreModule),
+    forwardRef(() => PosModule),
+    DeveloperApiModule,
+  ],
+  controllers: [BatchInventoryController, MarkdownRulesController],
+  providers: [
+    BatchInventoryService,
+    MarkdownRulesService,
+    ExpirationAlertService,
+    SlowMovingInventoryService,
+  ],
+  exports: [
+    BatchInventoryService,
+    MarkdownRulesService,
+    ExpirationAlertService,
+    SlowMovingInventoryService,
+  ],
 })
 export class InventoryModule {}

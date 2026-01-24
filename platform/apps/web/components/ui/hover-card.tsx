@@ -106,30 +106,33 @@ export function HoverCard({
     </div>
   );
 
-  const portalContent = isOpen && mounted ? createPortal(
-    <div
-      ref={contentRef}
-      className="fixed z-[100]"
-      style={{
-        top: position.top,
-        left: position.left,
-      }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div
-        className={cn(
-          "bg-card rounded-lg shadow-xl border border-border p-0",
-          "min-w-[280px] max-w-[360px]",
-          "animate-in fade-in-0 zoom-in-95 duration-200",
-          className
-        )}
-      >
-        {content}
-      </div>
-    </div>,
-    document.body
-  ) : null;
+  const portalContent =
+    isOpen && mounted
+      ? createPortal(
+          <div
+            ref={contentRef}
+            className="fixed z-[100]"
+            style={{
+              top: position.top,
+              left: position.left,
+            }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div
+              className={cn(
+                "bg-card rounded-lg shadow-xl border border-border p-0",
+                "min-w-[280px] max-w-[360px]",
+                "animate-in fade-in-0 zoom-in-95 duration-200",
+                className,
+              )}
+            >
+              {content}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
     <>
@@ -145,11 +148,7 @@ interface HoverCardHeaderProps {
 }
 
 export function HoverCardHeader({ children, className }: HoverCardHeaderProps) {
-  return (
-    <div className={cn("px-4 py-3 border-b border-border", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("px-4 py-3 border-b border-border", className)}>{children}</div>;
 }
 
 interface HoverCardContentProps {
@@ -158,11 +157,7 @@ interface HoverCardContentProps {
 }
 
 export function HoverCardContent({ children, className }: HoverCardContentProps) {
-  return (
-    <div className={cn("px-4 py-3", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("px-4 py-3", className)}>{children}</div>;
 }
 
 interface HoverCardFooterProps {

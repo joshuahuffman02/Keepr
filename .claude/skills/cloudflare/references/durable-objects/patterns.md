@@ -10,7 +10,9 @@ export class GameServer extends DurableObject<Env> {
     // Store child reference in parent
     this.ctx.storage.sql.exec(
       "INSERT INTO matches (id, created_at, status) VALUES (?, ?, ?)",
-      matchId, Date.now(), "active"
+      matchId,
+      Date.now(),
+      "active",
     );
     return matchId;
   }
@@ -27,7 +29,7 @@ export class GameServer extends DurableObject<Env> {
     return this.ctx.storage.sql
       .exec<{ id: string }>("SELECT id FROM matches WHERE status = ?", "active")
       .toArray()
-      .map(r => r.id);
+      .map((r) => r.id);
   }
 }
 ```
@@ -44,7 +46,7 @@ app.all('*', async (c) => {
   const path = new URL(c.req.url).pathname;
   const parts = path.split('/').filter(Boolean);
   const doName = parts.length === 0 ? '/' : `/${parts.join('/')}`;
-  
+
   const id = c.env.FLEET_DO.idFromName(doName);
   return c.env.FLEET_DO.get(id).fetch(c.req.raw);
 });
@@ -54,14 +56,14 @@ export class FleetDO extends DurableObject<Env> {
   async deleteWithCascade() {
     const data = await this.ctx.storage.get<{ agents: string[] }>('data');
     const myPath = /* derive from context */;
-    
+
     // Cascade delete to all children
     for (const agent of data?.agents || []) {
       const childPath = myPath === '/' ? `/${agent}` : `${myPath}/${agent}`;
       const child = this.env.FLEET_DO.get(this.env.FLEET_DO.idFromName(childPath));
       await child.fetch(new Request('https://internal' + childPath, { method: 'DELETE' }));
     }
-    
+
     await this.ctx.storage.deleteAll();
   }
 }
@@ -87,18 +89,22 @@ export class UserDO extends DurableObject<Env> {
 
   async getProfile(): Promise<Record<string, string>> {
     return Object.fromEntries(
-      this.ctx.storage.sql.exec<{ key: string; value: string }>("SELECT * FROM profile").toArray()
-        .map(r => [r.key, r.value])
+      this.ctx.storage.sql
+        .exec<{ key: string; value: string }>("SELECT * FROM profile")
+        .toArray()
+        .map((r) => [r.key, r.value]),
     );
   }
 
   async updateProfile(updates: Record<string, string>) {
     for (const [key, value] of Object.entries(updates)) {
       this.ctx.storage.sql.exec(
-        "INSERT OR REPLACE INTO profile (key, value) VALUES (?, ?)", key, value
+        "INSERT OR REPLACE INTO profile (key, value) VALUES (?, ?)",
+        key,
+        value,
       );
     }
-    this.broadcast({ type: 'profile_updated', data: updates });
+    this.broadcast({ type: "profile_updated", data: updates });
   }
 
   private broadcast(msg: object) {
@@ -124,16 +130,16 @@ export default {
     const userId = new URL(request.url).searchParams.get("userId") || "unknown";
     const colo = request.cf?.colo || "unknown";
     const shardKey = `${colo}:${userId}`;
-    
+
     // Rate limit per-colo (counters not shared across datacenters)
     const { success } = await env.RATE_LIMITER.limit({ key: shardKey });
     if (!success) return new Response("Rate limited", { status: 429 });
-    
+
     // Route to colo-aware DO shard
     const stub = env.MY_DO.get(env.MY_DO.idFromName(shardKey));
     return await stub.fetch(request);
-  }
-}
+  },
+};
 ```
 
 `request.cf.colo` returns IATA airport code (e.g., "SFO", "LHR"). Useful for high-throughput systems needing geographic awareness.

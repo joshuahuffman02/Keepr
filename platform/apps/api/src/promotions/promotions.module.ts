@@ -5,9 +5,9 @@ import { PrismaModule } from "../prisma/prisma.module";
 import { PermissionsModule } from "../permissions/permissions.module";
 
 @Module({
-    imports: [PrismaModule, PermissionsModule],
-    controllers: [PromotionsController],
-    providers: [PromotionsService],
-    exports: [PromotionsService]
+  imports: [PrismaModule, PermissionsModule],
+  controllers: [PromotionsController],
+  providers: [PromotionsService],
+  exports: [PromotionsService],
 })
-export class PromotionsModule { }
+export class PromotionsModule {}

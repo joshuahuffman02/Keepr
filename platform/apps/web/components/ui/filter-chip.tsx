@@ -49,7 +49,7 @@ export function FilterChip({
         onRemove();
       }
     },
-    [onRemove]
+    [onRemove],
   );
 
   const variantStyles = {
@@ -71,13 +71,9 @@ export function FilterChip({
       className={cn(
         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium border transition-colors",
         variantStyles[variant],
-        className
+        className,
       )}
-      animate={
-        isAnimating && !prefersReducedMotion
-          ? { scale: [1, 1.15, 0.95, 1.05, 1] }
-          : {}
-      }
+      animate={isAnimating && !prefersReducedMotion ? { scale: [1, 1.15, 0.95, 1.05, 1] } : {}}
       transition={{ duration: 0.4, ease: "easeOut" }}
       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
@@ -88,9 +84,7 @@ export function FilterChip({
         <span
           className={cn(
             "ml-0.5 text-xs px-1.5 py-0.5 rounded-full",
-            selected
-              ? "bg-card/20 text-foreground"
-              : "bg-muted text-muted-foreground"
+            selected ? "bg-card/20 text-foreground" : "bg-muted text-muted-foreground",
           )}
         >
           {count}
@@ -102,9 +96,7 @@ export function FilterChip({
           onClick={handleRemove}
           className={cn(
             "ml-0.5 p-0.5 rounded-full transition-colors",
-            selected
-              ? "hover:bg-card/20 text-foreground"
-              : "hover:bg-muted text-muted-foreground"
+            selected ? "hover:bg-card/20 text-foreground" : "hover:bg-muted text-muted-foreground",
           )}
           aria-label={`Remove ${label} filter`}
         >
@@ -148,7 +140,7 @@ export function FilterChipGroup({
         onChange(selected.includes(value) ? [] : [value]);
       }
     },
-    [selected, onChange, multiSelect]
+    [selected, onChange, multiSelect],
   );
 
   return (

@@ -3,7 +3,10 @@ import { DepositApplyTo, DepositDueTiming, DepositStrategy } from "@prisma/clien
 
 // Guarded enums to avoid runtime undefined when prisma client enums are missing
 const DepositStrategyFallback = { first_night: "first_night", percent: "percent", fixed: "fixed" };
-const DepositApplyToFallback = { lodging_only: "lodging_only", lodging_plus_fees: "lodging_plus_fees" };
+const DepositApplyToFallback = {
+  lodging_only: "lodging_only",
+  lodging_plus_fees: "lodging_plus_fees",
+};
 const DepositDueTimingFallback = { at_booking: "at_booking", before_arrival: "before_arrival" };
 
 const DepositStrategyGuard = DepositStrategy ?? DepositStrategyFallback;

@@ -6,7 +6,7 @@ import { CampgroundsService } from "./campgrounds.service";
 export class CampgroundsIngestScheduler {
   private readonly logger = new Logger(CampgroundsIngestScheduler.name);
 
-  constructor(private readonly campgrounds: CampgroundsService) { }
+  constructor(private readonly campgrounds: CampgroundsService) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_2AM, { name: "osm-ingest" })
   async handleOsmIngest() {
@@ -16,7 +16,7 @@ export class CampgroundsIngestScheduler {
     try {
       const { upserted, processed } = await this.campgrounds.ingestFromOsm({
         bbox,
-        limit
+        limit,
       });
       this.logger.log(`OSM ingest completed: processed=${processed}, upserted=${upserted}`);
     } catch (err) {

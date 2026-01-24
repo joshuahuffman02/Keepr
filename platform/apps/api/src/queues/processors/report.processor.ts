@@ -27,15 +27,13 @@ export class ReportQueueProcessor implements OnModuleInit {
   constructor(private readonly queueService: BullQueueService) {}
 
   onModuleInit() {
-    this.queueService.registerProcessor<ReportJobData>(
-      REPORT_QUEUE,
-      this.process.bind(this)
-    );
+    this.queueService.registerProcessor<ReportJobData>(REPORT_QUEUE, this.process.bind(this));
     this.logger.log("Report processor registered");
   }
 
   private async process(job: JobData<ReportJobData>): Promise<ReportResult> {
-    const { reportType, campgroundId, parameters, format, deliveryMethod, recipientEmail } = job.data;
+    const { reportType, campgroundId, parameters, format, deliveryMethod, recipientEmail } =
+      job.data;
 
     this.logger.debug(`Generating ${reportType} report for campground ${campgroundId}`);
 

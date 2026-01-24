@@ -2,12 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import {
-  MapPin,
-  Mountain,
-  ArrowRight,
-  Search,
-} from "lucide-react";
+import { MapPin, Mountain, ArrowRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CampingSearchForm } from "./CampingSearchForm";
 import { getServerApiUrl } from "@/lib/api-base";
@@ -95,10 +90,7 @@ export default async function CampingIndexPage({
     }
   }
 
-  const [states, popularDestinations] = await Promise.all([
-    getStates(),
-    getPopularDestinations(),
-  ]);
+  const [states, popularDestinations] = await Promise.all([getStates(), getPopularDestinations()]);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -141,8 +133,8 @@ export default async function CampingIndexPage({
             Find Your Perfect Campsite
           </h1>
           <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
-            Discover campgrounds, RV parks, and outdoor accommodations across the
-            United States. From national parks to hidden gems.
+            Discover campgrounds, RV parks, and outdoor accommodations across the United States.
+            From national parks to hidden gems.
           </p>
 
           {/* Search Bar */}
@@ -154,9 +146,7 @@ export default async function CampingIndexPage({
       {popularDestinations.length > 0 && (
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8">
-              Popular Camping Destinations
-            </h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-8">Popular Camping Destinations</h2>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {popularDestinations.slice(0, 6).map((destination) => (
@@ -205,9 +195,7 @@ export default async function CampingIndexPage({
       {/* Browse by State */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">
-            Browse Campgrounds by State
-          </h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">Browse Campgrounds by State</h2>
 
           {states.length > 0 ? (
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -223,9 +211,7 @@ export default async function CampingIndexPage({
                       <MapPin className="h-5 w-5 text-emerald-600" />
                       <span className="font-medium text-slate-700">{state.name}</span>
                     </div>
-                    <span className="text-sm text-slate-500">
-                      {state.campgroundCount}
-                    </span>
+                    <span className="text-sm text-slate-500">{state.campgroundCount}</span>
                   </Link>
                 ))}
             </div>
@@ -303,9 +289,7 @@ export default async function CampingIndexPage({
       {/* Camping Types */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 mb-8">
-            Types of Camping
-          </h2>
+          <h2 className="text-2xl font-bold text-slate-900 mb-8">Types of Camping</h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -348,7 +332,9 @@ export default async function CampingIndexPage({
                     sizes="64px"
                   />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">{type.title}</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-emerald-600 transition-colors">
+                  {type.title}
+                </h3>
                 <p className="text-slate-600 text-sm">{type.description}</p>
               </Link>
             ))}
@@ -359,19 +345,13 @@ export default async function CampingIndexPage({
       {/* CTA Section */}
       <section className="py-16 bg-emerald-900">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Own a Campground?
-          </h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Own a Campground?</h2>
           <p className="text-emerald-100 text-lg mb-8">
-            Claim your listing on Keepr and start accepting online reservations
-            today. No marketplace commission, transparent pricing.
+            Claim your listing on Keepr and start accepting online reservations today. No
+            marketplace commission, transparent pricing.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-emerald-900 hover:bg-emerald-50"
-            >
+            <Button asChild size="lg" className="bg-white text-emerald-900 hover:bg-emerald-50">
               <Link href="/claim-your-listing">
                 Claim Your Listing
                 <ArrowRight className="ml-2 h-4 w-4" />

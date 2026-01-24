@@ -9,7 +9,9 @@ import { AccessProviderRegistry } from "../access-control/access-provider.regist
 describe("AccessControlService", () => {
   const adapter = {
     provider: AccessProviderType.kisi,
-    provisionAccess: jest.fn().mockResolvedValue({ status: AccessGrantStatus.active, providerAccessId: "external-1" }),
+    provisionAccess: jest
+      .fn()
+      .mockResolvedValue({ status: AccessGrantStatus.active, providerAccessId: "external-1" }),
     revokeAccess: jest.fn().mockResolvedValue({ status: AccessGrantStatus.revoked }),
     verifyWebhookSignature: jest.fn().mockReturnValue(true),
   };
@@ -98,7 +100,13 @@ describe("AccessControlService", () => {
       ],
     }).compile();
 
-    return { service: moduleRef.get(AccessControlService), prisma, idempotency, audit, close: () => moduleRef.close() };
+    return {
+      service: moduleRef.get(AccessControlService),
+      prisma,
+      idempotency,
+      audit,
+      close: () => moduleRef.close(),
+    };
   };
 
   const hasGrant = (value: unknown): value is { grant: { status: AccessGrantStatus } } =>
@@ -116,7 +124,7 @@ describe("AccessControlService", () => {
           provider: AccessProviderType.kisi,
           credentialValue: "1234",
         },
-        "camp-1"
+        "camp-1",
       );
       expect(adapter.provisionAccess).toHaveBeenCalledTimes(1);
 
@@ -131,7 +139,7 @@ describe("AccessControlService", () => {
           provider: AccessProviderType.kisi,
           credentialValue: "1234",
         },
-        "camp-1"
+        "camp-1",
       );
       if (!hasGrant(result)) {
         throw new Error("Expected grant response to include grant payload");
@@ -161,7 +169,10 @@ describe("AccessControlService", () => {
     try {
       await service.blockAccessForReservation("res-1", "cancelled");
       expect(prisma.accessGrant.updateMany).toHaveBeenCalledWith({
-        where: { reservationId: "res-1", status: { in: [AccessGrantStatus.active, AccessGrantStatus.pending] } },
+        where: {
+          reservationId: "res-1",
+          status: { in: [AccessGrantStatus.active, AccessGrantStatus.pending] },
+        },
         data: expect.objectContaining({ status: AccessGrantStatus.blocked }),
       });
     } finally {

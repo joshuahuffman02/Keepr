@@ -72,8 +72,7 @@ const toNumberValue = (value: unknown): number | undefined => {
   return undefined;
 };
 
-const toPayloadRecord = (value: unknown): Record<string, unknown> =>
-  (isRecord(value) ? value : {});
+const toPayloadRecord = (value: unknown): Record<string, unknown> => (isRecord(value) ? value : {});
 
 const parseOpenAiUsage = (value: unknown): OpenAiUsage => {
   if (!isRecord(value)) return {};
@@ -81,7 +80,8 @@ const parseOpenAiUsage = (value: unknown): OpenAiUsage => {
   if (!isRecord(usage)) return {};
   return {
     prompt_tokens: typeof usage.prompt_tokens === "number" ? usage.prompt_tokens : undefined,
-    completion_tokens: typeof usage.completion_tokens === "number" ? usage.completion_tokens : undefined,
+    completion_tokens:
+      typeof usage.completion_tokens === "number" ? usage.completion_tokens : undefined,
     total_tokens: typeof usage.total_tokens === "number" ? usage.total_tokens : undefined,
   };
 };
@@ -134,7 +134,11 @@ const parsePricingSuggestion = (value: unknown): PricingSuggestion | null => {
     for (const factor of value.factors) {
       if (!isRecord(factor)) continue;
       const { label, value: factorValue, weight } = factor;
-      if (typeof label === "string" && typeof factorValue === "string" && typeof weight === "number") {
+      if (
+        typeof label === "string" &&
+        typeof factorValue === "string" &&
+        typeof weight === "number"
+      ) {
         factors.push({ label, value: factorValue, weight });
       }
     }
@@ -160,8 +164,8 @@ export class AiService {
     private readonly dashboardService: AiDashboardService,
     private readonly promptSanitizer: PromptSanitizerService,
     private readonly piiEncryption: PiiEncryptionService,
-    private readonly aiPrivacy: AiPrivacyService
-  ) { }
+    private readonly aiPrivacy: AiPrivacyService,
+  ) {}
 
   /**
    * Decrypt API key from database
@@ -200,9 +204,7 @@ export class AiService {
     if (!cg) throw new BadRequestException("Campground not found");
 
     // SECURITY: Encrypt API key before storing
-    const newApiKey = dto.openaiApiKey
-      ? this.piiEncryption.encrypt(dto.openaiApiKey)
-      : cg.aiApiKey;
+    const newApiKey = dto.openaiApiKey ? this.piiEncryption.encrypt(dto.openaiApiKey) : cg.aiApiKey;
 
     await this.prisma.campground.update({
       where: { id: campgroundId },
@@ -286,7 +288,11 @@ Guidelines:
     const body = {
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You produce concise, high-signal recommendations for campground operators. No PII. Be specific with actions and expected impact." },
+        {
+          role: "system",
+          content:
+            "You produce concise, high-signal recommendations for campground operators. No PII. Be specific with actions and expected impact.",
+        },
         { role: "user", content: prompt },
       ],
       temperature: 0.4,
@@ -338,13 +344,19 @@ Guidelines:
     const cgId = cg.id;
 
     // SECURITY: Sanitize user input to prevent prompt injection
-    const { sanitized: sanitizedQuestion, blocked, warnings } = this.promptSanitizer.sanitize(dto.question);
+    const {
+      sanitized: sanitizedQuestion,
+      blocked,
+      warnings,
+    } = this.promptSanitizer.sanitize(dto.question);
     if (blocked) {
       this.logger.warn(`Blocked suspicious AI ask request for campground ${dto.campgroundId}`);
-      throw new BadRequestException("Your question contains invalid content. Please rephrase and try again.");
+      throw new BadRequestException(
+        "Your question contains invalid content. Please rephrase and try again.",
+      );
     }
     if (warnings.length > 0) {
-      this.logger.debug(`AI ask request sanitization warnings: ${warnings.join(', ')}`);
+      this.logger.debug(`AI ask request sanitization warnings: ${warnings.join(", ")}`);
     }
 
     const metrics90 = await this.getEventCounts(cgId, 90);
@@ -373,7 +385,11 @@ Return:
     const body = {
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "You assist campground staff with concise answers and next steps. No guest PII. Be specific, short, and actionable." },
+        {
+          role: "system",
+          content:
+            "You assist campground staff with concise answers and next steps. No guest PII. Be specific, short, and actionable.",
+        },
         { role: "user", content: prompt },
       ],
       temperature: 0.3,
@@ -477,7 +493,8 @@ Return:
         departureDate: { gte: now },
       },
     });
-    const occupancyPercent = totalSites > 0 ? Math.round((bookedNights / (totalSites * 14)) * 100) : 0;
+    const occupancyPercent =
+      totalSites > 0 ? Math.round((bookedNights / (totalSites * 14)) * 100) : 0;
 
     // Get recent booking velocity (last 7 days vs prior 7 days)
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -488,10 +505,14 @@ Return:
     const priorBookings = await this.prisma.reservation.count({
       where: { campgroundId: cgId, createdAt: { gte: prior7Days, lt: last7Days } },
     });
-    const velocityChange = priorBookings > 0 ? Math.round(((recentBookings - priorBookings) / priorBookings) * 100) : 0;
+    const velocityChange =
+      priorBookings > 0 ? Math.round(((recentBookings - priorBookings) / priorBookings) * 100) : 0;
 
     // Calculate demand index based on real metrics
-    const demandIndex = Math.min(1, Math.max(0, (occupancyPercent / 100) * 0.6 + (velocityChange > 0 ? 0.2 : 0) + 0.2));
+    const demandIndex = Math.min(
+      1,
+      Math.max(0, (occupancyPercent / 100) * 0.6 + (velocityChange > 0 ? 0.2 : 0) + 0.2),
+    );
 
     if (useMock) {
       // Return formula-based result without AI
@@ -507,7 +528,11 @@ Return:
         demandIndex,
         factors: [
           { label: "Occupancy (next 14d)", value: `${occupancyPercent}%`, weight: 0.4 },
-          { label: "Booking velocity", value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`, weight: 0.25 },
+          {
+            label: "Booking velocity",
+            value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`,
+            weight: 0.25,
+          },
           { label: "Base demand", value: "Standard", weight: 0.2 },
           { label: "Active rules", value: "None detected", weight: 0.15 },
         ],
@@ -553,7 +578,10 @@ Respond with JSON only (no markdown):
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "You are a revenue management expert. Return only valid JSON." },
+            {
+              role: "system",
+              content: "You are a revenue management expert. Return only valid JSON.",
+            },
             { role: "user", content: prompt },
           ],
           temperature: 0.3,
@@ -599,7 +627,11 @@ Respond with JSON only (no markdown):
         demandIndex,
         factors: [
           { label: "Occupancy (next 14d)", value: `${occupancyPercent}%`, weight: 0.4 },
-          { label: "Booking velocity", value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`, weight: 0.25 },
+          {
+            label: "Booking velocity",
+            value: `${velocityChange >= 0 ? "+" : ""}${velocityChange}%`,
+            weight: 0.25,
+          },
         ],
         comparableSites: [],
         notes: "Fallback formula-based suggestion (AI unavailable).",
@@ -684,7 +716,9 @@ Respond with JSON only (no markdown):
 
     const siteItems: SearchableItem[] = sites.map((s) => {
       const powerLabel = s.hookupsPower
-        ? (s.powerAmps.length > 0 ? `${s.powerAmps.join("/")}A power` : "power")
+        ? s.powerAmps.length > 0
+          ? `${s.powerAmps.join("/")}A power`
+          : "power"
         : "";
       const hookups = [
         powerLabel,
@@ -697,7 +731,8 @@ Respond with JSON only (no markdown):
         type: "site",
         id: s.id,
         title: s.name,
-        content: `${s.name} ${s.description || ""} ${s.siteType || ""} ${rigLabel} ${hookups.join(" ")} ${amenities.join(" ")}`.trim(),
+        content:
+          `${s.name} ${s.description || ""} ${s.siteType || ""} ${rigLabel} ${hookups.join(" ")} ${amenities.join(" ")}`.trim(),
       };
     });
 
@@ -711,17 +746,17 @@ Respond with JSON only (no markdown):
       };
     });
 
-    const searchableItems: SearchableItem[] = [
-      ...guestItems,
-      ...siteItems,
-      ...messageItems,
-    ];
+    const searchableItems: SearchableItem[] = [...guestItems, ...siteItems, ...messageItems];
 
     if (useMock) {
       // Simple keyword matching without AI
       const lowerQuery = query.toLowerCase();
       const results = searchableItems
-        .filter((item) => item.content.toLowerCase().includes(lowerQuery) || item.title.toLowerCase().includes(lowerQuery))
+        .filter(
+          (item) =>
+            item.content.toLowerCase().includes(lowerQuery) ||
+            item.title.toLowerCase().includes(lowerQuery),
+        )
         .slice(0, 10)
         .map((item, idx) => ({
           type: item.type,
@@ -778,7 +813,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "You are a semantic search engine. Return only valid JSON arrays." },
+            {
+              role: "system",
+              content: "You are a semantic search engine. Return only valid JSON arrays.",
+            },
             { role: "user", content: prompt },
           ],
           temperature: 0.2,
@@ -818,7 +856,11 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       // Fallback to keyword search
       const lowerQuery = query.toLowerCase();
       const results = searchableItems
-        .filter((item) => item.content.toLowerCase().includes(lowerQuery) || item.title.toLowerCase().includes(lowerQuery))
+        .filter(
+          (item) =>
+            item.content.toLowerCase().includes(lowerQuery) ||
+            item.title.toLowerCase().includes(lowerQuery),
+        )
         .slice(0, 10)
         .map((item, idx) => ({
           type: item.type,
@@ -858,9 +900,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         action,
         recommendations,
         summary,
-        message: recommendations.length > 0
-          ? `Found ${recommendations.length} pricing recommendations. ${summary.pendingRecommendations} pending review.`
-          : "No pending pricing recommendations.",
+        message:
+          recommendations.length > 0
+            ? `Found ${recommendations.length} pricing recommendations. ${summary.pendingRecommendations} pending review.`
+            : "No pending pricing recommendations.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -870,9 +913,16 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       const recommendationId = toStringValue(payload.recommendationId);
       const userId = toStringValue(payload.userId);
       if (!recommendationId) {
-        return { action, error: "recommendationId is required", generatedAt: new Date().toISOString() };
+        return {
+          action,
+          error: "recommendationId is required",
+          generatedAt: new Date().toISOString(),
+        };
       }
-      const result = await this.dynamicPricingService.applyRecommendation(recommendationId, userId || "system");
+      const result = await this.dynamicPricingService.applyRecommendation(
+        recommendationId,
+        userId || "system",
+      );
       return {
         action,
         result,
@@ -887,9 +937,17 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       const userId = toStringValue(payload.userId);
       const reason = toStringValue(payload.reason);
       if (!recommendationId) {
-        return { action, error: "recommendationId is required", generatedAt: new Date().toISOString() };
+        return {
+          action,
+          error: "recommendationId is required",
+          generatedAt: new Date().toISOString(),
+        };
       }
-      const result = await this.dynamicPricingService.dismissRecommendation(recommendationId, userId || "system", reason);
+      const result = await this.dynamicPricingService.dismissRecommendation(
+        recommendationId,
+        userId || "system",
+        reason,
+      );
       return {
         action,
         result,
@@ -927,9 +985,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         action,
         insights,
         summary,
-        message: summary.totalOpportunityCents > 0
-          ? `You're leaving ${summary.totalOpportunityFormatted} on the table. ${summary.activeInsights} opportunities identified.`
-          : "No revenue opportunities identified at this time.",
+        message:
+          summary.totalOpportunityCents > 0
+            ? `You're leaving ${summary.totalOpportunityFormatted} on the table. ${summary.activeInsights} opportunities identified.`
+            : "No revenue opportunities identified at this time.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -976,9 +1035,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       return {
         action,
         forecast,
-        message: forecast.length > 0
-          ? `7-day forecast retrieved. Next day: ${forecast[0]?.tempHigh}°F high.`
-          : "Forecast unavailable.",
+        message:
+          forecast.length > 0
+            ? `7-day forecast retrieved. Next day: ${forecast[0]?.tempHigh}°F high.`
+            : "Forecast unavailable.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -995,9 +1055,8 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       return {
         action,
         alerts,
-        message: alerts.length > 0
-          ? `${alerts.length} weather alerts found.`
-          : "No weather alerts.",
+        message:
+          alerts.length > 0 ? `${alerts.length} weather alerts found.` : "No weather alerts.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -1011,9 +1070,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       return {
         action,
         newAlerts: alerts,
-        message: alerts.length > 0
-          ? `Created ${alerts.length} new weather alerts. Guests will be notified.`
-          : "No severe weather conditions detected.",
+        message:
+          alerts.length > 0
+            ? `Created ${alerts.length} new weather alerts. Guests will be notified.`
+            : "No severe weather conditions detected.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -1034,9 +1094,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         action,
         alerts,
         summary,
-        message: summary.activeAlerts > 0
-          ? `${summary.activeAlerts} maintenance issues detected. ${summary.critical + summary.high} need immediate attention.`
-          : "No maintenance issues detected.",
+        message:
+          summary.activeAlerts > 0
+            ? `${summary.activeAlerts} maintenance issues detected. ${summary.critical + summary.high} need immediate attention.`
+            : "No maintenance issues detected.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -1050,9 +1111,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       return {
         action,
         newAlerts: alerts,
-        message: alerts.length > 0
-          ? `Detected ${alerts.length} maintenance patterns requiring attention.`
-          : "No new maintenance patterns detected.",
+        message:
+          alerts.length > 0
+            ? `Detected ${alerts.length} maintenance patterns requiring attention.`
+            : "No new maintenance patterns detected.",
         generatedAt: new Date().toISOString(),
         mode: "live",
       };
@@ -1068,7 +1130,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         this.dashboardService.getQuickStats(campgroundId),
         this.dashboardService.getActivityFeed(
           campgroundId,
-          toNumberValue(payload.activityLimit) ?? 10
+          toNumberValue(payload.activityLimit) ?? 10,
         ),
       ]);
       return {
@@ -1088,7 +1150,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       }
       const activity = await this.dashboardService.getActivityFeed(
         campgroundId,
-        toNumberValue(payload.limit) ?? 20
+        toNumberValue(payload.limit) ?? 20,
       );
       return {
         action,
@@ -1105,7 +1167,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       }
       const metrics = await this.dashboardService.getMetrics(
         campgroundId,
-        toNumberValue(payload.periodDays) ?? 30
+        toNumberValue(payload.periodDays) ?? 30,
       );
       return {
         action,
@@ -1121,7 +1183,11 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       return {
         action,
         preview: "Apply +8% weekend uplift for premium RV sites; keep weekdays flat.",
-        steps: ["Preview affected stays", "Notify front desk of rate changes", "Publish to booking channels"],
+        steps: [
+          "Preview affected stays",
+          "Notify front desk of rate changes",
+          "Publish to booking channels",
+        ],
         impact: "Est. +$420 next 14 days with minimal cannibalization.",
         generatedAt: new Date().toISOString(),
         mode: useMock ? "mock" : "live",
@@ -1132,10 +1198,12 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       const guestName = toStringValue(payload.guestName);
       const lastMessage = toStringValue(payload.lastMessage);
       const reservationContext = toStringValue(payload.reservationContext);
-      const cg = campgroundId ? await this.prisma.campground.findUnique({
-        where: { id: campgroundId },
-        select: { aiApiKey: true },
-      }) : null;
+      const cg = campgroundId
+        ? await this.prisma.campground.findUnique({
+            where: { id: campgroundId },
+            select: { aiApiKey: true },
+          })
+        : null;
 
       const prompt = `
       You are a helpful campground concierge. Draft a friendly, professional reply to a guest.
@@ -1154,7 +1222,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
       const body = {
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are a helpful campground concierge. Draft concise, friendly replies." },
+          {
+            role: "system",
+            content: "You are a helpful campground concierge. Draft concise, friendly replies.",
+          },
           { role: "user", content: prompt },
         ],
         temperature: 0.7,
@@ -1197,7 +1268,7 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
 
         return {
           action,
-          preview: content.replace(/^"|"$/g, ''),
+          preview: content.replace(/^"|"$/g, ""),
           tone: "friendly",
           generatedAt: new Date().toISOString(),
           mode: "live",
@@ -1220,8 +1291,16 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
         availableActions: [
           // Pricing
           { action: "get_pricing_recommendations", description: "Get AI pricing recommendations" },
-          { action: "apply_pricing", description: "Apply a pricing recommendation", params: ["recommendationId"] },
-          { action: "dismiss_pricing", description: "Dismiss a pricing recommendation", params: ["recommendationId"] },
+          {
+            action: "apply_pricing",
+            description: "Apply a pricing recommendation",
+            params: ["recommendationId"],
+          },
+          {
+            action: "dismiss_pricing",
+            description: "Dismiss a pricing recommendation",
+            params: ["recommendationId"],
+          },
           { action: "analyze_pricing", description: "Trigger new pricing analysis" },
           // Revenue
           { action: "get_revenue_insights", description: "Get revenue opportunity insights" },
@@ -1235,7 +1314,10 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
           { action: "get_maintenance_alerts", description: "Get maintenance alerts" },
           { action: "analyze_maintenance", description: "Analyze maintenance patterns" },
           // Dashboard
-          { action: "get_ai_dashboard", description: "Get full AI dashboard with metrics and activity" },
+          {
+            action: "get_ai_dashboard",
+            description: "Get full AI dashboard with metrics and activity",
+          },
           { action: "get_ai_activity", description: "Get recent AI activity feed" },
           { action: "get_ai_metrics", description: "Get AI performance metrics" },
           // Messages
@@ -1250,7 +1332,8 @@ Only include items with score >= 0.5. Return empty array if no good matches.`;
     // Default fallback
     return {
       action,
-      preview: "What-if: add 10% rate during county fair and auto-apply late checkout bundle to Saturday departures.",
+      preview:
+        "What-if: add 10% rate during county fair and auto-apply late checkout bundle to Saturday departures.",
       steps: ["Simulate ADR/occupancy impact", "Stage pricing rule", "Confirm to apply"],
       generatedAt: new Date().toISOString(),
       mode: useMock ? "mock" : "live",

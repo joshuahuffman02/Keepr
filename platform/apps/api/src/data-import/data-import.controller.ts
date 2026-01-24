@@ -47,7 +47,7 @@ export class DataImportController {
   @Roles(UserRole.owner, UserRole.manager)
   getSchema(
     @Param("campgroundId") _campgroundId: string,
-    @Param("entityType") entityType: ImportEntityType
+    @Param("entityType") entityType: ImportEntityType,
   ) {
     this.validateEntityType(entityType);
     return this.dataImport.getImportSchema(entityType);
@@ -61,7 +61,7 @@ export class DataImportController {
   getTemplate(
     @Param("campgroundId") _campgroundId: string,
     @Param("entityType") entityType: ImportEntityType,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     this.validateEntityType(entityType);
 
@@ -79,10 +79,7 @@ export class DataImportController {
    */
   @Post("campgrounds/:campgroundId/import/detect")
   @Roles(UserRole.owner, UserRole.manager)
-  detectFormat(
-    @Param("campgroundId") _campgroundId: string,
-    @Body() body: DetectFormatDto
-  ) {
+  detectFormat(@Param("campgroundId") _campgroundId: string, @Body() body: DetectFormatDto) {
     this.validateEntityType(body.entityType);
 
     if (!body.csvContent) {
@@ -98,10 +95,7 @@ export class DataImportController {
    */
   @Post("campgrounds/:campgroundId/import/preview")
   @Roles(UserRole.owner, UserRole.manager)
-  previewImport(
-    @Param("campgroundId") campgroundId: string,
-    @Body() body: PreviewImportDto
-  ) {
+  previewImport(@Param("campgroundId") campgroundId: string, @Body() body: PreviewImportDto) {
     this.validateEntityType(body.entityType);
 
     if (!body.csvContent) {
@@ -116,7 +110,7 @@ export class DataImportController {
       campgroundId,
       body.entityType,
       body.csvContent,
-      body.fieldMappings
+      body.fieldMappings,
     );
   }
 
@@ -126,10 +120,7 @@ export class DataImportController {
    */
   @Post("campgrounds/:campgroundId/import/execute")
   @Roles(UserRole.owner, UserRole.manager)
-  executeImport(
-    @Param("campgroundId") campgroundId: string,
-    @Body() body: ExecuteImportDto
-  ) {
+  executeImport(@Param("campgroundId") campgroundId: string, @Body() body: ExecuteImportDto) {
     this.validateEntityType(body.entityType);
 
     if (!body.csvContent) {
@@ -145,7 +136,7 @@ export class DataImportController {
       body.entityType,
       body.csvContent,
       body.fieldMappings,
-      { updateExisting: body.updateExisting }
+      { updateExisting: body.updateExisting },
     );
   }
 
@@ -155,10 +146,7 @@ export class DataImportController {
    */
   @Get("campgrounds/:campgroundId/import/jobs/:jobId")
   @Roles(UserRole.owner, UserRole.manager)
-  getJobStatus(
-    @Param("campgroundId") campgroundId: string,
-    @Param("jobId") jobId: string
-  ) {
+  getJobStatus(@Param("campgroundId") campgroundId: string, @Param("jobId") jobId: string) {
     const job = this.dataImport.getJobStatus(jobId);
 
     if (!job) {
@@ -180,7 +168,7 @@ export class DataImportController {
     const validTypes: ImportEntityType[] = ["sites", "guests", "reservations"];
     if (!validTypes.some((type) => type === entityType)) {
       throw new BadRequestException(
-        `Invalid entity type: ${entityType}. Must be one of: ${validTypes.join(", ")}`
+        `Invalid entity type: ${entityType}. Must be one of: ${validTypes.join(", ")}`,
       );
     }
   }

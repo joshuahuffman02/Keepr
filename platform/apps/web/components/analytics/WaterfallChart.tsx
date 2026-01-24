@@ -149,7 +149,16 @@ export function WaterfallChart({
                 tickLine={false}
                 axisLine={{ stroke: "#64748b", strokeOpacity: 0.3 }}
                 tickFormatter={(v: number) => formatValue(v)}
-                label={yAxisLabel ? { value: yAxisLabel, angle: -90, position: "insideLeft", style: { textAnchor: "middle", fill: "#64748b", fontSize: 11 } } : undefined}
+                label={
+                  yAxisLabel
+                    ? {
+                        value: yAxisLabel,
+                        angle: -90,
+                        position: "insideLeft",
+                        style: { textAnchor: "middle", fill: "#64748b", fontSize: 11 },
+                      }
+                    : undefined
+                }
               />
               <Tooltip
                 contentStyle={{
@@ -159,16 +168,28 @@ export function WaterfallChart({
                   padding: "12px",
                 }}
                 labelStyle={{ color: "#f8fafc", fontWeight: "bold", marginBottom: "4px" }}
-                formatter={(value: number | string, name: string | number, item: { payload?: unknown }) => {
+                formatter={(
+                  value: number | string,
+                  name: string | number,
+                  item: { payload?: unknown },
+                ) => {
                   const payload: unknown = item.payload;
                   const payloadRecord = isRecord(payload) ? payload : {};
                   const rawType = toStringValue(payloadRecord.type);
-                  const type = rawType === "start" || rawType === "total" || rawType === "decrease" || rawType === "increase"
-                    ? rawType
-                    : undefined;
-                  const displayValue = typeof payloadRecord.displayValue === "number" ? payloadRecord.displayValue : value;
+                  const type =
+                    rawType === "start" ||
+                    rawType === "total" ||
+                    rawType === "decrease" ||
+                    rawType === "increase"
+                      ? rawType
+                      : undefined;
+                  const displayValue =
+                    typeof payloadRecord.displayValue === "number"
+                      ? payloadRecord.displayValue
+                      : value;
                   const prefix = type === "decrease" ? "-" : type === "increase" ? "+" : "";
-                  const label = type === "start" ? "Starting" : type === "total" ? "Total" : "Change";
+                  const label =
+                    type === "start" ? "Starting" : type === "total" ? "Total" : "Change";
                   return [`${prefix}${formatValue(Number(displayValue))}`, label ?? name];
                 }}
               />

@@ -32,21 +32,12 @@ interface ClaimFormData {
   verificationMethod: VerificationMethod;
 }
 
-const verificationMethodValues: VerificationMethod[] = [
-  "phone",
-  "email",
-  "document",
-  "domain",
-];
+const verificationMethodValues: VerificationMethod[] = ["phone", "email", "document", "domain"];
 
 const isVerificationMethod = (value: string): value is VerificationMethod =>
   verificationMethodValues.some((method) => method === value);
 
-export default function ClaimCampgroundPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default function ClaimCampgroundPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
   const router = useRouter();
   const [step, setStep] = useState<"form" | "verify" | "success">("form");
@@ -175,18 +166,13 @@ export default function ClaimCampgroundPage({
               (step === "verify" && stepNum === 2) ||
               (step === "success" && stepNum === 3);
             const isComplete =
-              (step === "verify" && stepNum === 1) ||
-              (step === "success" && stepNum <= 2);
+              (step === "verify" && stepNum === 1) || (step === "success" && stepNum <= 2);
 
             return (
               <div key={label} className="flex items-center gap-4">
                 <div
                   className={`flex items-center gap-2 ${
-                    isComplete
-                      ? "text-emerald-600"
-                      : isActive
-                        ? "text-slate-900"
-                        : "text-slate-400"
+                    isComplete ? "text-emerald-600" : isActive ? "text-slate-900" : "text-slate-400"
                   }`}
                 >
                   <div
@@ -203,9 +189,7 @@ export default function ClaimCampgroundPage({
                   <span className="hidden sm:inline font-medium">{label}</span>
                 </div>
                 {index < 2 && (
-                  <div
-                    className={`w-12 h-0.5 ${isComplete ? "bg-emerald-600" : "bg-slate-200"}`}
-                  />
+                  <div className={`w-12 h-0.5 ${isComplete ? "bg-emerald-600" : "bg-slate-200"}`} />
                 )}
               </div>
             );
@@ -219,9 +203,7 @@ export default function ClaimCampgroundPage({
               <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
                 <Shield className="h-8 w-8 text-emerald-600" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                Claim Your Campground
-              </h1>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Claim Your Campground</h1>
               <p className="text-slate-600">
                 Verify your ownership to manage your listing on Keepr
               </p>
@@ -249,9 +231,7 @@ export default function ClaimCampgroundPage({
                     type="text"
                     required
                     value={formData.businessName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, businessName: e.target.value })
-                    }
+                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder="Your Campground LLC"
                   />
@@ -274,9 +254,7 @@ export default function ClaimCampgroundPage({
                       type="text"
                       required
                       value={formData.contactName}
-                      onChange={(e) =>
-                        setFormData({ ...formData, contactName: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       placeholder="John Smith"
                     />
@@ -289,9 +267,7 @@ export default function ClaimCampgroundPage({
                     <select
                       required
                       value={formData.role}
-                      onChange={(e) =>
-                        setFormData({ ...formData, role: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     >
                       <option value="">Select role...</option>
@@ -305,32 +281,24 @@ export default function ClaimCampgroundPage({
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Email
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                     <input
                       type="email"
                       required
                       value={formData.contactEmail}
-                      onChange={(e) =>
-                        setFormData({ ...formData, contactEmail: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       placeholder="hello@keeprstay.com"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">
-                      Phone
-                    </label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
                     <input
                       type="tel"
                       required
                       value={formData.contactPhone}
-                      onChange={(e) =>
-                        setFormData({ ...formData, contactPhone: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       placeholder="(555) 123-4567"
                     />
@@ -340,9 +308,7 @@ export default function ClaimCampgroundPage({
 
               {/* Verification Method */}
               <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-slate-900">
-                  Verification Method
-                </h2>
+                <h2 className="text-lg font-semibold text-slate-900">Verification Method</h2>
                 <p className="text-sm text-slate-600">
                   Choose how you'd like to verify your ownership
                 </p>
@@ -418,9 +384,7 @@ export default function ClaimCampgroundPage({
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <Mail className="h-8 w-8 text-blue-600" />
               </div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                Enter Verification Code
-              </h1>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">Enter Verification Code</h1>
               <p className="text-slate-600">
                 We've sent a 6-digit code to{" "}
                 <span className="font-medium">{formData.contactEmail}</span>
@@ -443,9 +407,7 @@ export default function ClaimCampgroundPage({
                   required
                   maxLength={6}
                   value={verificationCode}
-                  onChange={(e) =>
-                    setVerificationCode(e.target.value.replace(/\D/g, ""))
-                  }
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ""))}
                   className="w-full px-4 py-3 text-center text-2xl tracking-widest border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="000000"
                 />
@@ -489,8 +451,8 @@ export default function ClaimCampgroundPage({
               Claim Submitted Successfully!
             </h1>
             <p className="text-slate-600 mb-8">
-              Your claim is being reviewed by our team. We'll notify you via email
-              within 24-48 hours once your ownership is verified.
+              Your claim is being reviewed by our team. We'll notify you via email within 24-48
+              hours once your ownership is verified.
             </p>
 
             <div className="bg-slate-50 rounded-xl p-6 mb-8">

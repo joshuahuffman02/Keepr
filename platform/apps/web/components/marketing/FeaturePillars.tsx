@@ -1,18 +1,11 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import {
-  TrendingUp,
-  Settings,
-  Users,
-  Brain,
-  Sparkles,
-  Calendar
-} from 'lucide-react';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { TrendingUp, Settings, Users, Brain, Sparkles, Calendar } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
-type FeatureColor = 'evergreen' | 'clay';
+type FeatureColor = "evergreen" | "clay";
 
 type Feature = {
   name: string;
@@ -24,97 +17,100 @@ type Feature = {
 
 const features: Feature[] = [
   {
-    name: 'AI-Powered Intelligence',
-    description: 'Predict demand, optimize pricing, and reduce no-shows with built-in AI.',
+    name: "AI-Powered Intelligence",
+    description: "Predict demand, optimize pricing, and reduce no-shows with built-in AI.",
     icon: Brain,
-    color: 'evergreen',
+    color: "evergreen",
     features: [
-      'AI demand forecasting',
-      'AI pricing recommendations',
-      'AI no-show detection',
-      'Anomaly detection alerts',
+      "AI demand forecasting",
+      "AI pricing recommendations",
+      "AI no-show detection",
+      "Anomaly detection alerts",
     ],
   },
   {
-    name: 'Loyalty & Gamification',
-    description: 'Turn one-time guests into lifetime campers with XP, levels, and rewards.',
+    name: "Loyalty & Gamification",
+    description: "Turn one-time guests into lifetime campers with XP, levels, and rewards.",
     icon: Sparkles,
-    color: 'clay',
+    color: "clay",
     features: [
-      'XP system & leveling',
-      'Rewards marketplace',
-      'Achievement badges',
-      'Referral programs',
+      "XP system & leveling",
+      "Rewards marketplace",
+      "Achievement badges",
+      "Referral programs",
     ],
   },
   {
-    name: 'Staff Scheduling & Payroll',
-    description: 'Schedule staff based on occupancy with integrated time tracking and payroll.',
+    name: "Staff Scheduling & Payroll",
+    description: "Schedule staff based on occupancy with integrated time tracking and payroll.",
     icon: Calendar,
-    color: 'evergreen',
+    color: "evergreen",
     features: [
-      'Shift scheduling',
-      'Time clock & tracking',
-      'Payroll integration',
-      'Occupancy-based staffing',
+      "Shift scheduling",
+      "Time clock & tracking",
+      "Payroll integration",
+      "Occupancy-based staffing",
     ],
   },
   {
-    name: 'Reservations & Revenue',
-    description: 'Maximize bookings with dynamic pricing and intelligent revenue management.',
+    name: "Reservations & Revenue",
+    description: "Maximize bookings with dynamic pricing and intelligent revenue management.",
     icon: TrendingUp,
-    color: 'clay',
+    color: "clay",
     features: [
-      'Drag-and-drop calendar',
-      'Dynamic pricing rules',
-      'Group bookings',
-      'Waitlist management',
+      "Drag-and-drop calendar",
+      "Dynamic pricing rules",
+      "Group bookings",
+      "Waitlist management",
     ],
   },
   {
-    name: 'Guest Experience',
-    description: 'Delight guests with seamless booking, check-in, and communication.',
+    name: "Guest Experience",
+    description: "Delight guests with seamless booking, check-in, and communication.",
     icon: Users,
-    color: 'evergreen',
+    color: "evergreen",
     features: [
-      'Online booking engine',
-      'Self-service portal',
-      '2-way SMS messaging',
-      'Push notifications',
+      "Online booking engine",
+      "Self-service portal",
+      "2-way SMS messaging",
+      "Push notifications",
     ],
   },
   {
-    name: 'Operations & Integrations',
-    description: 'Run your entire park from one place. Connect to your favorite tools.',
+    name: "Operations & Integrations",
+    description: "Run your entire park from one place. Connect to your favorite tools.",
     icon: Settings,
-    color: 'clay',
+    color: "clay",
     features: [
-      'Housekeeping management',
-      'Maintenance tickets',
-      'POS & camp store',
-      'Accounting integrations',
+      "Housekeeping management",
+      "Maintenance tickets",
+      "POS & camp store",
+      "Accounting integrations",
     ],
   },
 ];
 
-const colorClasses: Record<FeatureColor, { bg: string; icon: string; hover: string; check: string }> = {
+const colorClasses: Record<
+  FeatureColor,
+  { bg: string; icon: string; hover: string; check: string }
+> = {
   evergreen: {
-    bg: 'bg-keepr-evergreen/10',
-    icon: 'text-keepr-evergreen',
-    hover: 'hover:border-keepr-evergreen/30',
-    check: 'text-keepr-evergreen',
+    bg: "bg-keepr-evergreen/10",
+    icon: "text-keepr-evergreen",
+    hover: "hover:border-keepr-evergreen/30",
+    check: "text-keepr-evergreen",
   },
   clay: {
-    bg: 'bg-keepr-clay/10',
-    icon: 'text-keepr-clay',
-    hover: 'hover:border-keepr-clay/30',
-    check: 'text-keepr-clay',
+    bg: "bg-keepr-clay/10",
+    icon: "text-keepr-clay",
+    hover: "hover:border-keepr-clay/30",
+    check: "text-keepr-clay",
   },
 };
 
 export function FeaturePillars() {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotionSafe();
   const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -152,8 +148,8 @@ export function FeaturePillars() {
             Everything you need to run your campground
           </p>
           <p className="text-xl text-muted-foreground">
-            From AI-powered insights to guest loyalty programs, we've built the
-            all-in-one platform for modern campground operations.
+            From AI-powered insights to guest loyalty programs, we've built the all-in-one platform
+            for modern campground operations.
           </p>
         </motion.div>
 
@@ -161,7 +157,7 @@ export function FeaturePillars() {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
+          animate={isInView ? "visible" : "hidden"}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {features.map((feature) => {
@@ -175,17 +171,15 @@ export function FeaturePillars() {
                 className={`group relative bg-card rounded-2xl border border-border p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${colors.hover}`}
               >
                 {/* Icon */}
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 transition-transform duration-300 group-hover:scale-110`}>
+                <div
+                  className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 transition-transform duration-300 group-hover:scale-110`}
+                >
                   <Icon className={`h-7 w-7 ${colors.icon}`} />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold text-foreground mb-3">
-                  {feature.name}
-                </h3>
-                <p className="text-muted-foreground mb-6">
-                  {feature.description}
-                </p>
+                <h3 className="text-xl font-semibold text-foreground mb-3">{feature.name}</h3>
+                <p className="text-muted-foreground mb-6">{feature.description}</p>
 
                 {/* Feature List */}
                 <ul className="space-y-2">
@@ -208,7 +202,9 @@ export function FeaturePillars() {
                 </ul>
 
                 {/* Hover Effect - matches card color */}
-                <div className={`absolute inset-0 -z-10 rounded-2xl ${colors.bg} opacity-0 group-hover:opacity-50 transition-opacity duration-300`} />
+                <div
+                  className={`absolute inset-0 -z-10 rounded-2xl ${colors.bg} opacity-0 group-hover:opacity-50 transition-opacity duration-300`}
+                />
               </motion.div>
             );
           })}

@@ -306,20 +306,24 @@ No pitch required. Just curious about your operations.
 ## Posting Guidelines
 
 ### Frequency
+
 - LinkedIn: 3-5 posts per week
 - Twitter: 1-2 posts per day (mix of original + engagement)
 
 ### Best Times
+
 - LinkedIn: Tuesday-Thursday, 8-10 AM or 5-6 PM
 - Twitter: Varied, but mornings and lunch perform well
 
 ### Engagement Rules
+
 - Respond to every comment within 24 hours
 - Ask follow-up questions
 - Share relevant content from others
 - Don't pitch in comments unless asked
 
 ### Hashtags (LinkedIn)
+
 - #Campground
 - #RVPark
 - #Hospitality
@@ -327,6 +331,7 @@ No pitch required. Just curious about your operations.
 - #CampingIndustry
 
 ### Metrics to Track
+
 - Engagement rate (target: 2%+)
 - Profile views
 - Website clicks

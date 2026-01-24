@@ -113,15 +113,13 @@ function FeatureCheckbox({
         "border bg-slate-800/20 hover:bg-slate-800/40",
         isChecked
           ? "border-emerald-500/30 bg-emerald-500/5"
-          : "border-slate-700/50 hover:border-slate-600"
+          : "border-slate-700/50 hover:border-slate-600",
       )}
     >
       <div
         className={cn(
           "w-5 h-5 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-          isChecked
-            ? "bg-emerald-500 text-white"
-            : "border border-slate-600 bg-slate-800/50"
+          isChecked ? "bg-emerald-500 text-white" : "border border-slate-600 bg-slate-800/50",
         )}
       >
         {isChecked && <Check className="w-3 h-3" />}
@@ -168,14 +166,14 @@ function CategorySection({
         className={cn(
           "w-full flex items-center justify-between p-4 transition-colors",
           "hover:bg-slate-800/30",
-          isExpanded && "bg-slate-800/20"
+          isExpanded && "bg-slate-800/20",
         )}
       >
         <div className="flex items-center gap-3">
           <div
             className={cn(
               "w-10 h-10 rounded-lg flex items-center justify-center",
-              allCompleted ? "bg-emerald-500/20" : "bg-slate-700/50"
+              allCompleted ? "bg-emerald-500/20" : "bg-slate-700/50",
             )}
           >
             {allCompleted ? (
@@ -194,7 +192,7 @@ function CategorySection({
             <span
               className={cn(
                 "text-sm font-medium",
-                allCompleted ? "text-emerald-400" : "text-slate-400"
+                allCompleted ? "text-emerald-400" : "text-slate-400",
               )}
             >
               {completedCount}/{totalCount}
@@ -203,7 +201,7 @@ function CategorySection({
           <ChevronDown
             className={cn(
               "w-5 h-5 text-slate-500 transition-transform",
-              isExpanded && "rotate-180"
+              isExpanded && "rotate-180",
             )}
           />
         </div>
@@ -246,7 +244,7 @@ export function FeatureDiscovery({
   const [completedFeatures, setCompletedFeatures] = useState<string[]>(initialCompleted);
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedCategories, setExpandedCategories] = useState<Set<PageCategory>>(
-    new Set(["operations"])
+    new Set(["operations"]),
   );
 
   // Group pages by category
@@ -282,8 +280,8 @@ export function FeatureDiscovery({
         (page) =>
           page.label.toLowerCase().includes(query) ||
           page.description.toLowerCase().includes(query) ||
-          page.keywords.some((k) => k.toLowerCase().includes(query))
-      )
+          page.keywords.some((k) => k.toLowerCase().includes(query)),
+      ),
     );
   }, [searchQuery, pagesByCategory]);
 
@@ -336,9 +334,7 @@ export function FeatureDiscovery({
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/20 mb-4">
             <Sparkles className="w-8 h-8 text-amber-400" />
           </div>
-          <h2 className="text-xl font-semibold text-white mb-2">
-            Explore Your Features
-          </h2>
+          <h2 className="text-xl font-semibold text-white mb-2">Explore Your Features</h2>
           <p className="text-slate-400">
             Check off features as you try them. This list stays with you forever.
           </p>
@@ -376,10 +372,10 @@ export function FeatureDiscovery({
         >
           <BookOpen className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
           <div className="text-sm text-slate-400">
-            <span className="text-slate-300 font-medium">Your feature checklist:</span>{" "}
-            This lives in your dashboard at{" "}
-            <span className="text-emerald-400 font-mono text-xs">/features</span> so you
-            can track which tools you've explored over time.
+            <span className="text-slate-300 font-medium">Your feature checklist:</span> This lives
+            in your dashboard at{" "}
+            <span className="text-emerald-400 font-mono text-xs">/features</span> so you can track
+            which tools you've explored over time.
           </div>
         </motion.div>
 
@@ -452,7 +448,7 @@ export function FeatureDiscovery({
             className={cn(
               "w-full py-6 text-lg font-semibold transition-all",
               "bg-gradient-to-r from-emerald-500 to-teal-500",
-              "hover:from-emerald-400 hover:to-teal-400"
+              "hover:from-emerald-400 hover:to-teal-400",
             )}
           >
             Continue to Launch

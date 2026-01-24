@@ -53,17 +53,13 @@ export function FadeInSection({
     <motion.div
       ref={ref}
       className={cn(className)}
-      initial={
-        prefersReducedMotion
-          ? { opacity: 1 }
-          : { opacity: 0, x: offset.x, y: offset.y }
-      }
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, x: offset.x, y: offset.y }}
       animate={
         isInView
           ? { opacity: 1, x: 0, y: 0 }
           : prefersReducedMotion
-          ? { opacity: 1 }
-          : { opacity: 0, x: offset.x, y: offset.y }
+            ? { opacity: 1 }
+            : { opacity: 0, x: offset.x, y: offset.y }
       }
       transition={{
         duration: prefersReducedMotion ? 0 : 0.6,

@@ -58,14 +58,12 @@ import {
 const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 if (!stripeKey) {
   console.error(
-    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured. Stripe payments will not work."
+    "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is not configured. Stripe payments will not work.",
   );
 }
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
-type AvailableSite = Awaited<
-  ReturnType<typeof apiClient.getPublicAvailability>
->[0];
+type AvailableSite = Awaited<ReturnType<typeof apiClient.getPublicAvailability>>[0];
 type Quote = Awaited<ReturnType<typeof apiClient.getPublicQuote>>;
 type PublicCampground = Awaited<ReturnType<typeof apiClient.getPublicCampground>>;
 type CampgroundSiteClass = PublicCampground["siteClasses"][number] & { photoUrl?: string | null };
@@ -196,7 +194,8 @@ function AccommodationStep({
   const prefersReducedMotion = useReducedMotion();
   const today = new Date().toISOString().split("T")[0];
   const nights = arrivalDate && departureDate ? getNightsBetween(arrivalDate, departureDate) : 0;
-  const heroImageUrl = typeof campground?.heroImageUrl === "string" ? campground.heroImageUrl : undefined;
+  const heroImageUrl =
+    typeof campground?.heroImageUrl === "string" ? campground.heroImageUrl : undefined;
 
   // Group sites by site class for availability count
   const availabilityBySiteClass = useMemo(() => {
@@ -222,10 +221,7 @@ function AccommodationStep({
   const sitesForPicker = useMemo(() => {
     if (!availableSites || !selectedSiteClassId) return [];
     return availableSites
-      .filter(
-        (site) =>
-          site.siteClass?.id === selectedSiteClassId && site.status === "available"
-      )
+      .filter((site) => site.siteClass?.id === selectedSiteClassId && site.status === "available")
       .map((site) => ({
         id: site.id,
         name: site.name,
@@ -329,9 +325,7 @@ function AccommodationStep({
         {/* Date Inputs */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Check-in
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Check-in</label>
             <input
               type="date"
               value={arrivalDate}
@@ -341,9 +335,7 @@ function AccommodationStep({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Check-out
-            </label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Check-out</label>
             <input
               type="date"
               value={departureDate}
@@ -365,9 +357,7 @@ function AccommodationStep({
       {/* Site Class Selection */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">
-            Choose your accommodation
-          </h2>
+          <h2 className="text-lg font-semibold text-slate-900">Choose your accommodation</h2>
           {filteredSiteClasses.length > 0 && !isLoadingSites && (
             <span className="text-sm text-slate-500">
               {filteredSiteClasses.length} type
@@ -399,9 +389,7 @@ function AccommodationStep({
             <Tent className="h-12 w-12 text-emerald-500 animate-pulse" />
             <div className="text-center space-y-1">
               <p className="text-slate-700 font-medium">Finding available sites...</p>
-              <p className="text-sm text-slate-500">
-                Checking what's open for your dates
-              </p>
+              <p className="text-sm text-slate-500">Checking what's open for your dates</p>
             </div>
           </div>
         ) : filteredSiteClasses.length === 0 ? (
@@ -438,14 +426,11 @@ function AccommodationStep({
           upgradeFee={siteSelectionFeeCents}
           availableSites={sitesForPicker}
           selectedSite={
-            selectedSiteId
-              ? sitesForPicker.find((s) => s.id === selectedSiteId) || null
-              : null
+            selectedSiteId ? sitesForPicker.find((s) => s.id === selectedSiteId) || null : null
           }
           onSelectSite={(site) => onSelectSite(site)}
           siteClassPhoto={
-            siteClasses.find((sc) => sc.id === selectedSiteClassId)?.photoUrl ||
-            heroImageUrl
+            siteClasses.find((sc) => sc.id === selectedSiteClassId)?.photoUrl || heroImageUrl
           }
         />
       )}
@@ -605,12 +590,14 @@ function PaymentStep({
         children: guestInfo.children,
         petCount: guestInfo.petCount,
         petTypes: guestInfo.petTypes,
-        equipment: guestInfo.vehicle ? {
-          type: guestInfo.vehicle.type,
-          length: guestInfo.vehicle.length ? parseInt(guestInfo.vehicle.length) : undefined,
-          plateNumber: guestInfo.vehicle.plateNumber || undefined,
-          plateState: guestInfo.vehicle.plateState || undefined,
-        } : undefined,
+        equipment: guestInfo.vehicle
+          ? {
+              type: guestInfo.vehicle.type,
+              length: guestInfo.vehicle.length ? parseInt(guestInfo.vehicle.length) : undefined,
+              plateNumber: guestInfo.vehicle.plateNumber || undefined,
+              plateState: guestInfo.vehicle.plateState || undefined,
+            }
+          : undefined,
       });
       return res;
     },
@@ -671,9 +658,7 @@ function PaymentStep({
             ))}
             <div className="border-t border-slate-200 pt-3 flex justify-between font-semibold">
               <span>Total</span>
-              <span className="text-emerald-600">
-                ${(quoteTotalCents / 100).toFixed(2)}
-              </span>
+              <span className="text-emerald-600">${(quoteTotalCents / 100).toFixed(2)}</span>
             </div>
           </div>
         ) : null}
@@ -689,9 +674,7 @@ function PaymentStep({
         <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 text-center">
           <CreditCard className="h-12 w-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-600 font-medium">Payment integration</p>
-          <p className="text-sm text-slate-500 mt-1">
-            Stripe Elements would render here
-          </p>
+          <p className="text-sm text-slate-500 mt-1">Stripe Elements would render here</p>
         </div>
 
         {error && (
@@ -759,9 +742,7 @@ function SuccessScreen({
 
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-slate-900">Booking Confirmed!</h1>
-        <p className="text-slate-600">
-          Your reservation at {campgroundName} is complete.
-        </p>
+        <p className="text-slate-600">Your reservation at {campgroundName} is complete.</p>
       </div>
 
       {reservation?.confirmationNumber && (
@@ -889,9 +870,9 @@ export default function BookingPageV2() {
           typeof siteClass.id === "string" &&
           siteClass.id.length > 0 &&
           typeof siteClass.name === "string" &&
-          siteClass.name.length > 0
+          siteClass.name.length > 0,
       ),
-    [campground]
+    [campground],
   );
 
   const siteSelectionFeeCents = useMemo(() => {
@@ -899,7 +880,8 @@ export default function BookingPageV2() {
     return typeof fee === "number" ? fee : null;
   }, [campground]);
 
-  const heroImageUrl = typeof campground?.heroImageUrl === "string" ? campground.heroImageUrl : undefined;
+  const heroImageUrl =
+    typeof campground?.heroImageUrl === "string" ? campground.heroImageUrl : undefined;
 
   // Fetch availability
   const {
@@ -907,19 +889,9 @@ export default function BookingPageV2() {
     isLoading: isLoadingSites,
     error: availabilityError,
   } = useQuery({
-    queryKey: [
-      "public-availability",
-      slug,
-      arrivalDate,
-      departureDate,
-      previewToken,
-    ],
+    queryKey: ["public-availability", slug, arrivalDate, departureDate, previewToken],
     queryFn: () =>
-      apiClient.getPublicAvailability(
-        slug,
-        { arrivalDate, departureDate },
-        previewToken
-      ),
+      apiClient.getPublicAvailability(slug, { arrivalDate, departureDate }, previewToken),
     enabled: !!slug && !!arrivalDate && !!departureDate,
     retry: 2,
   });
@@ -934,16 +906,13 @@ export default function BookingPageV2() {
     if (selectedSiteId) return selectedSiteId;
     if (!selectedSiteClassId || !availableSites) return null;
     const classAvailable = availableSites.find(
-      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available"
+      (site) => site.siteClass?.id === selectedSiteClassId && site.status === "available",
     );
     return classAvailable?.id || null;
   }, [selectedSiteId, selectedSiteClassId, availableSites]);
 
   // Fetch quote for accurate pricing including dynamic pricing, taxes, booking fee, etc.
-  const {
-    data: quote,
-    isLoading: isLoadingQuote,
-  } = useQuery({
+  const { data: quote, isLoading: isLoadingQuote } = useQuery({
     queryKey: [
       "public-quote",
       slug,
@@ -1049,7 +1018,9 @@ export default function BookingPageV2() {
   }, [quote, selectedClass, nights, pricePerNight, selectedSiteId, siteSelectionFeeCents]);
 
   // Total from quote (includes all fees, taxes, dynamic pricing, booking fee, etc.)
-  const totalAmount = quote?.totalWithTaxesCents || quote?.totalCents ||
+  const totalAmount =
+    quote?.totalWithTaxesCents ||
+    quote?.totalCents ||
     priceBreakdown.reduce((sum, item) => {
       if (item.isDiscount) return sum - item.amount;
       return sum + item.amount;
@@ -1071,9 +1042,7 @@ export default function BookingPageV2() {
   };
 
   // Handle specific site selection (paid upgrade)
-  const handleSelectSite = (
-    site: { id: string; name: string; siteNumber: string } | null
-  ) => {
+  const handleSelectSite = (site: { id: string; name: string; siteNumber: string } | null) => {
     if (site) {
       setSelectedSiteId(site.id);
       setSelectedSite(site);
@@ -1089,9 +1058,7 @@ export default function BookingPageV2() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-b from-slate-50 to-white">
         <Tent className="h-12 w-12 text-emerald-500 animate-bounce" />
         <div className="text-center space-y-2">
-          <p className="text-slate-700 font-medium animate-pulse">
-            Preparing your booking...
-          </p>
+          <p className="text-slate-700 font-medium animate-pulse">Preparing your booking...</p>
         </div>
       </div>
     );
@@ -1141,8 +1108,12 @@ export default function BookingPageV2() {
       baseRatePerNight={pricePerNight}
       lineItems={priceBreakdown}
       totalAmount={totalAmount}
-      specificSite={selectedSite ? { name: selectedSite.name, number: selectedSite.siteNumber } : null}
-      ctaLabel={step === 1 ? "Continue to Details" : step === 2 ? "Continue to Payment" : "Complete Booking"}
+      specificSite={
+        selectedSite ? { name: selectedSite.name, number: selectedSite.siteNumber } : null
+      }
+      ctaLabel={
+        step === 1 ? "Continue to Details" : step === 2 ? "Continue to Payment" : "Complete Booking"
+      }
       ctaDisabled={step === 1 ? !selectedSiteClassId : false}
       onCtaClick={() => {
         if (step === 1) setStep(2);

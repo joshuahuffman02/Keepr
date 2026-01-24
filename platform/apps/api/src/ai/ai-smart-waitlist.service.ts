@@ -89,7 +89,7 @@ export class AiSmartWaitlistService {
     const seasonalFitScore = await this.calculateSeasonalFitScore(
       entry.campgroundId,
       entry.arrivalDate,
-      entry.departureDate
+      entry.departureDate,
     );
     const communicationScore = await this.calculateCommunicationScore(entry.guestId);
 
@@ -185,7 +185,7 @@ export class AiSmartWaitlistService {
     arrivalDate: Date,
     departureDate: Date,
     siteId?: string,
-    siteClassId?: string
+    siteClassId?: string,
   ): Promise<WaitlistMatch[]> {
     // Find matching waitlist entries
     const entries = await this.prisma.waitlistEntry.findMany({
@@ -258,7 +258,10 @@ export class AiSmartWaitlistService {
   /**
    * Calculate guest lifetime value score (0-100)
    */
-  private async calculateGuestLtvScore(guestId: string | null, campgroundId: string): Promise<number> {
+  private async calculateGuestLtvScore(
+    guestId: string | null,
+    campgroundId: string,
+  ): Promise<number> {
     if (!guestId) return 30; // Unknown guest gets base score
 
     // Get guest's reservation history
@@ -288,8 +291,10 @@ export class AiSmartWaitlistService {
     score += Math.min(30, reservationCount * 10);
 
     // Spending bonus (up to +30)
-    if (avgSpent > 50000) score += 30; // >$500 avg
-    else if (avgSpent > 20000) score += 20; // >$200 avg
+    if (avgSpent > 50000)
+      score += 30; // >$500 avg
+    else if (avgSpent > 20000)
+      score += 20; // >$200 avg
     else if (avgSpent > 10000) score += 10; // >$100 avg
 
     return Math.min(100, score);
@@ -312,7 +317,7 @@ export class AiSmartWaitlistService {
 
     // Recent entry is more likely to still be interested
     const daysSinceCreated = Math.floor(
-      (Date.now() - new Date(entry.createdAt).getTime()) / (1000 * 60 * 60 * 24)
+      (Date.now() - new Date(entry.createdAt).getTime()) / (1000 * 60 * 60 * 24),
     );
     if (daysSinceCreated < 7) score += 15;
     else if (daysSinceCreated < 14) score += 10;
@@ -336,7 +341,7 @@ export class AiSmartWaitlistService {
   private async calculateSeasonalFitScore(
     campgroundId: string,
     arrivalDate: Date | null,
-    departureDate: Date | null
+    departureDate: Date | null,
   ): Promise<number> {
     if (!arrivalDate || !departureDate) return 50; // Unknown dates
 
@@ -372,7 +377,7 @@ export class AiSmartWaitlistService {
 
     const daysInPeriod = Math.max(
       1,
-      (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24)
+      (departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24),
     );
     const avgPerDay = totalReservationsLastYear / 365;
     const periodAvgPerDay = historicalReservations / daysInPeriod;

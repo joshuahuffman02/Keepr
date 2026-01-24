@@ -161,10 +161,11 @@ export default function PageUsageReport() {
   // Summary stats
   const totalViews = aggregatedList.reduce((sum, s) => sum + s.views, 0);
   const totalUsers = Math.max(...aggregatedList.map((s) => s.uniqueUsers), 0);
-  const avgTimeAll = aggregatedList.filter((s) => s.avgTimeOnPage).length > 0
-    ? aggregatedList.reduce((sum, s) => sum + (s.avgTimeOnPage || 0), 0) /
-      aggregatedList.filter((s) => s.avgTimeOnPage).length
-    : 0;
+  const avgTimeAll =
+    aggregatedList.filter((s) => s.avgTimeOnPage).length > 0
+      ? aggregatedList.reduce((sum, s) => sum + (s.avgTimeOnPage || 0), 0) /
+        aggregatedList.filter((s) => s.avgTimeOnPage).length
+      : 0;
   const totalErrors = aggregatedList.reduce((sum, s) => sum + s.errors, 0);
 
   const toggleSort = (field: SortField) => {
@@ -187,9 +188,7 @@ export default function PageUsageReport() {
         </Link>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Page Usage Report</h1>
-          <p className="text-muted-foreground">
-            Detailed analytics for every admin page
-          </p>
+          <p className="text-muted-foreground">Detailed analytics for every admin page</p>
         </div>
       </div>
 
@@ -231,9 +230,7 @@ export default function PageUsageReport() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Total Errors</CardTitle>
-            <Badge variant={totalErrors > 0 ? "destructive" : "secondary"}>
-              {totalErrors}
-            </Badge>
+            <Badge variant={totalErrors > 0 ? "destructive" : "secondary"}>{totalErrors}</Badge>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalErrors}</div>
@@ -303,46 +300,31 @@ export default function PageUsageReport() {
                 <TableRow>
                   <TableHead className="w-[300px]">Page</TableHead>
                   <TableHead>Feature</TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("views")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("views")}>
                     <div className="flex items-center gap-1">
                       Views
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("uniqueUsers")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("uniqueUsers")}>
                     <div className="flex items-center gap-1">
                       Users
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("avgTimeOnPage")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("avgTimeOnPage")}>
                     <div className="flex items-center gap-1">
                       Avg Time
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("actions")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("actions")}>
                     <div className="flex items-center gap-1">
                       Actions
                       <ArrowUpDown className="h-4 w-4" />
                     </div>
                   </TableHead>
-                  <TableHead
-                    className="cursor-pointer"
-                    onClick={() => toggleSort("errors")}
-                  >
+                  <TableHead className="cursor-pointer" onClick={() => toggleSort("errors")}>
                     <div className="flex items-center gap-1">
                       Errors
                       <ArrowUpDown className="h-4 w-4" />
@@ -373,7 +355,7 @@ export default function PageUsageReport() {
                     <TableCell>
                       <div className="flex items-center gap-1">
                         {stat.views.toLocaleString()}
-                        {stat.views > totalViews / aggregatedList.length * 1.5 && (
+                        {stat.views > (totalViews / aggregatedList.length) * 1.5 && (
                           <TrendingUp className="h-3 w-3 text-green-500" />
                         )}
                       </div>

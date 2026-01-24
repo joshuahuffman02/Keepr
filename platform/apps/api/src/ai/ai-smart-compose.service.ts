@@ -118,7 +118,7 @@ export class AiSmartComposeService {
     private readonly provider: AiProviderService,
     private readonly privacy: AiPrivacyService,
     private readonly gate: AiFeatureGateService,
-    private readonly prisma: PrismaService
+    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -129,7 +129,7 @@ export class AiSmartComposeService {
     context: ComposeContext,
     currentText: string,
     cursorPosition: number,
-    userId: string
+    userId: string,
   ): Promise<InlineCompletion | null> {
     // Get text up to cursor
     const textBeforeCursor = currentText.slice(0, cursorPosition).toLowerCase();
@@ -137,7 +137,7 @@ export class AiSmartComposeService {
       textBeforeCursor.lastIndexOf(".") + 1,
       textBeforeCursor.lastIndexOf("!") + 1,
       textBeforeCursor.lastIndexOf("?") + 1,
-      0
+      0,
     );
     const currentSentence = textBeforeCursor.slice(lastSentenceStart).trim();
 
@@ -171,7 +171,7 @@ export class AiSmartComposeService {
   async checkGrammarAndTone(
     context: ComposeContext,
     text: string,
-    userId: string
+    userId: string,
   ): Promise<{
     suggestions: GrammarSuggestion[];
     overallTone: "professional" | "friendly" | "formal" | "casual";
@@ -184,7 +184,7 @@ export class AiSmartComposeService {
     // Check if feature is enabled
     const enabled = await this.gate.isFeatureEnabled(
       context.campgroundId,
-      AiFeatureType.reply_assist
+      AiFeatureType.reply_assist,
     );
 
     if (!enabled) {
@@ -257,7 +257,7 @@ Output format (JSON):
    */
   async getQuickReplies(
     context: ComposeContext,
-    userId: string
+    userId: string,
   ): Promise<Array<{ label: string; text: string }>> {
     const quickReplies: Array<{ label: string; text: string }> = [];
 
@@ -279,7 +279,7 @@ Output format (JSON):
         {
           label: "Closing",
           text: "Thank you for choosing us! We look forward to hosting you.",
-        }
+        },
       );
 
       // Add reservation-specific replies
@@ -299,7 +299,10 @@ Output format (JSON):
           label: "Need Info",
           text: "Could you provide more details about this?",
         },
-        { label: "Completed", text: "This has been completed. Let me know if you need anything else." }
+        {
+          label: "Completed",
+          text: "This has been completed. Let me know if you need anything else.",
+        },
       );
     }
 
@@ -360,12 +363,12 @@ Output format (JSON):
   private async getAiCompletion(
     context: ComposeContext,
     currentSentence: string,
-    userId: string
+    userId: string,
   ): Promise<InlineCompletion | null> {
     // Check if feature is enabled
     const enabled = await this.gate.isFeatureEnabled(
       context.campgroundId,
-      AiFeatureType.reply_assist
+      AiFeatureType.reply_assist,
     );
 
     if (!enabled) {
@@ -379,7 +382,10 @@ Match the tone and intent of what's been typed.
 Only output the completion text, nothing else.`;
 
     const contextInfo = context.priorMessages
-      ? `Prior context: ${context.priorMessages.slice(-2).map((m) => `${m.role}: ${m.content}`).join("\n")}\n\n`
+      ? `Prior context: ${context.priorMessages
+          .slice(-2)
+          .map((m) => `${m.role}: ${m.content}`)
+          .join("\n")}\n\n`
       : "";
 
     try {

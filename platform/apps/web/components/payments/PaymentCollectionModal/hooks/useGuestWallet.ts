@@ -58,7 +58,7 @@ export function useGuestWallet(): UseGuestWalletResult {
       setLoading(false);
       return null;
     },
-    [props.guestId, props.campgroundId, props.subject, walletBalanceCents]
+    [props.guestId, props.campgroundId, props.subject, walletBalanceCents],
   );
 
   const refreshBalance = useCallback(async () => {

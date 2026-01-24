@@ -20,9 +20,17 @@ export class CurrencyTaxController {
       reportingCurrency?: string;
       fxProvider?: string;
       fxRates?: { base: string; quote: string; rate: number; asOf?: string }[];
-      taxProfiles?: { id: string; name: string; region: string; type: "vat" | "gst" | "sales"; rate: number; inclusive: boolean; notes?: string }[];
+      taxProfiles?: {
+        id: string;
+        name: string;
+        region: string;
+        type: "vat" | "gst" | "sales";
+        rate: number;
+        inclusive: boolean;
+        notes?: string;
+      }[];
       parkCurrencies?: { parkId: string; currency: string; taxProfileId: string }[];
-    }
+    },
   ) {
     const normalized = {
       ...body,
@@ -55,4 +63,3 @@ export class CurrencyTaxController {
     return this.currencyTax.getRefreshStatus();
   }
 }
-

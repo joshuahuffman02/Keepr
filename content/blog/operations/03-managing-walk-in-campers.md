@@ -34,13 +34,13 @@ Walk-in campers often get overlooked in revenue planning, but they provide signi
 
 Understanding who walks in helps you serve them better:
 
-| Type | Characteristics | What They Need |
-|------|-----------------|----------------|
-| Road Trippers | Traveling through, flexible timing | Quick check-in, basic info |
-| Weekend Escapees | Last-minute decision, often local | Speed and convenience |
-| Overflow Guests | Turned away from full campgrounds | Availability confirmation |
-| RV Nomads | Long-term travelers, experienced | Minimal fuss, fair pricing |
-| First-Timers | New to camping, may have questions | Patient guidance, good site |
+| Type             | Characteristics                    | What They Need              |
+| ---------------- | ---------------------------------- | --------------------------- |
+| Road Trippers    | Traveling through, flexible timing | Quick check-in, basic info  |
+| Weekend Escapees | Last-minute decision, often local  | Speed and convenience       |
+| Overflow Guests  | Turned away from full campgrounds  | Availability confirmation   |
+| RV Nomads        | Long-term travelers, experienced   | Minimal fuss, fair pricing  |
+| First-Timers     | New to camping, may have questions | Patient guidance, good site |
 
 ---
 
@@ -63,6 +63,7 @@ Display this policy on your website and at your entrance.
 Walk-in guests want to get to their site quickly—especially after a long drive. Streamline the process:
 
 **Essential information to collect:**
+
 - Name and contact info
 - Vehicle details (license plate, RV length)
 - Party size
@@ -70,6 +71,7 @@ Walk-in guests want to get to their site quickly—especially after a long drive
 - Payment
 
 **Nice-to-have but can skip:**
+
 - Full home address (get email instead)
 - Detailed emergency contact (for short stays)
 - Marketing surveys (save for checkout)
@@ -81,11 +83,13 @@ Aim for **5 minutes or less** from arrival to site assignment.
 For campgrounds with limited staff or after-hours arrivals:
 
 **Self-check-in kiosk:**
+
 - Guest selects from available sites
 - Enters information and pays
 - Receives site map and access codes
 
 **After-hours envelopes:**
+
 - Pre-printed registration forms
 - Site map with available sites marked
 - Drop box for paperwork and payment
@@ -111,11 +115,13 @@ Paper calendars and spreadsheets create friction. Digital systems let you answer
 Charge the same rate whether someone books online or walks in.
 
 **Pros:**
+
 - Simple and transparent
 - No guest confusion or frustration
 - Easy for staff to communicate
 
 **Cons:**
+
 - May undervalue the convenience you're providing
 
 ### Option 2: Walk-In Premium
@@ -123,11 +129,13 @@ Charge the same rate whether someone books online or walks in.
 Add $5-10 for same-day/walk-in convenience.
 
 **Pros:**
+
 - Rewards advance bookers
 - Captures value of last-minute availability
 - Encourages future advance bookings
 
 **Cons:**
+
 - May frustrate walk-in guests
 - Requires clear communication
 
@@ -139,10 +147,12 @@ Adjust walk-in rates based on occupancy:
 - High occupancy: Premium for remaining sites
 
 **Pros:**
+
 - Maximizes revenue based on demand
 - Fills sites that would otherwise be empty
 
 **Cons:**
+
 - More complex to manage
 - Requires good reservation software
 
@@ -155,9 +165,11 @@ Adjust walk-in rates based on occupancy:
 First impressions matter, especially for tired travelers:
 
 **Good:**
+
 > "Welcome! Are you looking for a site tonight? Let me check what we have available."
 
 **Not as good:**
+
 > "Do you have a reservation?"
 
 The first approach assumes good faith and helpfulness. The second implies they might not belong.
@@ -233,18 +245,21 @@ Include a booking link and perhaps a small discount code for advance reservation
 ## Walk-In Management Checklist
 
 **Policy Setup:**
+
 - [ ] Create and post walk-in policy
 - [ ] Define acceptance hours
 - [ ] Set walk-in pricing strategy
 - [ ] Train staff on walk-in procedures
 
 **Systems:**
+
 - [ ] Enable real-time availability for front desk
 - [ ] Streamline registration forms
 - [ ] Set up self-service options if needed
 - [ ] Create after-hours check-in process
 
 **Guest Experience:**
+
 - [ ] Prepare site recommendations for different needs
 - [ ] Create quick-reference campground maps
 - [ ] Design follow-up email template
@@ -272,4 +287,4 @@ The key is being prepared: know your availability instantly, make check-in fast 
 
 ---
 
-*Keepr's check-in features include real-time availability, quick registration, and self-service kiosk options—making walk-in management effortless. [See it in action at campreserv.com](https://campreserv.com)*
+_Keepr's check-in features include real-time availability, quick registration, and self-service kiosk options—making walk-in management effortless. [See it in action at campreserv.com](https://campreserv.com)_

@@ -117,9 +117,7 @@ const amenityIconMap: Record<string, React.ReactNode> = {
 };
 
 // Categorize amenities
-const categorizeAmenity = (
-  amenity: string
-): { category: string; icon: React.ReactNode } => {
+const categorizeAmenity = (amenity: string): { category: string; icon: React.ReactNode } => {
   const lower = amenity.toLowerCase();
 
   // Find matching icon
@@ -196,11 +194,7 @@ const categorizeAmenity = (
   if (lower.includes("pet") || lower.includes("dog")) {
     return { category: "Pet Friendly", icon };
   }
-  if (
-    lower.includes("parking") ||
-    lower.includes("pull") ||
-    lower.includes("rig")
-  ) {
+  if (lower.includes("parking") || lower.includes("pull") || lower.includes("rig")) {
     return { category: "Parking", icon };
   }
 
@@ -241,10 +235,8 @@ export function AmenitiesSection({
       cats["Hookups"] = [];
       if (hasElectric)
         cats["Hookups"].push({ name: "Electric", icon: <Plug className="h-4 w-4" /> });
-      if (hasWater)
-        cats["Hookups"].push({ name: "Water", icon: <Droplets className="h-4 w-4" /> });
-      if (hasSewer)
-        cats["Hookups"].push({ name: "Sewer", icon: <Trash2 className="h-4 w-4" /> });
+      if (hasWater) cats["Hookups"].push({ name: "Water", icon: <Droplets className="h-4 w-4" /> });
+      if (hasSewer) cats["Hookups"].push({ name: "Sewer", icon: <Trash2 className="h-4 w-4" /> });
     }
 
     if (hasPets) {
@@ -258,7 +250,7 @@ export function AmenitiesSection({
 
       // Avoid duplicates
       const exists = cats[category].some(
-        (item) => item.name.toLowerCase() === amenity.toLowerCase()
+        (item) => item.name.toLowerCase() === amenity.toLowerCase(),
       );
       if (!exists) {
         cats[category].push({ name: amenity, icon });
@@ -300,9 +292,7 @@ export function AmenitiesSection({
 
   return (
     <section className={cn("space-y-4", className)}>
-      <h2 className="text-xl font-semibold text-foreground">
-        What this place offers
-      </h2>
+      <h2 className="text-xl font-semibold text-foreground">What this place offers</h2>
 
       <div className="grid gap-6 md:grid-cols-2">
         {visibleCategories.map((category) => (
@@ -314,18 +304,13 @@ export function AmenitiesSection({
           >
             <div className="flex items-center gap-2 text-muted-foreground">
               <span className="text-muted-foreground">{category.icon}</span>
-              <h3 className="text-sm font-semibold uppercase tracking-wider">
-                {category.name}
-              </h3>
+              <h3 className="text-sm font-semibold uppercase tracking-wider">{category.name}</h3>
             </div>
             <ul className="space-y-2">
               {category.items.map((item, idx) => {
                 const clayIconPath = getAmenityIconPath(item.name);
                 return (
-                  <li
-                    key={idx}
-                    className="flex items-center gap-3 text-foreground"
-                  >
+                  <li key={idx} className="flex items-center gap-3 text-foreground">
                     {clayIconPath ? (
                       <Image
                         src={clayIconPath}
@@ -348,11 +333,7 @@ export function AmenitiesSection({
 
       {/* Show more/less button */}
       {categories.length > 2 && (
-        <Button
-          variant="outline"
-          className="w-full mt-4"
-          onClick={() => setShowAll(!showAll)}
-        >
+        <Button variant="outline" className="w-full mt-4" onClick={() => setShowAll(!showAll)}>
           {showAll ? (
             <>Show less</>
           ) : (
@@ -391,13 +372,7 @@ export function AmenitiesInline({
             className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full"
           >
             {clayIconPath ? (
-              <Image
-                src={clayIconPath}
-                alt=""
-                width={14}
-                height={14}
-                className="object-contain"
-              />
+              <Image src={clayIconPath} alt="" width={14} height={14} className="object-contain" />
             ) : (
               <span className="text-muted-foreground">{icon}</span>
             )}

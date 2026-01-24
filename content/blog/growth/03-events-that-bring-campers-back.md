@@ -48,17 +48,20 @@ Over time, your events become part of guests' family traditions.
 ### Seasonal Celebrations
 
 **Spring:**
+
 - Easter egg hunt and brunch
 - Fishing tournament
 - Spring cleaning/planting days
 
 **Summer:**
+
 - July 4th celebration
 - Movie nights under the stars
 - Ice cream socials
 - Live music weekends
 
 **Fall:**
+
 - Halloween decorated campsite contest
 - Fall harvest festival
 - Trunk-or-treat
@@ -66,6 +69,7 @@ Over time, your events become part of guests' family traditions.
 - Oktoberfest celebration
 
 **Winter:**
+
 - Holiday lights display
 - New Year's Eve party
 - Chili cook-off
@@ -73,14 +77,14 @@ Over time, your events become part of guests' family traditions.
 
 ### Activity-Based Events
 
-| Activity | Event Format |
-|----------|--------------|
-| Fishing | Tournament, kids fishing derby |
-| Arts/Crafts | Craft weekend, painting classes |
-| Music | Open mic night, live band weekend |
-| Food | Potluck, cook-off, chef demonstration |
-| Sports | Cornhole tournament, horseshoe contest |
-| Education | Nature walks, astronomy nights, photography |
+| Activity    | Event Format                                |
+| ----------- | ------------------------------------------- |
+| Fishing     | Tournament, kids fishing derby              |
+| Arts/Crafts | Craft weekend, painting classes             |
+| Music       | Open mic night, live band weekend           |
+| Food        | Potluck, cook-off, chef demonstration       |
+| Sports      | Cornhole tournament, horseshoe contest      |
+| Education   | Nature walks, astronomy nights, photography |
 
 ### Community Events
 
@@ -103,12 +107,14 @@ Over time, your events become part of guests' family traditions.
 ### 12 Weeks Before: Concept and Planning
 
 **Define the event:**
+
 - Event name and theme
 - Date and time
 - Target audience
 - Goals (attendance, revenue, experience)
 
 **Logistics planning:**
+
 - Activities and timeline
 - Space requirements
 - Equipment and supplies needed
@@ -118,12 +124,14 @@ Over time, your events become part of guests' family traditions.
 ### 8 Weeks Before: Marketing Launch
 
 **Announce the event:**
+
 - Email to past guests
 - Social media posts (multiple)
 - Website event page
 - Campground directory updates
 
 **Open registration/booking:**
+
 - Create event-specific packages
 - Consider early-bird pricing
 - Track interest and adjust as needed
@@ -131,12 +139,14 @@ Over time, your events become part of guests' family traditions.
 ### 4 Weeks Before: Preparation Intensifies
 
 **Confirm details:**
+
 - Finalize vendor/entertainment bookings
 - Order supplies
 - Confirm staff schedule
 - Create detailed run-of-show timeline
 
 **Market intensively:**
+
 - Reminder emails
 - Facebook event invitations
 - Local media outreach (for large events)
@@ -211,10 +221,12 @@ Design at least one photo-worthy element:
 ### Activities
 
 **Friday Night:**
+
 - 6 PM: Check-in opens with welcome treat
 - 8 PM: Campfire storytelling (age-appropriate)
 
 **Saturday:**
+
 - 10 AM: Kids craft station opens
 - 2 PM: Site decorating judging begins
 - 3 PM: Costume parade
@@ -222,31 +234,35 @@ Design at least one photo-worthy element:
 - 7 PM: Halloween movie at pavilion
 
 **Sunday:**
+
 - 10 AM: Winners announced, prizes awarded
 - 12 PM: Event concludes
 
 ### Marketing Approach
 
 **8 weeks before:**
+
 > "Our 7th Annual Halloween Haunted Campground is coming! Book now—this weekend sold out last year!"
 
 **4 weeks before:**
+
 > "Still time to join the fun! Start planning your costume and campsite decorations."
 
 **1 week before:**
+
 > "The spooky countdown begins! Here's what to expect this weekend..."
 
 ### Budget Example
 
-| Item | Estimated Cost |
-|------|---------------|
-| Decorations | $300 |
-| Candy/treats | $150 |
-| Craft supplies | $100 |
-| Prizes | $200 |
-| Movie rental/license | $50 |
-| Staff overtime | $200 |
-| **Total** | **$1,000** |
+| Item                 | Estimated Cost |
+| -------------------- | -------------- |
+| Decorations          | $300           |
+| Candy/treats         | $150           |
+| Craft supplies       | $100           |
+| Prizes               | $200           |
+| Movie rental/license | $50            |
+| Staff overtime       | $200           |
+| **Total**            | **$1,000**     |
 
 **Revenue impact:** If 20 additional sites book for the event at $50/night × 2 nights = $2,000 additional revenue.
 
@@ -256,16 +272,16 @@ Design at least one photo-worthy element:
 
 Not every event needs major investment:
 
-| Event | Cost | Effort |
-|-------|------|--------|
-| Campfire s'mores night | $ | Low |
-| Potluck dinner | $ | Low |
-| Scavenger hunt | $ | Medium |
-| Movie night (free license films) | $ | Low |
-| Stargazing night | $ | Low |
-| Fishing derby | $$ | Medium |
-| Live music (local act) | $$ | Medium |
-| Decorated site contest | $ | Low |
+| Event                            | Cost | Effort |
+| -------------------------------- | ---- | ------ |
+| Campfire s'mores night           | $    | Low    |
+| Potluck dinner                   | $    | Low    |
+| Scavenger hunt                   | $    | Medium |
+| Movie night (free license films) | $    | Low    |
+| Stargazing night                 | $    | Low    |
+| Fishing derby                    | $$   | Medium |
+| Live music (local act)           | $$   | Medium |
+| Decorated site contest           | $    | Low    |
 
 ---
 
@@ -274,16 +290,19 @@ Not every event needs major investment:
 ### Track These Metrics
 
 **Attendance and booking:**
+
 - Event-weekend occupancy vs. typical weekend
 - New vs. returning guests
 - Length of stay during event
 
 **Engagement:**
+
 - Activity participation counts
 - Social media engagement
 - Photo sharing and tagging
 
 **Business impact:**
+
 - Revenue vs. non-event weekend
 - Review mentions of event
 - Repeat bookings for next year's event
@@ -344,4 +363,4 @@ Start planning your signature event—something that reflects your campground's 
 
 ---
 
-*Keepr helps you manage event bookings, communicate with attending guests, and capture the marketing value of your events. [Plan your next event at campreserv.com](https://campreserv.com)*
+_Keepr helps you manage event bookings, communicate with attending guests, and capture the marketing value of your events. [Plan your next event at campreserv.com](https://campreserv.com)_

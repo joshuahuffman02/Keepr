@@ -11,7 +11,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { JwtAuthGuard, RolesGuard, Roles } from "../auth/guards";
-import { PlatformRole, CampgroundDataSource, AttractionType, SeoLocationType } from "@prisma/client";
+import {
+  PlatformRole,
+  CampgroundDataSource,
+  AttractionType,
+  SeoLocationType,
+} from "@prisma/client";
 import { CampgroundSeederService } from "./campground-seeder.service";
 import { SeedJobService } from "./seed-job.service";
 import { SeoLocationService } from "./seo-location.service";
@@ -30,11 +35,56 @@ import { GeoAssociationService } from "./geo-association.service";
 
 // Valid US state codes
 const US_STATES = [
-  "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
-  "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
-  "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
-  "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
-  "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY",
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
 ];
 
 @Controller("admin/seo-seeding")
@@ -48,7 +98,7 @@ export class SeoSeedingController {
     private readonly seedJobs: SeedJobService,
     private readonly locations: SeoLocationService,
     private readonly attractions: AttractionService,
-    private readonly geoAssociation: GeoAssociationService
+    private readonly geoAssociation: GeoAssociationService,
   ) {}
 
   // =========================================================================
@@ -61,7 +111,7 @@ export class SeoSeedingController {
   @Post("seed/recreation-gov/:stateCode")
   async seedRecreationGovState(
     @Param("stateCode") stateCode: string,
-    @Body() body: { dryRun?: boolean; updateExisting?: boolean }
+    @Body() body: { dryRun?: boolean; updateExisting?: boolean },
   ) {
     const state = stateCode.toUpperCase();
     if (!US_STATES.includes(state)) {
@@ -69,14 +119,9 @@ export class SeoSeedingController {
     }
 
     // Check if already running
-    const isRunning = await this.seedJobs.isJobRunning(
-      CampgroundDataSource.recreation_gov,
-      state
-    );
+    const isRunning = await this.seedJobs.isJobRunning(CampgroundDataSource.recreation_gov, state);
     if (isRunning) {
-      throw new BadRequestException(
-        `A seeding job is already running for ${state}`
-      );
+      throw new BadRequestException(`A seeding job is already running for ${state}`);
     }
 
     // Create job
@@ -101,13 +146,9 @@ export class SeoSeedingController {
    * Trigger seeding for all states (full nationwide seed)
    */
   @Post("seed/recreation-gov/all")
-  async seedRecreationGovAll(
-    @Body() body: { dryRun?: boolean; updateExisting?: boolean }
-  ) {
+  async seedRecreationGovAll(@Body() body: { dryRun?: boolean; updateExisting?: boolean }) {
     // Check if any nationwide job is running
-    const isRunning = await this.seedJobs.isJobRunning(
-      CampgroundDataSource.recreation_gov
-    );
+    const isRunning = await this.seedJobs.isJobRunning(CampgroundDataSource.recreation_gov);
     if (isRunning) {
       throw new BadRequestException("A nationwide seeding job is already running");
     }
@@ -147,7 +188,7 @@ export class SeoSeedingController {
   @Get("jobs")
   async listJobs(
     @Query("limit") limit?: string,
-    @Query("dataSource") dataSource?: CampgroundDataSource
+    @Query("dataSource") dataSource?: CampgroundDataSource,
   ) {
     return this.seedJobs.listJobs({
       limit: limit ? parseInt(limit, 10) : 20,
@@ -200,7 +241,7 @@ export class SeoSeedingController {
   async getLocation(
     @Param("slug") slug: string,
     @Query("limit") limit?: string,
-    @Query("offset") offset?: string
+    @Query("offset") offset?: string,
   ) {
     const location = await this.locations.getBySlug(slug, {
       limit: limit ? parseInt(limit, 10) : 20,
@@ -221,7 +262,7 @@ export class SeoSeedingController {
   async listLocations(
     @Query("type") type: SeoLocationType,
     @Query("published") published?: string,
-    @Query("minCampgrounds") minCampgrounds?: string
+    @Query("minCampgrounds") minCampgrounds?: string,
   ) {
     return this.locations.listByType(type, {
       published: published === "true" ? true : published === "false" ? false : undefined,
@@ -242,9 +283,7 @@ export class SeoSeedingController {
    */
   @Post("locations/auto-publish")
   async autoPublishLocations(@Body() body: { minCampgrounds?: number }) {
-    const count = await this.locations.autoPublishLocations(
-      body.minCampgrounds || 5
-    );
+    const count = await this.locations.autoPublishLocations(body.minCampgrounds || 5);
     return { message: `Auto-published ${count} locations`, count };
   }
 
@@ -286,7 +325,7 @@ export class SeoSeedingController {
     @Param("slug") slug: string,
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
-    @Query("maxDistance") maxDistance?: string
+    @Query("maxDistance") maxDistance?: string,
   ) {
     const attraction = await this.attractions.getBySlug(slug, {
       limit: limit ? parseInt(limit, 10) : 20,
@@ -308,7 +347,7 @@ export class SeoSeedingController {
   async listAttractions(
     @Query("type") type: AttractionType,
     @Query("published") published?: string,
-    @Query("minCampgrounds") minCampgrounds?: string
+    @Query("minCampgrounds") minCampgrounds?: string,
   ) {
     return this.attractions.listByType(type, {
       published: published === "true" ? true : published === "false" ? false : undefined,
@@ -333,11 +372,9 @@ export class SeoSeedingController {
    */
   @Post("geo/associate-locations")
   async bulkAssociateLocations() {
-    const result = await this.geoAssociation.bulkAssociateLocations(
-      (processed, total) => {
-        this.logger.log(`Location association: ${processed}/${total}`);
-      }
-    );
+    const result = await this.geoAssociation.bulkAssociateLocations((processed, total) => {
+      this.logger.log(`Location association: ${processed}/${total}`);
+    });
     return {
       message: `Associated ${result.processed} campgrounds with locations`,
       ...result,
@@ -349,11 +386,9 @@ export class SeoSeedingController {
    */
   @Post("geo/associate-attractions")
   async bulkAssociateAttractions() {
-    const result = await this.geoAssociation.bulkAssociateAttractions(
-      (processed, total) => {
-        this.logger.log(`Attraction association: ${processed}/${total}`);
-      }
-    );
+    const result = await this.geoAssociation.bulkAssociateAttractions((processed, total) => {
+      this.logger.log(`Attraction association: ${processed}/${total}`);
+    });
     return {
       message: `Associated ${result.processed} campgrounds with attractions`,
       ...result,
@@ -405,7 +440,7 @@ export class SeoSeedingController {
   private async runSeedJob(
     jobId: string,
     stateCode: string,
-    options: { dryRun?: boolean; updateExisting?: boolean }
+    options: { dryRun?: boolean; updateExisting?: boolean },
   ): Promise<void> {
     try {
       await this.seedJobs.startJob(jobId);
@@ -430,7 +465,7 @@ export class SeoSeedingController {
    */
   private async runFullSeedJob(
     jobId: string,
-    options: { dryRun?: boolean; updateExisting?: boolean }
+    options: { dryRun?: boolean; updateExisting?: boolean },
   ): Promise<void> {
     try {
       await this.seedJobs.startJob(jobId);

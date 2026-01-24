@@ -63,9 +63,7 @@ export class BenchmarkService {
       _sum: { totalAmount: true },
     });
 
-    const revenues = revenueBycamp
-      .map((r) => r._sum.totalAmount || 0)
-      .sort((a, b) => a - b);
+    const revenues = revenueBycamp.map((r) => r._sum.totalAmount || 0).sort((a, b) => a - b);
 
     // Get reservations for other metrics
     const reservations = await this.prisma.reservation.findMany({
@@ -87,14 +85,13 @@ export class BenchmarkService {
     for (const res of reservations) {
       const los = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       losData.push({ los, type: res.Site?.siteType || "unknown" });
     }
 
-    const avgLos = losData.length > 0
-      ? losData.reduce((sum, d) => sum + d.los, 0) / losData.length
-      : 0;
+    const avgLos =
+      losData.length > 0 ? losData.reduce((sum, d) => sum + d.los, 0) / losData.length : 0;
 
     // LOS by type
     const losByType: Record<string, number[]> = {};
@@ -112,7 +109,7 @@ export class BenchmarkService {
     for (const res of reservations) {
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       if (nights > 0) {
         adrData.push({
@@ -122,9 +119,8 @@ export class BenchmarkService {
       }
     }
 
-    const avgAdr = adrData.length > 0
-      ? adrData.reduce((sum, d) => sum + d.rate, 0) / adrData.length
-      : 0;
+    const avgAdr =
+      adrData.length > 0 ? adrData.reduce((sum, d) => sum + d.rate, 0) / adrData.length : 0;
 
     // ADR by type
     const adrByType: Record<string, number[]> = {};
@@ -141,9 +137,8 @@ export class BenchmarkService {
     const leadTimes = reservations
       .filter((r) => r.leadTimeDays !== null)
       .map((r) => r.leadTimeDays!);
-    const avgLeadTime = leadTimes.length > 0
-      ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length
-      : 0;
+    const avgLeadTime =
+      leadTimes.length > 0 ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length : 0;
 
     // Calculate occupancy
     const totalSites = await this.prisma.site.count({ where: { isActive: true } });
@@ -152,13 +147,12 @@ export class BenchmarkService {
     for (const res of reservations) {
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       occupiedNights += nights;
     }
-    const avgOccupancy = totalAvailableNights > 0
-      ? (occupiedNights / totalAvailableNights) * 100
-      : 0;
+    const avgOccupancy =
+      totalAvailableNights > 0 ? (occupiedNights / totalAvailableNights) * 100 : 0;
 
     // Occupancy by season (simplified by quarter)
     const seasons: Record<string, { occupied: number; available: number }> = {
@@ -178,7 +172,7 @@ export class BenchmarkService {
 
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       seasons[season].occupied += nights;
     }
@@ -193,18 +187,11 @@ export class BenchmarkService {
 
     return {
       revenue: {
-        averagePerCampground: revenues.length > 0
-          ? revenues.reduce((a, b) => a + b, 0) / revenues.length
-          : 0,
-        medianPerCampground: revenues.length > 0
-          ? revenues[Math.floor(revenues.length / 2)]
-          : 0,
-        top10Percentile: revenues.length > 0
-          ? revenues[Math.floor(revenues.length * 0.9)]
-          : 0,
-        bottom10Percentile: revenues.length > 0
-          ? revenues[Math.floor(revenues.length * 0.1)]
-          : 0,
+        averagePerCampground:
+          revenues.length > 0 ? revenues.reduce((a, b) => a + b, 0) / revenues.length : 0,
+        medianPerCampground: revenues.length > 0 ? revenues[Math.floor(revenues.length / 2)] : 0,
+        top10Percentile: revenues.length > 0 ? revenues[Math.floor(revenues.length * 0.9)] : 0,
+        bottom10Percentile: revenues.length > 0 ? revenues[Math.floor(revenues.length * 0.1)] : 0,
       },
       occupancy: {
         platformAverage: avgOccupancy,
@@ -230,7 +217,7 @@ export class BenchmarkService {
    */
   async getCampgroundVsPlatform(
     campgroundId: string,
-    dateRange: DateRange
+    dateRange: DateRange,
   ): Promise<CampgroundComparison> {
     const { start, end } = dateRange;
     const daysInRange = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
@@ -266,39 +253,35 @@ export class BenchmarkService {
     // Calculate campground metrics
     const campgroundRevenue = campgroundReservations.reduce(
       (sum, r) => sum + (r.totalAmount || 0),
-      0
+      0,
     );
 
     let totalNights = 0;
     for (const res of campgroundReservations) {
       const nights = Math.ceil(
         (new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) /
-        (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24),
       );
       totalNights += nights;
     }
 
-    const campgroundLos = campgroundReservations.length > 0
-      ? totalNights / campgroundReservations.length
-      : 0;
+    const campgroundLos =
+      campgroundReservations.length > 0 ? totalNights / campgroundReservations.length : 0;
 
     const campgroundAdr = totalNights > 0 ? campgroundRevenue / totalNights : 0;
 
     const leadTimes = campgroundReservations
       .filter((r) => r.leadTimeDays !== null)
       .map((r) => r.leadTimeDays!);
-    const campgroundLeadTime = leadTimes.length > 0
-      ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length
-      : 0;
+    const campgroundLeadTime =
+      leadTimes.length > 0 ? leadTimes.reduce((a, b) => a + b, 0) / leadTimes.length : 0;
 
     // Calculate occupancy
     const campgroundSites = await this.prisma.site.count({
       where: { campgroundId, isActive: true },
     });
     const availableNights = campgroundSites * daysInRange;
-    const campgroundOccupancy = availableNights > 0
-      ? (totalNights / availableNights) * 100
-      : 0;
+    const campgroundOccupancy = availableNights > 0 ? (totalNights / availableNights) * 100 : 0;
 
     // Get all campground revenues for percentile calculation
     const allCampgroundRevenues = await this.prisma.reservation.groupBy({
@@ -329,7 +312,10 @@ export class BenchmarkService {
         metric: "Occupancy Rate (%)",
         campgroundValue: campgroundOccupancy,
         platformAverage: platformBenchmarks.occupancy.platformAverage,
-        percentile: this.estimatePercentile(campgroundOccupancy, platformBenchmarks.occupancy.platformAverage),
+        percentile: this.estimatePercentile(
+          campgroundOccupancy,
+          platformBenchmarks.occupancy.platformAverage,
+        ),
         status: this.getStatus(campgroundOccupancy, platformBenchmarks.occupancy.platformAverage),
       },
       {
@@ -350,8 +336,14 @@ export class BenchmarkService {
         metric: "Average Booking Window (days)",
         campgroundValue: campgroundLeadTime,
         platformAverage: platformBenchmarks.bookingWindow.platformAverage,
-        percentile: this.estimatePercentile(campgroundLeadTime, platformBenchmarks.bookingWindow.platformAverage),
-        status: this.getStatus(campgroundLeadTime, platformBenchmarks.bookingWindow.platformAverage),
+        percentile: this.estimatePercentile(
+          campgroundLeadTime,
+          platformBenchmarks.bookingWindow.platformAverage,
+        ),
+        status: this.getStatus(
+          campgroundLeadTime,
+          platformBenchmarks.bookingWindow.platformAverage,
+        ),
       },
     ];
 

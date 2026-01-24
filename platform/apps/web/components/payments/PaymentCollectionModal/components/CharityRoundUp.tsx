@@ -21,17 +21,19 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
   const [reservationTotal, setReservationTotal] = useState<number | null>(null);
 
   // Get reservationId from subject
-  const reservationId = props.subject.type === "reservation"
-    ? props.subject.reservationId
-    : props.subject.type === "balance"
+  const reservationId =
+    props.subject.type === "reservation"
       ? props.subject.reservationId
-      : null;
+      : props.subject.type === "balance"
+        ? props.subject.reservationId
+        : null;
 
   // Fetch reservation total to ensure we're rounding up the correct amount
   useEffect(() => {
     if (!reservationId) return;
 
-    apiClient.getReservation(reservationId)
+    apiClient
+      .getReservation(reservationId)
       .then((res) => {
         setReservationTotal(res.totalAmount ?? 0);
       })
@@ -44,13 +46,18 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
   // Calculate round-up amount based on actual payment total (including CC fees when applicable)
   const roundUpAmount = useMemo(() => {
     // Use the fetched reservation total, or fall back to state calculation
-    let baseTotal = reservationTotal !== null
-      ? reservationTotal - discountCents  // Reservation total minus any promo discounts applied in modal
-      : state.originalAmountCents - discountCents;
+    let baseTotal =
+      reservationTotal !== null
+        ? reservationTotal - discountCents // Reservation total minus any promo discounts applied in modal
+        : state.originalAmountCents - discountCents;
 
     // If a card payment method is selected (or likely to be selected), include CC processing fees
     // This ensures the round-up creates a nice round number after fees are added
-    if (selectedMethod && CARD_PAYMENT_METHODS.includes(selectedMethod) && config?.feeMode === "pass_through") {
+    if (
+      selectedMethod &&
+      CARD_PAYMENT_METHODS.includes(selectedMethod) &&
+      config?.feeMode === "pass_through"
+    ) {
       const ccFeeCents = actions.calculateFees(selectedMethod, baseTotal);
       baseTotal += ccFeeCents;
     }
@@ -78,7 +85,7 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
         "flex items-center gap-3 p-3 rounded-lg border transition-colors",
         charityDonation.optedIn
           ? "border-pink-300 bg-pink-50"
-          : "border-border bg-muted hover:border-border"
+          : "border-border bg-muted hover:border-border",
       )}
     >
       <Checkbox
@@ -87,7 +94,7 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
         onCheckedChange={handleToggle}
         disabled={disabled}
         className={cn(
-          charityDonation.optedIn && "border-pink-500 data-[state=checked]:bg-pink-500"
+          charityDonation.optedIn && "border-pink-500 data-[state=checked]:bg-pink-500",
         )}
       />
       <div className="flex-1 min-w-0">
@@ -95,13 +102,13 @@ export function CharityRoundUp({ disabled = false }: CharityRoundUpProps) {
           htmlFor="charity-roundup"
           className={cn(
             "text-sm cursor-pointer flex items-center gap-2",
-            charityDonation.optedIn ? "text-pink-700" : "text-foreground"
+            charityDonation.optedIn ? "text-pink-700" : "text-foreground",
           )}
         >
           <Heart
             className={cn(
               "h-4 w-4",
-              charityDonation.optedIn ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
+              charityDonation.optedIn ? "fill-pink-500 text-pink-500" : "text-muted-foreground",
             )}
           />
           Round up ${(roundUpAmount / 100).toFixed(2)} for{" "}
@@ -121,17 +128,19 @@ export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) 
   const [reservationTotal, setReservationTotal] = useState<number | null>(null);
 
   // Get reservationId from subject
-  const reservationId = props.subject.type === "reservation"
-    ? props.subject.reservationId
-    : props.subject.type === "balance"
+  const reservationId =
+    props.subject.type === "reservation"
       ? props.subject.reservationId
-      : null;
+      : props.subject.type === "balance"
+        ? props.subject.reservationId
+        : null;
 
   // Fetch reservation total
   useEffect(() => {
     if (!reservationId) return;
 
-    apiClient.getReservation(reservationId)
+    apiClient
+      .getReservation(reservationId)
       .then((res) => {
         setReservationTotal(res.totalAmount ?? 0);
       })
@@ -139,12 +148,17 @@ export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) 
   }, [reservationId]);
 
   const roundUpAmount = useMemo(() => {
-    let baseTotal = reservationTotal !== null
-      ? reservationTotal - discountCents
-      : state.originalAmountCents - discountCents;
+    let baseTotal =
+      reservationTotal !== null
+        ? reservationTotal - discountCents
+        : state.originalAmountCents - discountCents;
 
     // Include CC fees when card payment method is selected
-    if (selectedMethod && CARD_PAYMENT_METHODS.includes(selectedMethod) && config?.feeMode === "pass_through") {
+    if (
+      selectedMethod &&
+      CARD_PAYMENT_METHODS.includes(selectedMethod) &&
+      config?.feeMode === "pass_through"
+    ) {
       const ccFeeCents = actions.calculateFees(selectedMethod, baseTotal);
       baseTotal += ccFeeCents;
     }
@@ -173,15 +187,10 @@ export function CharityRoundUpInline({ disabled = false }: CharityRoundUpProps) 
         charityDonation.optedIn
           ? "bg-pink-100 text-pink-700 hover:bg-pink-200"
           : "bg-muted text-muted-foreground hover:bg-muted",
-        disabled && "opacity-50 cursor-not-allowed"
+        disabled && "opacity-50 cursor-not-allowed",
       )}
     >
-      <Heart
-        className={cn(
-          "h-4 w-4",
-          charityDonation.optedIn && "fill-pink-500"
-        )}
-      />
+      <Heart className={cn("h-4 w-4", charityDonation.optedIn && "fill-pink-500")} />
       <span>
         {charityDonation.optedIn ? "Donating" : "Add"} ${(roundUpAmount / 100).toFixed(2)}
       </span>

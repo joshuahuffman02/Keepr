@@ -18,11 +18,11 @@ export async function evaluatePricingV2(
   siteId: string,
   arrival: Date,
   departure: Date,
-  occupancyPct?: number
+  occupancyPct?: number,
 ): Promise<PricingV2Result> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    include: { SiteClass: true }
+    include: { SiteClass: true },
   });
   if (!site) throw new NotFoundException("Site not found");
 
@@ -33,7 +33,7 @@ export async function evaluatePricingV2(
     defaultRate,
     arrival,
     departure,
-    occupancyPct
+    occupancyPct,
   );
 
   return {
@@ -42,6 +42,6 @@ export async function evaluatePricingV2(
     totalCents: breakdown.totalBeforeTaxCents,
     rulesDeltaCents: breakdown.adjustmentsCents + breakdown.demandAdjustmentCents,
     pricingRuleVersion: breakdown.pricingRuleVersion,
-    appliedRules: breakdown.appliedRules
+    appliedRules: breakdown.appliedRules,
   };
 }

@@ -1,36 +1,36 @@
-'use client';
+"use client";
 
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { Heart, Shield, Users, Zap } from 'lucide-react';
-import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { Heart, Shield, Users, Zap } from "lucide-react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 // Authentic value props - no fake metrics, just genuine statements
 const valueProps = [
   {
     icon: Heart,
-    title: 'Built by Campground Owners',
-    description: 'We run parks ourselves. We know your pain.',
+    title: "Built by Campground Owners",
+    description: "We run parks ourselves. We know your pain.",
   },
   {
     icon: Shield,
-    title: 'No Contracts',
-    description: 'Month-to-month. Cancel anytime. 30-day guarantee.',
+    title: "No Contracts",
+    description: "Month-to-month. Cancel anytime. 30-day guarantee.",
   },
   {
     icon: Users,
-    title: 'Human Support',
-    description: 'Real people who understand campgrounds.',
+    title: "Human Support",
+    description: "Real people who understand campgrounds.",
   },
   {
     icon: Zap,
-    title: 'Go Live Today',
-    description: 'Same-day setup. Free data migration.',
+    title: "Go Live Today",
+    description: "Same-day setup. Free data migration.",
   },
 ];
 const EASE_OUT: "easeOut" = "easeOut";
 
-function ValuePropCard({ prop, index }: { prop: typeof valueProps[0]; index: number }) {
+function ValuePropCard({ prop, index }: { prop: (typeof valueProps)[0]; index: number }) {
   const prefersReducedMotion = useReducedMotionSafe();
   const Icon = prop.icon;
 
@@ -38,8 +38,10 @@ function ValuePropCard({ prop, index }: { prop: typeof valueProps[0]; index: num
     <motion.div
       initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-30px' }}
-      transition={prefersReducedMotion ? undefined : { duration: 0.4, delay: index * 0.1, ease: EASE_OUT }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={
+        prefersReducedMotion ? undefined : { duration: 0.4, delay: index * 0.1, ease: EASE_OUT }
+      }
       className="flex items-start gap-4 group"
     >
       {/* Icon */}
@@ -49,12 +51,8 @@ function ValuePropCard({ prop, index }: { prop: typeof valueProps[0]; index: num
 
       {/* Content */}
       <div>
-        <h3 className="text-base font-semibold text-foreground mb-0.5">
-          {prop.title}
-        </h3>
-        <p className="text-sm text-muted-foreground">
-          {prop.description}
-        </p>
+        <h3 className="text-base font-semibold text-foreground mb-0.5">{prop.title}</h3>
+        <p className="text-sm text-muted-foreground">{prop.description}</p>
       </div>
     </motion.div>
   );
@@ -62,7 +60,7 @@ function ValuePropCard({ prop, index }: { prop: typeof valueProps[0]; index: num
 
 export function SocialProof() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: '-50px' });
+  const isInView = useInView(sectionRef, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotionSafe();
 
   return (

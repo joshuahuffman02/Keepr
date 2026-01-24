@@ -24,5 +24,7 @@ if (dsn) {
     },
   });
 } else if (process.env.NODE_ENV === "production") {
-  console.warn("[Sentry] DSN not configured in production. Add NEXT_PUBLIC_SENTRY_DSN to enable error tracking.");
+  console.warn(
+    "[Sentry] DSN not configured in production. Add NEXT_PUBLIC_SENTRY_DSN to enable error tracking.",
+  );
 }

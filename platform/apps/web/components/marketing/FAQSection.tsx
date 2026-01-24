@@ -38,12 +38,14 @@ function FAQCard({
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
-      transition={prefersReducedMotion ? {} : { duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
+      transition={
+        prefersReducedMotion ? {} : { duration: 0.4, delay: index * 0.05, ease: "easeOut" }
+      }
       className={cn(
         "border rounded-2xl bg-card overflow-hidden transition-all duration-300",
         isOpen
           ? "border-keepr-evergreen/40 shadow-lg shadow-keepr-evergreen/5"
-          : "border-border hover:border-keepr-evergreen/20 hover:shadow-md"
+          : "border-border hover:border-keepr-evergreen/20 hover:shadow-md",
       )}
     >
       <button
@@ -57,7 +59,7 @@ function FAQCard({
         <span
           className={cn(
             "font-semibold text-left pr-4 transition-colors duration-300",
-            isOpen ? "text-keepr-evergreen" : "text-foreground"
+            isOpen ? "text-keepr-evergreen" : "text-foreground",
           )}
         >
           {faq.question}
@@ -67,13 +69,13 @@ function FAQCard({
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className={cn(
             "flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-colors duration-300",
-            isOpen ? "bg-keepr-evergreen/10" : "bg-muted"
+            isOpen ? "bg-keepr-evergreen/10" : "bg-muted",
           )}
         >
           <ChevronDown
             className={cn(
               "h-5 w-5 transition-colors duration-300",
-              isOpen ? "text-keepr-evergreen" : "text-muted-foreground"
+              isOpen ? "text-keepr-evergreen" : "text-muted-foreground",
             )}
           />
         </motion.div>
@@ -136,14 +138,8 @@ export function FAQSection({
           <p className="text-sm font-medium text-keepr-evergreen uppercase tracking-wider mb-3">
             Got Questions?
           </p>
-          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="text-lg text-muted-foreground">
-              {subtitle}
-            </p>
-          )}
+          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">{title}</h2>
+          {subtitle && <p className="text-lg text-muted-foreground">{subtitle}</p>}
         </motion.div>
 
         {/* 2-Column FAQ Grid on Desktop, Single Column on Mobile */}
@@ -186,9 +182,7 @@ export function FAQSection({
           transition={{ duration: 0.5, delay: 0.3 }}
           className="text-center mt-12 pt-8 border-t border-border"
         >
-          <p className="text-muted-foreground mb-2">
-            Still have questions?
-          </p>
+          <p className="text-muted-foreground mb-2">Still have questions?</p>
           <a
             href="mailto:hello@keeprstay.com"
             className="inline-flex items-center gap-2 text-keepr-evergreen font-semibold hover:underline"

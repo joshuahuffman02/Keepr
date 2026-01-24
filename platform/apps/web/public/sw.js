@@ -11,7 +11,7 @@ const PRECACHE_URLS = [
   "/manifest.webmanifest",
   "/pwa/pwa.css",
   "/icons/icon-192.png",
-  "/icons/icon-512.png"
+  "/icons/icon-512.png",
 ];
 
 // Runtime cache allowlist prefixes
@@ -26,23 +26,25 @@ const RUNTIME_CACHE_URL_PATTERNS = [
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(VERSION).then((cache) => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting())
+    caches
+      .open(VERSION)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== VERSION)
-          .map((key) => caches.delete(key))
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(keys.filter((key) => key !== VERSION).map((key) => caches.delete(key))),
       )
-    ).then(async () => {
-      await self.clients.claim();
-      const clients = await self.clients.matchAll({ includeUncontrolled: true });
-      clients.forEach((client) => client.postMessage({ type: "SW_ACTIVATED", version: VERSION }));
-    })
+      .then(async () => {
+        await self.clients.claim();
+        const clients = await self.clients.matchAll({ includeUncontrolled: true });
+        clients.forEach((client) => client.postMessage({ type: "SW_ACTIVATED", version: VERSION }));
+      }),
   );
 });
 
@@ -73,13 +75,19 @@ self.addEventListener("fetch", (event) => {
           const cached = await caches.match(request);
           if (cached) return cached;
           return caches.match("/pwa/offline");
-        })
+        }),
     );
     return;
   }
 
   // Same-origin static assets: cache-first.
-  if (sameOrigin(url) && (request.destination === "style" || request.destination === "script" || request.destination === "image" || request.destination === "font")) {
+  if (
+    sameOrigin(url) &&
+    (request.destination === "style" ||
+      request.destination === "script" ||
+      request.destination === "image" ||
+      request.destination === "font")
+  ) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
@@ -88,13 +96,17 @@ self.addEventListener("fetch", (event) => {
           caches.open(VERSION).then((cache) => cache.put(request, copy));
           return res;
         });
-      })
+      }),
     );
     return;
   }
 
   // Same-origin GET API calls: network-first with cache fallback, scoped to known runtime patterns.
-  if (sameOrigin(url) && url.includes("/api/") && RUNTIME_CACHE_URL_PATTERNS.some((p) => url.includes(p))) {
+  if (
+    sameOrigin(url) &&
+    url.includes("/api/") &&
+    RUNTIME_CACHE_URL_PATTERNS.some((p) => url.includes(p))
+  ) {
     event.respondWith(
       fetch(request)
         .then((res) => {
@@ -102,7 +114,7 @@ self.addEventListener("fetch", (event) => {
           caches.open(VERSION).then((cache) => cache.put(request, copy));
           return res;
         })
-        .catch(() => caches.match(request))
+        .catch(() => caches.match(request)),
     );
     return;
   }
@@ -129,7 +141,7 @@ self.addEventListener("sync", (event) => {
     event.waitUntil(
       self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
         clients.forEach((client) => client.postMessage({ type: "SYNC_QUEUES" }));
-      })
+      }),
     );
   }
 });
@@ -151,4 +163,3 @@ self.addEventListener("push", (event) => {
   };
   event.waitUntil(self.registration.showNotification(title, options));
 });
-

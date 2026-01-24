@@ -134,8 +134,8 @@ export default function IntegrationsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Integrations extend Campreserv's capabilities by connecting to external
-          services. Some integrations may require API keys or additional configuration.
+          Integrations extend Campreserv's capabilities by connecting to external services. Some
+          integrations may require API keys or additional configuration.
         </AlertDescription>
       </Alert>
 
@@ -210,9 +210,7 @@ export default function IntegrationsPage() {
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <h4 className="font-medium text-foreground">
-                                {integration.name}
-                              </h4>
+                              <h4 className="font-medium text-foreground">{integration.name}</h4>
                               <Badge className={status.className}>
                                 <StatusIcon className="h-3 w-3 mr-1" />
                                 {status.label}

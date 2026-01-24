@@ -15,3383 +15,3425 @@ export {};
 
 declare module "@prisma/client" {
   export const AbTestStatus: {
-    readonly "draft": "draft";
-    readonly "active": "active";
-    readonly "paused": "paused";
-    readonly "stopped": "stopped";
-    readonly "completed": "completed";
+    readonly draft: "draft";
+    readonly active: "active";
+    readonly paused: "paused";
+    readonly stopped: "stopped";
+    readonly completed: "completed";
   } = {
-    "draft": "draft",
-    "active": "active",
-    "paused": "paused",
-    "stopped": "stopped",
-    "completed": "completed",
+    draft: "draft",
+    active: "active",
+    paused: "paused",
+    stopped: "stopped",
+    completed: "completed",
   };
 
   export type AbTestStatus = (typeof AbTestStatus)[keyof typeof AbTestStatus];
 
   export const AccessCredentialType: {
-    readonly "pin": "pin";
-    readonly "card": "card";
-    readonly "fob": "fob";
-    readonly "mobile": "mobile";
-    readonly "qr": "qr";
+    readonly pin: "pin";
+    readonly card: "card";
+    readonly fob: "fob";
+    readonly mobile: "mobile";
+    readonly qr: "qr";
   } = {
-    "pin": "pin",
-    "card": "card",
-    "fob": "fob",
-    "mobile": "mobile",
-    "qr": "qr",
+    pin: "pin",
+    card: "card",
+    fob: "fob",
+    mobile: "mobile",
+    qr: "qr",
   };
 
-  export type AccessCredentialType = (typeof AccessCredentialType)[keyof typeof AccessCredentialType];
+  export type AccessCredentialType =
+    (typeof AccessCredentialType)[keyof typeof AccessCredentialType];
 
   export const AccessGrantStatus: {
-    readonly "pending": "pending";
-    readonly "active": "active";
-    readonly "revoked": "revoked";
-    readonly "blocked": "blocked";
-    readonly "expired": "expired";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly active: "active";
+    readonly revoked: "revoked";
+    readonly blocked: "blocked";
+    readonly expired: "expired";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "active": "active",
-    "revoked": "revoked",
-    "blocked": "blocked",
-    "expired": "expired",
-    "failed": "failed",
+    pending: "pending",
+    active: "active",
+    revoked: "revoked",
+    blocked: "blocked",
+    expired: "expired",
+    failed: "failed",
   };
 
   export type AccessGrantStatus = (typeof AccessGrantStatus)[keyof typeof AccessGrantStatus];
 
   export const AccessProviderType: {
-    readonly "kisi": "kisi";
-    readonly "brivo": "brivo";
-    readonly "cloudkey": "cloudkey";
+    readonly kisi: "kisi";
+    readonly brivo: "brivo";
+    readonly cloudkey: "cloudkey";
   } = {
-    "kisi": "kisi",
-    "brivo": "brivo",
-    "cloudkey": "cloudkey",
+    kisi: "kisi",
+    brivo: "brivo",
+    cloudkey: "cloudkey",
   };
 
   export type AccessProviderType = (typeof AccessProviderType)[keyof typeof AccessProviderType];
 
   export const ActivitySchedulingMode: {
-    readonly "scheduled": "scheduled";
-    readonly "open_availability": "open_availability";
+    readonly scheduled: "scheduled";
+    readonly open_availability: "open_availability";
   } = {
-    "scheduled": "scheduled",
-    "open_availability": "open_availability",
+    scheduled: "scheduled",
+    open_availability: "open_availability",
   };
 
-  export type ActivitySchedulingMode = (typeof ActivitySchedulingMode)[keyof typeof ActivitySchedulingMode];
+  export type ActivitySchedulingMode =
+    (typeof ActivitySchedulingMode)[keyof typeof ActivitySchedulingMode];
 
   export const AddOnPricingType: {
-    readonly "flat": "flat";
-    readonly "per_night": "per_night";
-    readonly "per_person": "per_person";
+    readonly flat: "flat";
+    readonly per_night: "per_night";
+    readonly per_person: "per_person";
   } = {
-    "flat": "flat",
-    "per_night": "per_night",
-    "per_person": "per_person",
+    flat: "flat",
+    per_night: "per_night",
+    per_person: "per_person",
   };
 
   export type AddOnPricingType = (typeof AddOnPricingType)[keyof typeof AddOnPricingType];
 
   export const AdjustmentType: {
-    readonly "percent": "percent";
-    readonly "flat": "flat";
+    readonly percent: "percent";
+    readonly flat: "flat";
   } = {
-    "percent": "percent",
-    "flat": "flat",
+    percent: "percent",
+    flat: "flat",
   };
 
   export type AdjustmentType = (typeof AdjustmentType)[keyof typeof AdjustmentType];
 
   export const AiConsentType: {
-    readonly "booking_assist": "booking_assist";
-    readonly "personalization": "personalization";
-    readonly "communications": "communications";
-    readonly "analytics": "analytics";
+    readonly booking_assist: "booking_assist";
+    readonly personalization: "personalization";
+    readonly communications: "communications";
+    readonly analytics: "analytics";
   } = {
-    "booking_assist": "booking_assist",
-    "personalization": "personalization",
-    "communications": "communications",
-    "analytics": "analytics",
+    booking_assist: "booking_assist",
+    personalization: "personalization",
+    communications: "communications",
+    analytics: "analytics",
   };
 
   export type AiConsentType = (typeof AiConsentType)[keyof typeof AiConsentType];
 
   export const AiFeatureType: {
-    readonly "reply_assist": "reply_assist";
-    readonly "booking_assist": "booking_assist";
-    readonly "analytics": "analytics";
-    readonly "forecasting": "forecasting";
-    readonly "anomaly_detection": "anomaly_detection";
-    readonly "recommendations": "recommendations";
+    readonly reply_assist: "reply_assist";
+    readonly booking_assist: "booking_assist";
+    readonly analytics: "analytics";
+    readonly forecasting: "forecasting";
+    readonly anomaly_detection: "anomaly_detection";
+    readonly recommendations: "recommendations";
   } = {
-    "reply_assist": "reply_assist",
-    "booking_assist": "booking_assist",
-    "analytics": "analytics",
-    "forecasting": "forecasting",
-    "anomaly_detection": "anomaly_detection",
-    "recommendations": "recommendations",
+    reply_assist: "reply_assist",
+    booking_assist: "booking_assist",
+    analytics: "analytics",
+    forecasting: "forecasting",
+    anomaly_detection: "anomaly_detection",
+    recommendations: "recommendations",
   };
 
   export type AiFeatureType = (typeof AiFeatureType)[keyof typeof AiFeatureType];
 
   export const AnalyticsActorType: {
-    readonly "staff": "staff";
-    readonly "guest": "guest";
-    readonly "anonymous": "anonymous";
-    readonly "system": "system";
+    readonly staff: "staff";
+    readonly guest: "guest";
+    readonly anonymous: "anonymous";
+    readonly system: "system";
   } = {
-    "staff": "staff",
-    "guest": "guest",
-    "anonymous": "anonymous",
-    "system": "system",
+    staff: "staff",
+    guest: "guest",
+    anonymous: "anonymous",
+    system: "system",
   };
 
   export type AnalyticsActorType = (typeof AnalyticsActorType)[keyof typeof AnalyticsActorType];
 
   export const AnalyticsEventName: {
-    readonly "page_view": "page_view";
-    readonly "site_card_view": "site_card_view";
-    readonly "image_viewed": "image_viewed";
-    readonly "image_hovered": "image_hovered";
-    readonly "image_clicked": "image_clicked";
-    readonly "site_class_viewed": "site_class_viewed";
-    readonly "availability_check": "availability_check";
-    readonly "add_to_stay": "add_to_stay";
-    readonly "reservation_start": "reservation_start";
-    readonly "reservation_abandoned": "reservation_abandoned";
-    readonly "reservation_completed": "reservation_completed";
-    readonly "deal_viewed": "deal_viewed";
-    readonly "deal_applied": "deal_applied";
-    readonly "email_signup": "email_signup";
-    readonly "review_viewed": "review_viewed";
-    readonly "admin_page_view": "admin_page_view";
-    readonly "admin_action": "admin_action";
-    readonly "admin_search": "admin_search";
-    readonly "admin_error": "admin_error";
-    readonly "admin_feature_use": "admin_feature_use";
-    readonly "admin_session_start": "admin_session_start";
-    readonly "admin_session_end": "admin_session_end";
-    readonly "admin_pricing_change": "admin_pricing_change";
-    readonly "admin_image_reorder": "admin_image_reorder";
-    readonly "funnel_step": "funnel_step";
-    readonly "funnel_abandon": "funnel_abandon";
-    readonly "funnel_complete": "funnel_complete";
-    readonly "portal_login": "portal_login";
-    readonly "portal_view": "portal_view";
-    readonly "portal_action": "portal_action";
+    readonly page_view: "page_view";
+    readonly site_card_view: "site_card_view";
+    readonly image_viewed: "image_viewed";
+    readonly image_hovered: "image_hovered";
+    readonly image_clicked: "image_clicked";
+    readonly site_class_viewed: "site_class_viewed";
+    readonly availability_check: "availability_check";
+    readonly add_to_stay: "add_to_stay";
+    readonly reservation_start: "reservation_start";
+    readonly reservation_abandoned: "reservation_abandoned";
+    readonly reservation_completed: "reservation_completed";
+    readonly deal_viewed: "deal_viewed";
+    readonly deal_applied: "deal_applied";
+    readonly email_signup: "email_signup";
+    readonly review_viewed: "review_viewed";
+    readonly admin_page_view: "admin_page_view";
+    readonly admin_action: "admin_action";
+    readonly admin_search: "admin_search";
+    readonly admin_error: "admin_error";
+    readonly admin_feature_use: "admin_feature_use";
+    readonly admin_session_start: "admin_session_start";
+    readonly admin_session_end: "admin_session_end";
+    readonly admin_pricing_change: "admin_pricing_change";
+    readonly admin_image_reorder: "admin_image_reorder";
+    readonly funnel_step: "funnel_step";
+    readonly funnel_abandon: "funnel_abandon";
+    readonly funnel_complete: "funnel_complete";
+    readonly portal_login: "portal_login";
+    readonly portal_view: "portal_view";
+    readonly portal_action: "portal_action";
   } = {
-    "page_view": "page_view",
-    "site_card_view": "site_card_view",
-    "image_viewed": "image_viewed",
-    "image_hovered": "image_hovered",
-    "image_clicked": "image_clicked",
-    "site_class_viewed": "site_class_viewed",
-    "availability_check": "availability_check",
-    "add_to_stay": "add_to_stay",
-    "reservation_start": "reservation_start",
-    "reservation_abandoned": "reservation_abandoned",
-    "reservation_completed": "reservation_completed",
-    "deal_viewed": "deal_viewed",
-    "deal_applied": "deal_applied",
-    "email_signup": "email_signup",
-    "review_viewed": "review_viewed",
-    "admin_page_view": "admin_page_view",
-    "admin_action": "admin_action",
-    "admin_search": "admin_search",
-    "admin_error": "admin_error",
-    "admin_feature_use": "admin_feature_use",
-    "admin_session_start": "admin_session_start",
-    "admin_session_end": "admin_session_end",
-    "admin_pricing_change": "admin_pricing_change",
-    "admin_image_reorder": "admin_image_reorder",
-    "funnel_step": "funnel_step",
-    "funnel_abandon": "funnel_abandon",
-    "funnel_complete": "funnel_complete",
-    "portal_login": "portal_login",
-    "portal_view": "portal_view",
-    "portal_action": "portal_action",
+    page_view: "page_view",
+    site_card_view: "site_card_view",
+    image_viewed: "image_viewed",
+    image_hovered: "image_hovered",
+    image_clicked: "image_clicked",
+    site_class_viewed: "site_class_viewed",
+    availability_check: "availability_check",
+    add_to_stay: "add_to_stay",
+    reservation_start: "reservation_start",
+    reservation_abandoned: "reservation_abandoned",
+    reservation_completed: "reservation_completed",
+    deal_viewed: "deal_viewed",
+    deal_applied: "deal_applied",
+    email_signup: "email_signup",
+    review_viewed: "review_viewed",
+    admin_page_view: "admin_page_view",
+    admin_action: "admin_action",
+    admin_search: "admin_search",
+    admin_error: "admin_error",
+    admin_feature_use: "admin_feature_use",
+    admin_session_start: "admin_session_start",
+    admin_session_end: "admin_session_end",
+    admin_pricing_change: "admin_pricing_change",
+    admin_image_reorder: "admin_image_reorder",
+    funnel_step: "funnel_step",
+    funnel_abandon: "funnel_abandon",
+    funnel_complete: "funnel_complete",
+    portal_login: "portal_login",
+    portal_view: "portal_view",
+    portal_action: "portal_action",
   };
 
   export type AnalyticsEventName = (typeof AnalyticsEventName)[keyof typeof AnalyticsEventName];
 
   export const AnalyticsType: {
-    readonly "overview": "overview";
-    readonly "geographic": "geographic";
-    readonly "demographics": "demographics";
-    readonly "seasonal_trends": "seasonal_trends";
-    readonly "travel_behavior": "travel_behavior";
-    readonly "full_report": "full_report";
-    readonly "segment": "segment";
+    readonly overview: "overview";
+    readonly geographic: "geographic";
+    readonly demographics: "demographics";
+    readonly seasonal_trends: "seasonal_trends";
+    readonly travel_behavior: "travel_behavior";
+    readonly full_report: "full_report";
+    readonly segment: "segment";
   } = {
-    "overview": "overview",
-    "geographic": "geographic",
-    "demographics": "demographics",
-    "seasonal_trends": "seasonal_trends",
-    "travel_behavior": "travel_behavior",
-    "full_report": "full_report",
-    "segment": "segment",
+    overview: "overview",
+    geographic: "geographic",
+    demographics: "demographics",
+    seasonal_trends: "seasonal_trends",
+    travel_behavior: "travel_behavior",
+    full_report: "full_report",
+    segment: "segment",
   };
 
   export type AnalyticsType = (typeof AnalyticsType)[keyof typeof AnalyticsType];
 
   export const AnnouncementStatus: {
-    readonly "draft": "draft";
-    readonly "scheduled": "scheduled";
-    readonly "sent": "sent";
+    readonly draft: "draft";
+    readonly scheduled: "scheduled";
+    readonly sent: "sent";
   } = {
-    "draft": "draft",
-    "scheduled": "scheduled",
-    "sent": "sent",
+    draft: "draft",
+    scheduled: "scheduled",
+    sent: "sent",
   };
 
   export type AnnouncementStatus = (typeof AnnouncementStatus)[keyof typeof AnnouncementStatus];
 
   export const AnnouncementTarget: {
-    readonly "all": "all";
-    readonly "admins": "admins";
-    readonly "campground": "campground";
+    readonly all: "all";
+    readonly admins: "admins";
+    readonly campground: "campground";
   } = {
-    "all": "all",
-    "admins": "admins",
-    "campground": "campground",
+    all: "all",
+    admins: "admins",
+    campground: "campground",
   };
 
   export type AnnouncementTarget = (typeof AnnouncementTarget)[keyof typeof AnnouncementTarget];
 
   export const AnnouncementType: {
-    readonly "info": "info";
-    readonly "warning": "warning";
-    readonly "success": "success";
+    readonly info: "info";
+    readonly warning: "warning";
+    readonly success: "success";
   } = {
-    "info": "info",
-    "warning": "warning",
-    "success": "success",
+    info: "info",
+    warning: "warning",
+    success: "success",
   };
 
   export type AnnouncementType = (typeof AnnouncementType)[keyof typeof AnnouncementType];
 
   export const ApiClientTier: {
-    readonly "free": "free";
-    readonly "standard": "standard";
-    readonly "enterprise": "enterprise";
+    readonly free: "free";
+    readonly standard: "standard";
+    readonly enterprise: "enterprise";
   } = {
-    "free": "free",
-    "standard": "standard",
-    "enterprise": "enterprise",
+    free: "free",
+    standard: "standard",
+    enterprise: "enterprise",
   };
 
   export type ApiClientTier = (typeof ApiClientTier)[keyof typeof ApiClientTier];
 
   export const ApprovalStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
   };
 
   export type ApprovalStatus = (typeof ApprovalStatus)[keyof typeof ApprovalStatus];
 
   export const AttemptOutcome: {
-    readonly "success": "success";
-    readonly "failed": "failed";
-    readonly "partial": "partial";
+    readonly success: "success";
+    readonly failed: "failed";
+    readonly partial: "partial";
   } = {
-    "success": "success",
-    "failed": "failed",
-    "partial": "partial",
+    success: "success",
+    failed: "failed",
+    partial: "partial",
   };
 
   export type AttemptOutcome = (typeof AttemptOutcome)[keyof typeof AttemptOutcome];
 
   export const AttractionType: {
-    readonly "national_park": "national_park";
-    readonly "state_park": "state_park";
-    readonly "national_forest": "national_forest";
-    readonly "national_monument": "national_monument";
-    readonly "lake": "lake";
-    readonly "beach": "beach";
-    readonly "river": "river";
-    readonly "mountain": "mountain";
-    readonly "ski_resort": "ski_resort";
-    readonly "theme_park": "theme_park";
-    readonly "historic_site": "historic_site";
-    readonly "scenic_byway": "scenic_byway";
-    readonly "wildlife_area": "wildlife_area";
-    readonly "recreation_area": "recreation_area";
-    readonly "other": "other";
+    readonly national_park: "national_park";
+    readonly state_park: "state_park";
+    readonly national_forest: "national_forest";
+    readonly national_monument: "national_monument";
+    readonly lake: "lake";
+    readonly beach: "beach";
+    readonly river: "river";
+    readonly mountain: "mountain";
+    readonly ski_resort: "ski_resort";
+    readonly theme_park: "theme_park";
+    readonly historic_site: "historic_site";
+    readonly scenic_byway: "scenic_byway";
+    readonly wildlife_area: "wildlife_area";
+    readonly recreation_area: "recreation_area";
+    readonly other: "other";
   } = {
-    "national_park": "national_park",
-    "state_park": "state_park",
-    "national_forest": "national_forest",
-    "national_monument": "national_monument",
-    "lake": "lake",
-    "beach": "beach",
-    "river": "river",
-    "mountain": "mountain",
-    "ski_resort": "ski_resort",
-    "theme_park": "theme_park",
-    "historic_site": "historic_site",
-    "scenic_byway": "scenic_byway",
-    "wildlife_area": "wildlife_area",
-    "recreation_area": "recreation_area",
-    "other": "other",
+    national_park: "national_park",
+    state_park: "state_park",
+    national_forest: "national_forest",
+    national_monument: "national_monument",
+    lake: "lake",
+    beach: "beach",
+    river: "river",
+    mountain: "mountain",
+    ski_resort: "ski_resort",
+    theme_park: "theme_park",
+    historic_site: "historic_site",
+    scenic_byway: "scenic_byway",
+    wildlife_area: "wildlife_area",
+    recreation_area: "recreation_area",
+    other: "other",
   };
 
   export type AttractionType = (typeof AttractionType)[keyof typeof AttractionType];
 
   export const AuditAction: {
-    readonly "CREATE": "CREATE";
-    readonly "UPDATE": "UPDATE";
-    readonly "DELETE": "DELETE";
-    readonly "LOGIN": "LOGIN";
-    readonly "LOGOUT": "LOGOUT";
-    readonly "SYNC": "SYNC";
-    readonly "EXPORT": "EXPORT";
-    readonly "IMPORT": "IMPORT";
+    readonly CREATE: "CREATE";
+    readonly UPDATE: "UPDATE";
+    readonly DELETE: "DELETE";
+    readonly LOGIN: "LOGIN";
+    readonly LOGOUT: "LOGOUT";
+    readonly SYNC: "SYNC";
+    readonly EXPORT: "EXPORT";
+    readonly IMPORT: "IMPORT";
   } = {
-    "CREATE": "CREATE",
-    "UPDATE": "UPDATE",
-    "DELETE": "DELETE",
-    "LOGIN": "LOGIN",
-    "LOGOUT": "LOGOUT",
-    "SYNC": "SYNC",
-    "EXPORT": "EXPORT",
-    "IMPORT": "IMPORT",
+    CREATE: "CREATE",
+    UPDATE: "UPDATE",
+    DELETE: "DELETE",
+    LOGIN: "LOGIN",
+    LOGOUT: "LOGOUT",
+    SYNC: "SYNC",
+    EXPORT: "EXPORT",
+    IMPORT: "IMPORT",
   };
 
   export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 
   export const AwardType: {
-    readonly "campground_of_year": "campground_of_year";
-    readonly "rising_star": "rising_star";
-    readonly "world_class": "world_class";
-    readonly "top_1_percent": "top_1_percent";
-    readonly "top_5_percent": "top_5_percent";
-    readonly "top_10_percent": "top_10_percent";
+    readonly campground_of_year: "campground_of_year";
+    readonly rising_star: "rising_star";
+    readonly world_class: "world_class";
+    readonly top_1_percent: "top_1_percent";
+    readonly top_5_percent: "top_5_percent";
+    readonly top_10_percent: "top_10_percent";
   } = {
-    "campground_of_year": "campground_of_year",
-    "rising_star": "rising_star",
-    "world_class": "world_class",
-    "top_1_percent": "top_1_percent",
-    "top_5_percent": "top_5_percent",
-    "top_10_percent": "top_10_percent",
+    campground_of_year: "campground_of_year",
+    rising_star: "rising_star",
+    world_class: "world_class",
+    top_1_percent: "top_1_percent",
+    top_5_percent: "top_5_percent",
+    top_10_percent: "top_10_percent",
   };
 
   export type AwardType = (typeof AwardType)[keyof typeof AwardType];
 
   export const BackoffStrategy: {
-    readonly "fixed": "fixed";
-    readonly "linear": "linear";
-    readonly "exponential": "exponential";
+    readonly fixed: "fixed";
+    readonly linear: "linear";
+    readonly exponential: "exponential";
   } = {
-    "fixed": "fixed",
-    "linear": "linear",
-    "exponential": "exponential",
+    fixed: "fixed",
+    linear: "linear",
+    exponential: "exponential",
   };
 
   export type BackoffStrategy = (typeof BackoffStrategy)[keyof typeof BackoffStrategy];
 
   export const BatchDisposalReason: {
-    readonly "expired": "expired";
-    readonly "damaged": "damaged";
-    readonly "quality_issue": "quality_issue";
-    readonly "recall": "recall";
-    readonly "theft_loss": "theft_loss";
-    readonly "donation": "donation";
-    readonly "sample": "sample";
-    readonly "other": "other";
+    readonly expired: "expired";
+    readonly damaged: "damaged";
+    readonly quality_issue: "quality_issue";
+    readonly recall: "recall";
+    readonly theft_loss: "theft_loss";
+    readonly donation: "donation";
+    readonly sample: "sample";
+    readonly other: "other";
   } = {
-    "expired": "expired",
-    "damaged": "damaged",
-    "quality_issue": "quality_issue",
-    "recall": "recall",
-    "theft_loss": "theft_loss",
-    "donation": "donation",
-    "sample": "sample",
-    "other": "other",
+    expired: "expired",
+    damaged: "damaged",
+    quality_issue: "quality_issue",
+    recall: "recall",
+    theft_loss: "theft_loss",
+    donation: "donation",
+    sample: "sample",
+    other: "other",
   };
 
   export type BatchDisposalReason = (typeof BatchDisposalReason)[keyof typeof BatchDisposalReason];
 
   export const BillingPlan: {
-    readonly "ota_only": "ota_only";
-    readonly "standard": "standard";
-    readonly "enterprise": "enterprise";
+    readonly ota_only: "ota_only";
+    readonly standard: "standard";
+    readonly enterprise: "enterprise";
   } = {
-    "ota_only": "ota_only",
-    "standard": "standard",
-    "enterprise": "enterprise",
+    ota_only: "ota_only",
+    standard: "standard",
+    enterprise: "enterprise",
   };
 
   export type BillingPlan = (typeof BillingPlan)[keyof typeof BillingPlan];
 
   export const BreakType: {
-    readonly "paid": "paid";
-    readonly "unpaid": "unpaid";
-    readonly "meal": "meal";
-    readonly "rest": "rest";
+    readonly paid: "paid";
+    readonly unpaid: "unpaid";
+    readonly meal: "meal";
+    readonly rest: "rest";
   } = {
-    "paid": "paid",
-    "unpaid": "unpaid",
-    "meal": "meal",
-    "rest": "rest",
+    paid: "paid",
+    unpaid: "unpaid",
+    meal: "meal",
+    rest: "rest",
   };
 
   export type BreakType = (typeof BreakType)[keyof typeof BreakType];
 
   export const CampaignSendStatus: {
-    readonly "queued": "queued";
-    readonly "sent": "sent";
-    readonly "failed": "failed";
-    readonly "unsubscribed": "unsubscribed";
+    readonly queued: "queued";
+    readonly sent: "sent";
+    readonly failed: "failed";
+    readonly unsubscribed: "unsubscribed";
   } = {
-    "queued": "queued",
-    "sent": "sent",
-    "failed": "failed",
-    "unsubscribed": "unsubscribed",
+    queued: "queued",
+    sent: "sent",
+    failed: "failed",
+    unsubscribed: "unsubscribed",
   };
 
   export type CampaignSendStatus = (typeof CampaignSendStatus)[keyof typeof CampaignSendStatus];
 
   export const CampaignStatus: {
-    readonly "draft": "draft";
-    readonly "scheduled": "scheduled";
-    readonly "sending": "sending";
-    readonly "sent": "sent";
-    readonly "cancelled": "cancelled";
+    readonly draft: "draft";
+    readonly scheduled: "scheduled";
+    readonly sending: "sending";
+    readonly sent: "sent";
+    readonly cancelled: "cancelled";
   } = {
-    "draft": "draft",
-    "scheduled": "scheduled",
-    "sending": "sending",
-    "sent": "sent",
-    "cancelled": "cancelled",
+    draft: "draft",
+    scheduled: "scheduled",
+    sending: "sending",
+    sent: "sent",
+    cancelled: "cancelled",
   };
 
   export type CampaignStatus = (typeof CampaignStatus)[keyof typeof CampaignStatus];
 
   export const CampgroundClaimStatus: {
-    readonly "unclaimed": "unclaimed";
-    readonly "claim_pending": "claim_pending";
-    readonly "claimed": "claimed";
+    readonly unclaimed: "unclaimed";
+    readonly claim_pending: "claim_pending";
+    readonly claimed: "claimed";
   } = {
-    "unclaimed": "unclaimed",
-    "claim_pending": "claim_pending",
-    "claimed": "claimed",
+    unclaimed: "unclaimed",
+    claim_pending: "claim_pending",
+    claimed: "claimed",
   };
 
-  export type CampgroundClaimStatus = (typeof CampgroundClaimStatus)[keyof typeof CampgroundClaimStatus];
+  export type CampgroundClaimStatus =
+    (typeof CampgroundClaimStatus)[keyof typeof CampgroundClaimStatus];
 
   export const CampgroundDataSource: {
-    readonly "recreation_gov": "recreation_gov";
-    readonly "reserve_california": "reserve_california";
-    readonly "reserve_america": "reserve_america";
-    readonly "nps": "nps";
-    readonly "usfs": "usfs";
-    readonly "blm": "blm";
-    readonly "state_parks": "state_parks";
-    readonly "osm": "osm";
-    readonly "manual": "manual";
-    readonly "user_submitted": "user_submitted";
-    readonly "claimed": "claimed";
+    readonly recreation_gov: "recreation_gov";
+    readonly reserve_california: "reserve_california";
+    readonly reserve_america: "reserve_america";
+    readonly nps: "nps";
+    readonly usfs: "usfs";
+    readonly blm: "blm";
+    readonly state_parks: "state_parks";
+    readonly osm: "osm";
+    readonly manual: "manual";
+    readonly user_submitted: "user_submitted";
+    readonly claimed: "claimed";
   } = {
-    "recreation_gov": "recreation_gov",
-    "reserve_california": "reserve_california",
-    "reserve_america": "reserve_america",
-    "nps": "nps",
-    "usfs": "usfs",
-    "blm": "blm",
-    "state_parks": "state_parks",
-    "osm": "osm",
-    "manual": "manual",
-    "user_submitted": "user_submitted",
-    "claimed": "claimed",
+    recreation_gov: "recreation_gov",
+    reserve_california: "reserve_california",
+    reserve_america: "reserve_america",
+    nps: "nps",
+    usfs: "usfs",
+    blm: "blm",
+    state_parks: "state_parks",
+    osm: "osm",
+    manual: "manual",
+    user_submitted: "user_submitted",
+    claimed: "claimed",
   };
 
-  export type CampgroundDataSource = (typeof CampgroundDataSource)[keyof typeof CampgroundDataSource];
+  export type CampgroundDataSource =
+    (typeof CampgroundDataSource)[keyof typeof CampgroundDataSource];
 
   export const ChannelInventoryMode: {
-    readonly "shared": "shared";
-    readonly "split": "split";
+    readonly shared: "shared";
+    readonly split: "split";
   } = {
-    "shared": "shared",
-    "split": "split",
+    shared: "shared",
+    split: "split",
   };
 
-  export type ChannelInventoryMode = (typeof ChannelInventoryMode)[keyof typeof ChannelInventoryMode];
+  export type ChannelInventoryMode =
+    (typeof ChannelInventoryMode)[keyof typeof ChannelInventoryMode];
 
   export const ChannelType: {
-    readonly "email": "email";
-    readonly "sms": "sms";
-    readonly "both": "both";
+    readonly email: "email";
+    readonly sms: "sms";
+    readonly both: "both";
   } = {
-    "email": "email",
-    "sms": "sms",
-    "both": "both",
+    email: "email",
+    sms: "sms",
+    both: "both",
   };
 
   export type ChannelType = (typeof ChannelType)[keyof typeof ChannelType];
 
   export const ChargeStatus: {
-    readonly "pending": "pending";
-    readonly "paid": "paid";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly paid: "paid";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "paid": "paid",
-    "failed": "failed",
+    pending: "pending",
+    paid: "paid",
+    failed: "failed",
   };
 
   export type ChargeStatus = (typeof ChargeStatus)[keyof typeof ChargeStatus];
 
   export const CharityPayoutStatus: {
-    readonly "pending": "pending";
-    readonly "processing": "processing";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly processing: "processing";
+    readonly completed: "completed";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "processing": "processing",
-    "completed": "completed",
-    "failed": "failed",
+    pending: "pending",
+    processing: "processing",
+    completed: "completed",
+    failed: "failed",
   };
 
   export type CharityPayoutStatus = (typeof CharityPayoutStatus)[keyof typeof CharityPayoutStatus];
 
   export const ChatMessageRole: {
-    readonly "user": "user";
-    readonly "assistant": "assistant";
-    readonly "tool": "tool";
-    readonly "system": "system";
+    readonly user: "user";
+    readonly assistant: "assistant";
+    readonly tool: "tool";
+    readonly system: "system";
   } = {
-    "user": "user",
-    "assistant": "assistant",
-    "tool": "tool",
-    "system": "system",
+    user: "user",
+    assistant: "assistant",
+    tool: "tool",
+    system: "system",
   };
 
   export type ChatMessageRole = (typeof ChatMessageRole)[keyof typeof ChatMessageRole];
 
   export const ChatParticipantType: {
-    readonly "guest": "guest";
-    readonly "staff": "staff";
+    readonly guest: "guest";
+    readonly staff: "staff";
   } = {
-    "guest": "guest",
-    "staff": "staff",
+    guest: "guest",
+    staff: "staff",
   };
 
   export type ChatParticipantType = (typeof ChatParticipantType)[keyof typeof ChatParticipantType];
 
   export const CheckInStatus: {
-    readonly "not_started": "not_started";
-    readonly "pending_id": "pending_id";
-    readonly "pending_payment": "pending_payment";
-    readonly "pending_waiver": "pending_waiver";
-    readonly "pending_site_ready": "pending_site_ready";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
+    readonly not_started: "not_started";
+    readonly pending_id: "pending_id";
+    readonly pending_payment: "pending_payment";
+    readonly pending_waiver: "pending_waiver";
+    readonly pending_site_ready: "pending_site_ready";
+    readonly completed: "completed";
+    readonly failed: "failed";
   } = {
-    "not_started": "not_started",
-    "pending_id": "pending_id",
-    "pending_payment": "pending_payment",
-    "pending_waiver": "pending_waiver",
-    "pending_site_ready": "pending_site_ready",
-    "completed": "completed",
-    "failed": "failed",
+    not_started: "not_started",
+    pending_id: "pending_id",
+    pending_payment: "pending_payment",
+    pending_waiver: "pending_waiver",
+    pending_site_ready: "pending_site_ready",
+    completed: "completed",
+    failed: "failed",
   };
 
   export type CheckInStatus = (typeof CheckInStatus)[keyof typeof CheckInStatus];
 
   export const CheckOutStatus: {
-    readonly "not_started": "not_started";
-    readonly "pending_review": "pending_review";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
+    readonly not_started: "not_started";
+    readonly pending_review: "pending_review";
+    readonly completed: "completed";
+    readonly failed: "failed";
   } = {
-    "not_started": "not_started",
-    "pending_review": "pending_review",
-    "completed": "completed",
-    "failed": "failed",
+    not_started: "not_started",
+    pending_review: "pending_review",
+    completed: "completed",
+    failed: "failed",
   };
 
   export type CheckOutStatus = (typeof CheckOutStatus)[keyof typeof CheckOutStatus];
 
   export const ClaimVerificationMethod: {
-    readonly "phone": "phone";
-    readonly "email": "email";
-    readonly "document": "document";
-    readonly "domain": "domain";
-    readonly "manual": "manual";
+    readonly phone: "phone";
+    readonly email: "email";
+    readonly document: "document";
+    readonly domain: "domain";
+    readonly manual: "manual";
   } = {
-    "phone": "phone",
-    "email": "email",
-    "document": "document",
-    "domain": "domain",
-    "manual": "manual",
+    phone: "phone",
+    email: "email",
+    document: "document",
+    domain: "domain",
+    manual: "manual",
   };
 
-  export type ClaimVerificationMethod = (typeof ClaimVerificationMethod)[keyof typeof ClaimVerificationMethod];
+  export type ClaimVerificationMethod =
+    (typeof ClaimVerificationMethod)[keyof typeof ClaimVerificationMethod];
 
   export const CoiStatus: {
-    readonly "pending": "pending";
-    readonly "active": "active";
-    readonly "expired": "expired";
-    readonly "voided": "voided";
+    readonly pending: "pending";
+    readonly active: "active";
+    readonly expired: "expired";
+    readonly voided: "voided";
   } = {
-    "pending": "pending",
-    "active": "active",
-    "expired": "expired",
-    "voided": "voided",
+    pending: "pending",
+    active: "active",
+    expired: "expired",
+    voided: "voided",
   };
 
   export type CoiStatus = (typeof CoiStatus)[keyof typeof CoiStatus];
 
   export const ConsentMethod: {
-    readonly "verbal": "verbal";
-    readonly "written": "written";
-    readonly "digital": "digital";
+    readonly verbal: "verbal";
+    readonly written: "written";
+    readonly digital: "digital";
   } = {
-    "verbal": "verbal",
-    "written": "written",
-    "digital": "digital",
+    verbal: "verbal",
+    written: "written",
+    digital: "digital",
   };
 
   export type ConsentMethod = (typeof ConsentMethod)[keyof typeof ConsentMethod];
 
   export const DepositApplyTo: {
-    readonly "lodging_only": "lodging_only";
-    readonly "lodging_plus_fees": "lodging_plus_fees";
+    readonly lodging_only: "lodging_only";
+    readonly lodging_plus_fees: "lodging_plus_fees";
   } = {
-    "lodging_only": "lodging_only",
-    "lodging_plus_fees": "lodging_plus_fees",
+    lodging_only: "lodging_only",
+    lodging_plus_fees: "lodging_plus_fees",
   };
 
   export type DepositApplyTo = (typeof DepositApplyTo)[keyof typeof DepositApplyTo];
 
   export const DepositDueTiming: {
-    readonly "at_booking": "at_booking";
-    readonly "before_arrival": "before_arrival";
+    readonly at_booking: "at_booking";
+    readonly before_arrival: "before_arrival";
   } = {
-    "at_booking": "at_booking",
-    "before_arrival": "before_arrival",
+    at_booking: "at_booking",
+    before_arrival: "before_arrival",
   };
 
   export type DepositDueTiming = (typeof DepositDueTiming)[keyof typeof DepositDueTiming];
 
   export const DepositStrategy: {
-    readonly "first_night": "first_night";
-    readonly "percent": "percent";
-    readonly "fixed": "fixed";
+    readonly first_night: "first_night";
+    readonly percent: "percent";
+    readonly fixed: "fixed";
   } = {
-    "first_night": "first_night",
-    "percent": "percent",
-    "fixed": "fixed",
+    first_night: "first_night",
+    percent: "percent",
+    fixed: "fixed",
   };
 
   export type DepositStrategy = (typeof DepositStrategy)[keyof typeof DepositStrategy];
 
   export const DisputeStatus: {
-    readonly "warning_needs_response": "warning_needs_response";
-    readonly "warning_under_review": "warning_under_review";
-    readonly "needs_response": "needs_response";
-    readonly "under_review": "under_review";
-    readonly "charge_refunded": "charge_refunded";
-    readonly "won": "won";
-    readonly "lost": "lost";
+    readonly warning_needs_response: "warning_needs_response";
+    readonly warning_under_review: "warning_under_review";
+    readonly needs_response: "needs_response";
+    readonly under_review: "under_review";
+    readonly charge_refunded: "charge_refunded";
+    readonly won: "won";
+    readonly lost: "lost";
   } = {
-    "warning_needs_response": "warning_needs_response",
-    "warning_under_review": "warning_under_review",
-    "needs_response": "needs_response",
-    "under_review": "under_review",
-    "charge_refunded": "charge_refunded",
-    "won": "won",
-    "lost": "lost",
+    warning_needs_response: "warning_needs_response",
+    warning_under_review: "warning_under_review",
+    needs_response: "needs_response",
+    under_review: "under_review",
+    charge_refunded: "charge_refunded",
+    won: "won",
+    lost: "lost",
   };
 
   export type DisputeStatus = (typeof DisputeStatus)[keyof typeof DisputeStatus];
 
   export const DonationStatus: {
-    readonly "collected": "collected";
-    readonly "pending_payout": "pending_payout";
-    readonly "paid_out": "paid_out";
-    readonly "refunded": "refunded";
+    readonly collected: "collected";
+    readonly pending_payout: "pending_payout";
+    readonly paid_out: "paid_out";
+    readonly refunded: "refunded";
   } = {
-    "collected": "collected",
-    "pending_payout": "pending_payout",
-    "paid_out": "paid_out",
-    "refunded": "refunded",
+    collected: "collected",
+    pending_payout: "pending_payout",
+    paid_out: "paid_out",
+    refunded: "refunded",
   };
 
   export type DonationStatus = (typeof DonationStatus)[keyof typeof DonationStatus];
 
   export const DynamicPricingTrigger: {
-    readonly "occupancy_high": "occupancy_high";
-    readonly "occupancy_low": "occupancy_low";
-    readonly "demand_surge": "demand_surge";
-    readonly "last_minute": "last_minute";
-    readonly "advance_booking": "advance_booking";
-    readonly "event_proximity": "event_proximity";
-    readonly "weather": "weather";
-    readonly "manual": "manual";
+    readonly occupancy_high: "occupancy_high";
+    readonly occupancy_low: "occupancy_low";
+    readonly demand_surge: "demand_surge";
+    readonly last_minute: "last_minute";
+    readonly advance_booking: "advance_booking";
+    readonly event_proximity: "event_proximity";
+    readonly weather: "weather";
+    readonly manual: "manual";
   } = {
-    "occupancy_high": "occupancy_high",
-    "occupancy_low": "occupancy_low",
-    "demand_surge": "demand_surge",
-    "last_minute": "last_minute",
-    "advance_booking": "advance_booking",
-    "event_proximity": "event_proximity",
-    "weather": "weather",
-    "manual": "manual",
+    occupancy_high: "occupancy_high",
+    occupancy_low: "occupancy_low",
+    demand_surge: "demand_surge",
+    last_minute: "last_minute",
+    advance_booking: "advance_booking",
+    event_proximity: "event_proximity",
+    weather: "weather",
+    manual: "manual",
   };
 
-  export type DynamicPricingTrigger = (typeof DynamicPricingTrigger)[keyof typeof DynamicPricingTrigger];
+  export type DynamicPricingTrigger =
+    (typeof DynamicPricingTrigger)[keyof typeof DynamicPricingTrigger];
 
   export const EarlyAccessTier: {
-    readonly "founders_circle": "founders_circle";
-    readonly "pioneer": "pioneer";
-    readonly "trailblazer": "trailblazer";
+    readonly founders_circle: "founders_circle";
+    readonly pioneer: "pioneer";
+    readonly trailblazer: "trailblazer";
   } = {
-    "founders_circle": "founders_circle",
-    "pioneer": "pioneer",
-    "trailblazer": "trailblazer",
+    founders_circle: "founders_circle",
+    pioneer: "pioneer",
+    trailblazer: "trailblazer",
   };
 
   export type EarlyAccessTier = (typeof EarlyAccessTier)[keyof typeof EarlyAccessTier];
 
   export const EventType: {
-    readonly "activity": "activity";
-    readonly "workshop": "workshop";
-    readonly "entertainment": "entertainment";
-    readonly "holiday": "holiday";
-    readonly "recurring": "recurring";
-    readonly "ongoing": "ongoing";
-    readonly "themed": "themed";
+    readonly activity: "activity";
+    readonly workshop: "workshop";
+    readonly entertainment: "entertainment";
+    readonly holiday: "holiday";
+    readonly recurring: "recurring";
+    readonly ongoing: "ongoing";
+    readonly themed: "themed";
   } = {
-    "activity": "activity",
-    "workshop": "workshop",
-    "entertainment": "entertainment",
-    "holiday": "holiday",
-    "recurring": "recurring",
-    "ongoing": "ongoing",
-    "themed": "themed",
+    activity: "activity",
+    workshop: "workshop",
+    entertainment: "entertainment",
+    holiday: "holiday",
+    recurring: "recurring",
+    ongoing: "ongoing",
+    themed: "themed",
   };
 
   export type EventType = (typeof EventType)[keyof typeof EventType];
 
   export const EvidenceType: {
-    readonly "photo": "photo";
-    readonly "document": "document";
-    readonly "note": "note";
-    readonly "audio": "audio";
-    readonly "video": "video";
-    readonly "other": "other";
+    readonly photo: "photo";
+    readonly document: "document";
+    readonly note: "note";
+    readonly audio: "audio";
+    readonly video: "video";
+    readonly other: "other";
   } = {
-    "photo": "photo",
-    "document": "document",
-    "note": "note",
-    "audio": "audio",
-    "video": "video",
-    "other": "other",
+    photo: "photo",
+    document: "document",
+    note: "note",
+    audio: "audio",
+    video: "video",
+    other: "other",
   };
 
   export type EvidenceType = (typeof EvidenceType)[keyof typeof EvidenceType];
 
   export const ExpirationTier: {
-    readonly "fresh": "fresh";
-    readonly "warning": "warning";
-    readonly "critical": "critical";
-    readonly "expired": "expired";
+    readonly fresh: "fresh";
+    readonly warning: "warning";
+    readonly critical: "critical";
+    readonly expired: "expired";
   } = {
-    "fresh": "fresh",
-    "warning": "warning",
-    "critical": "critical",
-    "expired": "expired",
+    fresh: "fresh",
+    warning: "warning",
+    critical: "critical",
+    expired: "expired",
   };
 
   export type ExpirationTier = (typeof ExpirationTier)[keyof typeof ExpirationTier];
 
   export const ExportFormat: {
-    readonly "csv": "csv";
-    readonly "json": "json";
-    readonly "pdf": "pdf";
+    readonly csv: "csv";
+    readonly json: "json";
+    readonly pdf: "pdf";
   } = {
-    "csv": "csv",
-    "json": "json",
-    "pdf": "pdf",
+    csv: "csv",
+    json: "json",
+    pdf: "pdf",
   };
 
   export type ExportFormat = (typeof ExportFormat)[keyof typeof ExportFormat];
 
   export const ExportStatus: {
-    readonly "pending": "pending";
-    readonly "processing": "processing";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly processing: "processing";
+    readonly completed: "completed";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "processing": "processing",
-    "completed": "completed",
-    "failed": "failed",
+    pending: "pending",
+    processing: "processing",
+    completed: "completed",
+    failed: "failed",
   };
 
   export type ExportStatus = (typeof ExportStatus)[keyof typeof ExportStatus];
 
   export const FeatureFlagScope: {
-    readonly "global": "global";
-    readonly "campground": "campground";
+    readonly global: "global";
+    readonly campground: "campground";
   } = {
-    "global": "global",
-    "campground": "campground",
+    global: "global",
+    campground: "campground",
   };
 
   export type FeatureFlagScope = (typeof FeatureFlagScope)[keyof typeof FeatureFlagScope];
 
   export const FeatureSetupStatus: {
-    readonly "setup_now": "setup_now";
-    readonly "setup_later": "setup_later";
-    readonly "skipped": "skipped";
-    readonly "completed": "completed";
+    readonly setup_now: "setup_now";
+    readonly setup_later: "setup_later";
+    readonly skipped: "skipped";
+    readonly completed: "completed";
   } = {
-    "setup_now": "setup_now",
-    "setup_later": "setup_later",
-    "skipped": "skipped",
-    "completed": "completed",
+    setup_now: "setup_now",
+    setup_later: "setup_later",
+    skipped: "skipped",
+    completed: "completed",
   };
 
   export type FeatureSetupStatus = (typeof FeatureSetupStatus)[keyof typeof FeatureSetupStatus];
 
   export const FormAutoAttachMode: {
-    readonly "manual": "manual";
-    readonly "all_bookings": "all_bookings";
-    readonly "site_classes": "site_classes";
+    readonly manual: "manual";
+    readonly all_bookings: "all_bookings";
+    readonly site_classes: "site_classes";
   } = {
-    "manual": "manual",
-    "all_bookings": "all_bookings",
-    "site_classes": "site_classes",
+    manual: "manual",
+    all_bookings: "all_bookings",
+    site_classes: "site_classes",
   };
 
   export type FormAutoAttachMode = (typeof FormAutoAttachMode)[keyof typeof FormAutoAttachMode];
 
   export const FormShowAt: {
-    readonly "during_booking": "during_booking";
-    readonly "at_checkin": "at_checkin";
-    readonly "after_booking": "after_booking";
-    readonly "on_demand": "on_demand";
+    readonly during_booking: "during_booking";
+    readonly at_checkin: "at_checkin";
+    readonly after_booking: "after_booking";
+    readonly on_demand: "on_demand";
   } = {
-    "during_booking": "during_booking",
-    "at_checkin": "at_checkin",
-    "after_booking": "after_booking",
-    "on_demand": "on_demand",
+    during_booking: "during_booking",
+    at_checkin: "at_checkin",
+    after_booking: "after_booking",
+    on_demand: "on_demand",
   };
 
   export type FormShowAt = (typeof FormShowAt)[keyof typeof FormShowAt];
 
   export const FormSubmissionStatus: {
-    readonly "pending": "pending";
-    readonly "completed": "completed";
-    readonly "void": "void";
+    readonly pending: "pending";
+    readonly completed: "completed";
+    readonly void: "void";
   } = {
-    "pending": "pending",
-    "completed": "completed",
-    "void": "void",
+    pending: "pending",
+    completed: "completed",
+    void: "void",
   };
 
-  export type FormSubmissionStatus = (typeof FormSubmissionStatus)[keyof typeof FormSubmissionStatus];
+  export type FormSubmissionStatus =
+    (typeof FormSubmissionStatus)[keyof typeof FormSubmissionStatus];
 
   export const FormTemplateType: {
-    readonly "waiver": "waiver";
-    readonly "vehicle": "vehicle";
-    readonly "intake": "intake";
-    readonly "custom": "custom";
+    readonly waiver: "waiver";
+    readonly vehicle: "vehicle";
+    readonly intake: "intake";
+    readonly custom: "custom";
   } = {
-    "waiver": "waiver",
-    "vehicle": "vehicle",
-    "intake": "intake",
-    "custom": "custom",
+    waiver: "waiver",
+    vehicle: "vehicle",
+    intake: "intake",
+    custom: "custom",
   };
 
   export type FormTemplateType = (typeof FormTemplateType)[keyof typeof FormTemplateType];
 
   export const FulfillmentAssignmentStatus: {
-    readonly "unassigned": "unassigned";
-    readonly "assigned": "assigned";
-    readonly "preparing": "preparing";
-    readonly "ready": "ready";
-    readonly "completed": "completed";
+    readonly unassigned: "unassigned";
+    readonly assigned: "assigned";
+    readonly preparing: "preparing";
+    readonly ready: "ready";
+    readonly completed: "completed";
   } = {
-    "unassigned": "unassigned",
-    "assigned": "assigned",
-    "preparing": "preparing",
-    "ready": "ready",
-    "completed": "completed",
+    unassigned: "unassigned",
+    assigned: "assigned",
+    preparing: "preparing",
+    ready: "ready",
+    completed: "completed",
   };
 
-  export type FulfillmentAssignmentStatus = (typeof FulfillmentAssignmentStatus)[keyof typeof FulfillmentAssignmentStatus];
+  export type FulfillmentAssignmentStatus =
+    (typeof FulfillmentAssignmentStatus)[keyof typeof FulfillmentAssignmentStatus];
 
   export const FulfillmentType: {
-    readonly "pickup": "pickup";
-    readonly "curbside": "curbside";
-    readonly "delivery": "delivery";
-    readonly "table_service": "table_service";
+    readonly pickup: "pickup";
+    readonly curbside: "curbside";
+    readonly delivery: "delivery";
+    readonly table_service: "table_service";
   } = {
-    "pickup": "pickup",
-    "curbside": "curbside",
-    "delivery": "delivery",
-    "table_service": "table_service",
+    pickup: "pickup",
+    curbside: "curbside",
+    delivery: "delivery",
+    table_service: "table_service",
   };
 
   export type FulfillmentType = (typeof FulfillmentType)[keyof typeof FulfillmentType];
 
   export const GamificationEventCategory: {
-    readonly "task": "task";
-    readonly "maintenance": "maintenance";
-    readonly "check_in": "check_in";
-    readonly "reservation_quality": "reservation_quality";
-    readonly "checklist": "checklist";
-    readonly "review_mention": "review_mention";
-    readonly "on_time_assignment": "on_time_assignment";
-    readonly "assist": "assist";
-    readonly "manual": "manual";
-    readonly "other": "other";
-    readonly "payment_collection": "payment_collection";
+    readonly task: "task";
+    readonly maintenance: "maintenance";
+    readonly check_in: "check_in";
+    readonly reservation_quality: "reservation_quality";
+    readonly checklist: "checklist";
+    readonly review_mention: "review_mention";
+    readonly on_time_assignment: "on_time_assignment";
+    readonly assist: "assist";
+    readonly manual: "manual";
+    readonly other: "other";
+    readonly payment_collection: "payment_collection";
   } = {
-    "task": "task",
-    "maintenance": "maintenance",
-    "check_in": "check_in",
-    "reservation_quality": "reservation_quality",
-    "checklist": "checklist",
-    "review_mention": "review_mention",
-    "on_time_assignment": "on_time_assignment",
-    "assist": "assist",
-    "manual": "manual",
-    "other": "other",
-    "payment_collection": "payment_collection",
+    task: "task",
+    maintenance: "maintenance",
+    check_in: "check_in",
+    reservation_quality: "reservation_quality",
+    checklist: "checklist",
+    review_mention: "review_mention",
+    on_time_assignment: "on_time_assignment",
+    assist: "assist",
+    manual: "manual",
+    other: "other",
+    payment_collection: "payment_collection",
   };
 
-  export type GamificationEventCategory = (typeof GamificationEventCategory)[keyof typeof GamificationEventCategory];
+  export type GamificationEventCategory =
+    (typeof GamificationEventCategory)[keyof typeof GamificationEventCategory];
 
   export const GlAccountType: {
-    readonly "asset": "asset";
-    readonly "liability": "liability";
-    readonly "equity": "equity";
-    readonly "revenue": "revenue";
-    readonly "expense": "expense";
+    readonly asset: "asset";
+    readonly liability: "liability";
+    readonly equity: "equity";
+    readonly revenue: "revenue";
+    readonly expense: "expense";
   } = {
-    "asset": "asset",
-    "liability": "liability",
-    "equity": "equity",
-    "revenue": "revenue",
-    "expense": "expense",
+    asset: "asset",
+    liability: "liability",
+    equity: "equity",
+    revenue: "revenue",
+    expense: "expense",
   };
 
   export type GlAccountType = (typeof GlAccountType)[keyof typeof GlAccountType];
 
   export const GlPeriodStatus: {
-    readonly "open": "open";
-    readonly "closed": "closed";
-    readonly "locked": "locked";
+    readonly open: "open";
+    readonly closed: "closed";
+    readonly locked: "locked";
   } = {
-    "open": "open",
-    "closed": "closed",
-    "locked": "locked",
+    open: "open",
+    closed: "closed",
+    locked: "locked",
   };
 
   export type GlPeriodStatus = (typeof GlPeriodStatus)[keyof typeof GlPeriodStatus];
 
   export const GoalCategory: {
-    readonly "revenue": "revenue";
-    readonly "bookings": "bookings";
-    readonly "guests": "guests";
-    readonly "satisfaction": "satisfaction";
+    readonly revenue: "revenue";
+    readonly bookings: "bookings";
+    readonly guests: "guests";
+    readonly satisfaction: "satisfaction";
   } = {
-    "revenue": "revenue",
-    "bookings": "bookings",
-    "guests": "guests",
-    "satisfaction": "satisfaction",
+    revenue: "revenue",
+    bookings: "bookings",
+    guests: "guests",
+    satisfaction: "satisfaction",
   };
 
   export type GoalCategory = (typeof GoalCategory)[keyof typeof GoalCategory];
 
   export const GoalStatus: {
-    readonly "on_track": "on_track";
-    readonly "at_risk": "at_risk";
-    readonly "behind": "behind";
-    readonly "achieved": "achieved";
+    readonly on_track: "on_track";
+    readonly at_risk: "at_risk";
+    readonly behind: "behind";
+    readonly achieved: "achieved";
   } = {
-    "on_track": "on_track",
-    "at_risk": "at_risk",
-    "behind": "behind",
-    "achieved": "achieved",
+    on_track: "on_track",
+    at_risk: "at_risk",
+    behind: "behind",
+    achieved: "achieved",
   };
 
   export type GoalStatus = (typeof GoalStatus)[keyof typeof GoalStatus];
 
   export const GoalUnit: {
-    readonly "currency": "currency";
-    readonly "percentage": "percentage";
-    readonly "number": "number";
-    readonly "score": "score";
+    readonly currency: "currency";
+    readonly percentage: "percentage";
+    readonly number: "number";
+    readonly score: "score";
   } = {
-    "currency": "currency",
-    "percentage": "percentage",
-    "number": "number",
-    "score": "score",
+    currency: "currency",
+    percentage: "percentage",
+    number: "number",
+    score: "score",
   };
 
   export type GoalUnit = (typeof GoalUnit)[keyof typeof GoalUnit];
 
   export const GroupRole: {
-    readonly "primary": "primary";
-    readonly "member": "member";
+    readonly primary: "primary";
+    readonly member: "member";
   } = {
-    "primary": "primary",
-    "member": "member",
+    primary: "primary",
+    member: "member",
   };
 
   export type GroupRole = (typeof GroupRole)[keyof typeof GroupRole];
 
   export const GuaranteeType: {
-    readonly "unconditional": "unconditional";
-    readonly "conditional": "conditional";
-    readonly "performance": "performance";
-    readonly "satisfaction": "satisfaction";
-    readonly "weather": "weather";
-    readonly "best_price": "best_price";
+    readonly unconditional: "unconditional";
+    readonly conditional: "conditional";
+    readonly performance: "performance";
+    readonly satisfaction: "satisfaction";
+    readonly weather: "weather";
+    readonly best_price: "best_price";
   } = {
-    "unconditional": "unconditional",
-    "conditional": "conditional",
-    "performance": "performance",
-    "satisfaction": "satisfaction",
-    "weather": "weather",
-    "best_price": "best_price",
+    unconditional: "unconditional",
+    conditional: "conditional",
+    performance: "performance",
+    satisfaction: "satisfaction",
+    weather: "weather",
+    best_price: "best_price",
   };
 
   export type GuaranteeType = (typeof GuaranteeType)[keyof typeof GuaranteeType];
 
   export const HousekeepingStatus: {
-    readonly "vacant_dirty": "vacant_dirty";
-    readonly "cleaning_in_progress": "cleaning_in_progress";
-    readonly "pending_inspection": "pending_inspection";
-    readonly "inspection_failed": "inspection_failed";
-    readonly "vacant_clean": "vacant_clean";
-    readonly "vacant_inspected": "vacant_inspected";
-    readonly "occupied": "occupied";
-    readonly "occupied_service": "occupied_service";
-    readonly "occupied_dnd": "occupied_dnd";
-    readonly "out_of_order": "out_of_order";
-    readonly "out_of_inventory": "out_of_inventory";
+    readonly vacant_dirty: "vacant_dirty";
+    readonly cleaning_in_progress: "cleaning_in_progress";
+    readonly pending_inspection: "pending_inspection";
+    readonly inspection_failed: "inspection_failed";
+    readonly vacant_clean: "vacant_clean";
+    readonly vacant_inspected: "vacant_inspected";
+    readonly occupied: "occupied";
+    readonly occupied_service: "occupied_service";
+    readonly occupied_dnd: "occupied_dnd";
+    readonly out_of_order: "out_of_order";
+    readonly out_of_inventory: "out_of_inventory";
   } = {
-    "vacant_dirty": "vacant_dirty",
-    "cleaning_in_progress": "cleaning_in_progress",
-    "pending_inspection": "pending_inspection",
-    "inspection_failed": "inspection_failed",
-    "vacant_clean": "vacant_clean",
-    "vacant_inspected": "vacant_inspected",
-    "occupied": "occupied",
-    "occupied_service": "occupied_service",
-    "occupied_dnd": "occupied_dnd",
-    "out_of_order": "out_of_order",
-    "out_of_inventory": "out_of_inventory",
+    vacant_dirty: "vacant_dirty",
+    cleaning_in_progress: "cleaning_in_progress",
+    pending_inspection: "pending_inspection",
+    inspection_failed: "inspection_failed",
+    vacant_clean: "vacant_clean",
+    vacant_inspected: "vacant_inspected",
+    occupied: "occupied",
+    occupied_service: "occupied_service",
+    occupied_dnd: "occupied_dnd",
+    out_of_order: "out_of_order",
+    out_of_inventory: "out_of_inventory",
   };
 
   export type HousekeepingStatus = (typeof HousekeepingStatus)[keyof typeof HousekeepingStatus];
 
   export const IdVerificationStatus: {
-    readonly "pending": "pending";
-    readonly "verified": "verified";
-    readonly "failed": "failed";
-    readonly "expired": "expired";
+    readonly pending: "pending";
+    readonly verified: "verified";
+    readonly failed: "failed";
+    readonly expired: "expired";
   } = {
-    "pending": "pending",
-    "verified": "verified",
-    "failed": "failed",
-    "expired": "expired",
+    pending: "pending",
+    verified: "verified",
+    failed: "failed",
+    expired: "expired",
   };
 
-  export type IdVerificationStatus = (typeof IdVerificationStatus)[keyof typeof IdVerificationStatus];
+  export type IdVerificationStatus =
+    (typeof IdVerificationStatus)[keyof typeof IdVerificationStatus];
 
   export const IdempotencyStatus: {
-    readonly "pending": "pending";
-    readonly "inflight": "inflight";
-    readonly "succeeded": "succeeded";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly inflight: "inflight";
+    readonly succeeded: "succeeded";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "inflight": "inflight",
-    "succeeded": "succeeded",
-    "failed": "failed",
+    pending: "pending",
+    inflight: "inflight",
+    succeeded: "succeeded",
+    failed: "failed",
   };
 
   export type IdempotencyStatus = (typeof IdempotencyStatus)[keyof typeof IdempotencyStatus];
 
   export const IncidentStatus: {
-    readonly "open": "open";
-    readonly "investigating": "investigating";
-    readonly "resolved": "resolved";
-    readonly "closed": "closed";
+    readonly open: "open";
+    readonly investigating: "investigating";
+    readonly resolved: "resolved";
+    readonly closed: "closed";
   } = {
-    "open": "open",
-    "investigating": "investigating",
-    "resolved": "resolved",
-    "closed": "closed",
+    open: "open",
+    investigating: "investigating",
+    resolved: "resolved",
+    closed: "closed",
   };
 
   export type IncidentStatus = (typeof IncidentStatus)[keyof typeof IncidentStatus];
 
   export const IncidentTaskStatus: {
-    readonly "pending": "pending";
-    readonly "in_progress": "in_progress";
-    readonly "done": "done";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly in_progress: "in_progress";
+    readonly done: "done";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "in_progress": "in_progress",
-    "done": "done",
-    "cancelled": "cancelled",
+    pending: "pending",
+    in_progress: "in_progress",
+    done: "done",
+    cancelled: "cancelled",
   };
 
   export type IncidentTaskStatus = (typeof IncidentTaskStatus)[keyof typeof IncidentTaskStatus];
 
   export const IncidentType: {
-    readonly "injury": "injury";
-    readonly "property_damage": "property_damage";
-    readonly "safety": "safety";
-    readonly "security": "security";
-    readonly "near_miss": "near_miss";
-    readonly "environmental": "environmental";
-    readonly "other": "other";
+    readonly injury: "injury";
+    readonly property_damage: "property_damage";
+    readonly safety: "safety";
+    readonly security: "security";
+    readonly near_miss: "near_miss";
+    readonly environmental: "environmental";
+    readonly other: "other";
   } = {
-    "injury": "injury",
-    "property_damage": "property_damage",
-    "safety": "safety",
-    "security": "security",
-    "near_miss": "near_miss",
-    "environmental": "environmental",
-    "other": "other",
+    injury: "injury",
+    property_damage: "property_damage",
+    safety: "safety",
+    security: "security",
+    near_miss: "near_miss",
+    environmental: "environmental",
+    other: "other",
   };
 
   export type IncidentType = (typeof IncidentType)[keyof typeof IncidentType];
 
   export const InventoryTransferStatus: {
-    readonly "pending": "pending";
-    readonly "in_transit": "in_transit";
-    readonly "completed": "completed";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly in_transit: "in_transit";
+    readonly completed: "completed";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "in_transit": "in_transit",
-    "completed": "completed",
-    "cancelled": "cancelled",
+    pending: "pending",
+    in_transit: "in_transit",
+    completed: "completed",
+    cancelled: "cancelled",
   };
 
-  export type InventoryTransferStatus = (typeof InventoryTransferStatus)[keyof typeof InventoryTransferStatus];
+  export type InventoryTransferStatus =
+    (typeof InventoryTransferStatus)[keyof typeof InventoryTransferStatus];
 
   export const IssueCategory: {
-    readonly "database": "database";
-    readonly "frontend": "frontend";
-    readonly "performance": "performance";
-    readonly "security": "security";
-    readonly "api": "api";
-    readonly "infrastructure": "infrastructure";
-    readonly "documentation": "documentation";
-    readonly "other": "other";
+    readonly database: "database";
+    readonly frontend: "frontend";
+    readonly performance: "performance";
+    readonly security: "security";
+    readonly api: "api";
+    readonly infrastructure: "infrastructure";
+    readonly documentation: "documentation";
+    readonly other: "other";
   } = {
-    "database": "database",
-    "frontend": "frontend",
-    "performance": "performance",
-    "security": "security",
-    "api": "api",
-    "infrastructure": "infrastructure",
-    "documentation": "documentation",
-    "other": "other",
+    database: "database",
+    frontend: "frontend",
+    performance: "performance",
+    security: "security",
+    api: "api",
+    infrastructure: "infrastructure",
+    documentation: "documentation",
+    other: "other",
   };
 
   export type IssueCategory = (typeof IssueCategory)[keyof typeof IssueCategory];
 
   export const IssuePriority: {
-    readonly "low": "low";
-    readonly "medium": "medium";
-    readonly "high": "high";
-    readonly "critical": "critical";
+    readonly low: "low";
+    readonly medium: "medium";
+    readonly high: "high";
+    readonly critical: "critical";
   } = {
-    "low": "low",
-    "medium": "medium",
-    "high": "high",
-    "critical": "critical",
+    low: "low",
+    medium: "medium",
+    high: "high",
+    critical: "critical",
   };
 
   export type IssuePriority = (typeof IssuePriority)[keyof typeof IssuePriority];
 
   export const IssueStatus: {
-    readonly "backlog": "backlog";
-    readonly "todo": "todo";
-    readonly "in_progress": "in_progress";
-    readonly "review": "review";
-    readonly "done": "done";
+    readonly backlog: "backlog";
+    readonly todo: "todo";
+    readonly in_progress: "in_progress";
+    readonly review: "review";
+    readonly done: "done";
   } = {
-    "backlog": "backlog",
-    "todo": "todo",
-    "in_progress": "in_progress",
-    "review": "review",
-    "done": "done",
+    backlog: "backlog",
+    todo: "todo",
+    in_progress: "in_progress",
+    review: "review",
+    done: "done",
   };
 
   export type IssueStatus = (typeof IssueStatus)[keyof typeof IssueStatus];
 
   export const LockCodeRotationSchedule: {
-    readonly "none": "none";
-    readonly "daily": "daily";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
-    readonly "per_guest": "per_guest";
+    readonly none: "none";
+    readonly daily: "daily";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
+    readonly per_guest: "per_guest";
   } = {
-    "none": "none",
-    "daily": "daily",
-    "weekly": "weekly",
-    "monthly": "monthly",
-    "per_guest": "per_guest",
+    none: "none",
+    daily: "daily",
+    weekly: "weekly",
+    monthly: "monthly",
+    per_guest: "per_guest",
   };
 
-  export type LockCodeRotationSchedule = (typeof LockCodeRotationSchedule)[keyof typeof LockCodeRotationSchedule];
+  export type LockCodeRotationSchedule =
+    (typeof LockCodeRotationSchedule)[keyof typeof LockCodeRotationSchedule];
 
   export const LockCodeType: {
-    readonly "gate": "gate";
-    readonly "cabin": "cabin";
-    readonly "amenity": "amenity";
-    readonly "wifi": "wifi";
-    readonly "master": "master";
+    readonly gate: "gate";
+    readonly cabin: "cabin";
+    readonly amenity: "amenity";
+    readonly wifi: "wifi";
+    readonly master: "master";
   } = {
-    "gate": "gate",
-    "cabin": "cabin",
-    "amenity": "amenity",
-    "wifi": "wifi",
-    "master": "master",
+    gate: "gate",
+    cabin: "cabin",
+    amenity: "amenity",
+    wifi: "wifi",
+    master: "master",
   };
 
   export type LockCodeType = (typeof LockCodeType)[keyof typeof LockCodeType];
 
   export const MaintenancePriority: {
-    readonly "low": "low";
-    readonly "medium": "medium";
-    readonly "high": "high";
-    readonly "critical": "critical";
+    readonly low: "low";
+    readonly medium: "medium";
+    readonly high: "high";
+    readonly critical: "critical";
   } = {
-    "low": "low",
-    "medium": "medium",
-    "high": "high",
-    "critical": "critical",
+    low: "low",
+    medium: "medium",
+    high: "high",
+    critical: "critical",
   };
 
   export type MaintenancePriority = (typeof MaintenancePriority)[keyof typeof MaintenancePriority];
 
   export const MaintenanceStatus: {
-    readonly "open": "open";
-    readonly "in_progress": "in_progress";
-    readonly "closed": "closed";
+    readonly open: "open";
+    readonly in_progress: "in_progress";
+    readonly closed: "closed";
   } = {
-    "open": "open",
-    "in_progress": "in_progress",
-    "closed": "closed",
+    open: "open",
+    in_progress: "in_progress",
+    closed: "closed",
   };
 
   export type MaintenanceStatus = (typeof MaintenanceStatus)[keyof typeof MaintenanceStatus];
 
   export const MarkdownDiscountType: {
-    readonly "percentage": "percentage";
-    readonly "flat": "flat";
+    readonly percentage: "percentage";
+    readonly flat: "flat";
   } = {
-    "percentage": "percentage",
-    "flat": "flat",
+    percentage: "percentage",
+    flat: "flat",
   };
 
-  export type MarkdownDiscountType = (typeof MarkdownDiscountType)[keyof typeof MarkdownDiscountType];
+  export type MarkdownDiscountType =
+    (typeof MarkdownDiscountType)[keyof typeof MarkdownDiscountType];
 
   export const MarkdownScope: {
-    readonly "all": "all";
-    readonly "category": "category";
-    readonly "product": "product";
+    readonly all: "all";
+    readonly category: "category";
+    readonly product: "product";
   } = {
-    "all": "all",
-    "category": "category",
-    "product": "product",
+    all: "all",
+    category: "category",
+    product: "product",
   };
 
   export type MarkdownScope = (typeof MarkdownScope)[keyof typeof MarkdownScope];
 
   export const NpsInviteStatus: {
-    readonly "queued": "queued";
-    readonly "sent": "sent";
-    readonly "bounced": "bounced";
-    readonly "opened": "opened";
-    readonly "responded": "responded";
-    readonly "expired": "expired";
+    readonly queued: "queued";
+    readonly sent: "sent";
+    readonly bounced: "bounced";
+    readonly opened: "opened";
+    readonly responded: "responded";
+    readonly expired: "expired";
   } = {
-    "queued": "queued",
-    "sent": "sent",
-    "bounced": "bounced",
-    "opened": "opened",
-    "responded": "responded",
-    "expired": "expired",
+    queued: "queued",
+    sent: "sent",
+    bounced: "bounced",
+    opened: "opened",
+    responded: "responded",
+    expired: "expired",
   };
 
   export type NpsInviteStatus = (typeof NpsInviteStatus)[keyof typeof NpsInviteStatus];
 
   export const NpsSurveyStatus: {
-    readonly "draft": "draft";
-    readonly "active": "active";
-    readonly "paused": "paused";
-    readonly "archived": "archived";
+    readonly draft: "draft";
+    readonly active: "active";
+    readonly paused: "paused";
+    readonly archived: "archived";
   } = {
-    "draft": "draft",
-    "active": "active",
-    "paused": "paused",
-    "archived": "archived",
+    draft: "draft",
+    active: "active",
+    paused: "paused",
+    archived: "archived",
   };
 
   export type NpsSurveyStatus = (typeof NpsSurveyStatus)[keyof typeof NpsSurveyStatus];
 
   export const OnboardingStatus: {
-    readonly "pending": "pending";
-    readonly "in_progress": "in_progress";
-    readonly "completed": "completed";
-    readonly "expired": "expired";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly in_progress: "in_progress";
+    readonly completed: "completed";
+    readonly expired: "expired";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "in_progress": "in_progress",
-    "completed": "completed",
-    "expired": "expired",
-    "cancelled": "cancelled",
+    pending: "pending",
+    in_progress: "in_progress",
+    completed: "completed",
+    expired: "expired",
+    cancelled: "cancelled",
   };
 
   export type OnboardingStatus = (typeof OnboardingStatus)[keyof typeof OnboardingStatus];
 
   export const ImportDraftStatus: {
-    readonly "pending_upload": "pending_upload";
-    readonly "pending_classification": "pending_classification";
-    readonly "pending_extraction": "pending_extraction";
-    readonly "extraction_complete": "extraction_complete";
-    readonly "review_in_progress": "review_in_progress";
-    readonly "confirmed": "confirmed";
-    readonly "imported": "imported";
-    readonly "failed": "failed";
-    readonly "expired": "expired";
+    readonly pending_upload: "pending_upload";
+    readonly pending_classification: "pending_classification";
+    readonly pending_extraction: "pending_extraction";
+    readonly extraction_complete: "extraction_complete";
+    readonly review_in_progress: "review_in_progress";
+    readonly confirmed: "confirmed";
+    readonly imported: "imported";
+    readonly failed: "failed";
+    readonly expired: "expired";
   } = {
-    "pending_upload": "pending_upload",
-    "pending_classification": "pending_classification",
-    "pending_extraction": "pending_extraction",
-    "extraction_complete": "extraction_complete",
-    "review_in_progress": "review_in_progress",
-    "confirmed": "confirmed",
-    "imported": "imported",
-    "failed": "failed",
-    "expired": "expired",
+    pending_upload: "pending_upload",
+    pending_classification: "pending_classification",
+    pending_extraction: "pending_extraction",
+    extraction_complete: "extraction_complete",
+    review_in_progress: "review_in_progress",
+    confirmed: "confirmed",
+    imported: "imported",
+    failed: "failed",
+    expired: "expired",
   };
 
   export type ImportDraftStatus = (typeof ImportDraftStatus)[keyof typeof ImportDraftStatus];
 
   export const OnboardingStep: {
-    readonly "park_profile": "park_profile";
-    readonly "operational_hours": "operational_hours";
-    readonly "stripe_connect": "stripe_connect";
-    readonly "inventory_choice": "inventory_choice";
-    readonly "data_import": "data_import";
-    readonly "site_classes": "site_classes";
-    readonly "sites_builder": "sites_builder";
-    readonly "rate_periods": "rate_periods";
-    readonly "rates_setup": "rates_setup";
-    readonly "fees_and_addons": "fees_and_addons";
-    readonly "tax_rules": "tax_rules";
-    readonly "booking_rules": "booking_rules";
-    readonly "deposit_policy": "deposit_policy";
-    readonly "cancellation_rules": "cancellation_rules";
-    readonly "waivers_documents": "waivers_documents";
-    readonly "park_rules": "park_rules";
-    readonly "team_setup": "team_setup";
-    readonly "communication_setup": "communication_setup";
-    readonly "integrations": "integrations";
-    readonly "menu_setup": "menu_setup";
-    readonly "feature_discovery": "feature_discovery";
-    readonly "smart_quiz": "smart_quiz";
-    readonly "feature_triage": "feature_triage";
-    readonly "guided_setup": "guided_setup";
-    readonly "review_launch": "review_launch";
-    readonly "account_profile": "account_profile";
-    readonly "payment_gateway": "payment_gateway";
-    readonly "taxes_and_fees": "taxes_and_fees";
-    readonly "inventory_sites": "inventory_sites";
-    readonly "rates_and_fees": "rates_and_fees";
-    readonly "policies": "policies";
-    readonly "communications_templates": "communications_templates";
-    readonly "pos_hardware": "pos_hardware";
-    readonly "imports": "imports";
+    readonly park_profile: "park_profile";
+    readonly operational_hours: "operational_hours";
+    readonly stripe_connect: "stripe_connect";
+    readonly inventory_choice: "inventory_choice";
+    readonly data_import: "data_import";
+    readonly site_classes: "site_classes";
+    readonly sites_builder: "sites_builder";
+    readonly rate_periods: "rate_periods";
+    readonly rates_setup: "rates_setup";
+    readonly fees_and_addons: "fees_and_addons";
+    readonly tax_rules: "tax_rules";
+    readonly booking_rules: "booking_rules";
+    readonly deposit_policy: "deposit_policy";
+    readonly cancellation_rules: "cancellation_rules";
+    readonly waivers_documents: "waivers_documents";
+    readonly park_rules: "park_rules";
+    readonly team_setup: "team_setup";
+    readonly communication_setup: "communication_setup";
+    readonly integrations: "integrations";
+    readonly menu_setup: "menu_setup";
+    readonly feature_discovery: "feature_discovery";
+    readonly smart_quiz: "smart_quiz";
+    readonly feature_triage: "feature_triage";
+    readonly guided_setup: "guided_setup";
+    readonly review_launch: "review_launch";
+    readonly account_profile: "account_profile";
+    readonly payment_gateway: "payment_gateway";
+    readonly taxes_and_fees: "taxes_and_fees";
+    readonly inventory_sites: "inventory_sites";
+    readonly rates_and_fees: "rates_and_fees";
+    readonly policies: "policies";
+    readonly communications_templates: "communications_templates";
+    readonly pos_hardware: "pos_hardware";
+    readonly imports: "imports";
   } = {
-    "park_profile": "park_profile",
-    "operational_hours": "operational_hours",
-    "stripe_connect": "stripe_connect",
-    "inventory_choice": "inventory_choice",
-    "data_import": "data_import",
-    "site_classes": "site_classes",
-    "sites_builder": "sites_builder",
-    "rate_periods": "rate_periods",
-    "rates_setup": "rates_setup",
-    "fees_and_addons": "fees_and_addons",
-    "tax_rules": "tax_rules",
-    "booking_rules": "booking_rules",
-    "deposit_policy": "deposit_policy",
-    "cancellation_rules": "cancellation_rules",
-    "waivers_documents": "waivers_documents",
-    "park_rules": "park_rules",
-    "team_setup": "team_setup",
-    "communication_setup": "communication_setup",
-    "integrations": "integrations",
-    "menu_setup": "menu_setup",
-    "feature_discovery": "feature_discovery",
-    "smart_quiz": "smart_quiz",
-    "feature_triage": "feature_triage",
-    "guided_setup": "guided_setup",
-    "review_launch": "review_launch",
-    "account_profile": "account_profile",
-    "payment_gateway": "payment_gateway",
-    "taxes_and_fees": "taxes_and_fees",
-    "inventory_sites": "inventory_sites",
-    "rates_and_fees": "rates_and_fees",
-    "policies": "policies",
-    "communications_templates": "communications_templates",
-    "pos_hardware": "pos_hardware",
-    "imports": "imports",
+    park_profile: "park_profile",
+    operational_hours: "operational_hours",
+    stripe_connect: "stripe_connect",
+    inventory_choice: "inventory_choice",
+    data_import: "data_import",
+    site_classes: "site_classes",
+    sites_builder: "sites_builder",
+    rate_periods: "rate_periods",
+    rates_setup: "rates_setup",
+    fees_and_addons: "fees_and_addons",
+    tax_rules: "tax_rules",
+    booking_rules: "booking_rules",
+    deposit_policy: "deposit_policy",
+    cancellation_rules: "cancellation_rules",
+    waivers_documents: "waivers_documents",
+    park_rules: "park_rules",
+    team_setup: "team_setup",
+    communication_setup: "communication_setup",
+    integrations: "integrations",
+    menu_setup: "menu_setup",
+    feature_discovery: "feature_discovery",
+    smart_quiz: "smart_quiz",
+    feature_triage: "feature_triage",
+    guided_setup: "guided_setup",
+    review_launch: "review_launch",
+    account_profile: "account_profile",
+    payment_gateway: "payment_gateway",
+    taxes_and_fees: "taxes_and_fees",
+    inventory_sites: "inventory_sites",
+    rates_and_fees: "rates_and_fees",
+    policies: "policies",
+    communications_templates: "communications_templates",
+    pos_hardware: "pos_hardware",
+    imports: "imports",
   };
 
   export type OnboardingStep = (typeof OnboardingStep)[keyof typeof OnboardingStep];
 
   export const OpBadgeCategory: {
-    readonly "speed": "speed";
-    readonly "volume": "volume";
-    readonly "quality": "quality";
-    readonly "streak": "streak";
-    readonly "teamwork": "teamwork";
-    readonly "milestone": "milestone";
-    readonly "special": "special";
+    readonly speed: "speed";
+    readonly volume: "volume";
+    readonly quality: "quality";
+    readonly streak: "streak";
+    readonly teamwork: "teamwork";
+    readonly milestone: "milestone";
+    readonly special: "special";
   } = {
-    "speed": "speed",
-    "volume": "volume",
-    "quality": "quality",
-    "streak": "streak",
-    "teamwork": "teamwork",
-    "milestone": "milestone",
-    "special": "special",
+    speed: "speed",
+    volume: "volume",
+    quality: "quality",
+    streak: "streak",
+    teamwork: "teamwork",
+    milestone: "milestone",
+    special: "special",
   };
 
   export type OpBadgeCategory = (typeof OpBadgeCategory)[keyof typeof OpBadgeCategory];
 
   export const OpBadgeTier: {
-    readonly "bronze": "bronze";
-    readonly "silver": "silver";
-    readonly "gold": "gold";
-    readonly "platinum": "platinum";
+    readonly bronze: "bronze";
+    readonly silver: "silver";
+    readonly gold: "gold";
+    readonly platinum: "platinum";
   } = {
-    "bronze": "bronze",
-    "silver": "silver",
-    "gold": "gold",
-    "platinum": "platinum",
+    bronze: "bronze",
+    silver: "silver",
+    gold: "gold",
+    platinum: "platinum",
   };
 
   export type OpBadgeTier = (typeof OpBadgeTier)[keyof typeof OpBadgeTier];
 
   export const OpRecurrencePattern: {
-    readonly "daily": "daily";
-    readonly "weekly": "weekly";
-    readonly "biweekly": "biweekly";
-    readonly "monthly": "monthly";
-    readonly "seasonal": "seasonal";
+    readonly daily: "daily";
+    readonly weekly: "weekly";
+    readonly biweekly: "biweekly";
+    readonly monthly: "monthly";
+    readonly seasonal: "seasonal";
   } = {
-    "daily": "daily",
-    "weekly": "weekly",
-    "biweekly": "biweekly",
-    "monthly": "monthly",
-    "seasonal": "seasonal",
+    daily: "daily",
+    weekly: "weekly",
+    biweekly: "biweekly",
+    monthly: "monthly",
+    seasonal: "seasonal",
   };
 
   export type OpRecurrencePattern = (typeof OpRecurrencePattern)[keyof typeof OpRecurrencePattern];
 
   export const OpSlaStatus: {
-    readonly "on_track": "on_track";
-    readonly "at_risk": "at_risk";
-    readonly "breached": "breached";
+    readonly on_track: "on_track";
+    readonly at_risk: "at_risk";
+    readonly breached: "breached";
   } = {
-    "on_track": "on_track",
-    "at_risk": "at_risk",
-    "breached": "breached",
+    on_track: "on_track",
+    at_risk: "at_risk",
+    breached: "breached",
   };
 
   export type OpSlaStatus = (typeof OpSlaStatus)[keyof typeof OpSlaStatus];
 
   export const OpTaskCategory: {
-    readonly "turnover": "turnover";
-    readonly "housekeeping": "housekeeping";
-    readonly "maintenance": "maintenance";
-    readonly "inspection": "inspection";
-    readonly "grounds": "grounds";
-    readonly "pool": "pool";
-    readonly "front_desk": "front_desk";
-    readonly "custom": "custom";
+    readonly turnover: "turnover";
+    readonly housekeeping: "housekeeping";
+    readonly maintenance: "maintenance";
+    readonly inspection: "inspection";
+    readonly grounds: "grounds";
+    readonly pool: "pool";
+    readonly front_desk: "front_desk";
+    readonly custom: "custom";
   } = {
-    "turnover": "turnover",
-    "housekeeping": "housekeeping",
-    "maintenance": "maintenance",
-    "inspection": "inspection",
-    "grounds": "grounds",
-    "pool": "pool",
-    "front_desk": "front_desk",
-    "custom": "custom",
+    turnover: "turnover",
+    housekeeping: "housekeeping",
+    maintenance: "maintenance",
+    inspection: "inspection",
+    grounds: "grounds",
+    pool: "pool",
+    front_desk: "front_desk",
+    custom: "custom",
   };
 
   export type OpTaskCategory = (typeof OpTaskCategory)[keyof typeof OpTaskCategory];
 
   export const OpTaskPriority: {
-    readonly "low": "low";
-    readonly "medium": "medium";
-    readonly "high": "high";
-    readonly "urgent": "urgent";
+    readonly low: "low";
+    readonly medium: "medium";
+    readonly high: "high";
+    readonly urgent: "urgent";
   } = {
-    "low": "low",
-    "medium": "medium",
-    "high": "high",
-    "urgent": "urgent",
+    low: "low",
+    medium: "medium",
+    high: "high",
+    urgent: "urgent",
   };
 
   export type OpTaskPriority = (typeof OpTaskPriority)[keyof typeof OpTaskPriority];
 
   export const OpTaskState: {
-    readonly "pending": "pending";
-    readonly "assigned": "assigned";
-    readonly "in_progress": "in_progress";
-    readonly "blocked": "blocked";
-    readonly "completed": "completed";
-    readonly "verified": "verified";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly assigned: "assigned";
+    readonly in_progress: "in_progress";
+    readonly blocked: "blocked";
+    readonly completed: "completed";
+    readonly verified: "verified";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "assigned": "assigned",
-    "in_progress": "in_progress",
-    "blocked": "blocked",
-    "completed": "completed",
-    "verified": "verified",
-    "cancelled": "cancelled",
+    pending: "pending",
+    assigned: "assigned",
+    in_progress: "in_progress",
+    blocked: "blocked",
+    completed: "completed",
+    verified: "verified",
+    cancelled: "cancelled",
   };
 
   export type OpTaskState = (typeof OpTaskState)[keyof typeof OpTaskState];
 
   export const OpTriggerEvent: {
-    readonly "reservation_checkout": "reservation_checkout";
-    readonly "reservation_checkin": "reservation_checkin";
-    readonly "reservation_created": "reservation_created";
-    readonly "reservation_cancelled": "reservation_cancelled";
-    readonly "reservation_modified": "reservation_modified";
-    readonly "maintenance_reported": "maintenance_reported";
-    readonly "inspection_failed": "inspection_failed";
-    readonly "site_status_changed": "site_status_changed";
-    readonly "manual": "manual";
+    readonly reservation_checkout: "reservation_checkout";
+    readonly reservation_checkin: "reservation_checkin";
+    readonly reservation_created: "reservation_created";
+    readonly reservation_cancelled: "reservation_cancelled";
+    readonly reservation_modified: "reservation_modified";
+    readonly maintenance_reported: "maintenance_reported";
+    readonly inspection_failed: "inspection_failed";
+    readonly site_status_changed: "site_status_changed";
+    readonly manual: "manual";
   } = {
-    "reservation_checkout": "reservation_checkout",
-    "reservation_checkin": "reservation_checkin",
-    "reservation_created": "reservation_created",
-    "reservation_cancelled": "reservation_cancelled",
-    "reservation_modified": "reservation_modified",
-    "maintenance_reported": "maintenance_reported",
-    "inspection_failed": "inspection_failed",
-    "site_status_changed": "site_status_changed",
-    "manual": "manual",
+    reservation_checkout: "reservation_checkout",
+    reservation_checkin: "reservation_checkin",
+    reservation_created: "reservation_created",
+    reservation_cancelled: "reservation_cancelled",
+    reservation_modified: "reservation_modified",
+    maintenance_reported: "maintenance_reported",
+    inspection_failed: "inspection_failed",
+    site_status_changed: "site_status_changed",
+    manual: "manual",
   };
 
   export type OpTriggerEvent = (typeof OpTriggerEvent)[keyof typeof OpTriggerEvent];
 
   export const OrderChannel: {
-    readonly "pos": "pos";
-    readonly "online": "online";
-    readonly "kiosk": "kiosk";
-    readonly "portal": "portal";
-    readonly "internal": "internal";
+    readonly pos: "pos";
+    readonly online: "online";
+    readonly kiosk: "kiosk";
+    readonly portal: "portal";
+    readonly internal: "internal";
   } = {
-    "pos": "pos",
-    "online": "online",
-    "kiosk": "kiosk",
-    "portal": "portal",
-    "internal": "internal",
+    pos: "pos",
+    online: "online",
+    kiosk: "kiosk",
+    portal: "portal",
+    internal: "internal",
   };
 
   export type OrderChannel = (typeof OrderChannel)[keyof typeof OrderChannel];
 
   export const OrderStatus: {
-    readonly "pending": "pending";
-    readonly "ready": "ready";
-    readonly "delivered": "delivered";
-    readonly "completed": "completed";
-    readonly "cancelled": "cancelled";
-    readonly "refunded": "refunded";
+    readonly pending: "pending";
+    readonly ready: "ready";
+    readonly delivered: "delivered";
+    readonly completed: "completed";
+    readonly cancelled: "cancelled";
+    readonly refunded: "refunded";
   } = {
-    "pending": "pending",
-    "ready": "ready",
-    "delivered": "delivered",
-    "completed": "completed",
-    "cancelled": "cancelled",
-    "refunded": "refunded",
+    pending: "pending",
+    ready: "ready",
+    delivered: "delivered",
+    completed: "completed",
+    cancelled: "cancelled",
+    refunded: "refunded",
   };
 
   export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
   export const OrgBillingLineItemType: {
-    readonly "subscription": "subscription";
-    readonly "booking_fee": "booking_fee";
-    readonly "sms_outbound": "sms_outbound";
-    readonly "sms_inbound": "sms_inbound";
-    readonly "ai_usage": "ai_usage";
-    readonly "overage": "overage";
-    readonly "credit": "credit";
-    readonly "discount": "discount";
-    readonly "early_access_discount": "early_access_discount";
+    readonly subscription: "subscription";
+    readonly booking_fee: "booking_fee";
+    readonly sms_outbound: "sms_outbound";
+    readonly sms_inbound: "sms_inbound";
+    readonly ai_usage: "ai_usage";
+    readonly overage: "overage";
+    readonly credit: "credit";
+    readonly discount: "discount";
+    readonly early_access_discount: "early_access_discount";
   } = {
-    "subscription": "subscription",
-    "booking_fee": "booking_fee",
-    "sms_outbound": "sms_outbound",
-    "sms_inbound": "sms_inbound",
-    "ai_usage": "ai_usage",
-    "overage": "overage",
-    "credit": "credit",
-    "discount": "discount",
-    "early_access_discount": "early_access_discount",
+    subscription: "subscription",
+    booking_fee: "booking_fee",
+    sms_outbound: "sms_outbound",
+    sms_inbound: "sms_inbound",
+    ai_usage: "ai_usage",
+    overage: "overage",
+    credit: "credit",
+    discount: "discount",
+    early_access_discount: "early_access_discount",
   };
 
-  export type OrgBillingLineItemType = (typeof OrgBillingLineItemType)[keyof typeof OrgBillingLineItemType];
+  export type OrgBillingLineItemType =
+    (typeof OrgBillingLineItemType)[keyof typeof OrgBillingLineItemType];
 
   export const OrgBillingPeriodStatus: {
-    readonly "open": "open";
-    readonly "processing": "processing";
-    readonly "invoiced": "invoiced";
-    readonly "paid": "paid";
-    readonly "past_due": "past_due";
-    readonly "void": "void";
+    readonly open: "open";
+    readonly processing: "processing";
+    readonly invoiced: "invoiced";
+    readonly paid: "paid";
+    readonly past_due: "past_due";
+    readonly void: "void";
   } = {
-    "open": "open",
-    "processing": "processing",
-    "invoiced": "invoiced",
-    "paid": "paid",
-    "past_due": "past_due",
-    "void": "void",
+    open: "open",
+    processing: "processing",
+    invoiced: "invoiced",
+    paid: "paid",
+    past_due: "past_due",
+    void: "void",
   };
 
-  export type OrgBillingPeriodStatus = (typeof OrgBillingPeriodStatus)[keyof typeof OrgBillingPeriodStatus];
+  export type OrgBillingPeriodStatus =
+    (typeof OrgBillingPeriodStatus)[keyof typeof OrgBillingPeriodStatus];
 
   export const OrgReferralStatus: {
-    readonly "clicked": "clicked";
-    readonly "signed_up": "signed_up";
-    readonly "converted": "converted";
-    readonly "credited": "credited";
+    readonly clicked: "clicked";
+    readonly signed_up: "signed_up";
+    readonly converted: "converted";
+    readonly credited: "credited";
   } = {
-    "clicked": "clicked",
-    "signed_up": "signed_up",
-    "converted": "converted",
-    "credited": "credited",
+    clicked: "clicked",
+    signed_up: "signed_up",
+    converted: "converted",
+    credited: "credited",
   };
 
   export type OrgReferralStatus = (typeof OrgReferralStatus)[keyof typeof OrgReferralStatus];
 
   export const OverrideStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
-    "cancelled": "cancelled",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
+    cancelled: "cancelled",
   };
 
   export type OverrideStatus = (typeof OverrideStatus)[keyof typeof OverrideStatus];
 
   export const OverrideType: {
-    readonly "comp": "comp";
-    readonly "void": "void";
-    readonly "discount": "discount";
+    readonly comp: "comp";
+    readonly void: "void";
+    readonly discount: "discount";
   } = {
-    "comp": "comp",
-    "void": "void",
-    "discount": "discount",
+    comp: "comp",
+    void: "void",
+    discount: "discount",
   };
 
   export type OverrideType = (typeof OverrideType)[keyof typeof OverrideType];
 
   export const PaymentFeeMode: {
-    readonly "absorb": "absorb";
-    readonly "pass_through": "pass_through";
+    readonly absorb: "absorb";
+    readonly pass_through: "pass_through";
   } = {
-    "absorb": "absorb",
-    "pass_through": "pass_through",
+    absorb: "absorb",
+    pass_through: "pass_through",
   };
 
   export type PaymentFeeMode = (typeof PaymentFeeMode)[keyof typeof PaymentFeeMode];
 
   export const PaymentGatewayMode: {
-    readonly "test": "test";
-    readonly "prod": "prod";
+    readonly test: "test";
+    readonly prod: "prod";
   } = {
-    "test": "test",
-    "prod": "prod",
+    test: "test",
+    prod: "prod",
   };
 
   export type PaymentGatewayMode = (typeof PaymentGatewayMode)[keyof typeof PaymentGatewayMode];
 
   export const PaymentGatewayProvider: {
-    readonly "stripe": "stripe";
-    readonly "adyen": "adyen";
-    readonly "authorize_net": "authorize_net";
-    readonly "other": "other";
+    readonly stripe: "stripe";
+    readonly adyen: "adyen";
+    readonly authorize_net: "authorize_net";
+    readonly other: "other";
   } = {
-    "stripe": "stripe",
-    "adyen": "adyen",
-    "authorize_net": "authorize_net",
-    "other": "other",
+    stripe: "stripe",
+    adyen: "adyen",
+    authorize_net: "authorize_net",
+    other: "other",
   };
 
-  export type PaymentGatewayProvider = (typeof PaymentGatewayProvider)[keyof typeof PaymentGatewayProvider];
+  export type PaymentGatewayProvider =
+    (typeof PaymentGatewayProvider)[keyof typeof PaymentGatewayProvider];
 
   export const PaymentMethod: {
-    readonly "card": "card";
-    readonly "cash": "cash";
-    readonly "charge_to_site": "charge_to_site";
+    readonly card: "card";
+    readonly cash: "cash";
+    readonly charge_to_site: "charge_to_site";
   } = {
-    "card": "card",
-    "cash": "cash",
-    "charge_to_site": "charge_to_site",
+    card: "card",
+    cash: "cash",
+    charge_to_site: "charge_to_site",
   };
 
   export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod];
 
   export const PaymentSchedule: {
-    readonly "single": "single";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
-    readonly "as_you_stay": "as_you_stay";
-    readonly "offseason_installments": "offseason_installments";
+    readonly single: "single";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
+    readonly as_you_stay: "as_you_stay";
+    readonly offseason_installments: "offseason_installments";
   } = {
-    "single": "single",
-    "weekly": "weekly",
-    "monthly": "monthly",
-    "as_you_stay": "as_you_stay",
-    "offseason_installments": "offseason_installments",
+    single: "single",
+    weekly: "weekly",
+    monthly: "monthly",
+    as_you_stay: "as_you_stay",
+    offseason_installments: "offseason_installments",
   };
 
   export type PaymentSchedule = (typeof PaymentSchedule)[keyof typeof PaymentSchedule];
 
   export const PayoutReconStatus: {
-    readonly "pending": "pending";
-    readonly "matched": "matched";
-    readonly "drift": "drift";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly matched: "matched";
+    readonly drift: "drift";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "matched": "matched",
-    "drift": "drift",
-    "failed": "failed",
+    pending: "pending",
+    matched: "matched",
+    drift: "drift",
+    failed: "failed",
   };
 
   export type PayoutReconStatus = (typeof PayoutReconStatus)[keyof typeof PayoutReconStatus];
 
   export const PayoutStatus: {
-    readonly "pending": "pending";
-    readonly "in_transit": "in_transit";
-    readonly "paid": "paid";
-    readonly "failed": "failed";
-    readonly "canceled": "canceled";
+    readonly pending: "pending";
+    readonly in_transit: "in_transit";
+    readonly paid: "paid";
+    readonly failed: "failed";
+    readonly canceled: "canceled";
   } = {
-    "pending": "pending",
-    "in_transit": "in_transit",
-    "paid": "paid",
-    "failed": "failed",
-    "canceled": "canceled",
+    pending: "pending",
+    in_transit: "in_transit",
+    paid: "paid",
+    failed: "failed",
+    canceled: "canceled",
   };
 
   export type PayoutStatus = (typeof PayoutStatus)[keyof typeof PayoutStatus];
 
   export const PayrollExportFormat: {
-    readonly "csv": "csv";
-    readonly "json": "json";
+    readonly csv: "csv";
+    readonly json: "json";
   } = {
-    "csv": "csv",
-    "json": "json",
+    csv: "csv",
+    json: "json",
   };
 
   export type PayrollExportFormat = (typeof PayrollExportFormat)[keyof typeof PayrollExportFormat];
 
   export const PayrollExportStatus: {
-    readonly "pending": "pending";
-    readonly "generated": "generated";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly generated: "generated";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "generated": "generated",
-    "failed": "failed",
+    pending: "pending",
+    generated: "generated",
+    failed: "failed",
   };
 
   export type PayrollExportStatus = (typeof PayrollExportStatus)[keyof typeof PayrollExportStatus];
 
   export const PayrollProvider: {
-    readonly "generic": "generic";
-    readonly "onpay": "onpay";
-    readonly "gusto": "gusto";
-    readonly "adp": "adp";
+    readonly generic: "generic";
+    readonly onpay: "onpay";
+    readonly gusto: "gusto";
+    readonly adp: "adp";
   } = {
-    "generic": "generic",
-    "onpay": "onpay",
-    "gusto": "gusto",
-    "adp": "adp",
+    generic: "generic",
+    onpay: "onpay",
+    gusto: "gusto",
+    adp: "adp",
   };
 
   export type PayrollProvider = (typeof PayrollProvider)[keyof typeof PayrollProvider];
 
   export const PermissionEffect: {
-    readonly "allow": "allow";
-    readonly "deny": "deny";
+    readonly allow: "allow";
+    readonly deny: "deny";
   } = {
-    "allow": "allow",
-    "deny": "deny",
+    allow: "allow",
+    deny: "deny",
   };
 
   export type PermissionEffect = (typeof PermissionEffect)[keyof typeof PermissionEffect];
 
   export const PiiClassification: {
-    readonly "basic": "basic";
-    readonly "sensitive": "sensitive";
-    readonly "payment": "payment";
-    readonly "secret": "secret";
+    readonly basic: "basic";
+    readonly sensitive: "sensitive";
+    readonly payment: "payment";
+    readonly secret: "secret";
   } = {
-    "basic": "basic",
-    "sensitive": "sensitive",
-    "payment": "payment",
-    "secret": "secret",
+    basic: "basic",
+    sensitive: "sensitive",
+    payment: "payment",
+    secret: "secret",
   };
 
   export type PiiClassification = (typeof PiiClassification)[keyof typeof PiiClassification];
 
   export const PlatformRole: {
-    readonly "support_agent": "support_agent";
-    readonly "support_lead": "support_lead";
-    readonly "regional_support": "regional_support";
-    readonly "ops_engineer": "ops_engineer";
-    readonly "platform_admin": "platform_admin";
+    readonly support_agent: "support_agent";
+    readonly support_lead: "support_lead";
+    readonly regional_support: "regional_support";
+    readonly ops_engineer: "ops_engineer";
+    readonly platform_admin: "platform_admin";
   } = {
-    "support_agent": "support_agent",
-    "support_lead": "support_lead",
-    "regional_support": "regional_support",
-    "ops_engineer": "ops_engineer",
-    "platform_admin": "platform_admin",
+    support_agent: "support_agent",
+    support_lead: "support_lead",
+    regional_support: "regional_support",
+    ops_engineer: "ops_engineer",
+    platform_admin: "platform_admin",
   };
 
   export type PlatformRole = (typeof PlatformRole)[keyof typeof PlatformRole];
 
   export const PosCartStatus: {
-    readonly "open": "open";
-    readonly "checked_out": "checked_out";
-    readonly "void": "void";
+    readonly open: "open";
+    readonly checked_out: "checked_out";
+    readonly void: "void";
   } = {
-    "open": "open",
-    "checked_out": "checked_out",
-    "void": "void",
+    open: "open",
+    checked_out: "checked_out",
+    void: "void",
   };
 
   export type PosCartStatus = (typeof PosCartStatus)[keyof typeof PosCartStatus];
 
   export const PosIntegrationStatus: {
-    readonly "enabled": "enabled";
-    readonly "disabled": "disabled";
-    readonly "error": "error";
+    readonly enabled: "enabled";
+    readonly disabled: "disabled";
+    readonly error: "error";
   } = {
-    "enabled": "enabled",
-    "disabled": "disabled",
-    "error": "error",
+    enabled: "enabled",
+    disabled: "disabled",
+    error: "error",
   };
 
-  export type PosIntegrationStatus = (typeof PosIntegrationStatus)[keyof typeof PosIntegrationStatus];
+  export type PosIntegrationStatus =
+    (typeof PosIntegrationStatus)[keyof typeof PosIntegrationStatus];
 
   export const PosPaymentMethod: {
-    readonly "card": "card";
-    readonly "cash": "cash";
-    readonly "gift": "gift";
-    readonly "store_credit": "store_credit";
-    readonly "charge_to_site": "charge_to_site";
+    readonly card: "card";
+    readonly cash: "cash";
+    readonly gift: "gift";
+    readonly store_credit: "store_credit";
+    readonly charge_to_site: "charge_to_site";
   } = {
-    "card": "card",
-    "cash": "cash",
-    "gift": "gift",
-    "store_credit": "store_credit",
-    "charge_to_site": "charge_to_site",
+    card: "card",
+    cash: "cash",
+    gift: "gift",
+    store_credit: "store_credit",
+    charge_to_site: "charge_to_site",
   };
 
   export type PosPaymentMethod = (typeof PosPaymentMethod)[keyof typeof PosPaymentMethod];
 
   export const PosPaymentStatus: {
-    readonly "pending": "pending";
-    readonly "succeeded": "succeeded";
-    readonly "failed": "failed";
-    readonly "refunded": "refunded";
+    readonly pending: "pending";
+    readonly succeeded: "succeeded";
+    readonly failed: "failed";
+    readonly refunded: "refunded";
   } = {
-    "pending": "pending",
-    "succeeded": "succeeded",
-    "failed": "failed",
-    "refunded": "refunded",
+    pending: "pending",
+    succeeded: "succeeded",
+    failed: "failed",
+    refunded: "refunded",
   };
 
   export type PosPaymentStatus = (typeof PosPaymentStatus)[keyof typeof PosPaymentStatus];
 
   export const PosProviderCapability: {
-    readonly "payments": "payments";
-    readonly "items_sync": "items_sync";
-    readonly "receipts": "receipts";
-    readonly "inventory_push": "inventory_push";
-    readonly "inventory_pull": "inventory_pull";
-    readonly "markdown_sync": "markdown_sync";
-    readonly "expiration_sync": "expiration_sync";
+    readonly payments: "payments";
+    readonly items_sync: "items_sync";
+    readonly receipts: "receipts";
+    readonly inventory_push: "inventory_push";
+    readonly inventory_pull: "inventory_pull";
+    readonly markdown_sync: "markdown_sync";
+    readonly expiration_sync: "expiration_sync";
   } = {
-    "payments": "payments",
-    "items_sync": "items_sync",
-    "receipts": "receipts",
-    "inventory_push": "inventory_push",
-    "inventory_pull": "inventory_pull",
-    "markdown_sync": "markdown_sync",
-    "expiration_sync": "expiration_sync",
+    payments: "payments",
+    items_sync: "items_sync",
+    receipts: "receipts",
+    inventory_push: "inventory_push",
+    inventory_pull: "inventory_pull",
+    markdown_sync: "markdown_sync",
+    expiration_sync: "expiration_sync",
   };
 
-  export type PosProviderCapability = (typeof PosProviderCapability)[keyof typeof PosProviderCapability];
+  export type PosProviderCapability =
+    (typeof PosProviderCapability)[keyof typeof PosProviderCapability];
 
   export const PosProviderType: {
-    readonly "clover": "clover";
-    readonly "square": "square";
-    readonly "toast": "toast";
-    readonly "lightspeed": "lightspeed";
-    readonly "shopify": "shopify";
-    readonly "vend": "vend";
+    readonly clover: "clover";
+    readonly square: "square";
+    readonly toast: "toast";
+    readonly lightspeed: "lightspeed";
+    readonly shopify: "shopify";
+    readonly vend: "vend";
   } = {
-    "clover": "clover",
-    "square": "square",
-    "toast": "toast",
-    "lightspeed": "lightspeed",
-    "shopify": "shopify",
-    "vend": "vend",
+    clover: "clover",
+    square: "square",
+    toast: "toast",
+    lightspeed: "lightspeed",
+    shopify: "shopify",
+    vend: "vend",
   };
 
   export type PosProviderType = (typeof PosProviderType)[keyof typeof PosProviderType];
 
   export const PosReturnStatus: {
-    readonly "pending": "pending";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly completed: "completed";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "completed": "completed",
-    "failed": "failed",
+    pending: "pending",
+    completed: "completed",
+    failed: "failed",
   };
 
   export type PosReturnStatus = (typeof PosReturnStatus)[keyof typeof PosReturnStatus];
 
   export const PosSyncStatus: {
-    readonly "idle": "idle";
-    readonly "running": "running";
-    readonly "succeeded": "succeeded";
-    readonly "failed": "failed";
+    readonly idle: "idle";
+    readonly running: "running";
+    readonly succeeded: "succeeded";
+    readonly failed: "failed";
   } = {
-    "idle": "idle",
-    "running": "running",
-    "succeeded": "succeeded",
-    "failed": "failed",
+    idle: "idle",
+    running: "running",
+    succeeded: "succeeded",
+    failed: "failed",
   };
 
   export type PosSyncStatus = (typeof PosSyncStatus)[keyof typeof PosSyncStatus];
 
   export const PosSyncTarget: {
-    readonly "catalog": "catalog";
-    readonly "tenders": "tenders";
-    readonly "payments": "payments";
-    readonly "inventory": "inventory";
-    readonly "markdowns": "markdowns";
+    readonly catalog: "catalog";
+    readonly tenders: "tenders";
+    readonly payments: "payments";
+    readonly inventory: "inventory";
+    readonly markdowns: "markdowns";
   } = {
-    "catalog": "catalog",
-    "tenders": "tenders",
-    "payments": "payments",
-    "inventory": "inventory",
-    "markdowns": "markdowns",
+    catalog: "catalog",
+    tenders: "tenders",
+    payments: "payments",
+    inventory: "inventory",
+    markdowns: "markdowns",
   };
 
   export type PosSyncTarget = (typeof PosSyncTarget)[keyof typeof PosSyncTarget];
 
   export const PricingRuleType: {
-    readonly "season": "season";
-    readonly "weekend": "weekend";
-    readonly "holiday": "holiday";
-    readonly "event": "event";
-    readonly "demand": "demand";
+    readonly season: "season";
+    readonly weekend: "weekend";
+    readonly holiday: "holiday";
+    readonly event: "event";
+    readonly demand: "demand";
   } = {
-    "season": "season",
-    "weekend": "weekend",
-    "holiday": "holiday",
-    "event": "event",
-    "demand": "demand",
+    season: "season",
+    weekend: "weekend",
+    holiday: "holiday",
+    event: "event",
+    demand: "demand",
   };
 
   export type PricingRuleType = (typeof PricingRuleType)[keyof typeof PricingRuleType];
 
   export const PricingStackMode: {
-    readonly "additive": "additive";
-    readonly "max": "max";
-    readonly "override": "override";
+    readonly additive: "additive";
+    readonly max: "max";
+    readonly override: "override";
   } = {
-    "additive": "additive",
-    "max": "max",
-    "override": "override",
+    additive: "additive",
+    max: "max",
+    override: "override",
   };
 
   export type PricingStackMode = (typeof PricingStackMode)[keyof typeof PricingStackMode];
 
   export const PricingStructure: {
-    readonly "per_night": "per_night";
-    readonly "flat_week": "flat_week";
-    readonly "flat_month": "flat_month";
-    readonly "flat_season": "flat_season";
+    readonly per_night: "per_night";
+    readonly flat_week: "flat_week";
+    readonly flat_month: "flat_month";
+    readonly flat_season: "flat_season";
   } = {
-    "per_night": "per_night",
-    "flat_week": "flat_week",
-    "flat_month": "flat_month",
-    "flat_season": "flat_season",
+    per_night: "per_night",
+    flat_week: "flat_week",
+    flat_month: "flat_month",
+    flat_season: "flat_season",
   };
 
   export type PricingStructure = (typeof PricingStructure)[keyof typeof PricingStructure];
 
   export const ProductInventoryMode: {
-    readonly "shared": "shared";
-    readonly "per_location": "per_location";
+    readonly shared: "shared";
+    readonly per_location: "per_location";
   } = {
-    "shared": "shared",
-    "per_location": "per_location",
+    shared: "shared",
+    per_location: "per_location",
   };
 
-  export type ProductInventoryMode = (typeof ProductInventoryMode)[keyof typeof ProductInventoryMode];
+  export type ProductInventoryMode =
+    (typeof ProductInventoryMode)[keyof typeof ProductInventoryMode];
 
   export const PromotionType: {
-    readonly "percentage": "percentage";
-    readonly "flat": "flat";
+    readonly percentage: "percentage";
+    readonly flat: "flat";
   } = {
-    "percentage": "percentage",
-    "flat": "flat",
+    percentage: "percentage",
+    flat: "flat",
   };
 
   export type PromotionType = (typeof PromotionType)[keyof typeof PromotionType];
 
   export const PushNotificationType: {
-    readonly "arrival": "arrival";
-    readonly "departure": "departure";
-    readonly "task_assigned": "task_assigned";
-    readonly "task_sla_warning": "task_sla_warning";
-    readonly "maintenance_urgent": "maintenance_urgent";
-    readonly "payment_received": "payment_received";
-    readonly "payment_failed": "payment_failed";
-    readonly "message_received": "message_received";
-    readonly "general": "general";
+    readonly arrival: "arrival";
+    readonly departure: "departure";
+    readonly task_assigned: "task_assigned";
+    readonly task_sla_warning: "task_sla_warning";
+    readonly maintenance_urgent: "maintenance_urgent";
+    readonly payment_received: "payment_received";
+    readonly payment_failed: "payment_failed";
+    readonly message_received: "message_received";
+    readonly general: "general";
   } = {
-    "arrival": "arrival",
-    "departure": "departure",
-    "task_assigned": "task_assigned",
-    "task_sla_warning": "task_sla_warning",
-    "maintenance_urgent": "maintenance_urgent",
-    "payment_received": "payment_received",
-    "payment_failed": "payment_failed",
-    "message_received": "message_received",
-    "general": "general",
+    arrival: "arrival",
+    departure: "departure",
+    task_assigned: "task_assigned",
+    task_sla_warning: "task_sla_warning",
+    maintenance_urgent: "maintenance_urgent",
+    payment_received: "payment_received",
+    payment_failed: "payment_failed",
+    message_received: "message_received",
+    general: "general",
   };
 
-  export type PushNotificationType = (typeof PushNotificationType)[keyof typeof PushNotificationType];
+  export type PushNotificationType =
+    (typeof PushNotificationType)[keyof typeof PushNotificationType];
 
   export const RateParityAlertStatus: {
-    readonly "active": "active";
-    readonly "acknowledged": "acknowledged";
-    readonly "resolved": "resolved";
+    readonly active: "active";
+    readonly acknowledged: "acknowledged";
+    readonly resolved: "resolved";
   } = {
-    "active": "active",
-    "acknowledged": "acknowledged",
-    "resolved": "resolved",
+    active: "active",
+    acknowledged: "acknowledged",
+    resolved: "resolved",
   };
 
-  export type RateParityAlertStatus = (typeof RateParityAlertStatus)[keyof typeof RateParityAlertStatus];
+  export type RateParityAlertStatus =
+    (typeof RateParityAlertStatus)[keyof typeof RateParityAlertStatus];
 
   export const RateType: {
-    readonly "nightly": "nightly";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
-    readonly "seasonal": "seasonal";
+    readonly nightly: "nightly";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
+    readonly seasonal: "seasonal";
   } = {
-    "nightly": "nightly",
-    "weekly": "weekly",
-    "monthly": "monthly",
-    "seasonal": "seasonal",
+    nightly: "nightly",
+    weekly: "weekly",
+    monthly: "monthly",
+    seasonal: "seasonal",
   };
 
   export type RateType = (typeof RateType)[keyof typeof RateType];
 
   export const RecurrencePatternType: {
-    readonly "none": "none";
-    readonly "daily": "daily";
-    readonly "weekly": "weekly";
-    readonly "biweekly": "biweekly";
-    readonly "monthly": "monthly";
+    readonly none: "none";
+    readonly daily: "daily";
+    readonly weekly: "weekly";
+    readonly biweekly: "biweekly";
+    readonly monthly: "monthly";
   } = {
-    "none": "none",
-    "daily": "daily",
-    "weekly": "weekly",
-    "biweekly": "biweekly",
-    "monthly": "monthly",
+    none: "none",
+    daily: "daily",
+    weekly: "weekly",
+    biweekly: "biweekly",
+    monthly: "monthly",
   };
 
-  export type RecurrencePatternType = (typeof RecurrencePatternType)[keyof typeof RecurrencePatternType];
+  export type RecurrencePatternType =
+    (typeof RecurrencePatternType)[keyof typeof RecurrencePatternType];
 
   export const RedactionMode: {
-    readonly "mask": "mask";
-    readonly "remove": "remove";
+    readonly mask: "mask";
+    readonly remove: "remove";
   } = {
-    "mask": "mask",
-    "remove": "remove",
+    mask: "mask",
+    remove: "remove",
   };
 
   export type RedactionMode = (typeof RedactionMode)[keyof typeof RedactionMode];
 
   export const ReferralIncentiveType: {
-    readonly "percent_discount": "percent_discount";
-    readonly "amount_discount": "amount_discount";
-    readonly "credit": "credit";
+    readonly percent_discount: "percent_discount";
+    readonly amount_discount: "amount_discount";
+    readonly credit: "credit";
   } = {
-    "percent_discount": "percent_discount",
-    "amount_discount": "amount_discount",
-    "credit": "credit",
+    percent_discount: "percent_discount",
+    amount_discount: "amount_discount",
+    credit: "credit",
   };
 
-  export type ReferralIncentiveType = (typeof ReferralIncentiveType)[keyof typeof ReferralIncentiveType];
+  export type ReferralIncentiveType =
+    (typeof ReferralIncentiveType)[keyof typeof ReferralIncentiveType];
 
   export const RenewalIntent: {
-    readonly "committed": "committed";
-    readonly "likely": "likely";
-    readonly "undecided": "undecided";
-    readonly "not_renewing": "not_renewing";
+    readonly committed: "committed";
+    readonly likely: "likely";
+    readonly undecided: "undecided";
+    readonly not_renewing: "not_renewing";
   } = {
-    "committed": "committed",
-    "likely": "likely",
-    "undecided": "undecided",
-    "not_renewing": "not_renewing",
+    committed: "committed",
+    likely: "likely",
+    undecided: "undecided",
+    not_renewing: "not_renewing",
   };
 
   export type RenewalIntent = (typeof RenewalIntent)[keyof typeof RenewalIntent];
 
   export const ReportFrequency: {
-    readonly "daily": "daily";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
+    readonly daily: "daily";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
   } = {
-    "daily": "daily",
-    "weekly": "weekly",
-    "monthly": "monthly",
+    daily: "daily",
+    weekly: "weekly",
+    monthly: "monthly",
   };
 
   export type ReportFrequency = (typeof ReportFrequency)[keyof typeof ReportFrequency];
 
   export const ReportScheduleFrequency: {
-    readonly "daily": "daily";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
-    readonly "quarterly": "quarterly";
+    readonly daily: "daily";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
+    readonly quarterly: "quarterly";
   } = {
-    "daily": "daily",
-    "weekly": "weekly",
-    "monthly": "monthly",
-    "quarterly": "quarterly",
+    daily: "daily",
+    weekly: "weekly",
+    monthly: "monthly",
+    quarterly: "quarterly",
   };
 
-  export type ReportScheduleFrequency = (typeof ReportScheduleFrequency)[keyof typeof ReportScheduleFrequency];
+  export type ReportScheduleFrequency =
+    (typeof ReportScheduleFrequency)[keyof typeof ReportScheduleFrequency];
 
   export const ReportType: {
-    readonly "occupancy_summary": "occupancy_summary";
-    readonly "revenue_summary": "revenue_summary";
-    readonly "arrivals_departures": "arrivals_departures";
-    readonly "maintenance_summary": "maintenance_summary";
-    readonly "reservation_activity": "reservation_activity";
-    readonly "guest_activity": "guest_activity";
-    readonly "financial_summary": "financial_summary";
+    readonly occupancy_summary: "occupancy_summary";
+    readonly revenue_summary: "revenue_summary";
+    readonly arrivals_departures: "arrivals_departures";
+    readonly maintenance_summary: "maintenance_summary";
+    readonly reservation_activity: "reservation_activity";
+    readonly guest_activity: "guest_activity";
+    readonly financial_summary: "financial_summary";
   } = {
-    "occupancy_summary": "occupancy_summary",
-    "revenue_summary": "revenue_summary",
-    "arrivals_departures": "arrivals_departures",
-    "maintenance_summary": "maintenance_summary",
-    "reservation_activity": "reservation_activity",
-    "guest_activity": "guest_activity",
-    "financial_summary": "financial_summary",
+    occupancy_summary: "occupancy_summary",
+    revenue_summary: "revenue_summary",
+    arrivals_departures: "arrivals_departures",
+    maintenance_summary: "maintenance_summary",
+    reservation_activity: "reservation_activity",
+    guest_activity: "guest_activity",
+    financial_summary: "financial_summary",
   };
 
   export type ReportType = (typeof ReportType)[keyof typeof ReportType];
 
   export const ReservationStatus: {
-    readonly "pending": "pending";
-    readonly "confirmed": "confirmed";
-    readonly "checked_in": "checked_in";
-    readonly "checked_out": "checked_out";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly confirmed: "confirmed";
+    readonly checked_in: "checked_in";
+    readonly checked_out: "checked_out";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "confirmed": "confirmed",
-    "checked_in": "checked_in",
-    "checked_out": "checked_out",
-    "cancelled": "cancelled",
+    pending: "pending",
+    confirmed: "confirmed",
+    checked_in: "checked_in",
+    checked_out: "checked_out",
+    cancelled: "cancelled",
   };
 
   export type ReservationStatus = (typeof ReservationStatus)[keyof typeof ReservationStatus];
 
   export const ReviewExposure: {
-    readonly "private": "private";
-    readonly "public": "public";
+    readonly private: "private";
+    readonly public: "public";
   } = {
-    "private": "private",
-    "public": "public",
+    private: "private",
+    public: "public",
   };
 
   export type ReviewExposure = (typeof ReviewExposure)[keyof typeof ReviewExposure];
 
   export const ReviewModerationStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
   };
 
-  export type ReviewModerationStatus = (typeof ReviewModerationStatus)[keyof typeof ReviewModerationStatus];
+  export type ReviewModerationStatus =
+    (typeof ReviewModerationStatus)[keyof typeof ReviewModerationStatus];
 
   export const ReviewSource: {
-    readonly "onsite": "onsite";
-    readonly "email": "email";
-    readonly "sms": "sms";
-    readonly "kiosk": "kiosk";
-    readonly "import": "import";
+    readonly onsite: "onsite";
+    readonly email: "email";
+    readonly sms: "sms";
+    readonly kiosk: "kiosk";
+    readonly import: "import";
   } = {
-    "onsite": "onsite",
-    "email": "email",
-    "sms": "sms",
-    "kiosk": "kiosk",
-    "import": "import",
+    onsite: "onsite",
+    email: "email",
+    sms: "sms",
+    kiosk: "kiosk",
+    import: "import",
   };
 
   export type ReviewSource = (typeof ReviewSource)[keyof typeof ReviewSource];
 
   export const ReviewStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
-    readonly "removed": "removed";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
+    readonly removed: "removed";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
-    "removed": "removed",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
+    removed: "removed",
   };
 
   export type ReviewStatus = (typeof ReviewStatus)[keyof typeof ReviewStatus];
 
   export const ReviewVoteValue: {
-    readonly "helpful": "helpful";
-    readonly "not_helpful": "not_helpful";
+    readonly helpful: "helpful";
+    readonly not_helpful: "not_helpful";
   } = {
-    "helpful": "helpful",
-    "not_helpful": "not_helpful",
+    helpful: "helpful",
+    not_helpful: "not_helpful",
   };
 
   export type ReviewVoteValue = (typeof ReviewVoteValue)[keyof typeof ReviewVoteValue];
 
   export const SeasonalBillingFrequency: {
-    readonly "monthly": "monthly";
-    readonly "biweekly": "biweekly";
-    readonly "semi_monthly": "semi_monthly";
-    readonly "quarterly": "quarterly";
-    readonly "semi_annual": "semi_annual";
-    readonly "seasonal": "seasonal";
-    readonly "deposit_plus_monthly": "deposit_plus_monthly";
-    readonly "offseason_installments": "offseason_installments";
-    readonly "custom": "custom";
+    readonly monthly: "monthly";
+    readonly biweekly: "biweekly";
+    readonly semi_monthly: "semi_monthly";
+    readonly quarterly: "quarterly";
+    readonly semi_annual: "semi_annual";
+    readonly seasonal: "seasonal";
+    readonly deposit_plus_monthly: "deposit_plus_monthly";
+    readonly offseason_installments: "offseason_installments";
+    readonly custom: "custom";
   } = {
-    "monthly": "monthly",
-    "biweekly": "biweekly",
-    "semi_monthly": "semi_monthly",
-    "quarterly": "quarterly",
-    "semi_annual": "semi_annual",
-    "seasonal": "seasonal",
-    "deposit_plus_monthly": "deposit_plus_monthly",
-    "offseason_installments": "offseason_installments",
-    "custom": "custom",
+    monthly: "monthly",
+    biweekly: "biweekly",
+    semi_monthly: "semi_monthly",
+    quarterly: "quarterly",
+    semi_annual: "semi_annual",
+    seasonal: "seasonal",
+    deposit_plus_monthly: "deposit_plus_monthly",
+    offseason_installments: "offseason_installments",
+    custom: "custom",
   };
 
-  export type SeasonalBillingFrequency = (typeof SeasonalBillingFrequency)[keyof typeof SeasonalBillingFrequency];
+  export type SeasonalBillingFrequency =
+    (typeof SeasonalBillingFrequency)[keyof typeof SeasonalBillingFrequency];
 
   export const SeasonalDiscountCondition: {
-    readonly "metered_utilities": "metered_utilities";
-    readonly "pay_in_full": "pay_in_full";
-    readonly "payment_method": "payment_method";
-    readonly "early_bird": "early_bird";
-    readonly "returning_guest": "returning_guest";
-    readonly "tenure_years": "tenure_years";
-    readonly "site_class": "site_class";
-    readonly "referral": "referral";
-    readonly "military": "military";
-    readonly "senior": "senior";
-    readonly "custom": "custom";
+    readonly metered_utilities: "metered_utilities";
+    readonly pay_in_full: "pay_in_full";
+    readonly payment_method: "payment_method";
+    readonly early_bird: "early_bird";
+    readonly returning_guest: "returning_guest";
+    readonly tenure_years: "tenure_years";
+    readonly site_class: "site_class";
+    readonly referral: "referral";
+    readonly military: "military";
+    readonly senior: "senior";
+    readonly custom: "custom";
   } = {
-    "metered_utilities": "metered_utilities",
-    "pay_in_full": "pay_in_full",
-    "payment_method": "payment_method",
-    "early_bird": "early_bird",
-    "returning_guest": "returning_guest",
-    "tenure_years": "tenure_years",
-    "site_class": "site_class",
-    "referral": "referral",
-    "military": "military",
-    "senior": "senior",
-    "custom": "custom",
+    metered_utilities: "metered_utilities",
+    pay_in_full: "pay_in_full",
+    payment_method: "payment_method",
+    early_bird: "early_bird",
+    returning_guest: "returning_guest",
+    tenure_years: "tenure_years",
+    site_class: "site_class",
+    referral: "referral",
+    military: "military",
+    senior: "senior",
+    custom: "custom",
   };
 
-  export type SeasonalDiscountCondition = (typeof SeasonalDiscountCondition)[keyof typeof SeasonalDiscountCondition];
+  export type SeasonalDiscountCondition =
+    (typeof SeasonalDiscountCondition)[keyof typeof SeasonalDiscountCondition];
 
   export const SeasonalDiscountType: {
-    readonly "fixed_amount": "fixed_amount";
-    readonly "percentage": "percentage";
-    readonly "per_month": "per_month";
+    readonly fixed_amount: "fixed_amount";
+    readonly percentage: "percentage";
+    readonly per_month: "per_month";
   } = {
-    "fixed_amount": "fixed_amount",
-    "percentage": "percentage",
-    "per_month": "per_month",
+    fixed_amount: "fixed_amount",
+    percentage: "percentage",
+    per_month: "per_month",
   };
 
-  export type SeasonalDiscountType = (typeof SeasonalDiscountType)[keyof typeof SeasonalDiscountType];
+  export type SeasonalDiscountType =
+    (typeof SeasonalDiscountType)[keyof typeof SeasonalDiscountType];
 
   export const SeasonalIncentiveType: {
-    readonly "guest_passes": "guest_passes";
-    readonly "store_credit": "store_credit";
-    readonly "free_nights": "free_nights";
-    readonly "early_site_selection": "early_site_selection";
-    readonly "rate_lock": "rate_lock";
-    readonly "amenity_access": "amenity_access";
-    readonly "custom": "custom";
+    readonly guest_passes: "guest_passes";
+    readonly store_credit: "store_credit";
+    readonly free_nights: "free_nights";
+    readonly early_site_selection: "early_site_selection";
+    readonly rate_lock: "rate_lock";
+    readonly amenity_access: "amenity_access";
+    readonly custom: "custom";
   } = {
-    "guest_passes": "guest_passes",
-    "store_credit": "store_credit",
-    "free_nights": "free_nights",
-    "early_site_selection": "early_site_selection",
-    "rate_lock": "rate_lock",
-    "amenity_access": "amenity_access",
-    "custom": "custom",
+    guest_passes: "guest_passes",
+    store_credit: "store_credit",
+    free_nights: "free_nights",
+    early_site_selection: "early_site_selection",
+    rate_lock: "rate_lock",
+    amenity_access: "amenity_access",
+    custom: "custom",
   };
 
-  export type SeasonalIncentiveType = (typeof SeasonalIncentiveType)[keyof typeof SeasonalIncentiveType];
+  export type SeasonalIncentiveType =
+    (typeof SeasonalIncentiveType)[keyof typeof SeasonalIncentiveType];
 
   export const SeasonalPaymentMethod: {
-    readonly "check": "check";
-    readonly "cash": "cash";
-    readonly "card": "card";
-    readonly "ach": "ach";
-    readonly "autopay": "autopay";
+    readonly check: "check";
+    readonly cash: "cash";
+    readonly card: "card";
+    readonly ach: "ach";
+    readonly autopay: "autopay";
   } = {
-    "check": "check",
-    "cash": "cash",
-    "card": "card",
-    "ach": "ach",
-    "autopay": "autopay",
+    check: "check",
+    cash: "cash",
+    card: "card",
+    ach: "ach",
+    autopay: "autopay",
   };
 
-  export type SeasonalPaymentMethod = (typeof SeasonalPaymentMethod)[keyof typeof SeasonalPaymentMethod];
+  export type SeasonalPaymentMethod =
+    (typeof SeasonalPaymentMethod)[keyof typeof SeasonalPaymentMethod];
 
   export const SeasonalPaymentStatus: {
-    readonly "scheduled": "scheduled";
-    readonly "due": "due";
-    readonly "past_due": "past_due";
-    readonly "paid": "paid";
-    readonly "partial": "partial";
-    readonly "waived": "waived";
+    readonly scheduled: "scheduled";
+    readonly due: "due";
+    readonly past_due: "past_due";
+    readonly paid: "paid";
+    readonly partial: "partial";
+    readonly waived: "waived";
   } = {
-    "scheduled": "scheduled",
-    "due": "due",
-    "past_due": "past_due",
-    "paid": "paid",
-    "partial": "partial",
-    "waived": "waived",
+    scheduled: "scheduled",
+    due: "due",
+    past_due: "past_due",
+    paid: "paid",
+    partial: "partial",
+    waived: "waived",
   };
 
-  export type SeasonalPaymentStatus = (typeof SeasonalPaymentStatus)[keyof typeof SeasonalPaymentStatus];
+  export type SeasonalPaymentStatus =
+    (typeof SeasonalPaymentStatus)[keyof typeof SeasonalPaymentStatus];
 
   export const SeasonalStatus: {
-    readonly "active": "active";
-    readonly "pending_renewal": "pending_renewal";
-    readonly "not_renewing": "not_renewing";
-    readonly "departed": "departed";
-    readonly "waitlist": "waitlist";
+    readonly active: "active";
+    readonly pending_renewal: "pending_renewal";
+    readonly not_renewing: "not_renewing";
+    readonly departed: "departed";
+    readonly waitlist: "waitlist";
   } = {
-    "active": "active",
-    "pending_renewal": "pending_renewal",
-    "not_renewing": "not_renewing",
-    "departed": "departed",
-    "waitlist": "waitlist",
+    active: "active",
+    pending_renewal: "pending_renewal",
+    not_renewing: "not_renewing",
+    departed: "departed",
+    waitlist: "waitlist",
   };
 
   export type SeasonalStatus = (typeof SeasonalStatus)[keyof typeof SeasonalStatus];
 
   export const SegmentScope: {
-    readonly "global": "global";
-    readonly "organization": "organization";
-    readonly "campground": "campground";
+    readonly global: "global";
+    readonly organization: "organization";
+    readonly campground: "campground";
   } = {
-    "global": "global",
-    "organization": "organization",
-    "campground": "campground",
+    global: "global",
+    organization: "organization",
+    campground: "campground",
   };
 
   export type SegmentScope = (typeof SegmentScope)[keyof typeof SegmentScope];
 
   export const SegmentStatus: {
-    readonly "active": "active";
-    readonly "archived": "archived";
+    readonly active: "active";
+    readonly archived: "archived";
   } = {
-    "active": "active",
-    "archived": "archived",
+    active: "active",
+    archived: "archived",
   };
 
   export type SegmentStatus = (typeof SegmentStatus)[keyof typeof SegmentStatus];
 
   export const SenderType: {
-    readonly "guest": "guest";
-    readonly "staff": "staff";
+    readonly guest: "guest";
+    readonly staff: "staff";
   } = {
-    "guest": "guest",
-    "staff": "staff",
+    guest: "guest",
+    staff: "staff",
   };
 
   export type SenderType = (typeof SenderType)[keyof typeof SenderType];
 
   export const SeoLocationType: {
-    readonly "country": "country";
-    readonly "state": "state";
-    readonly "region": "region";
-    readonly "county": "county";
-    readonly "city": "city";
-    readonly "neighborhood": "neighborhood";
-    readonly "attraction": "attraction";
+    readonly country: "country";
+    readonly state: "state";
+    readonly region: "region";
+    readonly county: "county";
+    readonly city: "city";
+    readonly neighborhood: "neighborhood";
+    readonly attraction: "attraction";
   } = {
-    "country": "country",
-    "state": "state",
-    "region": "region",
-    "county": "county",
-    "city": "city",
-    "neighborhood": "neighborhood",
-    "attraction": "attraction",
+    country: "country",
+    state: "state",
+    region: "region",
+    county: "county",
+    city: "city",
+    neighborhood: "neighborhood",
+    attraction: "attraction",
   };
 
   export type SeoLocationType = (typeof SeoLocationType)[keyof typeof SeoLocationType];
 
   export const SetupServiceStatus: {
-    readonly "pending": "pending";
-    readonly "in_progress": "in_progress";
-    readonly "completed": "completed";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly in_progress: "in_progress";
+    readonly completed: "completed";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "in_progress": "in_progress",
-    "completed": "completed",
-    "cancelled": "cancelled",
+    pending: "pending",
+    in_progress: "in_progress",
+    completed: "completed",
+    cancelled: "cancelled",
   };
 
   export type SetupServiceStatus = (typeof SetupServiceStatus)[keyof typeof SetupServiceStatus];
 
   export const SetupServiceType: {
-    readonly "quick_start": "quick_start";
-    readonly "data_import_500": "data_import_500";
-    readonly "data_import_2000": "data_import_2000";
-    readonly "data_import_5000": "data_import_5000";
-    readonly "data_import_custom": "data_import_custom";
+    readonly quick_start: "quick_start";
+    readonly data_import_500: "data_import_500";
+    readonly data_import_2000: "data_import_2000";
+    readonly data_import_5000: "data_import_5000";
+    readonly data_import_custom: "data_import_custom";
   } = {
-    "quick_start": "quick_start",
-    "data_import_500": "data_import_500",
-    "data_import_2000": "data_import_2000",
-    "data_import_5000": "data_import_5000",
-    "data_import_custom": "data_import_custom",
+    quick_start: "quick_start",
+    data_import_500: "data_import_500",
+    data_import_2000: "data_import_2000",
+    data_import_5000: "data_import_5000",
+    data_import_custom: "data_import_custom",
   };
 
   export type SetupServiceType = (typeof SetupServiceType)[keyof typeof SetupServiceType];
 
   export const Severity: {
-    readonly "low": "low";
-    readonly "med": "med";
-    readonly "high": "high";
-    readonly "critical": "critical";
+    readonly low: "low";
+    readonly med: "med";
+    readonly high: "high";
+    readonly critical: "critical";
   } = {
-    "low": "low",
-    "med": "med",
-    "high": "high",
-    "critical": "critical",
+    low: "low",
+    med: "med",
+    high: "high",
+    critical: "critical",
   };
 
   export type Severity = (typeof Severity)[keyof typeof Severity];
 
   export const ShareAccessLevel: {
-    readonly "view_only": "view_only";
-    readonly "downloadable": "downloadable";
+    readonly view_only: "view_only";
+    readonly downloadable: "downloadable";
   } = {
-    "view_only": "view_only",
-    "downloadable": "downloadable",
+    view_only: "view_only",
+    downloadable: "downloadable",
   };
 
   export type ShareAccessLevel = (typeof ShareAccessLevel)[keyof typeof ShareAccessLevel];
 
   export const ShiftApprovalStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
   };
 
   export type ShiftApprovalStatus = (typeof ShiftApprovalStatus)[keyof typeof ShiftApprovalStatus];
 
   export const ShiftStatus: {
-    readonly "scheduled": "scheduled";
-    readonly "in_progress": "in_progress";
-    readonly "submitted": "submitted";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
+    readonly scheduled: "scheduled";
+    readonly in_progress: "in_progress";
+    readonly submitted: "submitted";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
   } = {
-    "scheduled": "scheduled",
-    "in_progress": "in_progress",
-    "submitted": "submitted",
-    "approved": "approved",
-    "rejected": "rejected",
+    scheduled: "scheduled",
+    in_progress: "in_progress",
+    submitted: "submitted",
+    approved: "approved",
+    rejected: "rejected",
   };
 
   export type ShiftStatus = (typeof ShiftStatus)[keyof typeof ShiftStatus];
 
   export const SignatureDeliveryChannel: {
-    readonly "email": "email";
-    readonly "sms": "sms";
-    readonly "email_and_sms": "email_and_sms";
+    readonly email: "email";
+    readonly sms: "sms";
+    readonly email_and_sms: "email_and_sms";
   } = {
-    "email": "email",
-    "sms": "sms",
-    "email_and_sms": "email_and_sms",
+    email: "email",
+    sms: "sms",
+    email_and_sms: "email_and_sms",
   };
 
-  export type SignatureDeliveryChannel = (typeof SignatureDeliveryChannel)[keyof typeof SignatureDeliveryChannel];
+  export type SignatureDeliveryChannel =
+    (typeof SignatureDeliveryChannel)[keyof typeof SignatureDeliveryChannel];
 
   export const SignatureDocumentType: {
-    readonly "long_term_stay": "long_term_stay";
-    readonly "seasonal": "seasonal";
-    readonly "monthly": "monthly";
-    readonly "park_rules": "park_rules";
-    readonly "deposit": "deposit";
-    readonly "waiver": "waiver";
-    readonly "coi": "coi";
-    readonly "other": "other";
+    readonly long_term_stay: "long_term_stay";
+    readonly seasonal: "seasonal";
+    readonly monthly: "monthly";
+    readonly park_rules: "park_rules";
+    readonly deposit: "deposit";
+    readonly waiver: "waiver";
+    readonly coi: "coi";
+    readonly other: "other";
   } = {
-    "long_term_stay": "long_term_stay",
-    "seasonal": "seasonal",
-    "monthly": "monthly",
-    "park_rules": "park_rules",
-    "deposit": "deposit",
-    "waiver": "waiver",
-    "coi": "coi",
-    "other": "other",
+    long_term_stay: "long_term_stay",
+    seasonal: "seasonal",
+    monthly: "monthly",
+    park_rules: "park_rules",
+    deposit: "deposit",
+    waiver: "waiver",
+    coi: "coi",
+    other: "other",
   };
 
-  export type SignatureDocumentType = (typeof SignatureDocumentType)[keyof typeof SignatureDocumentType];
+  export type SignatureDocumentType =
+    (typeof SignatureDocumentType)[keyof typeof SignatureDocumentType];
 
   export const SignatureMethod: {
-    readonly "digital": "digital";
-    readonly "paper": "paper";
-    readonly "waived": "waived";
+    readonly digital: "digital";
+    readonly paper: "paper";
+    readonly waived: "waived";
   } = {
-    "digital": "digital",
-    "paper": "paper",
-    "waived": "waived",
+    digital: "digital",
+    paper: "paper",
+    waived: "waived",
   };
 
   export type SignatureMethod = (typeof SignatureMethod)[keyof typeof SignatureMethod];
 
   export const SignatureRequestStatus: {
-    readonly "preview": "preview";
-    readonly "draft": "draft";
-    readonly "sent": "sent";
-    readonly "viewed": "viewed";
-    readonly "signed": "signed";
-    readonly "signed_paper": "signed_paper";
-    readonly "waived": "waived";
-    readonly "declined": "declined";
-    readonly "voided": "voided";
-    readonly "expired": "expired";
+    readonly preview: "preview";
+    readonly draft: "draft";
+    readonly sent: "sent";
+    readonly viewed: "viewed";
+    readonly signed: "signed";
+    readonly signed_paper: "signed_paper";
+    readonly waived: "waived";
+    readonly declined: "declined";
+    readonly voided: "voided";
+    readonly expired: "expired";
   } = {
-    "preview": "preview",
-    "draft": "draft",
-    "sent": "sent",
-    "viewed": "viewed",
-    "signed": "signed",
-    "signed_paper": "signed_paper",
-    "waived": "waived",
-    "declined": "declined",
-    "voided": "voided",
-    "expired": "expired",
+    preview: "preview",
+    draft: "draft",
+    sent: "sent",
+    viewed: "viewed",
+    signed: "signed",
+    signed_paper: "signed_paper",
+    waived: "waived",
+    declined: "declined",
+    voided: "voided",
+    expired: "expired",
   };
 
-  export type SignatureRequestStatus = (typeof SignatureRequestStatus)[keyof typeof SignatureRequestStatus];
+  export type SignatureRequestStatus =
+    (typeof SignatureRequestStatus)[keyof typeof SignatureRequestStatus];
 
   export const SiteType: {
-    readonly "rv": "rv";
-    readonly "tent": "tent";
-    readonly "cabin": "cabin";
-    readonly "group": "group";
-    readonly "glamping": "glamping";
-    readonly "hotel_room": "hotel_room";
-    readonly "suite": "suite";
-    readonly "lodge_room": "lodge_room";
-    readonly "yurt": "yurt";
-    readonly "treehouse": "treehouse";
-    readonly "tiny_house": "tiny_house";
-    readonly "airstream": "airstream";
-    readonly "safari_tent": "safari_tent";
-    readonly "dome": "dome";
-    readonly "boat_slip": "boat_slip";
+    readonly rv: "rv";
+    readonly tent: "tent";
+    readonly cabin: "cabin";
+    readonly group: "group";
+    readonly glamping: "glamping";
+    readonly hotel_room: "hotel_room";
+    readonly suite: "suite";
+    readonly lodge_room: "lodge_room";
+    readonly yurt: "yurt";
+    readonly treehouse: "treehouse";
+    readonly tiny_house: "tiny_house";
+    readonly airstream: "airstream";
+    readonly safari_tent: "safari_tent";
+    readonly dome: "dome";
+    readonly boat_slip: "boat_slip";
   } = {
-    "rv": "rv",
-    "tent": "tent",
-    "cabin": "cabin",
-    "group": "group",
-    "glamping": "glamping",
-    "hotel_room": "hotel_room",
-    "suite": "suite",
-    "lodge_room": "lodge_room",
-    "yurt": "yurt",
-    "treehouse": "treehouse",
-    "tiny_house": "tiny_house",
-    "airstream": "airstream",
-    "safari_tent": "safari_tent",
-    "dome": "dome",
-    "boat_slip": "boat_slip",
+    rv: "rv",
+    tent: "tent",
+    cabin: "cabin",
+    group: "group",
+    glamping: "glamping",
+    hotel_room: "hotel_room",
+    suite: "suite",
+    lodge_room: "lodge_room",
+    yurt: "yurt",
+    treehouse: "treehouse",
+    tiny_house: "tiny_house",
+    airstream: "airstream",
+    safari_tent: "safari_tent",
+    dome: "dome",
+    boat_slip: "boat_slip",
   };
 
   export type SiteType = (typeof SiteType)[keyof typeof SiteType];
 
   export const SlaStatus: {
-    readonly "on_track": "on_track";
-    readonly "at_risk": "at_risk";
-    readonly "breached": "breached";
+    readonly on_track: "on_track";
+    readonly at_risk: "at_risk";
+    readonly breached: "breached";
   } = {
-    "on_track": "on_track",
-    "at_risk": "at_risk",
-    "breached": "breached",
+    on_track: "on_track",
+    at_risk: "at_risk",
+    breached: "breached",
   };
 
   export type SlaStatus = (typeof SlaStatus)[keyof typeof SlaStatus];
 
   export const SocialAlertCategory: {
-    readonly "weather": "weather";
-    readonly "occupancy": "occupancy";
-    readonly "events": "events";
-    readonly "deals": "deals";
-    readonly "reviews": "reviews";
-    readonly "inactivity": "inactivity";
-    readonly "inventory": "inventory";
+    readonly weather: "weather";
+    readonly occupancy: "occupancy";
+    readonly events: "events";
+    readonly deals: "deals";
+    readonly reviews: "reviews";
+    readonly inactivity: "inactivity";
+    readonly inventory: "inventory";
   } = {
-    "weather": "weather",
-    "occupancy": "occupancy",
-    "events": "events",
-    "deals": "deals",
-    "reviews": "reviews",
-    "inactivity": "inactivity",
-    "inventory": "inventory",
+    weather: "weather",
+    occupancy: "occupancy",
+    events: "events",
+    deals: "deals",
+    reviews: "reviews",
+    inactivity: "inactivity",
+    inventory: "inventory",
   };
 
   export type SocialAlertCategory = (typeof SocialAlertCategory)[keyof typeof SocialAlertCategory];
 
   export const SocialAssetType: {
-    readonly "photo": "photo";
-    readonly "video": "video";
-    readonly "logo": "logo";
-    readonly "template": "template";
-    readonly "other": "other";
+    readonly photo: "photo";
+    readonly video: "video";
+    readonly logo: "logo";
+    readonly template: "template";
+    readonly other: "other";
   } = {
-    "photo": "photo",
-    "video": "video",
-    "logo": "logo",
-    "template": "template",
-    "other": "other",
+    photo: "photo",
+    video: "video",
+    logo: "logo",
+    template: "template",
+    other: "other",
   };
 
   export type SocialAssetType = (typeof SocialAssetType)[keyof typeof SocialAssetType];
 
   export const SocialContentCategory: {
-    readonly "amenities": "amenities";
-    readonly "events": "events";
-    readonly "offers": "offers";
-    readonly "reviews": "reviews";
-    readonly "tips": "tips";
-    readonly "general": "general";
-    readonly "promo": "promo";
+    readonly amenities: "amenities";
+    readonly events: "events";
+    readonly offers: "offers";
+    readonly reviews: "reviews";
+    readonly tips: "tips";
+    readonly general: "general";
+    readonly promo: "promo";
   } = {
-    "amenities": "amenities",
-    "events": "events",
-    "offers": "offers",
-    "reviews": "reviews",
-    "tips": "tips",
-    "general": "general",
-    "promo": "promo",
+    amenities: "amenities",
+    events: "events",
+    offers: "offers",
+    reviews: "reviews",
+    tips: "tips",
+    general: "general",
+    promo: "promo",
   };
 
-  export type SocialContentCategory = (typeof SocialContentCategory)[keyof typeof SocialContentCategory];
+  export type SocialContentCategory =
+    (typeof SocialContentCategory)[keyof typeof SocialContentCategory];
 
   export const SocialPlatform: {
-    readonly "facebook": "facebook";
-    readonly "instagram": "instagram";
-    readonly "tiktok": "tiktok";
-    readonly "email": "email";
-    readonly "blog": "blog";
+    readonly facebook: "facebook";
+    readonly instagram: "instagram";
+    readonly tiktok: "tiktok";
+    readonly email: "email";
+    readonly blog: "blog";
   } = {
-    "facebook": "facebook",
-    "instagram": "instagram",
-    "tiktok": "tiktok",
-    "email": "email",
-    "blog": "blog",
+    facebook: "facebook",
+    instagram: "instagram",
+    tiktok: "tiktok",
+    email: "email",
+    blog: "blog",
   };
 
   export type SocialPlatform = (typeof SocialPlatform)[keyof typeof SocialPlatform];
 
   export const SocialPostStatus: {
-    readonly "draft": "draft";
-    readonly "scheduled": "scheduled";
-    readonly "needs_image": "needs_image";
-    readonly "needs_approval": "needs_approval";
-    readonly "ready": "ready";
-    readonly "completed": "completed";
-    readonly "dismissed": "dismissed";
+    readonly draft: "draft";
+    readonly scheduled: "scheduled";
+    readonly needs_image: "needs_image";
+    readonly needs_approval: "needs_approval";
+    readonly ready: "ready";
+    readonly completed: "completed";
+    readonly dismissed: "dismissed";
   } = {
-    "draft": "draft",
-    "scheduled": "scheduled",
-    "needs_image": "needs_image",
-    "needs_approval": "needs_approval",
-    "ready": "ready",
-    "completed": "completed",
-    "dismissed": "dismissed",
+    draft: "draft",
+    scheduled: "scheduled",
+    needs_image: "needs_image",
+    needs_approval: "needs_approval",
+    ready: "ready",
+    completed: "completed",
+    dismissed: "dismissed",
   };
 
   export type SocialPostStatus = (typeof SocialPostStatus)[keyof typeof SocialPostStatus];
 
   export const SocialSuggestionStatus: {
-    readonly "new": "new";
-    readonly "accepted": "accepted";
-    readonly "rejected": "rejected";
-    readonly "published": "published";
+    readonly new: "new";
+    readonly accepted: "accepted";
+    readonly rejected: "rejected";
+    readonly published: "published";
   } = {
-    "new": "new",
-    "accepted": "accepted",
-    "rejected": "rejected",
-    "published": "published",
+    new: "new",
+    accepted: "accepted",
+    rejected: "rejected",
+    published: "published",
   };
 
-  export type SocialSuggestionStatus = (typeof SocialSuggestionStatus)[keyof typeof SocialSuggestionStatus];
+  export type SocialSuggestionStatus =
+    (typeof SocialSuggestionStatus)[keyof typeof SocialSuggestionStatus];
 
   export const SocialSuggestionType: {
-    readonly "idea": "idea";
-    readonly "auto": "auto";
-    readonly "operator": "operator";
-    readonly "occupancy": "occupancy";
-    readonly "event": "event";
-    readonly "deal": "deal";
-    readonly "seasonal": "seasonal";
+    readonly idea: "idea";
+    readonly auto: "auto";
+    readonly operator: "operator";
+    readonly occupancy: "occupancy";
+    readonly event: "event";
+    readonly deal: "deal";
+    readonly seasonal: "seasonal";
   } = {
-    "idea": "idea",
-    "auto": "auto",
-    "operator": "operator",
-    "occupancy": "occupancy",
-    "event": "event",
-    "deal": "deal",
-    "seasonal": "seasonal",
+    idea: "idea",
+    auto: "auto",
+    operator: "operator",
+    occupancy: "occupancy",
+    event: "event",
+    deal: "deal",
+    seasonal: "seasonal",
   };
 
-  export type SocialSuggestionType = (typeof SocialSuggestionType)[keyof typeof SocialSuggestionType];
+  export type SocialSuggestionType =
+    (typeof SocialSuggestionType)[keyof typeof SocialSuggestionType];
 
   export const SocialTemplateStyle: {
-    readonly "short": "short";
-    readonly "detailed": "detailed";
-    readonly "story": "story";
-    readonly "carousel": "carousel";
-    readonly "announce": "announce";
+    readonly short: "short";
+    readonly detailed: "detailed";
+    readonly story: "story";
+    readonly carousel: "carousel";
+    readonly announce: "announce";
   } = {
-    "short": "short",
-    "detailed": "detailed",
-    "story": "story",
-    "carousel": "carousel",
-    "announce": "announce",
+    short: "short",
+    detailed: "detailed",
+    story: "story",
+    carousel: "carousel",
+    announce: "announce",
   };
 
   export type SocialTemplateStyle = (typeof SocialTemplateStyle)[keyof typeof SocialTemplateStyle];
 
   export const StayReasonPreset: {
-    readonly "vacation": "vacation";
-    readonly "family_visit": "family_visit";
-    readonly "event": "event";
-    readonly "work_remote": "work_remote";
-    readonly "stopover": "stopover";
-    readonly "relocation": "relocation";
-    readonly "other": "other";
+    readonly vacation: "vacation";
+    readonly family_visit: "family_visit";
+    readonly event: "event";
+    readonly work_remote: "work_remote";
+    readonly stopover: "stopover";
+    readonly relocation: "relocation";
+    readonly other: "other";
   } = {
-    "vacation": "vacation",
-    "family_visit": "family_visit",
-    "event": "event",
-    "work_remote": "work_remote",
-    "stopover": "stopover",
-    "relocation": "relocation",
-    "other": "other",
+    vacation: "vacation",
+    family_visit: "family_visit",
+    event: "event",
+    work_remote: "work_remote",
+    stopover: "stopover",
+    relocation: "relocation",
+    other: "other",
   };
 
   export type StayReasonPreset = (typeof StayReasonPreset)[keyof typeof StayReasonPreset];
 
   export const StayType: {
-    readonly "standard": "standard";
-    readonly "weekly": "weekly";
-    readonly "monthly": "monthly";
-    readonly "seasonal": "seasonal";
+    readonly standard: "standard";
+    readonly weekly: "weekly";
+    readonly monthly: "monthly";
+    readonly seasonal: "seasonal";
   } = {
-    "standard": "standard",
-    "weekly": "weekly",
-    "monthly": "monthly",
-    "seasonal": "seasonal",
+    standard: "standard",
+    weekly: "weekly",
+    monthly: "monthly",
+    seasonal: "seasonal",
   };
 
   export type StayType = (typeof StayType)[keyof typeof StayType];
 
   export const StoreAdjustmentType: {
-    readonly "refund": "refund";
-    readonly "exchange": "exchange";
-    readonly "discount": "discount";
+    readonly refund: "refund";
+    readonly exchange: "exchange";
+    readonly discount: "discount";
   } = {
-    "refund": "refund",
-    "exchange": "exchange",
-    "discount": "discount",
+    refund: "refund",
+    exchange: "exchange",
+    discount: "discount",
   };
 
   export type StoreAdjustmentType = (typeof StoreAdjustmentType)[keyof typeof StoreAdjustmentType];
 
   export const StoreLocationType: {
-    readonly "physical": "physical";
-    readonly "virtual": "virtual";
+    readonly physical: "physical";
+    readonly virtual: "virtual";
   } = {
-    "physical": "physical",
-    "virtual": "virtual",
+    physical: "physical",
+    virtual: "virtual",
   };
 
   export type StoreLocationType = (typeof StoreLocationType)[keyof typeof StoreLocationType];
 
   export const StoredValueDirection: {
-    readonly "issue": "issue";
-    readonly "redeem": "redeem";
-    readonly "adjust": "adjust";
-    readonly "expire": "expire";
-    readonly "refund": "refund";
-    readonly "hold_create": "hold_create";
-    readonly "hold_capture": "hold_capture";
-    readonly "hold_release": "hold_release";
+    readonly issue: "issue";
+    readonly redeem: "redeem";
+    readonly adjust: "adjust";
+    readonly expire: "expire";
+    readonly refund: "refund";
+    readonly hold_create: "hold_create";
+    readonly hold_capture: "hold_capture";
+    readonly hold_release: "hold_release";
   } = {
-    "issue": "issue",
-    "redeem": "redeem",
-    "adjust": "adjust",
-    "expire": "expire",
-    "refund": "refund",
-    "hold_create": "hold_create",
-    "hold_capture": "hold_capture",
-    "hold_release": "hold_release",
+    issue: "issue",
+    redeem: "redeem",
+    adjust: "adjust",
+    expire: "expire",
+    refund: "refund",
+    hold_create: "hold_create",
+    hold_capture: "hold_capture",
+    hold_release: "hold_release",
   };
 
-  export type StoredValueDirection = (typeof StoredValueDirection)[keyof typeof StoredValueDirection];
+  export type StoredValueDirection =
+    (typeof StoredValueDirection)[keyof typeof StoredValueDirection];
 
   export const StoredValueHoldStatus: {
-    readonly "open": "open";
-    readonly "captured": "captured";
-    readonly "released": "released";
-    readonly "expired": "expired";
+    readonly open: "open";
+    readonly captured: "captured";
+    readonly released: "released";
+    readonly expired: "expired";
   } = {
-    "open": "open",
-    "captured": "captured",
-    "released": "released",
-    "expired": "expired",
+    open: "open",
+    captured: "captured",
+    released: "released",
+    expired: "expired",
   };
 
-  export type StoredValueHoldStatus = (typeof StoredValueHoldStatus)[keyof typeof StoredValueHoldStatus];
+  export type StoredValueHoldStatus =
+    (typeof StoredValueHoldStatus)[keyof typeof StoredValueHoldStatus];
 
   export const StoredValueScopeType: {
-    readonly "campground": "campground";
-    readonly "organization": "organization";
-    readonly "global": "global";
+    readonly campground: "campground";
+    readonly organization: "organization";
+    readonly global: "global";
   } = {
-    "campground": "campground",
-    "organization": "organization",
-    "global": "global",
+    campground: "campground",
+    organization: "organization",
+    global: "global",
   };
 
-  export type StoredValueScopeType = (typeof StoredValueScopeType)[keyof typeof StoredValueScopeType];
+  export type StoredValueScopeType =
+    (typeof StoredValueScopeType)[keyof typeof StoredValueScopeType];
 
   export const StoredValueStatus: {
-    readonly "active": "active";
-    readonly "frozen": "frozen";
-    readonly "expired": "expired";
+    readonly active: "active";
+    readonly frozen: "frozen";
+    readonly expired: "expired";
   } = {
-    "active": "active",
-    "frozen": "frozen",
-    "expired": "expired",
+    active: "active",
+    frozen: "frozen",
+    expired: "expired",
   };
 
   export type StoredValueStatus = (typeof StoredValueStatus)[keyof typeof StoredValueStatus];
 
   export const StoredValueType: {
-    readonly "gift": "gift";
-    readonly "credit": "credit";
+    readonly gift: "gift";
+    readonly credit: "credit";
   } = {
-    "gift": "gift",
-    "credit": "credit",
+    gift: "gift",
+    credit: "credit",
   };
 
   export type StoredValueType = (typeof StoredValueType)[keyof typeof StoredValueType];
 
   export const SubscriptionTier: {
-    readonly "free": "free";
-    readonly "starter": "starter";
-    readonly "professional": "professional";
-    readonly "enterprise": "enterprise";
+    readonly free: "free";
+    readonly starter: "starter";
+    readonly professional: "professional";
+    readonly enterprise: "enterprise";
   } = {
-    "free": "free",
-    "starter": "starter",
-    "professional": "professional",
-    "enterprise": "enterprise",
+    free: "free",
+    starter: "starter",
+    professional: "professional",
+    enterprise: "enterprise",
   };
 
   export type SubscriptionTier = (typeof SubscriptionTier)[keyof typeof SubscriptionTier];
 
   export const SupportReportStatus: {
-    readonly "new": "new";
-    readonly "triage": "triage";
-    readonly "in_progress": "in_progress";
-    readonly "resolved": "resolved";
-    readonly "closed": "closed";
+    readonly new: "new";
+    readonly triage: "triage";
+    readonly in_progress: "in_progress";
+    readonly resolved: "resolved";
+    readonly closed: "closed";
   } = {
-    "new": "new",
-    "triage": "triage",
-    "in_progress": "in_progress",
-    "resolved": "resolved",
-    "closed": "closed",
+    new: "new",
+    triage: "triage",
+    in_progress: "in_progress",
+    resolved: "resolved",
+    closed: "closed",
   };
 
   export type SupportReportStatus = (typeof SupportReportStatus)[keyof typeof SupportReportStatus];
 
   export const SwapStatus: {
-    readonly "pending_recipient": "pending_recipient";
-    readonly "pending_manager": "pending_manager";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
-    readonly "declined": "declined";
-    readonly "cancelled": "cancelled";
+    readonly pending_recipient: "pending_recipient";
+    readonly pending_manager: "pending_manager";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
+    readonly declined: "declined";
+    readonly cancelled: "cancelled";
   } = {
-    "pending_recipient": "pending_recipient",
-    "pending_manager": "pending_manager",
-    "approved": "approved",
-    "rejected": "rejected",
-    "declined": "declined",
-    "cancelled": "cancelled",
+    pending_recipient: "pending_recipient",
+    pending_manager: "pending_manager",
+    approved: "approved",
+    rejected: "rejected",
+    declined: "declined",
+    cancelled: "cancelled",
   };
 
   export type SwapStatus = (typeof SwapStatus)[keyof typeof SwapStatus];
 
   export const TaskState: {
-    readonly "pending": "pending";
-    readonly "in_progress": "in_progress";
-    readonly "blocked": "blocked";
-    readonly "done": "done";
-    readonly "failed": "failed";
-    readonly "expired": "expired";
+    readonly pending: "pending";
+    readonly in_progress: "in_progress";
+    readonly blocked: "blocked";
+    readonly done: "done";
+    readonly failed: "failed";
+    readonly expired: "expired";
   } = {
-    "pending": "pending",
-    "in_progress": "in_progress",
-    "blocked": "blocked",
-    "done": "done",
-    "failed": "failed",
-    "expired": "expired",
+    pending: "pending",
+    in_progress: "in_progress",
+    blocked: "blocked",
+    done: "done",
+    failed: "failed",
+    expired: "expired",
   };
 
   export type TaskState = (typeof TaskState)[keyof typeof TaskState];
 
   export const TaskType: {
-    readonly "turnover": "turnover";
-    readonly "inspection": "inspection";
-    readonly "other": "other";
-    readonly "deep_clean": "deep_clean";
-    readonly "touch_up": "touch_up";
-    readonly "make_ready": "make_ready";
-    readonly "checkout_express": "checkout_express";
-    readonly "vip_prep": "vip_prep";
-    readonly "pet_treatment": "pet_treatment";
-    readonly "linen_change": "linen_change";
-    readonly "restocking": "restocking";
+    readonly turnover: "turnover";
+    readonly inspection: "inspection";
+    readonly other: "other";
+    readonly deep_clean: "deep_clean";
+    readonly touch_up: "touch_up";
+    readonly make_ready: "make_ready";
+    readonly checkout_express: "checkout_express";
+    readonly vip_prep: "vip_prep";
+    readonly pet_treatment: "pet_treatment";
+    readonly linen_change: "linen_change";
+    readonly restocking: "restocking";
   } = {
-    "turnover": "turnover",
-    "inspection": "inspection",
-    "other": "other",
-    "deep_clean": "deep_clean",
-    "touch_up": "touch_up",
-    "make_ready": "make_ready",
-    "checkout_express": "checkout_express",
-    "vip_prep": "vip_prep",
-    "pet_treatment": "pet_treatment",
-    "linen_change": "linen_change",
-    "restocking": "restocking",
+    turnover: "turnover",
+    inspection: "inspection",
+    other: "other",
+    deep_clean: "deep_clean",
+    touch_up: "touch_up",
+    make_ready: "make_ready",
+    checkout_express: "checkout_express",
+    vip_prep: "vip_prep",
+    pet_treatment: "pet_treatment",
+    linen_change: "linen_change",
+    restocking: "restocking",
   };
 
   export type TaskType = (typeof TaskType)[keyof typeof TaskType];
 
   export const TaxRuleType: {
-    readonly "percentage": "percentage";
-    readonly "flat": "flat";
-    readonly "exemption": "exemption";
+    readonly percentage: "percentage";
+    readonly flat: "flat";
+    readonly exemption: "exemption";
   } = {
-    "percentage": "percentage",
-    "flat": "flat",
-    "exemption": "exemption",
+    percentage: "percentage",
+    flat: "flat",
+    exemption: "exemption",
   };
 
   export type TaxRuleType = (typeof TaxRuleType)[keyof typeof TaxRuleType];
 
   export const TicketCategory: {
-    readonly "issue": "issue";
-    readonly "question": "question";
-    readonly "feature": "feature";
-    readonly "other": "other";
+    readonly issue: "issue";
+    readonly question: "question";
+    readonly feature: "feature";
+    readonly other: "other";
   } = {
-    "issue": "issue",
-    "question": "question",
-    "feature": "feature",
-    "other": "other",
+    issue: "issue",
+    question: "question",
+    feature: "feature",
+    other: "other",
   };
 
   export type TicketCategory = (typeof TicketCategory)[keyof typeof TicketCategory];
 
   export const TicketState: {
-    readonly "open": "open";
-    readonly "in_progress": "in_progress";
-    readonly "blocked": "blocked";
-    readonly "resolved": "resolved";
-    readonly "reopened": "reopened";
-    readonly "closed": "closed";
+    readonly open: "open";
+    readonly in_progress: "in_progress";
+    readonly blocked: "blocked";
+    readonly resolved: "resolved";
+    readonly reopened: "reopened";
+    readonly closed: "closed";
   } = {
-    "open": "open",
-    "in_progress": "in_progress",
-    "blocked": "blocked",
-    "resolved": "resolved",
-    "reopened": "reopened",
-    "closed": "closed",
+    open: "open",
+    in_progress: "in_progress",
+    blocked: "blocked",
+    resolved: "resolved",
+    reopened: "reopened",
+    closed: "closed",
   };
 
   export type TicketState = (typeof TicketState)[keyof typeof TicketState];
 
   export const TillMovementType: {
-    readonly "cash_sale": "cash_sale";
-    readonly "cash_refund": "cash_refund";
-    readonly "paid_in": "paid_in";
-    readonly "paid_out": "paid_out";
-    readonly "adjustment": "adjustment";
+    readonly cash_sale: "cash_sale";
+    readonly cash_refund: "cash_refund";
+    readonly paid_in: "paid_in";
+    readonly paid_out: "paid_out";
+    readonly adjustment: "adjustment";
   } = {
-    "cash_sale": "cash_sale",
-    "cash_refund": "cash_refund",
-    "paid_in": "paid_in",
-    "paid_out": "paid_out",
-    "adjustment": "adjustment",
+    cash_sale: "cash_sale",
+    cash_refund: "cash_refund",
+    paid_in: "paid_in",
+    paid_out: "paid_out",
+    adjustment: "adjustment",
   };
 
   export type TillMovementType = (typeof TillMovementType)[keyof typeof TillMovementType];
 
   export const TillSessionStatus: {
-    readonly "open": "open";
-    readonly "closed": "closed";
+    readonly open: "open";
+    readonly closed: "closed";
   } = {
-    "open": "open",
-    "closed": "closed",
+    open: "open",
+    closed: "closed",
   };
 
   export type TillSessionStatus = (typeof TillSessionStatus)[keyof typeof TillSessionStatus];
 
   export const TimeEntrySource: {
-    readonly "kiosk": "kiosk";
-    readonly "mobile": "mobile";
-    readonly "web": "web";
-    readonly "manual": "manual";
+    readonly kiosk: "kiosk";
+    readonly mobile: "mobile";
+    readonly web: "web";
+    readonly manual: "manual";
   } = {
-    "kiosk": "kiosk",
-    "mobile": "mobile",
-    "web": "web",
-    "manual": "manual",
+    kiosk: "kiosk",
+    mobile: "mobile",
+    web: "web",
+    manual: "manual",
   };
 
   export type TimeEntrySource = (typeof TimeEntrySource)[keyof typeof TimeEntrySource];
 
   export const TimeEntryStatus: {
-    readonly "open": "open";
-    readonly "submitted": "submitted";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
-    readonly "corrected": "corrected";
+    readonly open: "open";
+    readonly submitted: "submitted";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
+    readonly corrected: "corrected";
   } = {
-    "open": "open",
-    "submitted": "submitted",
-    "approved": "approved",
-    "rejected": "rejected",
-    "corrected": "corrected",
+    open: "open",
+    submitted: "submitted",
+    approved: "approved",
+    rejected: "rejected",
+    corrected: "corrected",
   };
 
   export type TimeEntryStatus = (typeof TimeEntryStatus)[keyof typeof TimeEntryStatus];
 
   export const TimeOffStatus: {
-    readonly "pending": "pending";
-    readonly "approved": "approved";
-    readonly "rejected": "rejected";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly approved: "approved";
+    readonly rejected: "rejected";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "approved": "approved",
-    "rejected": "rejected",
-    "cancelled": "cancelled",
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected",
+    cancelled: "cancelled",
   };
 
   export type TimeOffStatus = (typeof TimeOffStatus)[keyof typeof TimeOffStatus];
 
   export const TimeOffType: {
-    readonly "vacation": "vacation";
-    readonly "sick": "sick";
-    readonly "personal": "personal";
-    readonly "bereavement": "bereavement";
-    readonly "jury_duty": "jury_duty";
-    readonly "unpaid": "unpaid";
-    readonly "other": "other";
+    readonly vacation: "vacation";
+    readonly sick: "sick";
+    readonly personal: "personal";
+    readonly bereavement: "bereavement";
+    readonly jury_duty: "jury_duty";
+    readonly unpaid: "unpaid";
+    readonly other: "other";
   } = {
-    "vacation": "vacation",
-    "sick": "sick",
-    "personal": "personal",
-    "bereavement": "bereavement",
-    "jury_duty": "jury_duty",
-    "unpaid": "unpaid",
-    "other": "other",
+    vacation: "vacation",
+    sick: "sick",
+    personal: "personal",
+    bereavement: "bereavement",
+    jury_duty: "jury_duty",
+    unpaid: "unpaid",
+    other: "other",
   };
 
   export type TimeOffType = (typeof TimeOffType)[keyof typeof TimeOffType];
 
   export const UpsellChargeType: {
-    readonly "pay_now": "pay_now";
-    readonly "add_to_reservation": "add_to_reservation";
+    readonly pay_now: "pay_now";
+    readonly add_to_reservation: "add_to_reservation";
   } = {
-    "pay_now": "pay_now",
-    "add_to_reservation": "add_to_reservation",
+    pay_now: "pay_now",
+    add_to_reservation: "add_to_reservation",
   };
 
   export type UpsellChargeType = (typeof UpsellChargeType)[keyof typeof UpsellChargeType];
 
   export const UpsellPriceType: {
-    readonly "flat": "flat";
-    readonly "per_night": "per_night";
-    readonly "per_guest": "per_guest";
-    readonly "per_site": "per_site";
+    readonly flat: "flat";
+    readonly per_night: "per_night";
+    readonly per_guest: "per_guest";
+    readonly per_site: "per_site";
   } = {
-    "flat": "flat",
-    "per_night": "per_night",
-    "per_guest": "per_guest",
-    "per_site": "per_site",
+    flat: "flat",
+    per_night: "per_night",
+    per_guest: "per_guest",
+    per_site: "per_site",
   };
 
   export type UpsellPriceType = (typeof UpsellPriceType)[keyof typeof UpsellPriceType];
 
   export const UpsellStatus: {
-    readonly "pending_charge": "pending_charge";
-    readonly "charged": "charged";
-    readonly "canceled": "canceled";
+    readonly pending_charge: "pending_charge";
+    readonly charged: "charged";
+    readonly canceled: "canceled";
   } = {
-    "pending_charge": "pending_charge",
-    "charged": "charged",
-    "canceled": "canceled",
+    pending_charge: "pending_charge",
+    charged: "charged",
+    canceled: "canceled",
   };
 
   export type UpsellStatus = (typeof UpsellStatus)[keyof typeof UpsellStatus];
 
   export const UserRole: {
-    readonly "owner": "owner";
-    readonly "manager": "manager";
-    readonly "front_desk": "front_desk";
-    readonly "maintenance": "maintenance";
-    readonly "finance": "finance";
-    readonly "marketing": "marketing";
-    readonly "readonly": "readonly";
+    readonly owner: "owner";
+    readonly manager: "manager";
+    readonly front_desk: "front_desk";
+    readonly maintenance: "maintenance";
+    readonly finance: "finance";
+    readonly marketing: "marketing";
+    readonly readonly: "readonly";
   } = {
-    "owner": "owner",
-    "manager": "manager",
-    "front_desk": "front_desk",
-    "maintenance": "maintenance",
-    "finance": "finance",
-    "marketing": "marketing",
-    "readonly": "readonly",
+    owner: "owner",
+    manager: "manager",
+    front_desk: "front_desk",
+    maintenance: "maintenance",
+    finance: "finance",
+    marketing: "marketing",
+    readonly: "readonly",
   };
 
   export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
   export const WaitlistOfferStatus: {
-    readonly "pending": "pending";
-    readonly "sent": "sent";
-    readonly "accepted": "accepted";
-    readonly "declined": "declined";
-    readonly "expired": "expired";
-    readonly "failed": "failed";
+    readonly pending: "pending";
+    readonly sent: "sent";
+    readonly accepted: "accepted";
+    readonly declined: "declined";
+    readonly expired: "expired";
+    readonly failed: "failed";
   } = {
-    "pending": "pending",
-    "sent": "sent",
-    "accepted": "accepted",
-    "declined": "declined",
-    "expired": "expired",
-    "failed": "failed",
+    pending: "pending",
+    sent: "sent",
+    accepted: "accepted",
+    declined: "declined",
+    expired: "expired",
+    failed: "failed",
   };
 
   export type WaitlistOfferStatus = (typeof WaitlistOfferStatus)[keyof typeof WaitlistOfferStatus];
 
   export const WaitlistStatus: {
-    readonly "active": "active";
-    readonly "fulfilled": "fulfilled";
-    readonly "expired": "expired";
-    readonly "cancelled": "cancelled";
+    readonly active: "active";
+    readonly fulfilled: "fulfilled";
+    readonly expired: "expired";
+    readonly cancelled: "cancelled";
   } = {
-    "active": "active",
-    "fulfilled": "fulfilled",
-    "expired": "expired",
-    "cancelled": "cancelled",
+    active: "active",
+    fulfilled: "fulfilled",
+    expired: "expired",
+    cancelled: "cancelled",
   };
 
   export type WaitlistStatus = (typeof WaitlistStatus)[keyof typeof WaitlistStatus];
 
   export const WaitlistType: {
-    readonly "regular": "regular";
-    readonly "seasonal": "seasonal";
+    readonly regular: "regular";
+    readonly seasonal: "seasonal";
   } = {
-    "regular": "regular",
-    "seasonal": "seasonal",
+    regular: "regular",
+    seasonal: "seasonal",
   };
 
   export type WaitlistType = (typeof WaitlistType)[keyof typeof WaitlistType];
 
   export const WaiverReason: {
-    readonly "returning_same_terms": "returning_same_terms";
-    readonly "corporate_agreement": "corporate_agreement";
-    readonly "grandfathered": "grandfathered";
-    readonly "family_member": "family_member";
-    readonly "owner_discretion": "owner_discretion";
-    readonly "other": "other";
+    readonly returning_same_terms: "returning_same_terms";
+    readonly corporate_agreement: "corporate_agreement";
+    readonly grandfathered: "grandfathered";
+    readonly family_member: "family_member";
+    readonly owner_discretion: "owner_discretion";
+    readonly other: "other";
   } = {
-    "returning_same_terms": "returning_same_terms",
-    "corporate_agreement": "corporate_agreement",
-    "grandfathered": "grandfathered",
-    "family_member": "family_member",
-    "owner_discretion": "owner_discretion",
-    "other": "other",
+    returning_same_terms: "returning_same_terms",
+    corporate_agreement: "corporate_agreement",
+    grandfathered: "grandfathered",
+    family_member: "family_member",
+    owner_discretion: "owner_discretion",
+    other: "other",
   };
 
   export type WaiverReason = (typeof WaiverReason)[keyof typeof WaiverReason];
 
   export const WaiverStatus: {
-    readonly "pending": "pending";
-    readonly "signed": "signed";
-    readonly "expired": "expired";
-    readonly "declined": "declined";
+    readonly pending: "pending";
+    readonly signed: "signed";
+    readonly expired: "expired";
+    readonly declined: "declined";
   } = {
-    "pending": "pending",
-    "signed": "signed",
-    "expired": "expired",
-    "declined": "declined",
+    pending: "pending",
+    signed: "signed",
+    expired: "expired",
+    declined: "declined",
   };
 
   export type WaiverStatus = (typeof WaiverStatus)[keyof typeof WaiverStatus];
 
   export const WorkflowExecutionStatus: {
-    readonly "pending": "pending";
-    readonly "running": "running";
-    readonly "completed": "completed";
-    readonly "failed": "failed";
-    readonly "cancelled": "cancelled";
+    readonly pending: "pending";
+    readonly running: "running";
+    readonly completed: "completed";
+    readonly failed: "failed";
+    readonly cancelled: "cancelled";
   } = {
-    "pending": "pending",
-    "running": "running",
-    "completed": "completed",
-    "failed": "failed",
-    "cancelled": "cancelled",
+    pending: "pending",
+    running: "running",
+    completed: "completed",
+    failed: "failed",
+    cancelled: "cancelled",
   };
 
-  export type WorkflowExecutionStatus = (typeof WorkflowExecutionStatus)[keyof typeof WorkflowExecutionStatus];
+  export type WorkflowExecutionStatus =
+    (typeof WorkflowExecutionStatus)[keyof typeof WorkflowExecutionStatus];
 
   export const WorkflowStatus: {
-    readonly "active": "active";
-    readonly "paused": "paused";
-    readonly "draft": "draft";
-    readonly "archived": "archived";
+    readonly active: "active";
+    readonly paused: "paused";
+    readonly draft: "draft";
+    readonly archived: "archived";
   } = {
-    "active": "active",
-    "paused": "paused",
-    "draft": "draft",
-    "archived": "archived",
+    active: "active",
+    paused: "paused",
+    draft: "draft",
+    archived: "archived",
   };
 
   export type WorkflowStatus = (typeof WorkflowStatus)[keyof typeof WorkflowStatus];
 
   export const WorkflowTrigger: {
-    readonly "reservation_created": "reservation_created";
-    readonly "reservation_confirmed": "reservation_confirmed";
-    readonly "days_before_arrival": "days_before_arrival";
-    readonly "check_in": "check_in";
-    readonly "days_after_checkin": "days_after_checkin";
-    readonly "check_out": "check_out";
-    readonly "days_after_checkout": "days_after_checkout";
-    readonly "payment_received": "payment_received";
-    readonly "payment_failed": "payment_failed";
-    readonly "review_received": "review_received";
-    readonly "birthday": "birthday";
-    readonly "anniversary": "anniversary";
-    readonly "manual": "manual";
+    readonly reservation_created: "reservation_created";
+    readonly reservation_confirmed: "reservation_confirmed";
+    readonly days_before_arrival: "days_before_arrival";
+    readonly check_in: "check_in";
+    readonly days_after_checkin: "days_after_checkin";
+    readonly check_out: "check_out";
+    readonly days_after_checkout: "days_after_checkout";
+    readonly payment_received: "payment_received";
+    readonly payment_failed: "payment_failed";
+    readonly review_received: "review_received";
+    readonly birthday: "birthday";
+    readonly anniversary: "anniversary";
+    readonly manual: "manual";
   } = {
-    "reservation_created": "reservation_created",
-    "reservation_confirmed": "reservation_confirmed",
-    "days_before_arrival": "days_before_arrival",
-    "check_in": "check_in",
-    "days_after_checkin": "days_after_checkin",
-    "check_out": "check_out",
-    "days_after_checkout": "days_after_checkout",
-    "payment_received": "payment_received",
-    "payment_failed": "payment_failed",
-    "review_received": "review_received",
-    "birthday": "birthday",
-    "anniversary": "anniversary",
-    "manual": "manual",
+    reservation_created: "reservation_created",
+    reservation_confirmed: "reservation_confirmed",
+    days_before_arrival: "days_before_arrival",
+    check_in: "check_in",
+    days_after_checkin: "days_after_checkin",
+    check_out: "check_out",
+    days_after_checkout: "days_after_checkout",
+    payment_received: "payment_received",
+    payment_failed: "payment_failed",
+    review_received: "review_received",
+    birthday: "birthday",
+    anniversary: "anniversary",
+    manual: "manual",
   };
 
   export type WorkflowTrigger = (typeof WorkflowTrigger)[keyof typeof WorkflowTrigger];

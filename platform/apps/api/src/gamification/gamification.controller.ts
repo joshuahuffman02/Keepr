@@ -1,4 +1,14 @@
-import { BadRequestException, Body, Controller, Get, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { GamificationService } from "./gamification.service";
 import { AwardXpDto, UpdateGamificationSettingsDto, UpsertXpRuleDto } from "./dto/gamification.dto";
@@ -11,14 +21,18 @@ type GamificationRequest = ExpressRequest & { user?: AuthUser };
 @UseGuards(JwtAuthGuard)
 @Controller("gamification")
 export class GamificationController {
-  constructor(private readonly gamificationService: GamificationService) { }
+  constructor(private readonly gamificationService: GamificationService) {}
 
   private resolveCampgroundId(req: GamificationRequest, provided?: string) {
     const headerValue = req.headers?.["x-campground-id"];
     const headerId = Array.isArray(headerValue) ? headerValue[0] : headerValue;
     const queryValue = req.query?.campgroundId;
     const queryId =
-      typeof queryValue === "string" ? queryValue : Array.isArray(queryValue) ? queryValue[0] : undefined;
+      typeof queryValue === "string"
+        ? queryValue
+        : Array.isArray(queryValue)
+          ? queryValue[0]
+          : undefined;
     const cg = provided || headerId || queryId;
     if (!cg || typeof cg !== "string") {
       throw new BadRequestException("campgroundId is required");
@@ -120,12 +134,16 @@ export class GamificationController {
       campgroundId: cg,
       viewerId: userId,
       days: parsedDays,
-      limit: parsedLimit
+      limit: parsedLimit,
     });
   }
 
   @Get("stats")
-  getStats(@Req() req: GamificationRequest, @Query("campgroundId") campgroundId: string, @Query("days") days?: string) {
+  getStats(
+    @Req() req: GamificationRequest,
+    @Query("campgroundId") campgroundId: string,
+    @Query("days") days?: string,
+  ) {
     const cg = this.resolveCampgroundId(req, campgroundId);
     const parsedDays = days ? Number(days) : undefined;
     return this.gamificationService.getStats(cg, parsedDays);

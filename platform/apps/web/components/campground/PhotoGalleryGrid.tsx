@@ -36,7 +36,7 @@ export function PhotoGalleryGrid({
       <div
         className={cn(
           "relative h-[50vh] md:h-[60vh] w-full bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600",
-          className
+          className,
         )}
         aria-label="No photos available"
       >
@@ -62,19 +62,9 @@ export function PhotoGalleryGrid({
             aria-label={`View photo of ${campgroundName}`}
           >
             {isExternal ? (
-              <img
-                src={photos[0]}
-                alt={campgroundName}
-                className="w-full h-full object-cover"
-              />
+              <img src={photos[0]} alt={campgroundName} className="w-full h-full object-cover" />
             ) : (
-              <Image
-                src={photos[0]}
-                alt={campgroundName}
-                fill
-                className="object-cover"
-                priority
-              />
+              <Image src={photos[0]} alt={campgroundName} fill className="object-cover" priority />
             )}
           </button>
         </div>
@@ -102,7 +92,7 @@ export function PhotoGalleryGrid({
                 onClick={() => openLightbox(index)}
                 className={cn(
                   "relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset",
-                  index === 0 ? "rounded-bl-2xl" : "rounded-br-2xl"
+                  index === 0 ? "rounded-bl-2xl" : "rounded-br-2xl",
                 )}
                 whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                 transition={{ duration: 0.2 }}
@@ -154,11 +144,7 @@ export function PhotoGalleryGrid({
               aria-label="View main photo"
             >
               {isExternal ? (
-                <img
-                  src={photos[0]}
-                  alt={campgroundName}
-                  className="w-full h-full object-cover"
-                />
+                <img src={photos[0]} alt={campgroundName} className="w-full h-full object-cover" />
               ) : (
                 <Image
                   src={photos[0]}
@@ -179,9 +165,7 @@ export function PhotoGalleryGrid({
                   className={cn(
                     "relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-inset",
                     index === 0 && photos.length === 2 ? "rounded-br-2xl" : "",
-                    index === 1 || (index === 0 && photos.length === 3)
-                      ? "rounded-br-2xl"
-                      : ""
+                    index === 1 || (index === 0 && photos.length === 3) ? "rounded-br-2xl" : "",
                   )}
                   whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                   transition={{ duration: 0.2 }}
@@ -370,19 +354,9 @@ export function PhotoGalleryGrid({
             aria-label="View photos"
           >
             {isExternal ? (
-              <img
-                src={photos[0]}
-                alt={campgroundName}
-                className="w-full h-full object-cover"
-              />
+              <img src={photos[0]} alt={campgroundName} className="w-full h-full object-cover" />
             ) : (
-              <Image
-                src={photos[0]}
-                alt={campgroundName}
-                fill
-                className="object-cover"
-                priority
-              />
+              <Image src={photos[0]} alt={campgroundName} fill className="object-cover" priority />
             )}
           </button>
 
@@ -395,24 +369,14 @@ export function PhotoGalleryGrid({
                 className={cn(
                   "relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden",
                   "ring-2 ring-offset-2 ring-offset-transparent",
-                  index === 0 ? "ring-white" : "ring-white/50"
+                  index === 0 ? "ring-white" : "ring-white/50",
                 )}
                 aria-label={`View photo ${index + 1}`}
               >
                 {isExternal ? (
-                  <img
-                    src={photo}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={photo} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <Image
-                    src={photo}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
+                  <Image src={photo} alt="" fill className="object-cover" sizes="64px" />
                 )}
               </button>
             ))}

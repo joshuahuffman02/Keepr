@@ -1,8 +1,29 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, Inject, forwardRef } from "@nestjs/common";
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  Inject,
+  forwardRef,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { IdempotencyService } from "../payments/idempotency.service";
-import { CheckoutCartDto, CreateCartDto, OfflineReplayDto, UpdateCartDto, CreateReturnDto } from "./pos.dto";
-import { ExpirationTier, IdempotencyStatus, PosCartStatus, PosPaymentStatus, Prisma, TillMovementType } from "@prisma/client";
+import {
+  CheckoutCartDto,
+  CreateCartDto,
+  OfflineReplayDto,
+  UpdateCartDto,
+  CreateReturnDto,
+} from "./pos.dto";
+import {
+  ExpirationTier,
+  IdempotencyStatus,
+  PosCartStatus,
+  PosPaymentStatus,
+  Prisma,
+  TillMovementType,
+} from "@prisma/client";
 import { StoredValueService } from "../stored-value/stored-value.service";
 import { GuestWalletService } from "../guest-wallet/guest-wallet.service";
 import { StripeService } from "../payments/stripe.service";
@@ -66,13 +87,14 @@ type OfflineReplayItem = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
-const getString = (value: unknown): string | undefined => (typeof value === "string" ? value : undefined);
+const getString = (value: unknown): string | undefined =>
+  typeof value === "string" ? value : undefined;
 
 const getNumber = (value: unknown): number | undefined =>
   typeof value === "number" && Number.isFinite(value) ? value : undefined;
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullTypes.DbNull | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.DbNull;
@@ -104,7 +126,7 @@ export class PosService {
     @Inject(forwardRef(() => BatchInventoryService))
     private readonly batchInventory: BatchInventoryService,
     @Inject(forwardRef(() => MarkdownRulesService))
-    private readonly markdownRules: MarkdownRulesService
+    private readonly markdownRules: MarkdownRulesService,
   ) {}
 
   async createCart(dto: CreateCartDto, actor: PosActor) {
@@ -121,7 +143,7 @@ export class PosService {
     if (dto.terminalId) {
       const terminal = await this.prisma.posTerminal.findUnique({
         where: { id: dto.terminalId },
-        select: { locationId: true, priceVersion: true, taxVersion: true }
+        select: { locationId: true, priceVersion: true, taxVersion: true },
       });
       if (terminal) {
         locationId = terminal.locationId;
@@ -131,16 +153,18 @@ export class PosService {
     }
 
     // Use provided versions or fall back to terminal/system defaults
-    const pricingVersion = dto.pricingVersion ?? terminalPriceVersion ?? new Date().toISOString().split('T')[0];
-    const taxVersion = dto.taxVersion ?? terminalTaxVersion ?? new Date().toISOString().split('T')[0];
+    const pricingVersion =
+      dto.pricingVersion ?? terminalPriceVersion ?? new Date().toISOString().split("T")[0];
+    const taxVersion =
+      dto.taxVersion ?? terminalTaxVersion ?? new Date().toISOString().split("T")[0];
 
     // Fetch all products for this cart
-    const productIds = dto.items.map(i => i.productId);
+    const productIds = dto.items.map((i) => i.productId);
     const products = await this.prisma.product.findMany({
       where: { id: { in: productIds } },
-      select: { id: true, priceCents: true, name: true }
+      select: { id: true, priceCents: true, name: true },
     });
-    const productMap = new Map(products.map(p => [p.id, p]));
+    const productMap = new Map(products.map((p) => [p.id, p]));
 
     // Fetch location price overrides if we have a location
     const priceOverrides = new Map<string, number>();
@@ -149,8 +173,8 @@ export class PosService {
         where: {
           productId: { in: productIds },
           locationId,
-          isActive: true
-        }
+          isActive: true,
+        },
       });
       for (const o of overrides) {
         priceOverrides.set(o.productId, o.priceCents);
@@ -158,18 +182,20 @@ export class PosService {
     }
 
     // Fetch tax rules for goods/general
-    const taxRules = campgroundId ? await this.prisma.taxRule.findMany({
-      where: {
-        campgroundId,
-        isActive: true,
-        category: { in: ['general', 'goods'] }
-      }
-    }) : [];
+    const taxRules = campgroundId
+      ? await this.prisma.taxRule.findMany({
+          where: {
+            campgroundId,
+            isActive: true,
+            category: { in: ["general", "goods"] },
+          },
+        })
+      : [];
 
     // Calculate effective tax rate (sum of all applicable percentage rates)
     let effectiveTaxRate = 0;
     for (const rule of taxRules) {
-      if (rule.type === 'percentage' && rule.rate) {
+      if (rule.type === "percentage" && rule.rate) {
         effectiveTaxRate += Number(rule.rate);
       }
     }
@@ -178,10 +204,8 @@ export class PosService {
     const cartItemsData = dto.items.map((item) => {
       const product = productMap.get(item.productId);
       // Priority: override from DTO > location override > product base price
-      const unitPriceCents = item.overridePriceCents
-        ?? priceOverrides.get(item.productId)
-        ?? product?.priceCents
-        ?? 0;
+      const unitPriceCents =
+        item.overridePriceCents ?? priceOverrides.get(item.productId) ?? product?.priceCents ?? 0;
       const subtotalCents = unitPriceCents * item.qty;
       const taxCents = Math.round(subtotalCents * effectiveTaxRate);
       const totalCents = subtotalCents + taxCents;
@@ -193,7 +217,7 @@ export class PosService {
         unitPriceCents,
         taxCents,
         totalCents,
-        originalPriceCents: product?.priceCents ?? unitPriceCents
+        originalPriceCents: product?.priceCents ?? unitPriceCents,
       };
     });
 
@@ -207,10 +231,10 @@ export class PosService {
         priceVersion: pricingVersion,
         taxVersion,
         PosCartItem: {
-          create: cartItemsData
-        }
+          create: cartItemsData,
+        },
       },
-      include: { PosCartItem: true }
+      include: { PosCartItem: true },
     });
   }
 
@@ -218,7 +242,7 @@ export class PosService {
     // Fetch cart with terminal for location-based pricing
     const cart = await this.prisma.posCart.findUnique({
       where: { id: cartId },
-      select: { campgroundId: true, terminalId: true }
+      select: { campgroundId: true, terminalId: true },
     });
     if (!cart) throw new NotFoundException("Cart not found");
 
@@ -230,24 +254,24 @@ export class PosService {
       if (cart.terminalId) {
         const terminal = await this.prisma.posTerminal.findUnique({
           where: { id: cart.terminalId },
-          select: { locationId: true }
+          select: { locationId: true },
         });
         locationId = terminal?.locationId ?? null;
       }
 
       // Fetch products
-      const productIds = dto.add.map(i => i.productId);
+      const productIds = dto.add.map((i) => i.productId);
       const products = await this.prisma.product.findMany({
         where: { id: { in: productIds } },
-        select: { id: true, priceCents: true }
+        select: { id: true, priceCents: true },
       });
-      const productMap = new Map(products.map(p => [p.id, p]));
+      const productMap = new Map(products.map((p) => [p.id, p]));
 
       // Fetch location price overrides
       const priceOverrides = new Map<string, number>();
       if (locationId) {
         const overrides = await this.prisma.locationPriceOverride.findMany({
-          where: { productId: { in: productIds }, locationId, isActive: true }
+          where: { productId: { in: productIds }, locationId, isActive: true },
         });
         for (const o of overrides) {
           priceOverrides.set(o.productId, o.priceCents);
@@ -255,22 +279,26 @@ export class PosService {
       }
 
       // Fetch tax rules
-      const taxRules = cart.campgroundId ? await this.prisma.taxRule.findMany({
-        where: { campgroundId: cart.campgroundId, isActive: true, category: { in: ['general', 'goods'] } }
-      }) : [];
+      const taxRules = cart.campgroundId
+        ? await this.prisma.taxRule.findMany({
+            where: {
+              campgroundId: cart.campgroundId,
+              isActive: true,
+              category: { in: ["general", "goods"] },
+            },
+          })
+        : [];
       let effectiveTaxRate = 0;
       for (const rule of taxRules) {
-        if (rule.type === 'percentage' && rule.rate) {
+        if (rule.type === "percentage" && rule.rate) {
           effectiveTaxRate += Number(rule.rate);
         }
       }
 
       ops.create = dto.add.map((item) => {
         const product = productMap.get(item.productId);
-        const unitPriceCents = item.overridePriceCents
-          ?? priceOverrides.get(item.productId)
-          ?? product?.priceCents
-          ?? 0;
+        const unitPriceCents =
+          item.overridePriceCents ?? priceOverrides.get(item.productId) ?? product?.priceCents ?? 0;
         const subtotalCents = unitPriceCents * item.qty;
         const taxCents = Math.round(subtotalCents * effectiveTaxRate);
         const totalCents = subtotalCents + taxCents;
@@ -282,7 +310,7 @@ export class PosService {
           unitPriceCents,
           taxCents,
           totalCents,
-          originalPriceCents: product?.priceCents ?? unitPriceCents
+          originalPriceCents: product?.priceCents ?? unitPriceCents,
         };
       });
     }
@@ -292,8 +320,8 @@ export class PosService {
         where: { id: item.cartItemId },
         data: {
           qty: item.qty,
-          unitPriceCents: item.overridePriceCents ?? undefined
-        }
+          unitPriceCents: item.overridePriceCents ?? undefined,
+        },
       }));
     }
 
@@ -304,21 +332,31 @@ export class PosService {
     return this.prisma.posCart.update({
       where: { id: cartId },
       data: { PosCartItem: ops, updatedAt: new Date() },
-      include: { PosCartItem: true }
+      include: { PosCartItem: true },
     });
   }
 
   async checkout(cartId: string, dto: CheckoutCartDto, idempotencyKey?: string, actor?: PosActor) {
-    const existing = await this.guardIdempotency(idempotencyKey, { cartId, dto }, actor, "pos/checkout");
-    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
-    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      { cartId, dto },
+      actor,
+      "pos/checkout",
+    );
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson)
+      return existing.responseJson;
+    if (
+      existing?.status === IdempotencyStatus.inflight &&
+      existing.createdAt &&
+      Date.now() - new Date(existing.createdAt).getTime() < 60000
+    ) {
       throw new ConflictException("Request already in progress");
     }
 
     // Reprice cart items using stored prices and tax
     const cart = await this.prisma.posCart.findUnique({
       where: { id: cartId },
-      include: { PosCartItem: { include: { Product: true } }, PosPayment: true }
+      include: { PosCartItem: { include: { Product: true } }, PosPayment: true },
     });
     if (!cart) throw new NotFoundException("Cart not found");
     if (cart.status !== PosCartStatus.open) throw new ConflictException("Cart not open");
@@ -333,7 +371,7 @@ export class PosService {
       const resp = await this.prisma.posCart.update({
         where: { id: cartId },
         data: { needsReview: true, updatedAt: new Date() },
-        include: { PosCartItem: true, PosPayment: true }
+        include: { PosCartItem: true, PosPayment: true },
       });
       const response = {
         cartId,
@@ -343,7 +381,7 @@ export class PosService {
         expectedTotal,
         tenderTotal,
         delta,
-        expectedBreakdown: expected
+        expectedBreakdown: expected,
       };
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
       return response;
@@ -361,7 +399,9 @@ export class PosService {
     try {
       const result = await this.prisma.$transaction(async (tx) => {
         // Process stored value tenders first to catch insufficient balance early
-        for (const p of dto.payments.filter((p) => p.method === "gift" || p.method === "store_credit")) {
+        for (const p of dto.payments.filter(
+          (p) => p.method === "gift" || p.method === "store_credit",
+        )) {
           await this.storedValue.redeem(
             {
               code: dto.giftCode,
@@ -369,10 +409,10 @@ export class PosService {
               currency: cart.currency,
               redeemCampgroundId: cart.campgroundId,
               referenceType: "pos_cart",
-              referenceId: cartId
+              referenceId: cartId,
             },
             p.idempotencyKey,
-            actor
+            actor,
           );
         }
 
@@ -389,10 +429,10 @@ export class PosService {
               amountCents: p.amountCents,
               currency: p.currency,
               referenceType: "pos_cart",
-              referenceId: cartId
+              referenceId: cartId,
             },
             p.idempotencyKey,
-            actor
+            actor,
           );
           // Record the payment
           await tx.posPayment.create({
@@ -406,13 +446,15 @@ export class PosService {
               idempotencyKey: p.idempotencyKey,
               referenceType: p.referenceType ?? "guest_wallet",
               referenceId: p.referenceId ?? dto.guestId,
-              updatedAt: new Date()
-            }
+              updatedAt: new Date(),
+            },
           });
         }
 
         // Process non-stored-value tenders
-        for (const p of dto.payments.filter((p) => p.method !== "gift" && p.method !== "store_credit" && p.method !== "guest_wallet")) {
+        for (const p of dto.payments.filter(
+          (p) => p.method !== "gift" && p.method !== "store_credit" && p.method !== "guest_wallet",
+        )) {
           if (p.method === "charge_to_site") {
             // Integrate with reservations AR/folio
             const reservationId = dto.reservationId ?? p.referenceId;
@@ -423,13 +465,15 @@ export class PosService {
             // Validate reservation exists and is active
             const reservation = await tx.reservation.findUnique({
               where: { id: reservationId },
-              select: { id: true, status: true, siteId: true, Site: { select: { name: true } } }
+              select: { id: true, status: true, siteId: true, Site: { select: { name: true } } },
             });
             if (!reservation) {
               throw new BadRequestException("Reservation not found");
             }
             if (!["confirmed", "checked_in", "pending"].includes(reservation.status)) {
-              throw new BadRequestException(`Cannot charge to site - reservation status is ${reservation.status}`);
+              throw new BadRequestException(
+                `Cannot charge to site - reservation status is ${reservation.status}`,
+              );
             }
 
             // Create balanced ledger entries for the charge
@@ -443,7 +487,7 @@ export class PosService {
                 description: `POS charge from cart #${cartId.slice(-6)}`,
                 amountCents: p.amountCents,
                 direction: "debit", // Debit increases guest balance owed
-                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:debit`
+                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:debit`,
               },
               {
                 campgroundId: cart.campgroundId,
@@ -453,8 +497,8 @@ export class PosService {
                 description: `POS charge from cart #${cartId.slice(-6)}`,
                 amountCents: p.amountCents,
                 direction: "credit", // Credit recognizes revenue
-                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:credit`
-              }
+                dedupeKey: `pos_cart_${cartId}_${p.idempotencyKey}:credit`,
+              },
             ]);
 
             // Update reservation balance
@@ -462,8 +506,8 @@ export class PosService {
               where: { id: reservationId },
               data: {
                 balanceAmount: { increment: p.amountCents },
-                totalAmount: { increment: p.amountCents }
-              }
+                totalAmount: { increment: p.amountCents },
+              },
             });
 
             // Record the payment as succeeded
@@ -478,8 +522,8 @@ export class PosService {
                 idempotencyKey: p.idempotencyKey,
                 referenceType: "reservation",
                 referenceId: reservationId,
-                updatedAt: new Date()
-              }
+                updatedAt: new Date(),
+              },
             });
 
             await this.audit.record({
@@ -488,7 +532,7 @@ export class PosService {
               action: "pos.payment.charge_to_site",
               entity: "reservation",
               entityId: reservationId,
-              after: { cartId, amountCents: p.amountCents, siteName: reservation.Site?.name }
+              after: { cartId, amountCents: p.amountCents, siteName: reservation.Site?.name },
             });
 
             continue;
@@ -503,8 +547,8 @@ export class PosService {
                 currency: p.currency,
                 idempotencyKey: p.idempotencyKey,
                 cartId,
-                metadata: { referenceType: p.referenceType, referenceId: p.referenceId }
-              }
+                metadata: { referenceType: p.referenceType, referenceId: p.referenceId },
+              },
             );
 
             if (providerPayment) {
@@ -512,8 +556,8 @@ export class PosService {
                 providerPayment.status === "succeeded"
                   ? PosPaymentStatus.succeeded
                   : providerPayment.status === "failed"
-                  ? PosPaymentStatus.failed
-                  : PosPaymentStatus.pending;
+                    ? PosPaymentStatus.failed
+                    : PosPaymentStatus.pending;
 
               await tx.posPayment.create({
                 data: {
@@ -527,10 +571,10 @@ export class PosService {
                   referenceType: p.referenceType,
                   referenceId: p.referenceId,
                   processorIds: toNullableJsonInput(
-                    providerPayment.processorIds ?? { provider: providerPayment.provider }
+                    providerPayment.processorIds ?? { provider: providerPayment.provider },
                   ),
-                  updatedAt: new Date()
-                }
+                  updatedAt: new Date(),
+                },
               });
 
               // Post ledger entries for successful card payments via provider
@@ -543,7 +587,7 @@ export class PosService {
                     description: `POS card payment (provider) for cart #${cartId.slice(-6)}`,
                     amountCents: p.amountCents,
                     direction: "debit",
-                    dedupeKey: `pos_card_${cartId}_${p.idempotencyKey}:debit`
+                    dedupeKey: `pos_card_${cartId}_${p.idempotencyKey}:debit`,
                   },
                   {
                     campgroundId: cart.campgroundId,
@@ -552,8 +596,8 @@ export class PosService {
                     description: `POS card payment (provider) for cart #${cartId.slice(-6)}`,
                     amountCents: p.amountCents,
                     direction: "credit",
-                    dedupeKey: `pos_card_${cartId}_${p.idempotencyKey}:credit`
-                  }
+                    dedupeKey: `pos_card_${cartId}_${p.idempotencyKey}:credit`,
+                  },
                 ]);
               }
 
@@ -563,7 +607,7 @@ export class PosService {
                 action: "pos.payment.external",
                 entity: "pos_cart",
                 entityId: cartId,
-                after: { provider: providerPayment.provider, status }
+                after: { provider: providerPayment.provider, status },
               });
               continue;
             }
@@ -581,7 +625,7 @@ export class PosService {
               0,
               "automatic",
               undefined,
-              p.idempotencyKey
+              p.idempotencyKey,
             );
 
             // Map Stripe intent status to POS payment status
@@ -607,9 +651,12 @@ export class PosService {
                 idempotencyKey: p.idempotencyKey,
                 referenceType: p.referenceType,
                 referenceId: p.referenceId,
-                processorIds: toNullableJsonInput({ intentId: intent.id, clientSecret: intent.client_secret }),
-                updatedAt: new Date()
-              }
+                processorIds: toNullableJsonInput({
+                  intentId: intent.id,
+                  clientSecret: intent.client_secret,
+                }),
+                updatedAt: new Date(),
+              },
             });
 
             // Only post ledger entries when payment actually succeeds
@@ -622,7 +669,7 @@ export class PosService {
                   description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
                   amountCents: p.amountCents,
                   direction: "debit",
-                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:debit`
+                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:debit`,
                 },
                 {
                   campgroundId: cart.campgroundId,
@@ -631,8 +678,8 @@ export class PosService {
                   description: `POS card payment (Stripe) for cart #${cartId.slice(-6)}`,
                   amountCents: p.amountCents,
                   direction: "credit",
-                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:credit`
-                }
+                  dedupeKey: `pos_stripe_${cartId}_${p.idempotencyKey}:credit`,
+                },
               ]);
             }
 
@@ -647,7 +694,7 @@ export class PosService {
                 paymentStatus: intent.status,
                 message: "Payment requires additional action",
                 totalCents: expected.totalCents,
-                breakdown: expected
+                breakdown: expected,
               };
             }
 
@@ -669,8 +716,8 @@ export class PosService {
               idempotencyKey: p.idempotencyKey,
               referenceType: p.referenceType,
               referenceId: p.referenceId,
-              updatedAt: new Date()
-            }
+              updatedAt: new Date(),
+            },
           });
           if (p.method === "cash" && cashTillSession) {
             const movementActorId = actor?.id ?? cashTillSession.openedByUserId;
@@ -683,8 +730,8 @@ export class PosService {
                 currency: payment.currency,
                 actorUserId: movementActorId,
                 sourceCartId: cartId,
-                note: `cart:${cartId}`
-              }
+                note: `cart:${cartId}`,
+              },
             });
           }
 
@@ -697,7 +744,7 @@ export class PosService {
               description: `POS ${p.method} payment for cart #${cartId.slice(-6)}`,
               amountCents: p.amountCents,
               direction: "debit",
-              dedupeKey: `pos_${p.method}_${cartId}_${p.idempotencyKey}:debit`
+              dedupeKey: `pos_${p.method}_${cartId}_${p.idempotencyKey}:debit`,
             },
             {
               campgroundId: cart.campgroundId,
@@ -706,8 +753,8 @@ export class PosService {
               description: `POS ${p.method} payment for cart #${cartId.slice(-6)}`,
               amountCents: p.amountCents,
               direction: "credit",
-              dedupeKey: `pos_${p.method}_${cartId}_${p.idempotencyKey}:credit`
-            }
+              dedupeKey: `pos_${p.method}_${cartId}_${p.idempotencyKey}:credit`,
+            },
           ]);
         }
 
@@ -720,15 +767,15 @@ export class PosService {
             feeCents: expected.feeCents,
             grossCents: expected.totalCents,
             needsReview: false,
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
 
         return {
           cartId,
           status: "checked_out",
           totalCents: expected.totalCents,
-          breakdown: expected
+          breakdown: expected,
         };
       });
 
@@ -737,7 +784,7 @@ export class PosService {
         try {
           const lineItems = (cart.PosCartItem ?? []).map((item) => ({
             label: item.Product?.name ?? item.productId,
-            amountCents: item.totalCents ?? 0
+            amountCents: item.totalCents ?? 0,
           }));
           await this.email.sendPaymentReceipt({
             guestEmail: receiptEmail,
@@ -750,7 +797,7 @@ export class PosService {
             taxCents: expected.taxCents,
             feeCents: expected.feeCents,
             totalCents: expected.totalCents,
-            kind: "pos"
+            kind: "pos",
           });
         } catch (emailErr) {
           this.logger.warn(`POS receipt email failed for cart ${cartId}: ${emailErr}`);
@@ -770,22 +817,42 @@ export class PosService {
     const scope = this.scopeKey(actor);
 
     if (dto.clientTxId) {
-      const seqExisting = await this.idempotency.findBySequence(scope, "pos/offline/replay", dto.clientTxId);
+      const seqExisting = await this.idempotency.findBySequence(
+        scope,
+        "pos/offline/replay",
+        dto.clientTxId,
+      );
       if (seqExisting?.responseJson) {
-        this.logger.warn(`Duplicate offline replay detected for seq ${dto.clientTxId} scope ${scope}`);
+        this.logger.warn(
+          `Duplicate offline replay detected for seq ${dto.clientTxId} scope ${scope}`,
+        );
         return seqExisting.responseJson;
       }
       if (seqExisting?.status === IdempotencyStatus.inflight) {
         throw new ConflictException("Replay already in progress");
       }
       if (seqExisting) {
-        this.logger.warn(`Replay seq ${dto.clientTxId} already processed without snapshot for scope ${scope}`);
+        this.logger.warn(
+          `Replay seq ${dto.clientTxId} already processed without snapshot for scope ${scope}`,
+        );
       }
     }
 
-    const existing = await this.guardIdempotency(idempotencyKey, dto, actor, "pos/offline/replay", dto.clientTxId, dto.recordedTotalsHash);
-    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
-    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+    const existing = await this.guardIdempotency(
+      idempotencyKey,
+      dto,
+      actor,
+      "pos/offline/replay",
+      dto.clientTxId,
+      dto.recordedTotalsHash,
+    );
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson)
+      return existing.responseJson;
+    if (
+      existing?.status === IdempotencyStatus.inflight &&
+      existing.createdAt &&
+      Date.now() - new Date(existing.createdAt).getTime() < 60000
+    ) {
       throw new ConflictException("Request already in progress");
     }
 
@@ -800,7 +867,7 @@ export class PosService {
         clientTxId: dto.clientTxId,
         status: "needs_review",
         reason: "missing_cart_id",
-        recordedTotalsHash: dto.recordedTotalsHash
+        recordedTotalsHash: dto.recordedTotalsHash,
       };
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
       return response;
@@ -808,10 +875,14 @@ export class PosService {
 
     const cart = await this.prisma.posCart.findUnique({
       where: { id: cartId },
-      include: { PosCartItem: true }
+      include: { PosCartItem: true },
     });
     if (!cart) {
-      const response: OfflineReplayResponse = { clientTxId: dto.clientTxId, status: "needs_review", reason: "cart_not_found" };
+      const response: OfflineReplayResponse = {
+        clientTxId: dto.clientTxId,
+        status: "needs_review",
+        reason: "cart_not_found",
+      };
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
       return response;
     }
@@ -826,7 +897,7 @@ export class PosService {
         reason: "missing_recorded_totals_hash",
         cartId,
         expectedBreakdown: expected,
-        expectedHash
+        expectedHash,
       };
       if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
       return response;
@@ -838,7 +909,7 @@ export class PosService {
           clientTxId: dto.clientTxId,
           status: "accepted",
           cartId,
-          expectedBreakdown: expected
+          expectedBreakdown: expected,
         }
       : {
           clientTxId: dto.clientTxId,
@@ -847,20 +918,24 @@ export class PosService {
           cartId,
           expectedBreakdown: expected,
           expectedHash,
-          recordedTotalsHash: dto.recordedTotalsHash
+          recordedTotalsHash: dto.recordedTotalsHash,
         };
 
     if (response.status === "needs_review") {
-      await this.prisma.posCart.update({
-        where: { id: cartId },
-        data: { needsReview: true, updatedAt: new Date() }
-      }).catch(() => null);
+      await this.prisma.posCart
+        .update({
+          where: { id: cartId },
+          data: { needsReview: true, updatedAt: new Date() },
+        })
+        .catch(() => null);
     }
 
-    const payloadHash = dto.payload ? crypto.createHash("sha256").update(JSON.stringify(dto.payload)).digest("hex") : undefined;
+    const payloadHash = dto.payload
+      ? crypto.createHash("sha256").update(JSON.stringify(dto.payload)).digest("hex")
+      : undefined;
     const tender = this.extractTender(dto.payload);
     const items = this.extractItems(dto.payload);
-    const responseReason = response.status === "needs_review" ? response.reason ?? null : null;
+    const responseReason = response.status === "needs_review" ? (response.reason ?? null) : null;
 
     // Persist offline replay for reconciliation / review
     try {
@@ -880,7 +955,7 @@ export class PosService {
             expectedBreakdown: toNullableJsonInput(expected),
             campgroundId: actor?.campgroundId ?? null,
             cartId,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           },
           create: {
             id: offlineId,
@@ -896,8 +971,8 @@ export class PosService {
             tender: toNullableJsonInput(tender),
             items: toNullableJsonInput(items),
             expectedBreakdown: toNullableJsonInput(expected),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       } else {
         await this.prisma.posOfflineReplay.create({
@@ -915,12 +990,14 @@ export class PosService {
             tender: toNullableJsonInput(tender),
             items: toNullableJsonInput(items),
             expectedBreakdown: toNullableJsonInput(expected),
-            updatedAt: new Date()
-          }
+            updatedAt: new Date(),
+          },
         });
       }
     } catch (persistErr) {
-      this.logger.warn(`Failed to persist offline replay ${dto.clientTxId ?? "unknown"}: ${persistErr}`);
+      this.logger.warn(
+        `Failed to persist offline replay ${dto.clientTxId ?? "unknown"}: ${persistErr}`,
+      );
     }
 
     if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
@@ -928,24 +1005,30 @@ export class PosService {
       clientTxId: dto.clientTxId,
       cartId,
       status: response.status,
-      campgroundId: actor?.campgroundId ?? null
+      campgroundId: actor?.campgroundId ?? null,
     });
     return response;
   }
 
   async createReturn(dto: CreateReturnDto, idempotencyKey?: string, actor?: PosActor) {
     const existing = await this.guardIdempotency(idempotencyKey, dto, actor, "pos/returns");
-    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson) return existing.responseJson;
-    if (existing?.status === IdempotencyStatus.inflight && existing.createdAt && Date.now() - new Date(existing.createdAt).getTime() < 60000) {
+    if (existing?.status === IdempotencyStatus.succeeded && existing.responseJson)
+      return existing.responseJson;
+    if (
+      existing?.status === IdempotencyStatus.inflight &&
+      existing.createdAt &&
+      Date.now() - new Date(existing.createdAt).getTime() < 60000
+    ) {
       throw new ConflictException("Request already in progress");
     }
 
     const cart = await this.prisma.posCart.findUnique({
       where: { id: dto.originalCartId },
-      include: { PosCartItem: true }
+      include: { PosCartItem: true },
     });
     if (!cart) throw new NotFoundException("Original cart not found");
-    if (cart.status !== PosCartStatus.checked_out) throw new ConflictException("Only checked out carts can be returned");
+    if (cart.status !== PosCartStatus.checked_out)
+      throw new ConflictException("Only checked out carts can be returned");
 
     // Choose items to reverse
     const itemsToReverse = dto.items?.length
@@ -972,7 +1055,9 @@ export class PosService {
     for (const item of itemsToReverse) {
       const sel = dto.items?.find((s) => s.cartItemId === item.id);
       const qty = sel?.qty ?? item.qty ?? 1;
-      const unit = item.unitPriceCents ?? (item.totalCents && item.qty ? item.totalCents / item.qty : item.totalCents);
+      const unit =
+        item.unitPriceCents ??
+        (item.totalCents && item.qty ? item.totalCents / item.qty : item.totalCents);
       const lineNet = unit * qty;
       const lineTax = (item.taxCents ?? 0) * (qty / (item.qty || qty));
       const lineFee = (item.feeCents ?? 0) * (qty / (item.qty || qty));
@@ -995,8 +1080,8 @@ export class PosService {
         taxCents: Math.round(tax),
         feeCents: Math.round(fee),
         grossCents: Math.round(gross),
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     const response = {
@@ -1008,9 +1093,9 @@ export class PosService {
         netCents: Math.round(net),
         taxCents: Math.round(tax),
         feeCents: Math.round(fee),
-        grossCents: Math.round(gross)
+        grossCents: Math.round(gross),
       },
-      items: details
+      items: details,
     };
 
     if (idempotencyKey) await this.idempotency.complete(idempotencyKey, response);
@@ -1028,7 +1113,7 @@ export class PosService {
     productId: string,
     locationId: string | null,
     qty: number = 1,
-    options?: { allowExpired?: boolean; existingPromoDiscountCents?: number }
+    options?: { allowExpired?: boolean; existingPromoDiscountCents?: number },
   ): Promise<{
     productId: string;
     productName: string;
@@ -1082,12 +1167,10 @@ export class PosService {
     if (product.useBatchTracking) {
       try {
         // Preview FEFO allocation to determine which batch will be used
-        const allocations = await this.batchInventory.allocateFEFO(
-          productId,
-          locationId,
-          qty,
-          { previewOnly: true, allowExpired: options?.allowExpired }
-        );
+        const allocations = await this.batchInventory.allocateFEFO(productId, locationId, qty, {
+          previewOnly: true,
+          allowExpired: options?.allowExpired,
+        });
 
         if (allocations.length > 0) {
           const primaryBatch = allocations[0];
@@ -1138,7 +1221,7 @@ export class PosService {
         productId,
         batchId,
         basePriceCents,
-        options?.existingPromoDiscountCents ?? 0
+        options?.existingPromoDiscountCents ?? 0,
       );
 
       discountSource = bestDiscount.source;
@@ -1190,7 +1273,7 @@ export class PosService {
       overridePriceCents?: number;
       allowExpired?: boolean;
       existingPromoDiscountCents?: number;
-    }
+    },
   ) {
     const cart = await this.prisma.posCart.findUnique({
       where: { id: cartId },
@@ -1210,16 +1293,10 @@ export class PosService {
     const locationId = terminal?.locationId ?? null;
 
     // Scan product to get batch/markdown info
-    const scanResult = await this.scanProduct(
-      cart.campgroundId,
-      productId,
-      locationId,
-      qty,
-      {
-        allowExpired: options?.allowExpired,
-        existingPromoDiscountCents: options?.existingPromoDiscountCents,
-      }
-    );
+    const scanResult = await this.scanProduct(cart.campgroundId, productId, locationId, qty, {
+      allowExpired: options?.allowExpired,
+      existingPromoDiscountCents: options?.existingPromoDiscountCents,
+    });
 
     // Block expired items unless override is provided
     if (scanResult.requiresOverride && !options?.allowExpired) {
@@ -1268,7 +1345,7 @@ export class PosService {
           scanResult.basePriceCents,
           scanResult.effectivePriceCents,
           qty,
-          scanResult.daysUntilExpiration ?? 0
+          scanResult.daysUntilExpiration ?? 0,
         );
       } catch (err) {
         this.logger.warn(`Failed to record markdown application: ${err}`);
@@ -1293,7 +1370,7 @@ export class PosService {
     actor?: PosActor,
     endpoint?: string,
     sequence?: string | number | null,
-    checksum?: string | null
+    checksum?: string | null,
   ) {
     if (!key) return null;
     return this.idempotency.start(key, body ?? {}, actor?.campgroundId ?? null, {
@@ -1302,14 +1379,22 @@ export class PosService {
       sequence,
       rateAction: "apply",
       checksum: checksum ?? undefined,
-      requestBody: body ?? {}
+      requestBody: body ?? {},
     });
   }
 
   /**
    * Reprice cart items and calculate totals with tax
    */
-  private reprice(cart: { items: { totalCents: number; qty?: number; unitPriceCents?: number; taxCents?: number; feeCents?: number }[] }): CartTotals {
+  private reprice(cart: {
+    items: {
+      totalCents: number;
+      qty?: number;
+      unitPriceCents?: number;
+      taxCents?: number;
+      feeCents?: number;
+    }[];
+  }): CartTotals {
     let net = 0;
     let tax = 0;
     let fee = 0;
@@ -1325,14 +1410,20 @@ export class PosService {
   /**
    * Calculate tax for POS items using campground tax rules
    */
-  async calculatePosTax(campgroundId: string, subtotalCents: number): Promise<{ taxCents: number; breakdown: Array<{ name: string; rate: number; amount: number }> }> {
+  async calculatePosTax(
+    campgroundId: string,
+    subtotalCents: number,
+  ): Promise<{
+    taxCents: number;
+    breakdown: Array<{ name: string; rate: number; amount: number }>;
+  }> {
     const taxRules = await this.prisma.taxRule.findMany({
       where: {
         campgroundId,
         isActive: true,
-        category: { in: ['general', 'goods', 'services'] }
+        category: { in: ["general", "goods", "services"] },
       },
-      orderBy: { createdAt: 'asc' }
+      orderBy: { createdAt: "asc" },
     });
 
     if (taxRules.length === 0) {
@@ -1345,13 +1436,13 @@ export class PosService {
     for (const rule of taxRules) {
       let taxAmount = 0;
 
-      if (rule.type === 'percentage' && rule.rate) {
+      if (rule.type === "percentage" && rule.rate) {
         const rate = Number(rule.rate);
         taxAmount = Math.round(subtotalCents * rate);
         if (taxAmount > 0) {
           breakdown.push({ name: rule.name, rate: rate * 100, amount: taxAmount });
         }
-      } else if (rule.type === 'flat' && rule.rate) {
+      } else if (rule.type === "flat" && rule.rate) {
         taxAmount = Math.round(Number(rule.rate) * 100);
         if (taxAmount > 0) {
           breakdown.push({ name: rule.name, rate: 0, amount: taxAmount });
@@ -1369,9 +1460,12 @@ export class PosService {
     const payments = Array.isArray(payloadRecord?.payments) ? payloadRecord?.payments : [];
     return payments.map((payment) => {
       const paymentRecord = isRecord(payment) ? payment : undefined;
-      const method = getString(paymentRecord?.method) ?? getString(paymentRecord?.type) ?? "unknown";
-      const amountCents = getNumber(paymentRecord?.amountCents) ?? getNumber(paymentRecord?.amount) ?? 0;
-      const referenceId = getString(paymentRecord?.referenceId) ?? getString(paymentRecord?.id) ?? null;
+      const method =
+        getString(paymentRecord?.method) ?? getString(paymentRecord?.type) ?? "unknown";
+      const amountCents =
+        getNumber(paymentRecord?.amountCents) ?? getNumber(paymentRecord?.amount) ?? 0;
+      const referenceId =
+        getString(paymentRecord?.referenceId) ?? getString(paymentRecord?.id) ?? null;
       const tipCents = getNumber(paymentRecord?.tipCents) ?? 0;
       return { method, amountCents, referenceId, tipCents };
     });
@@ -1387,7 +1481,8 @@ export class PosService {
       const unitPriceCents = getNumber(itemRecord?.unitPriceCents) ?? null;
       const taxCents = getNumber(itemRecord?.taxCents) ?? 0;
       const feeCents = getNumber(itemRecord?.feeCents) ?? 0;
-      const totalCents = getNumber(itemRecord?.totalCents) ?? getNumber(itemRecord?.amountCents) ?? 0;
+      const totalCents =
+        getNumber(itemRecord?.totalCents) ?? getNumber(itemRecord?.amountCents) ?? 0;
       const description = getString(itemRecord?.name) ?? getString(itemRecord?.description) ?? null;
       return { productId, qty, unitPriceCents, taxCents, feeCents, totalCents, description };
     });

@@ -52,16 +52,10 @@ export function CharityBadge({
 
   if (variant === "inline") {
     return (
-      <div
-        className={cn(
-          "flex items-center gap-2 text-xs text-rose-600",
-          className
-        )}
-      >
+      <div className={cn("flex items-center gap-2 text-xs text-rose-600", className)}>
         <Heart className="h-3.5 w-3.5 fill-rose-500 text-rose-500" />
         <span>
-          Supporting{" "}
-          <span className="font-medium">{charity.name}</span>
+          Supporting <span className="font-medium">{charity.name}</span>
         </span>
       </div>
     );
@@ -72,7 +66,7 @@ export function CharityBadge({
       <motion.div
         className={cn(
           "flex items-center gap-3 p-3 bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl border border-rose-100",
-          className
+          className,
         )}
         initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,12 +74,7 @@ export function CharityBadge({
         <div className="flex-shrink-0">
           {charity.logoUrl ? (
             <div className="relative w-10 h-10 rounded-full overflow-hidden bg-card border border-rose-100">
-              <Image
-                src={charity.logoUrl}
-                alt={charity.name}
-                fill
-                className="object-contain p-1"
-              />
+              <Image src={charity.logoUrl} alt={charity.name} fill className="object-contain p-1" />
             </div>
           ) : (
             <div className="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center">
@@ -113,7 +102,7 @@ export function CharityBadge({
       className={cn(
         "relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-50 via-pink-50 to-rose-100",
         "border border-rose-200",
-        className
+        className,
       )}
       initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -150,18 +139,14 @@ export function CharityBadge({
                 <Gift className="h-3 w-3 mr-1" />
                 We Give Back
               </Badge>
-              <h3 className="text-xl font-bold text-foreground">
-                Supporting {charity.name}
-              </h3>
+              <h3 className="text-xl font-bold text-foreground">Supporting {charity.name}</h3>
               {charity.description && (
                 <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                   {charity.description}
                 </p>
               )}
               {customMessage && (
-                <p className="text-sm text-rose-600 mt-2 italic">
-                  "{customMessage}"
-                </p>
+                <p className="text-sm text-rose-600 mt-2 italic">"{customMessage}"</p>
               )}
             </div>
 
@@ -194,9 +179,7 @@ export function CharityBadge({
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-rose-500" />
                     <div>
-                      <div className="text-lg font-bold text-foreground">
-                        {stats.donorCount}
-                      </div>
+                      <div className="text-lg font-bold text-foreground">{stats.donorCount}</div>
                       <div className="text-xs text-muted-foreground">Supporters</div>
                     </div>
                   </div>
@@ -239,7 +222,7 @@ export function CharityFloatingBadge({
     <motion.div
       className={cn(
         "flex items-center gap-2 bg-card/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg",
-        className
+        className,
       )}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -254,8 +237,7 @@ export function CharityFloatingBadge({
           </>
         ) : (
           <>
-            Supporting{" "}
-            <span className="text-rose-600">{charityName}</span>
+            Supporting <span className="text-rose-600">{charityName}</span>
           </>
         )}
       </span>

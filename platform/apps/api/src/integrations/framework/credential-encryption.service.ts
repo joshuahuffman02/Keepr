@@ -44,10 +44,7 @@ export class CredentialEncryptionService {
       const cipher = crypto.createCipheriv(this.algorithm, key, iv);
 
       const plaintext = JSON.stringify(data);
-      const encrypted = Buffer.concat([
-        cipher.update(plaintext, "utf8"),
-        cipher.final(),
-      ]);
+      const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
       const authTag = cipher.getAuthTag();
 
       // Combine iv + authTag + encrypted data
@@ -75,10 +72,7 @@ export class CredentialEncryptionService {
       const decipher = crypto.createDecipheriv(this.algorithm, key, iv);
       decipher.setAuthTag(authTag);
 
-      const decrypted = Buffer.concat([
-        decipher.update(encrypted),
-        decipher.final(),
-      ]);
+      const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
 
       return JSON.parse(decrypted.toString("utf8"));
     } catch (error) {
@@ -123,7 +117,10 @@ export class CredentialEncryptionService {
   /**
    * Parse and validate OAuth state token
    */
-  parseOAuthState(state: string, maxAgeMs = 15 * 60 * 1000): {
+  parseOAuthState(
+    state: string,
+    maxAgeMs = 15 * 60 * 1000,
+  ): {
     campgroundId: string;
     provider: string;
   } | null {

@@ -8,12 +8,12 @@ import {
   Delete,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { BlocksService } from './blocks.service';
-import { JwtAuthGuard } from '../auth/guards';
+} from "@nestjs/common";
+import { BlocksService } from "./blocks.service";
+import { JwtAuthGuard } from "../auth/guards";
 
 @UseGuards(JwtAuthGuard)
-@Controller('blocks')
+@Controller("blocks")
 export class BlocksController {
   constructor(private readonly blocksService: BlocksService) {}
 
@@ -34,24 +34,21 @@ export class BlocksController {
   }
 
   @Get()
-  findAll(
-    @Query('tenantId') tenantId: string,
-    @Query('state') state?: string,
-  ) {
+  findAll(@Query("tenantId") tenantId: string, @Query("state") state?: string) {
     return this.blocksService.findAll(tenantId, state);
   }
 
-  @Get(':blockId')
-  findOne(@Param('blockId') blockId: string) {
+  @Get(":blockId")
+  findOne(@Param("blockId") blockId: string) {
     return this.blocksService.findOne(blockId);
   }
 
-  @Patch(':blockId')
+  @Patch(":blockId")
   update(
-    @Param('blockId') blockId: string,
+    @Param("blockId") blockId: string,
     @Body()
     updateBlockDto: {
-      state?: 'active' | 'released';
+      state?: "active" | "released";
       windowStart?: string;
       windowEnd?: string;
       reason?: string;
@@ -60,14 +57,13 @@ export class BlocksController {
     return this.blocksService.update(blockId, updateBlockDto);
   }
 
-  @Patch(':blockId/release')
-  release(@Param('blockId') blockId: string) {
+  @Patch(":blockId/release")
+  release(@Param("blockId") blockId: string) {
     return this.blocksService.release(blockId);
   }
 
-  @Delete(':blockId')
-  remove(@Param('blockId') blockId: string) {
+  @Delete(":blockId")
+  remove(@Param("blockId") blockId: string) {
     return this.blocksService.remove(blockId);
   }
 }
-

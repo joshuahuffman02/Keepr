@@ -13,7 +13,7 @@ export function ReportsV2Shell({
   activeShortcut,
   dateRange,
   filters,
-  pinnedReports
+  pinnedReports,
 }: {
   children: ReactNode;
   activeTab?: ReportTabV2 | null;

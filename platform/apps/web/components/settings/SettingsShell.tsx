@@ -32,9 +32,7 @@ export function SettingsShell({ children, className }: SettingsShellProps) {
               </Button>
             </Link>
             <div className="hidden sm:block h-6 w-px bg-muted" />
-            <h1 className="text-lg font-semibold text-foreground">
-              Central Settings
-            </h1>
+            <h1 className="text-lg font-semibold text-foreground">Central Settings</h1>
           </div>
 
           <div className="flex items-center gap-2">
@@ -59,12 +57,7 @@ export function SettingsShell({ children, className }: SettingsShellProps) {
             )}
 
             {/* Search button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openSearch}
-              className="gap-2"
-            >
+            <Button variant="outline" size="sm" onClick={openSearch} className="gap-2">
               <Search className="h-4 w-4" />
               <span className="hidden sm:inline">Search</span>
               <kbd className="hidden md:inline-flex px-1.5 py-0.5 text-[10px] font-medium bg-muted rounded">

@@ -10,11 +10,14 @@ import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 type FeaturedBadgeTone = "world-class" | "top-rated" | "featured";
 
 interface HeroBannerProps {
-  onSearch: (query: string, filters: {
-    location: string;
-    dates: { checkIn: string; checkOut: string };
-    guests: number;
-  } | null) => void;
+  onSearch: (
+    query: string,
+    filters: {
+      location: string;
+      dates: { checkIn: string; checkOut: string };
+      guests: number;
+    } | null,
+  ) => void;
   featuredCampground?: {
     id: string;
     name: string;
@@ -40,7 +43,11 @@ interface HeroBannerProps {
  * - Floating featured campground preview on XL screens
  * - Smooth transition to white content below
  */
-export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = false }: HeroBannerProps) {
+export function HeroBanner({
+  onSearch,
+  featuredCampground,
+  isLoadingFeatured = false,
+}: HeroBannerProps) {
   const prefersReducedMotion = useReducedMotionSafe();
   const hasFeatured = !!featuredCampground;
   const showSkeleton = isLoadingFeatured && !hasFeatured;
@@ -48,12 +55,11 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
     ? [featuredCampground.city, featuredCampground.state].filter(Boolean).join(", ")
     : "";
   const hasFeaturedReviews =
-    typeof featuredCampground?.rating === "number" &&
-    (featuredCampground?.reviewCount ?? 0) > 0;
+    typeof featuredCampground?.rating === "number" && (featuredCampground?.reviewCount ?? 0) > 0;
   const badgeToneStyles: Record<FeaturedBadgeTone, string> = {
     "world-class": "bg-keepr-evergreen text-white",
     "top-rated": "bg-amber-500 text-white",
-    "featured": "bg-slate-800 text-white",
+    featured: "bg-slate-800 text-white",
   };
 
   // Animation variants - disabled if user prefers reduced motion
@@ -102,11 +108,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-24 w-full">
         <div className="max-w-3xl">
           {/* Trust Badge */}
-          <motion.div
-            {...fadeUp}
-            transition={{ duration: 0.5 }}
-            className="mb-6"
-          >
+          <motion.div {...fadeUp} transition={{ duration: 0.5 }} className="mb-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
               <Shield className="w-4 h-4 text-keepr-evergreen" />
               <span className="text-sm text-white/90 font-medium">
@@ -114,10 +116,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
               </span>
               <div className="flex items-center gap-0.5 ml-2">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <Star
-                    key={i}
-                    className="w-3.5 h-3.5 text-amber-400 fill-amber-400"
-                  />
+                  <Star key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                 ))}
               </div>
             </div>
@@ -139,8 +138,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
             {...fadeUpDelayed(0.2)}
             className="text-xl md:text-2xl text-white/80 mb-10 max-w-xl leading-relaxed"
           >
-            Discover verified campgrounds with transparent pricing. Book
-            directly, no surprises.
+            Discover verified campgrounds with transparent pricing. Book directly, no surprises.
           </motion.p>
 
           {/* Search Box - Uses existing SearchBar component */}
@@ -203,9 +201,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
                     {featuredCampground.badgeLabel}
                   </div>
                 </div>
-                <h3 className="text-white font-semibold mb-1">
-                  {featuredCampground.name}
-                </h3>
+                <h3 className="text-white font-semibold mb-1">{featuredCampground.name}</h3>
                 {featuredLocation && (
                   <p className="text-white/60 text-sm mb-2">{featuredLocation}</p>
                 )}
@@ -216,7 +212,9 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
                       <span className="text-white font-medium">
                         {featuredCampground.rating?.toFixed(1)}
                       </span>
-                      <span className="text-white/50 text-sm">({featuredCampground.reviewCount})</span>
+                      <span className="text-white/50 text-sm">
+                        ({featuredCampground.reviewCount})
+                      </span>
                     </div>
                   ) : (
                     <span className="text-white/60 text-xs">Verified guest favorite</span>

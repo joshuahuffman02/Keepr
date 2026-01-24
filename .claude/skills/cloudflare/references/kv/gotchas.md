@@ -23,19 +23,13 @@ return new Response(newValue);
 
 ```typescript
 // ❌ BAD: Concurrent writes to same key (429 rate limit)
-await Promise.all([
-  env.MY_KV.put("counter", "1"),
-  env.MY_KV.put("counter", "2")
-]); // 429 error
+await Promise.all([env.MY_KV.put("counter", "1"), env.MY_KV.put("counter", "2")]); // 429 error
 
 // ✅ GOOD: Sequential writes
 await env.MY_KV.put("counter", "3");
 
 // ✅ GOOD: Unique keys for concurrent writes
-await Promise.all([
-  env.MY_KV.put("counter:1", "1"),
-  env.MY_KV.put("counter:2", "2")
-]);
+await Promise.all([env.MY_KV.put("counter:1", "1"), env.MY_KV.put("counter:2", "2")]);
 
 // ✅ GOOD: Retry with backoff
 async function putWithRetry(kv: KVNamespace, key: string, value: string) {
@@ -46,7 +40,7 @@ async function putWithRetry(kv: KVNamespace, key: string, value: string) {
       return;
     } catch (err) {
       if (err.message.includes("429") && i < 4) {
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         delay *= 2;
       } else throw err;
     }

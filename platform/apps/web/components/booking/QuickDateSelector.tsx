@@ -59,7 +59,7 @@ export function QuickDateSelector({
   onSelectDates,
   selectedArrival,
   selectedDeparture,
-  className
+  className,
 }: QuickDateSelectorProps) {
   const prefersReducedMotion = useReducedMotion();
 
@@ -111,7 +111,7 @@ export function QuickDateSelector({
         id: "next-weekend",
         label: isWeekendAvailable ? "Next Weekend" : "This Weekend",
         sublabel: `${formatShortDate(isWeekendAvailable ? nextFriday : thisFriday)} - ${formatShortDate(
-          addDays(isWeekendAvailable ? nextFriday : thisFriday, 2)
+          addDays(isWeekendAvailable ? nextFriday : thisFriday, 2),
         )}`,
         icon: <Calendar className="h-4 w-4" />,
         getArrival: () => (isWeekendAvailable ? nextFriday : thisFriday),
@@ -167,8 +167,8 @@ export function QuickDateSelector({
               isSelected(option)
                 ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm"
                 : option.highlight
-                ? "bg-amber-50 border-amber-200 text-amber-700 hover:border-amber-400"
-                : "bg-card border-border text-foreground hover:border-border hover:bg-muted"
+                  ? "bg-amber-50 border-amber-200 text-amber-700 hover:border-amber-400"
+                  : "bg-card border-border text-foreground hover:border-border hover:bg-muted",
             )}
             initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
             animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
@@ -180,8 +180,8 @@ export function QuickDateSelector({
                 isSelected(option)
                   ? "text-emerald-600"
                   : option.highlight
-                  ? "text-amber-600"
-                  : "text-muted-foreground"
+                    ? "text-amber-600"
+                    : "text-muted-foreground",
               )}
             >
               {option.icon}
@@ -213,7 +213,12 @@ export function QuickDateSelector({
             })}
           </span>
           <span className="text-muted-foreground">
-            ({Math.ceil((new Date(selectedDeparture).getTime() - new Date(selectedArrival).getTime()) / (1000 * 60 * 60 * 24))} nights)
+            (
+            {Math.ceil(
+              (new Date(selectedDeparture).getTime() - new Date(selectedArrival).getTime()) /
+                (1000 * 60 * 60 * 24),
+            )}{" "}
+            nights)
           </span>
         </motion.div>
       )}
@@ -224,7 +229,7 @@ export function QuickDateSelector({
 // Compact version for inline use
 export function QuickDateButtons({
   onSelectDates,
-  className
+  className,
 }: {
   onSelectDates: (arrivalDate: string, departureDate: string) => void;
   className?: string;
@@ -266,7 +271,7 @@ export function QuickDateButtons({
           onClick={() =>
             onSelectDates(
               formatDateISO(option.arrival),
-              formatDateISO(addDays(option.arrival, option.nights))
+              formatDateISO(addDays(option.arrival, option.nights)),
             )
           }
           className="px-2 py-1 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors"

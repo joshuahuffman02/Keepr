@@ -100,11 +100,7 @@ export const SCOPE_CATEGORIES: Record<ScopeCategory, ApiScope[]> = {
  * Default scopes for each tier
  */
 export const DEFAULT_TIER_SCOPES: Record<ApiClientTier, ApiScope[]> = {
-  [ApiClientTier.FREE]: [
-    "reservations:read",
-    "guests:read",
-    "sites:read",
-  ],
+  [ApiClientTier.FREE]: ["reservations:read", "guests:read", "sites:read"],
   [ApiClientTier.STANDARD]: [
     "reservations:read",
     "reservations:write",

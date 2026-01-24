@@ -72,7 +72,7 @@ export class OrgBillingWebhookController {
   @Post("billing")
   async handleBillingWebhook(
     @Req() req: RawBodyRequest<Request>,
-    @Headers("stripe-signature") signature: string
+    @Headers("stripe-signature") signature: string,
   ) {
     if (!this.stripe) {
       this.logger.warn("Stripe not configured - skipping webhook");
@@ -91,25 +91,19 @@ export class OrgBillingWebhookController {
     if (!webhookSecret) {
       if (isProduction || isStaging) {
         this.logger.error(
-          "STRIPE_BILLING_WEBHOOK_SECRET not configured - rejecting webhook in production/staging"
+          "STRIPE_BILLING_WEBHOOK_SECRET not configured - rejecting webhook in production/staging",
         );
-        throw new BadRequestException(
-          "Webhook signature verification not configured"
-        );
+        throw new BadRequestException("Webhook signature verification not configured");
       }
       this.logger.warn(
-        "STRIPE_BILLING_WEBHOOK_SECRET not set - accepting without verification (DEV ONLY)"
+        "STRIPE_BILLING_WEBHOOK_SECRET not set - accepting without verification (DEV ONLY)",
       );
     }
 
     let event: Stripe.Event;
     try {
       if (webhookSecret) {
-        event = this.stripe.webhooks.constructEvent(
-          req.rawBody!,
-          signature,
-          webhookSecret
-        );
+        event = this.stripe.webhooks.constructEvent(req.rawBody!, signature, webhookSecret);
       } else {
         // Only allowed in development when secret is missing
         const parsed = JSON.parse(req.rawBody!.toString());
@@ -135,7 +129,7 @@ export class OrgBillingWebhookController {
           if (isStripeSubscription(dataObject)) {
             await this.subscriptionService.handleSubscriptionUpdated(
               dataObject.id,
-              dataObject.status
+              dataObject.status,
             );
           } else {
             this.logger.warn("Received subscription event with unexpected payload");
@@ -146,10 +140,7 @@ export class OrgBillingWebhookController {
         case "customer.subscription.deleted": {
           const dataObject = event.data.object;
           if (isStripeSubscription(dataObject)) {
-            await this.subscriptionService.handleSubscriptionUpdated(
-              dataObject.id,
-              "canceled"
-            );
+            await this.subscriptionService.handleSubscriptionUpdated(dataObject.id, "canceled");
           } else {
             this.logger.warn("Received subscription deletion event with unexpected payload");
           }
@@ -161,10 +152,7 @@ export class OrgBillingWebhookController {
           const dataObject = event.data.object;
           if (isStripeInvoice(dataObject)) {
             if (dataObject.subscription && typeof dataObject.customer === "string") {
-              await this.subscriptionService.handleInvoicePaid(
-                dataObject.id,
-                dataObject.customer
-              );
+              await this.subscriptionService.handleInvoicePaid(dataObject.id, dataObject.customer);
             }
           } else {
             this.logger.warn("Received invoice event with unexpected payload");
@@ -178,7 +166,7 @@ export class OrgBillingWebhookController {
             if (dataObject.subscription && typeof dataObject.customer === "string") {
               await this.subscriptionService.handleInvoiceFailed(
                 dataObject.id,
-                dataObject.customer
+                dataObject.customer,
               );
             }
           } else {
@@ -194,7 +182,7 @@ export class OrgBillingWebhookController {
             break;
           }
           this.logger.log(
-            `Invoice finalized: ${dataObject.id}, amount: ${dataObject.amount_due}, customer: ${dataObject.customer}`
+            `Invoice finalized: ${dataObject.id}, amount: ${dataObject.amount_due}, customer: ${dataObject.customer}`,
           );
           // Could send notification email here
           break;

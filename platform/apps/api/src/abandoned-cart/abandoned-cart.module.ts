@@ -9,4 +9,3 @@ import { AbandonedCartController } from "./abandoned-cart.controller";
   exports: [AbandonedCartService],
 })
 export class AbandonedCartModule {}
-

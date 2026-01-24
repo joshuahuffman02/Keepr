@@ -1,56 +1,56 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import Link from 'next/link';
-import { Facebook, Instagram, Linkedin, Mail, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { XLogo } from '@/components/icons/XLogo';
+import { useState, useCallback } from "react";
+import Link from "next/link";
+import { Facebook, Instagram, Linkedin, Mail, Heart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { XLogo } from "@/components/icons/XLogo";
 
 const navigation = {
   product: [
-    { name: 'Features', href: '/owners#features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'Demo', href: '/demo' },
-    { name: 'ROI Calculator', href: '/roi-calculator' },
+    { name: "Features", href: "/owners#features" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Demo", href: "/demo" },
+    { name: "ROI Calculator", href: "/roi-calculator" },
   ],
   compare: [
-    { name: 'vs Campspot', href: '/compare/campspot' },
-    { name: 'vs Newbook', href: '/compare/newbook' },
-    { name: 'vs CampLife', href: '/compare/camplife' },
-    { name: 'Switch from Campspot', href: '/switch-from-campspot' },
+    { name: "vs Campspot", href: "/compare/campspot" },
+    { name: "vs Newbook", href: "/compare/newbook" },
+    { name: "vs CampLife", href: "/compare/camplife" },
+    { name: "Switch from Campspot", href: "/switch-from-campspot" },
   ],
   resources: [
-    { name: 'Blog', href: '/blog' },
-    { name: 'Help Center', href: '/help' },
-    { name: 'Campground Software', href: '/campground-management-software' },
-    { name: 'RV Park Systems', href: '/rv-park-reservation-system' },
+    { name: "Blog", href: "/blog" },
+    { name: "Help Center", href: "/help" },
+    { name: "Campground Software", href: "/campground-management-software" },
+    { name: "RV Park Systems", href: "/rv-park-reservation-system" },
   ],
   legal: [
-    { name: 'Privacy', href: '/privacy' },
-    { name: 'Terms', href: '/terms' },
-    { name: 'Security', href: '/security' },
+    { name: "Privacy", href: "/privacy" },
+    { name: "Terms", href: "/terms" },
+    { name: "Security", href: "/security" },
   ],
 };
 
 const social = [
   {
-    name: 'Facebook',
-    href: 'https://facebook.com/keeprstay',
+    name: "Facebook",
+    href: "https://facebook.com/keeprstay",
     icon: Facebook,
   },
   {
-    name: 'X',
-    href: 'https://x.com/keeprstay',
+    name: "X",
+    href: "https://x.com/keeprstay",
     icon: XLogo,
   },
   {
-    name: 'Instagram',
-    href: 'https://instagram.com/keeprstay',
+    name: "Instagram",
+    href: "https://instagram.com/keeprstay",
     icon: Instagram,
   },
   {
-    name: 'LinkedIn',
-    href: 'https://linkedin.com/company/keeprstay',
+    name: "LinkedIn",
+    href: "https://linkedin.com/company/keeprstay",
     icon: Linkedin,
   },
 ];
@@ -88,22 +88,33 @@ export function Footer() {
             <div className="col-span-2">
               <Link href="/owners" className="flex items-center space-x-2 mb-4">
                 <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-keepr-evergreen to-keepr-clay flex items-center justify-center">
-                  <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l7 7-7 7M12 3l7 7-7 7" />
+                  <svg
+                    className="h-6 w-6 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 3l7 7-7 7M12 3l7 7-7 7"
+                    />
                   </svg>
                 </div>
-                <span className="font-bold text-xl text-foreground">
-                  Keepr Host
-                </span>
+                <span className="font-bold text-xl text-foreground">Keepr Host</span>
               </Link>
               <p className="text-muted-foreground mb-6 max-w-sm">
-                The most powerful platform for campground and RV park owners to streamline operations
-                and grow their business.
+                The most powerful platform for campground and RV park owners to streamline
+                operations and grow their business.
               </p>
 
               {/* Contact Info */}
               <div className="space-y-2">
-                <a href="mailto:hello@keeprstay.com" className="flex items-center gap-2 text-muted-foreground hover:text-keepr-clay transition-colors">
+                <a
+                  href="mailto:hello@keeprstay.com"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-keepr-clay transition-colors"
+                >
                   <Mail className="h-4 w-4" />
                   <span className="text-sm">hello@keeprstay.com</span>
                 </a>

@@ -57,7 +57,9 @@ export function UrgencySection({
   if (sortedCampgrounds.length === 0) return null;
 
   return (
-    <section className={cn("py-16 md:py-20 bg-gradient-to-b from-keepr-off-white to-white", className)}>
+    <section
+      className={cn("py-16 md:py-20 bg-gradient-to-b from-keepr-off-white to-white", className)}
+    >
       <div className="max-w-7xl mx-auto px-6">
         {/* Section header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8 md:mb-12">

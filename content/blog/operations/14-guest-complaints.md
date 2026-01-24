@@ -24,35 +24,39 @@ This guide covers how to handle complaints professionally—turning frustrated g
 
 Complaints stem from unmet expectations:
 
-| Expectation | Reality | Complaint |
-|-------------|---------|-----------|
-| Clean, private site | Neighbor's trash visible | "This place is dirty" |
-| Quiet evening | Generator running at 10 PM | "No one enforces rules" |
-| Working utilities | Low water pressure | "Facilities are broken" |
-| Easy booking | Confusion at check-in | "Disorganized and unprofessional" |
+| Expectation         | Reality                    | Complaint                         |
+| ------------------- | -------------------------- | --------------------------------- |
+| Clean, private site | Neighbor's trash visible   | "This place is dirty"             |
+| Quiet evening       | Generator running at 10 PM | "No one enforces rules"           |
+| Working utilities   | Low water pressure         | "Facilities are broken"           |
+| Easy booking        | Confusion at check-in      | "Disorganized and unprofessional" |
 
 **Key insight:** The complaint is rarely just about the issue—it's about the gap between what was expected and what was delivered.
 
 ### Complaint Types
 
 **Legitimate issues:** Real problems that need fixing
+
 - Broken utilities
 - Cleanliness problems
 - Rule violations by others
 - Staff errors
 
 **Preference gaps:** Not broken, just not preferred
+
 - Site location dissatisfaction
 - Weather conditions
 - Neighboring guests' existence
 - Personal subjective standards
 
 **Unreasonable expectations:** Guest misunderstanding
+
 - Expecting hotel-level service
 - Believing they can modify rules
 - Demanding favors not offered
 
 **Professional complainers:** Hoping for freebies
+
 - Pattern of complaints across stays
 - Demanding compensation for minor issues
 - Escalating when denied
@@ -74,6 +78,7 @@ When a guest complains, follow this sequence:
 - Let them express emotion
 
 **Phrases that help:**
+
 > "Tell me what happened."
 > "I want to understand the situation."
 > "Please go on."
@@ -83,11 +88,13 @@ When a guest complains, follow this sequence:
 **Acknowledge their feelings before addressing facts.** People need to feel heard before they can hear solutions.
 
 **Good empathy statements:**
+
 > "I can see why that would be frustrating."
 > "That's not the experience we want you to have."
 > "I'd feel the same way."
 
 **Avoid:**
+
 > "I understand, BUT..." (negates empathy)
 > "That's not really a big deal" (dismissive)
 > "Other guests never complain about that" (invalidating)
@@ -97,6 +104,7 @@ When a guest complains, follow this sequence:
 **Apologize without necessarily admitting fault.** You can be sorry about their experience without accepting blame for things outside your control.
 
 **Appropriate apologies:**
+
 > "I'm sorry you had that experience."
 > "I apologize that we didn't meet your expectations."
 > "I'm sorry this happened during your stay."
@@ -111,12 +119,12 @@ When a guest complains, follow this sequence:
 
 **Match response to issue severity:**
 
-| Issue Level | Appropriate Response |
-|-------------|---------------------|
-| Minor annoyance | Sincere apology, quick fix if possible |
-| Service failure | Apology + gesture (discount, amenity) |
-| Significant problem | Apology + meaningful compensation |
-| Stay-ruining issue | Apology + refund consideration |
+| Issue Level         | Appropriate Response                   |
+| ------------------- | -------------------------------------- |
+| Minor annoyance     | Sincere apology, quick fix if possible |
+| Service failure     | Apology + gesture (discount, amenity)  |
+| Significant problem | Apology + meaningful compensation      |
+| Stay-ruining issue  | Apology + refund consideration         |
 
 ### D – Document
 
@@ -139,6 +147,7 @@ This protects you and helps identify patterns.
 **Guest says:** "The people next to us are so loud!"
 
 **Response:**
+
 1. Thank them for letting you know
 2. Remind of quiet hours
 3. Offer to speak with neighbor
@@ -152,6 +161,7 @@ This protects you and helps identify patterns.
 **Guest says:** "This site is filthy!"
 
 **Response:**
+
 1. Apologize for the condition
 2. Offer immediate cleanup or site change
 3. Inspect the issue yourself
@@ -164,6 +174,7 @@ This protects you and helps identify patterns.
 **Guest says:** "The electric doesn't work!"
 
 **Response:**
+
 1. Dispatch maintenance immediately
 2. Offer alternative (site change, extension cord)
 3. Follow up with guest after repair
@@ -176,6 +187,7 @@ This protects you and helps identify patterns.
 **Guest says:** "This isn't the site I expected."
 
 **Response:**
+
 1. Understand specific concern
 2. Review what was booked vs. delivered
 3. Move to different site if available and appropriate
@@ -194,6 +206,7 @@ This protects you and helps identify patterns.
 **Slow down.** Rushed responses feel dismissive.
 
 **Move locations.** Invite angry guests away from public areas.
+
 > "Let's step into the office where we can talk privately."
 
 **Offer water or a seat.** Small comforts reduce stress.
@@ -221,12 +234,12 @@ This protects you and helps identify patterns.
 
 Front-line staff should have authority for quick resolutions:
 
-| Staff Level | Authority Examples |
-|-------------|-------------------|
-| Any staff | Apology, immediate fixes, empathy |
-| Front desk | Site moves, small credits ($10-25) |
-| Shift lead | Larger credits, free amenities |
-| Manager | Refund decisions, policy exceptions |
+| Staff Level | Authority Examples                  |
+| ----------- | ----------------------------------- |
+| Any staff   | Apology, immediate fixes, empathy   |
+| Front desk  | Site moves, small credits ($10-25)  |
+| Shift lead  | Larger credits, free amenities      |
+| Manager     | Refund decisions, policy exceptions |
 
 ### When to Escalate
 
@@ -314,4 +327,4 @@ The key is treating every complaint as an opportunity: to fix a real problem, to
 
 ---
 
-*Keepr includes guest communication history so every staff member can see past interactions—enabling consistent, informed complaint resolution. [Improve guest relations at campreserv.com](https://campreserv.com)*
+_Keepr includes guest communication history so every staff member can see past interactions—enabling consistent, informed complaint resolution. [Improve guest relations at campreserv.com](https://campreserv.com)_

@@ -10,7 +10,7 @@ import { RespondNpsDto } from "./dto/respond-nps.dto";
 
 @Controller()
 export class NpsController {
-  constructor(private readonly npsService: NpsService) { }
+  constructor(private readonly npsService: NpsService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing, UserRole.front_desk)
@@ -20,7 +20,13 @@ export class NpsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.owner, UserRole.manager, UserRole.marketing, UserRole.front_desk, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.marketing,
+    UserRole.front_desk,
+    UserRole.readonly,
+  )
   @Get("nps/surveys")
   listSurveys(@Query("campgroundId") campgroundId: string) {
     return this.npsService.listSurveys(campgroundId);
@@ -51,10 +57,15 @@ export class NpsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.owner, UserRole.manager, UserRole.marketing, UserRole.front_desk, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.marketing,
+    UserRole.front_desk,
+    UserRole.readonly,
+  )
   @Get("nps/metrics")
   metrics(@Query("campgroundId") campgroundId: string) {
     return this.npsService.metrics(campgroundId);
   }
 }
-

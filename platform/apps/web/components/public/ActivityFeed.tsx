@@ -7,8 +7,22 @@ import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 // Sample data for social proof notifications
 const FIRST_NAMES = [
-  "Sarah", "Mike", "Emily", "David", "Jessica", "Chris", "Amanda", "Josh",
-  "Lauren", "Ryan", "Ashley", "Matt", "Nicole", "Tyler", "Megan", "Brandon",
+  "Sarah",
+  "Mike",
+  "Emily",
+  "David",
+  "Jessica",
+  "Chris",
+  "Amanda",
+  "Josh",
+  "Lauren",
+  "Ryan",
+  "Ashley",
+  "Matt",
+  "Nicole",
+  "Tyler",
+  "Megan",
+  "Brandon",
 ];
 
 const LOCATIONS = [
@@ -192,19 +206,15 @@ export function ActivityFeed({
         >
           <div
             className={`rounded-xl px-4 py-3 shadow-lg border flex items-start gap-3 ${getBgColor(
-              currentActivity.type
+              currentActivity.type,
             )}`}
           >
             {/* Icon */}
-            <div className="flex-shrink-0 mt-0.5">
-              {getIcon(currentActivity.type)}
-            </div>
+            <div className="flex-shrink-0 mt-0.5">{getIcon(currentActivity.type)}</div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground">
-                {currentActivity.message}
-              </p>
+              <p className="text-sm font-medium text-foreground">{currentActivity.message}</p>
               <p className="text-xs text-muted-foreground mt-0.5">Just now</p>
             </div>
 

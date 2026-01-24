@@ -53,12 +53,13 @@ Enhanced `TableRow` with keyboard support:
 
 ```typescript
 interface TableRowProps {
-  interactive?: boolean;  // Makes row focusable
-  onActivate?: () => void;  // Called on Enter/Space
+  interactive?: boolean; // Makes row focusable
+  onActivate?: () => void; // Called on Enter/Space
 }
 ```
 
 Features:
+
 - **Tab**: Can receive focus when `interactive={true}`
 - **Enter/Space**: Activates row (calls `onActivate`)
 - **Focus ring**: Visible 2px ring on focus
@@ -79,6 +80,7 @@ Created new component for complex tables with arrow key navigation:
 ```
 
 Features:
+
 - **Arrow Down**: Move to next row (wraps to first)
 - **Arrow Up**: Move to previous row (wraps to last)
 - **Home**: Jump to first row
@@ -91,6 +93,7 @@ Features:
 Enhanced `DropdownMenu` component (`/components/ui/dropdown-menu.tsx`):
 
 Features:
+
 - **Escape**: Closes menu and returns focus to trigger
 - **Arrow Down**: Navigate to next item (wraps)
 - **Arrow Up**: Navigate to previous item (wraps)
@@ -98,6 +101,7 @@ Features:
 - **Focus ring**: Visible ring on menu items
 
 Improved `DropdownMenuItem`:
+
 - Focus ring: `focus-visible:ring-2 focus-visible:ring-slate-950`
 - Smooth transitions with `transition-colors`
 
@@ -106,6 +110,7 @@ Improved `DropdownMenuItem`:
 #### Dialog Component (`/components/ui/dialog.tsx`)
 
 Existing features (already implemented):
+
 - **Escape**: Closes dialog
 - **Focus trap**: Keeps focus within dialog
 - **Focus restoration**: Returns focus to trigger on close
@@ -114,6 +119,7 @@ Existing features (already implemented):
 #### AlertDialog Component (`/components/ui/alert-dialog.tsx`)
 
 Added missing Escape key handler:
+
 - **Escape**: Now properly closes alert dialog
 - **Focus management**: Already had focus trap and restoration
 
@@ -124,12 +130,9 @@ Added missing Escape key handler:
 ```tsx
 import { TableRow } from "@/components/ui/table";
 
-<TableRow 
-  interactive 
-  onActivate={() => router.push(`/details/${id}`)}
->
+<TableRow interactive onActivate={() => router.push(`/details/${id}`)}>
   <TableCell>Content</TableCell>
-</TableRow>
+</TableRow>;
 ```
 
 ### Keyboard-Navigable Table
@@ -147,7 +150,7 @@ import { KeyboardNavigableTable, KeyboardTableRow } from "@/components/ui/keyboa
       </KeyboardTableRow>
     ))}
   </tbody>
-</KeyboardNavigableTable>
+</KeyboardNavigableTable>;
 ```
 
 ### Form with Visible Focus
@@ -156,10 +159,10 @@ All form inputs automatically have enhanced focus states:
 
 ```tsx
 <form>
-  <Input placeholder="Name" />  {/* Has 4px focus ring */}
-  <Select>...</Select>           {/* Has 4px focus ring */}
-  <Checkbox />                   {/* Has 4px focus ring */}
-  <Button type="submit">Save</Button>  {/* Has 4px focus ring */}
+  <Input placeholder="Name" /> {/* Has 4px focus ring */}
+  <Select>...</Select> {/* Has 4px focus ring */}
+  <Checkbox /> {/* Has 4px focus ring */}
+  <Button type="submit">Save</Button> {/* Has 4px focus ring */}
 </form>
 ```
 
@@ -226,6 +229,7 @@ These changes help meet:
 ## Future Enhancements
 
 Consider adding:
+
 - Skip navigation links for long tables
 - Keyboard shortcuts help dialog (press `?`)
 - Custom keyboard shortcut configuration

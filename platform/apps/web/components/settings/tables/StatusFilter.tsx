@@ -35,7 +35,7 @@ export function StatusFilter({ value, onChange, className }: StatusFilterProps) 
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1",
             value === option.value
               ? "bg-status-success-bg text-status-success-text"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted",
           )}
         >
           {option.label}

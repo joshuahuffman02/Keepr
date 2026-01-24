@@ -56,15 +56,32 @@ describe("NPS schedule enqueue", () => {
         npsSendHour: 7,
         npsTemplateId: "tpl-default",
         npsSchedule: [
-          { id: "arr-before-0d", anchor: "arrival", direction: "before", offset: 0, unit: "days", enabled: true },
-          { id: "dep-after-0d", anchor: "departure", direction: "after", offset: 0, unit: "days", enabled: true },
+          {
+            id: "arr-before-0d",
+            anchor: "arrival",
+            direction: "before",
+            offset: 0,
+            unit: "days",
+            enabled: true,
+          },
+          {
+            id: "dep-after-0d",
+            anchor: "departure",
+            direction: "after",
+            offset: 0,
+            unit: "days",
+            enabled: true,
+          },
         ],
       },
     ]);
     prisma.npsSurvey.findMany.mockResolvedValue([
       { id: "survey1", campgroundId: "cg1", rules: [{}] },
     ]);
-    prisma.communicationPlaybook.findFirst.mockResolvedValue({ id: "pb-nps", templateId: "tpl-default" });
+    prisma.communicationPlaybook.findFirst.mockResolvedValue({
+      id: "pb-nps",
+      templateId: "tpl-default",
+    });
     prisma.reservation.findMany.mockResolvedValue([
       {
         id: "res-arrival",

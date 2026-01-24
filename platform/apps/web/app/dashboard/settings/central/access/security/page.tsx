@@ -10,9 +10,7 @@ export default function SecurityPage() {
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Security</h2>
-        <p className="text-muted-foreground mt-1">
-          Configure security and privacy settings
-        </p>
+        <p className="text-muted-foreground mt-1">Configure security and privacy settings</p>
       </div>
 
       <Card>
@@ -24,8 +22,8 @@ export default function SecurityPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">Security Settings</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Configure PCI compliance, data retention, session timeouts,
-                and other security options.
+                Configure PCI compliance, data retention, session timeouts, and other security
+                options.
               </p>
               <div className="mt-4">
                 <Button asChild>

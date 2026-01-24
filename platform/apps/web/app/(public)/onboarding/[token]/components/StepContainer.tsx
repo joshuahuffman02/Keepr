@@ -49,9 +49,7 @@ export function StepContainer({
           animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
           transition={prefersReducedMotion ? { duration: 0.15 } : SPRING_CONFIG}
         >
-          <h1 className="text-2xl font-bold text-white mb-1">
-            {stepInfo?.title}
-          </h1>
+          <h1 className="text-2xl font-bold text-white mb-1">{stepInfo?.title}</h1>
           <p className="text-slate-400">{stepInfo?.description}</p>
         </motion.div>
       </div>
@@ -66,9 +64,7 @@ export function StepContainer({
             initial={prefersReducedMotion ? { opacity: 0 } : "enter"}
             animate={prefersReducedMotion ? { opacity: 1 } : "center"}
             exit={prefersReducedMotion ? { opacity: 0 } : "exit"}
-            transition={
-              prefersReducedMotion ? { duration: 0.15 } : SPRING_CONFIG
-            }
+            transition={prefersReducedMotion ? { duration: 0.15 } : SPRING_CONFIG}
           >
             {children}
           </motion.div>

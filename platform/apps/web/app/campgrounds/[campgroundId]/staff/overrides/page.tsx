@@ -8,7 +8,13 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   CheckCircle2,
   Clock,
@@ -26,7 +32,7 @@ import {
   Inbox,
   Loader2,
   AlertCircle,
-  Sparkles
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -56,32 +62,58 @@ const SPRING_CONFIG: { type: "spring"; stiffness: number; damping: number } = {
 };
 
 const targetEntityOptions = [
-  { value: "pos_ticket", label: "Store Purchase", icon: ShoppingCart, description: "Point of sale transaction" },
+  {
+    value: "pos_ticket",
+    label: "Store Purchase",
+    icon: ShoppingCart,
+    description: "Point of sale transaction",
+  },
   { value: "reservation", label: "Reservation", icon: Calendar, description: "Campsite booking" },
   { value: "invoice", label: "Invoice", icon: FileText, description: "Billing invoice" },
 ];
 
 const requestTypes = [
-  { value: "comp", label: "Comp", icon: Gift, description: "Complimentary - waive full charge", color: "text-purple-600" },
-  { value: "void", label: "Void", icon: Trash2, description: "Cancel this transaction", color: "text-red-600" },
-  { value: "discount", label: "Discount", icon: Percent, description: "Apply a price reduction", color: "text-blue-600" },
+  {
+    value: "comp",
+    label: "Comp",
+    icon: Gift,
+    description: "Complimentary - waive full charge",
+    color: "text-purple-600",
+  },
+  {
+    value: "void",
+    label: "Void",
+    icon: Trash2,
+    description: "Cancel this transaction",
+    color: "text-red-600",
+  },
+  {
+    value: "discount",
+    label: "Discount",
+    icon: Percent,
+    description: "Apply a price reduction",
+    color: "text-blue-600",
+  },
 ];
 
-const statusConfig: Record<string, { icon: typeof CheckCircle2; label: string; className: string }> = {
+const statusConfig: Record<
+  string,
+  { icon: typeof CheckCircle2; label: string; className: string }
+> = {
   pending: {
     icon: Clock,
     label: "Pending",
-    className: "bg-status-warning/15 text-status-warning border-status-warning/30"
+    className: "bg-status-warning/15 text-status-warning border-status-warning/30",
   },
   approved: {
     icon: CheckCircle2,
     label: "Approved",
-    className: "bg-status-success/15 text-status-success border-status-success/30"
+    className: "bg-status-success/15 text-status-success border-status-success/30",
   },
   rejected: {
     icon: XCircle,
     label: "Rejected",
-    className: "bg-status-error/15 text-status-error border-status-error/30"
+    className: "bg-status-error/15 text-status-error border-status-error/30",
   },
 };
 
@@ -92,10 +124,12 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
     reason: "",
     targetEntity: "",
     targetId: "",
-    deltaAmount: ""
+    deltaAmount: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle",
+  );
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -164,8 +198,8 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
           reason: form.reason,
           targetEntity: form.targetEntity,
           targetId: form.targetId,
-          deltaAmount: form.deltaAmount ? parseFloat(form.deltaAmount) : undefined
-        })
+          deltaAmount: form.deltaAmount ? parseFloat(form.deltaAmount) : undefined,
+        }),
       });
 
       if (res.ok) {
@@ -198,8 +232,8 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
     setStatusMessage(null);
   };
 
-  const selectedType = requestTypes.find(t => t.value === form.type);
-  const selectedEntity = targetEntityOptions.find(e => e.value === form.targetEntity);
+  const selectedType = requestTypes.find((t) => t.value === form.type);
+  const selectedEntity = targetEntityOptions.find((e) => e.value === form.targetEntity);
 
   return (
     <DashboardShell>
@@ -257,8 +291,17 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
             <CardContent className="space-y-5">
               {/* Request Type Selection */}
               <div className="space-y-2">
-                <label id="override-request-type-label" className="text-sm font-medium text-foreground">What do you need?</label>
-                <div className="grid gap-2 sm:grid-cols-3" role="group" aria-labelledby="override-request-type-label">
+                <label
+                  id="override-request-type-label"
+                  className="text-sm font-medium text-foreground"
+                >
+                  What do you need?
+                </label>
+                <div
+                  className="grid gap-2 sm:grid-cols-3"
+                  role="group"
+                  aria-labelledby="override-request-type-label"
+                >
                   {requestTypes.map((type) => {
                     const Icon = type.icon;
                     const isSelected = form.type === type.value;
@@ -274,16 +317,18 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                           "flex items-center gap-3 rounded-lg border p-3 text-left transition-all",
                           isSelected
                             ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
-                            : "border-border bg-background hover:border-muted-foreground/30 hover:bg-muted/50"
+                            : "border-border bg-background hover:border-muted-foreground/30 hover:bg-muted/50",
                         )}
                         aria-pressed={isSelected}
                       >
                         <Icon className={cn("h-5 w-5", type.color)} />
                         <div>
-                          <div className={cn(
-                            "font-medium",
-                            isSelected ? "text-foreground" : "text-foreground"
-                          )}>
+                          <div
+                            className={cn(
+                              "font-medium",
+                              isSelected ? "text-foreground" : "text-foreground",
+                            )}
+                          >
                             {type.label}
                           </div>
                           <div className="text-xs text-muted-foreground">{type.description}</div>
@@ -310,7 +355,10 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     transition={{ duration: 0.2 }}
                     className="space-y-2 overflow-hidden"
                   >
-                    <label htmlFor="override-amount" className="text-sm font-medium text-foreground">
+                    <label
+                      htmlFor="override-amount"
+                      className="text-sm font-medium text-foreground"
+                    >
                       {form.type === "comp" ? "Amount to comp" : "Discount amount"}
                       <span className="text-muted-foreground font-normal ml-1">(optional)</span>
                     </label>
@@ -329,7 +377,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                         placeholder="0.00"
                         className={cn(
                           "pl-9 bg-background border-border text-foreground",
-                          errors.deltaAmount && "border-red-500 focus:ring-red-500"
+                          errors.deltaAmount && "border-red-500 focus:ring-red-500",
                         )}
                       />
                     </div>
@@ -346,7 +394,12 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
               {/* Target Entity & ID */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label htmlFor="override-target-entity" className="text-sm font-medium text-foreground">What does this apply to?</label>
+                  <label
+                    htmlFor="override-target-entity"
+                    className="text-sm font-medium text-foreground"
+                  >
+                    What does this apply to?
+                  </label>
                   <Select
                     value={form.targetEntity}
                     onValueChange={(v) => {
@@ -354,10 +407,13 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                       setErrors({ ...errors, targetEntity: undefined });
                     }}
                   >
-                    <SelectTrigger className={cn(
-                      "bg-background border-border text-foreground",
-                      errors.targetEntity && "border-red-500"
-                    )} id="override-target-entity">
+                    <SelectTrigger
+                      className={cn(
+                        "bg-background border-border text-foreground",
+                        errors.targetEntity && "border-red-500",
+                      )}
+                      id="override-target-entity"
+                    >
                       <SelectValue placeholder="Select type..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -386,7 +442,10 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="override-target-id" className="text-sm font-medium text-foreground">
+                  <label
+                    htmlFor="override-target-id"
+                    className="text-sm font-medium text-foreground"
+                  >
                     {selectedEntity?.label || "Item"} ID or reference
                   </label>
                   <Input
@@ -400,12 +459,12 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                       form.targetEntity === "reservation"
                         ? "e.g., RES-12345"
                         : form.targetEntity === "invoice"
-                        ? "e.g., INV-2024-001"
-                        : "e.g., TKT-98765"
+                          ? "e.g., INV-2024-001"
+                          : "e.g., TKT-98765"
                     }
                     className={cn(
                       "bg-background border-border text-foreground",
-                      errors.targetId && "border-red-500 focus:ring-red-500"
+                      errors.targetId && "border-red-500 focus:ring-red-500",
                     )}
                   />
                   {errors.targetId && (
@@ -419,7 +478,9 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
 
               {/* Reason */}
               <div className="space-y-2">
-                <label htmlFor="override-reason" className="text-sm font-medium text-foreground">Why is this needed?</label>
+                <label htmlFor="override-reason" className="text-sm font-medium text-foreground">
+                  Why is this needed?
+                </label>
                 <Input
                   id="override-reason"
                   value={form.reason}
@@ -430,7 +491,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                   placeholder="Explain the situation so the manager has context..."
                   className={cn(
                     "bg-background border-border text-foreground",
-                    errors.reason && "border-red-500 focus:ring-red-500"
+                    errors.reason && "border-red-500 focus:ring-red-500",
                   )}
                 />
                 <p className="text-xs text-muted-foreground">
@@ -486,7 +547,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                       "flex items-center gap-2 rounded-lg px-4 py-3",
                       submitStatus === "success"
                         ? "bg-status-success/15 text-status-success border border-status-success/30"
-                        : "bg-status-error/15 text-status-error border border-status-error/30"
+                        : "bg-status-error/15 text-status-error border border-status-error/30",
                     )}
                     role={submitStatus === "success" ? "status" : "alert"}
                   >
@@ -549,9 +610,9 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                   {overrides.map((o, index) => {
                     const status = statusConfig[o.status] || statusConfig.pending;
                     const StatusIcon = status.icon;
-                    const typeInfo = requestTypes.find(t => t.value === o.type);
+                    const typeInfo = requestTypes.find((t) => t.value === o.type);
                     const TypeIcon = typeInfo?.icon || Gift;
-                    const entityInfo = targetEntityOptions.find(e => e.value === o.targetEntity);
+                    const entityInfo = targetEntityOptions.find((e) => e.value === o.targetEntity);
 
                     return (
                       <motion.div
@@ -563,11 +624,18 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3 min-w-0">
-                            <div className={cn(
-                              "flex h-8 w-8 items-center justify-center rounded-lg",
-                              "bg-muted"
-                            )}>
-                              <TypeIcon className={cn("h-4 w-4", typeInfo?.color || "text-muted-foreground")} />
+                            <div
+                              className={cn(
+                                "flex h-8 w-8 items-center justify-center rounded-lg",
+                                "bg-muted",
+                              )}
+                            >
+                              <TypeIcon
+                                className={cn(
+                                  "h-4 w-4",
+                                  typeInfo?.color || "text-muted-foreground",
+                                )}
+                              />
                             </div>
                             <div className="min-w-0">
                               <div className="font-medium capitalize text-foreground">

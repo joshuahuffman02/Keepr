@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { PrismaService } from '../../prisma/prisma.service';
-import { EmailService } from '../../email/email.service';
-import { OpSlaStatus, OpTask, OpTaskState } from '@prisma/client';
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { PrismaService } from "../../prisma/prisma.service";
+import { EmailService } from "../../email/email.service";
+import { OpSlaStatus, OpTask, OpTaskState } from "@prisma/client";
 
 type SlaTaskSummary = Pick<
   OpTask,
@@ -32,7 +29,7 @@ export class OpSlaService {
    */
   @Cron(CronExpression.EVERY_5_MINUTES)
   async updateSlaStatuses(): Promise<void> {
-    this.logger.log('Updating SLA statuses...');
+    this.logger.log("Updating SLA statuses...");
 
     const now = new Date();
     const atRiskThreshold = new Date(now.getTime() + this.AT_RISK_THRESHOLD_MINUTES * 60 * 1000);
@@ -76,9 +73,11 @@ export class OpSlaService {
           where: { id: task.id },
           data: {
             slaStatus: newStatus,
-            ...(newStatus === OpSlaStatus.breached && !task.slaStatus ? {
-              slaEscalatedAt: now,
-            } : {}),
+            ...(newStatus === OpSlaStatus.breached && !task.slaStatus
+              ? {
+                  slaEscalatedAt: now,
+                }
+              : {}),
           },
         });
 
@@ -103,15 +102,17 @@ export class OpSlaService {
         where: { id: task.id },
         include: {
           OpTaskTemplate: { select: { name: true } },
-          User_OpTask_assignedToUserIdToUser: { select: { email: true, firstName: true, lastName: true } },
+          User_OpTask_assignedToUserIdToUser: {
+            select: { email: true, firstName: true, lastName: true },
+          },
           OpTeam: {
             select: {
               name: true,
               OpTeamMember: {
-                where: { role: 'manager' },
-                include: { User: { select: { email: true, firstName: true, lastName: true } } }
-              }
-            }
+                where: { role: "manager" },
+                include: { User: { select: { email: true, firstName: true, lastName: true } } },
+              },
+            },
           },
         },
       });
@@ -146,11 +147,11 @@ export class OpSlaService {
         return;
       }
 
-      const taskName = fullTask.OpTaskTemplate?.name || fullTask.title || 'Unnamed task';
-      const dueAt = fullTask.slaDueAt ? new Date(fullTask.slaDueAt).toLocaleString() : 'Unknown';
+      const taskName = fullTask.OpTaskTemplate?.name || fullTask.title || "Unnamed task";
+      const dueAt = fullTask.slaDueAt ? new Date(fullTask.slaDueAt).toLocaleString() : "Unknown";
       const assigneeName = fullTask.User_OpTask_assignedToUserIdToUser
         ? `${fullTask.User_OpTask_assignedToUserIdToUser.firstName} ${fullTask.User_OpTask_assignedToUserIdToUser.lastName}`
-        : fullTask.OpTeam?.name || 'Unassigned';
+        : fullTask.OpTeam?.name || "Unassigned";
 
       for (const email of managerEmails) {
         await this.emailService.sendEmail({
@@ -163,7 +164,7 @@ export class OpSlaService {
               <tr><td style="padding: 8px; font-weight: bold;">Task:</td><td style="padding: 8px;">${taskName}</td></tr>
               <tr><td style="padding: 8px; font-weight: bold;">Due:</td><td style="padding: 8px; color: #dc2626;">${dueAt}</td></tr>
               <tr><td style="padding: 8px; font-weight: bold;">Assigned to:</td><td style="padding: 8px;">${assigneeName}</td></tr>
-              <tr><td style="padding: 8px; font-weight: bold;">Priority:</td><td style="padding: 8px;">${fullTask.priority || 'medium'}</td></tr>
+              <tr><td style="padding: 8px; font-weight: bold;">Priority:</td><td style="padding: 8px;">${fullTask.priority || "medium"}</td></tr>
             </table>
             <p>Please take action to resolve this task or reassign it if needed.</p>
           `,
@@ -171,7 +172,9 @@ export class OpSlaService {
         });
       }
 
-      this.logger.log(`Sent SLA breach notification for task ${task.id} to ${managerEmails.length} manager(s)`);
+      this.logger.log(
+        `Sent SLA breach notification for task ${task.id} to ${managerEmails.length} manager(s)`,
+      );
     } catch (error: unknown) {
       this.logger.error(`Failed to send SLA breach notification: ${getErrorMessage(error)}`);
     }
@@ -187,67 +190,70 @@ export class OpSlaService {
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
     startOfWeek.setHours(0, 0, 0, 0);
 
-    const [
-      currentStats,
-      completedToday,
-      completedThisWeek,
-      onTimeToday,
-      lateToday,
-    ] = await Promise.all([
-      // Current open tasks by SLA status
-      this.prisma.opTask.groupBy({
-        by: ['slaStatus'],
-        where: {
-          campgroundId,
-          state: { notIn: ['completed', 'cancelled', 'verified'] },
-          slaDueAt: { not: null },
-        },
-        _count: true,
-      }),
-      // Tasks completed today
-      this.prisma.opTask.count({
-        where: {
-          campgroundId,
-          state: OpTaskState.completed,
-          completedAt: { gte: startOfDay },
-        },
-      }),
-      // Tasks completed this week
-      this.prisma.opTask.count({
-        where: {
-          campgroundId,
-          state: OpTaskState.completed,
-          completedAt: { gte: startOfWeek },
-        },
-      }),
-      // On-time completions today
-      this.prisma.opTask.count({
-        where: {
-          campgroundId,
-          state: OpTaskState.completed,
-          completedAt: { gte: startOfDay },
-          slaStatus: OpSlaStatus.on_track,
-        },
-      }),
-      // Late completions today
-      this.prisma.opTask.count({
-        where: {
-          campgroundId,
-          state: OpTaskState.completed,
-          completedAt: { gte: startOfDay },
-          slaStatus: OpSlaStatus.breached,
-        },
-      }),
-    ]);
+    const [currentStats, completedToday, completedThisWeek, onTimeToday, lateToday] =
+      await Promise.all([
+        // Current open tasks by SLA status
+        this.prisma.opTask.groupBy({
+          by: ["slaStatus"],
+          where: {
+            campgroundId,
+            state: { notIn: ["completed", "cancelled", "verified"] },
+            slaDueAt: { not: null },
+          },
+          _count: true,
+        }),
+        // Tasks completed today
+        this.prisma.opTask.count({
+          where: {
+            campgroundId,
+            state: OpTaskState.completed,
+            completedAt: { gte: startOfDay },
+          },
+        }),
+        // Tasks completed this week
+        this.prisma.opTask.count({
+          where: {
+            campgroundId,
+            state: OpTaskState.completed,
+            completedAt: { gte: startOfWeek },
+          },
+        }),
+        // On-time completions today
+        this.prisma.opTask.count({
+          where: {
+            campgroundId,
+            state: OpTaskState.completed,
+            completedAt: { gte: startOfDay },
+            slaStatus: OpSlaStatus.on_track,
+          },
+        }),
+        // Late completions today
+        this.prisma.opTask.count({
+          where: {
+            campgroundId,
+            state: OpTaskState.completed,
+            completedAt: { gte: startOfDay },
+            slaStatus: OpSlaStatus.breached,
+          },
+        }),
+      ]);
 
-    const onTrackCount = currentStats.find((s: { slaStatus: string | null; _count: number }) => s.slaStatus === 'on_track')?._count ?? 0;
-    const atRiskCount = currentStats.find((s: { slaStatus: string | null; _count: number }) => s.slaStatus === 'at_risk')?._count ?? 0;
-    const breachedCount = currentStats.find((s: { slaStatus: string | null; _count: number }) => s.slaStatus === 'breached')?._count ?? 0;
+    const onTrackCount =
+      currentStats.find(
+        (s: { slaStatus: string | null; _count: number }) => s.slaStatus === "on_track",
+      )?._count ?? 0;
+    const atRiskCount =
+      currentStats.find(
+        (s: { slaStatus: string | null; _count: number }) => s.slaStatus === "at_risk",
+      )?._count ?? 0;
+    const breachedCount =
+      currentStats.find(
+        (s: { slaStatus: string | null; _count: number }) => s.slaStatus === "breached",
+      )?._count ?? 0;
     const totalOpen = onTrackCount + atRiskCount + breachedCount;
 
-    const complianceRate = completedToday > 0
-      ? Math.round((onTimeToday / completedToday) * 100)
-      : 100;
+    const complianceRate =
+      completedToday > 0 ? Math.round((onTimeToday / completedToday) * 100) : 100;
 
     return {
       current: {
@@ -282,14 +288,16 @@ export class OpSlaService {
     return this.prisma.opTask.findMany({
       where: {
         campgroundId,
-        state: { notIn: ['completed', 'cancelled', 'verified'] },
+        state: { notIn: ["completed", "cancelled", "verified"] },
         slaDueAt: { lte: deadline, gt: new Date() },
       },
-      orderBy: { slaDueAt: 'asc' },
+      orderBy: { slaDueAt: "asc" },
       take: limit,
       include: {
         Site: true,
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
       },
     });
@@ -302,13 +310,15 @@ export class OpSlaService {
     return this.prisma.opTask.findMany({
       where: {
         campgroundId,
-        state: { notIn: ['completed', 'cancelled', 'verified'] },
+        state: { notIn: ["completed", "cancelled", "verified"] },
         slaStatus: OpSlaStatus.breached,
       },
-      orderBy: { slaDueAt: 'asc' },
+      orderBy: { slaDueAt: "asc" },
       include: {
         Site: true,
-        User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+        User_OpTask_assignedToUserIdToUser: {
+          select: { id: true, firstName: true, lastName: true },
+        },
         OpTeam: true,
       },
     });
@@ -328,12 +338,10 @@ export class OpSlaService {
       },
     });
 
-    return teams.map((team: typeof teams[number]) => {
+    return teams.map((team: (typeof teams)[number]) => {
       const totalCompleted = team.OpTask.length;
-      const onTime = team.OpTask.filter((t) => t.slaStatus !== 'breached').length;
-      const complianceRate = totalCompleted > 0
-        ? Math.round((onTime / totalCompleted) * 100)
-        : 100;
+      const onTime = team.OpTask.filter((t) => t.slaStatus !== "breached").length;
+      const complianceRate = totalCompleted > 0 ? Math.round((onTime / totalCompleted) * 100) : 100;
 
       return {
         teamId: team.id,
@@ -378,10 +386,12 @@ export class OpSlaService {
     });
 
     return staff
-      .filter((s: typeof staff[number]) => s.OpTask_OpTask_completedByIdToUser.length > 0)
-      .map((s: typeof staff[number]) => {
+      .filter((s: (typeof staff)[number]) => s.OpTask_OpTask_completedByIdToUser.length > 0)
+      .map((s: (typeof staff)[number]) => {
         const totalCompleted = s.OpTask_OpTask_completedByIdToUser.length;
-        const onTime = s.OpTask_OpTask_completedByIdToUser.filter((t: { slaStatus: string | null }) => t.slaStatus !== 'breached').length;
+        const onTime = s.OpTask_OpTask_completedByIdToUser.filter(
+          (t: { slaStatus: string | null }) => t.slaStatus !== "breached",
+        ).length;
 
         return {
           userId: s.id,
@@ -392,7 +402,9 @@ export class OpSlaService {
           complianceRate: Math.round((onTime / totalCompleted) * 100),
         };
       })
-      .sort((a: StaffSlaPerformance, b: StaffSlaPerformance) => b.totalCompleted - a.totalCompleted);
+      .sort(
+        (a: StaffSlaPerformance, b: StaffSlaPerformance) => b.totalCompleted - a.totalCompleted,
+      );
   }
 
   /**

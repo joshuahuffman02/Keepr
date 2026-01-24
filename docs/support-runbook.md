@@ -5,4 +5,3 @@
 - Data shape: reports carry `rawContext.region` and optional `campgroundId` to drive scoping and filtering.
 - Alerts: Slack webhook is optional via `SUPPORT_SLACK_WEBHOOK`; email fan-out uses a comma-separated `SUPPORT_ALERT_EMAILS`. Both send concise summaries and are best-effort (errors are logged).
 - Oncall checks: verify the region on the session (`req.user.region`) matches requested filters, confirm assignee region/memberships before reassigning, and prefer region-filtered directory lookups when paging support staff.
-

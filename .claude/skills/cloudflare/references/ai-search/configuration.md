@@ -1,23 +1,26 @@
 ### Configuration
 
 **wrangler.toml:**
+
 ```toml
 [ai]
 binding = "AI"
 ```
 
 **wrangler.jsonc:**
+
 ```jsonc
 {
   "ai": {
-    "binding": "AI"
-  }
+    "binding": "AI",
+  },
 }
 ```
 
 ### Code Patterns
 
 #### AI Search with Generation
+
 ```typescript
 // Generate AI response with retrieved context
 const answer = await env.AI.autorag("my-autorag").aiSearch({
@@ -26,19 +29,20 @@ const answer = await env.AI.autorag("my-autorag").aiSearch({
   rewrite_query: true,
   max_num_results: 10,
   ranking_options: {
-    score_threshold: 0.3
+    score_threshold: 0.3,
   },
   reranking: {
     enabled: true,
-    model: "@cf/baai/bge-reranker-base"
+    model: "@cf/baai/bge-reranker-base",
   },
-  stream: true
+  stream: true,
 });
 
 // Response includes: search_query, response, data[], has_more, next_page
 ```
 
 #### Search Only (No Generation)
+
 ```typescript
 // Retrieve relevant chunks without generation
 const results = await env.AI.autorag("my-autorag").search({
@@ -50,3 +54,4 @@ const results = await env.AI.autorag("my-autorag").search({
   },
   reranking: {
     enab
+```

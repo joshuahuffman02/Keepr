@@ -3,13 +3,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion, type Variants, type TargetAndTransition } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useReducedMotion,
+  type Variants,
+  type TargetAndTransition,
+} from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   AnimatedCounter,
   ProgressBar,
   CelebrationOverlay,
-  ValidatedInput
+  ValidatedInput,
 } from "@/components/signup";
 import {
   Crown,
@@ -25,7 +31,7 @@ import {
   RefreshCw,
   ChevronDown,
   Mail,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
@@ -69,8 +75,8 @@ const tierConfig: Record<EarlyAccessTier, TierConfig> = {
       "Lifetime 'Founder' badge on your listing",
       "Direct line to founders (phone/text)",
       "Co-create features with us",
-      "First access to every new feature"
-    ]
+      "First access to every new feature",
+    ],
   },
   pioneer: {
     name: "Pioneer",
@@ -84,8 +90,8 @@ const tierConfig: Record<EarlyAccessTier, TierConfig> = {
       "Then just $29/month",
       "Priority support forever",
       "Early access to new features",
-      "Free data migration"
-    ]
+      "Free data migration",
+    ],
   },
   trailblazer: {
     name: "Trailblazer",
@@ -99,51 +105,57 @@ const tierConfig: Record<EarlyAccessTier, TierConfig> = {
       "Then $29/month",
       "Early access to new features",
       "Priority email support",
-      "Free data migration"
-    ]
-  }
+      "Free data migration",
+    ],
+  },
 };
 
-const colorStyles: Record<TierColor, {
-  border: string;
-  bg: string;
-  badge: string;
-  icon: string;
-  button: string;
-  ring: string;
-  text: string;
-  glow: string;
-}> = {
+const colorStyles: Record<
+  TierColor,
+  {
+    border: string;
+    bg: string;
+    badge: string;
+    icon: string;
+    button: string;
+    ring: string;
+    text: string;
+    glow: string;
+  }
+> = {
   amber: {
     border: "border-amber-500",
     bg: "bg-amber-500/10",
     badge: "bg-amber-500 text-slate-900",
     icon: "text-amber-400",
-    button: "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400",
+    button:
+      "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400",
     ring: "ring-amber-500",
     text: "text-amber-400",
-    glow: "rgba(251, 191, 36, 0.3)"
+    glow: "rgba(251, 191, 36, 0.3)",
   },
   emerald: {
     border: "border-emerald-500",
     bg: "bg-emerald-500/10",
     badge: "bg-emerald-500 text-white",
     icon: "text-emerald-400",
-    button: "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400",
+    button:
+      "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400",
     ring: "ring-emerald-500",
     text: "text-emerald-400",
-    glow: "rgba(16, 185, 129, 0.3)"
+    glow: "rgba(16, 185, 129, 0.3)",
   },
   violet: {
     border: "border-violet-500",
     bg: "bg-violet-500/10",
     badge: "bg-violet-500 text-white",
     icon: "text-violet-400",
-    button: "bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400",
+    button:
+      "bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400",
     ring: "ring-violet-500",
     text: "text-violet-400",
-    glow: "rgba(139, 92, 246, 0.3)"
-  }
+    glow: "rgba(139, 92, 246, 0.3)",
+  },
 };
 
 const tierOrder: EarlyAccessTier[] = ["founders_circle", "pioneer", "trailblazer"];
@@ -195,7 +207,10 @@ export default function SignupPage() {
   const [showResendForm, setShowResendForm] = useState(false);
   const [resendEmail, setResendEmail] = useState("");
   const [resendLoading, setResendLoading] = useState(false);
-  const [resendMessage, setResendMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [resendMessage, setResendMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   // Form fields
   const [firstName, setFirstName] = useState("");
@@ -210,8 +225,8 @@ export default function SignupPage() {
     if (step === "tier") return 33;
 
     const fields = [firstName, lastName, email, password, campgroundName, phone];
-    const completed = fields.filter(f => f.trim().length > 0).length;
-    const percentage = 33 + (completed / fields.length * 67);
+    const completed = fields.filter((f) => f.trim().length > 0).length;
+    const percentage = 33 + (completed / fields.length) * 67;
 
     return Math.round(percentage);
   }, [step, firstName, lastName, email, password, campgroundName, phone]);
@@ -264,8 +279,8 @@ export default function SignupPage() {
           email,
           password,
           firstName,
-          lastName
-        })
+          lastName,
+        }),
       });
 
       if (!registerRes.ok) {
@@ -285,14 +300,14 @@ export default function SignupPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${registerData.token}`
+          Authorization: `Bearer ${registerData.token}`,
         },
         body: JSON.stringify({
           tier: selectedTier,
           campgroundName,
           phone,
-          userId: registerData.id
-        })
+          userId: registerData.id,
+        }),
       });
 
       if (!signupRes.ok) {
@@ -309,11 +324,10 @@ export default function SignupPage() {
       setTimeout(() => {
         const params = new URLSearchParams({
           email,
-          ...(signupData.onboardingUrl && { url: signupData.onboardingUrl })
+          ...(signupData.onboardingUrl && { url: signupData.onboardingUrl }),
         });
         router.push(`/signup/confirm?${params.toString()}`);
       }, 1500);
-
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setSubmitting(false);
@@ -331,7 +345,7 @@ export default function SignupPage() {
       const res = await fetch(`${API_BASE}/early-access/resend-by-email`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: resendEmail.trim() })
+        body: JSON.stringify({ email: resendEmail.trim() }),
       });
 
       const data = await res.json();
@@ -345,7 +359,7 @@ export default function SignupPage() {
     } catch (err) {
       setResendMessage({
         type: "error",
-        text: "Something went wrong. Please try again."
+        text: "Something went wrong. Please try again.",
       });
     } finally {
       setResendLoading(false);
@@ -422,7 +436,8 @@ export default function SignupPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-                  Join the campgrounds shaping Keepr. Lock in your rate forever — once these spots are gone, they're gone.
+                  Join the campgrounds shaping Keepr. Lock in your rate forever — once these spots
+                  are gone, they're gone.
                 </p>
               </motion.div>
             ) : (
@@ -480,7 +495,7 @@ export default function SignupPage() {
                         !isSoldOut && !prefersReducedMotion
                           ? {
                               y: -8,
-                              boxShadow: `0 20px 40px -10px ${styles.glow}`
+                              boxShadow: `0 20px 40px -10px ${styles.glow}`,
                             }
                           : {}
                       }
@@ -517,10 +532,14 @@ export default function SignupPage() {
 
                         {/* Pricing */}
                         <div className="space-y-2">
-                          <div className="text-3xl font-bold text-white">{config.monthlyDisplay}</div>
+                          <div className="text-3xl font-bold text-white">
+                            {config.monthlyDisplay}
+                          </div>
                           <p className="text-slate-400">{config.durationDisplay}</p>
                           <div className="pt-2 border-t border-slate-700/50">
-                            <span className="text-emerald-400 font-semibold">{bookingFee} per booking</span>
+                            <span className="text-emerald-400 font-semibold">
+                              {bookingFee} per booking
+                            </span>
                             <span className="text-slate-500 text-sm block">(locked forever)</span>
                           </div>
                         </div>
@@ -590,7 +609,8 @@ export default function SignupPage() {
                           <div>
                             <p className="text-white font-semibold">{config.name}</p>
                             <p className="text-slate-400 text-sm">
-                              {availability.find((t) => t.tier === selectedTier)?.remainingSpots} spots remaining
+                              {availability.find((t) => t.tier === selectedTier)?.remainingSpots}{" "}
+                              spots remaining
                             </p>
                           </div>
                         </>
@@ -682,7 +702,9 @@ export default function SignupPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
                     Password
-                    <span className="text-slate-500 font-normal ml-2">(12+ chars, upper, lower, number, special)</span>
+                    <span className="text-slate-500 font-normal ml-2">
+                      (12+ chars, upper, lower, number, special)
+                    </span>
                   </label>
                   <ValidatedInput
                     type="password"
@@ -715,7 +737,9 @@ export default function SignupPage() {
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">
                     Phone Number
-                    <span className="text-slate-500 font-normal ml-2">(for important updates only)</span>
+                    <span className="text-slate-500 font-normal ml-2">
+                      (for important updates only)
+                    </span>
                   </label>
                   <ValidatedInput
                     type="tel"
@@ -729,8 +753,8 @@ export default function SignupPage() {
 
                 {/* Beta Acknowledgment */}
                 <p className="text-xs text-slate-500 text-center">
-                  By signing up, you acknowledge that Keepr is in early access.
-                  Features and availability may change as we improve the platform.
+                  By signing up, you acknowledge that Keepr is in early access. Features and
+                  availability may change as we improve the platform.
                 </p>
 
                 {/* Submit */}
@@ -829,7 +853,8 @@ export default function SignupPage() {
                 >
                   <div className="mt-6 p-6 rounded-xl bg-slate-800/50 border border-slate-700">
                     <p className="text-slate-300 text-sm mb-4">
-                      Enter your email and we'll resend your onboarding link if you have a pending signup.
+                      Enter your email and we'll resend your onboarding link if you have a pending
+                      signup.
                     </p>
 
                     <form onSubmit={handleResendEmail} className="space-y-4">

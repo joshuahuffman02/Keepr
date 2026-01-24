@@ -9,7 +9,7 @@ import {
   Post,
   Query,
   Req,
-  UseGuards
+  UseGuards,
 } from "@nestjs/common";
 import { BillingService } from "./billing.service";
 import { JwtAuthGuard } from "../auth/guards";
@@ -39,8 +39,8 @@ export class BillingController {
   }
 
   private assertCampgroundAccess(campgroundId: string, user?: AuthUser): void {
-    const isPlatformStaff = user?.platformRole === "platform_admin" ||
-                            user?.platformRole === "support_agent";
+    const isPlatformStaff =
+      user?.platformRole === "platform_admin" || user?.platformRole === "support_agent";
     if (isPlatformStaff) {
       return;
     }
@@ -56,16 +56,33 @@ export class BillingController {
   @Post("campgrounds/:campgroundId/meters")
   createMeter(
     @Param("campgroundId") campgroundId: string,
-    @Body() body: { siteId: string; type: string; serialNumber?: string; ratePlanId?: string; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean },
-    @Req() req: BillingRequest
+    @Body()
+    body: {
+      siteId: string;
+      type: string;
+      serialNumber?: string;
+      ratePlanId?: string;
+      billingMode?: string;
+      billTo?: string;
+      multiplier?: number;
+      autoEmail?: boolean;
+    },
+    @Req() req: BillingRequest,
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
-    return this.billing.createMeter(campgroundId, body.siteId, body.type, body.serialNumber, body.ratePlanId, {
-      billingMode: body.billingMode,
-      billTo: body.billTo,
-      multiplier: body.multiplier,
-      autoEmail: body.autoEmail
-    });
+    return this.billing.createMeter(
+      campgroundId,
+      body.siteId,
+      body.type,
+      body.serialNumber,
+      body.ratePlanId,
+      {
+        billingMode: body.billingMode,
+        billTo: body.billTo,
+        multiplier: body.multiplier,
+        autoEmail: body.autoEmail,
+      },
+    );
   }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
@@ -86,9 +103,10 @@ export class BillingController {
   @Post("meters/:meterId/reads")
   addRead(
     @Param("meterId") meterId: string,
-    @Body() body: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string },
+    @Body()
+    body: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string },
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -99,7 +117,7 @@ export class BillingController {
       new Date(body.readAt),
       body.readBy,
       body.note,
-      body.source
+      body.source,
     );
   }
 
@@ -107,14 +125,24 @@ export class BillingController {
   @Post("meters/import")
   importReads(
     @Body()
-    body: { campgroundId: string; reads: Array<{ meterId: string; readingValue: number; readAt: string; note?: string; readBy?: string; source?: string }> },
-    @Req() req: BillingRequest
+    body: {
+      campgroundId: string;
+      reads: Array<{
+        meterId: string;
+        readingValue: number;
+        readAt: string;
+        note?: string;
+        readBy?: string;
+        source?: string;
+      }>;
+    },
+    @Req() req: BillingRequest,
   ) {
     this.assertCampgroundAccess(body.campgroundId, req.user);
     const reads = body.reads.map((r) => ({
       ...r,
       readAt: new Date(r.readAt),
-      readingValue: Number(r.readingValue)
+      readingValue: Number(r.readingValue),
     }));
     return this.billing.importMeterReads(body.campgroundId, reads);
   }
@@ -126,7 +154,7 @@ export class BillingController {
     @Req() req: BillingRequest,
     @Query("campgroundId") campgroundId?: string,
     @Query("start") start?: string,
-    @Query("end") end?: string
+    @Query("end") end?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -134,7 +162,7 @@ export class BillingController {
       requiredCampgroundId,
       meterId,
       start ? new Date(start) : undefined,
-      end ? new Date(end) : undefined
+      end ? new Date(end) : undefined,
     );
   }
 
@@ -153,7 +181,7 @@ export class BillingController {
       serialNumber?: string | null;
     },
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -165,7 +193,7 @@ export class BillingController {
   billMeter(
     @Param("meterId") meterId: string,
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -177,7 +205,7 @@ export class BillingController {
   seedMeters(
     @Param("siteClassId") siteClassId: string,
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -191,7 +219,7 @@ export class BillingController {
     @Param("reservationId") reservationId: string,
     @Body() body: { cadence: string; periodStart: string; periodEnd: string },
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -200,7 +228,7 @@ export class BillingController {
       reservationId,
       body.cadence,
       new Date(body.periodStart),
-      new Date(body.periodEnd)
+      new Date(body.periodEnd),
     );
   }
 
@@ -209,7 +237,7 @@ export class BillingController {
   generateInvoice(
     @Param("cycleId") cycleId: string,
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -221,7 +249,7 @@ export class BillingController {
   listInvoices(
     @Param("reservationId") reservationId: string,
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -233,7 +261,7 @@ export class BillingController {
   getInvoice(
     @Param("invoiceId") invoiceId: string,
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -246,7 +274,7 @@ export class BillingController {
     @Param("invoiceId") invoiceId: string,
     @Body() body: { reason: string; actorId?: string },
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -260,7 +288,7 @@ export class BillingController {
     @Param("lineId") lineId: string,
     @Body() body: { amountCents: number; note: string; actorId?: string },
     @Req() req: BillingRequest,
-    @Query("campgroundId") campgroundId?: string
+    @Query("campgroundId") campgroundId?: string,
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -270,7 +298,7 @@ export class BillingController {
       lineId,
       Number(body.amountCents),
       body.note,
-      body.actorId
+      body.actorId,
     );
   }
 

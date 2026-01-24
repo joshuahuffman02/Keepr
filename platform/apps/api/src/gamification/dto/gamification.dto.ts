@@ -76,4 +76,3 @@ export class UpsertXpRuleDto {
   @IsBoolean()
   isActive?: boolean;
 }
-

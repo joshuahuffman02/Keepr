@@ -23,7 +23,7 @@ import {
   ChevronRight,
   Target,
   BarChart3,
-  Clock
+  Clock,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -31,7 +31,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 type Campground = Awaited<ReturnType<typeof apiClient.getCampgrounds>>[number];
-type PricingRecommendation = Awaited<ReturnType<typeof apiClient.getPricingRecommendations>>[number] & {
+type PricingRecommendation = Awaited<
+  ReturnType<typeof apiClient.getPricingRecommendations>
+>[number] & {
   siteClassName?: string | null;
   createdAt?: string | null;
   expiresAt?: string | null;
@@ -95,9 +97,17 @@ export default function AIPricingPage() {
   };
 
   // Get pricing recommendations
-  const { data: recommendations = [], isLoading, refetch } = useQuery<PricingRecommendation[]>({
+  const {
+    data: recommendations = [],
+    isLoading,
+    refetch,
+  } = useQuery<PricingRecommendation[]>({
     queryKey: ["pricing-recommendations", campgroundId, filter],
-    queryFn: () => apiClient.getPricingRecommendations(requireCampgroundId(), filter === "all" ? undefined : filter),
+    queryFn: () =>
+      apiClient.getPricingRecommendations(
+        requireCampgroundId(),
+        filter === "all" ? undefined : filter,
+      ),
     enabled: !!campgroundId,
   });
 
@@ -106,12 +116,19 @@ export default function AIPricingPage() {
     mutationFn: (recommendationId: string) =>
       apiClient.applyPricingRecommendation(recommendationId),
     onSuccess: () => {
-      toast({ title: "Pricing applied", description: "The pricing recommendation has been applied." });
+      toast({
+        title: "Pricing applied",
+        description: "The pricing recommendation has been applied.",
+      });
       refetch();
       queryClient.invalidateQueries({ queryKey: ["pricing-recommendations"] });
     },
     onError: (error) => {
-      toast({ title: "Failed to apply", description: getErrorMessage(error), variant: "destructive" });
+      toast({
+        title: "Failed to apply",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -125,13 +142,17 @@ export default function AIPricingPage() {
       queryClient.invalidateQueries({ queryKey: ["pricing-recommendations"] });
     },
     onError: (error) => {
-      toast({ title: "Failed to dismiss", description: getErrorMessage(error), variant: "destructive" });
+      toast({
+        title: "Failed to dismiss",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
     },
   });
 
-  const pendingCount = recommendations.filter(r => r.status === "pending").length;
+  const pendingCount = recommendations.filter((r) => r.status === "pending").length;
   const totalPotentialRevenue = recommendations
-    .filter(r => r.status === "pending")
+    .filter((r) => r.status === "pending")
     .reduce((acc, r) => acc + (r.estimatedRevenueDelta || 0), 0);
 
   if (!campground) {
@@ -141,7 +162,9 @@ export default function AIPricingPage() {
           <div className="text-center">
             <DollarSign className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h2 className="text-2xl font-bold text-foreground mb-2">No Campground Selected</h2>
-            <p className="text-muted-foreground">Select a campground to view pricing recommendations</p>
+            <p className="text-muted-foreground">
+              Select a campground to view pricing recommendations
+            </p>
           </div>
         </div>
       </DashboardShell>
@@ -215,7 +238,7 @@ export default function AIPricingPage() {
                 <Check className="h-5 w-5 text-status-info-text" />
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {recommendations.filter(r => r.status === "applied").length}
+                {recommendations.filter((r) => r.status === "applied").length}
               </div>
               <p className="text-xs text-muted-foreground">Applied This Month</p>
             </CardContent>
@@ -229,10 +252,12 @@ export default function AIPricingPage() {
               <div className="text-2xl font-bold text-foreground">
                 {recommendations.length > 0
                   ? Math.round(
-                      recommendations.reduce((acc, r) => acc + r.confidence, 0) /
-                        recommendations.length * 100
+                      (recommendations.reduce((acc, r) => acc + r.confidence, 0) /
+                        recommendations.length) *
+                        100,
                     )
-                  : 0}%
+                  : 0}
+                %
               </div>
               <p className="text-xs text-muted-foreground">Avg. Confidence Score</p>
             </CardContent>
@@ -303,12 +328,17 @@ export default function AIPricingPage() {
                       <Card
                         className={cn(
                           "transition-all hover:shadow-md",
-                          rec.status === "pending" && "border-l-4 border-l-status-warning"
+                          rec.status === "pending" && "border-l-4 border-l-status-warning",
                         )}
                       >
                         <CardContent className="p-5">
                           <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                            <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0", colorClass)}>
+                            <div
+                              className={cn(
+                                "flex h-12 w-12 items-center justify-center rounded-xl flex-shrink-0",
+                                colorClass,
+                              )}
+                            >
                               <Icon className="h-6 w-6" />
                             </div>
 
@@ -321,15 +351,21 @@ export default function AIPricingPage() {
                                   {rec.recommendationType.replace("_", " ")}
                                 </Badge>
                                 {rec.status !== "pending" && (
-                                  <Badge variant={rec.status === "applied" ? "default" : "secondary"} className="text-xs capitalize">
+                                  <Badge
+                                    variant={rec.status === "applied" ? "default" : "secondary"}
+                                    className="text-xs capitalize"
+                                  >
                                     {rec.status}
                                   </Badge>
                                 )}
                               </div>
                               <p className="text-sm text-muted-foreground mb-2">
-                                {format(new Date(rec.dateStart), "MMM d")} - {format(new Date(rec.dateEnd), "MMM d, yyyy")}
+                                {format(new Date(rec.dateStart), "MMM d")} -{" "}
+                                {format(new Date(rec.dateEnd), "MMM d, yyyy")}
                               </p>
-                              <p className="text-sm text-muted-foreground line-clamp-2">{rec.reasoning}</p>
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {rec.reasoning}
+                              </p>
                             </div>
 
                             <div className="flex items-center gap-6 lg:flex-shrink-0">
@@ -347,7 +383,9 @@ export default function AIPricingPage() {
                                 <p
                                   className={cn(
                                     "text-lg font-bold",
-                                    isPositive ? "text-status-success-text" : "text-status-warning-text"
+                                    isPositive
+                                      ? "text-status-success-text"
+                                      : "text-status-warning-text",
                                   )}
                                 >
                                   ${(rec.suggestedPriceCents / 100).toFixed(0)}
@@ -361,10 +399,11 @@ export default function AIPricingPage() {
                                   className={cn(
                                     isPositive
                                       ? "bg-status-success text-status-success-foreground"
-                                      : "bg-status-warning text-status-warning-foreground"
+                                      : "bg-status-warning text-status-warning-foreground",
                                   )}
                                 >
-                                  {isPositive ? "+" : ""}{rec.adjustmentPercent.toFixed(0)}%
+                                  {isPositive ? "+" : ""}
+                                  {rec.adjustmentPercent.toFixed(0)}%
                                 </Badge>
                               </div>
                             </div>
@@ -404,13 +443,15 @@ export default function AIPricingPage() {
                             {rec.createdAt && (
                               <div className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
-                                Created {formatDistanceToNow(new Date(rec.createdAt), { addSuffix: true })}
+                                Created{" "}
+                                {formatDistanceToNow(new Date(rec.createdAt), { addSuffix: true })}
                               </div>
                             )}
                             {rec.status === "pending" && rec.expiresAt && (
                               <div className="flex items-center gap-1">
                                 <AlertCircle className="h-3 w-3" />
-                                Expires {formatDistanceToNow(new Date(rec.expiresAt), { addSuffix: true })}
+                                Expires{" "}
+                                {formatDistanceToNow(new Date(rec.expiresAt), { addSuffix: true })}
                               </div>
                             )}
                           </div>

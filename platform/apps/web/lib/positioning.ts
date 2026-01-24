@@ -13,7 +13,7 @@ export const PRICING = {
   // Standard pricing (after early access)
   standard: {
     monthlyBase: 100, // $100/month
-    perBooking: 2.30, // $2.30 per booking
+    perBooking: 2.3, // $2.30 per booking
     aiCreditsIncluded: 5, // $5/month AI credits included
     aiOverageCostMultiplier: 2, // 2x cost for AI usage over included credits
     smsMarkup: 0.15, // 15% markup on SMS costs
@@ -21,16 +21,16 @@ export const PRICING = {
 
   // Expected revenue per customer size
   projectedRevenue: {
-    small: { bookingsPerMonth: 150, estimatedMonthly: 445 },   // ~$445/mo
-    medium: { bookingsPerMonth: 300, estimatedMonthly: 790 },  // ~$790/mo
-    large: { bookingsPerMonth: 500, estimatedMonthly: 1250 },  // ~$1,250/mo
+    small: { bookingsPerMonth: 150, estimatedMonthly: 445 }, // ~$445/mo
+    medium: { bookingsPerMonth: 300, estimatedMonthly: 790 }, // ~$790/mo
+    large: { bookingsPerMonth: 500, estimatedMonthly: 1250 }, // ~$1,250/mo
   },
 
   // Competitor pricing for comparison
   competitors: {
     campspot: {
-      perBooking: 3.00,
-      marketplaceCommission: 0.10, // 10%
+      perBooking: 3.0,
+      marketplaceCommission: 0.1, // 10%
       setupFee: "Unknown (often $$$)",
       hasHiddenFees: true,
     },
@@ -101,10 +101,7 @@ export const HEADLINES = {
   ],
 
   // Feature-specific headlines
-  ai: [
-    "AI That Actually Reduces No-Shows",
-    "Predict Demand. Optimize Pricing. Automatically.",
-  ],
+  ai: ["AI That Actually Reduces No-Shows", "Predict Demand. Optimize Pricing. Automatically."],
 
   loyalty: [
     "Turn One-Time Guests Into Lifetime Campers",
@@ -259,7 +256,13 @@ export const FEATURE_COMPARISON = {
         { name: "Online booking engine", us: true, campspot: true, newbook: true, camplife: true },
         { name: "Group bookings", us: true, campspot: true, newbook: true, camplife: "Limited" },
         { name: "Waitlist management", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "Reservation segments", us: true, campspot: false, newbook: "Limited", camplife: false },
+        {
+          name: "Reservation segments",
+          us: true,
+          campspot: false,
+          newbook: "Limited",
+          camplife: false,
+        },
       ],
     },
     {
@@ -267,7 +270,13 @@ export const FEATURE_COMPARISON = {
       features: [
         { name: "Stripe integration", us: true, campspot: true, newbook: true, camplife: true },
         { name: "Gift cards", us: true, campspot: true, newbook: false, camplife: false },
-        { name: "Stored value/wallets", us: true, campspot: false, newbook: false, camplife: false },
+        {
+          name: "Stored value/wallets",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
         { name: "Double-entry ledger", us: true, campspot: false, newbook: false, camplife: false },
         { name: "Charity round-up", us: true, campspot: false, newbook: false, camplife: false },
       ],
@@ -275,10 +284,34 @@ export const FEATURE_COMPARISON = {
     {
       name: "AI & Analytics",
       features: [
-        { name: "AI demand forecasting", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "AI pricing recommendations", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "AI no-show detection", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "A/B testing framework", us: true, campspot: false, newbook: false, camplife: false },
+        {
+          name: "AI demand forecasting",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
+        {
+          name: "AI pricing recommendations",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
+        {
+          name: "AI no-show detection",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
+        {
+          name: "A/B testing framework",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
         { name: "Anomaly detection", us: true, campspot: false, newbook: false, camplife: false },
       ],
     },
@@ -288,16 +321,34 @@ export const FEATURE_COMPARISON = {
         { name: "Staff scheduling", us: true, campspot: false, newbook: false, camplife: false },
         { name: "Payroll integration", us: true, campspot: false, newbook: false, camplife: false },
         { name: "Time tracking", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "Housekeeping management", us: true, campspot: true, newbook: true, camplife: true },
+        {
+          name: "Housekeeping management",
+          us: true,
+          campspot: true,
+          newbook: true,
+          camplife: true,
+        },
         { name: "Maintenance tickets", us: true, campspot: true, newbook: true, camplife: true },
       ],
     },
     {
       name: "Guest Experience",
       features: [
-        { name: "Loyalty/gamification", us: true, campspot: false, newbook: false, camplife: false },
+        {
+          name: "Loyalty/gamification",
+          us: true,
+          campspot: false,
+          newbook: false,
+          camplife: false,
+        },
         { name: "XP/leveling system", us: true, campspot: false, newbook: false, camplife: false },
-        { name: "Guest portal (self-serve)", us: true, campspot: "Limited", newbook: true, camplife: "Limited" },
+        {
+          name: "Guest portal (self-serve)",
+          us: true,
+          campspot: "Limited",
+          newbook: true,
+          camplife: "Limited",
+        },
         { name: "2-way SMS", us: true, campspot: false, newbook: true, camplife: false },
         { name: "Push notifications", us: true, campspot: false, newbook: false, camplife: false },
       ],
@@ -372,7 +423,7 @@ export const CTA_COPY = {
  * Calculate estimated monthly revenue for a park based on bookings
  */
 export function calculateMonthlyRevenue(bookingsPerMonth: number): number {
-  return PRICING.standard.monthlyBase + (bookingsPerMonth * PRICING.standard.perBooking);
+  return PRICING.standard.monthlyBase + bookingsPerMonth * PRICING.standard.perBooking;
 }
 
 /**
@@ -385,6 +436,8 @@ export function formatPrice(cents: number): string {
 /**
  * Get competitor pain points for a specific competitor
  */
-export function getCompetitorPainPoints(competitor: keyof typeof COMPETITOR_PAIN_POINTS): readonly string[] {
+export function getCompetitorPainPoints(
+  competitor: keyof typeof COMPETITOR_PAIN_POINTS,
+): readonly string[] {
   return COMPETITOR_PAIN_POINTS[competitor];
 }

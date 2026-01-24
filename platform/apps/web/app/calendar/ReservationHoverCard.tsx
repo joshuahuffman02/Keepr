@@ -1,8 +1,26 @@
 "use client";
 
-import { HoverCard, HoverCardHeader, HoverCardContent, HoverCardFooter } from "../../components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardHeader,
+  HoverCardContent,
+  HoverCardFooter,
+} from "../../components/ui/hover-card";
 import { formatDate, formatCurrency, calculateNights, getRelativeTime } from "@/lib/format";
-import { CheckCircle, Clock, XCircle, HelpCircle, Calendar, User, Mail, Phone, CreditCard, Tent, LogIn, Lock } from "lucide-react";
+import {
+  CheckCircle,
+  Clock,
+  XCircle,
+  HelpCircle,
+  Calendar,
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  Tent,
+  LogIn,
+  Lock,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ReservationHoverCardProps {
@@ -73,7 +91,9 @@ export function ReservationHoverCard({
   const config = statusConfig[statusKey];
   const StatusIcon = config.icon;
 
-  const guestName = `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest";
+  const guestName =
+    `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() ||
+    "Guest";
   const nights = calculateNights(reservation.arrivalDate, reservation.departureDate);
   const total = reservation.totalAmount ?? 0;
   const paid = reservation.paidAmount ?? 0;
@@ -93,7 +113,9 @@ export function ReservationHoverCard({
           {reservation.guest?.email && (
             <div className="flex items-center gap-2 mt-1">
               <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-              <span className="text-xs text-muted-foreground truncate">{reservation.guest.email}</span>
+              <span className="text-xs text-muted-foreground truncate">
+                {reservation.guest.email}
+              </span>
             </div>
           )}
         </div>
@@ -104,7 +126,12 @@ export function ReservationHoverCard({
               Site Locked
             </div>
           )}
-          <div className={cn("flex items-center gap-1.5 px-2 py-1 rounded-full border text-xs font-medium", config.color)}>
+          <div
+            className={cn(
+              "flex items-center gap-1.5 px-2 py-1 rounded-full border text-xs font-medium",
+              config.color,
+            )}
+          >
             <StatusIcon className={cn("h-3 w-3", config.iconColor)} />
             {config.label}
           </div>
@@ -147,18 +174,14 @@ export function ReservationHoverCard({
           <CreditCard className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-foreground">
-                {formatCurrency(total)}
-              </span>
+              <span className="text-sm font-medium text-foreground">{formatCurrency(total)}</span>
               {balance > 0 && (
                 <span className="text-xs text-status-warning font-medium">
                   {formatCurrency(balance)} due
                 </span>
               )}
               {balance <= 0 && paid > 0 && (
-                <span className="text-xs text-status-success font-medium">
-                  Paid in full
-                </span>
+                <span className="text-xs text-status-success font-medium">Paid in full</span>
               )}
             </div>
             {paid > 0 && paid < total && (

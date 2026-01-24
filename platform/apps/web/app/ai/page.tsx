@@ -41,7 +41,7 @@ import {
   ExternalLink,
   Play,
   Pause,
-  RotateCcw
+  RotateCcw,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import Link from "next/link";
@@ -219,7 +219,11 @@ export default function AICommandCenterPage() {
   };
 
   // Get AI dashboard metrics
-  const { data: dashboard, isLoading: loadingDashboard, refetch: refetchDashboard } = useQuery<DashboardData>({
+  const {
+    data: dashboard,
+    isLoading: loadingDashboard,
+    refetch: refetchDashboard,
+  } = useQuery<DashboardData>({
     queryKey: ["ai-dashboard", campgroundId],
     queryFn: () => apiClient.getAiDashboard(requireCampgroundId()),
     enabled: !!campgroundId,
@@ -227,7 +231,11 @@ export default function AICommandCenterPage() {
   });
 
   // Get AI activity feed
-  const { data: activityFeed = [], isLoading: loadingActivity, refetch: refetchActivity } = useQuery<ActivityItem[]>({
+  const {
+    data: activityFeed = [],
+    isLoading: loadingActivity,
+    refetch: refetchActivity,
+  } = useQuery<ActivityItem[]>({
     queryKey: ["ai-activity", campgroundId],
     queryFn: () => apiClient.getAiActivityFeed(requireCampgroundId()),
     enabled: !!campgroundId,
@@ -243,7 +251,8 @@ export default function AICommandCenterPage() {
 
   // Reverse autonomous action mutation
   const reverseActionMutation = useMutation({
-    mutationFn: (actionId: string) => apiClient.reverseAutonomousAction(requireCampgroundId(), actionId),
+    mutationFn: (actionId: string) =>
+      apiClient.reverseAutonomousAction(requireCampgroundId(), actionId),
     onSuccess: () => {
       toast({ title: "Action reversed", description: "The autonomous action has been reversed." });
       refetchActivity();
@@ -252,16 +261,17 @@ export default function AICommandCenterPage() {
       toast({
         title: "Failed to reverse action",
         description: error instanceof Error ? error.message : "Unable to reverse action",
-        variant: "destructive"
+        variant: "destructive",
       });
     },
   });
 
   const metrics = dashboard?.metrics;
   // Calculate ROI from metrics (revenue saved / cost)
-  const roiMultiple = metrics?.aiCostCents && metrics.aiCostCents > 0
-    ? (metrics.estimatedRevenueSavedCents || 0) / metrics.aiCostCents
-    : null;
+  const roiMultiple =
+    metrics?.aiCostCents && metrics.aiCostCents > 0
+      ? (metrics.estimatedRevenueSavedCents || 0) / metrics.aiCostCents
+      : null;
 
   // Calculate enabled features count
   const config = autopilotConfig;
@@ -295,7 +305,9 @@ export default function AICommandCenterPage() {
           <div className="text-center">
             <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h2 className="text-2xl font-bold text-foreground mb-2">No Campground Selected</h2>
-            <p className="text-muted-foreground">Select a campground to access the AI Command Center</p>
+            <p className="text-muted-foreground">
+              Select a campground to access the AI Command Center
+            </p>
           </div>
         </div>
       </DashboardShell>
@@ -388,7 +400,8 @@ export default function AICommandCenterPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mt-0.5">
-                      {enabledFeatures} of 8 AI features enabled • {autonomousFeatures} running autonomously
+                      {enabledFeatures} of 8 AI features enabled • {autonomousFeatures} running
+                      autonomously
                     </p>
                   </div>
                 </div>
@@ -422,7 +435,9 @@ export default function AICommandCenterPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <MessageSquare className="h-5 w-5 text-status-info-text" />
-                <Badge variant="outline" className="text-xs">Today</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Today
+                </Badge>
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {loadingDashboard ? (
@@ -444,7 +459,9 @@ export default function AICommandCenterPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <Phone className="h-5 w-5 text-primary" />
-                <Badge variant="outline" className="text-xs">Today</Badge>
+                <Badge variant="outline" className="text-xs">
+                  Today
+                </Badge>
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {loadingDashboard ? (
@@ -461,7 +478,9 @@ export default function AICommandCenterPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <DollarSign className="h-5 w-5 text-status-success-text" />
-                <Badge variant="outline" className="text-xs">This Month</Badge>
+                <Badge variant="outline" className="text-xs">
+                  This Month
+                </Badge>
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {loadingDashboard ? (
@@ -478,7 +497,9 @@ export default function AICommandCenterPage() {
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <Gauge className="h-5 w-5 text-status-warning-text" />
-                <Badge variant="outline" className="text-xs">ROI</Badge>
+                <Badge variant="outline" className="text-xs">
+                  ROI
+                </Badge>
               </div>
               <div className="text-2xl font-bold text-foreground">
                 {loadingDashboard ? (
@@ -528,9 +549,8 @@ export default function AICommandCenterPage() {
                 {featureCards.map((feature, index) => {
                   const Icon = feature.icon;
                   let statValue: string | number = 0;
-                  const isEnabled = feature.configKey && config
-                    ? Boolean(config[feature.configKey])
-                    : true;
+                  const isEnabled =
+                    feature.configKey && config ? Boolean(config[feature.configKey]) : true;
 
                   if (feature.stats.key === "featuresEnabled") {
                     statValue = enabledFeatures;
@@ -553,23 +573,28 @@ export default function AICommandCenterPage() {
                       transition={{ delay: 0.05 * index, ...SPRING_CONFIG }}
                     >
                       <Link href={feature.href}>
-                        <Card className={cn(
-                          "group h-full hover:shadow-lg transition-all cursor-pointer border-2",
-                          isEnabled ? "hover:border-primary/20" : "opacity-75"
-                        )}>
+                        <Card
+                          className={cn(
+                            "group h-full hover:shadow-lg transition-all cursor-pointer border-2",
+                            isEnabled ? "hover:border-primary/20" : "opacity-75",
+                          )}
+                        >
                           <CardContent className="p-5">
                             <div className="flex items-start justify-between mb-4">
                               <div
                                 className={cn(
                                   "flex h-12 w-12 items-center justify-center rounded-xl shadow-sm",
-                                  feature.color
+                                  feature.color,
                                 )}
                               >
                                 <Icon className="h-6 w-6" />
                               </div>
                               <div className="flex items-center gap-2">
                                 {feature.configKey && (
-                                  <Badge variant={isEnabled ? "default" : "secondary"} className="text-xs">
+                                  <Badge
+                                    variant={isEnabled ? "default" : "secondary"}
+                                    className="text-xs"
+                                  >
                                     {isEnabled ? "Enabled" : "Disabled"}
                                   </Badge>
                                 )}
@@ -577,7 +602,9 @@ export default function AICommandCenterPage() {
                               </div>
                             </div>
                             <h3 className="font-semibold text-foreground mb-1">{feature.title}</h3>
-                            <p className="text-sm text-muted-foreground mb-3">{feature.description}</p>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {feature.description}
+                            </p>
                             <div className="flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
                                 {feature.stats.label}: {statValue}
@@ -715,22 +742,34 @@ export default function AICommandCenterPage() {
                             transition={{ delay: index * 0.02 }}
                             className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                           >
-                            <div className={cn(
-                              "flex h-8 w-8 items-center justify-center rounded-full",
-                              item.status === "success" || item.color === "emerald" ? "bg-status-success/15" :
-                              item.status === "pending" || item.color === "amber" ? "bg-status-warning/15" :
-                              item.status === "warning" || item.color === "orange" ? "bg-status-warning/15" :
-                              item.status === "error" || item.color === "red" ? "bg-status-error/15" :
-                              "bg-muted"
-                            )}>
-                              <Icon className={cn(
-                                "h-4 w-4",
-                                item.status === "success" || item.color === "emerald" ? "text-status-success" :
-                                item.status === "pending" || item.color === "amber" ? "text-status-warning" :
-                                item.status === "warning" || item.color === "orange" ? "text-status-warning" :
-                                item.status === "error" || item.color === "red" ? "text-status-error" :
-                                "text-muted-foreground"
-                              )} />
+                            <div
+                              className={cn(
+                                "flex h-8 w-8 items-center justify-center rounded-full",
+                                item.status === "success" || item.color === "emerald"
+                                  ? "bg-status-success/15"
+                                  : item.status === "pending" || item.color === "amber"
+                                    ? "bg-status-warning/15"
+                                    : item.status === "warning" || item.color === "orange"
+                                      ? "bg-status-warning/15"
+                                      : item.status === "error" || item.color === "red"
+                                        ? "bg-status-error/15"
+                                        : "bg-muted",
+                              )}
+                            >
+                              <Icon
+                                className={cn(
+                                  "h-4 w-4",
+                                  item.status === "success" || item.color === "emerald"
+                                    ? "text-status-success"
+                                    : item.status === "pending" || item.color === "amber"
+                                      ? "text-status-warning"
+                                      : item.status === "warning" || item.color === "orange"
+                                        ? "text-status-warning"
+                                        : item.status === "error" || item.color === "red"
+                                          ? "text-status-error"
+                                          : "text-muted-foreground",
+                                )}
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
@@ -740,7 +779,10 @@ export default function AICommandCenterPage() {
                                 {item.status && (
                                   <Badge
                                     variant="outline"
-                                    className={cn("text-[10px] px-1.5 py-0", getStatusColor(item.status))}
+                                    className={cn(
+                                      "text-[10px] px-1.5 py-0",
+                                      getStatusColor(item.status),
+                                    )}
                                   >
                                     {item.status}
                                   </Badge>
@@ -786,9 +828,7 @@ export default function AICommandCenterPage() {
                     <Zap className="h-5 w-5 text-status-warning" />
                     Autonomous Mode Status
                   </CardTitle>
-                  <CardDescription>
-                    Features running without human intervention
-                  </CardDescription>
+                  <CardDescription>Features running without human intervention</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -895,7 +935,14 @@ export default function AICommandCenterPage() {
                   ) : (
                     <div className="space-y-2">
                       {activityFeed
-                        .filter(item => ["auto_reply_sent", "waitlist_auto_offered", "site_released", "anomaly_fixed"].includes(item.type))
+                        .filter((item) =>
+                          [
+                            "auto_reply_sent",
+                            "waitlist_auto_offered",
+                            "site_released",
+                            "anomaly_fixed",
+                          ].includes(item.type),
+                        )
                         .slice(0, 10)
                         .map((item) => {
                           const Icon = getActivityIcon(item.type);
@@ -909,8 +956,12 @@ export default function AICommandCenterPage() {
                                   <Icon className="h-4 w-4 text-status-info-text" />
                                 </div>
                                 <div>
-                                  <p className="font-medium text-sm text-foreground">{item.title}</p>
-                                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                                  <p className="font-medium text-sm text-foreground">
+                                    {item.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {item.description}
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
@@ -927,14 +978,21 @@ export default function AICommandCenterPage() {
                                   </Button>
                                 )}
                                 <span className="text-xs text-muted-foreground">
-                                  {formatDistanceToNow(new Date(item.timestamp), { addSuffix: true })}
+                                  {formatDistanceToNow(new Date(item.timestamp), {
+                                    addSuffix: true,
+                                  })}
                                 </span>
                               </div>
                             </div>
                           );
                         })}
-                      {activityFeed.filter(item =>
-                        ["auto_reply_sent", "waitlist_auto_offered", "site_released", "anomaly_fixed"].includes(item.type)
+                      {activityFeed.filter((item) =>
+                        [
+                          "auto_reply_sent",
+                          "waitlist_auto_offered",
+                          "site_released",
+                          "anomaly_fixed",
+                        ].includes(item.type),
                       ).length === 0 && (
                         <div className="text-center py-8 text-muted-foreground">
                           <Bot className="h-8 w-8 mx-auto mb-2 opacity-50" />

@@ -14,4 +14,3 @@ export class SyncRequestDto {
   @IsString()
   note?: string;
 }
-

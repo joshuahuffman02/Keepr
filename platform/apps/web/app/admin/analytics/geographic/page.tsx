@@ -23,16 +23,86 @@ const mockGeographicData = {
     internationalPercentage: 4.2,
   },
   originHeatmap: [
-    { state: "TX", country: "US", guestCount: 1245, reservations: 2890, revenue: 685000, averageDistance: 125 },
-    { state: "CA", country: "US", guestCount: 1120, reservations: 2450, revenue: 612000, averageDistance: 320 },
-    { state: "FL", country: "US", guestCount: 980, reservations: 2180, revenue: 545000, averageDistance: 450 },
-    { state: "CO", country: "US", guestCount: 745, reservations: 1680, revenue: 420000, averageDistance: 180 },
-    { state: "AZ", country: "US", guestCount: 680, reservations: 1520, revenue: 380000, averageDistance: 220 },
-    { state: "NY", country: "US", guestCount: 520, reservations: 1150, revenue: 287500, averageDistance: 890 },
-    { state: "WA", country: "US", guestCount: 485, reservations: 1080, revenue: 270000, averageDistance: 650 },
-    { state: "OR", country: "US", guestCount: 420, reservations: 940, revenue: 235000, averageDistance: 580 },
-    { state: "NV", country: "US", guestCount: 380, reservations: 850, revenue: 212500, averageDistance: 280 },
-    { state: "UT", country: "US", guestCount: 340, reservations: 760, revenue: 190000, averageDistance: 240 },
+    {
+      state: "TX",
+      country: "US",
+      guestCount: 1245,
+      reservations: 2890,
+      revenue: 685000,
+      averageDistance: 125,
+    },
+    {
+      state: "CA",
+      country: "US",
+      guestCount: 1120,
+      reservations: 2450,
+      revenue: 612000,
+      averageDistance: 320,
+    },
+    {
+      state: "FL",
+      country: "US",
+      guestCount: 980,
+      reservations: 2180,
+      revenue: 545000,
+      averageDistance: 450,
+    },
+    {
+      state: "CO",
+      country: "US",
+      guestCount: 745,
+      reservations: 1680,
+      revenue: 420000,
+      averageDistance: 180,
+    },
+    {
+      state: "AZ",
+      country: "US",
+      guestCount: 680,
+      reservations: 1520,
+      revenue: 380000,
+      averageDistance: 220,
+    },
+    {
+      state: "NY",
+      country: "US",
+      guestCount: 520,
+      reservations: 1150,
+      revenue: 287500,
+      averageDistance: 890,
+    },
+    {
+      state: "WA",
+      country: "US",
+      guestCount: 485,
+      reservations: 1080,
+      revenue: 270000,
+      averageDistance: 650,
+    },
+    {
+      state: "OR",
+      country: "US",
+      guestCount: 420,
+      reservations: 940,
+      revenue: 235000,
+      averageDistance: 580,
+    },
+    {
+      state: "NV",
+      country: "US",
+      guestCount: 380,
+      reservations: 850,
+      revenue: 212500,
+      averageDistance: 280,
+    },
+    {
+      state: "UT",
+      country: "US",
+      guestCount: 340,
+      reservations: 760,
+      revenue: 190000,
+      averageDistance: 240,
+    },
   ],
   travelDistance: {
     averageDistance: 285,
@@ -148,7 +218,7 @@ export default function GeographicPage() {
       <USStateHeatmap
         title="Guest Origins by State"
         description="Visualize where your guests are coming from across the United States"
-        data={data.originHeatmap.map(s => ({
+        data={data.originHeatmap.map((s) => ({
           state: s.state,
           value: s.guestCount,
         }))}
@@ -164,9 +234,7 @@ export default function GeographicPage() {
             title="Travel Distance Distribution"
             description="How far guests travel to reach campgrounds"
             data={data.travelDistance.buckets}
-            dataKeys={[
-              { key: "count", color: "#3b82f6", name: "Guest Count" },
-            ]}
+            dataKeys={[{ key: "count", color: "#3b82f6", name: "Guest Count" }]}
             xAxisKey="range"
             type="bar"
             height={300}
@@ -186,11 +254,15 @@ export default function GeographicPage() {
             <CardContent className="p-4 space-y-3">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Average Distance</span>
-                <span className="text-foreground font-medium">{Math.round(data.travelDistance.averageDistance ?? 0)} mi</span>
+                <span className="text-foreground font-medium">
+                  {Math.round(data.travelDistance.averageDistance ?? 0)} mi
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Median Distance</span>
-                <span className="text-foreground font-medium">{Math.round(data.travelDistance.medianDistance ?? 0)} mi</span>
+                <span className="text-foreground font-medium">
+                  {Math.round(data.travelDistance.medianDistance ?? 0)} mi
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -284,7 +356,9 @@ export default function GeographicPage() {
             {data.travelDistance.buckets.map((bucket, idx) => (
               <div key={idx} className="text-center p-4 bg-muted rounded-lg">
                 <p className="text-xs text-muted-foreground mb-1">{bucket.range}</p>
-                <p className="text-xl font-bold text-foreground">{formatCurrency(bucket.averageSpend)}</p>
+                <p className="text-xl font-bold text-foreground">
+                  {formatCurrency(bucket.averageSpend)}
+                </p>
                 <p className="text-xs text-muted-foreground">avg spend</p>
               </div>
             ))}

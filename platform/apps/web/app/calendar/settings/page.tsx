@@ -49,8 +49,16 @@ type StartOfWeek = CalendarSettings["startOfWeek"];
 const isStartOfWeek = (value: string): value is StartOfWeek =>
   value === "sunday" || value === "monday";
 
-const COLOR_SCHEMES: Array<{ value: CalendarSettings["colorScheme"]; label: string; desc: string }> = [
-  { value: "status", label: "By Status", desc: "Color by reservation status (confirmed, checked-in, etc.)" },
+const COLOR_SCHEMES: Array<{
+  value: CalendarSettings["colorScheme"];
+  label: string;
+  desc: string;
+}> = [
+  {
+    value: "status",
+    label: "By Status",
+    desc: "Color by reservation status (confirmed, checked-in, etc.)",
+  },
   { value: "source", label: "By Source", desc: "Color by booking channel (online, phone, OTA)" },
   { value: "siteType", label: "By Site Type", desc: "Color by site category (RV, tent, cabin)" },
   { value: "custom", label: "Custom", desc: "Define your own color rules" },
@@ -110,7 +118,10 @@ export default function CalendarSettingsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <Link href="/calendar" className="text-muted-foreground hover:text-foreground flex items-center gap-1">
+              <Link
+                href="/calendar"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+              >
                 <ArrowLeft className="h-4 w-4" /> Back to Calendar
               </Link>
             </div>
@@ -129,7 +140,15 @@ export default function CalendarSettingsPage() {
               disabled={saving}
               className="px-4 py-2 bg-status-success text-white rounded-lg hover:bg-status-success/90 disabled:opacity-50"
             >
-              {saving ? "Saving..." : saved ? <span className="flex items-center gap-1"><Check className="h-4 w-4" /> Saved</span> : "Save Settings"}
+              {saving ? (
+                "Saving..."
+              ) : saved ? (
+                <span className="flex items-center gap-1">
+                  <Check className="h-4 w-4" /> Saved
+                </span>
+              ) : (
+                "Save Settings"
+              )}
             </button>
           </div>
         </div>
@@ -139,9 +158,12 @@ export default function CalendarSettingsPage() {
           <section className="bg-card rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Display Settings</h2>
             <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                  <Label htmlFor="default-day-range" className="block text-sm font-medium text-foreground mb-1">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label
+                    htmlFor="default-day-range"
+                    className="block text-sm font-medium text-foreground mb-1"
+                  >
                     Default Day Range
                   </Label>
                   <Select
@@ -163,7 +185,10 @@ export default function CalendarSettingsPage() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="week-starts-on" className="block text-sm font-medium text-foreground mb-1">
+                  <Label
+                    htmlFor="week-starts-on"
+                    className="block text-sm font-medium text-foreground mb-1"
+                  >
                     Week Starts On
                   </Label>
                   <Select
@@ -234,13 +259,12 @@ export default function CalendarSettingsPage() {
               {COLOR_SCHEMES.map((scheme) => (
                 <button
                   key={scheme.value}
-                  onClick={() =>
-                    setSettings({ ...settings, colorScheme: scheme.value })
-                  }
-                  className={`p-4 rounded-xl border text-left transition-all ${settings.colorScheme === scheme.value
-                    ? "border-status-success bg-status-success/15 ring-2 ring-status-success/30"
-                    : "border-border hover:border-border"
-                    }`}
+                  onClick={() => setSettings({ ...settings, colorScheme: scheme.value })}
+                  className={`p-4 rounded-xl border text-left transition-all ${
+                    settings.colorScheme === scheme.value
+                      ? "border-status-success bg-status-success/15 ring-2 ring-status-success/30"
+                      : "border-border hover:border-border"
+                  }`}
                   aria-pressed={settings.colorScheme === scheme.value}
                 >
                   <div className="font-medium text-foreground">{scheme.label}</div>
@@ -286,7 +310,10 @@ export default function CalendarSettingsPage() {
           <section className="bg-card rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Auto-Refresh</h2>
             <div>
-              <Label htmlFor="refresh-interval" className="block text-sm font-medium text-foreground mb-1">
+              <Label
+                htmlFor="refresh-interval"
+                className="block text-sm font-medium text-foreground mb-1"
+              >
                 Refresh Interval
               </Label>
               <Select
@@ -338,7 +365,9 @@ export default function CalendarSettingsPage() {
                 }}
                 className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
-                <div className="flex items-center gap-2"><BarChart3 className="h-4 w-4" /> Export CSV</div>
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4" /> Export CSV
+                </div>
               </button>
               <button
                 onClick={() => {
@@ -347,7 +376,9 @@ export default function CalendarSettingsPage() {
                 }}
                 className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
-                <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" /> Export iCal</div>
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4" /> Export iCal
+                </div>
               </button>
               <button
                 onClick={() => {
@@ -356,7 +387,9 @@ export default function CalendarSettingsPage() {
                 }}
                 className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
-                <div className="flex items-center gap-2"><Printer className="h-4 w-4" /> Print</div>
+                <div className="flex items-center gap-2">
+                  <Printer className="h-4 w-4" /> Print
+                </div>
               </button>
             </div>
           </section>

@@ -10,9 +10,7 @@ export default function HoursPage() {
     <div className="max-w-4xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-foreground">Hours</h2>
-        <p className="text-muted-foreground mt-1">
-          Set check-in/check-out times and office hours
-        </p>
+        <p className="text-muted-foreground mt-1">Set check-in/check-out times and office hours</p>
       </div>
 
       <Card>
@@ -24,8 +22,8 @@ export default function HoursPage() {
             <div className="flex-1">
               <h3 className="font-semibold text-foreground">Operating Hours</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                Configure check-in and check-out times, office hours, and store hours.
-                These times are shown to guests during booking.
+                Configure check-in and check-out times, office hours, and store hours. These times
+                are shown to guests during booking.
               </p>
               <div className="mt-4">
                 <Button asChild>

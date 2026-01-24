@@ -122,9 +122,7 @@ export function SiteClassCards({
         {siteClasses.map((siteClass, idx) => {
           const price = siteClass.defaultRate ? siteClass.defaultRate / 100 : null;
           const hasFullHookups =
-            siteClass.hookupsPower &&
-            siteClass.hookupsWater &&
-            siteClass.hookupsSewer;
+            siteClass.hookupsPower && siteClass.hookupsWater && siteClass.hookupsSewer;
 
           return (
             <motion.article
@@ -161,12 +159,10 @@ export function SiteClassCards({
                       <div
                         className={cn(
                           "w-full h-full bg-gradient-to-br flex items-center justify-center",
-                          getSiteTypeGradient(siteClass.siteType)
+                          getSiteTypeGradient(siteClass.siteType),
                         )}
                       >
-                        <div className="text-white/80">
-                          {getSiteTypeIcon(siteClass.siteType)}
-                        </div>
+                        <div className="text-white/80">{getSiteTypeIcon(siteClass.siteType)}</div>
                       </div>
                     )}
 
@@ -175,13 +171,11 @@ export function SiteClassCards({
                       <Badge
                         className={cn(
                           "text-white border-0 bg-gradient-to-r",
-                          getSiteTypeGradient(siteClass.siteType)
+                          getSiteTypeGradient(siteClass.siteType),
                         )}
                       >
                         {getSiteTypeIcon(siteClass.siteType)}
-                        <span className="ml-1">
-                          {siteClass.siteType?.toUpperCase() || "SITE"}
-                        </span>
+                        <span className="ml-1">{siteClass.siteType?.toUpperCase() || "SITE"}</span>
                       </Badge>
                     </div>
 
@@ -314,7 +308,7 @@ export function SiteClassGrid({
                       <div
                         className={cn(
                           "w-full h-full bg-gradient-to-br flex items-center justify-center",
-                          getSiteTypeGradient(siteClass.siteType)
+                          getSiteTypeGradient(siteClass.siteType),
                         )}
                       >
                         <div className="text-white/50 scale-150">
@@ -327,7 +321,7 @@ export function SiteClassGrid({
                       <Badge
                         className={cn(
                           "text-white border-0 bg-gradient-to-r",
-                          getSiteTypeGradient(siteClass.siteType)
+                          getSiteTypeGradient(siteClass.siteType),
                         )}
                       >
                         {siteClass.siteType?.toUpperCase() || "SITE"}
@@ -336,9 +330,7 @@ export function SiteClassGrid({
 
                     {price && (
                       <div className="absolute bottom-3 right-3 bg-card/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
-                        <span className="font-bold text-emerald-600">
-                          ${price.toFixed(0)}
-                        </span>
+                        <span className="font-bold text-emerald-600">${price.toFixed(0)}</span>
                         <span className="text-xs text-muted-foreground">/night</span>
                       </div>
                     )}

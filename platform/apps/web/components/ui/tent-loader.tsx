@@ -44,9 +44,7 @@ export function TentLoader({ message, className }: TentLoaderProps) {
         />
       </div>
 
-      <p className="text-sm text-muted-foreground animate-pulse">
-        {displayMessage}
-      </p>
+      <p className="text-sm text-muted-foreground animate-pulse">{displayMessage}</p>
     </div>
   );
 }

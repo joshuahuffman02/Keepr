@@ -11,7 +11,7 @@ export class PricingService {
   listByCampground(campgroundId: string) {
     return this.prisma.pricingRule.findMany({
       where: { campgroundId },
-      orderBy: [{ isActive: "desc" }, { startDate: "asc" }, { createdAt: "desc" }]
+      orderBy: [{ isActive: "desc" }, { startDate: "asc" }, { createdAt: "desc" }],
     });
   }
 
@@ -23,8 +23,8 @@ export class PricingService {
         campgroundId,
         siteClassId: dto.siteClassId || null,
         startDate: dto.startDate ? new Date(dto.startDate) : null,
-        endDate: dto.endDate ? new Date(dto.endDate) : null
-      }
+        endDate: dto.endDate ? new Date(dto.endDate) : null,
+      },
     });
     await this.prisma.analyticsEvent.create({
       data: {
@@ -32,7 +32,14 @@ export class PricingService {
         sessionId: randomUUID(),
         eventName: AnalyticsEventName.admin_pricing_change,
         Campground: { connect: { id: campgroundId } },
-        metadata: { action: "create", ruleId: rule.id, label: dto.label, ruleType: dto.ruleType, percentAdjust: dto.percentAdjust, flatAdjust: dto.flatAdjust },
+        metadata: {
+          action: "create",
+          ruleId: rule.id,
+          label: dto.label,
+          ruleType: dto.ruleType,
+          percentAdjust: dto.percentAdjust,
+          flatAdjust: dto.flatAdjust,
+        },
       },
     });
     return rule;
@@ -47,9 +54,10 @@ export class PricingService {
       data: {
         ...rest,
         siteClassId: dto.siteClassId === undefined ? undefined : dto.siteClassId || null,
-        startDate: dto.startDate === undefined ? undefined : dto.startDate ? new Date(dto.startDate) : null,
-        endDate: dto.endDate === undefined ? undefined : dto.endDate ? new Date(dto.endDate) : null
-      }
+        startDate:
+          dto.startDate === undefined ? undefined : dto.startDate ? new Date(dto.startDate) : null,
+        endDate: dto.endDate === undefined ? undefined : dto.endDate ? new Date(dto.endDate) : null,
+      },
     });
     await this.prisma.analyticsEvent.create({
       data: {

@@ -22,7 +22,7 @@ export class SyntheticsService {
   private readonly baseUrl = process.env.SYNTHETIC_API_BASE;
   private readonly budgetMs = Number(process.env.SYNTHETIC_BUDGET_MS ?? 3000);
 
-  constructor(private readonly observability: ObservabilityService) { }
+  constructor(private readonly observability: ObservabilityService) {}
 
   @Cron("*/5 * * * *")
   async run() {
@@ -62,7 +62,12 @@ export class SyntheticsService {
       const res = await fetch(url, options);
       const latency = Date.now() - started;
       const ok = res.ok && latency <= this.budgetMs;
-      this.observability.recordSynthetic(spec.name, ok, latency, ok ? undefined : `HTTP ${res.status} latency ${latency}ms`);
+      this.observability.recordSynthetic(
+        spec.name,
+        ok,
+        latency,
+        ok ? undefined : `HTTP ${res.status} latency ${latency}ms`,
+      );
       if (!ok) {
         this.logger.warn(`Synthetic ${spec.name} failed (${latency}ms)`);
       }

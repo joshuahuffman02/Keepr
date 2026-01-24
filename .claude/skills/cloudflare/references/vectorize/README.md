@@ -7,6 +7,7 @@ Expert guidance for Cloudflare Vectorize - globally distributed vector database 
 Vectorize is Cloudflare's vector database that enables building full-stack AI-powered applications with Workers. It stores and queries vector embeddings for semantic search, recommendations, classification, and anomaly detection.
 
 **Key Features:**
+
 - Globally distributed vector database
 - Seamless integration with Workers AI
 - Support for dimensions up to 1536 (32-bit float precision)
@@ -34,13 +35,14 @@ npx wrangler@latest vectorize create <index-name> \
 
 #### Distance Metrics
 
-| Metric | Best For | Score Interpretation |
-|--------|----------|---------------------|
-| `euclidean` | Absolute distance, spatial data | Lower = closer (0.0 = identical) |
-| `cosine` | Text embeddings, semantic similarity | Higher = closer (1.0 = identical) |
-| `dot-product` | Recommendation systems, normalized vectors | Higher = closer |
+| Metric        | Best For                                   | Score Interpretation              |
+| ------------- | ------------------------------------------ | --------------------------------- |
+| `euclidean`   | Absolute distance, spatial data            | Lower = closer (0.0 = identical)  |
+| `cosine`      | Text embeddings, semantic similarity       | Higher = closer (1.0 = identical) |
+| `dot-product` | Recommendation systems, normalized vectors | Higher = closer                   |
 
 **Metric Selection:**
+
 - Text/semantic search: `cosine` (most common)
 - Image similarity: `euclidean`
 - Pre-normalized vectors: `dot-product`
@@ -48,6 +50,7 @@ npx wrangler@latest vectorize create <index-name> \
 #### Naming Conventions
 
 Index names must:
+
 - Be lowercase and/or numeric ASCII
 - Start with a letter
 - Use dashes (-) instead of spaces
@@ -66,6 +69,7 @@ npx wrangler vectorize create-metadata-index <index-name> \
 ```
 
 **Important:**
+
 - Create metadata indexes BEFORE inserting vectors
 - Existing vectors won't be indexed retroactively (must re-upsert)
 - String fields: first 64 bytes indexed (UTF-8 boundary)
@@ -73,6 +77,7 @@ npx wrangler vectorize create-metadata-index <index-name> \
 - Max 10 metadata indexes per Vectorize index
 
 **Cardinality Considerations:**
+
 - **High cardinality** (UUIDs, millisecond timestamps): Good for `$eq`, poor for range queries
 - **Low cardinality** (enum values, status): Good for filters, less selective
 - **Best practice**: Bucket high-cardinality data (e.g., round timestamps to 5-min windows)
@@ -100,19 +105,21 @@ npx wrangler vectorize list-vectors <index-name> \
 ### Configuration
 
 **wrangler.jsonc:**
+
 ```jsonc
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "vectorize": [
     {
       "binding": "VECTORIZE",
-      "index_name": "production-index"
-    }
-  ]
+      "index_name": "production-index",
+    },
+  ],
 }
 ```
 
 **wrangler.toml:**
+
 ```toml
 [[vectorize]]
 binding = "VECTORIZE"  # Available as env.VECTORIZE
@@ -136,14 +143,15 @@ export interface Env {
 
 ```typescript
 interface VectorizeVector {
-  id: string;              // Unique identifier (max 64 bytes)
-  values: number[] | Float32Array | Float64Array;  // Match index dimensions
-  namespace?: string;      // Optional partition key (max 64 bytes)
-  metadata?: Record<string, string | number | boolean | null>;  // Max 10 KiB
+  id: string; // Unique identifier (max 64 bytes)
+  values: number[] | Float32Array | Float64Array; // Match index dimensions
+  namespace?: string; // Optional partition key (max 64 bytes)
+  metadata?: Record<string, string | number | boolean | null>; // Max 10 KiB
 }
 ```
 
 **Vector Values:**
+
 - Array of numbers, Float32Array, or Float64Array
 - Must match index dimensions exactly
 - Stored as Float32 (Float64 converted on insert)
@@ -172,12 +180,14 @@ const upserted = await env.VECTORIZE.upsert([
 ```
 
 **Key Differences:**
+
 - `insert()`: Duplicate IDs ignored, first insert wins
 - `upsert()`: Overwrites completely (no merge), last upsert wins
 - Both return `{ mutationId: string }`
 - Asynchronous: Takes a few seconds to be queryable
 
 **Batch Limits:**
+
 - Workers: 1000 vectors per batch
 - HTTP API: 5000 vectors per batch
 - File upload: 100 MB max
@@ -200,14 +210,15 @@ const matches = await env.VECTORIZE.query(queryVector, {
 ```
 
 **Response:**
+
 ```typescript
 interface VectorizeMatches {
   count: number;
   matches: Array<{
     id: string;
-    score: number;           // Distance score (interpretation depends on metric)
-    values?: number[];       // If returnValues: true
-    metadata?: Record<string, any>;  // If returnMetadata != "none"
+    score: number; // Distance score (interpretation depends on metric)
+    values?: number[]; // If returnValues: true
+    metadata?: Record<string, any>; // If returnMetadata != "none"
   }>;
 }
 ```
@@ -219,7 +230,7 @@ interface VectorizeMatches {
 const matches = await env.VECTORIZE.queryById("some-vector-id", {
   topK: 5,
   returnValues: true,
-  returnMetadata: "all"
+  returnMetadata: "all",
 });
 ```
 
@@ -237,7 +248,7 @@ const vectors = await env.VECTORIZE.getByIds(ids);
 // Implicit $eq
 const matches = await env.VECTORIZE.query(queryVector, {
   topK: 10,
-  filter: { category: "electronics" }
+  filter: { category: "electronics" },
 });
 
 // Explicit operators
@@ -246,24 +257,25 @@ const matches = await env.VECTORIZE.query(queryVector, {
     category: { $ne: "deprecated" },
     price: { $gte: 10, $lt: 100 },
     tags: { $in: ["featured", "sale"] },
-    discontinued: { $ne: true }
-  }
+    discontinued: { $ne: true },
+  },
 });
 
 // Nested metadata with dot notation
 const matches = await env.VECTORIZE.query(queryVector, {
-  filter: { "product.brand": "acme" }
+  filter: { "product.brand": "acme" },
 });
 
 // Range query for prefix search (strings)
 const matches = await env.VECTORIZE.query(queryVector, {
-  filter: { 
-    category: { $gte: "elec", $lt: "eled" }  // Matches "electronics"
-  }
+  filter: {
+    category: { $gte: "elec", $lt: "eled" }, // Matches "electronics"
+  },
 });
 ```
 
 **Operators:**
+
 - `$eq`: Equals (implicit if no operator)
 - `$ne`: Not equals
 - `$in`: In array
@@ -272,6 +284,7 @@ const matches = await env.VECTORIZE.query(queryVector, {
 - `$gt`, `$gte`: Greater than (or equal)
 
 **Filter Constraints:**
+
 - Max 2048 bytes (compact JSON)
 - Keys: no empty, no dots, no `$` prefix, no double-quotes, max 512 chars
 - Values: string, number, boolean, null
@@ -312,6 +325,7 @@ const matches = await env.VECTORIZE.query(queryVector, {
 ```
 
 **Limits:**
+
 - 50,000 namespaces (Paid) / 1,000 (Free)
 - Max 64 bytes per namespace name
 - Namespace filter applied before metadata filters
@@ -321,31 +335,32 @@ const matches = await env.VECTORIZE.query(queryVector, {
 ### Workers AI Integration
 
 ```typescript
-import { Ai } from '@cloudflare/ai';
+import { Ai } from "@cloudflare/ai";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const ai = new Ai(env.AI);
-    
+
     // Generate embedding
     const userQuery = "what is a vector database";
     const embeddings = await ai.run("@cf/baai/bge-base-en-v1.5", {
-      text: [userQuery]
+      text: [userQuery],
     });
-    
+
     // embeddings.data is number[][]
     // Pass embeddings.data[0], NOT embeddings or embeddings.data
     const matches = await env.VECTORIZE.query(embeddings.data[0], {
       topK: 3,
-      returnMetadata: "all"
+      returnMetadata: "all",
     });
-    
+
     return Response.json({ matches });
-  }
+  },
 };
 ```
 
 **Common Embedding Models:**
+
 - `@cf/baai/bge-base-en-v1.5`: 768 dimensions, English
 - `@cf/baai/bge-large-en-v1.5`: 1024 dimensions, English
 - `@cf/baai/bge-small-en-v1.5`: 384 dimensions, English
@@ -353,26 +368,26 @@ export default {
 ### OpenAI Integration
 
 ```typescript
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const openai = new OpenAI({ apiKey: env.OPENAI_KEY });
-    
+
     const userQuery = "semantic search query";
     const response = await openai.embeddings.create({
       model: "text-embedding-ada-002",
-      input: userQuery
+      input: userQuery,
     });
-    
+
     // Pass response.data[0].embedding, NOT response
     const matches = await env.VECTORIZE.query(response.data[0].embedding, {
       topK: 5,
-      returnMetadata: "all"
+      returnMetadata: "all",
     });
-    
+
     return Response.json({ matches });
-  }
+  },
 };
 ```
 
@@ -382,37 +397,37 @@ export default {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const { query } = await request.json();
-    
+
     // 1. Generate query embedding
     const embeddings = await env.AI.run("@cf/baai/bge-base-en-v1.5", {
-      text: [query]
+      text: [query],
     });
-    
+
     // 2. Search Vectorize
     const matches = await env.VECTORIZE.query(embeddings.data[0], {
       topK: 5,
-      returnMetadata: "all"
+      returnMetadata: "all",
     });
-    
+
     // 3. Fetch full documents from R2/D1/KV
     const documents = await Promise.all(
       matches.matches.map(async (match) => {
         const key = match.metadata?.r2_key as string;
         const obj = await env.R2_BUCKET.get(key);
         return obj?.text();
-      })
+      }),
     );
-    
+
     // 4. Build context for LLM
     const context = documents.filter(Boolean).join("\n\n");
-    
+
     // 5. Generate response with context
     const llmResponse = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
-      prompt: `Context: ${context}\n\nQuestion: ${query}\n\nAnswer:`
+      prompt: `Context: ${context}\n\nQuestion: ${query}\n\nAnswer:`,
     });
-    
+
     return Response.json({ answer: llmResponse, sources: matches.matches });
-  }
+  },
 };
 ```
 
@@ -429,6 +444,7 @@ npx wrangler vectorize insert <index-name> --file=embeddings.ndjson
 ```
 
 **Rate Limits:**
+
 - Max 5000 vectors per file (Cloudflare API rate limit)
 - Use multiple files for larger batches
 
@@ -450,11 +466,13 @@ with open('embeddings.ndjson', 'rb') as f:
 ### Write Throughput
 
 **Batching Strategy:**
+
 - Vectorize batches up to 200K vectors OR 1000 operations per job
 - Inserting 1 vector at a time = 1000 vectors per job = slow
 - Inserting 2500 vectors at a time = 200K+ vectors per job = fast
 
 **Example:**
+
 ```typescript
 // BAD: 250,000 individual inserts = 250 jobs = ~1 hour
 for (const vector of vectors) {
@@ -471,15 +489,18 @@ for (let i = 0; i < vectors.length; i += 2500) {
 ### Query Performance
 
 **High-Precision vs. Approximate:**
+
 - Default: Approximate scoring (faster, good trade-off)
 - `returnValues: true`: High-precision scoring (slower, more accurate)
 
 **topK Limits:**
+
 - Default limit: 100 without values/metadata
 - With `returnValues: true` or `returnMetadata: "all"`: Max 20
 - Balance accuracy vs. latency
 
 **Metadata Filter Performance:**
+
 - Namespace filters applied first (fastest)
 - High-cardinality range queries degrade performance
 - Bucket high-cardinality values when possible
@@ -496,24 +517,24 @@ npx wrangler vectorize info <index-name>
 
 ## Limits (V2)
 
-| Resource | Limit |
-|----------|-------|
-| Indexes per account | 50,000 (Paid) / 100 (Free) |
-| Max dimensions | 1536 (32-bit float) |
-| Max vector ID length | 64 bytes |
-| Metadata per vector | 10 KiB |
-| Max topK (no values/metadata) | 100 |
-| Max topK (with values/metadata) | 20 |
-| Insert batch size (Workers) | 1000 |
-| Insert batch size (HTTP API) | 5000 |
-| List vectors page size | 1000 |
-| Max index name length | 64 bytes |
-| Max vectors per index | 5,000,000 |
-| Max namespaces | 50,000 (Paid) / 1000 (Free) |
-| Max namespace length | 64 bytes |
-| Max upload size | 100 MB |
-| Max metadata indexes | 10 |
-| Indexed metadata per field | 64 bytes (strings, UTF-8) |
+| Resource                        | Limit                       |
+| ------------------------------- | --------------------------- |
+| Indexes per account             | 50,000 (Paid) / 100 (Free)  |
+| Max dimensions                  | 1536 (32-bit float)         |
+| Max vector ID length            | 64 bytes                    |
+| Metadata per vector             | 10 KiB                      |
+| Max topK (no values/metadata)   | 100                         |
+| Max topK (with values/metadata) | 20                          |
+| Insert batch size (Workers)     | 1000                        |
+| Insert batch size (HTTP API)    | 5000                        |
+| List vectors page size          | 1000                        |
+| Max index name length           | 64 bytes                    |
+| Max vectors per index           | 5,000,000                   |
+| Max namespaces                  | 50,000 (Paid) / 1000 (Free) |
+| Max namespace length            | 64 bytes                    |
+| Max upload size                 | 100 MB                      |
+| Max metadata indexes            | 10                          |
+| Indexed metadata per field      | 64 bytes (strings, UTF-8)   |
 
 ## Common Patterns
 
@@ -551,9 +572,9 @@ await env.VECTORIZE.upsert([
       category: doc.category,
       published: Math.floor(doc.date / 1000), // Unix timestamp
       tags: doc.tags.join(","),
-      url: doc.url
-    }
-  }
+      url: doc.url,
+    },
+  },
 ]);
 
 // Search with filters
@@ -562,8 +583,8 @@ const matches = await env.VECTORIZE.query(queryVector, {
   returnMetadata: "all",
   filter: {
     category: "tutorials",
-    published: { $gte: thirtyDaysAgo }
-  }
+    published: { $gte: thirtyDaysAgo },
+  },
 });
 ```
 
@@ -581,8 +602,8 @@ const results = await env.VECTORIZE.query(queryVector, {
   filter: {
     category: { $in: ["tech", "science"] },
     published: { $gte: lastMonth },
-    status: "published"
-  }
+    status: "published",
+  },
 });
 ```
 
@@ -598,12 +619,15 @@ try {
   // - topK exceeds limits
   // - Index not found/not bound
   console.error("Vectorize query failed:", error);
-  
+
   // Fallback strategy
-  return Response.json({ 
-    error: "Search unavailable", 
-    matches: [] 
-  }, { status: 503 });
+  return Response.json(
+    {
+      error: "Search unavailable",
+      matches: [],
+    },
+    { status: 503 },
+  );
 }
 ```
 

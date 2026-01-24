@@ -60,18 +60,18 @@ function processSankeyData(
   links: SankeyLink[],
   width: number,
   height: number,
-  padding: number = 40
+  padding: number = 40,
 ): { nodes: ProcessedNode[]; links: ProcessedLink[] } {
   // Determine node levels (columns)
-  const sourceNodes = new Set(links.map(l => l.source));
-  const targetNodes = new Set(links.map(l => l.target));
+  const sourceNodes = new Set(links.map((l) => l.source));
+  const targetNodes = new Set(links.map((l) => l.target));
 
   // Nodes that are only sources go on the left
-  const leftNodes = nodes.filter(n => sourceNodes.has(n.id) && !targetNodes.has(n.id));
+  const leftNodes = nodes.filter((n) => sourceNodes.has(n.id) && !targetNodes.has(n.id));
   // Nodes that are only targets go on the right
-  const rightNodes = nodes.filter(n => targetNodes.has(n.id) && !sourceNodes.has(n.id));
+  const rightNodes = nodes.filter((n) => targetNodes.has(n.id) && !sourceNodes.has(n.id));
   // Nodes that are both go in the middle
-  const middleNodes = nodes.filter(n => sourceNodes.has(n.id) && targetNodes.has(n.id));
+  const middleNodes = nodes.filter((n) => sourceNodes.has(n.id) && targetNodes.has(n.id));
 
   // Simple layout: left, middle, right columns
   const columns: SankeyNode[][] = [];
@@ -81,8 +81,8 @@ function processSankeyData(
 
   // If we only have 2 columns (common case), just use source/target
   if (columns.length === 0) {
-    columns.push(nodes.filter(n => sourceNodes.has(n.id)));
-    columns.push(nodes.filter(n => targetNodes.has(n.id)));
+    columns.push(nodes.filter((n) => sourceNodes.has(n.id)));
+    columns.push(nodes.filter((n) => targetNodes.has(n.id)));
   }
 
   const nodeWidth = 20;
@@ -91,10 +91,10 @@ function processSankeyData(
 
   // Calculate total value for each node (max of in/out)
   const nodeValues: Record<string, { in: number; out: number }> = {};
-  nodes.forEach(n => {
+  nodes.forEach((n) => {
     nodeValues[n.id] = { in: 0, out: 0 };
   });
-  links.forEach(l => {
+  links.forEach((l) => {
     nodeValues[l.source].out += l.value;
     nodeValues[l.target].in += l.value;
   });
@@ -118,7 +118,8 @@ function processSankeyData(
     column.forEach((node, nodeIdx) => {
       const nv = nodeValues[node.id];
       const value = Math.max(nv.in, nv.out, node.value || 0);
-      const nodeHeight = totalValue > 0 ? (value / totalValue) * availableHeight : availableHeight / column.length;
+      const nodeHeight =
+        totalValue > 0 ? (value / totalValue) * availableHeight : availableHeight / column.length;
 
       const processedNode: ProcessedNode = {
         id: node.id,
@@ -141,46 +142,47 @@ function processSankeyData(
   // Process links
   const sourceOffsets: Record<string, number> = {};
   const targetOffsets: Record<string, number> = {};
-  processedNodes.forEach(n => {
+  processedNodes.forEach((n) => {
     sourceOffsets[n.id] = 0;
     targetOffsets[n.id] = 0;
   });
 
-  const processedLinks = links.map((link): ProcessedLink | null => {
-    const source = nodeMap[link.source];
-    const target = nodeMap[link.target];
+  const processedLinks = links
+    .map((link): ProcessedLink | null => {
+      const source = nodeMap[link.source];
+      const target = nodeMap[link.target];
 
-    if (!source || !target) {
-      return null;
-    }
+      if (!source || !target) {
+        return null;
+      }
 
-    const sourceHeight = source.totalOut > 0 ? (link.value / source.totalOut) * source.height : source.height;
-    const targetHeight = target.totalIn > 0 ? (link.value / target.totalIn) * target.height : target.height;
-    const linkHeight = Math.min(sourceHeight, targetHeight);
+      const sourceHeight =
+        source.totalOut > 0 ? (link.value / source.totalOut) * source.height : source.height;
+      const targetHeight =
+        target.totalIn > 0 ? (link.value / target.totalIn) * target.height : target.height;
+      const linkHeight = Math.min(sourceHeight, targetHeight);
 
-    const sourceY = source.y + sourceOffsets[source.id];
-    const targetY = target.y + targetOffsets[target.id];
+      const sourceY = source.y + sourceOffsets[source.id];
+      const targetY = target.y + targetOffsets[target.id];
 
-    sourceOffsets[source.id] += linkHeight;
-    targetOffsets[target.id] += linkHeight;
+      sourceOffsets[source.id] += linkHeight;
+      targetOffsets[target.id] += linkHeight;
 
-    return {
-      source,
-      target,
-      value: link.value,
-      sourceY,
-      targetY,
-      height: linkHeight,
-    };
-  }).filter((link): link is ProcessedLink => link !== null);
+      return {
+        source,
+        target,
+        value: link.value,
+        sourceY,
+        targetY,
+        height: linkHeight,
+      };
+    })
+    .filter((link): link is ProcessedLink => link !== null);
 
   return { nodes: processedNodes, links: processedLinks };
 }
 
-function createLinkPath(
-  link: ProcessedLink,
-  nodeWidth: number
-): string {
+function createLinkPath(link: ProcessedLink, nodeWidth: number): string {
   const x0 = link.source.x + nodeWidth;
   const x1 = link.target.x;
   const y0Top = link.sourceY;
@@ -240,7 +242,7 @@ export function SankeyDiagram({
     nodes,
     links,
     width,
-    height
+    height,
   );
 
   return (
@@ -312,10 +314,7 @@ export function SankeyDiagram({
         <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
           {processedNodes.slice(0, 6).map((node, idx) => (
             <span key={node.id} className="flex items-center gap-1.5">
-              <span
-                className="w-3 h-3 rounded"
-                style={{ backgroundColor: node.color }}
-              />
+              <span className="w-3 h-3 rounded" style={{ backgroundColor: node.color }} />
               {node.label}
             </span>
           ))}

@@ -19,10 +19,7 @@ export class WebhookQueueProcessor implements OnModuleInit {
   constructor(private readonly queueService: BullQueueService) {}
 
   onModuleInit() {
-    this.queueService.registerProcessor<WebhookJobData>(
-      WEBHOOK_QUEUE,
-      this.process.bind(this)
-    );
+    this.queueService.registerProcessor<WebhookJobData>(WEBHOOK_QUEUE, this.process.bind(this));
     this.logger.log("Webhook processor registered");
   }
 

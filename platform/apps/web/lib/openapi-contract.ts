@@ -13,5 +13,5 @@ export type OpenApiContract = [
   Assert<HasMethod<"/auth/login", "post">>,
   Assert<HasMethod<"/auth/me", "get">>,
   Assert<HasMethod<"/campgrounds", "get">>,
-  Assert<HasMethod<"/reservations", "post">>
+  Assert<HasMethod<"/reservations", "post">>,
 ];

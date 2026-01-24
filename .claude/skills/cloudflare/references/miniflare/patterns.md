@@ -27,7 +27,7 @@ test("fetch returns hello", async () => {
 test("kv operations", async () => {
   const kv = await mf.getKVNamespace("TEST_KV");
   await kv.put("key", "value");
-  
+
   const res = await mf.dispatchFetch("http://localhost/kv");
   assert.strictEqual(await res.text(), "value");
 });
@@ -54,13 +54,13 @@ test("durable object state", async () => {
   const ns = await mf.getDurableObjectNamespace("COUNTER");
   const id = ns.idFromName("test-counter");
   const stub = ns.get(id);
-  
+
   const res1 = await stub.fetch("http://localhost/increment");
   assert.strictEqual(await res1.text(), "1");
-  
+
   const res2 = await stub.fetch("http://localhost/increment");
   assert.strictEqual(await res2.text(), "2");
-  
+
   // Direct storage access
   const storage = await mf.getDurableObjectStorage(id);
   const count = await storage.get("count");
@@ -73,13 +73,13 @@ test("durable object state", async () => {
 ```js
 test("queue message processing", async () => {
   const worker = await mf.getWorker();
-  
+
   const result = await worker.queue("my-queue", [
     { id: "msg1", timestamp: new Date(), body: { userId: 123 }, attempts: 1 },
   ]);
-  
+
   assert.strictEqual(result.outcome, "ok");
-  
+
   // Verify side effects
   const kv = await mf.getKVNamespace("QUEUE_LOG");
   const log = await kv.get("msg1");
@@ -92,12 +92,12 @@ test("queue message processing", async () => {
 ```js
 test("scheduled cron handler", async () => {
   const worker = await mf.getWorker();
-  
+
   const result = await worker.scheduled({
     scheduledTime: new Date("2024-01-01T00:00:00Z"),
     cron: "0 0 * * *",
   });
-  
+
   assert.strictEqual(result.outcome, "ok");
 });
 ```
@@ -107,7 +107,7 @@ test("scheduled cron handler", async () => {
 ```js
 describe("user tests", () => {
   let mf;
-  
+
   beforeEach(async () => {
     mf = new Miniflare({
       scriptPath: "worker.js",
@@ -115,11 +115,11 @@ describe("user tests", () => {
       // In-memory: no persist
     });
   });
-  
+
   afterEach(async () => {
     await mf.dispose();
   });
-  
+
   test("create user", async () => {
     // Fresh KV per test
   });

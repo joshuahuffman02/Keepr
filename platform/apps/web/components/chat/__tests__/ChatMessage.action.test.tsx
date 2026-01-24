@@ -31,7 +31,7 @@ describe("ChatMessage action approvals", () => {
     render(<ChatMessage {...message} onActionSelect={onActionSelect} />);
 
     expect(
-      screen.getByText("Summary: Hold site B2 from 2025-01-01 to 2025-01-03.")
+      screen.getByText("Summary: Hold site B2 from 2025-01-01 to 2025-01-03."),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Confirm" }));

@@ -9,7 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -59,7 +66,13 @@ const POS_PROVIDERS = [
     name: "Shopify POS",
     description: "Sync products and inventory with Shopify POS",
     fields: [
-      { key: "shopDomain", label: "Shop Domain", type: "text", placeholder: "mystore.myshopify.com", required: true },
+      {
+        key: "shopDomain",
+        label: "Shop Domain",
+        type: "text",
+        placeholder: "mystore.myshopify.com",
+        required: true,
+      },
       { key: "accessToken", label: "Access Token", type: "password", required: true },
       { key: "locationId", label: "Default Location ID", type: "text", required: false },
     ],
@@ -69,7 +82,13 @@ const POS_PROVIDERS = [
     name: "Vend (Lightspeed X-Series)",
     description: "Connect to Vend for product and inventory management",
     fields: [
-      { key: "domainPrefix", label: "Domain Prefix", type: "text", placeholder: "yourstore", required: true },
+      {
+        key: "domainPrefix",
+        label: "Domain Prefix",
+        type: "text",
+        placeholder: "yourstore",
+        required: true,
+      },
       { key: "accessToken", label: "Access Token", type: "password", required: true },
       { key: "defaultOutletId", label: "Default Outlet ID", type: "text", required: false },
     ],
@@ -110,7 +129,8 @@ export default function PosIntegrationsPage() {
   const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
-    const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
+    const stored =
+      typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
     if (stored) setCampgroundId(stored);
   }, []);
 
@@ -129,7 +149,11 @@ export default function PosIntegrationsPage() {
       resetDialog();
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to create connection", description: getErrorMessage(err, "Create failed"), variant: "destructive" });
+      toast({
+        title: "Failed to create connection",
+        description: getErrorMessage(err, "Create failed"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -143,7 +167,11 @@ export default function PosIntegrationsPage() {
       }
     },
     onError: (err: unknown) => {
-      toast({ title: "Test failed", description: getErrorMessage(err, "Test failed"), variant: "destructive" });
+      toast({
+        title: "Test failed",
+        description: getErrorMessage(err, "Test failed"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -155,7 +183,11 @@ export default function PosIntegrationsPage() {
       qc.invalidateQueries({ queryKey: ["pos-integrations", campgroundId] });
     },
     onError: (err: unknown) => {
-      toast({ title: "Sync failed", description: getErrorMessage(err, "Sync failed"), variant: "destructive" });
+      toast({
+        title: "Sync failed",
+        description: getErrorMessage(err, "Sync failed"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -166,7 +198,11 @@ export default function PosIntegrationsPage() {
       qc.invalidateQueries({ queryKey: ["pos-integrations", campgroundId] });
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to remove", description: getErrorMessage(err, "Remove failed"), variant: "destructive" });
+      toast({
+        title: "Failed to remove",
+        description: getErrorMessage(err, "Remove failed"),
+        variant: "destructive",
+      });
     },
   });
 
@@ -235,279 +271,279 @@ export default function PosIntegrationsPage() {
 
   return (
     <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">POS Integrations</h1>
-            <p className="text-muted-foreground">
-              Connect external POS systems to sync inventory, products, and sales.
-            </p>
-          </div>
-          <Dialog open={isCreateOpen} onOpenChange={(open) => !open && resetDialog()}>
-            <DialogTrigger asChild>
-              <Button onClick={() => setIsCreateOpen(true)}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add POS Connection
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Connect POS System</DialogTitle>
-                <DialogDescription>
-                  Select a POS provider and enter your credentials to connect.
-                </DialogDescription>
-              </DialogHeader>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">POS Integrations</h1>
+          <p className="text-muted-foreground">
+            Connect external POS systems to sync inventory, products, and sales.
+          </p>
+        </div>
+        <Dialog open={isCreateOpen} onOpenChange={(open) => !open && resetDialog()}>
+          <DialogTrigger asChild>
+            <Button onClick={() => setIsCreateOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Add POS Connection
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Connect POS System</DialogTitle>
+              <DialogDescription>
+                Select a POS provider and enter your credentials to connect.
+              </DialogDescription>
+            </DialogHeader>
 
-              <div className="space-y-4 py-4">
-                {/* Provider Selection */}
-                <div className="space-y-2">
-                  <Label>POS Provider</Label>
-                  <Select value={selectedProvider ?? ""} onValueChange={setSelectedProvider}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a provider..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {POS_PROVIDERS.map((provider) => (
-                        <SelectItem key={provider.id} value={provider.id}>
-                          {provider.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedProvider && (
-                    <p className="text-sm text-muted-foreground">
-                      {providerInfo(selectedProvider)?.description}
-                    </p>
-                  )}
-                </div>
-
-                {/* Provider-specific fields */}
-                {selectedProvider && (
-                  <>
-                    <div className="space-y-2">
-                      <Label>Display Name (optional)</Label>
-                      <Input
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder={providerInfo(selectedProvider)?.name}
-                      />
-                    </div>
-
-                    {providerInfo(selectedProvider)?.fields.map((field) => (
-                      <div key={field.key} className="space-y-2">
-                        <Label>
-                          {field.label}
-                          {field.required && <span className="text-red-500 ml-1">*</span>}
-                        </Label>
-                        <Input
-                          type={field.type}
-                          placeholder={field.placeholder}
-                          value={credentials[field.key] || ""}
-                          onChange={(e) =>
-                            setCredentials((prev) => ({ ...prev, [field.key]: e.target.value }))
-                          }
-                        />
-                      </div>
+            <div className="space-y-4 py-4">
+              {/* Provider Selection */}
+              <div className="space-y-2">
+                <Label>POS Provider</Label>
+                <Select value={selectedProvider ?? ""} onValueChange={setSelectedProvider}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a provider..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {POS_PROVIDERS.map((provider) => (
+                      <SelectItem key={provider.id} value={provider.id}>
+                        {provider.name}
+                      </SelectItem>
                     ))}
-                  </>
+                  </SelectContent>
+                </Select>
+                {selectedProvider && (
+                  <p className="text-sm text-muted-foreground">
+                    {providerInfo(selectedProvider)?.description}
+                  </p>
                 )}
               </div>
 
-              <DialogFooter>
-                <Button variant="outline" onClick={resetDialog}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleCreate}
-                  disabled={!selectedProvider || createMutation.isPending}
-                >
-                  {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Connect
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="connections">
-          <TabsList>
-            <TabsTrigger value="connections">Connections</TabsTrigger>
-            <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
-            <TabsTrigger value="logs">Sync Logs</TabsTrigger>
-          </TabsList>
-
-          {/* Connections Tab */}
-          <TabsContent value="connections" className="space-y-4">
-            {integrationsQuery.isLoading ? (
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
-                  Loading integrations...
-                </CardContent>
-              </Card>
-            ) : integrationsQuery.data?.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <div className="text-muted-foreground mb-4">
-                    <Link2 className="h-12 w-12 mx-auto" />
+              {/* Provider-specific fields */}
+              {selectedProvider && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Display Name (optional)</Label>
+                    <Input
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder={providerInfo(selectedProvider)?.name}
+                    />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">No POS Connections</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Connect an external POS system to sync inventory and sales.
-                  </p>
-                  <Button onClick={() => setIsCreateOpen(true)}>
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Your First Connection
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {integrationsQuery.data?.map((integration) => (
-                  <Card key={integration.id}>
-                    <CardContent className="py-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-4">
-                          <div className="mt-1">{getStatusIcon(integration.status)}</div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <h3 className="font-semibold text-foreground">
-                                {integration.displayName ||
-                                  providerInfo(integration.provider)?.name ||
-                                  integration.provider}
-                              </h3>
-                              {getStatusBadge(integration.status)}
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {providerInfo(integration.provider)?.description}
-                            </p>
-                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                              {integration.lastSyncAt && (
-                                <span>
-                                  Last sync:{" "}
-                                  {formatDistanceToNow(new Date(integration.lastSyncAt), {
-                                    addSuffix: true,
-                                  })}
-                                </span>
-                              )}
-                              {integration.mappingCount !== undefined && (
-                                <span>{integration.mappingCount} products mapped</span>
-                              )}
-                            </div>
-                            {integration.lastError && (
-                              <p className="text-sm text-red-600 mt-2">
-                                Error: {integration.lastError}
-                              </p>
-                            )}
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => testMutation.mutate(integration.id)}
-                            disabled={testMutation.isPending}
-                          >
-                            {testMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              "Test"
-                            )}
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() =>
-                              syncMutation.mutate({ id: integration.id, type: "products" })
-                            }
-                            disabled={syncMutation.isPending}
-                          >
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Sync
-                          </Button>
-                          <Link
-                            href={`/dashboard/settings/pos-integrations/${integration.id}/mappings`}
-                          >
-                            <Button variant="outline" size="sm">
-                              <Link2 className="h-4 w-4 mr-1" />
-                              Mappings
-                            </Button>
-                          </Link>
-                          <Link href={`/dashboard/settings/pos-integrations/${integration.id}`}>
-                            <Button variant="outline" size="sm">
-                              <Settings className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                  {providerInfo(selectedProvider)?.fields.map((field) => (
+                    <div key={field.key} className="space-y-2">
+                      <Label>
+                        {field.label}
+                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                      </Label>
+                      <Input
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        value={credentials[field.key] || ""}
+                        onChange={(e) =>
+                          setCredentials((prev) => ({ ...prev, [field.key]: e.target.value }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
 
-            {/* Available Providers */}
+            <DialogFooter>
+              <Button variant="outline" onClick={resetDialog}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCreate}
+                disabled={!selectedProvider || createMutation.isPending}
+              >
+                {createMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Connect
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Tabs */}
+      <Tabs defaultValue="connections">
+        <TabsList>
+          <TabsTrigger value="connections">Connections</TabsTrigger>
+          <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+          <TabsTrigger value="logs">Sync Logs</TabsTrigger>
+        </TabsList>
+
+        {/* Connections Tab */}
+        <TabsContent value="connections" className="space-y-4">
+          {integrationsQuery.isLoading ? (
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Available Providers</CardTitle>
-                <CardDescription>
-                  Connect additional POS systems to extend your inventory management.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {POS_PROVIDERS.map((provider) => {
-                    const isConnected = integrationsQuery.data?.some(
-                      (i) => i.provider === provider.id
-                    );
-                    return (
-                      <div
-                        key={provider.id}
-                        className={`p-4 rounded-lg border ${
-                          isConnected ? "bg-muted border-border" : "border-dashed"
-                        }`}
-                      >
-                        <h4 className="font-medium text-foreground">{provider.name}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
-                        {isConnected ? (
-                          <Badge variant="outline" className="mt-3">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Connected
-                          </Badge>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="mt-3"
-                            onClick={() => {
-                              setSelectedProvider(provider.id);
-                              setIsCreateOpen(true);
-                            }}
-                          >
-                            Connect
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+              <CardContent className="py-8 text-center text-muted-foreground">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                Loading integrations...
               </CardContent>
             </Card>
-          </TabsContent>
+          ) : integrationsQuery.data?.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <div className="text-muted-foreground mb-4">
+                  <Link2 className="h-12 w-12 mx-auto" />
+                </div>
+                <h3 className="text-lg font-medium text-foreground mb-2">No POS Connections</h3>
+                <p className="text-muted-foreground mb-4">
+                  Connect an external POS system to sync inventory and sales.
+                </p>
+                <Button onClick={() => setIsCreateOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Connection
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-4">
+              {integrationsQuery.data?.map((integration) => (
+                <Card key={integration.id}>
+                  <CardContent className="py-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-4">
+                        <div className="mt-1">{getStatusIcon(integration.status)}</div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-foreground">
+                              {integration.displayName ||
+                                providerInfo(integration.provider)?.name ||
+                                integration.provider}
+                            </h3>
+                            {getStatusBadge(integration.status)}
+                          </div>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {providerInfo(integration.provider)?.description}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                            {integration.lastSyncAt && (
+                              <span>
+                                Last sync:{" "}
+                                {formatDistanceToNow(new Date(integration.lastSyncAt), {
+                                  addSuffix: true,
+                                })}
+                              </span>
+                            )}
+                            {integration.mappingCount !== undefined && (
+                              <span>{integration.mappingCount} products mapped</span>
+                            )}
+                          </div>
+                          {integration.lastError && (
+                            <p className="text-sm text-red-600 mt-2">
+                              Error: {integration.lastError}
+                            </p>
+                          )}
+                        </div>
+                      </div>
 
-          {/* Webhooks Tab */}
-          <TabsContent value="webhooks">
-            <WebhooksTab campgroundId={campgroundId} />
-          </TabsContent>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => testMutation.mutate(integration.id)}
+                          disabled={testMutation.isPending}
+                        >
+                          {testMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            "Test"
+                          )}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            syncMutation.mutate({ id: integration.id, type: "products" })
+                          }
+                          disabled={syncMutation.isPending}
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                          Sync
+                        </Button>
+                        <Link
+                          href={`/dashboard/settings/pos-integrations/${integration.id}/mappings`}
+                        >
+                          <Button variant="outline" size="sm">
+                            <Link2 className="h-4 w-4 mr-1" />
+                            Mappings
+                          </Button>
+                        </Link>
+                        <Link href={`/dashboard/settings/pos-integrations/${integration.id}`}>
+                          <Button variant="outline" size="sm">
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
 
-          {/* Sync Logs Tab */}
-          <TabsContent value="logs">
-            <SyncLogsTab integrations={integrationsQuery.data || []} />
-          </TabsContent>
-        </Tabs>
-      </div>
+          {/* Available Providers */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Available Providers</CardTitle>
+              <CardDescription>
+                Connect additional POS systems to extend your inventory management.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {POS_PROVIDERS.map((provider) => {
+                  const isConnected = integrationsQuery.data?.some(
+                    (i) => i.provider === provider.id,
+                  );
+                  return (
+                    <div
+                      key={provider.id}
+                      className={`p-4 rounded-lg border ${
+                        isConnected ? "bg-muted border-border" : "border-dashed"
+                      }`}
+                    >
+                      <h4 className="font-medium text-foreground">{provider.name}</h4>
+                      <p className="text-sm text-muted-foreground mt-1">{provider.description}</p>
+                      {isConnected ? (
+                        <Badge variant="outline" className="mt-3">
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                          Connected
+                        </Badge>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="mt-3"
+                          onClick={() => {
+                            setSelectedProvider(provider.id);
+                            setIsCreateOpen(true);
+                          }}
+                        >
+                          Connect
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Webhooks Tab */}
+        <TabsContent value="webhooks">
+          <WebhooksTab campgroundId={campgroundId} />
+        </TabsContent>
+
+        {/* Sync Logs Tab */}
+        <TabsContent value="logs">
+          <SyncLogsTab integrations={integrationsQuery.data || []} />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
 
@@ -522,13 +558,37 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
   const [createdSecret, setCreatedSecret] = useState<string | null>(null);
 
   const INVENTORY_EVENTS = [
-    { id: "inventory.batch.received", label: "Batch Received", description: "New inventory batch added" },
-    { id: "inventory.batch.depleted", label: "Batch Depleted", description: "Batch fully depleted" },
-    { id: "inventory.expiration.warning", label: "Expiration Warning", description: "Batch entering warning tier" },
-    { id: "inventory.expiration.critical", label: "Expiration Critical", description: "Batch entering critical tier" },
-    { id: "inventory.expiration.expired", label: "Batch Expired", description: "Batch has expired" },
+    {
+      id: "inventory.batch.received",
+      label: "Batch Received",
+      description: "New inventory batch added",
+    },
+    {
+      id: "inventory.batch.depleted",
+      label: "Batch Depleted",
+      description: "Batch fully depleted",
+    },
+    {
+      id: "inventory.expiration.warning",
+      label: "Expiration Warning",
+      description: "Batch entering warning tier",
+    },
+    {
+      id: "inventory.expiration.critical",
+      label: "Expiration Critical",
+      description: "Batch entering critical tier",
+    },
+    {
+      id: "inventory.expiration.expired",
+      label: "Batch Expired",
+      description: "Batch has expired",
+    },
     { id: "inventory.low_stock", label: "Low Stock", description: "Product below reorder point" },
-    { id: "markdown.rule.applied", label: "Markdown Applied", description: "Auto-markdown rule triggered" },
+    {
+      id: "markdown.rule.applied",
+      label: "Markdown Applied",
+      description: "Auto-markdown rule triggered",
+    },
     { id: "product.price.changed", label: "Price Changed", description: "Product price updated" },
   ];
 
@@ -539,18 +599,24 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: () => apiClient.createWebhook(campgroundId, { url, eventTypes: selectedEvents, description }),
+    mutationFn: () =>
+      apiClient.createWebhook(campgroundId, { url, eventTypes: selectedEvents, description }),
     onSuccess: (data) => {
       setCreatedSecret(data.secret);
       qc.invalidateQueries({ queryKey: ["webhooks", campgroundId] });
     },
     onError: (err: unknown) => {
-      toast({ title: "Failed to create webhook", description: getErrorMessage(err, "Create failed"), variant: "destructive" });
+      toast({
+        title: "Failed to create webhook",
+        description: getErrorMessage(err, "Create failed"),
+        variant: "destructive",
+      });
     },
   });
 
   const toggleMutation = useMutation({
-    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) => apiClient.toggleWebhook(id, isActive, campgroundId),
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      apiClient.toggleWebhook(id, isActive, campgroundId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["webhooks", campgroundId] });
     },
@@ -566,7 +632,7 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
 
   const toggleEvent = (eventId: string) => {
     setSelectedEvents((prev) =>
-      prev.includes(eventId) ? prev.filter((e) => e !== eventId) : [...prev, eventId]
+      prev.includes(eventId) ? prev.filter((e) => e !== eventId) : [...prev, eventId],
     );
   };
 
@@ -711,44 +777,44 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
               {getWebhooks(webhooksQuery.data).map((webhook) => {
                 const eventTypes = webhook.eventTypes ?? [];
                 return (
-                <TableRow key={webhook.id}>
-                  <TableCell>
-                    <div className="font-mono text-sm truncate max-w-xs">{webhook.url}</div>
-                    {webhook.description && (
-                      <div className="text-xs text-muted-foreground">{webhook.description}</div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-wrap gap-1">
-                      {eventTypes.slice(0, 3).map((event: string) => (
-                        <Badge key={event} variant="outline" className="text-xs">
-                          {event.split(".").pop()}
-                        </Badge>
-                      ))}
-                      {eventTypes.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{eventTypes.length - 3}
-                        </Badge>
+                  <TableRow key={webhook.id}>
+                    <TableCell>
+                      <div className="font-mono text-sm truncate max-w-xs">{webhook.url}</div>
+                      {webhook.description && (
+                        <div className="text-xs text-muted-foreground">{webhook.description}</div>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={webhook.isActive ? "default" : "secondary"}>
-                      {webhook.isActive ? "Active" : "Disabled"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        toggleMutation.mutate({ id: webhook.id, isActive: !webhook.isActive })
-                      }
-                    >
-                      {webhook.isActive ? "Disable" : "Enable"}
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {eventTypes.slice(0, 3).map((event: string) => (
+                          <Badge key={event} variant="outline" className="text-xs">
+                            {event.split(".").pop()}
+                          </Badge>
+                        ))}
+                        {eventTypes.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{eventTypes.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={webhook.isActive ? "default" : "secondary"}>
+                        {webhook.isActive ? "Active" : "Disabled"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          toggleMutation.mutate({ id: webhook.id, isActive: !webhook.isActive })
+                        }
+                      >
+                        {webhook.isActive ? "Disable" : "Enable"}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>

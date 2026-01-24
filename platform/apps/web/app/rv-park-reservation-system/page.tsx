@@ -49,7 +49,8 @@ const structuredData = {
   name: "Keepr - RV Park Reservation System",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
-  description: "Complete RV park reservation system with hookup management, utility metering, and online booking.",
+  description:
+    "Complete RV park reservation system with hookup management, utility metering, and online booking.",
   offers: {
     "@type": "Offer",
     price: "100",
@@ -61,7 +62,8 @@ const rvSpecificFeatures = [
   {
     title: "Hookup Management",
     icon: Plug,
-    description: "Track 30/50 amp, water, sewer, and cable hookups per site. Guests see availability at booking.",
+    description:
+      "Track 30/50 amp, water, sewer, and cable hookups per site. Guests see availability at booking.",
     features: [
       "30/50 amp electrical tracking",
       "Water/sewer hookup status",
@@ -72,7 +74,8 @@ const rvSpecificFeatures = [
   {
     title: "Utility Metering",
     icon: Gauge,
-    description: "Built-in utility billing for electric, water, and propane. Bill guests fairly for what they use.",
+    description:
+      "Built-in utility billing for electric, water, and propane. Bill guests fairly for what they use.",
     features: [
       "Electric meter readings",
       "Water usage tracking",
@@ -94,7 +97,8 @@ const rvSpecificFeatures = [
   {
     title: "Long-Term Stays",
     icon: Calendar,
-    description: "Monthly and seasonal rates with recurring billing. Perfect for snowbirds and workampers.",
+    description:
+      "Monthly and seasonal rates with recurring billing. Perfect for snowbirds and workampers.",
     features: [
       "Monthly rate cards",
       "Seasonal contracts",
@@ -132,8 +136,8 @@ export default function RvParkReservationSystemPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
-              Online booking, utility metering, long-term stay management, and AI demand forecasting.
-              Everything your RV park needs in one platform.
+              Online booking, utility metering, long-term stay management, and AI demand
+              forecasting. Everything your RV park needs in one platform.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -241,7 +245,8 @@ export default function RvParkReservationSystemPage() {
               Online Booking That RVers Love
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Guests can book 24/7, filtering by hookup type, RV size, and amenities. No phone tag required.
+              Guests can book 24/7, filtering by hookup type, RV size, and amenities. No phone tag
+              required.
             </p>
           </div>
 
@@ -250,20 +255,26 @@ export default function RvParkReservationSystemPage() {
               {
                 step: "1",
                 title: "Search & Filter",
-                description: "Guests enter dates and RV size. They see only sites that fit their rig with the hookups they need.",
+                description:
+                  "Guests enter dates and RV size. They see only sites that fit their rig with the hookups they need.",
               },
               {
                 step: "2",
                 title: "Pick Their Site",
-                description: "Interactive map shows available sites. Pull-through, back-in, shaded, pet-friendly - all visible.",
+                description:
+                  "Interactive map shows available sites. Pull-through, back-in, shaded, pet-friendly - all visible.",
               },
               {
                 step: "3",
                 title: "Book & Pay",
-                description: "Secure checkout with deposit options. Confirmation email with check-in instructions sent automatically.",
+                description:
+                  "Secure checkout with deposit options. Confirmation email with check-in instructions sent automatically.",
               },
             ].map((item) => (
-              <div key={item.step} className="bg-white rounded-2xl p-8 border border-slate-200 text-center">
+              <div
+                key={item.step}
+                className="bg-white rounded-2xl p-8 border border-slate-200 text-center"
+              >
                 <div className="w-12 h-12 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-bold text-xl flex items-center justify-center mx-auto mb-4">
                   {item.step}
                 </div>
@@ -289,9 +300,17 @@ export default function RvParkReservationSystemPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: CreditCard, title: "POS System", desc: "Camp store sales, inventory, offline mode" },
+              {
+                icon: CreditCard,
+                title: "POS System",
+                desc: "Camp store sales, inventory, offline mode",
+              },
               { icon: Users, title: "Loyalty Program", desc: "Built-in rewards for repeat guests" },
-              { icon: BarChart3, title: "AI Forecasting", desc: "Predict demand and optimize rates" },
+              {
+                icon: BarChart3,
+                title: "AI Forecasting",
+                desc: "Predict demand and optimize rates",
+              },
               { icon: Calendar, title: "Staff Scheduling", desc: "Sync schedules with occupancy" },
             ].map((item) => (
               <div
@@ -366,7 +385,8 @@ export default function RvParkReservationSystemPage() {
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
-              "The utility metering alone saves us hours every week. No more manual meter readings and calculations."
+              "The utility metering alone saves us hours every week. No more manual meter readings
+              and calculations."
             </blockquote>
             <div className="text-slate-600">
               <span className="font-semibold text-slate-900">Mike T.</span>
@@ -384,7 +404,8 @@ export default function RvParkReservationSystemPage() {
             Ready to Upgrade Your RV Park?
           </h2>
           <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
-            Join RV parks across the country using Keepr for reservations, utility billing, and more.
+            Join RV parks across the country using Keepr for reservations, utility billing, and
+            more.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

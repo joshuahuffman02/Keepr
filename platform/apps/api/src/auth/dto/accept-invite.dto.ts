@@ -14,4 +14,3 @@ export class AcceptInviteDto {
   @IsString()
   lastName!: string;
 }
-

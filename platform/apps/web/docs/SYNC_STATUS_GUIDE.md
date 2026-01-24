@@ -3,6 +3,7 @@
 ## Overview
 
 This implementation adds comprehensive offline sync status indicators throughout the Campreserv app, providing users with clear visibility into:
+
 - Online/offline connection status
 - Number of pending items waiting to sync
 - Last successful sync time
@@ -16,6 +17,7 @@ This implementation adds comprehensive offline sync status indicators throughout
 Global state management for sync status across the entire application.
 
 **Key Features:**
+
 - Monitors 5 queue sources (guest messages, POS orders, kiosk check-ins, portal orders, activity bookings)
 - Auto-refreshes every 5 seconds
 - Listens to online/offline events
@@ -24,6 +26,7 @@ Global state management for sync status across the entire application.
 - Manages conflict resolution
 
 **Usage:**
+
 ```tsx
 import { useSyncStatus } from "@/contexts/SyncStatusContext";
 
@@ -45,11 +48,13 @@ Visual indicator component with three variants:
 **Variants:**
 
 1. **Badge** - Compact pill for headers
+
    ```tsx
    <SyncStatus variant="badge" onClick={() => openDetails()} />
    ```
 
 2. **Compact** - Small card with icon and text
+
    ```tsx
    <SyncStatus variant="compact" showDetails={true} />
    ```
@@ -60,6 +65,7 @@ Visual indicator component with three variants:
    ```
 
 **Visual States:**
+
 - [OK] **Synced** (green) - All items synchronized
 - [SYNC] **Syncing** (blue, animated) - Sync in progress
 - [WARN] **Pending (X items)** (amber) - Items waiting to sync
@@ -71,6 +77,7 @@ Visual indicator component with three variants:
 Slide-out panel showing detailed sync information and controls.
 
 **Features:**
+
 - Current sync status overview
 - "Sync Now" manual trigger
 - Queue breakdown by source
@@ -80,10 +87,11 @@ Slide-out panel showing detailed sync information and controls.
 - Help text
 
 **Usage:**
+
 ```tsx
 const [drawerOpen, setDrawerOpen] = useState(false);
 
-<SyncDetailsDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />
+<SyncDetailsDrawer open={drawerOpen} onOpenChange={setDrawerOpen} />;
 ```
 
 ## Integration Points
@@ -93,6 +101,7 @@ const [drawerOpen, setDrawerOpen] = useState(false);
 **Location:** Fixed bottom-right corner (only when there are pending/error items)
 
 **Implementation:**
+
 - Shows compact sync status as floating indicator
 - Only visible when: pending items > 0 OR conflicts > 0 OR offline
 - Clicking opens SyncDetailsDrawer
@@ -103,6 +112,7 @@ const [drawerOpen, setDrawerOpen] = useState(false);
 **Location:** Top-right header area
 
 **Implementation:**
+
 - Shows badge variant inline with other header buttons
 - Always visible for immediate feedback during sales
 - Critical for offline sales scenarios
@@ -113,6 +123,7 @@ const [drawerOpen, setDrawerOpen] = useState(false);
 **Location:** Top-right header area
 
 **Implementation:**
+
 - Shows badge variant next to cart icon
 - Guest-facing visibility
 - Important for offline guest purchases
@@ -140,28 +151,33 @@ The system monitors these localStorage queues:
 ## Sync States
 
 ### Synced
+
 - All queues empty
 - Online connection available
 - Last sync completed successfully
 - **Visual:** Green checkmark
 
 ### Syncing
+
 - `isSyncing` flag is true
 - Active sync operation in progress
 - **Visual:** Blue spinning icon
 
 ### Pending
+
 - One or more items in queues
 - Online connection available
 - Waiting to sync or scheduled for retry
 - **Visual:** Amber clock icon with count badge
 
 ### Offline
+
 - No internet connection (`navigator.onLine === false`)
 - Items may or may not be queued
 - **Visual:** Red offline icon
 
 ### Error
+
 - One or more conflicts detected
 - Requires manual intervention
 - Retry or discard actions needed
@@ -170,10 +186,12 @@ The system monitors these localStorage queues:
 ## Manual Sync
 
 Users can trigger manual sync via:
+
 1. SyncDetailsDrawer "Sync Now" button
 2. Programmatic call: `manualSync()` from useSyncStatus hook
 
 **Flow:**
+
 1. Sets `isSyncing` flag
 2. Posts message to service worker
 3. Dispatches `campreserv:manual-sync` event
@@ -186,10 +204,12 @@ Users can trigger manual sync via:
 When a sync fails with conflict (409/412 status or conflict message):
 
 **User Options:**
+
 1. **Retry** - Marks item for immediate retry
 2. **Discard** - Removes item from queue
 
 **API:**
+
 ```tsx
 const { retryConflict, discardConflict } = useSyncStatus();
 
@@ -221,12 +241,14 @@ discardConflict("campreserv:pos:orderQueue", "item-id-123");
 ## Styling
 
 **Color Palette:**
+
 - **Synced:** `emerald-600/50/200` (green)
 - **Syncing:** `blue-600/50/200` (blue)
 - **Pending:** `amber-700/50/200` (amber/yellow)
 - **Offline/Error:** `red-700/50/200` (red)
 
 **Animations:**
+
 - Syncing icon: `animate-spin`
 - Pending dot: `animate-pulse`
 
@@ -281,21 +303,25 @@ discardConflict("campreserv:pos:orderQueue", "item-id-123");
 ## Troubleshooting
 
 **Status not updating:**
+
 - Check SyncStatusProvider is wrapping the app
 - Verify client-root.tsx includes provider
 - Check browser console for errors
 
 **Queues not detected:**
+
 - Verify localStorage keys match QUEUE_SOURCES
 - Check queue item structure (needs `id`, `conflict`, etc.)
 - Ensure items have `nextAttemptAt` timestamp
 
 **Manual sync not working:**
+
 - Check service worker is registered
 - Verify navigator.serviceWorker.controller exists
 - Check for error messages in console
 
 **Conflicts not showing:**
+
 - Ensure error responses include 409/412 status
 - Verify conflict flag is set on queue items
 - Check error message includes "conflict" text

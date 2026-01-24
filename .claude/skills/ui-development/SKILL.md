@@ -7,6 +7,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 # UI Development for Campreserv
 
 ## Tech Stack
+
 - React 18 with TypeScript
 - Next.js 14 (App Router)
 - Tailwind CSS
@@ -16,6 +17,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ## Component Patterns
 
 ### File Structure
+
 ```
 components/
 ├── ui/           # Base UI components (Button, Card, Input, etc.)
@@ -25,6 +27,7 @@ components/
 ```
 
 ### Component Template
+
 ```tsx
 "use client";
 
@@ -36,17 +39,14 @@ interface MyComponentProps {
 }
 
 export function MyComponent({ className, children }: MyComponentProps) {
-  return (
-    <div className={cn("base-styles", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn("base-styles", className)}>{children}</div>;
 }
 ```
 
 ## Design Tokens
 
 ### Colors (Semantic)
+
 - **Primary**: emerald-600 (actions, links, active states)
 - **Neutral**: slate (backgrounds, text, borders)
 - **Success**: green
@@ -54,21 +54,25 @@ export function MyComponent({ className, children }: MyComponentProps) {
 - **Error**: red/rose
 
 ### Spacing Scale
+
 Use Tailwind's default spacing: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24
 
 ### Typography
+
 - Headings: font-bold, text-slate-900
 - Body: text-slate-700
 - Muted: text-slate-500
 - Small: text-sm, text-xs
 
 ### Border Radius
+
 - Cards/modals: rounded-lg or rounded-xl
 - Buttons: rounded-md
 - Inputs: rounded-md
 - Badges: rounded-full
 
 ### Shadows
+
 - Cards: shadow-sm
 - Modals: shadow-xl
 - Dropdowns: shadow-lg
@@ -76,19 +80,19 @@ Use Tailwind's default spacing: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 2
 ## Common Patterns
 
 ### Card Component
+
 ```tsx
 <Card className="p-6">
   <CardHeader>
     <CardTitle>Title</CardTitle>
     <CardDescription>Description</CardDescription>
   </CardHeader>
-  <CardContent>
-    {/* Content */}
-  </CardContent>
+  <CardContent>{/* Content */}</CardContent>
 </Card>
 ```
 
 ### Button Variants
+
 ```tsx
 // Primary action
 <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -101,6 +105,7 @@ Use Tailwind's default spacing: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 2
 ```
 
 ### Form Inputs
+
 ```tsx
 <div className="space-y-2">
   <Label htmlFor="field">Label</Label>
@@ -110,6 +115,7 @@ Use Tailwind's default spacing: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 2
 ```
 
 ### Responsive Design
+
 ```tsx
 // Mobile-first approach
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

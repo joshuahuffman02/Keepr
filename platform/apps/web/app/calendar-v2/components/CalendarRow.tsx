@@ -30,7 +30,7 @@ interface CalendarRowProps {
   draftSelection: QuotePreview | null;
   onCellPointerDown: (siteId: string, dayIdx: number, e: React.PointerEvent) => void;
   onReservationClick: (id: string) => void;
-  densityConfig: typeof DENSITY_CONFIG[DensityMode];
+  densityConfig: (typeof DENSITY_CONFIG)[DensityMode];
 }
 
 export const CalendarRow = memo(function CalendarRow({
@@ -45,7 +45,7 @@ export const CalendarRow = memo(function CalendarRow({
   draftSelection,
   onCellPointerDown,
   onReservationClick,
-  densityConfig
+  densityConfig,
 }: CalendarRowProps) {
   const active = activeSelection?.siteId === site.id ? activeSelection : null;
   const typeKey = (site.siteType ?? "").toLowerCase();
@@ -56,7 +56,8 @@ export const CalendarRow = memo(function CalendarRow({
   const activeSpan = activeStart !== null && activeEnd !== null ? activeEnd - activeStart + 1 : 0;
   const activeLabel = activeSpan === 1 ? "night" : "nights";
 
-  const selectionHeightClass = densityConfig.rowHeight === 40 ? "h-6" : densityConfig.rowHeight === 88 ? "h-16" : "h-12";
+  const selectionHeightClass =
+    densityConfig.rowHeight === 40 ? "h-6" : densityConfig.rowHeight === 88 ? "h-16" : "h-12";
 
   return (
     <div
@@ -64,18 +65,40 @@ export const CalendarRow = memo(function CalendarRow({
       style={{ gridTemplateColumns: gridTemplate }}
       data-site-id={site.id}
     >
-      <div className={cn("px-4 sticky left-0 z-10 border-r border-l-4 border-border", zebra, typeMeta.border, densityConfig.padding)}>
-        <div className={cn("font-bold text-foreground truncate", densityConfig.rowHeight === 40 ? "text-xs" : "text-sm")} title={site.name}>{site.name}</div>
+      <div
+        className={cn(
+          "px-4 sticky left-0 z-10 border-r border-l-4 border-border",
+          zebra,
+          typeMeta.border,
+          densityConfig.padding,
+        )}
+      >
+        <div
+          className={cn(
+            "font-bold text-foreground truncate",
+            densityConfig.rowHeight === 40 ? "text-xs" : "text-sm",
+          )}
+          title={site.name}
+        >
+          {site.name}
+        </div>
         {densityConfig.showDetails && (
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-wider">
-            <span className={cn("px-2 py-0.5 rounded-full font-bold", typeMeta.badge)}>{typeMeta.label}</span>
-            {site.siteNumber ? <span className="text-muted-foreground/70">#{site.siteNumber}</span> : null}
+            <span className={cn("px-2 py-0.5 rounded-full font-bold", typeMeta.badge)}>
+              {typeMeta.label}
+            </span>
+            {site.siteNumber ? (
+              <span className="text-muted-foreground/70">#{site.siteNumber}</span>
+            ) : null}
           </div>
         )}
       </div>
 
       <div className="relative" style={{ gridColumn: "2 / -1" }}>
-        <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))` }}>
+        <div
+          className="grid h-full"
+          style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))` }}
+        >
           {days.map((d, i) => (
             <div
               key={i}
@@ -85,7 +108,7 @@ export const CalendarRow = memo(function CalendarRow({
                 zebra,
                 d.weekend && "bg-muted/50",
                 d.isToday && "bg-primary/10",
-                "hover:bg-primary/10"
+                "hover:bg-primary/10",
               )}
               style={{ height: `${densityConfig.rowHeight}px` }}
               onPointerDown={(e) => onCellPointerDown(site.id, i, e)}
@@ -99,12 +122,22 @@ export const CalendarRow = memo(function CalendarRow({
         >
           {active && activeStart !== null && activeEnd !== null && (
             <div
-              className={cn("my-1 mx-1 rounded-xl bg-primary/20 border border-primary/60 shadow-lg flex items-center justify-center z-20", selectionHeightClass)}
+              className={cn(
+                "my-1 mx-1 rounded-xl bg-primary/20 border border-primary/60 shadow-lg flex items-center justify-center z-20",
+                selectionHeightClass,
+              )}
               style={{ gridColumn: `${activeStart + 1} / span ${activeSpan}` }}
             >
-              <div className={cn("px-3 py-1 rounded-full bg-action-primary text-action-primary-foreground font-black uppercase tracking-widest flex items-center gap-2", densityConfig.fontSize)}>
+              <div
+                className={cn(
+                  "px-3 py-1 rounded-full bg-action-primary text-action-primary-foreground font-black uppercase tracking-widest flex items-center gap-2",
+                  densityConfig.fontSize,
+                )}
+              >
                 {densityConfig.showDetails && <span className="opacity-80">{site.name}</span>}
-                <span>{activeSpan} {activeLabel}</span>
+                <span>
+                  {activeSpan} {activeLabel}
+                </span>
               </div>
             </div>
           )}
@@ -162,13 +195,13 @@ const DraftSelectionOverlay = memo(function DraftSelectionOverlay({
   days,
   dayCount,
   selectionHeightClass,
-  densityConfig
+  densityConfig,
 }: {
   draftSelection: QuotePreview;
   days: DayMeta[];
   dayCount: number;
   selectionHeightClass: string;
-  densityConfig: typeof DENSITY_CONFIG[DensityMode];
+  densityConfig: (typeof DENSITY_CONFIG)[DensityMode];
 }) {
   const start = days[0].date;
   const resStart = parseLocalDateInput(draftSelection.arrival);
@@ -180,10 +213,18 @@ const DraftSelectionOverlay = memo(function DraftSelectionOverlay({
 
   return (
     <div
-      className={cn("mx-1 rounded-lg bg-status-info/10 border-2 border-status-info/40 border-dashed flex items-center justify-center z-10", selectionHeightClass)}
+      className={cn(
+        "mx-1 rounded-lg bg-status-info/10 border-2 border-status-info/40 border-dashed flex items-center justify-center z-10",
+        selectionHeightClass,
+      )}
       style={{ gridColumn: `${startIdx + 1} / span ${span}` }}
     >
-      <span className={cn("font-bold text-status-info bg-card/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
+      <span
+        className={cn(
+          "font-bold text-status-info bg-card/90 px-2 py-0.5 rounded",
+          densityConfig.fontSize,
+        )}
+      >
         Draft
       </span>
     </div>
@@ -193,7 +234,7 @@ const DraftSelectionOverlay = memo(function DraftSelectionOverlay({
 const BlackoutOverlay = memo(function BlackoutOverlay({
   blackout,
   days,
-  dayCount
+  dayCount,
 }: {
   blackout: CalendarBlackout;
   days: DayMeta[];
@@ -214,7 +255,7 @@ const BlackoutOverlay = memo(function BlackoutOverlay({
       className="relative h-full w-full pointer-events-none"
       style={{
         gridColumn: `${startIdx + 1} / span ${span}`,
-        zIndex: 15
+        zIndex: 15,
       }}
       title={blackout.reason ?? "Blocked"}
     >
@@ -229,7 +270,7 @@ const BlackoutOverlay = memo(function BlackoutOverlay({
               currentColor 4px,
               currentColor 5px
             )`,
-            color: 'hsl(var(--destructive))'
+            color: "hsl(var(--destructive))",
           }}
         />
         <div className="relative z-10 flex items-center gap-1 bg-card/90 px-2 py-0.5 rounded text-[10px] font-medium text-destructive">

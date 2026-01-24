@@ -108,7 +108,7 @@ export class IntegrationRegistryService implements OnModuleInit {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly framework: IntegrationFrameworkService
+    private readonly framework: IntegrationFrameworkService,
   ) {}
 
   async onModuleInit() {
@@ -193,7 +193,7 @@ export class IntegrationRegistryService implements OnModuleInit {
    */
   async listIntegrationsWithStatus(
     campgroundId: string,
-    options?: { category?: string }
+    options?: { category?: string },
   ): Promise<IntegrationListing[]> {
     const integrations = await this.listIntegrations(options);
 
@@ -207,9 +207,7 @@ export class IntegrationRegistryService implements OnModuleInit {
       },
     });
 
-    const connectionMap = new Map(
-      connections.map((c) => [c.definitionId, c])
-    );
+    const connectionMap = new Map(connections.map((c) => [c.definitionId, c]));
 
     return integrations.map((integration) => {
       const connection = connectionMap.get(integration.id);
@@ -260,19 +258,14 @@ export class IntegrationRegistryService implements OnModuleInit {
   /**
    * Get sync logs for a connection
    */
-  async getSyncLogs(
-    connectionId: string,
-    options?: { limit?: number; cursor?: string }
-  ) {
+  async getSyncLogs(connectionId: string, options?: { limit?: number; cursor?: string }) {
     const limit = Math.min(options?.limit || 50, 200);
 
     const logs = await this.prisma.marketplaceSyncLog.findMany({
       where: { connectionId },
       orderBy: { startedAt: "desc" },
       take: limit + 1,
-      ...(options?.cursor
-        ? { cursor: { id: options.cursor }, skip: 1 }
-        : {}),
+      ...(options?.cursor ? { cursor: { id: options.cursor }, skip: 1 } : {}),
     });
 
     const hasMore = logs.length > limit;

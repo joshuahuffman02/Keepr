@@ -27,7 +27,7 @@ export class SeasonalsScheduler {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
   ) {}
 
   /**
@@ -104,7 +104,9 @@ export class SeasonalsScheduler {
             campgroundId: campground.id,
           });
         } catch (emailError) {
-          this.logger.error(`Failed to send past_due notification for payment ${payment.id}: ${emailError instanceof Error ? emailError.message : emailError}`);
+          this.logger.error(
+            `Failed to send past_due notification for payment ${payment.id}: ${emailError instanceof Error ? emailError.message : emailError}`,
+          );
         }
       }
 
@@ -122,10 +124,14 @@ export class SeasonalsScheduler {
       for (const [campgroundId, payments] of byCampground) {
         const totalOverdue = payments.reduce((sum, p) => sum + Number(p.amount), 0);
         const campgroundName = payments[0]?.SeasonalGuest?.Campground?.name || campgroundId;
-        this.logger.warn(`${campgroundName}: ${payments.length} payments now past_due, total $${(totalOverdue / 100).toFixed(2)}`);
+        this.logger.warn(
+          `${campgroundName}: ${payments.length} payments now past_due, total $${(totalOverdue / 100).toFixed(2)}`,
+        );
       }
     } catch (error) {
-      this.logger.error(`Failed to mark overdue payments: ${error instanceof Error ? error.message : error}`);
+      this.logger.error(
+        `Failed to mark overdue payments: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
@@ -224,7 +230,9 @@ export class SeasonalsScheduler {
         include: {
           SeasonalGuest: {
             include: {
-              Guest: { select: { id: true, email: true, primaryFirstName: true, primaryLastName: true } },
+              Guest: {
+                select: { id: true, email: true, primaryFirstName: true, primaryLastName: true },
+              },
               Campground: { select: { id: true, name: true } },
               Site: { select: { siteNumber: true } },
             },
@@ -237,7 +245,9 @@ export class SeasonalsScheduler {
         return;
       }
 
-      this.logger.log(`Sending ${reminderType} reminders for ${upcomingPayments.length} seasonal payments due within ${daysAhead} days`);
+      this.logger.log(
+        `Sending ${reminderType} reminders for ${upcomingPayments.length} seasonal payments due within ${daysAhead} days`,
+      );
 
       let sent = 0;
       let failed = 0;
@@ -285,14 +295,18 @@ export class SeasonalsScheduler {
           });
           sent++;
         } catch (emailError) {
-          this.logger.error(`Failed to send reminder for payment ${payment.id}: ${emailError instanceof Error ? emailError.message : emailError}`);
+          this.logger.error(
+            `Failed to send reminder for payment ${payment.id}: ${emailError instanceof Error ? emailError.message : emailError}`,
+          );
           failed++;
         }
       }
 
       this.logger.log(`Payment reminder emails sent: ${sent} successful, ${failed} failed`);
     } catch (error) {
-      this.logger.error(`Failed to process payment reminders: ${error instanceof Error ? error.message : error}`);
+      this.logger.error(
+        `Failed to process payment reminders: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
@@ -410,7 +424,11 @@ export class SeasonalsScheduler {
               periodStart: nextMonth,
               periodEnd: nextMonthEnd,
               amount: monthlyAmount,
-              dueDate: new Date(nextMonth.getFullYear(), nextMonth.getMonth(), seasonal.paymentDay || 1),
+              dueDate: new Date(
+                nextMonth.getFullYear(),
+                nextMonth.getMonth(),
+                seasonal.paymentDay || 1,
+              ),
               status: SeasonalPaymentStatus.scheduled,
               updatedAt: new Date(),
             },
@@ -420,10 +438,14 @@ export class SeasonalsScheduler {
       }
 
       if (created > 0) {
-        this.logger.log(`Generated ${created} seasonal payment records for ${nextMonth.toLocaleString("default", { month: "long", year: "numeric" })}`);
+        this.logger.log(
+          `Generated ${created} seasonal payment records for ${nextMonth.toLocaleString("default", { month: "long", year: "numeric" })}`,
+        );
       }
     } catch (error) {
-      this.logger.error(`Failed to generate next month payments: ${error instanceof Error ? error.message : error}`);
+      this.logger.error(
+        `Failed to generate next month payments: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 }

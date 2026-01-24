@@ -17,4 +17,3 @@ export class RespondNpsDto {
   @IsArray()
   tags?: string[];
 }
-

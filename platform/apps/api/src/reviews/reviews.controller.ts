@@ -1,4 +1,13 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, Req, UseGuards } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { Roles, RolesGuard } from "../auth/guards/roles.guard";
 import { UserRole } from "@prisma/client";
@@ -14,15 +23,13 @@ import type { Guest } from "@prisma/client";
 
 type ReviewsRequest = Request & { user?: AuthUser | Guest };
 
-const isAuthUser = (user: AuthUser | Guest): user is AuthUser =>
-  "platformRole" in user;
+const isAuthUser = (user: AuthUser | Guest): user is AuthUser => "platformRole" in user;
 
-const isGuest = (user: AuthUser | Guest): user is Guest =>
-  !isAuthUser(user);
+const isGuest = (user: AuthUser | Guest): user is Guest => !isAuthUser(user);
 
 @Controller()
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) { }
+  constructor(private readonly reviewsService: ReviewsService) {}
 
   private requireUserId(req: ReviewsRequest): string {
     const user = req.user;
@@ -56,7 +63,13 @@ export class ReviewsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.owner, UserRole.manager, UserRole.marketing, UserRole.front_desk, UserRole.readonly)
+  @Roles(
+    UserRole.owner,
+    UserRole.manager,
+    UserRole.marketing,
+    UserRole.front_desk,
+    UserRole.readonly,
+  )
   @Get("reviews")
   listAdmin(@Query("campgroundId") campgroundId: string, @Query("status") status?: string) {
     return this.reviewsService.listAdmin(campgroundId, status);

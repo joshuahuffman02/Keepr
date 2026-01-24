@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  NotFoundException,
-} from "@nestjs/common";
+import { Controller, Get, Param, Query, NotFoundException } from "@nestjs/common";
 import { PublicLocationsService } from "./public-locations.service";
 import { AttractionType } from "@prisma/client";
 
@@ -58,7 +52,7 @@ export class PublicLocationsController {
     @Param("slug") slug: string,
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
-    @Query("sortBy") sortBy?: "name" | "rating" | "distance"
+    @Query("sortBy") sortBy?: "name" | "rating" | "distance",
   ) {
     const location = await this.locationsService.getLocationBySlug(slug, {
       limit: limit ? parseInt(limit, 10) : 20,
@@ -105,7 +99,7 @@ export class PublicAttractionsController {
     @Param("slug") slug: string,
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
-    @Query("maxDistance") maxDistance?: string
+    @Query("maxDistance") maxDistance?: string,
   ) {
     const attraction = await this.locationsService.getAttractionBySlug(slug, {
       limit: limit ? parseInt(limit, 10) : 20,

@@ -7,443 +7,467 @@ import { recordError, recordMetric, startTiming } from "../../lib/calendar-metri
 import { computeDepositDue } from "@keepr/shared";
 import { format, parseISO } from "date-fns";
 import {
-    diffInDays,
-    formatLocalDateInput,
-    parseLocalDateInput,
-    toLocalDate,
-    isToday
+  diffInDays,
+  formatLocalDateInput,
+  parseLocalDateInput,
+  toLocalDate,
+  isToday,
 } from "./utils";
 import type {
-    CalendarSite,
-    CalendarReservation,
-    CalendarBlackout,
-    DayMeta,
-    ReservationConflict,
-    QuotePreview,
-    HoldStatus,
-    ExtendPrompt,
-    CalendarViewMode,
-    AssignmentFilter
+  CalendarSite,
+  CalendarReservation,
+  CalendarBlackout,
+  DayMeta,
+  ReservationConflict,
+  QuotePreview,
+  HoldStatus,
+  ExtendPrompt,
+  CalendarViewMode,
+  AssignmentFilter,
 } from "./types";
 
 type GuestData = Awaited<ReturnType<typeof apiClient.getGuests>>[number];
 type Membership = Awaited<ReturnType<typeof apiClient.getWhoami>>["user"]["memberships"][number];
 
 const getReservationChannel = (reservation: CalendarReservation): string | undefined => {
-    const channel = reservation.channel || reservation.bookingChannel || reservation.source;
-    return channel ?? undefined;
+  const channel = reservation.channel || reservation.bookingChannel || reservation.source;
+  return channel ?? undefined;
 };
 
 export function useCalendarData() {
-    const queryClient = useQueryClient();
-    const { selection: ganttSelection, setSelection: setStoreSelection } = useGanttStore();
-    const { data: whoami } = useWhoami();
+  const queryClient = useQueryClient();
+  const { selection: ganttSelection, setSelection: setStoreSelection } = useGanttStore();
+  const { data: whoami } = useWhoami();
 
-    const [isReady, setIsReady] = useState(false);
-    const [selectedCampground, setSelectedCampground] = useState<string>("");
-    const [startDate, setStartDate] = useState(() => formatLocalDateInput(new Date(0)));
-    const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
-    const [dayCount, setDayCount] = useState(14);
+  const [isReady, setIsReady] = useState(false);
+  const [selectedCampground, setSelectedCampground] = useState<string>("");
+  const [startDate, setStartDate] = useState(() => formatLocalDateInput(new Date(0)));
+  const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
+  const [dayCount, setDayCount] = useState(14);
 
-    const [statusFilter, setStatusFilter] = useState<string>("all");
-    const [siteTypeFilter, setSiteTypeFilter] = useState<string>("all");
-    const [channelFilter, setChannelFilter] = useState<string>("all");
-    const [assignmentFilter, setAssignmentFilter] = useState<AssignmentFilter>("all");
-    const [guestSearch, setGuestSearch] = useState<string>("");
-    const [arrivalsNowOnly, setArrivalsNowOnly] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [siteTypeFilter, setSiteTypeFilter] = useState<string>("all");
+  const [channelFilter, setChannelFilter] = useState<string>("all");
+  const [assignmentFilter, setAssignmentFilter] = useState<AssignmentFilter>("all");
+  const [guestSearch, setGuestSearch] = useState<string>("");
+  const [arrivalsNowOnly, setArrivalsNowOnly] = useState(false);
 
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-    const loadTimers = useRef<Record<string, number | null>>({
-        campgrounds: null,
-        sites: null,
-        reservations: null,
-        blackouts: null
-    });
+  const loadTimers = useRef<Record<string, number | null>>({
+    campgrounds: null,
+    sites: null,
+    reservations: null,
+    blackouts: null,
+  });
 
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        const stored = localStorage.getItem("campreserv:selectedCampground") || "";
-        if (stored) setSelectedCampground(stored);
-        setStartDate(formatLocalDateInput(new Date()));
-        setIsReady(true);
-    }, []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = localStorage.getItem("campreserv:selectedCampground") || "";
+    if (stored) setSelectedCampground(stored);
+    setStartDate(formatLocalDateInput(new Date()));
+    setIsReady(true);
+  }, []);
 
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        if (selectedCampground) {
-            localStorage.setItem("campreserv:selectedCampground", selectedCampground);
-        }
-    }, [selectedCampground]);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (selectedCampground) {
+      localStorage.setItem("campreserv:selectedCampground", selectedCampground);
+    }
+  }, [selectedCampground]);
 
-    // Effect to sync with localStorage if it changes
-    useEffect(() => {
-        if (typeof window === "undefined") return;
-        const handleStorageChange = () => {
-            const stored = localStorage.getItem("campreserv:selectedCampground");
-            if (stored && stored !== selectedCampground) {
-                setSelectedCampground(stored);
-            }
-        };
-
-        window.addEventListener("storage", handleStorageChange);
-        // Also poll briefly or use a custom event if needed, 
-        // but DashboardShell does a full reload so this is mostly for completeness.
-        return () => window.removeEventListener("storage", handleStorageChange);
-    }, [selectedCampground]);
-
-    // Basic Queries
-    const campgroundsQuery = useQuery({
-        queryKey: ["campgrounds"],
-        queryFn: () => {
-            loadTimers.current.campgrounds = typeof performance !== "undefined" ? performance.now() : Date.now();
-            return apiClient.getCampgrounds();
-        },
-        enabled: isReady,
-        staleTime: 60_000,
-        refetchOnWindowFocus: false
-    });
-
-    const selectedCampgroundDetails = useMemo(
-        () => campgroundsQuery.data?.find((cg) => cg.id === selectedCampground) ?? null,
-        [campgroundsQuery.data, selectedCampground]
-    );
-
-    const sitesQuery = useQuery<CalendarSite[]>({
-        queryKey: ["calendar-sites", selectedCampground],
-        queryFn: () => {
-            loadTimers.current.sites = typeof performance !== "undefined" ? performance.now() : Date.now();
-            return apiClient.getSites(selectedCampground);
-        },
-        enabled: isReady && !!selectedCampground,
-        staleTime: 15_000,
-        refetchInterval: 60_000
-    });
-
-    const reservationsQuery = useQuery<CalendarReservation[]>({
-        queryKey: ["calendar-reservations", selectedCampground],
-        queryFn: () => {
-            loadTimers.current.reservations = typeof performance !== "undefined" ? performance.now() : Date.now();
-            return apiClient.getReservations(selectedCampground);
-        },
-        enabled: isReady && !!selectedCampground,
-        staleTime: 15_000,
-        refetchInterval: 60_000
-    });
-
-    const guestsQuery = useQuery<GuestData[]>({
-        queryKey: ["calendar-guests", selectedCampground],
-        queryFn: () => apiClient.getGuests(selectedCampground),
-        enabled: isReady && !!selectedCampground,
-        staleTime: 60_000,
-        refetchInterval: 5 * 60_000
-    });
-
-    const blackoutsQuery = useQuery({
-        queryKey: ["calendar-blackouts", selectedCampground],
-        queryFn: () => {
-            loadTimers.current.blackouts = typeof performance !== "undefined" ? performance.now() : Date.now();
-            return apiClient.getBlackouts(selectedCampground);
-        },
-        enabled: isReady && !!selectedCampground,
-        staleTime: 15_000,
-        refetchInterval: 60_000
-    });
-
-    const maintenanceQuery = useQuery({
-        queryKey: ["calendar-maintenance", selectedCampground],
-        queryFn: () => apiClient.getMaintenanceTickets("open", selectedCampground),
-        enabled: isReady && !!selectedCampground,
-        staleTime: 60_000,
-        refetchInterval: 60_000
-    });
-
-    const housekeepingTasksQuery = useQuery({
-        queryKey: ["calendar-housekeeping", selectedCampground],
-        queryFn: () => apiClient.listTasks(selectedCampground, { type: "housekeeping" }),
-        enabled: isReady && !!selectedCampground,
-        staleTime: 30_000,
-        refetchInterval: 30_000
-    });
-
-    useEffect(() => {
-        if (!isReady) return;
-        if (selectedCampground) return;
-        const first = campgroundsQuery.data?.[0];
-        if (first?.id) {
-            setSelectedCampground(first.id);
-        }
-    }, [isReady, selectedCampground, campgroundsQuery.data]);
-
-    // Permissions
-    const memberships = whoami?.user?.memberships ?? [];
-    const hasCampgroundAccess = selectedCampground
-        ? memberships.some((m) => m.campgroundId === selectedCampground)
-        : memberships.length > 0;
-    const allowOps = (whoami?.allowed?.operationsWrite ?? false) && hasCampgroundAccess;
-
-    // Derived Data
-    const start = useMemo(() => parseLocalDateInput(startDate), [startDate]);
-    const visibleEnd = useMemo(() => {
-        const end = new Date(start);
-        end.setDate(end.getDate() + dayCount);
-        return end;
-    }, [start, dayCount]);
-
-    const days: DayMeta[] = useMemo(() => {
-        return Array.from({ length: dayCount }).map((_, i) => {
-            const d = new Date(start);
-            d.setDate(d.getDate() + i);
-            const weekend = d.getDay() === 0 || d.getDay() === 6;
-            const label = format(d, "MMM d");
-            return { date: d, weekend, label, isToday: isToday(d) };
-        });
-    }, [start, dayCount]);
-
-    const reservationsActive = useMemo(
-        () => (reservationsQuery.data || []).filter((r) => r.status !== "cancelled"),
-        [reservationsQuery.data]
-    );
-
-    const guestLookup = useMemo(() => {
-        const map = new Map<string, { firstName: string; lastName: string; email: string; phone: string; fullName: string }>();
-        (guestsQuery.data ?? []).forEach((guest) => {
-            const firstName = (guest.primaryFirstName || "").toLowerCase();
-            const lastName = (guest.primaryLastName || "").toLowerCase();
-            const email = (guest.email || "").toLowerCase();
-            const phone = (guest.phone || "").toLowerCase();
-            const fullName = `${firstName} ${lastName}`.trim();
-            map.set(guest.id, { firstName, lastName, email, phone, fullName });
-        });
-        return map;
-    }, [guestsQuery.data]);
-
-    const filteredReservations = useMemo(() => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const searchLower = guestSearch.toLowerCase().trim();
-        return reservationsActive.filter((res) => {
-            if (statusFilter !== "all" && res.status !== statusFilter) return false;
-            if (assignmentFilter === "assigned" && !res.siteId) return false;
-            if (assignmentFilter === "unassigned" && res.siteId) return false;
-            if (channelFilter !== "all") {
-                const channel = getReservationChannel(res);
-                if (channel !== channelFilter) return false;
-            }
-            if (arrivalsNowOnly) {
-                const arr = new Date(res.arrivalDate);
-                arr.setHours(0, 0, 0, 0);
-                if (arr.getTime() !== today.getTime()) return false;
-            }
-            if (searchLower) {
-                const guest = res.guest;
-                const firstName = (guest?.primaryFirstName || "").toLowerCase();
-                const lastName = (guest?.primaryLastName || "").toLowerCase();
-                const email = (guest?.email || "").toLowerCase();
-                const phone = (guest?.phone || "").toLowerCase();
-                const siteName = (res.site?.name || "").toLowerCase();
-                const fullName = `${firstName} ${lastName}`.toLowerCase();
-
-                let noMatch =
-                    !firstName.includes(searchLower) &&
-                    !lastName.includes(searchLower) &&
-                    !email.includes(searchLower) &&
-                    !phone.includes(searchLower) &&
-                    !fullName.includes(searchLower) &&
-                    !siteName.includes(searchLower);
-
-                if (noMatch && res.guestId) {
-                    const lookup = guestLookup.get(res.guestId);
-                    if (lookup) {
-                        noMatch =
-                            !lookup.firstName.includes(searchLower) &&
-                            !lookup.lastName.includes(searchLower) &&
-                            !lookup.email.includes(searchLower) &&
-                            !lookup.phone.includes(searchLower) &&
-                            !lookup.fullName.includes(searchLower);
-                    }
-                }
-
-                if (noMatch) return false;
-            }
-            return true;
-        });
-    }, [reservationsActive, statusFilter, assignmentFilter, channelFilter, arrivalsNowOnly, guestSearch, guestLookup]);
-
-    const reservationsBySite = useMemo(() => {
-        const grouped: Record<string, typeof filteredReservations> = {};
-        for (const res of filteredReservations) {
-            if (!res.siteId) continue;
-            if (!grouped[res.siteId]) {
-                grouped[res.siteId] = [];
-            }
-            grouped[res.siteId].push(res);
-        }
-        return grouped;
-    }, [filteredReservations]);
-
-    const conflicts = useMemo(() => {
-        const bySite: Record<string, typeof filteredReservations> = {};
-        filteredReservations.forEach((res) => {
-            if (!res.siteId) return;
-            if (!bySite[res.siteId]) bySite[res.siteId] = [];
-            bySite[res.siteId].push(res);
-        });
-        const results: ReservationConflict[] = [];
-        Object.entries(bySite).forEach(([siteId, list]) => {
-            const sorted = [...list].sort((a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime());
-            for (let i = 1; i < sorted.length; i++) {
-                const prev = sorted[i - 1];
-                const cur = sorted[i];
-                const prevEnd = new Date(prev.departureDate);
-                const curStart = new Date(cur.arrivalDate);
-                if (curStart < prevEnd) {
-                    const overlapStart = curStart > start ? curStart : start;
-                    const overlapEnd = prevEnd < visibleEnd ? prevEnd : visibleEnd;
-                    if (overlapEnd > overlapStart) {
-                        results.push({ siteId, overlapStart, overlapEnd, a: prev, b: cur });
-                    }
-                }
-            }
-        });
-        return results;
-    }, [filteredReservations, start, visibleEnd]);
-
-    // Telemetry effects
-    useEffect(() => {
-        if (reservationsQuery.isSuccess && loadTimers.current.reservations) {
-            const activeCount = (reservationsQuery.data || []).filter((r) => r.status !== "cancelled").length;
-            startTiming("reservations.load").end({ count: activeCount, dayCount });
-            recordMetric("calendar.reservations.visible", { total: activeCount, dayCount });
-            setLastUpdated(new Date());
-        }
-    }, [reservationsQuery.isSuccess, reservationsQuery.data, dayCount]);
-
-    // Selection & Quote logic
-    const [reservationDraft, setReservationDraft] = useState<QuotePreview | null>(null);
-    const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
-
-    const selectRange = async (siteId: string, arrival: Date, departure: Date) => {
-        const arrivalStr = formatLocalDateInput(arrival);
-        const departureStr = formatLocalDateInput(departure);
-        const site = (sitesQuery.data ?? []).find((s) => s.id === siteId);
-
-        if (!site || !selectedCampground) return;
-
-        try {
-            const quote = await apiClient.getQuote(selectedCampground, {
-                siteId,
-                arrivalDate: arrivalStr,
-                departureDate: departureStr
-            });
-            const quotePreview: QuotePreview = {
-                siteId,
-                siteName: site.name,
-                arrival: arrivalStr,
-                departure: departureStr,
-                total: quote.totalCents,
-                nights: quote.nights,
-                base: quote.baseSubtotalCents,
-                perNight: quote.perNightCents,
-                rulesDelta: quote.rulesDeltaCents,
-                depositRule: null
-            };
-            setReservationDraft(quotePreview);
-        } catch (err) {
-            const nights = diffInDays(departure, arrival);
-            const base = (site.siteClass?.defaultRate || 5000) * nights;
-            setReservationDraft({
-                siteId,
-                siteName: site.name,
-                arrival: arrivalStr,
-                departure: departureStr,
-                total: base,
-                nights,
-                base,
-                perNight: site.siteClass?.defaultRate || 5000,
-                rulesDelta: 0,
-                depositRule: null
-            });
-            recordError("calendar.selectRange", err);
-        }
+  // Effect to sync with localStorage if it changes
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleStorageChange = () => {
+      const stored = localStorage.getItem("campreserv:selectedCampground");
+      if (stored && stored !== selectedCampground) {
+        setSelectedCampground(stored);
+      }
     };
 
-    // Mutations
-    const moveMutation = useMutation({
-        mutationFn: async (payload: { id: string; siteId: string; arrivalDate: string; departureDate: string }) =>
-            apiClient.updateReservation(payload.id, {
-                siteId: payload.siteId,
-                arrivalDate: payload.arrivalDate,
-                departureDate: payload.departureDate
-            }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
-            queryClient.invalidateQueries({ queryKey: ["reservations", selectedCampground] });
-            recordMetric("calendar.move.success", { campgroundId: selectedCampground });
-        }
+    window.addEventListener("storage", handleStorageChange);
+    // Also poll briefly or use a custom event if needed,
+    // but DashboardShell does a full reload so this is mostly for completeness.
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [selectedCampground]);
+
+  // Basic Queries
+  const campgroundsQuery = useQuery({
+    queryKey: ["campgrounds"],
+    queryFn: () => {
+      loadTimers.current.campgrounds =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
+      return apiClient.getCampgrounds();
+    },
+    enabled: isReady,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const selectedCampgroundDetails = useMemo(
+    () => campgroundsQuery.data?.find((cg) => cg.id === selectedCampground) ?? null,
+    [campgroundsQuery.data, selectedCampground],
+  );
+
+  const sitesQuery = useQuery<CalendarSite[]>({
+    queryKey: ["calendar-sites", selectedCampground],
+    queryFn: () => {
+      loadTimers.current.sites =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
+      return apiClient.getSites(selectedCampground);
+    },
+    enabled: isReady && !!selectedCampground,
+    staleTime: 15_000,
+    refetchInterval: 60_000,
+  });
+
+  const reservationsQuery = useQuery<CalendarReservation[]>({
+    queryKey: ["calendar-reservations", selectedCampground],
+    queryFn: () => {
+      loadTimers.current.reservations =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
+      return apiClient.getReservations(selectedCampground);
+    },
+    enabled: isReady && !!selectedCampground,
+    staleTime: 15_000,
+    refetchInterval: 60_000,
+  });
+
+  const guestsQuery = useQuery<GuestData[]>({
+    queryKey: ["calendar-guests", selectedCampground],
+    queryFn: () => apiClient.getGuests(selectedCampground),
+    enabled: isReady && !!selectedCampground,
+    staleTime: 60_000,
+    refetchInterval: 5 * 60_000,
+  });
+
+  const blackoutsQuery = useQuery({
+    queryKey: ["calendar-blackouts", selectedCampground],
+    queryFn: () => {
+      loadTimers.current.blackouts =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
+      return apiClient.getBlackouts(selectedCampground);
+    },
+    enabled: isReady && !!selectedCampground,
+    staleTime: 15_000,
+    refetchInterval: 60_000,
+  });
+
+  const maintenanceQuery = useQuery({
+    queryKey: ["calendar-maintenance", selectedCampground],
+    queryFn: () => apiClient.getMaintenanceTickets("open", selectedCampground),
+    enabled: isReady && !!selectedCampground,
+    staleTime: 60_000,
+    refetchInterval: 60_000,
+  });
+
+  const housekeepingTasksQuery = useQuery({
+    queryKey: ["calendar-housekeeping", selectedCampground],
+    queryFn: () => apiClient.listTasks(selectedCampground, { type: "housekeeping" }),
+    enabled: isReady && !!selectedCampground,
+    staleTime: 30_000,
+    refetchInterval: 30_000,
+  });
+
+  useEffect(() => {
+    if (!isReady) return;
+    if (selectedCampground) return;
+    const first = campgroundsQuery.data?.[0];
+    if (first?.id) {
+      setSelectedCampground(first.id);
+    }
+  }, [isReady, selectedCampground, campgroundsQuery.data]);
+
+  // Permissions
+  const memberships = whoami?.user?.memberships ?? [];
+  const hasCampgroundAccess = selectedCampground
+    ? memberships.some((m) => m.campgroundId === selectedCampground)
+    : memberships.length > 0;
+  const allowOps = (whoami?.allowed?.operationsWrite ?? false) && hasCampgroundAccess;
+
+  // Derived Data
+  const start = useMemo(() => parseLocalDateInput(startDate), [startDate]);
+  const visibleEnd = useMemo(() => {
+    const end = new Date(start);
+    end.setDate(end.getDate() + dayCount);
+    return end;
+  }, [start, dayCount]);
+
+  const days: DayMeta[] = useMemo(() => {
+    return Array.from({ length: dayCount }).map((_, i) => {
+      const d = new Date(start);
+      d.setDate(d.getDate() + i);
+      const weekend = d.getDay() === 0 || d.getDay() === 6;
+      const label = format(d, "MMM d");
+      return { date: d, weekend, label, isToday: isToday(d) };
     });
+  }, [start, dayCount]);
 
-    const handleQuickCheckIn = (reservationId: string) => {
-        // Implementation for quick check-in
-        console.log("Quick check-in for:", reservationId);
-    };
+  const reservationsActive = useMemo(
+    () => (reservationsQuery.data || []).filter((r) => r.status !== "cancelled"),
+    [reservationsQuery.data],
+  );
 
-    return {
-        state: {
-            isReady,
-            selectedCampground,
-            startDate,
-            viewMode,
-            dayCount,
-            statusFilter,
-            siteTypeFilter,
-            channelFilter,
-            assignmentFilter,
-            guestSearch,
-            arrivalsNowOnly,
-            lastUpdated,
-            reservationDraft,
-            selectedReservationId
-        },
-        actions: {
-            setSelectedCampground,
-            setStartDate,
-            setViewMode,
-            setDayCount,
-            setStatusFilter,
-            setSiteTypeFilter,
-            setChannelFilter,
-            setAssignmentFilter,
-            setGuestSearch,
-            setArrivalsNowOnly,
-            setReservationDraft,
-            setSelectedReservationId,
-            handleQuickCheckIn,
-            selectRange
-        },
-        queries: {
-            campgrounds: campgroundsQuery,
-            sites: sitesQuery,
-            reservations: reservationsQuery,
-            guests: guestsQuery,
-            blackouts: blackoutsQuery,
-            maintenance: maintenanceQuery,
-            housekeeping: housekeepingTasksQuery
-        },
-        derived: {
-            selectedCampgroundDetails,
-            days,
-            dayCount,
-            start,
-            visibleEnd,
-            filteredReservations,
-            reservationsBySite,
-            conflicts,
-            allowOps,
-            ganttSelection
-        },
-        mutations: {
-            move: moveMutation
+  const guestLookup = useMemo(() => {
+    const map = new Map<
+      string,
+      { firstName: string; lastName: string; email: string; phone: string; fullName: string }
+    >();
+    (guestsQuery.data ?? []).forEach((guest) => {
+      const firstName = (guest.primaryFirstName || "").toLowerCase();
+      const lastName = (guest.primaryLastName || "").toLowerCase();
+      const email = (guest.email || "").toLowerCase();
+      const phone = (guest.phone || "").toLowerCase();
+      const fullName = `${firstName} ${lastName}`.trim();
+      map.set(guest.id, { firstName, lastName, email, phone, fullName });
+    });
+    return map;
+  }, [guestsQuery.data]);
+
+  const filteredReservations = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const searchLower = guestSearch.toLowerCase().trim();
+    return reservationsActive.filter((res) => {
+      if (statusFilter !== "all" && res.status !== statusFilter) return false;
+      if (assignmentFilter === "assigned" && !res.siteId) return false;
+      if (assignmentFilter === "unassigned" && res.siteId) return false;
+      if (channelFilter !== "all") {
+        const channel = getReservationChannel(res);
+        if (channel !== channelFilter) return false;
+      }
+      if (arrivalsNowOnly) {
+        const arr = new Date(res.arrivalDate);
+        arr.setHours(0, 0, 0, 0);
+        if (arr.getTime() !== today.getTime()) return false;
+      }
+      if (searchLower) {
+        const guest = res.guest;
+        const firstName = (guest?.primaryFirstName || "").toLowerCase();
+        const lastName = (guest?.primaryLastName || "").toLowerCase();
+        const email = (guest?.email || "").toLowerCase();
+        const phone = (guest?.phone || "").toLowerCase();
+        const siteName = (res.site?.name || "").toLowerCase();
+        const fullName = `${firstName} ${lastName}`.toLowerCase();
+
+        let noMatch =
+          !firstName.includes(searchLower) &&
+          !lastName.includes(searchLower) &&
+          !email.includes(searchLower) &&
+          !phone.includes(searchLower) &&
+          !fullName.includes(searchLower) &&
+          !siteName.includes(searchLower);
+
+        if (noMatch && res.guestId) {
+          const lookup = guestLookup.get(res.guestId);
+          if (lookup) {
+            noMatch =
+              !lookup.firstName.includes(searchLower) &&
+              !lookup.lastName.includes(searchLower) &&
+              !lookup.email.includes(searchLower) &&
+              !lookup.phone.includes(searchLower) &&
+              !lookup.fullName.includes(searchLower);
+          }
         }
-    };
+
+        if (noMatch) return false;
+      }
+      return true;
+    });
+  }, [
+    reservationsActive,
+    statusFilter,
+    assignmentFilter,
+    channelFilter,
+    arrivalsNowOnly,
+    guestSearch,
+    guestLookup,
+  ]);
+
+  const reservationsBySite = useMemo(() => {
+    const grouped: Record<string, typeof filteredReservations> = {};
+    for (const res of filteredReservations) {
+      if (!res.siteId) continue;
+      if (!grouped[res.siteId]) {
+        grouped[res.siteId] = [];
+      }
+      grouped[res.siteId].push(res);
+    }
+    return grouped;
+  }, [filteredReservations]);
+
+  const conflicts = useMemo(() => {
+    const bySite: Record<string, typeof filteredReservations> = {};
+    filteredReservations.forEach((res) => {
+      if (!res.siteId) return;
+      if (!bySite[res.siteId]) bySite[res.siteId] = [];
+      bySite[res.siteId].push(res);
+    });
+    const results: ReservationConflict[] = [];
+    Object.entries(bySite).forEach(([siteId, list]) => {
+      const sorted = [...list].sort(
+        (a, b) => new Date(a.arrivalDate).getTime() - new Date(b.arrivalDate).getTime(),
+      );
+      for (let i = 1; i < sorted.length; i++) {
+        const prev = sorted[i - 1];
+        const cur = sorted[i];
+        const prevEnd = new Date(prev.departureDate);
+        const curStart = new Date(cur.arrivalDate);
+        if (curStart < prevEnd) {
+          const overlapStart = curStart > start ? curStart : start;
+          const overlapEnd = prevEnd < visibleEnd ? prevEnd : visibleEnd;
+          if (overlapEnd > overlapStart) {
+            results.push({ siteId, overlapStart, overlapEnd, a: prev, b: cur });
+          }
+        }
+      }
+    });
+    return results;
+  }, [filteredReservations, start, visibleEnd]);
+
+  // Telemetry effects
+  useEffect(() => {
+    if (reservationsQuery.isSuccess && loadTimers.current.reservations) {
+      const activeCount = (reservationsQuery.data || []).filter(
+        (r) => r.status !== "cancelled",
+      ).length;
+      startTiming("reservations.load").end({ count: activeCount, dayCount });
+      recordMetric("calendar.reservations.visible", { total: activeCount, dayCount });
+      setLastUpdated(new Date());
+    }
+  }, [reservationsQuery.isSuccess, reservationsQuery.data, dayCount]);
+
+  // Selection & Quote logic
+  const [reservationDraft, setReservationDraft] = useState<QuotePreview | null>(null);
+  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
+
+  const selectRange = async (siteId: string, arrival: Date, departure: Date) => {
+    const arrivalStr = formatLocalDateInput(arrival);
+    const departureStr = formatLocalDateInput(departure);
+    const site = (sitesQuery.data ?? []).find((s) => s.id === siteId);
+
+    if (!site || !selectedCampground) return;
+
+    try {
+      const quote = await apiClient.getQuote(selectedCampground, {
+        siteId,
+        arrivalDate: arrivalStr,
+        departureDate: departureStr,
+      });
+      const quotePreview: QuotePreview = {
+        siteId,
+        siteName: site.name,
+        arrival: arrivalStr,
+        departure: departureStr,
+        total: quote.totalCents,
+        nights: quote.nights,
+        base: quote.baseSubtotalCents,
+        perNight: quote.perNightCents,
+        rulesDelta: quote.rulesDeltaCents,
+        depositRule: null,
+      };
+      setReservationDraft(quotePreview);
+    } catch (err) {
+      const nights = diffInDays(departure, arrival);
+      const base = (site.siteClass?.defaultRate || 5000) * nights;
+      setReservationDraft({
+        siteId,
+        siteName: site.name,
+        arrival: arrivalStr,
+        departure: departureStr,
+        total: base,
+        nights,
+        base,
+        perNight: site.siteClass?.defaultRate || 5000,
+        rulesDelta: 0,
+        depositRule: null,
+      });
+      recordError("calendar.selectRange", err);
+    }
+  };
+
+  // Mutations
+  const moveMutation = useMutation({
+    mutationFn: async (payload: {
+      id: string;
+      siteId: string;
+      arrivalDate: string;
+      departureDate: string;
+    }) =>
+      apiClient.updateReservation(payload.id, {
+        siteId: payload.siteId,
+        arrivalDate: payload.arrivalDate,
+        departureDate: payload.departureDate,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["calendar-reservations", selectedCampground] });
+      queryClient.invalidateQueries({ queryKey: ["reservations", selectedCampground] });
+      recordMetric("calendar.move.success", { campgroundId: selectedCampground });
+    },
+  });
+
+  const handleQuickCheckIn = (reservationId: string) => {
+    // Implementation for quick check-in
+    console.log("Quick check-in for:", reservationId);
+  };
+
+  return {
+    state: {
+      isReady,
+      selectedCampground,
+      startDate,
+      viewMode,
+      dayCount,
+      statusFilter,
+      siteTypeFilter,
+      channelFilter,
+      assignmentFilter,
+      guestSearch,
+      arrivalsNowOnly,
+      lastUpdated,
+      reservationDraft,
+      selectedReservationId,
+    },
+    actions: {
+      setSelectedCampground,
+      setStartDate,
+      setViewMode,
+      setDayCount,
+      setStatusFilter,
+      setSiteTypeFilter,
+      setChannelFilter,
+      setAssignmentFilter,
+      setGuestSearch,
+      setArrivalsNowOnly,
+      setReservationDraft,
+      setSelectedReservationId,
+      handleQuickCheckIn,
+      selectRange,
+    },
+    queries: {
+      campgrounds: campgroundsQuery,
+      sites: sitesQuery,
+      reservations: reservationsQuery,
+      guests: guestsQuery,
+      blackouts: blackoutsQuery,
+      maintenance: maintenanceQuery,
+      housekeeping: housekeepingTasksQuery,
+    },
+    derived: {
+      selectedCampgroundDetails,
+      days,
+      dayCount,
+      start,
+      visibleEnd,
+      filteredReservations,
+      reservationsBySite,
+      conflicts,
+      allowOps,
+      ganttSelection,
+    },
+    mutations: {
+      move: moveMutation,
+    },
+  };
 }

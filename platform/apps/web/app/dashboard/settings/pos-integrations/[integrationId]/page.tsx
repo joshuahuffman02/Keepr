@@ -6,13 +6,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -235,8 +229,10 @@ export default function PosIntegrationDetailPage() {
 
   // Update integration mutation
   const updateMutation = useMutation({
-    mutationFn: (payload: { credentials?: Record<string, string>; settings?: Record<string, boolean> }) =>
-      apiClient.updatePosIntegration(integrationId, payload),
+    mutationFn: (payload: {
+      credentials?: Record<string, string>;
+      settings?: Record<string, boolean>;
+    }) => apiClient.updatePosIntegration(integrationId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pos-integration", integrationId] });
       toast({
@@ -373,9 +369,7 @@ export default function PosIntegrationDetailPage() {
             </Button>
             <div>
               <h1 className="text-2xl font-bold">{providerConfig.name}</h1>
-              <p className="text-muted-foreground">
-                Configure your POS integration settings
-              </p>
+              <p className="text-muted-foreground">Configure your POS integration settings</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -385,16 +379,12 @@ export default function PosIntegrationDetailPage() {
                 integration.status === "CONNECTED"
                   ? "bg-status-success/15 text-status-success"
                   : integration.status === "ERROR"
-                  ? "bg-status-error/15 text-status-error"
-                  : ""
+                    ? "bg-status-error/15 text-status-error"
+                    : ""
               }
             >
-              {integration.status === "CONNECTED" && (
-                <CheckCircle className="mr-1 h-3 w-3" />
-              )}
-              {integration.status === "ERROR" && (
-                <XCircle className="mr-1 h-3 w-3" />
-              )}
+              {integration.status === "CONNECTED" && <CheckCircle className="mr-1 h-3 w-3" />}
+              {integration.status === "ERROR" && <XCircle className="mr-1 h-3 w-3" />}
               {integration.status}
             </Badge>
           </div>
@@ -437,11 +427,7 @@ export default function PosIntegrationDetailPage() {
               <Separator className="my-4" />
 
               <div className="flex gap-2">
-                <Button
-                  onClick={handleTestConnection}
-                  variant="outline"
-                  disabled={isTesting}
-                >
+                <Button onClick={handleTestConnection} variant="outline" disabled={isTesting}>
                   {isTesting ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -450,9 +436,7 @@ export default function PosIntegrationDetailPage() {
                   Test Connection
                 </Button>
                 <Button onClick={handleSave} disabled={updateMutation.isPending}>
-                  {updateMutation.isPending && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                  {updateMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Settings
                 </Button>
               </div>
@@ -466,9 +450,7 @@ export default function PosIntegrationDetailPage() {
                 <RefreshCw className="h-5 w-5" />
                 Sync Configuration
               </CardTitle>
-              <CardDescription>
-                Choose what data to sync with {providerConfig.name}
-              </CardDescription>
+              <CardDescription>Choose what data to sync with {providerConfig.name}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {providerConfig.syncOptions.map((option) => (
@@ -478,9 +460,7 @@ export default function PosIntegrationDetailPage() {
                 >
                   <div className="space-y-0.5">
                     <Label htmlFor={option.key}>{option.label}</Label>
-                    <p className="text-sm text-muted-foreground">
-                      {option.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{option.description}</p>
                   </div>
                   <Switch
                     id={option.key}
@@ -512,9 +492,7 @@ export default function PosIntegrationDetailPage() {
                 <Zap className="h-5 w-5" />
                 Quick Actions
               </CardTitle>
-              <CardDescription>
-                Manually trigger sync operations
-              </CardDescription>
+              <CardDescription>Manually trigger sync operations</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button
@@ -545,11 +523,7 @@ export default function PosIntegrationDetailPage() {
                 Pull Sales Data
               </Button>
               <Separator />
-              <Button
-                variant="outline"
-                className="w-full justify-start"
-                asChild
-              >
+              <Button variant="outline" className="w-full justify-start" asChild>
                 <Link href={`/dashboard/settings/pos-integrations/${integrationId}/mappings`}>
                   <Link2 className="mr-2 h-4 w-4" />
                   Manage Product Mappings
@@ -565,9 +539,7 @@ export default function PosIntegrationDetailPage() {
                 <Trash2 className="h-5 w-5" />
                 Danger Zone
               </CardTitle>
-              <CardDescription>
-                Irreversible actions for this integration
-              </CardDescription>
+              <CardDescription>Irreversible actions for this integration</CardDescription>
             </CardHeader>
             <CardContent>
               <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -581,9 +553,8 @@ export default function PosIntegrationDetailPage() {
                   <DialogHeader>
                     <DialogTitle>Disconnect {providerConfig.name}?</DialogTitle>
                     <DialogDescription>
-                      This will remove all connection settings and product mappings.
-                      Your data in {providerConfig.name} will not be affected, but
-                      sync will stop immediately.
+                      This will remove all connection settings and product mappings. Your data in{" "}
+                      {providerConfig.name} will not be affected, but sync will stop immediately.
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>

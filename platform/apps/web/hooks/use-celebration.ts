@@ -33,7 +33,7 @@ export function useCelebration(): UseCelebrationReturn {
       if (prefersReducedMotion) return;
       launchCelebration(type);
     },
-    [prefersReducedMotion]
+    [prefersReducedMotion],
   );
 
   const celebrateBooking = useCallback(() => {

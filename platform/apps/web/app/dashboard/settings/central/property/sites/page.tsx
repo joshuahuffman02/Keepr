@@ -66,10 +66,11 @@ export default function SiteTypesPage() {
 
     const emptyClasses: ApiSiteClass[] = [];
     const emptySites: ApiSite[] = [];
-    const classesPromise: Promise<ApiSiteClass[]> = apiClient.getSiteClasses(id).catch(() => emptyClasses);
+    const classesPromise: Promise<ApiSiteClass[]> = apiClient
+      .getSiteClasses(id)
+      .catch(() => emptyClasses);
     const sitesPromise: Promise<ApiSite[]> = apiClient.getSites(id).catch(() => emptySites);
     Promise.all([classesPromise, sitesPromise]).then(([classesArray, sitesArray]) => {
-
       // Count sites per class
       const classCounts: Record<string, number> = {};
       sitesArray.forEach((s) => {
@@ -168,8 +169,8 @@ export default function SiteTypesPage() {
       <Alert className="bg-emerald-50 border-emerald-200">
         <Tent className="h-4 w-4 text-emerald-500" />
         <AlertDescription className="text-emerald-800">
-          Site Classes group similar sites together (e.g., Full Hookup RV, Tent Sites, Cabins).
-          Each class has its own base pricing, amenities, and booking rules.
+          Site Classes group similar sites together (e.g., Full Hookup RV, Tent Sites, Cabins). Each
+          class has its own base pricing, amenities, and booking rules.
         </AlertDescription>
       </Alert>
 
@@ -223,12 +224,9 @@ export default function SiteTypesPage() {
         <Card className="border-dashed">
           <CardContent className="py-12 text-center">
             <Layers className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">
-              No site classes yet
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No site classes yet</h3>
             <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-              Create site classes to organize your camping spots by type,
-              amenities, and pricing.
+              Create site classes to organize your camping spots by type, amenities, and pricing.
             </p>
             <Button asChild>
               <Link href={`/campgrounds/${campgroundId}/classes`}>
@@ -265,9 +263,7 @@ export default function SiteTypesPage() {
                     <p className="font-medium text-foreground">{siteClass.name}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{formatPrice(siteClass.basePrice)}/night</span>
-                      {siteClass.maxOccupancy && (
-                        <span>• Max {siteClass.maxOccupancy} guests</span>
-                      )}
+                      {siteClass.maxOccupancy && <span>• Max {siteClass.maxOccupancy} guests</span>}
                     </div>
                     {siteClass.amenities && siteClass.amenities.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-1">

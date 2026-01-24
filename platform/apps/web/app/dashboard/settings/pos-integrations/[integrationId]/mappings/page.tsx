@@ -5,13 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -269,10 +263,10 @@ export default function ProductMappingsPage() {
     integration?.provider === "LIGHTSPEED"
       ? "Lightspeed"
       : integration?.provider === "SHOPIFY_POS"
-      ? "Shopify"
-      : integration?.provider === "VEND"
-      ? "Vend"
-      : integration?.provider || "POS";
+        ? "Shopify"
+        : integration?.provider === "VEND"
+          ? "Vend"
+          : integration?.provider || "POS";
 
   const stats = {
     total: mappings.length,
@@ -339,9 +333,7 @@ export default function ProductMappingsPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Mapped
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Mapped</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-green-600">{stats.mapped}</p>
@@ -349,9 +341,7 @@ export default function ProductMappingsPage() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                Unmatched
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-muted-foreground">Unmatched</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold text-yellow-600">{stats.unmatched}</p>
@@ -378,9 +368,7 @@ export default function ProductMappingsPage() {
                 <TabsList>
                   <TabsTrigger value="all">All ({stats.total})</TabsTrigger>
                   <TabsTrigger value="mapped">Mapped ({stats.mapped})</TabsTrigger>
-                  <TabsTrigger value="unmatched">
-                    Unmatched ({stats.unmatched})
-                  </TabsTrigger>
+                  <TabsTrigger value="unmatched">Unmatched ({stats.unmatched})</TabsTrigger>
                 </TabsList>
               </Tabs>
               <div className="relative w-64">
@@ -423,16 +411,12 @@ export default function ProductMappingsPage() {
                 <TableBody>
                   {filteredMappings.map((mapping) => (
                     <TableRow key={mapping.id}>
-                      <TableCell className="font-medium">
-                        {mapping.product.name}
-                      </TableCell>
+                      <TableCell className="font-medium">{mapping.product.name}</TableCell>
                       <TableCell className="text-muted-foreground">
                         {mapping.product.sku || "—"}
                       </TableCell>
                       <TableCell>
-                        {mapping.externalId || (
-                          <span className="text-muted-foreground">—</span>
-                        )}
+                        {mapping.externalId || <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell className="text-muted-foreground">
                         {mapping.externalSku || "—"}
@@ -543,13 +527,8 @@ export default function ProductMappingsPage() {
               <Button variant="outline" onClick={() => setLinkDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button
-                onClick={handleLink}
-                disabled={!selectedExternalId || linkMutation.isPending}
-              >
-                {linkMutation.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+              <Button onClick={handleLink} disabled={!selectedExternalId || linkMutation.isPending}>
+                {linkMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Link Products
               </Button>
             </DialogFooter>

@@ -1,24 +1,44 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards, Req, ForbiddenException, Logger, BadRequestException, Query } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from '../auth/guards';
-import { RolesGuard, Roles } from '../auth/guards/roles.guard';
-import { AiConsentType, Guest, UserRole } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Body,
+  UseGuards,
+  Req,
+  ForbiddenException,
+  Logger,
+  BadRequestException,
+  Query,
+} from "@nestjs/common";
+import { Throttle } from "@nestjs/throttler";
+import { AuthGuard } from "@nestjs/passport";
+import { JwtAuthGuard } from "../auth/guards";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
+import { AiConsentType, Guest, UserRole } from "@prisma/client";
+import { PrismaService } from "../prisma/prisma.service";
 import { FeatureFlagService } from "../admin/feature-flag.service";
-import { AiFeatureGateService } from './ai-feature-gate.service';
-import { AiBookingAssistService } from './ai-booking-assist.service';
-import { AiSupportService } from './ai-support.service';
-import { AiPrivacyService } from './ai-privacy.service';
-import { AiPartnerService, type ActionType, type ImpactArea, type PartnerMembership, type PartnerUser, type SensitivityLevel } from './ai-partner.service';
-import { AiSentimentService } from './ai-sentiment.service';
-import { AiMorningBriefingService } from './ai-morning-briefing.service';
-import { AiReportQueryService } from './ai-report-query.service';
-import { AiCampaignService } from './ai-campaign.service';
-import { AiSmartComposeService } from './ai-smart-compose.service';
-import { AiService } from './ai.service';
-import { CopilotActionDto } from './dto/copilot-action.dto';
-import type { Request } from 'express';
+import { AiFeatureGateService } from "./ai-feature-gate.service";
+import { AiBookingAssistService } from "./ai-booking-assist.service";
+import { AiSupportService } from "./ai-support.service";
+import { AiPrivacyService } from "./ai-privacy.service";
+import {
+  AiPartnerService,
+  type ActionType,
+  type ImpactArea,
+  type PartnerMembership,
+  type PartnerUser,
+  type SensitivityLevel,
+} from "./ai-partner.service";
+import { AiSentimentService } from "./ai-sentiment.service";
+import { AiMorningBriefingService } from "./ai-morning-briefing.service";
+import { AiReportQueryService } from "./ai-report-query.service";
+import { AiCampaignService } from "./ai-campaign.service";
+import { AiSmartComposeService } from "./ai-smart-compose.service";
+import { AiService } from "./ai.service";
+import { CopilotActionDto } from "./dto/copilot-action.dto";
+import type { Request } from "express";
 
 interface UpdateAiSettingsDto {
   aiEnabled?: boolean;
@@ -26,8 +46,8 @@ interface UpdateAiSettingsDto {
   aiBookingAssistEnabled?: boolean;
   aiAnalyticsEnabled?: boolean;
   aiForecastingEnabled?: boolean;
-  aiAnonymizationLevel?: 'strict' | 'moderate' | 'minimal';
-  aiProvider?: 'openai' | 'anthropic' | 'local';
+  aiAnonymizationLevel?: "strict" | "moderate" | "minimal";
+  aiProvider?: "openai" | "anthropic" | "local";
   aiApiKey?: string | null;
   aiMonthlyBudgetCents?: number | null;
 }
@@ -39,13 +59,13 @@ interface BookingChatDto {
   partySize?: { adults: number; children: number };
   rigInfo?: { type: string; length: number };
   preferences?: string[];
-  history?: { role: 'user' | 'assistant'; content: string }[];
+  history?: { role: "user" | "assistant"; content: string }[];
 }
 
 interface SupportChatDto {
   sessionId: string;
   message: string;
-  history?: { role: 'user' | 'assistant'; content: string }[];
+  history?: { role: "user" | "assistant"; content: string }[];
   context?: string;
 }
 
@@ -59,7 +79,7 @@ interface ConsentDto {
 interface PartnerChatDto {
   sessionId?: string;
   message: string;
-  history?: { role: 'user' | 'assistant'; content: string }[];
+  history?: { role: "user" | "assistant"; content: string }[];
 }
 
 interface PartnerConfirmDto {
@@ -138,7 +158,7 @@ const getQueryString = (value: unknown): string | undefined => {
   return undefined;
 };
 
-@Controller('ai')
+@Controller("ai")
 export class AiController {
   private readonly logger = new Logger(AiController.name);
 
@@ -156,7 +176,7 @@ export class AiController {
     private readonly aiService: AiService,
     private readonly privacy: AiPrivacyService,
     private readonly flags: FeatureFlagService,
-  ) { }
+  ) {}
 
   private async assertChatEnabled(flagKey: string, campgroundId?: string) {
     const enabled = await this.flags.isEnabledOrDefault(flagKey, campgroundId, true);
@@ -170,21 +190,18 @@ export class AiController {
   /**
    * Public endpoint for booking assistant chat (no auth required)
    */
-  @Post('public/campgrounds/:campgroundId/chat')
+  @Post("public/campgrounds/:campgroundId/chat")
   @Throttle({ default: { limit: 20, ttl: 60000 } })
-  async bookingChat(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: BookingChatDto,
-  ) {
+  async bookingChat(@Param("campgroundId") campgroundId: string, @Body() body: BookingChatDto) {
     await this.assertChatEnabled(PUBLIC_CHAT_FLAG_KEY, campgroundId);
     if (!body?.sessionId) {
-      throw new BadRequestException('sessionId is required');
+      throw new BadRequestException("sessionId is required");
     }
     if (!body?.message || body.message.trim().length === 0) {
-      throw new BadRequestException('Message is required');
+      throw new BadRequestException("Message is required");
     }
     if (body.message.length > 4000) {
-      throw new BadRequestException('Message is too long');
+      throw new BadRequestException("Message is too long");
     }
     const history = Array.isArray(body.history) ? body.history.slice(-12) : undefined;
 
@@ -201,11 +218,11 @@ export class AiController {
         sessionOnly: true,
       });
     } catch (error) {
-      this.logger.error('Chat endpoint error:', error instanceof Error ? error.stack : error);
+      this.logger.error("Chat endpoint error:", error instanceof Error ? error.stack : error);
       // Return the error message for debugging (in production you'd want to sanitize this)
       return {
-        message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        action: 'info',
+        message: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
+        action: "info",
         error: true,
       };
     }
@@ -214,9 +231,9 @@ export class AiController {
   /**
    * Check if booking assist is enabled for a campground (public)
    */
-  @Get('public/campgrounds/:campgroundId/status')
+  @Get("public/campgrounds/:campgroundId/status")
   @Throttle({ default: { limit: 120, ttl: 60000 } })
-  async getPublicAiStatus(@Param('campgroundId') campgroundId: string) {
+  async getPublicAiStatus(@Param("campgroundId") campgroundId: string) {
     await this.assertChatEnabled(PUBLIC_CHAT_FLAG_KEY, campgroundId);
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
@@ -234,19 +251,19 @@ export class AiController {
   /**
    * Public consent status (session-only booking assist).
    */
-  @Get('public/campgrounds/:campgroundId/consent')
+  @Get("public/campgrounds/:campgroundId/consent")
   @Throttle({ default: { limit: 60, ttl: 60000 } })
   async getPublicConsent(
-    @Param('campgroundId') campgroundId: string,
-    @Query('sessionId') sessionId?: string,
-    @Query('consentType') consentType?: AiConsentType,
+    @Param("campgroundId") campgroundId: string,
+    @Query("sessionId") sessionId?: string,
+    @Query("consentType") consentType?: AiConsentType,
   ) {
     await this.assertChatEnabled(PUBLIC_CHAT_FLAG_KEY, campgroundId);
     if (!sessionId) {
-      throw new BadRequestException('sessionId is required');
+      throw new BadRequestException("sessionId is required");
     }
     if (!isConsentType(consentType)) {
-      throw new BadRequestException('Invalid consentType');
+      throw new BadRequestException("Invalid consentType");
     }
 
     const granted = await this.gate.hasConsent(campgroundId, consentType, undefined, sessionId);
@@ -256,25 +273,25 @@ export class AiController {
   /**
    * Public consent update (session-only booking assist).
    */
-  @Post('public/campgrounds/:campgroundId/consent')
+  @Post("public/campgrounds/:campgroundId/consent")
   @Throttle({ default: { limit: 20, ttl: 60000 } })
   async updatePublicConsent(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: ConsentDto,
     @Req() req: Request,
   ) {
     await this.assertChatEnabled(PUBLIC_CHAT_FLAG_KEY, campgroundId);
     if (!body?.sessionId) {
-      throw new BadRequestException('sessionId is required');
+      throw new BadRequestException("sessionId is required");
     }
     if (!isConsentType(body.consentType)) {
-      throw new BadRequestException('Invalid consentType');
+      throw new BadRequestException("Invalid consentType");
     }
 
     const granted = body.granted !== false;
     const ipHash = this.getIpHash(req);
-    const userAgent = req.headers['user-agent'];
-    const source = typeof body.source === 'string' ? body.source.slice(0, 80) : undefined;
+    const userAgent = req.headers["user-agent"];
+    const source = typeof body.source === "string" ? body.source.slice(0, 80) : undefined;
 
     if (granted) {
       await this.gate.recordConsent({
@@ -283,7 +300,7 @@ export class AiController {
         sessionId: body.sessionId,
         ipHash,
         userAgent,
-        source: source ?? 'booking_widget',
+        source: source ?? "booking_widget",
       });
     } else {
       await this.gate.revokeConsent(campgroundId, body.consentType, undefined, body.sessionId);
@@ -297,15 +314,12 @@ export class AiController {
   /**
    * Get consent records for a guest (portal).
    */
-  @UseGuards(AuthGuard('guest-jwt'))
-  @Get('portal/campgrounds/:campgroundId/consent')
-  async getGuestConsent(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @UseGuards(AuthGuard("guest-jwt"))
+  @Get("portal/campgrounds/:campgroundId/consent")
+  async getGuestConsent(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const guest = req.user;
     if (!isGuestUser(guest)) {
-      throw new ForbiddenException('Invalid guest session');
+      throw new ForbiddenException("Invalid guest session");
     }
     await this.assertGuestAccess(guest.id, campgroundId);
     const records = await this.gate.getConsentRecords(campgroundId, guest.id);
@@ -323,25 +337,25 @@ export class AiController {
   /**
    * Update consent for a guest (portal).
    */
-  @UseGuards(AuthGuard('guest-jwt'))
-  @Post('portal/campgrounds/:campgroundId/consent')
+  @UseGuards(AuthGuard("guest-jwt"))
+  @Post("portal/campgrounds/:campgroundId/consent")
   async updateGuestConsent(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: ConsentDto,
     @Req() req: Request,
   ) {
     const guest = req.user;
     if (!isGuestUser(guest)) {
-      throw new ForbiddenException('Invalid guest session');
+      throw new ForbiddenException("Invalid guest session");
     }
     await this.assertGuestAccess(guest.id, campgroundId);
     if (!isConsentType(body.consentType)) {
-      throw new BadRequestException('Invalid consentType');
+      throw new BadRequestException("Invalid consentType");
     }
     const granted = body.granted !== false;
     const ipHash = this.getIpHash(req);
-    const userAgent = req.headers['user-agent'];
-    const source = typeof body.source === 'string' ? body.source.slice(0, 80) : undefined;
+    const userAgent = req.headers["user-agent"];
+    const source = typeof body.source === "string" ? body.source.slice(0, 80) : undefined;
 
     if (granted) {
       await this.gate.recordConsent({
@@ -351,7 +365,7 @@ export class AiController {
         sessionId: body.sessionId,
         ipHash,
         userAgent,
-        source: source ?? 'guest_portal',
+        source: source ?? "guest_portal",
       });
     } else {
       await this.gate.revokeConsent(campgroundId, body.consentType, guest.id, body.sessionId);
@@ -367,22 +381,19 @@ export class AiController {
    * Provides AI-powered help with using Keepr
    */
   @UseGuards(JwtAuthGuard)
-  @Post('support/chat')
+  @Post("support/chat")
   @Throttle({ default: { limit: 30, ttl: 60000 } })
-  async supportChat(
-    @Body() body: SupportChatDto,
-    @Req() req: Request,
-  ) {
+  async supportChat(@Body() body: SupportChatDto, @Req() req: Request) {
     await this.assertChatEnabled(SUPPORT_CHAT_FLAG_KEY);
     const userId = getUserId(req.user);
     if (!body?.sessionId) {
-      throw new BadRequestException('sessionId is required');
+      throw new BadRequestException("sessionId is required");
     }
     if (!body?.message || body.message.trim().length === 0) {
-      throw new BadRequestException('Message is required');
+      throw new BadRequestException("Message is required");
     }
     if (body.message.length > 4000) {
-      throw new BadRequestException('Message is too long');
+      throw new BadRequestException("Message is too long");
     }
     const history = Array.isArray(body.history) ? body.history.slice(-12) : undefined;
 
@@ -395,7 +406,7 @@ export class AiController {
         userId,
       });
     } catch (error) {
-      this.logger.error('Support chat error:', error instanceof Error ? error.stack : error);
+      this.logger.error("Support chat error:", error instanceof Error ? error.stack : error);
       // Return graceful fallback
       return {
         message:
@@ -418,15 +429,15 @@ export class AiController {
    * Handles AI actions like pricing recommendations, weather, maintenance, etc.
    */
   @UseGuards(JwtAuthGuard)
-  @Post('copilot')
+  @Post("copilot")
   async copilot(@Body() body: CopilotActionDto) {
     try {
       return await this.aiService.copilot(body);
     } catch (error) {
-      this.logger.error('Copilot error:', error instanceof Error ? error.stack : error);
+      this.logger.error("Copilot error:", error instanceof Error ? error.stack : error);
       return {
         action: body.action,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         generatedAt: new Date().toISOString(),
       };
     }
@@ -436,9 +447,9 @@ export class AiController {
    * Authenticated AI partner endpoint for staff/admin
    */
   @UseGuards(JwtAuthGuard)
-  @Post('campgrounds/:campgroundId/partner')
+  @Post("campgrounds/:campgroundId/partner")
   async partnerChat(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: PartnerChatDto,
     @Req() req: Request,
   ) {
@@ -453,19 +464,19 @@ export class AiController {
         user,
       });
     } catch (error) {
-      this.logger.error('AI partner chat error:', error instanceof Error ? error.stack : error);
+      this.logger.error("AI partner chat error:", error instanceof Error ? error.stack : error);
       return {
-        mode: 'staff',
+        mode: "staff",
         message: "I'm having trouble completing that request right now.",
-        denials: [{ reason: error instanceof Error ? error.message : 'Unknown error' }],
+        denials: [{ reason: error instanceof Error ? error.message : "Unknown error" }],
       };
     }
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('campgrounds/:campgroundId/partner/confirm')
+  @Post("campgrounds/:campgroundId/partner/confirm")
   async partnerConfirm(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: PartnerConfirmDto,
     @Req() req: Request,
   ) {
@@ -478,18 +489,18 @@ export class AiController {
         user,
       });
     } catch (error) {
-      this.logger.error('AI partner confirm error:', error instanceof Error ? error.stack : error);
+      this.logger.error("AI partner confirm error:", error instanceof Error ? error.stack : error);
       return {
-        mode: 'staff',
+        mode: "staff",
         message: "I'm having trouble confirming that request right now.",
-        denials: [{ reason: error instanceof Error ? error.message : 'Unknown error' }],
+        denials: [{ reason: error instanceof Error ? error.message : "Unknown error" }],
       };
     }
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('campgrounds/:campgroundId/settings')
-  async getAiSettings(@Param('campgroundId') campgroundId: string, @Req() req: Request) {
+  @Get("campgrounds/:campgroundId/settings")
+  async getAiSettings(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
 
     const campground = await this.prisma.campground.findUnique({
@@ -514,26 +525,26 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return {
       ...campground,
-      aiApiKey: campground.aiApiKey ? '••••••••' : null,
+      aiApiKey: campground.aiApiKey ? "••••••••" : null,
       hasCustomApiKey: !!campground.aiApiKey,
-      aiProvider: 'openai',
+      aiProvider: "openai",
     };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Patch('campgrounds/:campgroundId/settings')
+  @Patch("campgrounds/:campgroundId/settings")
   async updateAiSettings(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: UpdateAiSettingsDto,
     @Req() req: Request,
   ) {
@@ -545,24 +556,29 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     const updateData: Record<string, unknown> = {};
 
-    if (typeof body.aiEnabled === 'boolean') updateData.aiEnabled = body.aiEnabled;
-    if (typeof body.aiReplyAssistEnabled === 'boolean') updateData.aiReplyAssistEnabled = body.aiReplyAssistEnabled;
-    if (typeof body.aiBookingAssistEnabled === 'boolean') updateData.aiBookingAssistEnabled = body.aiBookingAssistEnabled;
-    if (typeof body.aiAnalyticsEnabled === 'boolean') updateData.aiAnalyticsEnabled = body.aiAnalyticsEnabled;
-    if (typeof body.aiForecastingEnabled === 'boolean') updateData.aiForecastingEnabled = body.aiForecastingEnabled;
+    if (typeof body.aiEnabled === "boolean") updateData.aiEnabled = body.aiEnabled;
+    if (typeof body.aiReplyAssistEnabled === "boolean")
+      updateData.aiReplyAssistEnabled = body.aiReplyAssistEnabled;
+    if (typeof body.aiBookingAssistEnabled === "boolean")
+      updateData.aiBookingAssistEnabled = body.aiBookingAssistEnabled;
+    if (typeof body.aiAnalyticsEnabled === "boolean")
+      updateData.aiAnalyticsEnabled = body.aiAnalyticsEnabled;
+    if (typeof body.aiForecastingEnabled === "boolean")
+      updateData.aiForecastingEnabled = body.aiForecastingEnabled;
     if (body.aiAnonymizationLevel) updateData.aiAnonymizationLevel = body.aiAnonymizationLevel;
-    updateData.aiProvider = 'openai';
+    updateData.aiProvider = "openai";
     if (body.aiApiKey !== undefined) updateData.aiApiKey = body.aiApiKey;
-    if (body.aiMonthlyBudgetCents !== undefined) updateData.aiMonthlyBudgetCents = body.aiMonthlyBudgetCents;
+    if (body.aiMonthlyBudgetCents !== undefined)
+      updateData.aiMonthlyBudgetCents = body.aiMonthlyBudgetCents;
 
     if (body.aiEnabled && !campground) {
       updateData.aiConsentCollected = true;
@@ -589,11 +605,8 @@ export class AiController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('campgrounds/:campgroundId/usage')
-  async getAiUsage(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/usage")
+  async getAiUsage(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
 
     const campground = await this.prisma.campground.findUnique({
@@ -602,11 +615,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.gate.getUsageStats(campgroundId, 30);
@@ -619,11 +632,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Get('campgrounds/:campgroundId/sentiment')
-  async getSentimentStats(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/sentiment")
+  async getSentimentStats(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
 
     const campground = await this.prisma.campground.findUnique({
@@ -632,11 +642,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.sentimentService.getSentimentStats(campgroundId);
@@ -647,11 +657,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Get('campgrounds/:campgroundId/sentiment/range')
-  async getSentimentStatsRange(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/sentiment/range")
+  async getSentimentStatsRange(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
     const query = req.query || {};
     const startDateValue = getQueryString(query.startDate);
@@ -665,11 +672,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.sentimentService.getSentimentStats(campgroundId, { startDate, endDate });
@@ -680,10 +687,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('communications/:communicationId/analyze-sentiment')
-  async analyzeCommunicationSentiment(
-    @Param('communicationId') communicationId: string,
-  ) {
+  @Post("communications/:communicationId/analyze-sentiment")
+  async analyzeCommunicationSentiment(@Param("communicationId") communicationId: string) {
     return this.sentimentService.analyzeCommunication(communicationId);
   }
 
@@ -694,11 +699,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Get('campgrounds/:campgroundId/briefing')
-  async getMorningBriefing(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/briefing")
+  async getMorningBriefing(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
 
     const campground = await this.prisma.campground.findUnique({
@@ -707,11 +709,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.morningBriefingService.getBriefingForApi(campgroundId);
@@ -722,11 +724,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/briefing/send')
-  async sendMorningBriefing(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Post("campgrounds/:campgroundId/briefing/send")
+  async sendMorningBriefing(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
 
     const campground = await this.prisma.campground.findUnique({
@@ -735,11 +734,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.morningBriefingService.sendBriefingEmail(campgroundId);
@@ -752,9 +751,9 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
-  @Post('campgrounds/:campgroundId/reports/parse')
+  @Post("campgrounds/:campgroundId/reports/parse")
   async parseReportQuery(
-    @Param('campgroundId') campgroundId: string,
+    @Param("campgroundId") campgroundId: string,
     @Body() body: { query: string },
     @Req() req: Request,
   ) {
@@ -775,11 +774,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.reportQueryService.parseQuery(campgroundId, body.query, userId);
@@ -790,10 +789,11 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
-  @Post('campgrounds/:campgroundId/reports/narrative')
+  @Post("campgrounds/:campgroundId/reports/narrative")
   async generateReportNarrative(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       reportName: string;
       rows: Record<string, unknown>[];
       metrics: string[];
@@ -819,11 +819,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.reportQueryService.generateNarrative(
@@ -835,7 +835,7 @@ export class AiController {
         dimensions: body.dimensions,
         timeRange: body.timeRange,
       },
-      userId
+      userId,
     );
   }
 
@@ -843,14 +843,11 @@ export class AiController {
    * Get suggested report queries
    */
   @UseGuards(JwtAuthGuard)
-  @Get('campgrounds/:campgroundId/reports/suggestions')
-  async getReportSuggestions(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/reports/suggestions")
+  async getReportSuggestions(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
     const query = req.query || {};
-    const category = typeof query.category === 'string' ? query.category : undefined;
+    const category = typeof query.category === "string" ? query.category : undefined;
 
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
@@ -858,11 +855,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return {
@@ -878,10 +875,11 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/campaigns/subject-lines')
+  @Post("campgrounds/:campgroundId/campaigns/subject-lines")
   async generateSubjectLines(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       campaignType: string;
       targetAudience?: string;
       promotion?: string;
@@ -899,11 +897,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.campaignService.generateSubjectLines(
@@ -916,7 +914,7 @@ export class AiController {
         campgroundName: campground.name,
         previousSubject: body.previousSubject,
       },
-      body.count
+      body.count,
     );
   }
 
@@ -925,10 +923,11 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/campaigns/content')
+  @Post("campgrounds/:campgroundId/campaigns/content")
   async generateCampaignContent(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       campaignType: string;
       subject: string;
       targetAudience?: string;
@@ -945,11 +944,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.campaignService.generateContent(campgroundId, {
@@ -967,10 +966,11 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/campaigns/send-times')
+  @Post("campgrounds/:campgroundId/campaigns/send-times")
   async suggestSendTimes(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       campaignType: string;
       targetAudience?: string;
     },
@@ -984,17 +984,17 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.campaignService.suggestSendTimes(
       campgroundId,
       body.campaignType,
-      body.targetAudience
+      body.targetAudience,
     );
   }
 
@@ -1003,13 +1003,14 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/campaigns/improve')
+  @Post("campgrounds/:campgroundId/campaigns/improve")
   async improveContent(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       subject?: string;
       body?: string;
-      goal: 'clarity' | 'urgency' | 'warmth' | 'brevity' | 'persuasion';
+      goal: "clarity" | "urgency" | "warmth" | "brevity" | "persuasion";
     },
     @Req() req: Request,
   ) {
@@ -1021,17 +1022,17 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.campaignService.improveContent(
       campgroundId,
       { subject: body.subject, body: body.body },
-      body.goal
+      body.goal,
     );
   }
 
@@ -1040,13 +1041,14 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager)
-  @Post('campgrounds/:campgroundId/campaigns/ab-test')
+  @Post("campgrounds/:campgroundId/campaigns/ab-test")
   async generateAbTest(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       subject: string;
       body?: string;
-      testElement: 'subject' | 'cta' | 'opening';
+      testElement: "subject" | "cta" | "opening";
     },
     @Req() req: Request,
   ) {
@@ -1058,17 +1060,17 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.campaignService.generateAbTest(
       campgroundId,
       { subject: body.subject, body: body.body },
-      body.testElement
+      body.testElement,
     );
   }
 
@@ -1079,17 +1081,18 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Post('campgrounds/:campgroundId/compose/complete')
+  @Post("campgrounds/:campgroundId/compose/complete")
   async getInlineCompletion(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       text: string;
       cursorPosition: number;
-      recipientType: 'guest' | 'staff' | 'vendor';
-      messageType: 'email' | 'sms' | 'internal';
+      recipientType: "guest" | "staff" | "vendor";
+      messageType: "email" | "sms" | "internal";
       conversationId?: string;
       guestName?: string;
-      priorMessages?: Array<{ role: 'guest' | 'staff'; content: string }>;
+      priorMessages?: Array<{ role: "guest" | "staff"; content: string }>;
     },
     @Req() req: Request,
   ) {
@@ -1106,11 +1109,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.smartComposeService.getInlineCompletion(
@@ -1124,7 +1127,7 @@ export class AiController {
       },
       body.text,
       body.cursorPosition,
-      userId
+      userId,
     );
   }
 
@@ -1133,13 +1136,14 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Post('campgrounds/:campgroundId/compose/check')
+  @Post("campgrounds/:campgroundId/compose/check")
   async checkGrammarAndTone(
-    @Param('campgroundId') campgroundId: string,
-    @Body() body: {
+    @Param("campgroundId") campgroundId: string,
+    @Body()
+    body: {
       text: string;
-      recipientType: 'guest' | 'staff' | 'vendor';
-      messageType: 'email' | 'sms' | 'internal';
+      recipientType: "guest" | "staff" | "vendor";
+      messageType: "email" | "sms" | "internal";
     },
     @Req() req: Request,
   ) {
@@ -1156,11 +1160,11 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.smartComposeService.checkGrammarAndTone(
@@ -1170,7 +1174,7 @@ export class AiController {
         messageType: body.messageType,
       },
       body.text,
-      userId
+      userId,
     );
   }
 
@@ -1179,11 +1183,8 @@ export class AiController {
    */
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  @Get('campgrounds/:campgroundId/compose/quick-replies')
-  async getQuickReplies(
-    @Param('campgroundId') campgroundId: string,
-    @Req() req: Request,
-  ) {
+  @Get("campgrounds/:campgroundId/compose/quick-replies")
+  async getQuickReplies(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const org = getOrganizationId(req);
     const userId = getUserId(req.user);
 
@@ -1197,20 +1198,20 @@ export class AiController {
     });
 
     if (!campground) {
-      throw new ForbiddenException('Campground not found');
+      throw new ForbiddenException("Campground not found");
     }
 
     if (org && campground.organizationId !== org) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException("Access denied");
     }
 
     return this.smartComposeService.getQuickReplies(
       {
         campgroundId,
-        recipientType: 'guest',
-        messageType: 'email',
+        recipientType: "guest",
+        messageType: "email",
       },
-      userId
+      userId,
     );
   }
 
@@ -1221,16 +1222,16 @@ export class AiController {
     });
 
     if (!reservation) {
-      throw new ForbiddenException('You do not have access to this campground');
+      throw new ForbiddenException("You do not have access to this campground");
     }
   }
 
   private getIpHash(req: Request): string | undefined {
-    const forwarded = req.headers['x-forwarded-for'];
+    const forwarded = req.headers["x-forwarded-for"];
     const raw = Array.isArray(forwarded)
       ? forwarded[0]
-      : typeof forwarded === 'string'
-        ? forwarded.split(',')[0].trim()
+      : typeof forwarded === "string"
+        ? forwarded.split(",")[0].trim()
         : req.ip;
     return raw ? this.privacy.hashIp(raw) : undefined;
   }

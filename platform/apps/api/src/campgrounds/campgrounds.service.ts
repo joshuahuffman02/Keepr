@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, NotFoundException, ForbiddenException, BadRequestException, Logger } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+  BadRequestException,
+  Logger,
+} from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCampgroundDto } from "./dto/create-campground.dto";
 import * as bcrypt from "bcryptjs";
@@ -50,9 +57,7 @@ type ReviewSource = {
   weight: number | undefined;
 };
 
-const toReviewSources = (
-  value: unknown
-): ReviewSource[] | undefined => {
+const toReviewSources = (value: unknown): ReviewSource[] | undefined => {
   if (!Array.isArray(value)) return undefined;
   const sources = value
     .map((entry) => {
@@ -79,19 +84,21 @@ export class CampgroundsService {
     private readonly emailService: EmailService,
     private readonly audit: AuditService,
     private readonly assets: CampgroundAssetsService,
-    private readonly reviewConnectors: CampgroundReviewConnectors
-  ) { }
+    private readonly reviewConnectors: CampgroundReviewConnectors,
+  ) {}
 
   private readonly INVITE_RESEND_COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes
   private readonly EXTERNAL_ORG_NAME = "External Inventory";
   private readonly DEFAULT_SLA_MINUTES = Number(process.env.DEFAULT_SLA_MINUTES || 30);
 
   private slugifyName(name: string) {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "")
-      .slice(0, 64) || `camp-${randomBytes(3).toString("hex")}`;
+    return (
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 64) || `camp-${randomBytes(3).toString("hex")}`
+    );
   }
 
   private normalizeName(name?: string) {
@@ -135,7 +142,7 @@ export class CampgroundsService {
     backcountry: "Backcountry",
     cabin: "Cabins",
     reservation: "Reservations",
-    charge: "EV Charging"
+    charge: "EV Charging",
   };
 
   private extractAmenitiesFromTags(tags?: Record<string, unknown>): string[] {
@@ -183,7 +190,7 @@ export class CampgroundsService {
 
   private computeBlendedReviewScore(
     sources?: { source?: string; rating?: number; count?: number; weight?: number }[],
-    fallback?: number | null
+    fallback?: number | null,
   ): { score: number | null; count?: number } {
     if (!sources || sources.length === 0) {
       return { score: fallback ?? null };
@@ -200,11 +207,14 @@ export class CampgroundsService {
       if (src.count) totalCount += src.count;
     }
 
-    const score = totalWeight > 0 ? weightedSum / totalWeight : fallback ?? null;
+    const score = totalWeight > 0 ? weightedSum / totalWeight : (fallback ?? null);
     return { score, count: totalCount || undefined };
   }
 
-  async refreshExternalReviews(campgroundId: string, opts?: { googlePlaceId?: string; rvLifeId?: string }) {
+  async refreshExternalReviews(
+    campgroundId: string,
+    opts?: { googlePlaceId?: string; rvLifeId?: string },
+  ) {
     const cg = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
       select: {
@@ -213,19 +223,25 @@ export class CampgroundsService {
         dataSourceId: true,
         reviewScore: true,
         reviewCount: true,
-        reviewSources: true
-      }
+        reviewSources: true,
+      },
     });
     if (!cg) throw new NotFoundException("Campground not found");
 
     const reviews = await this.reviewConnectors.collectExternalReviews({
-      googlePlaceId: opts?.googlePlaceId || (cg.dataSource === "google_places" ? cg.dataSourceId || undefined : undefined),
-      rvLifeId: opts?.rvLifeId
+      googlePlaceId:
+        opts?.googlePlaceId ||
+        (cg.dataSource === "google_places" ? cg.dataSourceId || undefined : undefined),
+      rvLifeId: opts?.rvLifeId,
     });
 
     const blended = this.computeBlendedReviewScore(
-      reviews.map((r) => ({ source: r.source, rating: r.rating ?? undefined, count: r.count ?? undefined })),
-      cg.reviewScore ? Number(cg.reviewScore) : null
+      reviews.map((r) => ({
+        source: r.source,
+        rating: r.rating ?? undefined,
+        count: r.count ?? undefined,
+      })),
+      cg.reviewScore ? Number(cg.reviewScore) : null,
     );
 
     return this.prisma.campground.update({
@@ -234,15 +250,15 @@ export class CampgroundsService {
         reviewScore: blended.score ?? cg.reviewScore ?? null,
         reviewCount: blended.count ?? cg.reviewCount ?? 0,
         reviewSources: reviews,
-        reviewsUpdatedAt: new Date()
-      }
+        reviewsUpdatedAt: new Date(),
+      },
     });
   }
 
   async mirrorCampgroundPhotos(campgroundId: string) {
     const cg = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { id: true, photos: true }
+      select: { id: true, photos: true },
     });
     if (!cg) throw new NotFoundException("Campground not found");
     if (!cg.photos || cg.photos.length === 0) return { updated: false, photos: [], meta: [] };
@@ -252,16 +268,25 @@ export class CampgroundsService {
       where: { id: cg.id },
       data: {
         photos,
-        photosMeta: meta ?? []
-      }
+        photosMeta: meta ?? [],
+      },
     });
     return { updated: true, photos: updated.photos, meta: updated.photosMeta };
   }
 
-  async updatePhotos(campgroundId: string, dto: UpdatePhotosDto, organizationId?: string, actorId?: string) {
-    const cg = await this.prisma.campground.findUnique({ where: { id: campgroundId }, select: { id: true, organizationId: true, photos: true } });
+  async updatePhotos(
+    campgroundId: string,
+    dto: UpdatePhotosDto,
+    organizationId?: string,
+    actorId?: string,
+  ) {
+    const cg = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { id: true, organizationId: true, photos: true },
+    });
     if (!cg) throw new NotFoundException("Campground not found");
-    if (organizationId && cg.organizationId !== organizationId) throw new ForbiddenException("Unauthorized");
+    if (organizationId && cg.organizationId !== organizationId)
+      throw new ForbiddenException("Unauthorized");
 
     const unique = Array.from(new Set(dto.photos.filter(Boolean)));
     if (unique.length === 0) throw new BadRequestException("At least one photo is required");
@@ -299,19 +324,27 @@ export class CampgroundsService {
     return updated;
   }
 
-  async updateFaqs(campgroundId: string, faqs: Array<{ id: string; question: string; answer: string; order: number }>, organizationId?: string) {
-    const cg = await this.prisma.campground.findUnique({ where: { id: campgroundId }, select: { id: true, organizationId: true, faqs: true } });
+  async updateFaqs(
+    campgroundId: string,
+    faqs: Array<{ id: string; question: string; answer: string; order: number }>,
+    organizationId?: string,
+  ) {
+    const cg = await this.prisma.campground.findUnique({
+      where: { id: campgroundId },
+      select: { id: true, organizationId: true, faqs: true },
+    });
     if (!cg) throw new NotFoundException("Campground not found");
-    if (organizationId && cg.organizationId !== organizationId) throw new ForbiddenException("Unauthorized");
+    if (organizationId && cg.organizationId !== organizationId)
+      throw new ForbiddenException("Unauthorized");
 
     // Validate and sanitize FAQs
     const sanitizedFaqs = faqs
-      .filter(faq => faq.question?.trim() && faq.answer?.trim())
+      .filter((faq) => faq.question?.trim() && faq.answer?.trim())
       .map((faq, idx) => ({
         id: faq.id || `faq-${Date.now()}-${idx}`,
         question: faq.question.trim(),
         answer: faq.answer.trim(),
-        order: faq.order ?? idx
+        order: faq.order ?? idx,
       }))
       .sort((a, b) => a.order - b.order);
 
@@ -328,18 +361,28 @@ export class CampgroundsService {
     if (process.env.EXTERNAL_ORG_ID) return process.env.EXTERNAL_ORG_ID;
 
     const existing = await this.prisma.organization.findFirst({
-      where: { name: this.EXTERNAL_ORG_NAME }
+      where: { name: this.EXTERNAL_ORG_NAME },
     });
     if (existing) return existing.id;
 
     const org = await this.prisma.organization.create({
-      data: { id: randomUUID(), name: this.EXTERNAL_ORG_NAME }
+      data: { id: randomUUID(), name: this.EXTERNAL_ORG_NAME },
     });
     return org.id;
   }
 
-  private async findNearbyCampground(name?: string, latitude?: number | null, longitude?: number | null) {
-    if (latitude === undefined || longitude === undefined || latitude === null || longitude === null) return null;
+  private async findNearbyCampground(
+    name?: string,
+    latitude?: number | null,
+    longitude?: number | null,
+  ) {
+    if (
+      latitude === undefined ||
+      longitude === undefined ||
+      latitude === null ||
+      longitude === null
+    )
+      return null;
     const lat = Number(latitude);
     const lon = Number(longitude);
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
@@ -348,16 +391,16 @@ export class CampgroundsService {
     const candidates = await this.prisma.campground.findMany({
       where: {
         latitude: { gte: lat - delta, lte: lat + delta },
-        longitude: { gte: lon - delta, lte: lon + delta }
+        longitude: { gte: lon - delta, lte: lon + delta },
       },
-      take: 10
+      take: 10,
     });
 
     if (!name) return candidates[0] || null;
     const scored = candidates
       .map((c) => ({
         campground: c,
-        score: this.nameSimilarity(name, c.name)
+        score: this.nameSimilarity(name, c.name),
       }))
       .sort((a, b) => b.score - a.score);
     return scored[0]?.score && scored[0].score >= 0.4 ? scored[0].campground : null;
@@ -412,9 +455,9 @@ export class CampgroundsService {
         CampgroundAward: {
           where: { awardType: "campground_of_year" },
           select: { year: true, npsScore: true },
-          orderBy: { year: "desc" }
-        }
-      }
+          orderBy: { year: "desc" },
+        },
+      },
     });
 
     // Date ranges for NPS comparison
@@ -428,24 +471,24 @@ export class CampgroundsService {
     const currentPeriodResponses = await this.prisma.npsResponse.findMany({
       where: {
         createdAt: { gte: sixMonthsAgo },
-        campgroundId: { in: campgrounds.map(c => c.id) }
+        campgroundId: { in: campgrounds.map((c) => c.id) },
       },
       select: {
         campgroundId: true,
-        score: true
-      }
+        score: true,
+      },
     });
 
     // Fetch NPS responses for previous period (6-12 months ago)
     const previousPeriodResponses = await this.prisma.npsResponse.findMany({
       where: {
         createdAt: { gte: twelveMonthsAgo, lt: sixMonthsAgo },
-        campgroundId: { in: campgrounds.map(c => c.id) }
+        campgroundId: { in: campgrounds.map((c) => c.id) },
       },
       select: {
         campgroundId: true,
-        score: true
-      }
+        score: true,
+      },
     });
 
     // Calculate NPS for current period
@@ -461,8 +504,8 @@ export class CampgroundsService {
 
     for (const [campgroundId, scores] of Object.entries(currentByCampground)) {
       if (scores.length >= 5) {
-        const promoters = scores.filter(s => s >= 9).length;
-        const detractors = scores.filter(s => s <= 6).length;
+        const promoters = scores.filter((s) => s >= 9).length;
+        const detractors = scores.filter((s) => s <= 6).length;
         const nps = Math.round(((promoters - detractors) / scores.length) * 100);
         currentNps[campgroundId] = { score: nps, responseCount: scores.length };
       }
@@ -481,8 +524,8 @@ export class CampgroundsService {
 
     for (const [campgroundId, scores] of Object.entries(previousByCampground)) {
       if (scores.length >= 5) {
-        const promoters = scores.filter(s => s >= 9).length;
-        const detractors = scores.filter(s => s <= 6).length;
+        const promoters = scores.filter((s) => s >= 9).length;
+        const detractors = scores.filter((s) => s <= 6).length;
         previousNps[campgroundId] = Math.round(((promoters - detractors) / scores.length) * 100);
       }
     }
@@ -502,9 +545,9 @@ export class CampgroundsService {
     npsImprovements.sort((a, b) => b.improvement - a.improvement);
     const risingStars = new Set(
       npsImprovements
-        .filter(item => item.improvement >= 10) // Must have improved by at least 10 points
+        .filter((item) => item.improvement >= 10) // Must have improved by at least 10 points
         .slice(0, 5) // Top 5 improvers
-        .map(item => item.id)
+        .map((item) => item.id),
     );
     const risingStarData: Record<string, number> = {};
     for (const item of npsImprovements) {
@@ -519,7 +562,17 @@ export class CampgroundsService {
       .sort((a, b) => b.score - a.score);
 
     const totalWithNps = npsScores.length;
-    const percentileRankings: Record<string, { rank: number; percentile: number; isTop1Percent: boolean; isTop5Percent: boolean; isTop10Percent: boolean; isTopCampground: boolean }> = {};
+    const percentileRankings: Record<
+      string,
+      {
+        rank: number;
+        percentile: number;
+        isTop1Percent: boolean;
+        isTop5Percent: boolean;
+        isTop10Percent: boolean;
+        isTopCampground: boolean;
+      }
+    > = {};
 
     npsScores.forEach((item, index) => {
       const rank = index + 1;
@@ -530,21 +583,21 @@ export class CampgroundsService {
         isTopCampground: rank === 1,
         isTop1Percent: percentile >= 99,
         isTop5Percent: percentile >= 95,
-        isTop10Percent: percentile >= 90
+        isTop10Percent: percentile >= 90,
       };
     });
 
     // Combine data
-    return campgrounds.map(cg => {
+    return campgrounds.map((cg) => {
       const nps = currentNps[cg.id];
       const ranking = percentileRankings[cg.id];
       const isRisingStar = risingStars.has(cg.id);
       const npsImprovement = risingStarData[cg.id] ?? null;
 
       // Get past Campground of the Year awards
-      const pastAwards = cg.CampgroundAward
-        .filter(a => a.year < new Date().getFullYear())
-        .map(a => ({ year: a.year, npsScore: a.npsScore }));
+      const pastAwards = cg.CampgroundAward.filter((a) => a.year < new Date().getFullYear()).map(
+        (a) => ({ year: a.year, npsScore: a.npsScore }),
+      );
 
       return {
         ...cg,
@@ -560,13 +613,15 @@ export class CampgroundsService {
         isTop5PercentNps: ranking?.isTop5Percent ?? false,
         isTop10PercentNps: ranking?.isTop10Percent ?? false,
         isRisingStar,
-        pastCampgroundOfYearAwards: pastAwards
+        pastCampgroundOfYearAwards: pastAwards,
       };
     });
   }
 
   findOne(id: string, orgId?: string) {
-    return this.prisma.campground.findFirst({ where: { id, ...(orgId ? { organizationId: orgId } : {}) } });
+    return this.prisma.campground.findFirst({
+      where: { id, ...(orgId ? { organizationId: orgId } : {}) },
+    });
   }
 
   async updateSlaMinutes(id: string, slaMinutes: number, orgId?: string) {
@@ -576,7 +631,7 @@ export class CampgroundsService {
     await this.assertCampgroundScoped(id, orgId);
     return this.prisma.campground.update({
       where: { id },
-      data: { slaMinutes }
+      data: { slaMinutes },
     });
   }
 
@@ -592,7 +647,12 @@ export class CampgroundsService {
   private evaluateSpf(txtRecords: string[]) {
     const spf = txtRecords.find((t) => t.toLowerCase().startsWith("v=spf1"));
     if (!spf) return { status: "fail", record: null };
-    if (spf.includes("-all") || spf.includes("~all") || spf.includes("?all") || spf.includes("+all")) {
+    if (
+      spf.includes("-all") ||
+      spf.includes("~all") ||
+      spf.includes("?all") ||
+      spf.includes("+all")
+    ) {
       return { status: "pass", record: spf };
     }
     return { status: "unknown", record: spf };
@@ -621,22 +681,27 @@ export class CampgroundsService {
         senderDomainStatus: status,
         senderDomainCheckedAt: new Date(),
         senderDomainSpf: spf.record,
-        senderDomainDmarc: dmarc.record
-      }
+        senderDomainDmarc: dmarc.record,
+      },
     });
 
     return {
       status,
       spf,
       dmarc,
-      checkedAt: updated.senderDomainCheckedAt
+      checkedAt: updated.senderDomainCheckedAt,
     };
   }
 
   async updateOpsSettings(
     id: string,
-    data: { quietHoursStart?: string | null; quietHoursEnd?: string | null; routingAssigneeId?: string | null; officeClosesAt?: string | null },
-    orgId?: string
+    data: {
+      quietHoursStart?: string | null;
+      quietHoursEnd?: string | null;
+      routingAssigneeId?: string | null;
+      officeClosesAt?: string | null;
+    },
+    orgId?: string,
   ) {
     await this.assertCampgroundScoped(id, orgId);
     return this.prisma.campground.update({
@@ -645,8 +710,8 @@ export class CampgroundsService {
         quietHoursStart: data.quietHoursStart ?? null,
         quietHoursEnd: data.quietHoursEnd ?? null,
         routingAssigneeId: data.routingAssigneeId ?? null,
-        officeClosesAt: data.officeClosesAt ?? undefined
-      }
+        officeClosesAt: data.officeClosesAt ?? undefined,
+      },
     });
   }
 
@@ -668,8 +733,8 @@ export class CampgroundsService {
       where: { id },
       data: {
         ...(open !== undefined ? { storeOpenHour: open } : {}),
-        ...(close !== undefined ? { storeCloseHour: close } : {})
-      }
+        ...(close !== undefined ? { storeCloseHour: close } : {}),
+      },
     });
   }
 
@@ -678,14 +743,14 @@ export class CampgroundsService {
     if (!cg) throw new NotFoundException("Campground not found");
     return this.prisma.campground.update({
       where: { id },
-      data: { orderWebhookUrl: orderWebhookUrl || null }
+      data: { orderWebhookUrl: orderWebhookUrl || null },
     });
   }
 
   async updateAnalytics(
     id: string,
     data: { gaMeasurementId?: string | null; metaPixelId?: string | null },
-    orgId?: string
+    orgId?: string,
   ) {
     const cg = await this.findOne(id, orgId);
     if (!cg) throw new NotFoundException("Campground not found");
@@ -693,15 +758,20 @@ export class CampgroundsService {
       where: { id },
       data: {
         gaMeasurementId: data.gaMeasurementId ?? null,
-        metaPixelId: data.metaPixelId ?? null
-      }
+        metaPixelId: data.metaPixelId ?? null,
+      },
     });
   }
 
   async updateNpsSettings(
     id: string,
-    data: { npsAutoSendEnabled?: boolean; npsSendHour?: number | null; npsTemplateId?: string | null; npsSchedule?: unknown },
-    orgId?: string
+    data: {
+      npsAutoSendEnabled?: boolean;
+      npsSendHour?: number | null;
+      npsTemplateId?: string | null;
+      npsSchedule?: unknown;
+    },
+    orgId?: string,
   ) {
     const cg = await this.findOne(id, orgId);
     if (!cg) throw new NotFoundException("Campground not found");
@@ -714,11 +784,13 @@ export class CampgroundsService {
     return this.prisma.campground.update({
       where: { id },
       data: {
-        ...(data.npsAutoSendEnabled !== undefined ? { npsAutoSendEnabled: data.npsAutoSendEnabled } : {}),
+        ...(data.npsAutoSendEnabled !== undefined
+          ? { npsAutoSendEnabled: data.npsAutoSendEnabled }
+          : {}),
         ...(data.npsSendHour !== undefined ? { npsSendHour: data.npsSendHour } : {}),
         ...(data.npsTemplateId !== undefined ? { npsTemplateId: data.npsTemplateId } : {}),
-        ...(data.npsSchedule !== undefined ? { npsSchedule } : {})
-      }
+        ...(data.npsSchedule !== undefined ? { npsSchedule } : {}),
+      },
     });
   }
 
@@ -731,7 +803,7 @@ export class CampgroundsService {
       twilioFromNumber?: string | null;
       smsWelcomeMessage?: string | null;
     },
-    orgId?: string
+    orgId?: string,
   ) {
     const cg = await this.findOne(id, orgId);
     if (!cg) throw new NotFoundException("Campground not found");
@@ -743,7 +815,9 @@ export class CampgroundsService {
         ...(data.twilioAccountSid !== undefined ? { twilioAccountSid: data.twilioAccountSid } : {}),
         ...(data.twilioAuthToken !== undefined ? { twilioAuthToken: data.twilioAuthToken } : {}),
         ...(data.twilioFromNumber !== undefined ? { twilioFromNumber: data.twilioFromNumber } : {}),
-        ...(data.smsWelcomeMessage !== undefined ? { smsWelcomeMessage: data.smsWelcomeMessage } : {}),
+        ...(data.smsWelcomeMessage !== undefined
+          ? { smsWelcomeMessage: data.smsWelcomeMessage }
+          : {}),
       },
       select: {
         id: true,
@@ -752,7 +826,7 @@ export class CampgroundsService {
         // Don't return the auth token for security
         twilioFromNumber: true,
         smsWelcomeMessage: true,
-      }
+      },
     });
   }
 
@@ -770,7 +844,7 @@ export class CampgroundsService {
         smsWelcomeMessage: true,
         // Include whether auth token is set (but not the token itself)
         twilioAuthToken: true,
-      }
+      },
     });
 
     return {
@@ -788,22 +862,22 @@ export class CampgroundsService {
       include: {
         SiteClass: {
           where: { isActive: true },
-          orderBy: { defaultRate: "asc" }
+          orderBy: { defaultRate: "asc" },
         },
         Event: {
           where: {
             isPublished: true,
             isCancelled: false,
-            startDate: { gte: new Date() }
+            startDate: { gte: new Date() },
           },
           orderBy: { startDate: "asc" },
-          take: 10
+          take: 10,
         },
         Promotion: {
           where: { isActive: true },
-          orderBy: { createdAt: "desc" }
-        }
-      }
+          orderBy: { createdAt: "desc" },
+        },
+      },
     });
     if (!campground) return null;
     const { SiteClass, Event, Promotion, ...rest } = campground;
@@ -814,25 +888,25 @@ export class CampgroundsService {
       promotions: Promotion,
       SiteClass: undefined,
       Event: undefined,
-      Promotion: undefined
+      Promotion: undefined,
     };
   }
 
   async findPublicSite(slug: string, code: string) {
     const campground = await this.prisma.campground.findUnique({
       where: { slug },
-      select: { id: true }
+      select: { id: true },
     });
     if (!campground) return null;
 
     const site = await this.prisma.site.findFirst({
       where: {
         campgroundId: campground.id,
-        name: { equals: code, mode: "insensitive" } // Flexible matching
+        name: { equals: code, mode: "insensitive" }, // Flexible matching
       },
       include: {
-        SiteClass: true
-      }
+        SiteClass: true,
+      },
     });
 
     if (!site) return null;
@@ -840,7 +914,7 @@ export class CampgroundsService {
     const normalizedSite = {
       ...restSite,
       siteClass: SiteClass,
-      SiteClass: undefined
+      SiteClass: undefined,
     };
 
     const now = new Date();
@@ -849,15 +923,15 @@ export class CampgroundsService {
         siteId: site.id,
         status: { not: "cancelled" }, // Assuming string based status or enum mapping
         arrivalDate: { lte: now },
-        departureDate: { gt: now }
+        departureDate: { gt: now },
       },
-      select: { id: true, status: true, arrivalDate: true, departureDate: true, guestId: true }
+      select: { id: true, status: true, arrivalDate: true, departureDate: true, guestId: true },
     });
 
     return {
       site: normalizedSite,
       status: activeReservation ? "occupied" : "available",
-      currentReservation: activeReservation
+      currentReservation: activeReservation,
     };
   }
 
@@ -890,8 +964,8 @@ export class CampgroundsService {
         externalUrl: rest?.externalUrl ?? null,
         nonBookableReason: rest?.nonBookableReason ?? null,
         reviewScore: reviewScore !== undefined ? Number(reviewScore) : null,
-        reviewCount: reviewCount !== undefined ? Number(reviewCount) : 0
-      }
+        reviewCount: reviewCount !== undefined ? Number(reviewCount) : 0,
+      },
     });
   }
 
@@ -924,11 +998,9 @@ export class CampgroundsService {
         : toJsonInput(reviewSourcesRaw);
     const now = new Date();
     const reviewSourcesForBlend = toReviewSources(payload.reviewSources ?? existing?.reviewSources);
-    const fallbackScore = payload.reviewScore ?? (existing?.reviewScore ? Number(existing.reviewScore) : undefined);
-    const blended = this.computeBlendedReviewScore(
-      reviewSourcesForBlend,
-      fallbackScore ?? null
-    );
+    const fallbackScore =
+      payload.reviewScore ?? (existing?.reviewScore ? Number(existing.reviewScore) : undefined);
+    const blended = this.computeBlendedReviewScore(reviewSourcesForBlend, fallbackScore ?? null);
 
     const photosMetaRaw = payload.photosMeta ?? existing?.photosMeta;
     const photosMeta =
@@ -940,7 +1012,7 @@ export class CampgroundsService {
     const provenance = toJsonInput({
       ...provenanceBase,
       lastIngestSource: payload.dataSource ?? existing?.dataSource ?? "osm",
-      lastIngestedAt: now.toISOString()
+      lastIngestedAt: now.toISOString(),
     });
 
     const data = {
@@ -962,7 +1034,8 @@ export class CampgroundsService {
       externalUrl: payload.externalUrl ?? payload.website ?? existing?.externalUrl,
       isExternal: true,
       isBookable: payload.isBookable ?? false,
-      nonBookableReason: payload.nonBookableReason ?? existing?.nonBookableReason ?? "View-only listing",
+      nonBookableReason:
+        payload.nonBookableReason ?? existing?.nonBookableReason ?? "View-only listing",
       isPublished: payload.isPublished ?? true,
       dataSource: payload.dataSource ?? existing?.dataSource ?? "osm",
       dataSourceId: payload.dataSourceId ?? existing?.dataSourceId,
@@ -981,22 +1054,22 @@ export class CampgroundsService {
         : existing?.reviewsUpdatedAt,
       importedAt: payload.dataSourceUpdatedAt
         ? new Date(payload.dataSourceUpdatedAt)
-        : existing?.importedAt ?? now,
-      provenance
+        : (existing?.importedAt ?? now),
+      provenance,
     };
 
     if (existing) {
       return this.prisma.campground.update({
         where: { id: existing.id },
-        data
+        data,
       });
     }
 
     return this.prisma.campground.create({
       data: {
         id: randomUUID(),
-        ...data
-      }
+        ...data,
+      },
     });
   }
 
@@ -1019,7 +1092,7 @@ export class CampgroundsService {
     const res = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: query
+      body: query,
     });
 
     if (!res.ok) {
@@ -1044,7 +1117,8 @@ export class CampgroundsService {
 
       const image = tagValue("image");
       await this.upsertExternalCampground({
-        name: tagValue("name") ?? tagValue("ref") ?? (idValue ? `Campground ${idValue}` : "Campground"),
+        name:
+          tagValue("name") ?? tagValue("ref") ?? (idValue ? `Campground ${idValue}` : "Campground"),
         slug: tagValue("slug"),
         latitude: lat,
         longitude: lon,
@@ -1062,7 +1136,7 @@ export class CampgroundsService {
         dataSourceId: `${type}:${idValue || String(el.id ?? "")}`,
         dataSourceUpdatedAt: tagValue("source:date"),
         isBookable: false,
-        isPublished: true
+        isPublished: true,
       });
       upserted++;
     }
@@ -1078,13 +1152,13 @@ export class CampgroundsService {
       this.prisma.campground.findFirst({
         where: { isExternal: true },
         orderBy: [{ importedAt: "desc" }, { dataSourceUpdatedAt: "desc" }],
-        select: { importedAt: true, dataSourceUpdatedAt: true }
+        select: { importedAt: true, dataSourceUpdatedAt: true },
       }),
       this.prisma.campground.groupBy({
         by: ["dataSource"],
         where: { isExternal: true },
-        _count: { _all: true }
-      })
+        _count: { _all: true },
+      }),
     ]);
 
     return {
@@ -1093,7 +1167,7 @@ export class CampgroundsService {
       externalBookable: bookable,
       lastImportedAt: freshest?.importedAt ?? null,
       lastSourceUpdatedAt: freshest?.dataSourceUpdatedAt ?? null,
-      sources: sources.map((s) => ({ source: s.dataSource ?? "unknown", count: s._count._all }))
+      sources: sources.map((s) => ({ source: s.dataSource ?? "unknown", count: s._count._all })),
     };
   }
 
@@ -1101,7 +1175,12 @@ export class CampgroundsService {
     return this.prisma.campground.delete({ where: { id } });
   }
 
-  async updateDepositRule(id: string, depositRule: string, depositPercentage?: number | null, depositConfig?: unknown) {
+  async updateDepositRule(
+    id: string,
+    depositRule: string,
+    depositPercentage?: number | null,
+    depositConfig?: unknown,
+  ) {
     const depositConfigValue =
       depositConfig === undefined
         ? undefined
@@ -1113,8 +1192,8 @@ export class CampgroundsService {
       data: {
         depositRule,
         depositPercentage: depositPercentage ?? null,
-        depositConfig: depositConfigValue
-      }
+        depositConfig: depositConfigValue,
+      },
     });
   }
 
@@ -1131,7 +1210,7 @@ export class CampgroundsService {
       receiptFooter?: string | null;
       brandingNote?: string | null;
     },
-    organizationId?: string
+    organizationId?: string,
   ) {
     await this.assertCampgroundScoped(id, organizationId);
     return this.prisma.campground.update({
@@ -1145,8 +1224,8 @@ export class CampgroundsService {
         brandFont: data.brandFont ?? null,
         emailHeader: data.emailHeader ?? null,
         receiptFooter: data.receiptFooter ?? null,
-        brandingNote: data.brandingNote ?? null
-      }
+        brandingNote: data.brandingNote ?? null,
+      },
     });
   }
 
@@ -1160,7 +1239,7 @@ export class CampgroundsService {
       cancellationFeePercent?: number | null;
       cancellationNotes?: string | null;
     },
-    organizationId?: string
+    organizationId?: string,
   ) {
     await this.assertCampgroundScoped(id, organizationId);
     return this.prisma.campground.update({
@@ -1171,8 +1250,8 @@ export class CampgroundsService {
         cancellationFeeType: data.cancellationFeeType ?? null,
         cancellationFeeFlatCents: data.cancellationFeeFlatCents ?? null,
         cancellationFeePercent: data.cancellationFeePercent ?? null,
-        cancellationNotes: data.cancellationNotes ?? null
-      }
+        cancellationNotes: data.cancellationNotes ?? null,
+      },
     });
   }
 
@@ -1185,7 +1264,7 @@ export class CampgroundsService {
       taxState?: number | null;
       taxLocal?: number | null;
     },
-    organizationId?: string
+    organizationId?: string,
   ) {
     await this.assertCampgroundScoped(id, organizationId);
     return this.prisma.campground.update({
@@ -1195,8 +1274,8 @@ export class CampgroundsService {
         taxId: data.taxId ?? null,
         taxIdName: data.taxIdName ?? "Tax ID",
         taxState: data.taxState ?? null,
-        taxLocal: data.taxLocal ?? null
-      }
+        taxLocal: data.taxLocal ?? null,
+      },
     });
   }
 
@@ -1204,15 +1283,17 @@ export class CampgroundsService {
     const memberships = await this.prisma.campgroundMembership.findMany({
       where: { campgroundId: id },
       include: {
-        User: { select: { id: true, firstName: true, lastName: true, email: true, isActive: true } }
+        User: {
+          select: { id: true, firstName: true, lastName: true, email: true, isActive: true },
+        },
       },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
 
     const userIds = memberships.map((m) => m.userId);
     const invites = await this.prisma.inviteToken.findMany({
       where: { campgroundId: id, userId: { in: userIds } },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
     const latestInviteByUser = new Map<string, (typeof invites)[number]>();
     for (const inv of invites) {
@@ -1230,7 +1311,7 @@ export class CampgroundsService {
         createdAt: m.createdAt,
         lastInviteSentAt: invite?.createdAt ?? null,
         lastInviteRedeemedAt: invite?.redeemedAt ?? null,
-        inviteExpiresAt: invite?.expiresAt ?? null
+        inviteExpiresAt: invite?.expiresAt ?? null,
       };
     });
   }
@@ -1240,8 +1321,8 @@ export class CampgroundsService {
       where: {
         campgroundId,
         role: UserRole.owner,
-        ...(excludeMembershipId ? { id: { not: excludeMembershipId } } : {})
-      }
+        ...(excludeMembershipId ? { id: { not: excludeMembershipId } } : {}),
+      },
     });
     if (ownerCount <= 0) {
       throw new ConflictException("At least one owner is required");
@@ -1261,7 +1342,7 @@ export class CampgroundsService {
   private async assertCampgroundScoped(campgroundId: string, organizationId?: string | null) {
     if (!organizationId) return;
     const found = await this.prisma.campground.findFirst({
-      where: { id: campgroundId, organizationId }
+      where: { id: campgroundId, organizationId },
     });
     if (!found) {
       throw new ForbiddenException("Campground not found in your organization");
@@ -1271,7 +1352,7 @@ export class CampgroundsService {
   async addMember(
     campgroundId: string,
     data: { email: string; firstName?: string; lastName?: string; role: UserRole },
-    actorId?: string
+    actorId?: string,
   ) {
     const email = data.email.toLowerCase().trim();
     const existingUser = await this.prisma.user.findUnique({ where: { email } });
@@ -1287,8 +1368,8 @@ export class CampgroundsService {
           passwordHash,
           firstName: data.firstName || "Pending",
           lastName: data.lastName || "User",
-          isActive: true
-        }
+          isActive: true,
+        },
       });
       userId = user.id;
     }
@@ -1302,9 +1383,9 @@ export class CampgroundsService {
       where: {
         userId_campgroundId: {
           userId: ensuredUserId,
-          campgroundId
-        }
-      }
+          campgroundId,
+        },
+      },
     });
 
     if (existingMembership) {
@@ -1312,12 +1393,12 @@ export class CampgroundsService {
     }
 
     const membership = await this.prisma.campgroundMembership.create({
-      data: { id: randomUUID(), userId: ensuredUserId, campgroundId, role: data.role }
+      data: { id: randomUUID(), userId: ensuredUserId, campgroundId, role: data.role },
     });
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, firstName: true, lastName: true, email: true, isActive: true }
+      select: { id: true, firstName: true, lastName: true, email: true, isActive: true },
     });
 
     // Create invite token for newly added users or inactive users
@@ -1330,8 +1411,8 @@ export class CampgroundsService {
           token: inviteToken,
           userId,
           campgroundId,
-          expiresAt: this.inviteExpiresAt()
-        }
+          expiresAt: this.inviteExpiresAt(),
+        },
       });
     }
 
@@ -1341,10 +1422,11 @@ export class CampgroundsService {
       const roleLabel = data.role.replace("_", " ");
       const baseUrl = process.env.FRONTEND_URL || "https://app.campreserv.com";
       const inviteUrl = inviteToken ? `${baseUrl}/invite?token=${inviteToken}` : `${baseUrl}/login`;
-      this.emailService.sendEmail({
-        to: user.email,
-        subject: `You've been added to a campground as ${roleLabel}`,
-        html: `
+      this.emailService
+        .sendEmail({
+          to: user.email,
+          subject: `You've been added to a campground as ${roleLabel}`,
+          html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #0f172a; margin-bottom: 12px;">Welcome, ${name}!</h2>
             <p style="color: #475569; line-height: 1.5;">
@@ -1362,18 +1444,21 @@ export class CampgroundsService {
               Tip: Save this email for your records.
             </div>
           </div>
-        `
-      }).catch((err) => {
-        // best-effort email; don't block - but log for debugging
-        this.logger.warn(`Failed to send invite email: ${err instanceof Error ? err.message : err}`);
-      });
+        `,
+        })
+        .catch((err) => {
+          // best-effort email; don't block - but log for debugging
+          this.logger.warn(
+            `Failed to send invite email: ${err instanceof Error ? err.message : err}`,
+          );
+        });
     }
 
     const result = {
       id: membership.id,
       role: membership.role,
       createdAt: membership.createdAt,
-      user
+      user,
     };
 
     // Audit
@@ -1383,7 +1468,7 @@ export class CampgroundsService {
       action: "member.added",
       entity: "campground_membership",
       entityId: membership.id,
-      after: { role: membership.role, userId: ensuredUserId }
+      after: { role: membership.role, userId: ensuredUserId },
     });
 
     return result;
@@ -1392,7 +1477,7 @@ export class CampgroundsService {
   async resendInvite(campgroundId: string, membershipId: string, actorId?: string) {
     const membership = await this.prisma.campgroundMembership.findFirst({
       where: { id: membershipId, campgroundId },
-      include: { User: true }
+      include: { User: true },
     });
     if (!membership) {
       throw new NotFoundException("Membership not found");
@@ -1400,7 +1485,7 @@ export class CampgroundsService {
     // Rate-limit resends
     const latestInvite = await this.prisma.inviteToken.findFirst({
       where: { campgroundId, userId: membership.userId },
-      orderBy: { createdAt: "desc" }
+      orderBy: { createdAt: "desc" },
     });
     const now = Date.now();
     if (latestInvite && !latestInvite.redeemedAt) {
@@ -1408,7 +1493,9 @@ export class CampgroundsService {
       if (now - createdMs < this.INVITE_RESEND_COOLDOWN_MS) {
         const waitMs = this.INVITE_RESEND_COOLDOWN_MS - (now - createdMs);
         const waitMinutes = Math.ceil(waitMs / 60000);
-        throw new ConflictException(`Please wait ${waitMinutes} minute(s) before resending another invite`);
+        throw new ConflictException(
+          `Please wait ${waitMinutes} minute(s) before resending another invite`,
+        );
       }
     }
 
@@ -1419,16 +1506,17 @@ export class CampgroundsService {
         token,
         userId: membership.userId,
         campgroundId,
-        expiresAt: this.inviteExpiresAt()
-      }
+        expiresAt: this.inviteExpiresAt(),
+      },
     });
 
     const baseUrl = process.env.FRONTEND_URL || "https://app.campreserv.com";
     const inviteUrl = `${baseUrl}/invite?token=${token}`;
-    this.emailService.sendEmail({
-      to: membership.User.email,
-      subject: "Your Keepr Host invite",
-      html: `
+    this.emailService
+      .sendEmail({
+        to: membership.User.email,
+        subject: "Your Keepr Host invite",
+        html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #0f172a; margin-bottom: 12px;">You're invited</h2>
           <p style="color: #475569; line-height: 1.5;">Use the button below to set your password and access the campground.</p>
@@ -1438,8 +1526,13 @@ export class CampgroundsService {
             </a>
           </div>
         </div>
-      `
-    }).catch((err) => this.logger.warn(`Failed to send invite email: ${err instanceof Error ? err.message : err}`));
+      `,
+      })
+      .catch((err) =>
+        this.logger.warn(
+          `Failed to send invite email: ${err instanceof Error ? err.message : err}`,
+        ),
+      );
 
     await this.audit.record({
       campgroundId,
@@ -1447,21 +1540,31 @@ export class CampgroundsService {
       action: "member.invite_resent",
       entity: "campground_membership",
       entityId: membershipId,
-      after: { userId: membership.userId }
+      after: { userId: membership.userId },
     });
 
     return { ok: true };
   }
 
-  async updateMemberRole(campgroundId: string, membershipId: string, role: UserRole, actorId?: string) {
+  async updateMemberRole(
+    campgroundId: string,
+    membershipId: string,
+    role: UserRole,
+    actorId?: string,
+  ) {
     const membership = await this.prisma.campgroundMembership.findFirst({
-      where: { id: membershipId, campgroundId }
+      where: { id: membershipId, campgroundId },
     });
     if (!membership) {
       throw new NotFoundException("Membership not found");
     }
 
-    if (actorId && membership.userId === actorId && membership.role === UserRole.owner && role !== UserRole.owner) {
+    if (
+      actorId &&
+      membership.userId === actorId &&
+      membership.role === UserRole.owner &&
+      role !== UserRole.owner
+    ) {
       throw new ConflictException("You cannot demote yourself as the last owner");
     }
 
@@ -1471,7 +1574,7 @@ export class CampgroundsService {
 
     const updated = await this.prisma.campgroundMembership.update({
       where: { id: membershipId },
-      data: { role }
+      data: { role },
     });
 
     await this.audit.record({
@@ -1481,7 +1584,7 @@ export class CampgroundsService {
       entity: "campground_membership",
       entityId: membershipId,
       before: { role: membership.role },
-      after: { role }
+      after: { role },
     });
 
     return updated;
@@ -1489,7 +1592,7 @@ export class CampgroundsService {
 
   async removeMember(campgroundId: string, membershipId: string, actorId?: string) {
     const membership = await this.prisma.campgroundMembership.findFirst({
-      where: { id: membershipId, campgroundId }
+      where: { id: membershipId, campgroundId },
     });
     if (!membership) {
       throw new NotFoundException("Membership not found");
@@ -1511,7 +1614,7 @@ export class CampgroundsService {
       action: "member.removed",
       entity: "campground_membership",
       entityId: membershipId,
-      before: { role: membership.role, userId: membership.userId }
+      before: { role: membership.role, userId: membership.userId },
     });
 
     return deleted;
@@ -1529,10 +1632,11 @@ export class CampgroundsService {
       adaVerifiedAt?: string | null;
       adaVerifiedBy?: string | null;
     },
-    organizationId?: string
+    organizationId?: string,
   ) {
     await this.assertCampgroundScoped(id, organizationId);
-    const adaAssessment = data.adaAssessment !== undefined ? toJsonInput(data.adaAssessment) : undefined;
+    const adaAssessment =
+      data.adaAssessment !== undefined ? toJsonInput(data.adaAssessment) : undefined;
     return this.prisma.campground.update({
       where: { id },
       data: {
@@ -1540,11 +1644,13 @@ export class CampgroundsService {
         adaCertificationLevel: data.adaCertificationLevel ?? undefined,
         adaAccessibleSiteCount: data.adaAccessibleSiteCount ?? undefined,
         adaTotalSiteCount: data.adaTotalSiteCount ?? undefined,
-        adaAssessmentUpdatedAt: data.adaAssessmentUpdatedAt ? new Date(data.adaAssessmentUpdatedAt) : undefined,
+        adaAssessmentUpdatedAt: data.adaAssessmentUpdatedAt
+          ? new Date(data.adaAssessmentUpdatedAt)
+          : undefined,
         adaVerified: data.adaVerified ?? undefined,
         adaVerifiedAt: data.adaVerifiedAt ? new Date(data.adaVerifiedAt) : undefined,
         adaVerifiedBy: data.adaVerifiedBy ?? undefined,
-      }
+      },
     });
   }
 
@@ -1560,22 +1666,25 @@ export class CampgroundsService {
       securityAuditorEmail?: string | null;
       securityAuditorOrg?: string | null;
     },
-    organizationId?: string
+    organizationId?: string,
   ) {
     await this.assertCampgroundScoped(id, organizationId);
-    const securityAssessment = data.securityAssessment !== undefined ? toJsonInput(data.securityAssessment) : undefined;
+    const securityAssessment =
+      data.securityAssessment !== undefined ? toJsonInput(data.securityAssessment) : undefined;
     return this.prisma.campground.update({
       where: { id },
       data: {
         securityAssessment,
         securityCertificationLevel: data.securityCertificationLevel ?? undefined,
-        securityAssessmentUpdatedAt: data.securityAssessmentUpdatedAt ? new Date(data.securityAssessmentUpdatedAt) : undefined,
+        securityAssessmentUpdatedAt: data.securityAssessmentUpdatedAt
+          ? new Date(data.securityAssessmentUpdatedAt)
+          : undefined,
         securityVerified: data.securityVerified ?? undefined,
         securityVerifiedAt: data.securityVerifiedAt ? new Date(data.securityVerifiedAt) : undefined,
         securityVerifiedBy: data.securityVerifiedBy ?? undefined,
         securityAuditorEmail: data.securityAuditorEmail ?? undefined,
         securityAuditorOrg: data.securityAuditorOrg ?? undefined,
-      }
+      },
     });
   }
 }

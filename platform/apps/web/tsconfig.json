@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2020"
-    ],
+    "lib": ["dom", "dom.iterable", "es2020"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -22,27 +18,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@keepr/sdk": [
-        "../../packages/sdk/src"
-      ],
-      "@keepr/sdk/*": [
-        "../../packages/sdk/src/*"
-      ],
-      "@keepr/shared": [
-        "../../packages/shared/dist"
-      ],
-      "@keepr/shared/*": [
-        "../../packages/shared/dist/*"
-      ]
+      "@/*": ["./*"],
+      "@keepr/sdk": ["../../packages/sdk/src"],
+      "@keepr/sdk/*": ["../../packages/sdk/src/*"],
+      "@keepr/shared": ["../../packages/shared/dist"],
+      "@keepr/shared/*": ["../../packages/shared/dist/*"]
     },
-    "types": [
-      "node",
-      "vitest/globals",
-      "@testing-library/jest-dom"
-    ],
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
     "plugins": [
       {
         "name": "next"
@@ -56,9 +38,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "vitest.config.ts",
-    "vitest.setup.ts"
-  ]
+  "exclude": ["node_modules", "vitest.config.ts", "vitest.setup.ts"]
 }

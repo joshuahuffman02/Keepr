@@ -44,18 +44,18 @@ Welcome to the Campreserv accessibility documentation. This README serves as the
 When creating a new component:
 
 ```tsx
-import { Badge, Button, FormField, IconButton } from "@/components/ui"
-import { useAccessibility } from "@/components/accessibility/AccessibilityProvider"
+import { Badge, Button, FormField, IconButton } from "@/components/ui";
+import { useAccessibility } from "@/components/accessibility/AccessibilityProvider";
 
 function MyComponent() {
-  const { announceMessage } = useAccessibility()
+  const { announceMessage } = useAccessibility();
 
   return (
     <article aria-labelledby="title">
       <h2 id="title">My Component</h2>
       {/* Use semantic HTML and accessible components */}
     </article>
-  )
+  );
 }
 ```
 
@@ -65,33 +65,31 @@ Import these for accessible patterns:
 
 ```tsx
 // Form inputs
-import { FormField } from "@/components/ui/form-field"
+import { FormField } from "@/components/ui/form-field";
 
 // Icon buttons
-import { IconButton } from "@/components/ui/icon-button"
+import { IconButton } from "@/components/ui/icon-button";
 
 // Loading states
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 // Screen reader only text
-import { VisuallyHidden } from "@/components/ui/visually-hidden"
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 // Announcements
-import { useAccessibility } from "@/components/accessibility/AccessibilityProvider"
+import { useAccessibility } from "@/components/accessibility/AccessibilityProvider";
 ```
 
 ### 3. Common Patterns
 
 **Icon-only button:**
+
 ```tsx
-<IconButton
-  ariaLabel="Delete item"
-  icon={<Trash className="h-4 w-4" />}
-  onClick={handleDelete}
-/>
+<IconButton ariaLabel="Delete item" icon={<Trash className="h-4 w-4" />} onClick={handleDelete} />
 ```
 
 **Status badge:**
+
 ```tsx
 <Badge variant="success" srText="Status: Active">
   Active
@@ -99,6 +97,7 @@ import { useAccessibility } from "@/components/accessibility/AccessibilityProvid
 ```
 
 **Form field:**
+
 ```tsx
 <FormField
   label="Email"
@@ -114,6 +113,7 @@ import { useAccessibility } from "@/components/accessibility/AccessibilityProvid
 ### What We've Achieved
 
 **Level A (Critical):**
+
 - 1.3.1 Info and Relationships
 - 1.4.1 Use of Color
 - 2.1.1 Keyboard
@@ -123,6 +123,7 @@ import { useAccessibility } from "@/components/accessibility/AccessibilityProvid
 - 4.1.2 Name, Role, Value
 
 **Level AA (Important):**
+
 - 1.4.3 Contrast (Minimum)
 - 2.4.7 Focus Visible
 - 3.3.3 Error Suggestion
@@ -231,9 +232,7 @@ Already added to `app/client-root.tsx`:
 Add to your main content area:
 
 ```tsx
-<main id="main-content">
-  {/* Your content */}
-</main>
+<main id="main-content">{/* Your content */}</main>
 ```
 
 ## Learning Path
@@ -280,18 +279,23 @@ Add to your main content area:
 ## Key Principles
 
 ### 1. Semantic HTML First
+
 Use the right HTML element for the job.
 
 ### 2. Keyboard Navigation
+
 All functionality must work with keyboard only.
 
 ### 3. Screen Reader Support
+
 Provide context and announcements.
 
 ### 4. Visual Clarity
+
 Sufficient contrast and visible focus indicators.
 
 ### 5. Progressive Enhancement
+
 Build accessible, then enhance.
 
 ## Contributing
@@ -335,12 +339,14 @@ For accessibility questions:
 ## Success Stories
 
 Before implementing these changes:
+
 - Keyboard users couldn't navigate efficiently
 - Screen readers missed important context
 - Status indicators relied on color alone
 - Forms lacked proper error announcements
 
 After implementing these changes:
+
 - [OK] Skip link for efficient keyboard navigation
 - [OK] Comprehensive screen reader support
 - [OK] Text-based status indicators

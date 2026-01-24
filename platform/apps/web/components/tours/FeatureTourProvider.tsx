@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  ReactNode
-} from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,15 +9,9 @@ import {
   markTourCompleted,
   getFirstLoginTours,
   type FeatureTour,
-  type TourStep
+  type TourStep,
 } from "@/lib/tours/feature-tours";
-import {
-  X,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  SkipForward
-} from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Sparkles, SkipForward } from "lucide-react";
 
 interface TourContextValue {
   isActive: boolean;
@@ -56,7 +43,7 @@ interface FeatureTourProviderProps {
 
 export function FeatureTourProvider({
   children,
-  autoStartFirstLogin = true
+  autoStartFirstLogin = true,
 }: FeatureTourProviderProps) {
   const [tour, setTour] = useState<FeatureTour | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -199,7 +186,7 @@ export function FeatureTourProvider({
     nextStep,
     prevStep,
     skipTour,
-    endTour
+    endTour,
   };
 
   // Calculate tooltip position
@@ -210,7 +197,7 @@ export function FeatureTourProvider({
       return {
         top: "50%",
         left: "50%",
-        transform: "translate(-50%, -50%)"
+        transform: "translate(-50%, -50%)",
       };
     }
 
@@ -222,28 +209,28 @@ export function FeatureTourProvider({
       case "top":
         return {
           top: highlightRect.top - tooltipHeight - padding,
-          left: highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2
+          left: highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2,
         };
       case "bottom":
         return {
           top: highlightRect.bottom + padding,
-          left: highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2
+          left: highlightRect.left + highlightRect.width / 2 - tooltipWidth / 2,
         };
       case "left":
         return {
           top: highlightRect.top + highlightRect.height / 2 - tooltipHeight / 2,
-          left: highlightRect.left - tooltipWidth - padding
+          left: highlightRect.left - tooltipWidth - padding,
         };
       case "right":
         return {
           top: highlightRect.top + highlightRect.height / 2 - tooltipHeight / 2,
-          left: highlightRect.right + padding
+          left: highlightRect.right + padding,
         };
       default:
         return {
           top: "50%",
           left: "50%",
-          transform: "translate(-50%, -50%)"
+          transform: "translate(-50%, -50%)",
         };
     }
   };
@@ -300,7 +287,7 @@ export function FeatureTourProvider({
                     top: highlightRect.top - 8,
                     left: highlightRect.left - 8,
                     width: highlightRect.width + 16,
-                    height: highlightRect.height + 16
+                    height: highlightRect.height + 16,
                   }}
                 />
               )}
@@ -336,9 +323,7 @@ export function FeatureTourProvider({
 
               {/* Content */}
               <div className="p-5">
-                <h3 className="text-lg font-bold text-foreground mb-2">
-                  {currentStep.title}
-                </h3>
+                <h3 className="text-lg font-bold text-foreground mb-2">{currentStep.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                   {currentStep.content}
                 </p>
@@ -372,8 +357,8 @@ export function FeatureTourProvider({
                           idx === currentStepIndex
                             ? "bg-emerald-500"
                             : idx < currentStepIndex
-                            ? "bg-emerald-200"
-                            : "bg-muted"
+                              ? "bg-emerald-200"
+                              : "bg-muted"
                         }`}
                       />
                     ))}
@@ -385,11 +370,7 @@ export function FeatureTourProvider({
                   {/* Navigation */}
                   <div className="flex items-center gap-2">
                     {currentStepIndex > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={prevStep}
-                      >
+                      <Button variant="ghost" size="sm" onClick={prevStep}>
                         <ChevronLeft className="h-4 w-4 mr-1" />
                         Back
                       </Button>

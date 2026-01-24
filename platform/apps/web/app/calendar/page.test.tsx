@@ -30,12 +30,12 @@ const apiClient = {
   getQuote: vi.fn(),
   updateReservation: vi.fn(),
   createHold: vi.fn(),
-  checkInReservation: vi.fn()
+  checkInReservation: vi.fn(),
 };
 
 vi.mock("@/lib/api-client", () => {
   return {
-    apiClient
+    apiClient,
   };
 });
 
@@ -67,7 +67,7 @@ const buildCampground = (overrides: Partial<CampgroundInput> = {}): CampgroundIn
   name: "Camp One",
   slug: "camp-one",
   depositRule: "percentage_50",
-  ...overrides
+  ...overrides,
 });
 
 const buildSite = (overrides: Partial<SiteInput> = {}): SiteInput => ({
@@ -77,7 +77,7 @@ const buildSite = (overrides: Partial<SiteInput> = {}): SiteInput => ({
   siteNumber: "1",
   siteType: "rv",
   maxOccupancy: 6,
-  ...overrides
+  ...overrides,
 });
 
 const buildGuest = (overrides: Partial<GuestInput> = {}): GuestInput => ({
@@ -85,7 +85,7 @@ const buildGuest = (overrides: Partial<GuestInput> = {}): GuestInput => ({
   primaryFirstName: "Guest",
   primaryLastName: "One",
   email: "guest@example.com",
-  ...overrides
+  ...overrides,
 });
 
 const buildReservation = (overrides: Partial<ReservationInput> = {}): ReservationInput => ({
@@ -99,7 +99,7 @@ const buildReservation = (overrides: Partial<ReservationInput> = {}): Reservatio
   status: "confirmed",
   totalAmount: 30000,
   guest: buildGuest(),
-  ...overrides
+  ...overrides,
 });
 
 const buildAvailabilitySite = (overrides: Partial<AvailabilitySite> = {}): AvailabilitySite => ({
@@ -107,7 +107,7 @@ const buildAvailabilitySite = (overrides: Partial<AvailabilitySite> = {}): Avail
   siteClassId: null,
   siteClass: null,
   isActive: true,
-  ...overrides
+  ...overrides,
 });
 
 const defaultQuote: QuoteInput = {
@@ -115,7 +115,7 @@ const defaultQuote: QuoteInput = {
   baseSubtotalCents: 20000,
   rulesDeltaCents: 0,
   totalCents: 22000,
-  perNightCents: 11000
+  perNightCents: 11000,
 };
 
 function createWrapper(initialData?: {
@@ -126,12 +126,13 @@ function createWrapper(initialData?: {
 }) {
   const qc = new QueryClient({
     defaultOptions: {
-      queries: { retry: false, staleTime: 0, gcTime: Infinity }
-    }
+      queries: { retry: false, staleTime: 0, gcTime: Infinity },
+    },
   });
   if (initialData?.campgrounds) qc.setQueryData(["campgrounds"], initialData.campgrounds);
   if (initialData?.sites) qc.setQueryData(["calendar-sites", "cg1"], initialData.sites);
-  if (initialData?.reservations) qc.setQueryData(["calendar-reservations", "cg1"], initialData.reservations);
+  if (initialData?.reservations)
+    qc.setQueryData(["calendar-reservations", "cg1"], initialData.reservations);
   if (initialData?.blackouts) qc.setQueryData(["calendar-blackouts", "cg1"], initialData.blackouts);
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -173,7 +174,10 @@ describe("CalendarPage", () => {
     expect(dayCells.length).toBeGreaterThan(3);
 
     // Select two nights (Jan 1 -> Jan 3 exclusive)
-    await user.pointer([{ keys: "[MouseLeft]", target: dayCells[0] }, { keys: "[/MouseLeft]", target: dayCells[2] }]);
+    await user.pointer([
+      { keys: "[MouseLeft]", target: dayCells[0] },
+      { keys: "[/MouseLeft]", target: dayCells[2] },
+    ]);
 
     // Quote panel should appear with totals
     await screen.findByText("Selection");
@@ -191,7 +195,7 @@ describe("CalendarPage", () => {
       siteId: "s1",
       arrivalDate: "2025-01-01",
       departureDate: "2025-01-03",
-      holdMinutes: 15
+      holdMinutes: 15,
     });
   });
 
@@ -201,8 +205,8 @@ describe("CalendarPage", () => {
         id: "r1",
         arrivalDate: "2025-01-03",
         departureDate: "2025-01-05",
-        guest: buildGuest({ primaryFirstName: "Guest", primaryLastName: "One" })
-      })
+        guest: buildGuest({ primaryFirstName: "Guest", primaryLastName: "One" }),
+      }),
     ]);
 
     const user = userEvent.setup();
@@ -216,7 +220,7 @@ describe("CalendarPage", () => {
     // Drag reservation start (Jan 3) to Jan 1 (earlier)
     await user.pointer([
       { keys: "[MouseLeft]", target: resPill },
-      { keys: "[/MouseLeft]", target: dayCells[0] }
+      { keys: "[/MouseLeft]", target: dayCells[0] },
     ]);
 
     await waitFor(() => {
@@ -225,7 +229,7 @@ describe("CalendarPage", () => {
     expect(apiClient.updateReservation).toHaveBeenCalledWith("r1", {
       siteId: "s1",
       arrivalDate: "2025-01-01",
-      departureDate: "2025-01-03"
+      departureDate: "2025-01-03",
     });
   });
 
@@ -234,8 +238,8 @@ describe("CalendarPage", () => {
       buildReservation({
         id: "r2",
         status: "checked_in",
-        guest: buildGuest({ primaryFirstName: "Guest", primaryLastName: "Two" })
-      })
+        guest: buildGuest({ primaryFirstName: "Guest", primaryLastName: "Two" }),
+      }),
     ]);
     const user = userEvent.setup();
     render(<CalendarPage />, { wrapper: createWrapper() });
@@ -247,7 +251,7 @@ describe("CalendarPage", () => {
 
     await user.pointer([
       { keys: "[MouseLeft]", target: resPill },
-      { keys: "[/MouseLeft]", target: dayCells[3] }
+      { keys: "[/MouseLeft]", target: dayCells[3] },
     ]);
 
     await screen.findByText(/Checked-in stays cannot be moved/i);
@@ -263,7 +267,10 @@ describe("CalendarPage", () => {
     const siteRow = screen.getByText("Site One").closest("div")!.parentElement!.parentElement!;
     const dayCells = siteRow.querySelectorAll(".h-12");
 
-    await user.pointer([{ keys: "[MouseLeft]", target: dayCells[0] }, { keys: "[/MouseLeft]", target: dayCells[1] }]);
+    await user.pointer([
+      { keys: "[MouseLeft]", target: dayCells[0] },
+      { keys: "[/MouseLeft]", target: dayCells[1] },
+    ]);
 
     await screen.findByText(/overlaps these dates/i);
     expect(apiClient.createHold).not.toHaveBeenCalled();
@@ -278,7 +285,10 @@ describe("CalendarPage", () => {
     const siteRow = screen.getByText("Site One").closest("div")!.parentElement!.parentElement!;
     const dayCells = siteRow.querySelectorAll(".h-12");
 
-    await user.pointer([{ keys: "[MouseLeft]", target: dayCells[0] }, { keys: "[/MouseLeft]", target: dayCells[2] }]);
+    await user.pointer([
+      { keys: "[MouseLeft]", target: dayCells[0] },
+      { keys: "[/MouseLeft]", target: dayCells[2] },
+    ]);
 
     await screen.findByText(/Availability check failed/i);
     // Still allows showing draft panel for manual proceed if quote succeeds
@@ -290,15 +300,15 @@ describe("CalendarPage", () => {
       buildReservation({
         id: "r3",
         totalAmount: 20000,
-        guest: buildGuest({ primaryFirstName: "Ext", primaryLastName: "Guest" })
-      })
+        guest: buildGuest({ primaryFirstName: "Ext", primaryLastName: "Guest" }),
+      }),
     ]);
     apiClient.getQuote.mockResolvedValue({
       nights: 3,
       baseSubtotalCents: 30000,
       rulesDeltaCents: 0,
       totalCents: 33000,
-      perNightCents: 11000
+      perNightCents: 11000,
     });
     const user = userEvent.setup();
     const { container } = render(<CalendarPage />, { wrapper: createWrapper() });
@@ -311,7 +321,7 @@ describe("CalendarPage", () => {
     // Extend to Jan 4 (one more night)
     await user.pointer([
       { keys: "[MouseLeft]", target: resPill },
-      { keys: "[/MouseLeft]", target: dayCells[3] }
+      { keys: "[/MouseLeft]", target: dayCells[3] },
     ]);
 
     // Extension modal should appear
@@ -327,7 +337,7 @@ describe("CalendarPage", () => {
       expect(apiClient.updateReservation).toHaveBeenCalledWith("r3", {
         siteId: "s1",
         arrivalDate: "2025-01-01",
-        departureDate: "2025-01-04"
+        departureDate: "2025-01-04",
       });
     });
   });
@@ -337,8 +347,8 @@ describe("CalendarPage", () => {
       buildReservation({
         id: "r4",
         totalAmount: 20000,
-        guest: buildGuest({ primaryFirstName: "Err", primaryLastName: "Guest" })
-      })
+        guest: buildGuest({ primaryFirstName: "Err", primaryLastName: "Guest" }),
+      }),
     ]);
     apiClient.getQuote.mockRejectedValue(new Error("quote failed"));
 
@@ -352,7 +362,7 @@ describe("CalendarPage", () => {
 
     await user.pointer([
       { keys: "[MouseLeft]", target: resPill },
-      { keys: "[/MouseLeft]", target: dayCells[3] }
+      { keys: "[/MouseLeft]", target: dayCells[3] },
     ]);
 
     await screen.findByText(/Unable to fetch extension quote/i);

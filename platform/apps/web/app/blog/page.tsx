@@ -25,10 +25,10 @@ export const metadata: Metadata = {
 // Map categories to icons/labels
 const categoryConfig: Record<string, { label: string; icon: LucideIcon; color: string }> = {
   "camper-tips": { label: "Camper Tips", icon: Tent, color: "text-keepr-evergreen" },
-  "growth": { label: "Growth Strategies", icon: TreePine, color: "text-keepr-clay" },
-  "industry": { label: "Industry Trends", icon: Map, color: "text-keepr-charcoal" },
-  "operations": { label: "Campground Operations", icon: Wrench, color: "text-keepr-evergreen-light" },
-  "technology": { label: "Technology", icon: Caravan, color: "text-keepr-clay" },
+  growth: { label: "Growth Strategies", icon: TreePine, color: "text-keepr-clay" },
+  industry: { label: "Industry Trends", icon: Map, color: "text-keepr-charcoal" },
+  operations: { label: "Campground Operations", icon: Wrench, color: "text-keepr-evergreen-light" },
+  technology: { label: "Technology", icon: Caravan, color: "text-keepr-clay" },
 };
 
 export default function BlogPage() {
@@ -41,8 +41,12 @@ export default function BlogPage() {
       <div className="min-h-screen bg-slate-900 text-green-400 p-8 font-mono overflow-auto">
         <h1 className="text-xl font-bold mb-4">Blog Debug Info</h1>
         <div className="bg-slate-800 p-4 rounded mb-4">
-          <p><strong>CWD:</strong> {debug.cwd}</p>
-          <p><strong>Resolved Blog Dir:</strong> {String(debug.blogDir)}</p>
+          <p>
+            <strong>CWD:</strong> {debug.cwd}
+          </p>
+          <p>
+            <strong>Resolved Blog Dir:</strong> {String(debug.blogDir)}
+          </p>
         </div>
       </div>
     );
@@ -81,8 +85,12 @@ export default function BlogPage() {
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
-            {categories.map(cat => (
-              <a href={`#${cat}`} key={cat} className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors">
+            {categories.map((cat) => (
+              <a
+                href={`#${cat}`}
+                key={cat}
+                className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full text-sm font-medium transition-colors"
+              >
                 {categoryConfig[cat]?.label || cat}
               </a>
             ))}
@@ -91,16 +99,20 @@ export default function BlogPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-16 -mt-20 relative z-10">
-
         {/* Featured Post Card */}
         {featuredPost && (
           <div className="bg-card rounded-3xl p-8 md:p-12 shadow-xl shadow-slate-900/5 border border-border mb-20 group cursor-pointer hover:shadow-2xl transition-all relative overflow-hidden">
-            <Link href={`/blog/${featuredPost.category}/${featuredPost.slug}`} className="absolute inset-0 z-10" />
+            <Link
+              href={`/blog/${featuredPost.category}/${featuredPost.slug}`}
+              className="absolute inset-0 z-10"
+            />
             <div className="absolute top-0 right-0 w-64 h-64 bg-keepr-evergreen/10 rounded-bl-[100px] -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform duration-500" />
 
             <div className="relative z-0">
               <div className="flex items-center gap-4 mb-6">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-muted ${categoryConfig[featuredPost.category]?.color || 'text-muted-foreground'}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-muted ${categoryConfig[featuredPost.category]?.color || "text-muted-foreground"}`}
+                >
                   {categoryConfig[featuredPost.category]?.label || featuredPost.category}
                 </span>
                 <span className="text-muted-foreground text-sm flex items-center gap-1">
@@ -125,9 +137,13 @@ export default function BlogPage() {
         )}
 
         {/* Categories Sections */}
-        {categories.map(category => {
-          const catPosts = posts.filter(p => p.category === category);
-          const config = categoryConfig[category] || { label: category, icon: BookOpen, color: 'text-muted-foreground' };
+        {categories.map((category) => {
+          const catPosts = posts.filter((p) => p.category === category);
+          const config = categoryConfig[category] || {
+            label: category,
+            icon: BookOpen,
+            color: "text-muted-foreground",
+          };
           const Icon = config.icon;
 
           if (catPosts.length === 0) return null;
@@ -135,7 +151,9 @@ export default function BlogPage() {
           return (
             <div key={category} id={category} className="mb-20 scroll-mt-32">
               <div className="flex items-center gap-4 mb-10">
-                <div className={`p-3 rounded-2xl bg-card shadow-sm border border-border ${config.color}`}>
+                <div
+                  className={`p-3 rounded-2xl bg-card shadow-sm border border-border ${config.color}`}
+                >
                   <Icon className="w-6 h-6" />
                 </div>
                 <h2 className="text-3xl font-bold text-foreground">{config.label}</h2>
@@ -143,7 +161,7 @@ export default function BlogPage() {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {catPosts.map(post => (
+                {catPosts.map((post) => (
                   <Link
                     key={post.slug}
                     href={`/blog/${category}/${post.slug}`}
@@ -213,7 +231,16 @@ export default function BlogPage() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-light flex items-center justify-center shadow-lg">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="m4 20 8-14 8 14" />
                     <path d="M2 20h20" />
                   </svg>
@@ -226,32 +253,92 @@ export default function BlogPage() {
             </div>
 
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">Explore</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">
+                Explore
+              </h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/" className="text-white/70 hover:text-white transition-colors">Find Campgrounds</a></li>
-                <li><a href="/" className="text-white/70 hover:text-white transition-colors">Top Destinations</a></li>
-                <li><a href="/" className="text-white/70 hover:text-white transition-colors">RV Parks</a></li>
-                <li><a href="/blog" className="text-white/70 hover:text-white transition-colors">Blog</a></li>
+                <li>
+                  <a href="/" className="text-white/70 hover:text-white transition-colors">
+                    Find Campgrounds
+                  </a>
+                </li>
+                <li>
+                  <a href="/" className="text-white/70 hover:text-white transition-colors">
+                    Top Destinations
+                  </a>
+                </li>
+                <li>
+                  <a href="/" className="text-white/70 hover:text-white transition-colors">
+                    RV Parks
+                  </a>
+                </li>
+                <li>
+                  <a href="/blog" className="text-white/70 hover:text-white transition-colors">
+                    Blog
+                  </a>
+                </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">For Owners</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">
+                For Owners
+              </h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/auth/signin?callbackUrl=/dashboard" className="text-white/70 hover:text-white transition-colors">Owner Login</a></li>
-                <li><a href="/owners" className="text-white/70 hover:text-white transition-colors">List Your Property</a></li>
-                <li><a href="/owners" className="text-white/70 hover:text-white transition-colors">Management Tools</a></li>
-                <li><a href="/owners#pricing" className="text-white/70 hover:text-white transition-colors">Pricing</a></li>
+                <li>
+                  <a
+                    href="/auth/signin?callbackUrl=/dashboard"
+                    className="text-white/70 hover:text-white transition-colors"
+                  >
+                    Owner Login
+                  </a>
+                </li>
+                <li>
+                  <a href="/owners" className="text-white/70 hover:text-white transition-colors">
+                    List Your Property
+                  </a>
+                </li>
+                <li>
+                  <a href="/owners" className="text-white/70 hover:text-white transition-colors">
+                    Management Tools
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/owners#pricing"
+                    className="text-white/70 hover:text-white transition-colors"
+                  >
+                    Pricing
+                  </a>
+                </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">Support</h4>
+              <h4 className="font-semibold text-sm uppercase tracking-wider text-white/60 mb-4">
+                Support
+              </h4>
               <ul className="space-y-2 text-sm">
-                <li><a href="/help" className="text-white/70 hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="/contact" className="text-white/70 hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="/terms" className="text-white/70 hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="/privacy" className="text-white/70 hover:text-white transition-colors">Privacy Policy</a></li>
+                <li>
+                  <a href="/help" className="text-white/70 hover:text-white transition-colors">
+                    Help Center
+                  </a>
+                </li>
+                <li>
+                  <a href="/contact" className="text-white/70 hover:text-white transition-colors">
+                    Contact Us
+                  </a>
+                </li>
+                <li>
+                  <a href="/terms" className="text-white/70 hover:text-white transition-colors">
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a href="/privacy" className="text-white/70 hover:text-white transition-colors">
+                    Privacy Policy
+                  </a>
+                </li>
               </ul>
             </div>
           </div>

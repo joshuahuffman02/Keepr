@@ -23,12 +23,14 @@ This guide covers how to design, launch, and manage a loyalty program that fits 
 ### The Business Case
 
 **Retention benefits:**
+
 - Repeat guests book more confidently
 - Familiar guests require less service effort
 - Loyal guests leave better reviews
 - Referrals come from engaged guests
 
 **Financial impact:**
+
 - A 5% increase in retention can boost profits 25-95%
 - Loyal guests spend 67% more than new guests
 - Marketing to existing guests is nearly free
@@ -51,6 +53,7 @@ Loyalty programs succeed when they offer:
 Earn points for stays and spending, redeem for rewards.
 
 **Structure:**
+
 ```
 Earn: 1 point per $1 spent
 Redeem:
@@ -60,11 +63,13 @@ Redeem:
 ```
 
 **Pros:**
+
 - Flexible earning and redemption
 - Encourages spending across campground
 - Familiar to consumers
 
 **Cons:**
+
 - Requires tracking system
 - Points expiration decisions needed
 - Can feel complex
@@ -74,6 +79,7 @@ Redeem:
 Simple: stay X nights, earn rewards.
 
 **Structure:**
+
 ```
 Stay 10 nights = 1 free night
 Every 25 nights = Upgrade to premium site
@@ -81,11 +87,13 @@ Every 50 nights = Free weekend stay
 ```
 
 **Pros:**
+
 - Very simple to understand
 - Easy to track manually
 - Clear goal motivation
 
 **Cons:**
+
 - Only rewards stays (not spending)
 - Less flexibility
 
@@ -94,6 +102,7 @@ Every 50 nights = Free weekend stay
 Status levels unlock increasing benefits.
 
 **Structure:**
+
 ```
 Camper (0-9 nights/year): 10% off merch
 Explorer (10-24 nights/year): Early booking access, 15% off
@@ -101,11 +110,13 @@ Adventurer (25+ nights/year): Free upgrades, exclusive weekends
 ```
 
 **Pros:**
+
 - Creates aspirational status
 - Increasing benefits encourage more stays
 - VIP treatment for best guests
 
 **Cons:**
+
 - More complex to administer
 - Requires clear tier communication
 - Annual reset decisions
@@ -115,6 +126,7 @@ Adventurer (25+ nights/year): Free upgrades, exclusive weekends
 Old school but effective: X visits = reward.
 
 **Structure:**
+
 ```
 Physical or digital punch card
 Stay 5 weekends = 6th weekend 50% off
@@ -122,11 +134,13 @@ Every 10th stay = Free night
 ```
 
 **Pros:**
+
 - Dead-simple understanding
 - Works without technology
 - Tangible and fun
 
 **Cons:**
+
 - Physical cards get lost
 - Limited flexibility
 - Hard to track across years
@@ -151,14 +165,14 @@ Your structure should align with your goals.
 
 **Effective campground rewards:**
 
-| Reward Type | Examples |
-|-------------|----------|
-| Free stays | Night, weekend, week |
-| Discounts | Percentage off, dollar credits |
-| Upgrades | Better site, early check-in |
-| Perks | Free firewood, golf cart rental |
+| Reward Type      | Examples                         |
+| ---------------- | -------------------------------- |
+| Free stays       | Night, weekend, week             |
+| Discounts        | Percentage off, dollar credits   |
+| Upgrades         | Better site, early check-in      |
+| Perks            | Free firewood, golf cart rental  |
 | Exclusive access | Early booking, sold-out weekends |
-| Recognition | Member-only events, VIP parking |
+| Recognition      | Member-only events, VIP parking  |
 
 **Key principle:** Rewards should feel valuable but have manageable cost to you.
 
@@ -167,12 +181,15 @@ Your structure should align with your goals.
 Make rewards achievable but meaningful:
 
 **Too easy:**
+
 > "Stay 2 nights, get a free night!" (unsustainable)
 
 **Too hard:**
+
 > "Stay 100 nights for a free t-shirt" (no motivation)
 
 **Just right:**
+
 > "Stay 10 nights, get a free night" (achievable annual goal)
 
 ### Step 4: Keep It Simple
@@ -206,12 +223,14 @@ Give it a memorable name:
 ### Announce the Launch
 
 **To existing guests:**
+
 > "You asked, we listened! Introducing our new loyalty program. As a thank-you for being a past guest, you're automatically enrolled with [X] nights already credited!"
 
 **On website:**
 Dedicated page explaining benefits, how to earn, how to join.
 
 **At check-in:**
+
 > "Have you joined our loyalty program? For every 10 nights you stay, you earn a free night."
 
 ---
@@ -313,6 +332,7 @@ Blackout dates, complicated processes, and expiring points frustrate guests.
 ### Surprise and Delight
 
 Beyond structured rewards:
+
 - Unexpected upgrades for top members
 - Birthday or anniversary recognition
 - First-to-know about new amenities
@@ -339,4 +359,4 @@ Start simple, launch it properly, and improve over time. Your most loyal guests 
 
 ---
 
-*Keepr includes built-in loyalty program features that automatically track guest stays and communicate rewards—no manual tracking required. [Build loyalty at campreserv.com](https://campreserv.com)*
+_Keepr includes built-in loyalty program features that automatically track guest stays and communicate rewards—no manual tracking required. [Build loyalty at campreserv.com](https://campreserv.com)_

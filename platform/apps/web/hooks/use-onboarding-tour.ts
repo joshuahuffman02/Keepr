@@ -201,7 +201,7 @@ export function useTour(options: UseTourOptions): UseTourReturn {
         setCurrentStepIndex(index);
       }
     },
-    [totalSteps]
+    [totalSteps],
   );
 
   const skip = useCallback(() => {
@@ -263,7 +263,8 @@ export const DASHBOARD_TOUR: Tour = {
       id: "welcome",
       target: "[data-tour='dashboard-header']",
       title: "Welcome to Your Dashboard",
-      content: "This is your command center for managing your campground. Let's take a quick tour of the key features.",
+      content:
+        "This is your command center for managing your campground. Let's take a quick tour of the key features.",
       placement: "bottom",
       spotlight: true,
     },
@@ -271,7 +272,8 @@ export const DASHBOARD_TOUR: Tour = {
       id: "quick-stats",
       target: "[data-tour='quick-stats']",
       title: "Quick Stats",
-      content: "See your key metrics at a glance: today's arrivals, departures, occupancy, and revenue.",
+      content:
+        "See your key metrics at a glance: today's arrivals, departures, occupancy, and revenue.",
       placement: "bottom",
       spotlight: true,
     },

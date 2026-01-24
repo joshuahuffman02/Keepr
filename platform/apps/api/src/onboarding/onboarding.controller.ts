@@ -1,8 +1,26 @@
-import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, Query, Req, UseGuards, Logger } from "@nestjs/common";
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  Logger,
+} from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards";
 import { OnboardingService } from "./onboarding.service";
 import { OnboardingStep } from "@prisma/client";
-import { CreateOnboardingInviteDto, StartOnboardingDto, UpdateOnboardingDraftDto, UpdateOnboardingStepDto } from "./dto";
+import {
+  CreateOnboardingInviteDto,
+  StartOnboardingDto,
+  UpdateOnboardingDraftDto,
+  UpdateOnboardingStepDto,
+} from "./dto";
 import { StripeService } from "../payments/stripe.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { OnboardingTokenGateService } from "./onboarding-token-gate.service";
@@ -149,28 +167,33 @@ export class OnboardingController {
     const session = await this.onboarding.getSession(sessionId, token);
     const campgroundId = session.session.campgroundId;
     if (!campgroundId) {
-      throw new BadRequestException("Campground not created yet. Please complete the Park Profile step first.");
+      throw new BadRequestException(
+        "Campground not created yet. Please complete the Park Profile step first.",
+      );
     }
 
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { id: true, email: true, stripeAccountId: true }
+      select: { id: true, email: true, stripeAccountId: true },
     });
     if (!campground) throw new BadRequestException("Campground not found");
 
     // Create or retrieve Stripe Express account
     let accountId = campground.stripeAccountId ?? undefined;
     if (!accountId) {
-      const account = await this.stripe.createExpressAccount(campground.email || undefined, { campgroundId });
+      const account = await this.stripe.createExpressAccount(campground.email || undefined, {
+        campgroundId,
+      });
       accountId = account.id;
       await this.prisma.campground.update({
         where: { id: campgroundId },
-        data: { stripeAccountId: accountId }
+        data: { stripeAccountId: accountId },
       });
     }
 
     // Create onboarding link with return to the onboarding flow
-    const baseUrl = process.env.FRONTEND_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const baseUrl =
+      process.env.FRONTEND_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const returnUrl = `${baseUrl}/onboarding/${token}?stripe_status=success`;
     const refreshUrl = `${baseUrl}/onboarding/${token}?stripe_status=error`;
     const link = await this.stripe.createAccountOnboardingLink(accountId, returnUrl, refreshUrl);
@@ -198,7 +221,7 @@ export class OnboardingController {
 
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
-      select: { stripeAccountId: true }
+      select: { stripeAccountId: true },
     });
 
     const accountId = campground?.stripeAccountId;
@@ -218,7 +241,7 @@ export class OnboardingController {
         fullyEnabled,
         accountId,
         details_submitted: account.details_submitted,
-        charges_enabled: account.charges_enabled
+        charges_enabled: account.charges_enabled,
       };
     } catch (err) {
       this.logger.error("Stripe account retrieval error:", err instanceof Error ? err.stack : err);
@@ -235,7 +258,7 @@ export class OnboardingController {
     @Param("id") id: string,
     @Headers("x-onboarding-token") tokenHeader: string,
     @Body() body: { token?: string },
-    @Req() req: Request
+    @Req() req: Request,
   ) {
     const token = body.token ?? tokenHeader;
     if (!token) throw new BadRequestException("Missing onboarding token");

@@ -93,17 +93,14 @@ export function ReservationImportModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        apiUrl(`/campgrounds/${campgroundId}/import/reservations/upload`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({ csvContent: content }),
-        }
-      );
+      const res = await fetch(apiUrl(`/campgrounds/${campgroundId}/import/reservations/upload`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({ csvContent: content }),
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || "Failed to upload CSV");
@@ -144,17 +141,14 @@ export function ReservationImportModal({
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(
-        apiUrl(`/campgrounds/${campgroundId}/import/reservations/preview`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({ csvContent, mapping }),
-        }
-      );
+      const res = await fetch(apiUrl(`/campgrounds/${campgroundId}/import/reservations/preview`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({ csvContent, mapping }),
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || "Failed to preview import");
@@ -198,29 +192,29 @@ export function ReservationImportModal({
           siteId: override.siteId || m.site.matchedSiteId,
           siteClassId: override.siteClassId || m.site.suggestedSiteClassId,
           guestId: m.guest.existingGuestId,
-          createGuest: m.guest.matchType === "will_create" && parsed ? {
-            firstName: parsed.guest.firstName,
-            lastName: parsed.guest.lastName,
-            email: parsed.guest.email,
-            phone: parsed.guest.phone,
-          } : undefined,
+          createGuest:
+            m.guest.matchType === "will_create" && parsed
+              ? {
+                  firstName: parsed.guest.firstName,
+                  lastName: parsed.guest.lastName,
+                  email: parsed.guest.email,
+                  phone: parsed.guest.phone,
+                }
+              : undefined,
           useSystemPricing: override.useSystemPricing ?? false,
           manualTotalOverrideCents: override.manualTotalOverrideCents,
           skip: Boolean(m.site.conflict) || Boolean(override.skip),
         };
       });
 
-      const res = await fetch(
-        apiUrl(`/campgrounds/${campgroundId}/import/reservations/execute`),
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-onboarding-token": token,
-          },
-          body: JSON.stringify({ csvContent, mapping, rows }),
-        }
-      );
+      const res = await fetch(apiUrl(`/campgrounds/${campgroundId}/import/reservations/execute`), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-onboarding-token": token,
+        },
+        body: JSON.stringify({ csvContent, mapping, rows }),
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.message || "Failed to execute import");
@@ -285,10 +279,7 @@ export function ReservationImportModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
       <motion.div
@@ -302,8 +293,7 @@ export function ReservationImportModal({
           <div>
             <h2 className="text-lg font-semibold text-white">Import Reservations</h2>
             <p className="text-sm text-slate-400">
-              Step {step} of 4 -{" "}
-              {step === 1 && "Upload CSV"}
+              Step {step} of 4 - {step === 1 && "Upload CSV"}
               {step === 2 && "Map Columns"}
               {step === 3 && "Review & Match"}
               {step === 4 && "Complete"}
@@ -325,7 +315,7 @@ export function ReservationImportModal({
                 key={s}
                 className={cn(
                   "h-1 flex-1 rounded-full transition-colors",
-                  s <= step ? "bg-emerald-500" : "bg-slate-700"
+                  s <= step ? "bg-emerald-500" : "bg-slate-700",
                 )}
               />
             ))}
@@ -343,11 +333,7 @@ export function ReservationImportModal({
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           <AnimatePresence mode="wait">
             {step === 1 && (
-              <Step1Upload
-                loading={loading}
-                onFileChange={handleFileChange}
-                onDrop={handleDrop}
-              />
+              <Step1Upload loading={loading} onFileChange={handleFileChange} onDrop={handleDrop} />
             )}
             {step === 2 && uploadResponse && (
               <Step2Mapping
@@ -366,9 +352,7 @@ export function ReservationImportModal({
                 onUpdateRow={updateRowOverride}
               />
             )}
-            {step === 4 && (
-              <Step4Complete />
-            )}
+            {step === 4 && <Step4Complete />}
           </AnimatePresence>
         </div>
 
@@ -457,7 +441,7 @@ function Step1Upload({
           "border-2 border-dashed rounded-xl p-12 text-center transition-colors",
           loading
             ? "border-slate-600 bg-slate-800/30"
-            : "border-slate-600 hover:border-emerald-500 cursor-pointer"
+            : "border-slate-600 hover:border-emerald-500 cursor-pointer",
         )}
       >
         {loading ? (
@@ -467,20 +451,13 @@ function Step1Upload({
           </div>
         ) : (
           <label className="cursor-pointer">
-            <input
-              type="file"
-              accept=".csv"
-              onChange={onFileChange}
-              className="hidden"
-            />
+            <input type="file" accept=".csv" onChange={onFileChange} className="hidden" />
             <div className="flex flex-col items-center gap-4">
               <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center">
                 <Upload className="w-8 h-8 text-emerald-500" />
               </div>
               <div>
-                <p className="text-white font-medium">
-                  Drop your CSV file here or click to browse
-                </p>
+                <p className="text-white font-medium">Drop your CSV file here or click to browse</p>
                 <p className="text-sm text-slate-400 mt-1">
                   Export reservations from your current system as CSV
                 </p>
@@ -515,7 +492,8 @@ function Step1Upload({
               </button>
             </div>
             <p className="text-slate-500 mt-1">
-              arrival_date, departure_date, first_name, last_name, email, site_number (or site_class), total_amount
+              arrival_date, departure_date, first_name, last_name, email, site_number (or
+              site_class), total_amount
             </p>
           </div>
         </div>
@@ -701,10 +679,7 @@ function Step3Preview({
               return (
                 <tr
                   key={match.rowIndex}
-                  className={cn(
-                    "border-b border-slate-800",
-                    override.skip && "opacity-50"
-                  )}
+                  className={cn("border-b border-slate-800", override.skip && "opacity-50")}
                 >
                   <td className="px-2 py-3 text-slate-500">{match.rowIndex + 1}</td>
 
@@ -721,9 +696,7 @@ function Step3Preview({
                           {parsed.guest.firstName} {parsed.guest.lastName}
                         </p>
                         <p className="text-xs text-slate-500">
-                          {match.guest.matchType === "existing"
-                            ? "Existing guest"
-                            : "Will create"}
+                          {match.guest.matchType === "existing" ? "Existing guest" : "Will create"}
                         </p>
                       </div>
                     </div>
@@ -748,9 +721,7 @@ function Step3Preview({
                           {match.site.matchedSiteNumber || match.site.matchedSiteName}
                         </span>
                         {match.site.conflict && (
-                          <span className="text-xs text-red-400 ml-2">
-                            (conflict)
-                          </span>
+                          <span className="text-xs text-red-400 ml-2">(conflict)</span>
                         )}
                       </div>
                     ) : (
@@ -776,16 +747,12 @@ function Step3Preview({
                   <td className="px-2 py-3">
                     <div className="flex items-center gap-2">
                       <div>
-                        <p className="text-white">
-                          {formatCents(match.pricing.csvTotalCents)}
-                        </p>
+                        <p className="text-white">{formatCents(match.pricing.csvTotalCents)}</p>
                         {match.pricing.calculatedTotalCents > 0 && (
                           <p
                             className={cn(
                               "text-xs",
-                              match.pricing.requiresReview
-                                ? "text-amber-400"
-                                : "text-slate-500"
+                              match.pricing.requiresReview ? "text-amber-400" : "text-slate-500",
                             )}
                           >
                             System: {formatCents(match.pricing.calculatedTotalCents)}
@@ -835,9 +802,7 @@ function Step4Complete() {
         <CheckCircle2 className="w-10 h-10 text-emerald-400" />
       </div>
       <h3 className="text-xl font-semibold text-white mb-2">Import Complete!</h3>
-      <p className="text-slate-400">
-        Your reservations have been imported successfully.
-      </p>
+      <p className="text-slate-400">Your reservations have been imported successfully.</p>
     </motion.div>
   );
 }

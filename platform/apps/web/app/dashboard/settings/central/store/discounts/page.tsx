@@ -71,10 +71,7 @@ async function fetchDiscounts(campgroundId: string): Promise<Discount[]> {
       const code = getString(promo.code) || name.toUpperCase().replace(/\s+/g, "");
       const discountType = getString(promo.discountType);
       const type: Discount["type"] = discountType === "percentage" ? "percent" : "fixed";
-      const value =
-        getNumber(promo.discountValue) ??
-        getNumber(promo.amount) ??
-        0;
+      const value = getNumber(promo.discountValue) ?? getNumber(promo.amount) ?? 0;
       return {
         id,
         name,
@@ -144,9 +141,7 @@ export default function DiscountsPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{item.name}</p>
-            <code className="text-xs px-1.5 py-0.5 rounded bg-muted">
-              {item.code}
-            </code>
+            <code className="text-xs px-1.5 py-0.5 rounded bg-muted">{item.code}</code>
           </div>
         </div>
       ),
@@ -163,9 +158,7 @@ export default function DiscountsPage() {
     {
       key: "appliesTo",
       label: "Applies To",
-      render: (item: Discount) => (
-        <Badge variant="outline">{item.appliesTo}</Badge>
-      ),
+      render: (item: Discount) => <Badge variant="outline">{item.appliesTo}</Badge>,
     },
     {
       key: "validity",
@@ -186,9 +179,7 @@ export default function DiscountsPage() {
     {
       key: "usage",
       label: "Uses",
-      render: (item: Discount) => (
-        <span className="text-muted-foreground">{item.usageCount}</span>
-      ),
+      render: (item: Discount) => <span className="text-muted-foreground">{item.usageCount}</span>,
     },
     {
       key: "status",
@@ -199,7 +190,7 @@ export default function DiscountsPage() {
           className={cn(
             item.isActive
               ? "bg-status-success/15 text-status-success"
-              : "bg-muted text-muted-foreground"
+              : "bg-muted text-muted-foreground",
           )}
         >
           {item.isActive ? "Active" : "Inactive"}
@@ -213,9 +204,7 @@ export default function DiscountsPage() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Discounts</h2>
-          <p className="text-muted-foreground mt-1">
-            Create discount codes for your store and POS
-          </p>
+          <p className="text-muted-foreground mt-1">Create discount codes for your store and POS</p>
         </div>
         <Button>
           <Plus className="h-4 w-4 mr-2" />
@@ -226,9 +215,8 @@ export default function DiscountsPage() {
       <Alert className="bg-blue-50 border-blue-200">
         <Info className="h-4 w-4 text-blue-500" />
         <AlertDescription className="text-blue-800">
-          Discounts can be applied at checkout in the POS system. Use codes for
-          special promotions or create standing discounts for groups like seniors
-          or military.
+          Discounts can be applied at checkout in the POS system. Use codes for special promotions
+          or create standing discounts for groups like seniors or military.
         </AlertDescription>
       </Alert>
 
@@ -252,9 +240,7 @@ export default function DiscountsPage() {
                 <Pencil className="h-4 w-4 mr-2" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                {item.isActive ? "Deactivate" : "Activate"}
-              </DropdownMenuItem>
+              <DropdownMenuItem>{item.isActive ? "Deactivate" : "Activate"}</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-red-600"

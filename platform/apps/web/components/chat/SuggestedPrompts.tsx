@@ -56,7 +56,7 @@ export function SuggestedPrompts({
       <p
         className={cn(
           "text-xs font-medium text-muted-foreground",
-          align === "center" ? "text-center" : "text-left"
+          align === "center" ? "text-center" : "text-left",
         )}
       >
         {label}
@@ -64,7 +64,7 @@ export function SuggestedPrompts({
       <div
         className={cn(
           "flex flex-wrap gap-2",
-          align === "center" ? "justify-center" : "justify-start"
+          align === "center" ? "justify-center" : "justify-start",
         )}
       >
         {prompts.map((prompt) => (
@@ -76,7 +76,7 @@ export function SuggestedPrompts({
               "px-3 py-1.5 text-xs font-medium rounded-full border transition-colors",
               styles.chip,
               styles.hover,
-              styles.text
+              styles.text,
             )}
           >
             {prompt}

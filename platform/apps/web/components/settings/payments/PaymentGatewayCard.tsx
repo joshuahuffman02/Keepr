@@ -6,7 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
@@ -61,20 +67,68 @@ interface PaymentGatewayCardProps {
 const isGateway = (value: string): value is Gateway =>
   value === "stripe" || value === "adyen" || value === "authorize_net" || value === "other";
 
-const isGatewayMode = (value: string): value is GatewayMode =>
-  value === "test" || value === "prod";
+const isGatewayMode = (value: string): value is GatewayMode => value === "test" || value === "prod";
 
 const isFeeMode = (value: string): value is FeeMode =>
   value === "absorb" || value === "pass_through";
 
 const GATEWAY_PRESETS: GatewayPreset[] = [
-  { id: "preset_stripe_test", gateway: "stripe", mode: "test", label: "Stripe test (no fees)", percentBasisPoints: 0, flatFeeCents: 0 },
-  { id: "preset_stripe_prod", gateway: "stripe", mode: "prod", label: "Stripe default (2.9% + 30¢)", percentBasisPoints: 290, flatFeeCents: 30 },
-  { id: "preset_adyen_test", gateway: "adyen", mode: "test", label: "Adyen test (no fees)", percentBasisPoints: 0, flatFeeCents: 0 },
-  { id: "preset_adyen_prod", gateway: "adyen", mode: "prod", label: "Adyen default (2.5% + 12¢)", percentBasisPoints: 250, flatFeeCents: 12 },
-  { id: "preset_authorize_test", gateway: "authorize_net", mode: "test", label: "Authorize.Net test", percentBasisPoints: 0, flatFeeCents: 0 },
-  { id: "preset_authorize_prod", gateway: "authorize_net", mode: "prod", label: "Authorize.Net default (2.9% + 30¢)", percentBasisPoints: 290, flatFeeCents: 30 },
-  { id: "preset_other_prod", gateway: "other", mode: "prod", label: "Other gateway (3% + 30¢)", percentBasisPoints: 300, flatFeeCents: 30 },
+  {
+    id: "preset_stripe_test",
+    gateway: "stripe",
+    mode: "test",
+    label: "Stripe test (no fees)",
+    percentBasisPoints: 0,
+    flatFeeCents: 0,
+  },
+  {
+    id: "preset_stripe_prod",
+    gateway: "stripe",
+    mode: "prod",
+    label: "Stripe default (2.9% + 30¢)",
+    percentBasisPoints: 290,
+    flatFeeCents: 30,
+  },
+  {
+    id: "preset_adyen_test",
+    gateway: "adyen",
+    mode: "test",
+    label: "Adyen test (no fees)",
+    percentBasisPoints: 0,
+    flatFeeCents: 0,
+  },
+  {
+    id: "preset_adyen_prod",
+    gateway: "adyen",
+    mode: "prod",
+    label: "Adyen default (2.5% + 12¢)",
+    percentBasisPoints: 250,
+    flatFeeCents: 12,
+  },
+  {
+    id: "preset_authorize_test",
+    gateway: "authorize_net",
+    mode: "test",
+    label: "Authorize.Net test",
+    percentBasisPoints: 0,
+    flatFeeCents: 0,
+  },
+  {
+    id: "preset_authorize_prod",
+    gateway: "authorize_net",
+    mode: "prod",
+    label: "Authorize.Net default (2.9% + 30¢)",
+    percentBasisPoints: 290,
+    flatFeeCents: 30,
+  },
+  {
+    id: "preset_other_prod",
+    gateway: "other",
+    mode: "prod",
+    label: "Other gateway (3% + 30¢)",
+    percentBasisPoints: 300,
+    flatFeeCents: 30,
+  },
 ];
 
 export function PaymentGatewayCard({
@@ -97,10 +151,10 @@ export function PaymentGatewayCard({
   const [feeMode, setFeeMode] = useState<FeeMode>(initialFeeMode);
   const [presetId, setPresetId] = useState<string | null>(initialPresetId ?? "preset_stripe_test");
   const [feePercent, setFeePercent] = useState<string>(
-    initialFeePercent !== undefined ? (initialFeePercent / 100).toFixed(2) : "0"
+    initialFeePercent !== undefined ? (initialFeePercent / 100).toFixed(2) : "0",
   );
   const [feeFlat, setFeeFlat] = useState<string>(
-    initialFeeFlat !== undefined ? (initialFeeFlat / 100).toFixed(2) : "0.30"
+    initialFeeFlat !== undefined ? (initialFeeFlat / 100).toFixed(2) : "0.30",
   );
   const [publishableKey, setPublishableKey] = useState(credentials.publishableKeySecretId ?? "");
   const [secretKey, setSecretKey] = useState(credentials.secretKeySecretId ?? "");
@@ -145,7 +199,15 @@ export function PaymentGatewayCard({
     if (credentials.secretKeySecretId) setSecretKey(credentials.secretKeySecretId);
     if (credentials.merchantAccountIdSecretId) setMerchantId(credentials.merchantAccountIdSecretId);
     if (credentials.webhookSecretId) setWebhookSecret(credentials.webhookSecretId);
-  }, [initialGateway, initialMode, initialFeeMode, initialPresetId, initialFeePercent, initialFeeFlat, credentials]);
+  }, [
+    initialGateway,
+    initialMode,
+    initialFeeMode,
+    initialPresetId,
+    initialFeePercent,
+    initialFeeFlat,
+    credentials,
+  ]);
 
   // Success animation
   useEffect(() => {
@@ -156,7 +218,8 @@ export function PaymentGatewayCard({
     }
   }, [saveSuccess]);
 
-  const prodMissingSecrets = mode === "prod" && !secretKey && !merchantId && !hasProductionCredentials;
+  const prodMissingSecrets =
+    mode === "prod" && !secretKey && !merchantId && !hasProductionCredentials;
 
   const effectiveFeeLabel = useMemo(() => {
     if (effectiveFee) {
@@ -191,9 +254,7 @@ export function PaymentGatewayCard({
           <Settings2 className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
           Payment Gateway
         </CardTitle>
-        <CardDescription>
-          Configure your payment processor settings and fees.
-        </CardDescription>
+        <CardDescription>Configure your payment processor settings and fees.</CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-6">
@@ -214,7 +275,9 @@ export function PaymentGatewayCard({
                 <SelectItem value="stripe">
                   <span className="flex items-center gap-2">
                     Stripe
-                    <span className="text-xs text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Recommended</span>
+                    <span className="text-xs text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                      Recommended
+                    </span>
                   </span>
                 </SelectItem>
                 <SelectItem value="adyen">Adyen</SelectItem>
@@ -246,9 +309,7 @@ export function PaymentGatewayCard({
               </SelectContent>
             </Select>
             {mode === "test" && (
-              <p className="text-xs text-blue-600">
-                Test mode - no real charges will be made.
-              </p>
+              <p className="text-xs text-blue-600">Test mode - no real charges will be made.</p>
             )}
           </div>
         </div>
@@ -312,7 +373,9 @@ export function PaymentGatewayCard({
           <div className="space-y-2">
             <Label htmlFor="fee-flat">Flat fee (USD)</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                $
+              </span>
               <Input
                 id="fee-flat"
                 type="number"
@@ -344,7 +407,8 @@ export function PaymentGatewayCard({
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-4 space-y-4">
             <p className="text-xs text-muted-foreground">
-              Enter secret references, not the actual keys. Keys are stored securely in your secrets manager.
+              Enter secret references, not the actual keys. Keys are stored securely in your secrets
+              manager.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -393,7 +457,10 @@ export function PaymentGatewayCard({
             className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-start gap-3"
             role="alert"
           >
-            <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" aria-hidden="true" />
+            <AlertTriangle
+              className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0"
+              aria-hidden="true"
+            />
             <div>
               <p className="text-sm font-medium text-amber-900">Credentials required</p>
               <p className="text-sm text-amber-700 mt-0.5">
@@ -410,7 +477,7 @@ export function PaymentGatewayCard({
             disabled={disabled || isSaving}
             className={cn(
               "transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] motion-reduce:transform-none",
-              showSuccess && "bg-emerald-600 hover:bg-emerald-600"
+              showSuccess && "bg-emerald-600 hover:bg-emerald-600",
             )}
           >
             {isSaving ? (
@@ -420,16 +487,17 @@ export function PaymentGatewayCard({
               </>
             ) : showSuccess ? (
               <>
-                <Check className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in" aria-hidden="true" />
+                <Check
+                  className="w-4 h-4 mr-2 motion-safe:animate-in motion-safe:zoom-in"
+                  aria-hidden="true"
+                />
                 Saved!
               </>
             ) : (
               "Save gateway settings"
             )}
           </Button>
-          <p className="text-xs text-muted-foreground">
-            Changes are logged for compliance.
-          </p>
+          <p className="text-xs text-muted-foreground">Changes are logged for compliance.</p>
         </div>
       </CardContent>
     </Card>

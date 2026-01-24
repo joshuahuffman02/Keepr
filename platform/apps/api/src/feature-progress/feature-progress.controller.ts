@@ -54,7 +54,7 @@ export class FeatureProgressController {
   @Get(":featureKey")
   async getFeatureProgress(
     @Req() req: FeatureProgressRequest,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     const userId = this.requireUserId(req);
     return this.featureProgressService.getFeatureProgress(userId, featureKey);
@@ -64,10 +64,7 @@ export class FeatureProgressController {
    * Toggle feature completion
    */
   @Post(":featureKey/toggle")
-  async toggleFeature(
-    @Req() req: FeatureProgressRequest,
-    @Param("featureKey") featureKey: string
-  ) {
+  async toggleFeature(@Req() req: FeatureProgressRequest, @Param("featureKey") featureKey: string) {
     const userId = this.requireUserId(req);
     return this.featureProgressService.toggleFeature(userId, featureKey);
   }
@@ -79,14 +76,10 @@ export class FeatureProgressController {
   async markCompleted(
     @Req() req: FeatureProgressRequest,
     @Param("featureKey") featureKey: string,
-    @Body() body: { notes?: string }
+    @Body() body: { notes?: string },
   ) {
     const userId = this.requireUserId(req);
-    return this.featureProgressService.markCompleted(
-      userId,
-      featureKey,
-      body.notes
-    );
+    return this.featureProgressService.markCompleted(userId, featureKey, body.notes);
   }
 
   /**
@@ -95,7 +88,7 @@ export class FeatureProgressController {
   @Delete(":featureKey/complete")
   async markIncomplete(
     @Req() req: FeatureProgressRequest,
-    @Param("featureKey") featureKey: string
+    @Param("featureKey") featureKey: string,
   ) {
     const userId = this.requireUserId(req);
     return this.featureProgressService.markIncomplete(userId, featureKey);
@@ -107,7 +100,7 @@ export class FeatureProgressController {
   @Patch("bulk")
   async bulkUpdate(
     @Req() req: FeatureProgressRequest,
-    @Body() body: { updates: Array<{ featureKey: string; completed: boolean }> }
+    @Body() body: { updates: Array<{ featureKey: string; completed: boolean }> },
   ) {
     const userId = this.requireUserId(req);
     return this.featureProgressService.bulkUpdate(userId, body.updates);

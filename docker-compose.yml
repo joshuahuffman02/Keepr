@@ -1,7 +1,7 @@
 # Docker Compose for local development
 # Includes all Rust services and supporting infrastructure
 
-version: '3.8'
+version: "3.8"
 
 services:
   # ============================================================================

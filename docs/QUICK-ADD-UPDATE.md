@@ -10,10 +10,10 @@ platform/apps/web/lib/roadmap-data.ts
 
 ```typescript
 export const updates: Update[] = [
-    {
-        // YOUR NEW UPDATE HERE
-    },
-    // ... existing updates below
+  {
+    // YOUR NEW UPDATE HERE
+  },
+  // ... existing updates below
 ];
 ```
 
@@ -43,64 +43,64 @@ export const updates: Update[] = [
 
 ### Required Fields
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| `id` | string | Unique identifier | `'update-2026-01-15-pricing'` |
-| `title` | string | Update headline | `'Dynamic Pricing Enhancements'` |
-| `date` | string | ISO date | `'2026-01-15'` |
-| `body` | string | Summary | `'Added weather-based pricing rules.'` |
-| `tags` | string[] | Search tags | `['pricing', 'automation']` |
-| `category` | enum | Update category | `'feature'` |
-| `phaseId` | string | Roadmap phase | `'reservations'` |
-| `milestoneIds` | string[] | Related milestones | `['dynamic-pricing']` |
+| Field          | Type     | Description        | Example                                |
+| -------------- | -------- | ------------------ | -------------------------------------- |
+| `id`           | string   | Unique identifier  | `'update-2026-01-15-pricing'`          |
+| `title`        | string   | Update headline    | `'Dynamic Pricing Enhancements'`       |
+| `date`         | string   | ISO date           | `'2026-01-15'`                         |
+| `body`         | string   | Summary            | `'Added weather-based pricing rules.'` |
+| `tags`         | string[] | Search tags        | `['pricing', 'automation']`            |
+| `category`     | enum     | Update category    | `'feature'`                            |
+| `phaseId`      | string   | Roadmap phase      | `'reservations'`                       |
+| `milestoneIds` | string[] | Related milestones | `['dynamic-pricing']`                  |
 
 ### Optional Fields
 
-| Field | Description | When to Use |
-|-------|-------------|-------------|
-| `version` | Semantic version | For versioned releases |
-| `type` | Badge type | Always (New/Update/Enhancement/Fix) |
-| `whatChanged` | Technical details | For significant changes |
-| `whyItMatters` | Business value | For significant changes |
-| `whoItHelps` | Target users | For significant changes |
-| `screenshot` | Image path | For UI changes |
-| `videoUrl` | Demo video | For complex features |
+| Field          | Description       | When to Use                         |
+| -------------- | ----------------- | ----------------------------------- |
+| `version`      | Semantic version  | For versioned releases              |
+| `type`         | Badge type        | Always (New/Update/Enhancement/Fix) |
+| `whatChanged`  | Technical details | For significant changes             |
+| `whyItMatters` | Business value    | For significant changes             |
+| `whoItHelps`   | Target users      | For significant changes             |
+| `screenshot`   | Image path        | For UI changes                      |
+| `videoUrl`     | Demo video        | For complex features                |
 
 ## 5. Choose the Right Type
 
-| Type | Use When | Example |
-|------|----------|---------|
-| `'new'` | Brand new feature | First-time API launch, new module |
-| `'update'` | Changed existing feature | Replaced pricing calc with API |
-| `'enhancement'` | Improved existing feature | Added quick action buttons |
-| `'fix'` | Bug fix | Fixed 403 error, corrected rounding |
+| Type            | Use When                  | Example                             |
+| --------------- | ------------------------- | ----------------------------------- |
+| `'new'`         | Brand new feature         | First-time API launch, new module   |
+| `'update'`      | Changed existing feature  | Replaced pricing calc with API      |
+| `'enhancement'` | Improved existing feature | Added quick action buttons          |
+| `'fix'`         | Bug fix                   | Fixed 403 error, corrected rounding |
 
 ## 6. Choose the Right Category
 
-| Category | Use When | Example |
-|----------|----------|---------|
-| `'feature'` | New user-facing capability | Charity donations, QR codes |
-| `'improvement'` | UX/workflow enhancement | Faster reports, better mobile UI |
-| `'bugfix'` | Correction or security fix | Fixed auth error, patched XSS |
-| `'infrastructure'` | Backend/platform work | Database migration, API perf |
+| Category           | Use When                   | Example                          |
+| ------------------ | -------------------------- | -------------------------------- |
+| `'feature'`        | New user-facing capability | Charity donations, QR codes      |
+| `'improvement'`    | UX/workflow enhancement    | Faster reports, better mobile UI |
+| `'bugfix'`         | Correction or security fix | Fixed auth error, patched XSS    |
+| `'infrastructure'` | Backend/platform work      | Database migration, API perf     |
 
 ## 7. Valid Phase IDs
 
 ```typescript
-'foundation'
-'reservations'
-'guest-experience'
-'payments'
-'operational'
-'reporting'
-'marketing'
-'integrations'
-'depth'
-'advanced'
-'ship-readiness'
-'stabilize'
-'platform-scale'
-'charity-roundup'
+"foundation";
+"reservations";
+"guest-experience";
+"payments";
+"operational";
+"reporting";
+"marketing";
+"integrations";
+"depth";
+"advanced";
+"ship-readiness";
+"stabilize";
+"platform-scale";
+"charity-roundup";
 ```
 
 ## 8. Example: Simple Update

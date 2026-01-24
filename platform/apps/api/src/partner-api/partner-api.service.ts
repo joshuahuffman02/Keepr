@@ -9,10 +9,7 @@ import { BatchInventoryService } from "../inventory/batch-inventory.service";
 import { MarkdownRulesService } from "../inventory/markdown-rules.service";
 import { ExpirationTier, Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
-import {
-  ScanProductDto,
-  ScanProductResponseDto,
-} from "./dto/scan-product.dto";
+import { ScanProductDto, ScanProductResponseDto } from "./dto/scan-product.dto";
 import {
   RecordSaleDto,
   RecordSaleResponseDto,
@@ -29,11 +26,10 @@ const toJsonValue = (value: unknown): Prisma.InputJsonValue | undefined => {
   }
 };
 
-const toRequiredJson = (value: unknown): Prisma.InputJsonValue =>
-  toJsonValue(value) ?? [];
+const toRequiredJson = (value: unknown): Prisma.InputJsonValue => toJsonValue(value) ?? [];
 
 const toNullableJsonInput = (
-  value: unknown
+  value: unknown,
 ): Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput | undefined => {
   if (value === undefined) return undefined;
   if (value === null) return Prisma.JsonNull;
@@ -45,16 +41,13 @@ export class PartnerApiService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly batchInventory: BatchInventoryService,
-    private readonly markdownRules: MarkdownRulesService
+    private readonly markdownRules: MarkdownRulesService,
   ) {}
 
   /**
    * Scan a product by SKU and return pricing/markdown/batch info
    */
-  async scanProduct(
-    campgroundId: string,
-    dto: ScanProductDto
-  ): Promise<ScanProductResponseDto> {
+  async scanProduct(campgroundId: string, dto: ScanProductDto): Promise<ScanProductResponseDto> {
     // Find product by SKU
     const product = await this.prisma.product.findFirst({
       where: {
@@ -90,7 +83,7 @@ export class PartnerApiService {
           product.id,
           dto.locationId ?? null,
           qty,
-          { previewOnly: true, allowExpired: dto.allowExpired }
+          { previewOnly: true, allowExpired: dto.allowExpired },
         );
 
         if (allocation.length > 0) {
@@ -104,7 +97,11 @@ export class PartnerApiService {
             daysUntilExpiration = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 
             // Determine expiration tier
-            const config = await this.getExpirationConfig(campgroundId, product.id, product.categoryId);
+            const config = await this.getExpirationConfig(
+              campgroundId,
+              product.id,
+              product.categoryId,
+            );
             if (daysUntilExpiration <= 0) {
               expirationTier = ExpirationTier.expired;
               requiresOverride = !dto.allowExpired;
@@ -125,7 +122,7 @@ export class PartnerApiService {
                 campgroundId,
                 product.id,
                 product.categoryId,
-                daysUntilExpiration
+                daysUntilExpiration,
               );
 
               if (markdown) {
@@ -176,7 +173,7 @@ export class PartnerApiService {
   async recordSale(
     campgroundId: string,
     apiClientId: string,
-    dto: RecordSaleDto
+    dto: RecordSaleDto,
   ): Promise<RecordSaleResponseDto> {
     // Check for duplicate transaction
     const existing = await this.prisma.externalPosSale.findUnique({
@@ -189,9 +186,7 @@ export class PartnerApiService {
     });
 
     if (existing) {
-      throw new ConflictException(
-        `Transaction '${dto.externalTransactionId}' already recorded`
-      );
+      throw new ConflictException(`Transaction '${dto.externalTransactionId}' already recorded`);
     }
 
     // Resolve SKUs to products
@@ -214,10 +209,7 @@ export class PartnerApiService {
     }
 
     // Calculate total
-    const totalCents = dto.items.reduce(
-      (sum, item) => sum + item.priceCents * item.qty,
-      0
-    );
+    const totalCents = dto.items.reduce((sum, item) => sum + item.priceCents * item.qty, 0);
 
     // Record the sale and deduct inventory in a transaction
     const result = await this.prisma.$transaction(async (tx) => {
@@ -256,7 +248,7 @@ export class PartnerApiService {
             const allocations = await this.batchInventory.allocateFEFO(
               product.id,
               dto.locationId ?? null,
-              item.qty
+              item.qty,
             );
 
             // Deduct from all allocated batches
@@ -362,7 +354,7 @@ export class PartnerApiService {
   async recordRefund(
     campgroundId: string,
     saleId: string,
-    dto: RecordRefundDto
+    dto: RecordRefundDto,
   ): Promise<RecordRefundResponseDto> {
     const sale = await this.prisma.externalPosSale.findFirst({
       where: {
@@ -462,7 +454,7 @@ export class PartnerApiService {
       search?: string;
       limit?: number;
       offset?: number;
-    }
+    },
   ) {
     const where: Prisma.ProductWhereInput = {
       campgroundId,
@@ -632,7 +624,7 @@ export class PartnerApiService {
   private async getExpirationConfig(
     campgroundId: string,
     productId: string,
-    categoryId: string | null
+    categoryId: string | null,
   ) {
     // Check product-level config
     const productConfig = await this.prisma.productExpirationConfig.findFirst({
@@ -668,7 +660,7 @@ export class PartnerApiService {
     tx: Prisma.TransactionClient,
     productId: string,
     locationId: string | null | undefined,
-    qty: number
+    qty: number,
   ) {
     if (locationId) {
       await tx.locationInventory.updateMany({
@@ -687,7 +679,7 @@ export class PartnerApiService {
     tx: Prisma.TransactionClient,
     productId: string,
     locationId: string | null | undefined,
-    qty: number
+    qty: number,
   ) {
     if (locationId) {
       await tx.locationInventory.updateMany({

@@ -29,7 +29,7 @@ describe("Portfolio report API", () => {
         adr: expect.any(Number),
         revpar: expect.any(Number),
         revenueHome: expect.any(Number),
-      })
+      }),
     );
     expect(report.rollup).toEqual(
       expect.objectContaining({
@@ -38,10 +38,12 @@ describe("Portfolio report API", () => {
         occupancy: expect.any(Number),
         adr: expect.any(Number),
         revpar: expect.any(Number),
-      })
+      }),
     );
     expect(report.recommendations).toBeDefined();
-    expect(Array.isArray(report.recommendations) || report.recommendations === undefined).toBe(true);
+    expect(Array.isArray(report.recommendations) || report.recommendations === undefined).toBe(
+      true,
+    );
   });
 
   it("falls back gracefully for an unknown portfolio id", async () => {
@@ -53,4 +55,3 @@ describe("Portfolio report API", () => {
     expect(report.portfolioId).toBe(fallbackId);
   });
 });
-

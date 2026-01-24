@@ -1,6 +1,7 @@
 # AI Site Suggestions - Enhanced Reasoning Display
 
 ## Overview
+
 Enhanced the AI site suggestions feature in the booking flow to display 1-2 clear reasons WHY each site is recommended. This builds trust with staff by making the AI recommendations transparent and actionable.
 
 ## Changes Made
@@ -8,11 +9,13 @@ Enhanced the AI site suggestions feature in the booking flow to display 1-2 clea
 ### 1. Frontend Enhancement (booking-v2/page.tsx)
 
 **Before:**
+
 - Showed only site name, score badge, and first reason (or generic "High match")
 - Single line of text, no visual hierarchy
 - No fallback logic when reasons weren't provided
 
 **After:**
+
 - Displays up to 2 specific reasons per suggestion
 - Bullet-point format for easy scanning
 - Fallback logic generates context-aware reasons based on:
@@ -96,7 +99,7 @@ AI Suggestions
 ## Testing
 
 - ✅ TypeScript compilation passes
-- ✅ ESLint validation passes  
+- ✅ ESLint validation passes
 - ✅ Next.js build succeeds
 - ✅ NestJS build succeeds
 - ✅ Maintains existing behavior when no reasons available

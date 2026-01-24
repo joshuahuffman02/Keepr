@@ -82,7 +82,7 @@ export class SeasonalPricingService {
   async calculatePricing(
     rateCardId: string,
     guestContext: GuestPricingContext,
-    overrideBillingFrequency?: SeasonalBillingFrequency
+    overrideBillingFrequency?: SeasonalBillingFrequency,
   ): Promise<PricingCalculation> {
     const rateCard = await this.prisma.seasonalRateCard.findUnique({
       where: { id: rateCardId },
@@ -114,7 +114,7 @@ export class SeasonalPricingService {
           discount.discountAmount.toNumber(),
           runningTotal,
           rateCard.seasonStartDate,
-          rateCard.seasonEndDate
+          rateCard.seasonEndDate,
         );
 
         appliedDiscounts.push({
@@ -143,14 +143,18 @@ export class SeasonalPricingService {
           name: incentive.name,
           type: incentive.incentiveType,
           value: incentive.incentiveValue.toNumber(),
-          description: this.getIncentiveDescription(incentive.incentiveType, incentive.incentiveValue.toNumber()),
+          description: this.getIncentiveDescription(
+            incentive.incentiveType,
+            incentive.incentiveValue.toNumber(),
+          ),
           status: "pending",
         });
       }
     }
 
     // Determine billing frequency
-    const billingFrequency = overrideBillingFrequency ||
+    const billingFrequency =
+      overrideBillingFrequency ||
       (guestContext.paysInFull ? SeasonalBillingFrequency.seasonal : rateCard.billingFrequency);
 
     // Generate payment schedule
@@ -158,7 +162,7 @@ export class SeasonalPricingService {
       runningTotal,
       billingFrequency,
       rateCard.seasonStartDate,
-      rateCard.seasonEndDate
+      rateCard.seasonEndDate,
     );
 
     return {
@@ -178,7 +182,7 @@ export class SeasonalPricingService {
   private evaluateCondition(
     type: SeasonalDiscountCondition,
     conditionValue: string | null,
-    ctx: GuestPricingContext
+    ctx: GuestPricingContext,
   ): boolean {
     try {
       const parsedValue = conditionValue ? JSON.parse(conditionValue) : {};
@@ -242,7 +246,7 @@ export class SeasonalPricingService {
     amount: number,
     baseAmount: number,
     seasonStart: Date,
-    seasonEnd: Date
+    seasonEnd: Date,
   ): number {
     switch (type) {
       case SeasonalDiscountType.fixed_amount:
@@ -292,7 +296,7 @@ export class SeasonalPricingService {
     totalAmount: number,
     frequency: SeasonalBillingFrequency,
     seasonStart: Date,
-    seasonEnd: Date
+    seasonEnd: Date,
   ): PaymentScheduleItem[] {
     const schedule: PaymentScheduleItem[] = [];
     const startDate = new Date(seasonStart);
@@ -313,7 +317,9 @@ export class SeasonalPricingService {
       case SeasonalBillingFrequency.semi_annual:
         // Two payments
         const midPoint = new Date(startDate);
-        midPoint.setMonth(midPoint.getMonth() + Math.floor(this.getMonthsBetween(startDate, endDate) / 2));
+        midPoint.setMonth(
+          midPoint.getMonth() + Math.floor(this.getMonthsBetween(startDate, endDate) / 2),
+        );
 
         schedule.push({
           dueDate: startDate,
@@ -357,7 +363,9 @@ export class SeasonalPricingService {
 
       case SeasonalBillingFrequency.biweekly:
         // Bi-weekly payments (every 2 weeks)
-        const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const totalDays = Math.ceil(
+          (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
         const biweeklyPeriods = Math.ceil(totalDays / 14);
         const biweeklyAmount = totalAmount / biweeklyPeriods;
         let biweeklyDate = new Date(startDate);
@@ -390,7 +398,11 @@ export class SeasonalPricingService {
 
         for (let month = 0; month < semiMonthlyMonths; month++) {
           // 1st of month payment
-          const firstDate = new Date(semiMonthlyDate.getFullYear(), semiMonthlyDate.getMonth() + month, 1);
+          const firstDate = new Date(
+            semiMonthlyDate.getFullYear(),
+            semiMonthlyDate.getMonth() + month,
+            1,
+          );
           if (firstDate >= startDate && firstDate <= endDate) {
             const firstEnd = new Date(firstDate.getFullYear(), firstDate.getMonth(), 15);
             schedule.push({
@@ -403,9 +415,17 @@ export class SeasonalPricingService {
           }
 
           // 15th of month payment
-          const fifteenthDate = new Date(semiMonthlyDate.getFullYear(), semiMonthlyDate.getMonth() + month, 15);
+          const fifteenthDate = new Date(
+            semiMonthlyDate.getFullYear(),
+            semiMonthlyDate.getMonth() + month,
+            15,
+          );
           if (fifteenthDate >= startDate && fifteenthDate <= endDate) {
-            const fifteenthEnd = new Date(fifteenthDate.getFullYear(), fifteenthDate.getMonth() + 1, 1);
+            const fifteenthEnd = new Date(
+              fifteenthDate.getFullYear(),
+              fifteenthDate.getMonth() + 1,
+              1,
+            );
             schedule.push({
               dueDate: fifteenthDate,
               amount: Math.round(semiMonthlyAmount * 100) / 100,
@@ -431,7 +451,11 @@ export class SeasonalPricingService {
           amount: Math.round(depositAmount * 100) / 100,
           description: "Deposit Payment",
           periodStart: startDate,
-          periodEnd: new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()),
+          periodEnd: new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            startDate.getDate(),
+          ),
         });
 
         // Monthly payments for remainder
@@ -444,7 +468,10 @@ export class SeasonalPricingService {
           periodEnd.setMonth(periodEnd.getMonth() + 1);
           if (periodEnd > endDate) periodEnd.setTime(endDate.getTime());
 
-          const monthName = depositDate.toLocaleString("default", { month: "long", year: "numeric" });
+          const monthName = depositDate.toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          });
 
           schedule.push({
             dueDate: new Date(depositDate),
@@ -470,14 +497,21 @@ export class SeasonalPricingService {
           const paymentDate = new Date(offseasonStart);
           paymentDate.setMonth(paymentDate.getMonth() + i);
 
-          const monthName = paymentDate.toLocaleString("default", { month: "long", year: "numeric" });
+          const monthName = paymentDate.toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          });
 
           schedule.push({
             dueDate: paymentDate,
             amount: Math.round(offseasonAmount * 100) / 100,
             description: `${monthName} (Off-Season)`,
             periodStart: paymentDate,
-            periodEnd: new Date(paymentDate.getFullYear(), paymentDate.getMonth() + 1, paymentDate.getDate()),
+            periodEnd: new Date(
+              paymentDate.getFullYear(),
+              paymentDate.getMonth() + 1,
+              paymentDate.getDate(),
+            ),
           });
         }
         break;
@@ -486,7 +520,7 @@ export class SeasonalPricingService {
         // Custom schedules need to be handled separately with manual schedule input
         // For now, fall back to monthly
         this.logger.warn("Custom billing frequency - falling back to monthly schedule");
-        // Fall through to monthly...
+      // Fall through to monthly...
 
       case SeasonalBillingFrequency.monthly:
       default:
@@ -501,7 +535,10 @@ export class SeasonalPricingService {
           periodEnd.setMonth(periodEnd.getMonth() + 1);
           if (periodEnd > endDate) periodEnd.setTime(endDate.getTime());
 
-          const monthName = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
+          const monthName = currentDate.toLocaleString("default", {
+            month: "long",
+            year: "numeric",
+          });
 
           schedule.push({
             dueDate: new Date(currentDate),
@@ -544,7 +581,7 @@ export class SeasonalPricingService {
     seasonalGuestId: string,
     rateCardId: string,
     seasonYear: number,
-    manualAdjustment?: { amount: number; reason: string; userId: string }
+    manualAdjustment?: { amount: number; reason: string; userId: string },
   ): Promise<void> {
     const seasonalGuest = await this.prisma.seasonalGuest.findUnique({
       where: { id: seasonalGuestId },
@@ -614,7 +651,9 @@ export class SeasonalPricingService {
       },
     });
 
-    this.logger.log(`Applied pricing to seasonal guest ${seasonalGuestId} for season ${seasonYear}`);
+    this.logger.log(
+      `Applied pricing to seasonal guest ${seasonalGuestId} for season ${seasonYear}`,
+    );
   }
 
   /**
@@ -622,7 +661,7 @@ export class SeasonalPricingService {
    */
   async previewPricing(
     rateCardId: string,
-    guestContext: GuestPricingContext
+    guestContext: GuestPricingContext,
   ): Promise<PricingCalculation> {
     return this.calculatePricing(rateCardId, guestContext);
   }

@@ -26,7 +26,7 @@ class TokenRequestDto {
 
 @Controller("developer/oauth")
 export class ApiAuthController {
-  constructor(private readonly apiAuth: ApiAuthService) { }
+  constructor(private readonly apiAuth: ApiAuthService) {}
 
   @Post("token")
   async token(@Body() body: TokenRequestDto) {
@@ -37,7 +37,7 @@ export class ApiAuthController {
       return this.apiAuth.issueClientCredentialsToken({
         clientId: body.client_id,
         clientSecret: body.client_secret,
-        scope: body.scope
+        scope: body.scope,
       });
     }
 
@@ -51,4 +51,3 @@ export class ApiAuthController {
     throw new BadRequestException("Unsupported grant type");
   }
 }
-

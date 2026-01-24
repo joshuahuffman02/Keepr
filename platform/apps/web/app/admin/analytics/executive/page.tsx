@@ -112,11 +112,41 @@ const mockExecutiveData = {
     },
   ],
   topPerformers: [
-    { campgroundId: "1", campgroundName: "Top Performer 1", metric: "Revenue", value: 425000, rank: 1 },
-    { campgroundId: "2", campgroundName: "Top Performer 2", metric: "Revenue", value: 389000, rank: 2 },
-    { campgroundId: "3", campgroundName: "Top Performer 3", metric: "Revenue", value: 356000, rank: 3 },
-    { campgroundId: "4", campgroundName: "Top Performer 4", metric: "Revenue", value: 312000, rank: 4 },
-    { campgroundId: "5", campgroundName: "Top Performer 5", metric: "Revenue", value: 298000, rank: 5 },
+    {
+      campgroundId: "1",
+      campgroundName: "Top Performer 1",
+      metric: "Revenue",
+      value: 425000,
+      rank: 1,
+    },
+    {
+      campgroundId: "2",
+      campgroundName: "Top Performer 2",
+      metric: "Revenue",
+      value: 389000,
+      rank: 2,
+    },
+    {
+      campgroundId: "3",
+      campgroundName: "Top Performer 3",
+      metric: "Revenue",
+      value: 356000,
+      rank: 3,
+    },
+    {
+      campgroundId: "4",
+      campgroundName: "Top Performer 4",
+      metric: "Revenue",
+      value: 312000,
+      rank: 4,
+    },
+    {
+      campgroundId: "5",
+      campgroundName: "Top Performer 5",
+      metric: "Revenue",
+      value: 298000,
+      rank: 5,
+    },
   ],
   needsAttention: [
     {
@@ -145,19 +175,59 @@ const mockExecutiveData = {
     },
   ],
   recentActivity: [
-    { type: "reservation", description: "New reservation - $487.50", campgroundName: "Campground A", timestamp: new Date("2024-12-17T10:30:00"), value: 487.5 },
-    { type: "nps_response", description: "NPS Response: 9/10 (Promoter)", campgroundName: "Campground B", timestamp: new Date("2024-12-17T10:15:00"), value: 9 },
-    { type: "reservation", description: "New reservation - $325.00", campgroundName: "Campground C", timestamp: new Date("2024-12-17T09:45:00"), value: 325 },
-    { type: "nps_response", description: "NPS Response: 4/10 (Detractor)", campgroundName: "Campground D", timestamp: new Date("2024-12-17T09:30:00"), value: 4 },
-    { type: "reservation", description: "New reservation - $612.00", campgroundName: "Campground E", timestamp: new Date("2024-12-17T09:00:00"), value: 612 },
-    { type: "cancellation", description: "Reservation cancelled - $245.00", campgroundName: "Campground F", timestamp: new Date("2024-12-17T08:30:00"), value: 245 },
+    {
+      type: "reservation",
+      description: "New reservation - $487.50",
+      campgroundName: "Campground A",
+      timestamp: new Date("2024-12-17T10:30:00"),
+      value: 487.5,
+    },
+    {
+      type: "nps_response",
+      description: "NPS Response: 9/10 (Promoter)",
+      campgroundName: "Campground B",
+      timestamp: new Date("2024-12-17T10:15:00"),
+      value: 9,
+    },
+    {
+      type: "reservation",
+      description: "New reservation - $325.00",
+      campgroundName: "Campground C",
+      timestamp: new Date("2024-12-17T09:45:00"),
+      value: 325,
+    },
+    {
+      type: "nps_response",
+      description: "NPS Response: 4/10 (Detractor)",
+      campgroundName: "Campground D",
+      timestamp: new Date("2024-12-17T09:30:00"),
+      value: 4,
+    },
+    {
+      type: "reservation",
+      description: "New reservation - $612.00",
+      campgroundName: "Campground E",
+      timestamp: new Date("2024-12-17T09:00:00"),
+      value: 612,
+    },
+    {
+      type: "cancellation",
+      description: "Reservation cancelled - $245.00",
+      campgroundName: "Campground F",
+      timestamp: new Date("2024-12-17T08:30:00"),
+      value: 245,
+    },
   ],
 };
 
 function formatValue(value: number, format: string): string {
   switch (format) {
     case "currency":
-      return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      }).format(value);
     case "percentage":
       return `${value.toFixed(1)}%`;
     case "number":
@@ -250,7 +320,8 @@ export default function ExecutiveDashboardPage() {
             <AlertTriangle className="h-5 w-5 text-red-400" />
             <div>
               <p className="font-medium text-red-400">
-                {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? "s" : ""} Require Attention
+                {criticalAlerts.length} Critical Alert{criticalAlerts.length > 1 ? "s" : ""} Require
+                Attention
               </p>
               <p className="text-sm text-red-300/70">{criticalAlerts[0].message}</p>
             </div>
@@ -270,14 +341,20 @@ export default function ExecutiveDashboardPage() {
               {kpi.change !== undefined && (
                 <div className="flex items-center gap-1 mt-2">
                   {kpi.changeType === "increase" ? (
-                    <ArrowUpRight className={`h-3 w-3 ${kpi.format === "percentage" && kpi.change < 0 ? "text-green-400" : kpi.change >= 0 ? "text-green-400" : "text-red-400"}`} />
+                    <ArrowUpRight
+                      className={`h-3 w-3 ${kpi.format === "percentage" && kpi.change < 0 ? "text-green-400" : kpi.change >= 0 ? "text-green-400" : "text-red-400"}`}
+                    />
                   ) : kpi.changeType === "decrease" ? (
                     <ArrowDownRight className="h-3 w-3 text-red-400" />
                   ) : (
                     <Minus className="h-3 w-3 text-muted-foreground" />
                   )}
-                  <span className={`text-xs ${kpi.format === "percentage" && kpi.change < 0 ? "text-green-400" : kpi.change >= 0 ? "text-green-400" : "text-red-400"}`}>
-                    {kpi.change > 0 ? "+" : ""}{kpi.change.toFixed(1)}{kpi.format === "score" ? " pts" : "%"}
+                  <span
+                    className={`text-xs ${kpi.format === "percentage" && kpi.change < 0 ? "text-green-400" : kpi.change >= 0 ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {kpi.change > 0 ? "+" : ""}
+                    {kpi.change.toFixed(1)}
+                    {kpi.format === "score" ? " pts" : "%"}
                   </span>
                 </div>
               )}
@@ -315,14 +392,24 @@ export default function ExecutiveDashboardPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className={`text-sm font-medium ${alert.severity === "critical" ? "text-red-400" : "text-amber-400"}`}>
+                        <p
+                          className={`text-sm font-medium ${alert.severity === "critical" ? "text-red-400" : "text-amber-400"}`}
+                        >
                           {alert.campgroundName}
                         </p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {alert.type === "nps" ? `NPS: ${alert.value}` : `Rate: ${alert.value.toFixed(1)}%`}
+                          {alert.type === "nps"
+                            ? `NPS: ${alert.value}`
+                            : `Rate: ${alert.value.toFixed(1)}%`}
                         </p>
                       </div>
-                      <Badge className={alert.severity === "critical" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"}>
+                      <Badge
+                        className={
+                          alert.severity === "critical"
+                            ? "bg-red-500/20 text-red-400"
+                            : "bg-amber-500/20 text-amber-400"
+                        }
+                      >
                         {alert.severity}
                       </Badge>
                     </div>
@@ -346,12 +433,17 @@ export default function ExecutiveDashboardPage() {
               {data.topPerformers.map((p, idx) => (
                 <div key={p.campgroundId} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                      idx === 0 ? "bg-amber-500 text-black" :
-                      idx === 1 ? "bg-muted text-black" :
-                      idx === 2 ? "bg-amber-700 text-white" :
-                      "bg-muted text-muted-foreground"
-                    }`}>
+                    <span
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        idx === 0
+                          ? "bg-amber-500 text-black"
+                          : idx === 1
+                            ? "bg-muted text-black"
+                            : idx === 2
+                              ? "bg-amber-700 text-white"
+                              : "bg-muted text-muted-foreground"
+                      }`}
+                    >
                       {p.rank}
                     </span>
                     <span className="text-sm text-foreground">{p.campgroundName}</span>
@@ -377,12 +469,17 @@ export default function ExecutiveDashboardPage() {
             <div className="space-y-3">
               {data.recentActivity.slice(0, 6).map((activity, idx) => (
                 <div key={idx} className="flex items-start gap-3">
-                  <div className={`p-1.5 rounded ${
-                    activity.type === "reservation" ? "bg-green-500/20" :
-                    activity.type === "nps_response" ? "bg-blue-500/20" :
-                    activity.type === "cancellation" ? "bg-red-500/20" :
-                    "bg-muted"
-                  }`}>
+                  <div
+                    className={`p-1.5 rounded ${
+                      activity.type === "reservation"
+                        ? "bg-green-500/20"
+                        : activity.type === "nps_response"
+                          ? "bg-blue-500/20"
+                          : activity.type === "cancellation"
+                            ? "bg-red-500/20"
+                            : "bg-muted"
+                    }`}
+                  >
                     {activity.type === "reservation" ? (
                       <DollarSign className="h-3 w-3 text-green-400" />
                     ) : activity.type === "nps_response" ? (
@@ -398,7 +495,10 @@ export default function ExecutiveDashboardPage() {
                     <p className="text-xs text-muted-foreground">{activity.campgroundName}</p>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(activity.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(activity.timestamp).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
               ))}
@@ -415,17 +515,27 @@ export default function ExecutiveDashboardPage() {
               <Building2 className="h-5 w-5 text-red-400" />
               Campgrounds Needing Attention
             </CardTitle>
-            <p className="text-sm text-muted-foreground">Prioritized list of properties requiring intervention</p>
+            <p className="text-sm text-muted-foreground">
+              Prioritized list of properties requiring intervention
+            </p>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Campground</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Issue</th>
-                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">Metric</th>
-                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">Recommendation</th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Campground
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Issue
+                    </th>
+                    <th className="text-right py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Metric
+                    </th>
+                    <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      Recommendation
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -435,13 +545,22 @@ export default function ExecutiveDashboardPage() {
                         <span className="text-sm text-foreground">{item.campgroundName}</span>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge className={item.severity === "critical" ? "bg-red-500/20 text-red-400" : "bg-amber-500/20 text-amber-400"}>
+                        <Badge
+                          className={
+                            item.severity === "critical"
+                              ? "bg-red-500/20 text-red-400"
+                              : "bg-amber-500/20 text-amber-400"
+                          }
+                        >
                           {item.issue}
                         </Badge>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <span className={`font-medium ${item.severity === "critical" ? "text-red-400" : "text-amber-400"}`}>
-                          {item.metric}{typeof item.metric === "number" && item.metric > 1 ? "%" : ""}
+                        <span
+                          className={`font-medium ${item.severity === "critical" ? "text-red-400" : "text-amber-400"}`}
+                        >
+                          {item.metric}
+                          {typeof item.metric === "number" && item.metric > 1 ? "%" : ""}
                         </span>
                       </td>
                       <td className="py-3 px-4">

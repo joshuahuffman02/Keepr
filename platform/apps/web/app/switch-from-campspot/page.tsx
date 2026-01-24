@@ -46,25 +46,29 @@ const migrationSteps = [
   {
     day: "Day 1",
     title: "Export Your Data",
-    description: "We'll guide you through exporting your reservations, guests, and settings from Campspot. Takes about 30 minutes.",
+    description:
+      "We'll guide you through exporting your reservations, guests, and settings from Campspot. Takes about 30 minutes.",
     icon: Database,
   },
   {
     day: "Day 1",
     title: "We Import & Configure",
-    description: "Our team imports your data and configures your account to match your current setup. No work for you.",
+    description:
+      "Our team imports your data and configures your account to match your current setup. No work for you.",
     icon: Zap,
   },
   {
     day: "Day 2",
     title: "Quick Training Call",
-    description: "30-minute call to walk through Keepr. Your team will be comfortable immediately - it's intuitive.",
+    description:
+      "30-minute call to walk through Keepr. Your team will be comfortable immediately - it's intuitive.",
     icon: Phone,
   },
   {
     day: "Day 2",
     title: "Go Live",
-    description: "Switch your booking engine and start taking reservations. We're on standby for any questions.",
+    description:
+      "Switch your booking engine and start taking reservations. We're on standby for any questions.",
     icon: Calendar,
   },
 ];
@@ -238,9 +242,7 @@ export default function SwitchFromCampspotPage() {
       <section className="py-20 bg-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              The Full Picture
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The Full Picture</h2>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               Here's exactly what happens when you switch from Campspot.
             </p>
@@ -309,9 +311,7 @@ export default function SwitchFromCampspotPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-keepr-evergreen/10 rounded-3xl p-8 md:p-12 border border-keepr-evergreen/20">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Calculate Your Savings
-              </h2>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">Calculate Your Savings</h2>
               <p className="text-slate-600">
                 Here's what a typical park saves by switching from Campspot.
               </p>
@@ -342,12 +342,17 @@ export default function SwitchFromCampspotPage() {
               </div>
 
               <p className="text-xs text-slate-500 mt-4">
-                *If 100% of bookings currently come through Campspot marketplace. Actual savings vary.
+                *If 100% of bookings currently come through Campspot marketplace. Actual savings
+                vary.
               </p>
             </div>
 
             <div className="text-center">
-              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
+              <Button
+                asChild
+                size="lg"
+                className="bg-keepr-evergreen hover:bg-keepr-evergreen-light"
+              >
                 <Link href="/roi-calculator">
                   Calculate Your Exact Savings
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -368,7 +373,9 @@ export default function SwitchFromCampspotPage() {
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
-              "We were nervous about switching after 3 years on Campspot. The migration took exactly 2 days, and the 10% we were paying in marketplace fees? Gone. Wish we'd done it sooner."
+              "We were nervous about switching after 3 years on Campspot. The migration took exactly
+              2 days, and the 10% we were paying in marketplace fees? Gone. Wish we'd done it
+              sooner."
             </blockquote>
             <div className="text-slate-600">
               <span className="font-semibold text-slate-900">Jennifer R.</span>
@@ -386,7 +393,8 @@ export default function SwitchFromCampspotPage() {
             Ready to Leave Campspot Behind?
           </h2>
           <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
-            Free migration, 48-hour go-live, 30-day money-back guarantee. No risk, just better software.
+            Free migration, 48-hour go-live, 30-day money-back guarantee. No risk, just better
+            software.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

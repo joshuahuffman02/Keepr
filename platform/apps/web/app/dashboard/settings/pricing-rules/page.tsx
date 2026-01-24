@@ -8,25 +8,30 @@ import { Checkbox } from "../../../../components/ui/checkbox";
 import { FormField } from "../../../../components/ui/form-field";
 import { Label } from "../../../../components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "../../../../components/ui/select";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Calendar, TrendingUp, Sun, Gift, BarChart3 } from "lucide-react";
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "../../../../components/ui/alert-dialog";
-import { HelpTooltip, HelpTooltipContent, HelpTooltipSection, HelpTooltipList } from "../../../../components/help/HelpTooltip";
+import {
+  HelpTooltip,
+  HelpTooltipContent,
+  HelpTooltipSection,
+  HelpTooltipList,
+} from "../../../../components/help/HelpTooltip";
 import { PageOnboardingHint } from "../../../../components/help/OnboardingHint";
 
 type PricingRuleV2 = {
@@ -115,7 +120,10 @@ function validateFormData(data: FormData): { field: string; message: string } | 
     const min = parseFloat(data.minRateCap);
     const max = parseFloat(data.maxRateCap);
     if (max < min) {
-      return { field: "maxRateCap", message: "Max rate cap must be greater than or equal to min rate cap" };
+      return {
+        field: "maxRateCap",
+        message: "Max rate cap must be greater than or equal to min rate cap",
+      };
     }
   }
 
@@ -204,8 +212,13 @@ export default function PricingRulesV2Page() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Parameters<typeof apiClient.updatePricingRuleV2>[1] }) =>
-      apiClient.updatePricingRuleV2(id, data, campgroundId!),
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Parameters<typeof apiClient.updatePricingRuleV2>[1];
+    }) => apiClient.updatePricingRuleV2(id, data, campgroundId!),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["pricing-rules-v2", campgroundId] });
       closeModal();
@@ -233,9 +246,10 @@ export default function PricingRulesV2Page() {
       priority: rule.priority,
       stackMode: rule.stackMode,
       adjustmentType: rule.adjustmentType,
-      adjustmentValue: rule.adjustmentType === "percent"
-        ? String(rule.adjustmentValue * 100)
-        : String(rule.adjustmentValue / 100),
+      adjustmentValue:
+        rule.adjustmentType === "percent"
+          ? String(rule.adjustmentValue * 100)
+          : String(rule.adjustmentValue / 100),
       siteClassId: rule.siteClassId || "",
       dowMask: rule.dowMask || [],
       startDate: rule.startDate?.split("T")[0] || "",
@@ -267,9 +281,10 @@ export default function PricingRulesV2Page() {
       priority: data.priority,
       stackMode: data.stackMode,
       adjustmentType: data.adjustmentType,
-      adjustmentValue: data.adjustmentType === "percent"
-        ? parseFloat(data.adjustmentValue) / 100
-        : parseFloat(data.adjustmentValue) * 100,
+      adjustmentValue:
+        data.adjustmentType === "percent"
+          ? parseFloat(data.adjustmentValue) / 100
+          : parseFloat(data.adjustmentValue) * 100,
       siteClassId: data.siteClassId || null,
       dowMask: data.dowMask && data.dowMask.length > 0 ? data.dowMask : undefined,
       startDate: data.startDate || null,
@@ -328,54 +343,58 @@ export default function PricingRulesV2Page() {
 
   return (
     <div className="space-y-6">
-        <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dynamic Pricing Rules</h1>
+          <p className="text-muted-foreground">
+            Configure advanced pricing adjustments for seasons, weekends, holidays, events, and
+            demand.
+          </p>
+        </div>
+        <Button onClick={openCreateModal}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Rule
+        </Button>
+      </div>
+
+      <PageOnboardingHint
+        id="pricing-rules-intro"
+        title="Dynamic Pricing Made Easy"
+        content={
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Dynamic Pricing Rules</h1>
-            <p className="text-muted-foreground">
-              Configure advanced pricing adjustments for seasons, weekends, holidays, events, and demand.
+            <p className="mb-2">
+              Use pricing rules to automatically adjust rates based on demand, seasons, and special
+              events.
             </p>
+            <ul className="list-disc list-inside space-y-1 text-sm">
+              <li>Rules run in priority order (lower numbers first)</li>
+              <li>Choose how rules stack: add together, use highest, or override</li>
+              <li>Set minimum and maximum rate caps to prevent extreme prices</li>
+              <li>Enable/disable rules without deleting them</li>
+            </ul>
           </div>
-          <Button onClick={openCreateModal}>
+        }
+      />
+
+      {rulesQuery.isLoading ? (
+        <div className="text-center py-12 text-muted-foreground">Loading...</div>
+      ) : rulesQuery.data?.length === 0 ? (
+        <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
+          <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold text-foreground">No pricing rules yet</h3>
+          <p className="mt-2 text-muted-foreground">
+            Create dynamic pricing rules to adjust rates based on seasons, demand, and more.
+          </p>
+          <Button className="mt-4" onClick={openCreateModal}>
             <Plus className="h-4 w-4 mr-2" />
-            Add Rule
+            Create First Rule
           </Button>
         </div>
-
-        <PageOnboardingHint
-          id="pricing-rules-intro"
-          title="Dynamic Pricing Made Easy"
-          content={
-            <div>
-              <p className="mb-2">
-                Use pricing rules to automatically adjust rates based on demand, seasons, and special events.
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                <li>Rules run in priority order (lower numbers first)</li>
-                <li>Choose how rules stack: add together, use highest, or override</li>
-                <li>Set minimum and maximum rate caps to prevent extreme prices</li>
-                <li>Enable/disable rules without deleting them</li>
-              </ul>
-            </div>
-          }
-        />
-
-        {rulesQuery.isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
-        ) : rulesQuery.data?.length === 0 ? (
-          <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
-            <TrendingUp className="mx-auto h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold text-foreground">No pricing rules yet</h3>
-            <p className="mt-2 text-muted-foreground">
-              Create dynamic pricing rules to adjust rates based on seasons, demand, and more.
-            </p>
-            <Button className="mt-4" onClick={openCreateModal}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create First Rule
-            </Button>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {rulesQuery.data?.sort((a, b) => a.priority - b.priority).map((rule) => {
+      ) : (
+        <div className="grid gap-4">
+          {rulesQuery.data
+            ?.sort((a, b) => a.priority - b.priority)
+            .map((rule) => {
               const TypeIcon = ruleTypeLabels[rule.type]?.icon || Calendar;
               return (
                 <div
@@ -384,7 +403,9 @@ export default function PricingRulesV2Page() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${rule.active ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"}`}>
+                      <div
+                        className={`p-2 rounded-lg ${rule.active ? "bg-status-success/15 text-status-success" : "bg-muted text-muted-foreground"}`}
+                      >
                         <TypeIcon className="h-5 w-5" />
                       </div>
                       <div>
@@ -400,7 +421,9 @@ export default function PricingRulesV2Page() {
                           )}
                         </div>
                         <div className="mt-1 text-sm text-muted-foreground">
-                          <span className="font-medium text-foreground">{formatAdjustment(rule)}</span>
+                          <span className="font-medium text-foreground">
+                            {formatAdjustment(rule)}
+                          </span>
                           {" • "}
                           {ruleTypeLabels[rule.type]?.label}
                           {" • "}
@@ -409,7 +432,11 @@ export default function PricingRulesV2Page() {
                         <div className="mt-1 text-xs text-muted-foreground">
                           {getSiteClassName(rule.siteClassId)}
                           {rule.startDate && rule.endDate && (
-                            <> • {new Date(rule.startDate).toLocaleDateString()} - {new Date(rule.endDate).toLocaleDateString()}</>
+                            <>
+                              {" "}
+                              • {new Date(rule.startDate).toLocaleDateString()} -{" "}
+                              {new Date(rule.endDate).toLocaleDateString()}
+                            </>
                           )}
                           {rule.dowMask && rule.dowMask.length > 0 && (
                             <> • {rule.dowMask.map((d) => daysOfWeek[d]).join(", ")}</>
@@ -434,8 +461,8 @@ export default function PricingRulesV2Page() {
                 </div>
               );
             })}
-          </div>
-        )}
+        </div>
+      )}
 
       {/* Modal */}
       {isModalOpen && (
@@ -487,7 +514,8 @@ export default function PricingRulesV2Page() {
                             Rules are evaluated in priority order, with lower numbers running first.
                           </HelpTooltipSection>
                           <HelpTooltipSection title="Example">
-                            A rule with priority 1 runs before priority 10. If both apply to the same date, the stacking mode determines the final price.
+                            A rule with priority 1 runs before priority 10. If both apply to the
+                            same date, the stacking mode determines the final price.
                           </HelpTooltipSection>
                           <HelpTooltipSection title="Tip">
                             Use priorities like 10, 20, 30 to leave room for future rules.
@@ -516,16 +544,20 @@ export default function PricingRulesV2Page() {
                     content={
                       <HelpTooltipContent>
                         <HelpTooltipSection>
-                          When multiple rules apply to the same date, the stacking mode controls how they combine:
+                          When multiple rules apply to the same date, the stacking mode controls how
+                          they combine:
                         </HelpTooltipSection>
                         <HelpTooltipSection title="Additive">
-                          Add this adjustment to the base rate plus any other additive rules. Great for combining seasonal and weekend pricing.
+                          Add this adjustment to the base rate plus any other additive rules. Great
+                          for combining seasonal and weekend pricing.
                         </HelpTooltipSection>
                         <HelpTooltipSection title="Max">
-                          Use the highest adjustment among all rules. Prevents over-discounting or over-pricing.
+                          Use the highest adjustment among all rules. Prevents over-discounting or
+                          over-pricing.
                         </HelpTooltipSection>
                         <HelpTooltipSection title="Override">
-                          Ignore all other rules and use only this adjustment. Perfect for special events with fixed pricing.
+                          Ignore all other rules and use only this adjustment. Perfect for special
+                          events with fixed pricing.
                         </HelpTooltipSection>
                       </HelpTooltipContent>
                     }
@@ -555,7 +587,9 @@ export default function PricingRulesV2Page() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="block text-sm font-medium text-foreground mb-1">Adjustment Type</Label>
+                  <Label className="block text-sm font-medium text-foreground mb-1">
+                    Adjustment Type
+                  </Label>
                   <Controller
                     name="adjustmentType"
                     control={control}
@@ -591,7 +625,9 @@ export default function PricingRulesV2Page() {
                   render={({ field }) => (
                     <Select
                       value={field.value || EMPTY_SELECT_VALUE}
-                      onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)}
+                      onValueChange={(value) =>
+                        field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)
+                      }
                     >
                       <SelectTrigger className="w-full text-sm">
                         <SelectValue />
@@ -611,7 +647,9 @@ export default function PricingRulesV2Page() {
 
               {formData.type === "weekend" && (
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Days of Week</label>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Days of Week
+                  </label>
                   <div className="flex gap-2">
                     {daysOfWeek.map((day, idx) => (
                       <button
@@ -631,7 +669,9 @@ export default function PricingRulesV2Page() {
                 </div>
               )}
 
-              {(formData.type === "season" || formData.type === "holiday" || formData.type === "event") && (
+              {(formData.type === "season" ||
+                formData.type === "holiday" ||
+                formData.type === "event") && (
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     label="Start Date"
@@ -653,13 +693,21 @@ export default function PricingRulesV2Page() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-foreground">Min Rate Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">
+                      Min Rate Cap ($)
+                    </label>
                     <HelpTooltip
                       title="Minimum Rate"
                       content={
                         <div className="space-y-2">
-                          <p>Set a floor price to prevent rates from going too low, even with discounts.</p>
-                          <p className="text-xs text-muted-foreground">Example: If your base rate is $50 and you have a -30% discount, a $40 minimum cap ensures the price never goes below $40.</p>
+                          <p>
+                            Set a floor price to prevent rates from going too low, even with
+                            discounts.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Example: If your base rate is $50 and you have a -30% discount, a $40
+                            minimum cap ensures the price never goes below $40.
+                          </p>
                         </div>
                       }
                       side="top"
@@ -678,13 +726,21 @@ export default function PricingRulesV2Page() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <label className="block text-sm font-medium text-foreground">Max Rate Cap ($)</label>
+                    <label className="block text-sm font-medium text-foreground">
+                      Max Rate Cap ($)
+                    </label>
                     <HelpTooltip
                       title="Maximum Rate"
                       content={
                         <div className="space-y-2">
-                          <p>Set a ceiling price to prevent rates from going too high, even with markups.</p>
-                          <p className="text-xs text-muted-foreground">Example: If your base rate is $50 and you have a +50% markup, a $70 maximum cap ensures the price never exceeds $70.</p>
+                          <p>
+                            Set a ceiling price to prevent rates from going too high, even with
+                            markups.
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Example: If your base rate is $50 and you have a +50% markup, a $70
+                            maximum cap ensures the price never exceeds $70.
+                          </p>
                         </div>
                       }
                       side="top"
@@ -715,7 +771,9 @@ export default function PricingRulesV2Page() {
                     />
                   )}
                 />
-                <Label htmlFor="active" className="text-sm text-foreground">Active</Label>
+                <Label htmlFor="active" className="text-sm text-foreground">
+                  Active
+                </Label>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">
@@ -724,13 +782,17 @@ export default function PricingRulesV2Page() {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={(!isDirty && !editingRule) || createMutation.isPending || updateMutation.isPending}
+                  disabled={
+                    (!isDirty && !editingRule) ||
+                    createMutation.isPending ||
+                    updateMutation.isPending
+                  }
                 >
                   {createMutation.isPending || updateMutation.isPending
                     ? "Saving..."
                     : editingRule
-                    ? "Save Changes"
-                    : "Create Rule"}
+                      ? "Save Changes"
+                      : "Create Rule"}
                 </Button>
               </div>
             </form>
@@ -738,7 +800,10 @@ export default function PricingRulesV2Page() {
         </div>
       )}
 
-      <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
+      <AlertDialog
+        open={!!deleteConfirmId}
+        onOpenChange={(open) => !open && setDeleteConfirmId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Pricing Rule</AlertDialogTitle>
@@ -748,10 +813,7 @@ export default function PricingRulesV2Page() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDeleteRule}
-              className="bg-red-600 hover:bg-red-700"
-            >
+            <AlertDialogAction onClick={confirmDeleteRule} className="bg-red-600 hover:bg-red-700">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -40,12 +40,14 @@ Railway Project: Campreserv
 **Symptoms:** Build keeps restarting, never completes
 
 **Causes:**
+
 1. Watch paths triggering on build output
 2. Health check failing repeatedly
 3. Memory exhaustion during build
 4. Circular dependency in build
 
 **Solutions:**
+
 ```toml
 # railway.toml - Add watch paths to prevent loops
 [build]
@@ -64,6 +66,7 @@ watchPatterns = ["platform/apps/web/**"]
 **Symptoms:** Builds not picking up changes, stale dependencies
 
 **Solutions:**
+
 ```bash
 # Force rebuild without cache (via Railway dashboard)
 # Or use CI/CD with --no-cache flag
@@ -75,6 +78,7 @@ RUN npm ci
 ```
 
 **Better approach - layer ordering:**
+
 ```dockerfile
 # Copy package files first (cached unless they change)
 COPY package.json pnpm-lock.yaml ./
@@ -88,6 +92,7 @@ RUN pnpm build
 ### "Application Failed to Respond" (502)
 
 **Check:**
+
 1. App listening on `0.0.0.0:$PORT` not `localhost`
 2. Target port matches actual listening port
 3. Health check path returns 200
@@ -100,6 +105,7 @@ next start -p ${PORT:-3000} -H 0.0.0.0
 ### Build Memory Issues
 
 **Solutions:**
+
 ```toml
 # railway.toml
 [build]
@@ -108,6 +114,7 @@ nixpacksPlan = { phases = { build = { cmds = ["NODE_OPTIONS=--max-old-space-size
 ```
 
 Or in Dockerfile:
+
 ```dockerfile
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN pnpm build
@@ -115,7 +122,7 @@ RUN pnpm build
 
 ### Private Networking Issues
 
-**"ENOTFOUND *.railway.internal"**
+**"ENOTFOUND \*.railway.internal"**
 
 Private networking is NOT available during build. Only use at runtime.
 
@@ -176,6 +183,7 @@ Before deploying:
 ## Config File Reference
 
 ### railway.api.toml
+
 ```toml
 [build]
 builder = "dockerfile"
@@ -188,6 +196,7 @@ restartPolicyType = "on-failure"
 ```
 
 ### railway.web.toml
+
 ```toml
 [build]
 builder = "dockerfile"
@@ -211,6 +220,7 @@ restartPolicyType = "on-failure"
 ## Environment Variables
 
 ### Required for API
+
 ```
 DATABASE_URL=postgresql://...
 JWT_SECRET=...
@@ -219,6 +229,7 @@ PORT=8080 (Railway provides this)
 ```
 
 ### Required for Web
+
 ```
 NEXT_PUBLIC_API_BASE=https://api.keeprstay.com
 NEXTAUTH_URL=https://keeprstay.com
@@ -228,12 +239,14 @@ NEXTAUTH_SECRET=...
 ## Performance Optimization
 
 ### Faster Deploys
+
 1. Use multi-stage Dockerfiles
 2. Order layers: dependencies → source → build
 3. Use `.dockerignore` aggressively
 4. Pre-build images in CI/CD
 
 ### Cost Optimization
+
 1. Use private networking (zero egress)
 2. Enable App Sleep for staging
 3. Set resource limits
@@ -248,6 +261,7 @@ NEXTAUTH_SECRET=...
 5. Click "Rollback"
 
 Or via CLI:
+
 ```bash
 railway redeploy  # Rebuilds from same commit
 ```
@@ -255,6 +269,7 @@ railway redeploy  # Rebuilds from same commit
 ## When to Escalate
 
 Contact Railway support if:
+
 - Builds stuck for >15 minutes
 - Dashboard not reflecting config changes
 - Mysterious 502s with correct config

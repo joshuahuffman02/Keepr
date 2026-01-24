@@ -75,13 +75,11 @@ export default function DemoPreviewPage() {
             Preview Mode
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Explore Keepr
-          </h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Explore Keepr</h1>
 
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Browse key features and screens without signing up.
-            Ready for hands-on access? Get full demo credentials in seconds.
+            Browse key features and screens without signing up. Ready for hands-on access? Get full
+            demo credentials in seconds.
           </p>
 
           <Button
@@ -101,12 +99,8 @@ export default function DemoPreviewPage() {
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">
-              Feature Previews
-            </h2>
-            <p className="text-lg text-slate-600">
-              Click any screen to see it in detail
-            </p>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Feature Previews</h2>
+            <p className="text-lg text-slate-600">Click any screen to see it in detail</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -153,8 +147,8 @@ export default function DemoPreviewPage() {
             <span className="text-lg font-semibold">Want hands-on access?</span>
           </div>
           <p className="text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
-            Get full demo credentials to create reservations, modify rates,
-            and explore every feature. Takes 30 seconds.
+            Get full demo credentials to create reservations, modify rates, and explore every
+            feature. Takes 30 seconds.
           </p>
           <Button
             asChild
