@@ -432,12 +432,30 @@ export class CampgroundsService {
   }
 
   // Public campgrounds (published only)
-  async listPublic() {
+  async listPublic(options?: { limit?: number; cursor?: { createdAt: Date; id: string } }) {
+    const limit = Math.max(1, Math.min(options?.limit ?? 1000, 1000));
+    const cursor = options?.cursor;
+    const cursorFilter = cursor
+      ? {
+          OR: [
+            { createdAt: { gt: cursor.createdAt } },
+            { createdAt: cursor.createdAt, id: { gt: cursor.id } },
+          ],
+        }
+      : undefined;
+
     // Fetch campgrounds with historical awards
     const campgrounds = await this.prisma.campground.findMany({
-      where: { OR: [{ isPublished: true }, { isExternal: true }] },
+      where: {
+        deletedAt: null,
+        OR: [{ isPublished: true }, { isExternal: true }],
+        AND: cursorFilter ? [cursorFilter] : undefined,
+      },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      take: limit,
       select: {
         id: true,
+        createdAt: true,
         name: true,
         slug: true,
         city: true,
@@ -482,17 +500,17 @@ export class CampgroundsService {
     const statsById = new Map(stats.map((stat) => [stat.campgroundId, stat]));
 
     // Combine data
-    return campgrounds.map((cg) => {
+    const results = campgrounds.map((cg) => {
       const stat = statsById.get(cg.id);
+      const { CampgroundAward, createdAt: _createdAt, ...rest } = cg;
 
       // Get past Campground of the Year awards
-      const pastAwards = cg.CampgroundAward.filter((a) => a.year < new Date().getFullYear()).map(
+      const pastAwards = CampgroundAward.filter((a) => a.year < new Date().getFullYear()).map(
         (a) => ({ year: a.year, npsScore: a.npsScore }),
       );
 
       return {
-        ...cg,
-        CampgroundAward: undefined, // Remove raw data
+        ...rest,
         npsScore: stat?.npsScore ?? null,
         npsResponseCount: stat?.npsResponseCount ?? 0,
         npsRank: stat?.npsRank ?? null,
@@ -507,6 +525,14 @@ export class CampgroundsService {
         pastCampgroundOfYearAwards: pastAwards,
       };
     });
+
+    const last = campgrounds.at(-1);
+    const nextCursor =
+      last && campgrounds.length === limit
+        ? { createdAt: last.createdAt.toISOString(), id: last.id }
+        : null;
+
+    return { results, nextCursor };
   }
 
   async refreshPublicCampgroundStats() {

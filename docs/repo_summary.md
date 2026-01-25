@@ -38,10 +38,13 @@ Keepr is a pnpm 9.15.9 workspace that pairs a NestJS API (`platform/apps/api`) w
 - `platform/apps/api/.env` needs `PLATFORM_DATABASE_URL`, optional `PLATFORM_REDIS_URL`, `JWT_SECRET`, and optional `OTEL_ENABLED`/`OTEL_EXPORTER_OTLP_ENDPOINT` for API + Rust tracing.
 - `platform/apps/web/.env` sets `NEXT_PUBLIC_API_BASE`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, and optional `OTEL_ENABLED`/`OTEL_EXPORTER_OTLP_ENDPOINT` for tracing.
 - Copy `.env.example` files in each app directory before running dev or build commands; secrets should live outside the repo.
+- Supabase project: https://supabase.com/dashboard/project/qmtfiytfdclikdkdaqvi
 
 ## Reference Notes
 
 - Prisma seeds live alongside migrations under `platform/apps/api/prisma`; seeds must be executed manually (`pnpm --dir platform/apps/api prisma:seed`).
+- Prisma migrations run inside transactions; any `CREATE INDEX CONCURRENTLY` statements must be executed manually and documented (see migration notes in `platform/apps/api/prisma/migrations/*`).
+- Swagger/OpenAPI: the unused public campgrounds search handler is intentionally hidden from Swagger to avoid collisions with the list endpoint; keep it hidden unless you move it to a distinct path (for example, `/public/campgrounds/search`) and document it separately.
 - Shared UI and logic should avoid `any` and type assertions due to web ESLint; `scripts/check-no-any-no-assert.js` catches violations.
 - Use this document as the first-read reference before consulting deeper guides such as `docs/DEVELOPER_WORKFLOW.md` or service-specific runbooks.
 

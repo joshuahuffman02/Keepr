@@ -13,6 +13,7 @@ import {
   BadRequestException,
   Query,
 } from "@nestjs/common";
+import { ApiOkResponse, ApiQuery } from "@nestjs/swagger";
 import { CampgroundsService } from "./campgrounds.service";
 import { CreateCampgroundDto } from "./dto/create-campground.dto";
 import type { Request } from "express";
@@ -28,6 +29,7 @@ import { DepositConfigSchema, DepositRule } from "@keepr/shared";
 import type { DepositConfig } from "@keepr/shared";
 import type { AuthUser } from "../auth/auth.types";
 import { PrismaService } from "../prisma/prisma.service";
+import { PublicCampgroundListResponseDto } from "./dto/public-campground-list.dto";
 
 type CampgroundsRequest = Request & {
   user?: AuthUser;
@@ -43,8 +45,52 @@ export class CampgroundsController {
 
   // Public endpoints (no auth required)
   @Get("public/campgrounds")
-  listPublic() {
-    return this.campgrounds.listPublic();
+  @ApiOkResponse({ type: PublicCampgroundListResponseDto })
+  @ApiQuery({
+    name: "limit",
+    required: false,
+    description: "Page size for keyset pagination.",
+  })
+  @ApiQuery({
+    name: "cursorCreatedAt",
+    required: false,
+    description: "ISO-8601 cursor timestamp from the previous page.",
+  })
+  @ApiQuery({
+    name: "cursorId",
+    required: false,
+    description: "Cursor id from the previous page.",
+  })
+  listPublic(
+    @Query("limit") limit?: string,
+    @Query("cursorCreatedAt") cursorCreatedAt?: string,
+    @Query("cursorId") cursorId?: string,
+  ) {
+    const parsedLimit = limit ? parseInt(limit, 10) : undefined;
+    if (parsedLimit !== undefined && (Number.isNaN(parsedLimit) || parsedLimit <= 0)) {
+      throw new BadRequestException("limit must be a positive integer");
+    }
+
+    if ((cursorCreatedAt && !cursorId) || (!cursorCreatedAt && cursorId)) {
+      throw new BadRequestException("cursorCreatedAt and cursorId must be provided together");
+    }
+
+    const cursor =
+      cursorCreatedAt && cursorId
+        ? {
+            createdAt: new Date(cursorCreatedAt),
+            id: cursorId,
+          }
+        : undefined;
+
+    if (cursor?.createdAt && Number.isNaN(cursor.createdAt.getTime())) {
+      throw new BadRequestException("cursorCreatedAt must be a valid ISO date string");
+    }
+
+    return this.campgrounds.listPublic({
+      limit: parsedLimit,
+      cursor,
+    });
   }
 
   @Get("public/campgrounds/:slug")

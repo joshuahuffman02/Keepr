@@ -5420,19 +5420,50 @@ export const apiClient = {
 
   // Public API methods (no auth required)
   async getPublicCampgrounds(options?: { limit?: number }) {
-    const params = new URLSearchParams();
-    // Default to a high limit to fetch all campgrounds including external/RIDB ones
-    if (options?.limit) params.set("limit", String(options.limit));
-    else params.set("limit", "1000"); // Fetch up to 1000 campgrounds by default
+    const maxResults = options?.limit ?? null;
+    const pageSize = Math.max(1, Math.min(options?.limit ?? 1000, 1000));
+    const allResults: unknown[] = [];
+    let cursor: { createdAt: string; id: string } | null = null;
 
-    const query = params.toString();
-    const data = await fetchJSONUnknown(`/public/campgrounds${query ? `?${query}` : ""}`);
-    // Handle both array response and {results, total} response for backwards compatibility
-    const parsed = z
-      .union([z.array(z.unknown()), z.object({ results: z.array(z.unknown()) })])
-      .parse(data);
-    const results = Array.isArray(parsed) ? parsed : parsed.results;
-    return PublicCampgroundListSchema.parse(results);
+    while (true) {
+      const params = new URLSearchParams();
+      params.set("limit", String(pageSize));
+      if (cursor) {
+        params.set("cursorCreatedAt", cursor.createdAt);
+        params.set("cursorId", cursor.id);
+      }
+
+      const query = params.toString();
+      const data = await fetchJSONUnknown(`/public/campgrounds${query ? `?${query}` : ""}`);
+      const parsed = z
+        .union([
+          z.array(z.unknown()),
+          z.object({
+            results: z.array(z.unknown()),
+            nextCursor: z
+              .object({ createdAt: z.string(), id: z.string() })
+              .nullable()
+              .optional(),
+          }),
+        ])
+        .parse(data);
+
+      const pageResults = Array.isArray(parsed) ? parsed : parsed.results;
+      allResults.push(...pageResults);
+
+      if (maxResults !== null && allResults.length >= maxResults) {
+        return PublicCampgroundListSchema.parse(allResults.slice(0, maxResults));
+      }
+
+      const nextCursor = Array.isArray(parsed) ? null : parsed.nextCursor ?? null;
+      if (!nextCursor || pageResults.length < pageSize) {
+        break;
+      }
+
+      cursor = nextCursor;
+    }
+
+    return PublicCampgroundListSchema.parse(allResults);
   },
   async searchPublicEvents(params?: {
     state?: string;

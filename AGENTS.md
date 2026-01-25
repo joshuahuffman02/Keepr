@@ -82,3 +82,45 @@
 
 - Missing guardrails: no repo-level guidance on where MCP tool configs should live (global vs repo), which Chrome Developer MCP package/version to pin, or how to verify MCP tools are installed correctly.
 - Missing guardrails: no guidance on handling network-restricted installs (approved mirrors, offline cache strategy), which affects MCP setup in sandboxed runs.
+
+## Codex guardrails summary (2026-01-25)
+
+- Missing guardrails: no guidance for Supabase MCP auth fallbacks (OAuth vs bearer token), including where Supabase CLI stores tokens (Keychain vs `~/.supabase/access-token`) and how to safely load them.
+- Missing guardrails: no explicit instruction on when to restart Codex after MCP config changes to avoid stale server registry.
+
+## Codex failure notes (2026-01-25)
+
+- Failure: Supabase MCP `list_mcp_resources` kept failing with `SUPABASE_ACCESS_TOKEN` missing even after updating config and Keychain.
+- Why: Codex MCP server registry appears to cache env/config per session; changes in `~/.codex/config.toml` or launchctl env are not picked up without a full Codex restart.
+- Avoidance: When MCP auth or headers are changed, restart Codex before validating. Prefer bearer token in `http_headers` only for temporary debugging, then remove and use env var once the restart is done.
+
+## Codex guardrails summary (2026-01-25, addendum)
+
+- Missing guardrails: no explicit guidance on prioritizing OAuth vs bearer token for MCP auth and how to detect which one is active (`codex mcp list` output semantics).
+
+## Codex guardrails summary (2026-01-25, addendum 2)
+
+- Missing guardrails: no repo-level guidance for when to replace OFFSET pagination with keyset pagination (cursor fields, stability guarantees, and API contracts).
+- Missing guardrails: no standard for adding partial indexes in production (naming, WHERE clause conventions, and rollout/rollback notes).
+- Missing guardrails: no guidance on when it is safe to run VACUUM (ANALYZE) against production tables (scheduling and impact expectations).
+
+## Codex guardrails summary (2026-01-25, addendum 3)
+
+- Missing guardrails: no standard for documenting and hiding Swagger endpoints that overlap with public API paths (when to hide vs split into new routes).
+
+## Codex guardrails summary (2026-02-02)
+
+- Missing guardrails: no explicit checklist for when to regenerate OpenAPI specs after controller/DTO changes and how to validate SDK types stay in sync.
+- Missing guardrails: no guidance on where to document Swagger exclusions so future audits do not re-expose hidden routes.
+
+## Codex prompt snippet (2026-01-25)
+
+```
+Do both, and keep the search endpoint hidden.
+```
+
+## Codex prompt snippet (2026-02-02)
+
+```
+Added the prompt snippet and a new guardrail addendum in AGENTS.md, and documented the Swagger hide decision in docs/repo_summary.md so future audits don’t re‑expose the hidden public campgrounds search endpoint.
+```

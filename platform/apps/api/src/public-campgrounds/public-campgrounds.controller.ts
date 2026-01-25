@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query, NotFoundException } from "@nestjs/common";
+import { ApiExcludeEndpoint } from "@nestjs/swagger";
 import { PublicCampgroundsService, CampgroundSearchOptions } from "./public-campgrounds.service";
 import { CampgroundClaimStatus } from "@prisma/client";
 
@@ -46,6 +47,7 @@ export class PublicCampgroundsController {
    * Search campgrounds with filters
    */
   @Get()
+  @ApiExcludeEndpoint()
   async searchCampgrounds(
     @Query("state") state?: string,
     @Query("city") city?: string,
