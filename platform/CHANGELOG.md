@@ -12,6 +12,7 @@
 
 - Finalize campground onboarding launch by setting bookability and ensuring an owner membership is present.
 - Stabilize toolchain and tests by cleaning Jest config, closing test modules, and standardizing Prisma client imports.
+- Precompute public campground NPS rankings nightly and serve `/public/campgrounds` from snapshot stats to avoid heavy NPS aggregation.
 - Clear and unref synthetic check and job queue timeout timers to reduce lingering test handles.
 - Run API Jest tests in-band by default; set `JEST_RUN_IN_BAND=false` and/or `JEST_MAX_WORKERS` to override, plus undici teardown/debug hooks to prevent worker exit warnings.
 - Disable Turbo test task caching/outputs to prevent missing-output warnings in test pipelines.
@@ -268,6 +269,9 @@ POSTMARK_SERVER_TOKEN=  # Alternative to SMTP
 
 # Waitlist
 WAITLIST_NOTIFY_COOLDOWN_HOURS=6
+
+# Public campgrounds
+PUBLIC_STATS_CRON_ENABLED=true
 ```
 
 ### Migration

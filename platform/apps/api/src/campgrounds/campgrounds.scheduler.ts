@@ -24,4 +24,18 @@ export class CampgroundsIngestScheduler {
       this.logger.error(`OSM ingest failed: ${message}`);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM, { name: "public-campground-stats" })
+  async handlePublicStatsRefresh() {
+    if (process.env.PUBLIC_STATS_CRON_ENABLED !== "true") return;
+    try {
+      const result = await this.campgrounds.refreshPublicCampgroundStats();
+      this.logger.log(
+        `Public stats refresh completed: processed=${result.processed}, withNps=${result.withNps}`,
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.error(`Public stats refresh failed: ${message}`);
+    }
+  }
 }

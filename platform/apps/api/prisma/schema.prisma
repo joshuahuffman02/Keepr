@@ -1754,6 +1754,7 @@ model Campground {
   ProductExternalMapping                                         ProductExternalMapping[]
   Promotion                                                      Promotion[]
   PublicLead                                                     PublicLead[]
+  PublicCampgroundStats                                          PublicCampgroundStats?
   PushNotification                                               PushNotification[]
   PushSubscription                                               PushSubscription[]
   QRCode                                                         QRCode[]
@@ -1826,6 +1827,29 @@ model Campground {
   @@index([latitude, longitude])
   @@index([seededDataSource, seededDataSourceId])
   @@index([state, city])
+}
+
+model PublicCampgroundStats {
+  campgroundId      String     @id
+  npsScore          Int?
+  npsResponseCount  Int        @default(0)
+  npsRank           Int?
+  npsPercentile     Float?
+  npsImprovement    Int?
+  isWorldClassNps   Boolean    @default(false)
+  isTopCampground   Boolean    @default(false)
+  isTop1PercentNps  Boolean    @default(false)
+  isTop5PercentNps  Boolean    @default(false)
+  isTop10PercentNps Boolean    @default(false)
+  isRisingStar      Boolean    @default(false)
+  periodStart       DateTime
+  periodEnd         DateTime
+  previousPeriodStart DateTime
+  previousPeriodEnd DateTime
+  calculatedAt      DateTime   @default(now())
+  Campground        Campground @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+
+  @@index([calculatedAt])
 }
 
 model CampgroundAttraction {
