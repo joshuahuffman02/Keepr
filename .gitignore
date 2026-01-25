@@ -26,6 +26,7 @@ tmp/
 temp/
 .ralph/
 target/
+supabase/
 
 # Env
 .env
